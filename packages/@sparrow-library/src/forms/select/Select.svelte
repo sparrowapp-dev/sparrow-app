@@ -30,6 +30,7 @@
     hide?: boolean;
     disabled?: boolean;
     display?: string;
+    icon?: GitBranchIcon;
   }>;
 
   export let iconColor = "grey";
@@ -282,7 +283,6 @@
     e.stopPropagation();
     searchData = headerSearchValue;
   };
-
   $: {
     if (titleId) {
       data.forEach((element) => {
@@ -290,6 +290,9 @@
           selectedRequest = element;
         }
       });
+    } else {
+      // Clear selectedRequest when titleId is empty or null
+      selectedRequest = false;
     }
   }
 
@@ -484,7 +487,7 @@
                 ? 'var(--text-ds-neutral-100)'
                 : 'var(--text-ds-neutral-400)'}"
             >
-              {placeholderText}
+              {placeholderText || ""}
             </span>
           {:else if isHeaderCombined}
             <div class="d-flex ellipsis select-combined-wrapper">
@@ -512,7 +515,7 @@
                 ? "opacity: 0.5 !important"
                 : ""}
             >
-              {selectedRequest?.name}
+              {selectedRequest?.name || ""}
             </span>
           {/if}
         </p>
@@ -534,9 +537,7 @@
       : 'position-absolute'} {selectBodyBackgroundClass} border-radius-2 {selectBodyBackgroundShadow}
     {isOpen ? 'visible' : 'invisible'}"
     style="
-    {isOpen
-      ? 'opacity: 1; transform: scale(1);'
-      : 'opacity: 0; transform: scale(0.8);'}
+    {isOpen ? 'opacity: 1;' : 'opacity: 0;'}
     min-width:{minBodyWidth}; 
     left: {position === 'fixed'
       ? bodyAlignment === 'right'
@@ -927,5 +928,25 @@
 
   .select-body-shadow {
     box-shadow: inset 0px 16px 32px 0px rgba(0, 0, 0, 0.3);
+  }
+  .select-data {
+    opacity: 0;
+    transform: translateY(6px);
+    will-change: opacity, transform;
+    overflow: hidden;
+  }
+  .select-data.visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+      opacity 200ms ease-in,
+      transform 200ms ease-in;
+  }
+  .select-data.invisible {
+    opacity: 0;
+    transform: translateY(4px);
+    transition:
+      opacity 300ms ease-out,
+      transform 300ms ease-out;
   }
 </style>

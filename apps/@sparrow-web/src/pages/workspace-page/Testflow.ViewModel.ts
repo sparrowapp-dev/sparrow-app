@@ -8,9 +8,7 @@ import type { TFRxDocumentType } from "../../models/testflow.model";
 import { TFDefaultEnum } from "@sparrow/common/types/workspace/testflow";
 import { TestflowService } from "../../services/testflow.service";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
-import {
-  type Tab,
-} from "@sparrow/common/types/workspace/tab";
+import { type Tab } from "@sparrow/common/types/workspace/tab";
 
 import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
 import {
@@ -20,6 +18,8 @@ import {
 } from "@sparrow/workspaces/stores";
 import constants from "src/constants/constants";
 import { TestflowTabAdapter } from "src/adapter";
+import { WorkspaceType } from "@sparrow/common/enums";
+import { tick } from "svelte";
 
 export class TestflowViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -93,8 +93,8 @@ export class TestflowViewModel {
             collectionId: "",
             requestId: "",
             folderId: "",
-            name:"",
-            method:"",
+            name: "",
+            method: "",
             requestData: null,
           },
           position: { x: 100, y: 200 },
@@ -147,8 +147,10 @@ export class TestflowViewModel {
               requestData: null,
             },
           },
-      ],
-    }, baseUrl);
+        ],
+      },
+      baseUrl,
+    );
     if (response.isSuccessful && response.data.data) {
       const res = response.data.data;
 
@@ -177,9 +179,12 @@ export class TestflowViewModel {
         isFirstTimeInTestFlow.set(false);
       }
       return;
+    } else if (response?.data?.statusCode) {
+      // notifications.error(response?.data?.message);
     } else {
       notifications.error("Failed to create testflow. Please try again.");
     }
+    return response;
   };
 
   /**
@@ -303,7 +308,10 @@ export class TestflowViewModel {
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
       _testflow.workspaceId,
     );
-    const testflowTab = new TestflowTabAdapter().adapt(currentWorkspace._id, _testflow.toMutableJSON());
+    const testflowTab = new TestflowTabAdapter().adapt(
+      currentWorkspace._id,
+      _testflow.toMutableJSON(),
+    );
     this.tabRepository.createTab(testflowTab);
   };
 
@@ -324,50 +332,69 @@ export class TestflowViewModel {
    * @returns
    */
   public refreshTestflow = async (
-    workspaceId: string,
+    workspaceId: string
   ): Promise<{
     testflowTabsToBeDeleted?: string[];
   }> => {
     const guestUser = await this.guestUserRepository.findOne({
       name: "guestUser",
     });
+
     const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
     if (isGuestUser) {
       return {};
     }
+
     const baseUrl = await this.constructBaseUrl(workspaceId);
-    const response = await this.testflowService.fetchAllTestflow(
-      workspaceId,
-      baseUrl,
-    );
-    if (response?.isSuccessful && response?.data?.data) {
-      const testflows = response.data.data;
-      await this.testflowRepository.refreshTestflow(
-        testflows?.map((_testflow: any) => {
-          const testflow = createDeepCopy(_testflow);
-          testflow["workspaceId"] = workspaceId;
-          return testflow;
-        }),
-      );
-      await this.testflowRepository.deleteOrphanTestflows(
+    const workspaceData = await this.workspaceRepository.readWorkspace(workspaceId);
+
+    let response;
+    if (
+      workspaceData &&
+      workspaceData.workspaceType === WorkspaceType.PUBLIC &&
+      workspaceData.isShared
+    ) {
+      response = await this.testflowService.fetchAllPublicTestflow(
         workspaceId,
-        testflows?.map((_testflow: any) => {
-          return _testflow._id;
-        }),
+        constants.API_URL
       );
-      const testflowTabsToBeDeleted =
-        await this.tabRepository.getIdOfTabsThatDoesntExistAtTestflowLevel(
-          workspaceId,
-          testflows?.map((_testflow: any) => {
-            return _testflow._id;
-          }),
-        );
-      return {
-        testflowTabsToBeDeleted,
-      };
+    } else {
+      response = await this.testflowService.fetchAllTestflow(workspaceId, baseUrl);
     }
-    return {};
+
+    if (!response?.isSuccessful || !response?.data?.data) {
+      return {};
+    }
+
+    const testflows = response.data.data;
+    const testflowsWithWorkspaceId: any[] = [];
+    const testflowIds: string[] = [];
+
+    // ✅ Process in chunks to avoid blocking UI
+    const chunkSize = 100;
+    for (let i = 0; i < testflows.length; i += chunkSize) {
+      const chunk = testflows.slice(i, i + chunkSize);
+      for (const tf of chunk) {
+        const copy = createDeepCopy(tf);
+        copy.workspaceId = workspaceId;
+        testflowsWithWorkspaceId.push(copy);
+        testflowIds.push(tf._id);
+      }
+      await new Promise((res) => setTimeout(res)); // Yield to UI
+    }
+
+    await this.testflowRepository.refreshTestflow(testflowsWithWorkspaceId);
+    await this.testflowRepository.deleteOrphanTestflows(workspaceId, testflowIds);
+
+    const testflowTabsToBeDeleted =
+      await this.tabRepository.getIdOfTabsThatDoesntExistAtTestflowLevel(
+        workspaceId,
+        testflowIds
+      );
+
+    return { testflowTabsToBeDeleted };
   };
+
 
   /**
    * @description - saves testflow to the mongo server
@@ -377,8 +404,10 @@ export class TestflowViewModel {
     const activeWorkspace = await this.workspaceRepository.readWorkspace(
       currentTestflow?.path?.workspaceId as string,
     );
-    const unadaptedTestflow = new TestflowTabAdapter().unadapt(currentTestflow as Tab); // Adapt the testflow tab
-    
+    const unadaptedTestflow = new TestflowTabAdapter().unadapt(
+      currentTestflow as Tab,
+    ); // Adapt the testflow tab
+
     const guestUser = await this.guestUserRepository.findOne({
       name: "guestUser",
     });
@@ -425,5 +454,11 @@ export class TestflowViewModel {
       }
       return false;
     }
+  };
+
+  public currentTestflowCount = async (workspaceId: string) => {
+    const testflowDetails =
+      await this.testflowRepository.getTestflowByWorkspaceId(workspaceId);
+    return testflowDetails?.length;
   };
 }

@@ -14,6 +14,7 @@
     deleteIcon,
     patchIcon,
     postIcon,
+    BotRegular,
   } from "@sparrow/library/icons";
   import NoResults from "./sub-components/NoResults.svelte";
   import { KeyboardShortcuts } from "@sparrow/library/ui";
@@ -46,11 +47,13 @@
     PATCH: patchIcon,
     SOCKETIO: SocketIoIcon,
     WEBSOCKET: SocketIcon,
+    AI_REQUEST: BotRegular,
   };
   const methodIconsProps = {
     SOCKETIO: "var(--icon-ds-success-300)",
     WEBSOCKET: "var(--icon-ds-primary-400)",
     GRAPHQL: "var(--icon-ds-accent-400)",
+    AI_REQUEST: "var(--icon-ds-secondary-200)",
   };
 
   const getRequestDetails = (request) => {
@@ -73,6 +76,20 @@
         return {
           url: request.tree.websocket?.url || "",
           method: "WEBSOCKET",
+          name: request.tree.name,
+          description: request.tree.description || "",
+        };
+      case "AI_REQUEST":
+        return {
+          url: request.tree.aiRequest?.url || "",
+          method: "AI_REQUEST",
+          name: request.tree.name,
+          description: request.tree.description || "",
+        };
+      case "MOCK_REQUEST":
+        return {
+          url: request.tree.mockRequest?.url || "",
+          method: request.tree.mockRequest?.method || "",
           name: request.tree.name,
           description: request.tree.description || "",
         };
@@ -153,7 +170,7 @@
       icon: StackIcon,
       nav: (item) => handleGlobalSearchEnvironmentNavigation(item),
       getName: (item) => item.title,
-      getPath: (item) => "",
+      getPath: (item) => item.path || "",
     },
     flows: {
       items: filteredTestflows,
@@ -162,7 +179,7 @@
       icon: FlowIcon,
       nav: (item) => handleGlobalSearchTestflowNavgation(item),
       getName: (item) => item.name,
-      getPath: (item) => item.description || "",
+      getPath: (item) => item.path || "",
     },
   };
 

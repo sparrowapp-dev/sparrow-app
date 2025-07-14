@@ -1,6 +1,6 @@
 {
   "name": "@sparrow/common",
-  "version": "2.23.1",
+  "version": "2.28.0",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
@@ -32,6 +32,7 @@
     "./types/workspace": "./src/types/workspace/http-request-tab.ts",
     "./types/workspace/ai-request-tab": "./src/types/workspace/ai-request-tab.ts",
     "./types/workspace/ai-request-base": "./src/types/workspace/ai-request-base.ts",
+    "./types/workspace/ai-request-dto": "./src/types/workspace/ai-request-dto.ts",
     "./types/workspace/collection-base": "./src/types/workspace/collection-base.ts",
     "./types/workspace/collection-tab": "./src/types/workspace/collection-tab.ts",
     "./types/workspace/http-request-base": "./src/types/workspace/http-request-base.ts",
@@ -42,6 +43,7 @@
     "./types/workspace/http-request-mock-tab": "./src/types/workspace/http-request-mock-tab.ts",
     "./types/workspace/http-request-mock-base": "./src/types/workspace/http-request-mock-base.ts",
     "./types/workspace/http-request-mock-dto": "./src/types/workspace/http-request-mock-dto.ts",
+    "./types/workspace/http-response-mock-dto": "./src/types/workspace/http-response-mock-dto.ts",
     "./types/workspace/graphql-request-base": "./src/types/workspace/graphql-request-base.ts",
     "./types/workspace/graphql-request-dto": "./src/types/workspace/graphql-request-dto.ts",
     "./types/workspace/graphql-request-tab": "./src/types/workspace/graphql-request-tab.ts",

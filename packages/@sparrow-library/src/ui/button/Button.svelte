@@ -216,7 +216,7 @@
   {id}
   disabled={disable}
   style={` ${`flex:none; min-width:${buttonSize}px; white-space:nowrap; height: ${buttonSize}px; width: ${customWidth}; border-radius: ${borderRadius}px;`}  `}
-  class={`${buttonClassProp}  
+  class={`smooth-button-transition ${buttonClassProp}  
  py-1 px-${title.length > 0 ? 3 : 1} gap-2 d-flex align-items-center justify-content-center
   ${btnClass}`}
   on:click={(e) => {
@@ -341,7 +341,7 @@
   }
   .custom-btn-outline-secondary:hover {
     background-color: var(--bg-ds-surface-300);
-    border: 0px;
+    border: 1px solid var(--border-ds-surface-300);
     color: var(--text-ds-neutral-50);
   }
   .custom-btn-outline-secondary:focus-visible {
@@ -351,7 +351,7 @@
   }
   .custom-btn-outline-secondary:active {
     background-color: var(--bg-ds-surface-400);
-    border: 0px;
+    border: 1px solid var(--border-ds-surface-400);
     color: var(--text-ds-neutral-50);
   }
   .custom-btn-outline-secondary-disable {
@@ -529,5 +529,8 @@
     background-color: transparent;
     color: var(--text-ds-neutral-500);
     border: 0px;
+  }
+  .smooth-button-transition {
+    transition: all 80ms ease-out;
   }
 </style>

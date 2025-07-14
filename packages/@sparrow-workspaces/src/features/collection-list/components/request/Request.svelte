@@ -5,6 +5,7 @@
   import { Button } from "@sparrow/library/ui";
   import { Tooltip } from "@sparrow/library/ui";
   import { Options } from "@sparrow/library/ui";
+  import { slide } from "svelte/transition";
   import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 
   // ---- Helper functions
@@ -33,7 +34,7 @@
   } from "@sparrow/library/icons";
   import { SavedRequest } from "..";
 
-  let expand = false;
+  export let expand = false;
   /**
    * Callback for Item Deleted
    * @param entityType - type of item to delete like request/folder
@@ -164,19 +165,19 @@
       }
     }
   }
-  $: {
-    if ($openedComponent.has(api.id)) {
-      expand = true;
-    }
-    if (searchData) {
-      expand = true;
-    }
-    // if (activeTabPath) {
-    //   if (activeTabPath.requestId === api.id) {
-    //     expand = true;
-    //   }
-    // }
-  }
+  // $: {
+  //   if ($openedComponent.has(api.id)) {
+  //     expand = true;
+  //   }
+  //   if (searchData) {
+  //     expand = true;
+  //   }
+  // if (activeTabPath) {
+  //   if (activeTabPath.requestId === api.id) {
+  //     expand = true;
+  //   }
+  // }
+  // }
   const dragStop = () => {
     isDragging = false;
   };
@@ -247,7 +248,7 @@
   <Options
     xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
-      requestTabWrapper.getBoundingClientRect().top - 0,
+      requestTabWrapper.getBoundingClientRect().top - 5,
       requestTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={500}
@@ -292,7 +293,6 @@
             : true,
       },
     ]}
-    {noOfColumns}
   />
 {/if}
 
@@ -313,23 +313,32 @@
   <button
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
-    on:click|preventDefault={() => {
-      if (api?.items && api?.items?.length > 0) {
-      } else {
-        expand = false;
-      }
+    on:click|preventDefault|stopPropagation={(e) => {
+      // if (api?.items && api?.items?.length > 0) {
+      // } else {
+      //   expand = false;
+      // }
       if (!isRenaming) {
-        expand = !expand;
-        if (expand) {
-          addCollectionItem(api.id, "Request");
+        // expand = !expand;
+        if (api?.items?.length) {
+          if (expand) {
+            removeCollectionItem(api.id);
+          } else {
+            onItemOpened("request", {
+              workspaceId: collection.workspaceId,
+              collection,
+              folder,
+              request: api,
+            });
+            addCollectionItem(api.id, "Request");
+          }
+        } else {
           onItemOpened("request", {
             workspaceId: collection.workspaceId,
             collection,
             folder,
             request: api,
           });
-        } else {
-          removeCollectionItem(api.id);
         }
       }
     }}
@@ -362,7 +371,12 @@
           type="teritiary-regular"
           onClick={(e) => {
             e.stopPropagation();
-            expand = !expand;
+            // expand = !expand;
+            if (expand) {
+              removeCollectionItem(api.id);
+            } else {
+              addCollectionItem(api.id, "Request");
+            }
           }}
         />
       {:else}
@@ -398,7 +412,7 @@
       />
     {:else}
       <div
-        class="api-name ellipsis {api?.isDeleted && 'api-name-deleted'}"
+        class="api-name ellipsis"
         style={`color: ${api?.items?.length > 0 ? "var(--bg-ds-neutral-50)" : "var(--bg-ds-neutral-200)"}`}
       >
         <p
@@ -451,35 +465,6 @@
       </Tooltip>
     {/if}
   {/if}
-</div>
-<div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
-  <div
-    class="sub-files position-relative"
-    style="background-color: {api.id === activeTabId
-      ? 'var(--bg-ds-surface-600)'
-      : 'transparent'};"
-  >
-    <div
-      class="box-line"
-      style={`left: ${folder?.id ? "55.5px" : "41.1px"}; background-color: ${verticalActiveLine ? "var(--bg-ds-neutral-500)" : "var(--bg-ds-surface-100)"};`}
-    ></div>
-    <!-- {#if } -->
-    {#each api?.items || [] as exp}
-      <div>
-        <SavedRequest
-          {userRole}
-          api={exp}
-          request={api}
-          {onItemRenamed}
-          {onItemDeleted}
-          {onItemOpened}
-          {folder}
-          {collection}
-          {activeTabId}
-        />
-      </div>
-    {/each}
-  </div>
 </div>
 
 <style lang="scss">

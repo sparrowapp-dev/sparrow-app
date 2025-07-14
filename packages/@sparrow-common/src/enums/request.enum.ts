@@ -56,6 +56,8 @@ export enum RequestDataType {
   JAVASCRIPT = "JavaScript",
   GRAPHQL = "Graphql",
   IMAGE = "Image",
+  PYTHON = "Python",
+  CURL = "Curl"
 }
 
 export enum RequestDataset {

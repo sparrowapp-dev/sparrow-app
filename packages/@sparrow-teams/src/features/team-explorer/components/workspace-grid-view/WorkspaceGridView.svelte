@@ -7,7 +7,7 @@
   } from "@sparrow/library/assets";
   import type { WorkspaceDocument } from "@app/database/database";
   import { Button, Spinner } from "@sparrow/library/ui";
-  import { WorkspaceGrid } from "@sparrow/teams/compopnents";
+  import { WorkspaceGrid } from "@sparrow/common/components";
   import { TeamSkeleton } from "../../images";
   import { SparrowLogo } from "@sparrow/common/icons";
   import {
@@ -50,7 +50,6 @@
   export let isWorkspaceCreationInProgress = false;
   export let onCopyLink;
   export let selectedFilter;
-  
 
   let workspacePerPage = 5;
   let filterText = "";
@@ -123,12 +122,52 @@
       <div class="sparrow-thin-scrollbar" style="flex:1; overflow:auto;">
         <div class="d-flex flex-wrap" style="gap:16px">
           {#if searchQuery == "" && filteredWorkspaces.length === 0 && !isAdminOrOwner}
-            <p class="not-found-text mx-auto mt-3">
-              You don't have access to any workspace in this team.
-            </p>
+            <div class="container">
+              <div class="sparrow-logo">
+                <SparrowLogo />
+              </div>
+              <p
+                style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+              >
+                You don't have access to any workspace in this hub.
+              </p>
+            </div>
           {:else if searchQuery !== "" && filteredWorkspaces.length === 0}
-            <span class="not-found-text mx-auto ellipsis">No result found.</span
-            >
+            <div class="container">
+              <div class="sparrow-logo">
+                <SparrowLogo />
+              </div>
+              <p
+                style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+              >
+                No result found.
+              </p>
+            </div>
+          {:else if workspaces.length === 0}
+            <div class="container">
+              <div class="sparrow-logo">
+                <SparrowLogo />
+              </div>
+              {#if selectedFilter === WorkspaceType.PUBLIC}
+                <p
+                  style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+                >
+                  Welcome to Sparrow! Explore your public workspaces here.
+                </p>
+              {:else if selectedFilter === WorkspaceType.PRIVATE}
+                <p
+                  style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+                >
+                  Welcome to Sparrow! Explore your private workspaces here.
+                </p>
+              {:else}
+                <p
+                  style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
+                >
+                  Welcome to Sparrow! Explore your all workspaces here.
+                </p>
+              {/if}
+            </div>
           {/if}
           <!-- {#if currPage === 1 && searchQuery === "" && isAdminOrOwner}
             <div
@@ -149,38 +188,7 @@
               {/if}
             </div>
           {/if} -->
-          {#if workspaces.length === 0}
-            <div class="container">
-              <div class="sparrow-logo">
-                <SparrowLogo />
-              </div>
-              {#if selectedFilter === WorkspaceType.PUBLIC}
-                <p
-                  style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500; height:2px"
-                >
-                  Public workspaces let you share your APIs and tools with the
-                </p>
-                <p
-                  style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
-                >
-                  community. Create one to start collaborating openly.
-                </p>
-              {:else}
-                <p
-                  style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500; height:2px"
-                >
-                  Welcome to Sparrow! Let's create your first workspace to
-                  unlock
-                </p>
-                <p
-                  style="color:var(--text-ds-neutral-400); font-size: 12px;font-weight:500;"
-                >
-                  powerful tools and bring your team together in one organized
-                  space.
-                </p>
-              {/if}
-            </div>
-          {/if}
+
           {#each paginatedWorkspaces as workspace}
             <WorkspaceGrid
               {onAddMember}
@@ -256,7 +264,8 @@
     flex-direction: column;
     align-items: center;
     height: 100%;
-    padding: 150px 35px 24px;
+    padding: 5%;
+    gap: 16px;
   }
   .tab-head {
     padding: 8px;

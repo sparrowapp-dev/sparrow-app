@@ -12,6 +12,7 @@
     SocketIoIcon,
     GraphIcon,
     DatabaseStackRegular,
+    BotRegular,
   } from "@sparrow/library/icons";
 
   import SparrowLogo from "../../rest-explorer/assets/images/sparrow-logo.svelte";
@@ -86,6 +87,15 @@
       }}
     />
     <Card
+      icon={BotRegular}
+      label={`AI Request`}
+      iconColor="var(--text-primary-300)"
+      iconSize={"22px"}
+      onClick={() => {
+        onItemCreated("aiRequest", {});
+      }}
+    />
+    <Card
       icon={SocketIcon}
       label="WebSocket"
       iconColor="var(--text-primary-300)"
@@ -137,8 +147,8 @@
         label={TFDefaultEnum.FULL_NAME}
         iconColor="var(--text-primary-300)"
         iconSize={"18px"}
-        onClick={() => {
-          onCreateTestflow();
+        onClick={async() => {
+          await onCreateTestflow();
           MixpanelEvent(Events.Default_Screen_TestFlows);
         }}
       />

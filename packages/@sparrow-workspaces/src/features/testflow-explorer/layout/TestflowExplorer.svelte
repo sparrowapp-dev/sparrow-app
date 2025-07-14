@@ -97,6 +97,11 @@
     isDynamicExpressionContent,
     updateDynamicExpressionValue,
   } from "../store/testflow";
+  import { WorkspaceRole } from "@sparrow/common/enums";
+  import { PlanUpgradeModal } from "@sparrow/common/components";
+  import { planInfoByRole } from "@sparrow/common/utils";
+  import { TeamRole } from "@sparrow/common/enums";
+  import { planContentDisable } from "@sparrow/common/utils";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -126,6 +131,21 @@
   export let onPreviewExpression;
   export let redirectDocsTestflow: () => void;
   export let handleEventOnClickQuestionMark;
+  export let planLimitRunHistoryCount: number = 5;
+  export let planLimitTestFlowBlocks: number = 5;
+  export let planLimitTestFlows: number = 3;
+  export let testflowCount: number = 1;
+  export let teamDetails: any;
+  export let testflowBlocksPlanModalOpen: boolean = false;
+  export let handleRequestOwner: () => void;
+  export let handleRedirectToAdminPanel: () => void;
+  export let handleContactSales: () => void;
+  export let runHistoryPlanModalOpen: boolean = false;
+  export let selectiveRunModalOpen: boolean = false;
+  export let selectiveRunTestflow: boolean = false;
+  export let isGuestUser = false;
+  let planContent: any;
+  let planContentNonActive: any;
 
   const checkRequestExistInNode = (_id: string) => {
     let result = false;
@@ -749,7 +769,13 @@
     _direction = "add-block-after",
   ) => {
     if (!_id) return;
-
+    if ($nodes.length >= planLimitTestFlowBlocks + 1 && !isGuestUser) {
+      testflowBlocksPlanModalOpen = true;
+      // notifications.error(
+      //   `You’ve reached the limit of ${planLimitTestFlowBlocks} Blocks per test flow on your current plan. Upgrade to increase this limit.`,
+      // );
+      return;
+    }
     let requestData;
     if (_requestData) {
       requestData = await createCustomRequestObject(
@@ -762,7 +788,10 @@
     // handles run from from start button click
     if (_id === "0") {
       await onClickRun();
-      selectNode("2");
+      const startingNode = handleSelectFirstNode();
+      if (startingNode) {
+        selectNode(startingNode);
+      }
       MixpanelEvent(Events.Run_TestFlows);
       return;
     }
@@ -982,98 +1011,120 @@
   /**
    * Initializes nodes and edges on component mount.
    */
+
+  let prevTabName = "";
+  let prevTabId = "";
+  $: {
+    if ($tab) {
+      if (prevTabId !== $tab?.tabId) {
+        (async () => {
+          /**
+           * @description - Initialize the view model for the new http request tab
+           */
+          unselectNodes();
+          nodes.update((_nodes: Node[]) => {
+            const dbNodes = $tab?.property?.testflow?.nodes as TFNodeType[];
+            let res = [];
+            for (let i = 0; i < dbNodes.length; i++) {
+              res.push({
+                id: dbNodes[i].id,
+                type: dbNodes[i].type,
+                data: {
+                  blockName: dbNodes[i]?.data?.blockName,
+                  blocks: nodes,
+                  connector: edges,
+                  onClick: function (_id: string, _options = undefined) {
+                    createNewNode(_id, _options);
+                  },
+                  onCheckEdges: function (_id: string, _direction: string) {
+                    return checkIfEdgesExist(_id, _direction);
+                  },
+                  onContextMenu: function (id: string, _event: string) {
+                    if (_event === "delete") {
+                      handleDeleteModal(id);
+                    } else if (
+                      _event === "run-from-here" ||
+                      _event === "run-till-here"
+                    ) {
+                      partialRun(id, _event);
+                    } else if (
+                      _event === "add-block-before" ||
+                      _event === "add-block-after"
+                    ) {
+                      createNewNode(id, undefined, _event);
+                    }
+                  },
+                  onOpenAddCustomRequestModal: function (id: string) {
+                    handleOpenAddCustomRequestModal(id);
+                  },
+                  onOpenSaveNodeRequestModal: function (
+                    nodeId: string,
+                    name: string,
+                    requestId: string,
+                    collectionId: string,
+                    method: string,
+                    folderId: string,
+                  ) {
+                    handleNodeRequestDropdown(
+                      nodeId,
+                      name,
+                      requestId,
+                      collectionId,
+                      method,
+                      folderId,
+                    );
+                  },
+                  updateBlockName: function (_id: string, value: string) {
+                    handleUpdateBlockName(_id, value);
+                  },
+                  collectionId: dbNodes[i].data?.collectionId,
+                  requestId: dbNodes[i].data?.requestId,
+                  folderId: dbNodes[i].data?.folderId,
+                  requestData: dbNodes[i].data?.requestData,
+                  collections: filteredCollections,
+                  tabId: $tab.tabId,
+                },
+                position: {
+                  x: dbNodes[i].position.x,
+                  y: dbNodes[i].position.y,
+                },
+                deletable: dbNodes[i].id === "1" ? false : isNodeDeletable,
+                draggable: dbNodes[i].id === "1" ? false : isNodesDraggable, // Disable dragging for this node
+              });
+            }
+            return res;
+          });
+          edges.update((_edges: TFEdgeHandlerType[]) => {
+            const dbEdges = $tab?.property?.testflow?.edges as TFEdgeType[];
+            let res = [];
+            for (let i = 0; i < dbEdges.length; i++) {
+              res.push({
+                id: dbEdges[i].id,
+                source: dbEdges[i].source,
+                type: "edge",
+                target: dbEdges[i].target,
+                deletable: isEdgeDeletable,
+                data: {
+                  onDeleteEdge: deleteEdges,
+                  onCreateNode: createNewNode,
+                },
+              });
+            }
+            return res;
+          });
+
+          prevTabId = $tab?.tabId;
+        })();
+      } else if ($tab?.name && prevTabName !== $tab.name) {
+        // renameWithEnvironmentList(tab.name);
+        prevTabName = $tab.name;
+      }
+      // findUserRole();
+    }
+  }
+
   onMount(() => {
     // Load initial nodes from the tab property
-    nodes.update((_nodes: Node[]) => {
-      const dbNodes = $tab?.property?.testflow?.nodes as TFNodeType[];
-      let res = [];
-      for (let i = 0; i < dbNodes.length; i++) {
-        res.push({
-          id: dbNodes[i].id,
-          type: dbNodes[i].type,
-          data: {
-            blockName: dbNodes[i]?.data?.blockName,
-            blocks: nodes,
-            connector: edges,
-            onClick: function (_id: string, _options = undefined) {
-              createNewNode(_id, _options);
-            },
-            onCheckEdges: function (_id: string, _direction: string) {
-              return checkIfEdgesExist(_id, _direction);
-            },
-            onContextMenu: function (id: string, _event: string) {
-              if (_event === "delete") {
-                handleDeleteModal(id);
-              } else if (
-                _event === "run-from-here" ||
-                _event === "run-till-here"
-              ) {
-                partialRun(id, _event);
-              } else if (
-                _event === "add-block-before" ||
-                _event === "add-block-after"
-              ) {
-                createNewNode(id, undefined, _event);
-              }
-            },
-            onOpenAddCustomRequestModal: function (id: string) {
-              handleOpenAddCustomRequestModal(id);
-            },
-            onOpenSaveNodeRequestModal: function (
-              nodeId: string,
-              name: string,
-              requestId: string,
-              collectionId: string,
-              method: string,
-              folderId: string,
-            ) {
-              handleNodeRequestDropdown(
-                nodeId,
-                name,
-                requestId,
-                collectionId,
-                method,
-                folderId,
-              );
-            },
-            updateBlockName: function (_id: string, value: string) {
-              handleUpdateBlockName(_id, value);
-            },
-            collectionId: dbNodes[i].data?.collectionId,
-            requestId: dbNodes[i].data?.requestId,
-            folderId: dbNodes[i].data?.folderId,
-            requestData: dbNodes[i].data?.requestData,
-            collections: filteredCollections,
-            tabId: $tab.tabId,
-          },
-          position: {
-            x: dbNodes[i].position.x,
-            y: dbNodes[i].position.y,
-          },
-          deletable: dbNodes[i].id === "1" ? false : isNodeDeletable,
-          draggable: dbNodes[i].id === "1" ? false : isNodesDraggable, // Disable dragging for this node
-        });
-      }
-      return res;
-    });
-    edges.update((_edges: TFEdgeHandlerType[]) => {
-      const dbEdges = $tab?.property?.testflow?.edges as TFEdgeType[];
-      let res = [];
-      for (let i = 0; i < dbEdges.length; i++) {
-        res.push({
-          id: dbEdges[i].id,
-          source: dbEdges[i].source,
-          type: "edge",
-          target: dbEdges[i].target,
-          deletable: isEdgeDeletable,
-          data: {
-            onDeleteEdge: deleteEdges,
-            onCreateNode: createNewNode,
-          },
-        });
-      }
-      return res;
-    });
   });
 
   // Reactive statement to handle selected node updates
@@ -1088,6 +1139,9 @@
       });
       if (!isIdExist) {
         selectedNode = undefined;
+      }
+      if (testflowStore?.history.length > 0) {
+        handleTestFlowHistoryLimit();
       }
     }
   }
@@ -1248,6 +1302,23 @@
   };
 
   /**
+   * This Function will the pass the value of first Node is Connected Target value.
+   */
+  const handleSelectFirstNode = () => {
+    let defaultNode = "2";
+    edges.update((_edges) => {
+      for (let item = 0; item < _edges.length; item++) {
+        if (_edges[item]?.source === "1") {
+          defaultNode = _edges[item]?.target;
+          break;
+        }
+      }
+      return _edges;
+    });
+    return defaultNode;
+  };
+
+  /**
    * Focuses the div element by calling its focus method.
    */
   const focusDiv = () => {
@@ -1303,6 +1374,9 @@
   });
 
   const partialRun = async (_id: string, _event: string) => {
+    if (!selectiveRunTestflow && !isGuestUser) {
+      selectiveRunModalOpen = true;
+    }
     if (!testflowStore?.isTestFlowRunning) {
       unselectNodes();
       await onClickRun(_id, _event);
@@ -1376,6 +1450,23 @@
       });
     }
   };
+
+  const handleTestFlowHistoryLimit = () => {
+    if (testflowStore?.history && !isGuestUser) {
+      const updateHistoryItems = testflowStore.history.slice(
+        0,
+        planLimitRunHistoryCount,
+      );
+      testflowStore.history = updateHistoryItems;
+    }
+  };
+
+  $: {
+    if (userRole) {
+      planContent = planInfoByRole(userRole);
+      planContentNonActive = planContentDisable();
+    }
+  }
 </script>
 
 <div
@@ -1432,7 +1523,10 @@
                 onClick={async () => {
                   unselectNodes();
                   await onClickRun();
-                  selectNode("2");
+                  const startingNode = handleSelectFirstNode();
+                  if (startingNode) {
+                    selectNode(startingNode);
+                  }
                   MixpanelEvent(Events.Run_TestFlows);
                   handleEventOnRunBlocks();
                 }}
@@ -1470,20 +1564,25 @@
           />
         </Tooltip>
       </div>
-      <div>
-        <SaveTestflow
-          isSave={$tab.isSaved}
-          {isTestflowEditable}
-          {onSaveTestflow}
-          testFlowRunning={testflowStore?.isTestFlowRunning}
-        />
-      </div>
+      {#if !(userRole === WorkspaceRole.WORKSPACE_VIEWER)}
+        <div>
+          <SaveTestflow
+            isSave={$tab.isSaved}
+            {isTestflowEditable}
+            {onSaveTestflow}
+            testFlowRunning={testflowStore?.isTestFlowRunning}
+          />
+        </div>
+      {/if}
       <div class="position-relative">
         <RunHistory
+          bind:runHistoryPlanModalOpen
+          bind:planLimitRunHistoryCount
           {testflowStore}
           testflowName={$tab?.name}
           {toggleHistoryDetails}
           {toggleHistoryContainer}
+          {isGuestUser}
         />
       </div>
     </div>
@@ -1675,16 +1774,18 @@
   {/if}
 
   <div class="p-3" style="position:absolute; z-index:3; bottom:0; right:0;">
-    <p
-      class="mb-0 pb-0 text-fs-14"
-      style="color: var(--text-primary-300); font-weight:500; cursor:pointer;  "
-      on:click={() => {
-        currentStep.set(1);
-        isTestFlowTourGuideOpen.set(true);
-      }}
-    >
-      Need help?
-    </p>
+    {#if testflowCount <= planLimitTestFlows || isGuestUser}
+      <p
+        class="mb-0 pb-0 text-fs-14"
+        style="color: var(--text-primary-300); font-weight:500; cursor:pointer;  "
+        on:click={() => {
+          currentStep.set(1);
+          isTestFlowTourGuideOpen.set(true);
+        }}
+      >
+        Need help?
+      </p>
+    {/if}
   </div>
 </div>
 <!-- <svelte:window on:keydown={handleKeyPress} /> -->
@@ -1787,6 +1888,65 @@
     }}
   />
 </Modal>
+
+<PlanUpgradeModal
+  bind:isOpen={testflowBlocksPlanModalOpen}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Test flow blocks"
+  planLimitValue={planLimitTestFlowBlocks}
+  currentPlanValue={$nodes.length - 1}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  {handleContactSales}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName}
+  userEmail={teamDetails?.teamOwnerEmail}
+  submitButtonName={planContent?.buttonName}
+/>
+
+<PlanUpgradeModal
+  bind:isOpen={runHistoryPlanModalOpen}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Run History"
+  planLimitValue={planLimitRunHistoryCount}
+  currentPlanValue={testflowStore?.history.length}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  {handleContactSales}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName}
+  userEmail={teamDetails?.teamOwnerEmail}
+  submitButtonName={planContent?.buttonName}
+/>
+
+<PlanUpgradeModal
+  bind:isOpen={selectiveRunModalOpen}
+  title={planContent?.title}
+  description={planContentNonActive?.description}
+  planType="Selective Runs"
+  activePlan={selectiveRunTestflow ? "active" : "disabled"}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  {handleContactSales}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName}
+  userEmail={teamDetails?.teamOwnerEmail}
+  submitButtonName={planContent?.buttonName}
+/>
 
 <style>
   :global(.svelte-flow__attribution) {

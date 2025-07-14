@@ -598,6 +598,7 @@ class RestExplorerViewModel {
           responseBodyLanguage: data.response.bodyLanguage,
           responseBodyFormatter: data?.response?.bodyFormatter,
         });
+        savedRequestTab.updateName(progressiveTab.name +` (${data.response.status.replace(/^\d+\s*/, "")})`);
         responseCode = data.response.status;
       }
       return restApiDataMap;
@@ -1418,7 +1419,7 @@ class RestExplorerViewModel {
         description: requestMetaData.description,
         type: "REQUEST",
         request: unadaptedRequest,
-        updatedAt: "",
+        updatedAt: new Date().toISOString(),
         updatedBy: "Guest User",
       };
 
@@ -2414,6 +2415,12 @@ class RestExplorerViewModel {
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
 
+    let workspaceId = componentData.path.workspaceId;
+
+    let workspaceVal = await this.readWorkspace(workspaceId);
+
+    let teamId = workspaceVal.team?.teamId;
+
     // extraction of request API data for setting AI Context
     const apiData = {
       body: componentData.property.request.body,
@@ -2424,11 +2431,14 @@ class RestExplorerViewModel {
       auth: componentData.property.request.auth,
     };
 
-    const rawConversations = componentData?.property?.request?.ai?.conversations || [];
-    const formattedConversations = rawConversations.map(({ type, message }) => ({
-      role: type === 'Sender' ? 'user' : 'assistant',
-      content: message
-    }));
+    const rawConversations =
+      componentData?.property?.request?.ai?.conversations || [];
+    const formattedConversations = rawConversations.map(
+      ({ type, message }) => ({
+        role: type === "Sender" ? "user" : "assistant",
+        content: message,
+      }),
+    );
 
     try {
       const userEmail = getClientUser().email;
@@ -2444,7 +2454,8 @@ class RestExplorerViewModel {
         JSON.stringify(apiData),
         formattedConversations,
         "deepseek",
-        "chat"
+        "chat",
+        teamId,
       );
 
       if (!socketResponse) {
@@ -2802,6 +2813,13 @@ class RestExplorerViewModel {
   public generateDocumentation = async (prompt = "") => {
     await this.updateRequestState({ isDocGenerating: true });
     const componentData = this._tab.getValue();
+
+    let workspaceId = componentData.path.workspaceId;
+
+    let workspaceVal = await this.readWorkspace(workspaceId);
+
+    let teamId = workspaceVal.team?.teamId;
+
     const apiData = {
       body: componentData.property.request.body,
       headers: componentData.property.request.headers,
@@ -2814,6 +2832,8 @@ class RestExplorerViewModel {
     const response = await this.aiAssistentService.generateAiResponse({
       text: prompt,
       instructions: `You are an AI Assistant to generate documentation, responsible to generate documentation for API requests, Give response only in text format not in markdown.`,
+      model: "deepseek",
+      teamId: teamId,
     });
     if (response.isSuccessful) {
       const formatter = new MarkdownFormatter();
@@ -2825,7 +2845,7 @@ class RestExplorerViewModel {
       await this.updateRequestState({
         isDocAlreadyGenerated: true,
       });
-    } else if (response?.message === "Limit reached") {
+    } else if (response?.message === "Limit reached. Please try again later.") {
       notifications.error(
         "Failed to generate documentation. Your monthly AI usage limit is reached.",
       );

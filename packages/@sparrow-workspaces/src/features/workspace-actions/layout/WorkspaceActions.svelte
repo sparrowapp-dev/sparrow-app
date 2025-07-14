@@ -25,7 +25,7 @@
     WorkspaceDocument,
   } from "@app/database/database";
 
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount, tick } from "svelte";
   import {
     CollectionIcon,
     DoubleArrowIcon,
@@ -60,7 +60,10 @@
   import { TestFlowTourGuide } from "@sparrow/workspaces/components";
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
-  import { LaunchDesktop } from "@sparrow/common/components";
+  import {
+    GithubStarRedirect,
+    LaunchDesktop,
+  } from "@sparrow/common/components";
   import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
   import {
     ArrowRightIcon,
@@ -77,6 +80,10 @@
   export let onItemDeleted: (entityType: string, args: any) => void;
   export let onItemRenamed: (entityType: string, args: any) => void;
   export let onItemOpened: (entityType: string, args: any) => void;
+  export let onCreateMockCollection: (
+    collectionId: string,
+    workspaceId: string,
+  ) => void;
 
   export let onBranchSwitched: (collection: CollectionDocument) => void;
   export let navigateToGithub: () => void;
@@ -150,19 +157,36 @@
   export let onSyncCollection;
   export let onUpdateRunningState;
 
-  let runAnimation: boolean = true;
+  let collectionListMounted = false;
+  function delayFrames(count: number): Promise<void> {
+    return new Promise((resolve) => {
+      function nextFrame(n: number) {
+        if (n <= 0) return resolve();
+        requestAnimationFrame(() => nextFrame(n - 1));
+      }
+      nextFrame(count);
+    });
+  }
+
+  onMount(async () => {
+    await tick(); // let Svelte bind DOM
+    await delayFrames(10); // wait for 2 frames
+    collectionListMounted = true;
+  });
+
   let showfilterDropdown: boolean = false;
-  let collectionListDocument: CollectionDocument[];
   let searchData: string = "";
   let addButtonMenu: boolean = false;
   let activeWorkspace: WorkspaceDocument;
   let currentWorkspaceId = "";
   let currentWorkspaceName: string = "";
   let isWorkspaceTabOpen: boolean = false;
-  currentWorkspace.subscribe((value) => {
+
+  const currentWorkspaceSubscriber = currentWorkspace.subscribe((value) => {
     if (value?._data) {
       currentWorkspaceName = value._data.name;
       currentWorkspaceId = value._data._id;
+      activeWorkspace = value;
     }
   });
 
@@ -209,84 +233,6 @@
   //   }
   // }
 
-  let isGithubStarHover = false;
-
-  let collectionFilter: any = [];
-  /**
-   * @description - performs searching on a single collection
-   */
-  const searchCollectionHelper: (searchText: string, tree: any) => any = (
-    searchText,
-    tree,
-  ) => {
-    if (tree.name.toLowerCase().includes(searchText.toLowerCase())) {
-      return tree;
-    }
-
-    // Recursively search through the collection
-    if (tree && tree?.items?.length) {
-      let response = [];
-      for (let j = 0; j < tree.items.length; j++) {
-        const res = searchCollectionHelper(searchText, tree.items[j]);
-        if (res) {
-          response.push(res);
-        }
-      }
-      if (response.length) {
-        let item = createDeepCopy(tree);
-        item.items = response;
-        return item;
-      } else {
-        return 0;
-      }
-    }
-    return 0;
-  };
-
-  /**
-   * @description - searches data from the list of collections
-   */
-  const searchCollection: (
-    searchText: string,
-    collectionData: any[],
-  ) => void = (searchText, collectionData) => {
-    let response = [];
-    for (let i = 0; i < collectionData.length; i++) {
-      const res = searchCollectionHelper(searchText, collectionData[i]);
-      if (res) {
-        response.push(res);
-      }
-    }
-    return response;
-  };
-
-  /**
-   * Handle searching and filtering
-   */
-  const handleSearch = () => {
-    collectionFilter = searchCollection(searchData, collectionListDocument);
-  };
-  $: {
-    if (currentWorkspace) {
-      currentWorkspace.subscribe((value) => {
-        activeWorkspace = value;
-        collectionListDocument = collectionListDocument?.filter(
-          (value) => value.workspaceId === activeWorkspace?._id,
-        );
-      });
-    }
-  }
-  $: {
-    if (collectionList) {
-      collectionList.subscribe((value) => {
-        collectionListDocument = value;
-        collectionListDocument = collectionListDocument?.filter(
-          (value) => value.workspaceId === activeWorkspace?._id,
-        );
-        collectionFilter = searchCollection(searchData, collectionListDocument);
-      });
-    }
-  }
   let isBackgroundClickable = true;
 
   $: {
@@ -298,7 +244,9 @@
     }
   }
 
-  onDestroy(() => {});
+  onDestroy(() => {
+    currentWorkspaceSubscriber.unsubscribe();
+  });
 
   const addButtonData = isWebApp
     ? [
@@ -362,7 +310,7 @@
           iconSize: "16px",
           endIcon: BetaVectorIcon,
           onclick: () => {
-            onItemCreated("Ai-Request-Tab", {});
+            onItemCreated("aiRequest", {});
             // MixpanelEvent(Events.Add_WebSocket);
           },
         },
@@ -485,7 +433,7 @@
           iconSize: "16px",
           endIcon: BetaVectorIcon,
           onclick: () => {
-            onItemCreated("Ai-Request-Tab", {});
+            onItemCreated("aiRequest", {});
             // MixpanelEvent(Events.Add_WebSocket);
           },
         },
@@ -645,7 +593,6 @@
         size="small"
         bind:value={searchData}
         on:input={() => {
-          handleSearch();
           isExpandCollection.set(true);
           isExpandEnvironment.set(true);
           isExpandTestflow.set(true);
@@ -815,36 +762,39 @@
         class="ps-1"
         style=" overflow:auto; {$isExpandCollection ? 'flex:2;' : ''}"
       >
-        <CollectionList
-          bind:scrollList
-          bind:userRole
-          bind:isFirstCollectionExpand
-          {onRefetchCollection}
-          {showImportCurlPopup}
-          {collectionList}
-          {isGuestUser}
-          {currentWorkspace}
-          {userRoleInWorkspace}
-          {activeTabPath}
-          {activeTabId}
-          {activeTabType}
-          {showImportCollectionPopup}
-          {onItemCreated}
-          {onItemDeleted}
-          {onItemRenamed}
-          {onItemOpened}
-          {onBranchSwitched}
-          {searchData}
-          {toggleExpandCollection}
-          {isExpandCollectionLine}
-          {handleExpandCollectionLine}
-          {isWebApp}
-          {ActiveTab}
-          {handleTabUpdate}
-          {onCompareCollection}
-          {onSyncCollection}
-          {onUpdateRunningState}
-        />
+        {#if true}
+          <CollectionList
+            bind:scrollList
+            bind:userRole
+            bind:isFirstCollectionExpand
+            {onRefetchCollection}
+            {showImportCurlPopup}
+            {collectionList}
+            {isGuestUser}
+            {currentWorkspace}
+            {userRoleInWorkspace}
+            {activeTabPath}
+            {activeTabId}
+            {activeTabType}
+            {showImportCollectionPopup}
+            {onItemCreated}
+            {onItemDeleted}
+            {onItemRenamed}
+            {onItemOpened}
+            {onBranchSwitched}
+            {searchData}
+            {toggleExpandCollection}
+            {isExpandCollectionLine}
+            {handleExpandCollectionLine}
+            {isWebApp}
+            {ActiveTab}
+            {handleTabUpdate}
+            {onCompareCollection}
+            {onSyncCollection}
+            {onUpdateRunningState}
+            {onCreateMockCollection}
+          />
+        {/if}
       </div>
 
       <hr class="my-1 ms-1 me-1" />
@@ -914,34 +864,10 @@
       style="z-index: 4;"
     >
       <Tooltip title={"Star Us On GitHub"} placement={"top-center"}>
-        <div
-          class="px-2 py-1 border-radius-2 d-flex align-items-center {isGithubStarHover
-            ? 'bg-secondary-600'
-            : ''}"
-          role="button"
-          on:mouseenter={() => {
-            isGithubStarHover = true;
-          }}
-          on:mouseleave={() => {
-            isGithubStarHover = false;
-          }}
-          on:click={navigateToGithub}
-        >
-          <GithubIcon
-            height={"18px"}
-            width={"18px"}
-            color={isGithubStarHover
-              ? "var(--bg-secondary-100)"
-              : "var(--bg-secondary-200)"}
-          />
-          <span
-            class="ps-2 text-fs-14 {isGithubStarHover
-              ? 'text-secondary-100'
-              : 'text-secondary-200'}"
-          >
-            {githubRepo?.stargazers_count || ""}
-          </span>
-        </div>
+        <GithubStarRedirect
+          onClick={navigateToGithub}
+          count={githubRepo?.stargazers_count || ""}
+        />
       </Tooltip>
 
       <div class="d-flex align-items-center">

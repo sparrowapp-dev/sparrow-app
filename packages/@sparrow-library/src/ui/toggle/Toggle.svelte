@@ -2,23 +2,28 @@
   export let isActive: boolean = false;
   export let disabled: boolean = false;
   export let label = "";
+  export let id = "";
   export let textColor = "var(--text-ds-neutral-200)";
   export let fontSize = "12px";
   export let fontWeight = "500";
   export let onChange: (event: Event) => void = () => {};
   export let onClick: (event: MouseEvent) => void = () => {};
+  export let editable = true;
 
   let inputRef: HTMLInputElement;
 
-  const handleChange=(event: Event)=> {
+  const handleChange = (event: Event) => {
     if (disabled) {
       event.preventDefault();
       return;
     }
+    if (!editable) {
+      isActive = !isActive;
+    }
     isActive = !isActive;
     onChange(event);
   };
-  const handleClick=(event: MouseEvent)=> {
+  const handleClick = (event: MouseEvent) => {
     if (disabled) {
       event.preventDefault();
       return;
@@ -60,7 +65,7 @@
         on:click={handleClick}
         {disabled}
         aria-label={label}
-        id="toggle"
+        id={id ? id : "toggle"}
       />
       <span
         class="toggle-track"
@@ -129,12 +134,12 @@
     outline: 1px solid var(--bg-ds-surface-100);
   }
 
-.hasLabel input:focus-visible ~ .toggle-track {
-  box-shadow: none;
-  outline: none;
-}
+  .hasLabel input:focus-visible ~ .toggle-track {
+    box-shadow: none;
+    outline: none;
+  }
 
- .toggle-track[tabindex="0"]:focus-visible {
+  .toggle-track[tabindex="0"]:focus-visible {
     box-shadow: 0 0 0 2px var(--bg-ds-primary-300);
     outline: none;
   }
@@ -191,16 +196,16 @@
     display: block;
   }
 
-.toggle-track:active .toggle-knob {
-  width: 18px;
-}
+  .toggle-track:active .toggle-knob {
+    width: 18px;
+  }
 
-input:checked ~ .toggle-track .toggle-knob {
-  transform: translateX(14px) translateY(-50%);
-}
+  input:checked ~ .toggle-track .toggle-knob {
+    transform: translateX(14px) translateY(-50%);
+  }
 
-input:checked ~ .toggle-track:active .toggle-knob {
+  input:checked ~ .toggle-track:active .toggle-knob {
     transform: translateX(10px) translateY(-50%);
     width: 16px;
-}
+  }
 </style>

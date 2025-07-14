@@ -12,6 +12,7 @@
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { TestflowListItem } from "../components";
   import type { ScrollList } from "@sparrow/library/ui/list/types";
+  import VirtualScroll from "svelte-virtual-scroll-list";
   import {
     TFDefaultEnum,
     type TFDocumentType,
@@ -19,6 +20,7 @@
 
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
+  import { slide } from "svelte/transition";
 
   import {
     isTestFlowTourGuideOpen,
@@ -130,20 +132,40 @@
 
   let scrollDiv: HTMLElement;
 
-  function scrollToBottom() {
-    if (scrollDiv) {
-      scrollDiv.scrollTo({
-        top: scrollDiv.scrollHeight,
-        behavior: "smooth",
-      });
-    }
-  }
+  // function scrollToBottom() {
+  //   if (scrollDiv) {
+  //     scrollDiv.scrollTo({
+  //       top: scrollDiv.scrollHeight,
+  //       behavior: "smooth",
+  //     });
+  //   }
+  // }
   $: $isExpandTestflow =
     $isDefaultTourGuideOpen === true ? true : $isExpandTestflow;
+
+  let isNewTestflowCreating = false;
+
+  let virtualScrollEl: HTMLDivElement;
+
+  const scrollToBottom = () => {
+    requestAnimationFrame(() => {
+      if (virtualScrollEl) {
+        const scrollRoot = virtualScrollEl.querySelector(
+          ".virtual-scroll-root",
+        ) as HTMLElement;
+        if (scrollRoot) {
+          scrollRoot.scrollTo({
+            top: scrollRoot.scrollHeight,
+            behavior: "smooth",
+          });
+        }
+      }
+    });
+  };
 </script>
 
 <div
-  class={`d-flex flex-column h-100 pt-0 px-1`}
+  class={`d-flex flex-column h-100 pt-0 px-1 overflow-auto`}
   style="font-weight: 500;"
   id="testflow-container"
 >
@@ -152,11 +174,14 @@
   -->
   <div
     tabindex="0"
-    class="d-flex align-items-center border-radius-2 me-0 mb-0 pe-2 env-sidebar"
-    style="cursor:pointer; justify-content: space-between; height:32px; "
+    class="d-flex align-items-center border-radius-2 me-0 mb-0 py-2 pe-2 env-sidebar"
+    style="cursor:pointer; justify-content: space-between; height:32px; gap:4px;"
     on:mouseover={handleMouseOver}
     on:mouseout={handleMouseOut}
     on:click={() => {
+      if($isDefaultTourGuideOpen === true){
+        isDefaultTourGuideOpen.set(false)
+      }
       toggleExpandTestflow();
       handleTabUpdate("testflow");
     }}
@@ -195,7 +220,7 @@
       title={`Add ${TFDefaultEnum.NAME}`}
       placement={"bottom-center"}
       distance={13}
-      show={isHovered}
+      show={isHovered && !isNewTestflowCreating}
       zIndex={701}
     >
       <span
@@ -203,15 +228,20 @@
         currentWorkspace?.isShared
           ? 'd-none'
           : ''} add-icon-container d-flex"
+        on:click|stopPropagation={() => {}}
       >
         <Button
           size="extra-small"
           customWidth={"24px"}
           type="teritiary-regular"
           startIcon={AddRegular}
-          onClick={(e) => {
+          disable={isNewTestflowCreating}
+          onClick={async (e) => {
+            e.preventDefault();
             e.stopPropagation();
-            handleCreateTestflow(e);
+            isNewTestflowCreating = true;
+            await handleCreateTestflow(e);
+            isNewTestflowCreating = false;
           }}
         />
       </span>
@@ -220,82 +250,80 @@
 
   {#if $isExpandTestflow}
     <div
-      style="flex: 1; height: 32px; background-color: {ActiveTab === 'testflow'
+      transition:slide={{ duration: 250 }}
+      style="background-color: {ActiveTab === 'testflow'
         ? 'var(--bg-ds-surface-600)'
         : 'transparent'};"
-      class="overflow-auto h-100"
+      class="overflow-hidden position-relative d-flex flex-column me-0 py-0"
       bind:this={scrollDiv}
     >
-      <!-- 
-  --  Testflow Empty screen 
-  -->
-      {#if filteredflows && flows.length === 0 && !searchData}
-        {#if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER && !currentWorkspace?.isShared}
-          <div class={`pb-2 px-2`}>
-            <p
-              class={`add-env-desc-text mb-3 text-ds-font-size-12  text-ds-font-weight-regular text-center`}
-              style="color: var(--text-secondary-50); "
-            >
-              Start with basic test cases to check core functions and build a
-              strong testing foundation.
-            </p>
-
-            <Button
-              title={`Add ${TFDefaultEnum.NAME}`}
-              size={"small"}
-              type="secondary"
-              customWidth={"100%"}
-              startIcon={AddRegular}
-              disabled={loggedUserRoleInWorkspace ===
-                WorkspaceRole.WORKSPACE_VIEWER}
-              onClick={async () => {
-                await onCreateTestflow();
-                MixpanelEvent(Events.Add_New_Flow);
-              }}
-            />
-          </div>
-        {/if}
-      {/if}
-
-      <!-- 
-  --  Testflow List 
-  -->
-      <div class="position-relative">
-        {#if filteredflows?.length > 0}
+      {#if filteredflows?.length > 0}
+        <div class="position-relative h-100">
+          <!-- 
+          --  Testflow Vertical line 
+          -->
           <div
             class="box-line"
             style="background-color: {isExpandTestflowLine
               ? 'var(--bg-ds-neutral-500)'
               : 'var(--bg-ds-surface-100)'}"
           ></div>
-          <List
-            bind:scrollList
-            height={"auto"}
-            overflowY={"auto"}
-            classProps={"pe-0 ps-0"}
-            style={"flex:1;"}
-          >
-            {#each filteredflows as flow}
+          <!-- 
+          --  Testflow List 
+          -->
+          <div bind:this={virtualScrollEl} style="height: 100%;">
+            <VirtualScroll data={filteredflows} key="_id" let:data>
               <TestflowListItem
                 bind:loggedUserRoleInWorkspace
-                {flow}
+                flow={data}
                 {currentWorkspace}
                 {onDeleteTestflow}
                 {onUpdateTestflow}
                 {onOpenTestflow}
                 {activeTabId}
               />
-            {/each}
-          </List>
-        {/if}
-      </div>
-      {#if filteredflows?.length === 0 && searchData}
-        <p
-          class="mx-1 mb-0 text-center text-ds-font-size-12 text-ds-font-weight-regular"
-          style="color: var(--text-secondary-550);   letter-spacing: 0.5px;"
-        >
-          It seems we couldn't find the result matching your search query.
-        </p>
+            </VirtualScroll>
+          </div>
+        </div>
+      {:else if searchData}
+        <!-- 
+        --  Testflow Not Found 
+        -->
+        <div class="pb-2 px-2 h-100 overflow-auto">
+          <p
+            class="mb-0 text-center text-ds-font-size-12 text-ds-font-weight-regular"
+            style="color: var(--text-secondary-550); letter-spacing: 0.5px;"
+          >
+            It seems we couldn't find the result matching your search query.
+          </p>
+        </div>
+      {:else if loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER && !currentWorkspace?.isShared}
+        <!-- 
+        --  Testflow Empty screen 
+        -->
+        <div class={`pb-2 px-2 h-100 overflow-auto`}>
+          <p
+            class={`add-env-desc-text mb-3 text-ds-font-size-12  text-ds-font-weight-regular text-center`}
+            style="color: var(--text-secondary-50); "
+          >
+            Start with basic test cases to check core functions and build a
+            strong testing foundation.
+          </p>
+
+          <Button
+            title={`Add ${TFDefaultEnum.NAME}`}
+            size={"small"}
+            type="secondary"
+            customWidth={"100%"}
+            startIcon={AddRegular}
+            disabled={loggedUserRoleInWorkspace ===
+              WorkspaceRole.WORKSPACE_VIEWER}
+            onClick={async () => {
+              await onCreateTestflow();
+              MixpanelEvent(Events.Add_New_Flow);
+            }}
+          />
+        </div>
       {/if}
     </div>
   {/if}

@@ -1,13 +1,11 @@
 import {
     AiRequestAuthTypeBaseEnum,
     AiModelProviderEnum,
-    type AIConfig,
-    type AIModelVariant
-
+    type AIModelVariant,
+    type AiConfigurations,
+    type PromptFileAttachment
 } from "./ai-request-base";
 import { CollectionRequestAddToBaseEnum } from "./collection-base";
-
-
 
 ///////////////////////////////////////////////////////////////////
 //                   AI Request Interface
@@ -27,9 +25,6 @@ export enum MessageTypeEnum {
 export enum UntrackedItemsEnum {
     UNTRACKED = "UNTRACKED-",
 }
-
-
-
 
 ////////////////////////////////////////////////////////////////
 //            Managing AI Request Tab State
@@ -64,6 +59,25 @@ export interface IsSaveRequestInProgressWrapper {
 
 export interface IsChatbotActive {
     isChatbotActive: boolean;
+}
+
+export interface IsChatbotPromptBoxActiveWrapper {
+    isChatbotPromptBoxActive: boolean;
+}
+
+export interface IsChatAutoClearActive {
+    isChatAutoClearActive: boolean;
+}
+
+export interface IsChatbotConversationLoading {
+    isChatbotConversationLoading: boolean;
+}
+export interface IsConversationHistoryPanelOpen {
+    isConversationHistoryPanelOpen: boolean;
+}
+
+export interface IsConversationHistoryLoading {
+    isConversationHistoryLoading: boolean;
 }
 
 export interface IsChatbotSuggestionsActive {
@@ -106,7 +120,7 @@ export interface AiSystemPromptWrapper {
 }
 
 export interface AiConfigurationsWrapper {
-    Configurations: AIConfig;
+    configurations: AiConfigurations;
 }
 
 export interface ResponseStatusWrapper {
@@ -153,25 +167,43 @@ export interface StatusWrapper {
     status: boolean;
 }
 
+export interface FileAttachmentsWrapper {
+    fileAttachments: PromptFileAttachment[]
+}
+
 export interface Conversation
     extends TypeWrapper,
     MessageIdWrapper,
     MessageWrapper,
     IsLikedWrapper,
     IsDislikedWrapper,
-    StatusWrapper { }
+    StatusWrapper, FileAttachmentsWrapper { }
 
 export interface ConversationsWrapper {
     conversations: Conversation[];
 }
-export interface ThreadIdWrapper {
-    threadId: string;
+export interface LastActiveConversationBackupWrapper {
+    lastActiveChatBackup: Conversation[];
+}
+export interface ConversationIdWrapper {
+    conversationId: string;
+}
+
+export interface ConversationTitleWrapper {
+    conversationTitle: string;
+}
+
+export interface IsoldChatPreviewActiveWrapper {
+    isoldChatPreviewActive: boolean
 }
 
 export interface Ai
     extends PromptWrapper,
     ConversationsWrapper,
-    ThreadIdWrapper { }
+    ConversationIdWrapper,
+    LastActiveConversationBackupWrapper,
+    IsoldChatPreviewActiveWrapper,
+    ConversationTitleWrapper { }
 export interface AiWrapper {
     ai: Ai;
 }
@@ -220,8 +252,13 @@ export interface State
     IsSaveDescriptionInProgressWrapper,
     IsSaveRequestInProgressWrapper,
     IsChatbotActive,
+    IsChatAutoClearActive,
     IsChatbotSuggestionsActive,
-    IsChatbotGeneratingResponse { }
+    IsChatbotGeneratingResponse,
+    IsChatbotConversationLoading,
+    IsConversationHistoryPanelOpen,
+    IsConversationHistoryLoading,
+    IsChatbotPromptBoxActiveWrapper { }
 
 export interface StatePartial
     extends
@@ -233,5 +270,10 @@ export interface StatePartial
     Partial<IsSaveDescriptionInProgressWrapper>,
     Partial<IsSaveRequestInProgressWrapper>,
     Partial<IsChatbotActive>,
+    Partial<IsChatAutoClearActive>,
     Partial<IsChatbotSuggestionsActive>,
-    Partial<IsChatbotGeneratingResponse> { }
+    Partial<IsChatbotGeneratingResponse>,
+    Partial<IsChatbotConversationLoading>,
+    Partial<IsConversationHistoryPanelOpen>,
+    Partial<IsConversationHistoryLoading>,
+    Partial<IsChatbotPromptBoxActiveWrapper> { }

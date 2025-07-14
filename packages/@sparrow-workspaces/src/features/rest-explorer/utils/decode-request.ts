@@ -177,7 +177,7 @@ class DecodeRequest {
       value: string;
     };
     if(request.state.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.INHERIT_AUTH){
-      authHeader = new ReduceAuthHeader(_collectionAuth.collectionAuthNavigation, _collectionAuth.auth).getValue();
+      authHeader = new ReduceAuthHeader(_collectionAuth.collectionAuthNavigation, auth).getValue();
     }else{
      authHeader = new ReduceAuthHeader(request.state.requestAuthNavigation, auth).getValue();
       

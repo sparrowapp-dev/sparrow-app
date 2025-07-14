@@ -28,6 +28,9 @@
     CopyRegular,
     BoardRegular,
     BotRegular,
+    HistoryRegular,
+    HistoryIcon2,
+    DatabaseStackRegular,
   } from "@sparrow/library/icons";
   import {
     TabPersistenceTypeEnum,
@@ -37,6 +40,7 @@
   import { Badge, Spinner, Options, Dropdown, Tag } from "@sparrow/library/ui";
   import { SvelteComponent } from "svelte";
   import { WorkspaceRole } from "@sparrow/common/enums/team.enum";
+  import { CollectionTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
   // ----
 
   // ------ Props ------
@@ -85,7 +89,6 @@
   export let onClickDuplicateTab: (tabId: string) => void;
   export let userRole;
 
-
   let noOfColumns = 200;
   let showTabControlMenu = false;
 
@@ -129,7 +132,8 @@
     onDragStart(index);
   }}
   tabindex="0"
-  class=" badge-container tab-container h-100 d-inline-block p-0 position-relative pt-1 individual-tab"
+  class="badge-container tab-container h-100 d-inline-block p-0 position-relative pt-1 individual-tab"
+  id={tab.id}
   style="width: {tabWidth}px;  margin-left:{index === 0 ? '4px' : ''}"
   on:mousedown={handleMouseDown}
   on:dblclick={() => handleDoubleClick(tab)}
@@ -141,7 +145,7 @@
     <Options
       isTabMenu={true}
       xAxis={mouseX}
-      yAxis={[mouseY, mouseY + 20]}
+      yAxis={[mouseY, mouseY]}
       zIndex={500}
       menuItems={[
         {
@@ -187,13 +191,16 @@
             onClickDuplicateTab(tab.id);
           },
           displayText: "Duplicate Tab",
-          hidden: !["REQUEST", "WEBSOCKET", "SOCKETIO", "GRAPHQL"].includes(
-            tab.type,
-          ),
+          hidden: ![
+            "REQUEST",
+            "WEBSOCKET",
+            "SOCKETIO",
+            "GRAPHQL",
+            "AI_REQUEST",
+          ].includes(tab.type),
           icon: CopyRegular,
         },
       ]}
-      {noOfColumns}
     />
   {/if}
 
@@ -216,7 +223,11 @@
     <button
       tabindex="-1"
       class="position-relative p-0 border-0 ellipsis"
-      style="width: {tab?.type === TabTypeEnum.MOCK_REQUEST ? '60%' : '100%'};
+      style="width: {tab?.type === TabTypeEnum.MOCK_REQUEST ||
+      (tab?.type === TabTypeEnum.FOLDER &&
+        tab?.label === CollectionTypeBaseEnum.MOCK)
+        ? '60%'
+        : '100%'};
         text-align: left; font-weight:700; background-color:transparent;"
     >
       {#if loader}
@@ -247,11 +258,19 @@
         >
       {:else if tab.type === TabTypeEnum.COLLECTION}
         <span>
-          <img
-            src={Collection}
-            alt="book"
-            style="width: 19px;heigh:19px;margin-right:5px;"
-          />
+          {#if tab?.label === CollectionTypeBaseEnum.MOCK}
+            <DatabaseStackRegular height="14px" width="10px" />
+          {:else}
+            <img
+              src={Collection}
+              alt="book"
+              style="width: 19px; height:19px; margin-right:5px;"
+            />
+          {/if}
+        </span>
+      {:else if tab.type === TabTypeEnum.HUB}
+        <span>
+          <BookIcon />
         </span>
       {:else if tab.type === TabTypeEnum.WORKSPACE}
         <span>
@@ -301,6 +320,10 @@
         <span>
           <BotRegular height={"17px"} width={"15px"} />
         </span>
+      {:else if tab.type === TabTypeEnum.MOCK_HISTORY}
+        <span>
+          <HistoryIcon2 height={"16px"} width={"16px"} />
+        </span>
       {:else if tab.type === TabTypeEnum.SAVED_REQUEST}
         <span>
           <!-- <GraphIcon
@@ -331,11 +354,11 @@
         {tab.name}
       </span>
     </button>
-    {#if tab?.type === TabTypeEnum.MOCK_REQUEST}
-      <Tag type={"green"} text={"Mock"} />
+    {#if tab?.label && tab.type != TabTypeEnum.COLLECTION}
+      <Tag type={"green"} text={tab.label} />
     {/if}
     <div style="align-items:center; justify-content:center;">
-      {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.MOCK_REQUEST || tab?.type === TabTypeEnum.WORKSPACE || tab?.type === TabTypeEnum.FOLDER || tab?.type === TabTypeEnum.COLLECTION || tab?.type === TabTypeEnum.SAVED_REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
+      {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.MOCK_REQUEST || tab?.type === TabTypeEnum.AI_REQUEST || tab?.type === TabTypeEnum.WORKSPACE || tab?.type === TabTypeEnum.FOLDER || tab?.type === TabTypeEnum.COLLECTION || tab?.type === TabTypeEnum.SAVED_REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
         <div
           class="badge-container badge"
           style="width:18px ; height:18px ; align-items:center; justify-content:center;"
@@ -350,8 +373,8 @@
         class="cross-icon-btn p-0 align-items-center justify-content-center {// toggle cross icon for inactive tabs
         !tab.isActive ? 'inactive-close-btn' : ''} btn"
         on:click={(e) => {
-            e.stopPropagation();
-            onTabClosed(tab.id, tab);
+          e.stopPropagation();
+          onTabClosed(tab.id, tab);
         }}
         style="overflow:hidden; height: 18px; width:18px;"
       >

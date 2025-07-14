@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AttachmentIcon } from "@sparrow/library/icons"; // Import your icon
+  import { AttachmentIcon, AttachRegular } from "@sparrow/library/icons"; // Import your icon
 
   // Props: inputId and onFileSelect handler are passed in from the parent component
   export let inputId: string; // Parent will pass a unique id
@@ -23,7 +23,7 @@
   style="cursor: pointer"
   on:click={triggerFileSelect}
 >
-  <AttachmentIcon height="14px" width="14px" />
+  <AttachRegular size={"14px"} />
 </div>
 
 <!-- Hidden file input, using the inputId passed from the parent -->

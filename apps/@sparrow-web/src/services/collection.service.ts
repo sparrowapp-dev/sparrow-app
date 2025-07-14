@@ -33,6 +33,11 @@ import type {
   SocketIORequestDeletePayloadDtoInterface,
 } from "@sparrow/common/types/workspace/socket-io-request-dto";
 import type {
+  AiRequestCreateUpdateInCollectionPayloadDtoInterface,
+  AiRequestCreateUpdateInFolderPayloadDtoInterface,
+  AiRequestDeletePayloadDtoInterface,
+} from "@sparrow/common/types/workspace/ai-request-dto";
+import type {
   GraphqlRequestAuthDtoInterface,
   GraphqlRequestCreateUpdateInCollectionPayloadDtoInterface,
   GraphqlRequestCreateUpdateInFolderPayloadDtoInterface,
@@ -51,8 +56,15 @@ import type {
   HttpRequestMockDeletePayloadDtoInterface,
 } from "@sparrow/common/types/workspace/http-request-mock-dto";
 
+import type {
+  HttpResponseMockCreateUpdatePayloadDtoInterface,
+  HttpResponseMockDeletePayloadDtoInterface,
+  HttpResponseMockUpdatePayloadDtoInterface,
+  HttpResponseRatiosMockUpdatePayloadDtoInterface,
+} from "@sparrow/common/types/workspace/http-response-mock-dto";
+
 export class CollectionService {
-  constructor() {}
+  constructor() { }
 
   private apiUrl: string = constants.API_URL;
   private collectionRepository = new CollectionRepository();
@@ -535,6 +547,69 @@ export class CollectionService {
     return response;
   };
 
+  public addAiRequestInCollection = async (
+    _aiRequest:
+      AiRequestCreateUpdateInCollectionPayloadDtoInterface
+      | AiRequestCreateUpdateInFolderPayloadDtoInterface,
+    baseUrl: string,
+  ): Promise<
+    HttpClientResponseInterface<
+      HttpClientBackendResponseInterface<CollectionItemDtoInterface>
+    >
+  > => {
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/collection/ai-request`,
+      {
+        body: _aiRequest,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public updateAiRequestInCollection = async (
+    _aiRequestId: string,
+    _aiRequest:
+      | AiRequestCreateUpdateInCollectionPayloadDtoInterface
+      | AiRequestCreateUpdateInFolderPayloadDtoInterface,
+    baseUrl: string,
+  ): Promise<
+    HttpClientResponseInterface<
+      HttpClientBackendResponseInterface<CollectionItemDtoInterface>
+    >
+  > => {
+    const response = await makeRequest(
+      "PUT",
+      `${baseUrl}/api/collection/ai-request/${_aiRequestId}`,
+      {
+        body: _aiRequest,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public deleteAiRequestInCollection = async (
+    _aiRequestId: string,
+    _aiRequest: AiRequestDeletePayloadDtoInterface,
+    baseUrl: string,
+  ): Promise<
+    HttpClientResponseInterface<
+      HttpClientBackendResponseInterface<CollectionDtoInterface>
+    >
+  > => {
+    const response = await makeRequest(
+      "DELETE",
+      `${baseUrl}/api/collection/ai-request/${_aiRequestId}`,
+      {
+        body: _aiRequest,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
   // public connectSocketIo = async (
   //   _url: string,
   //   _tabId: string,
@@ -778,6 +853,98 @@ export class CollectionService {
       `${baseUrl}/api/collection/${collectionId}/workspace/${workspaceId}/mock-status`,
       {
         body: requestBody,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public geCollectionByIdAndWorkspace = async (
+    collectionId: string,
+    workspaceId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "GET",
+      `${baseUrl}/api/collection/${collectionId}/workspace/${workspaceId}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public createMockCollectionFromExisting = async (
+    collectionId: string,
+    workspaceId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/collection/${collectionId}/workspace/${workspaceId}/create-mock`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public createMockResponseInCollection = async (
+    mockResponse: HttpResponseMockCreateUpdatePayloadDtoInterface,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/collection/mock-response`,
+      {
+        body: mockResponse,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public updateMockResponseInCollection = async (
+    responseId: string,
+    updateMockResponse: HttpResponseMockUpdatePayloadDtoInterface,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "PATCH",
+      `${baseUrl}/api/collection/mock-response/${responseId}`,
+      {
+        body: updateMockResponse,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public deleteMockResponseInCollection = async (
+    responseId: string,
+    deleteResponseBody: HttpResponseMockDeletePayloadDtoInterface,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${baseUrl}/api/collection/mock-response/${responseId}`,
+      {
+        body: deleteResponseBody,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public updateMockResponseRatios = async (
+    payload: HttpResponseRatiosMockUpdatePayloadDtoInterface,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "PATCH",
+      `${baseUrl}/api/collection/mock-response/ratios`,
+      {
+        body: payload,
         headers: getAuthHeaders(),
       },
     );

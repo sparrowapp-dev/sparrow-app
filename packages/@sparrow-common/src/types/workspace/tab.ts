@@ -9,6 +9,8 @@ import type { GraphqlRequestWrapperTabInterface } from "./graphql-request-tab";
 import type { HttpRequestSavedWrapperTabInterface } from "./http-request-saved-tab";
 import type { HttpRequestMockWrapperTabInterface } from "./http-request-mock-tab";
 import type { AiRequestWrapper } from "./ai-request-tab";
+import type { MockHistoryWrapper } from "./mock-history-tab";
+import type { HubWrapper } from "./hub-tab";
 
 export enum TabTypeEnum {
   FOLDER = "FOLDER",
@@ -24,6 +26,8 @@ export enum TabTypeEnum {
   SAVED_REQUEST = "SAVED_REQUEST",
   AI_REQUEST = "AI_REQUEST",
   MOCK_REQUEST = "MOCK_REQUEST",
+  MOCK_HISTORY = "MOCK_HISTORY",
+  HUB = "HUB",
 }
 
 export enum TabPersistenceTypeEnum {
@@ -47,9 +51,9 @@ export interface LLMRequestIdWrapper {
 }
 export interface Path
   extends WorkspaceIdWrapper,
-  CollectionIdWrapper,
-  FolderIdWrapper,
-    RequestIdWrapper { }
+    CollectionIdWrapper,
+    FolderIdWrapper,
+    RequestIdWrapper {}
 export interface DescriptionWrapper {
   description: string;
 }
@@ -94,18 +98,24 @@ export interface PathWrapper {
   path: Path;
 }
 
+export interface LabelWrapper {
+  label: string;
+}
+
 export interface Property
   extends Partial<RequestWrapper>,
-  Partial<FolderWrapper>,
-  Partial<CollectionWrapper>,
-  Partial<WorkspaceWrapper>,
-  Partial<WebSocketWrapper>,
-  Partial<TFTabItemWrapperType>,
-  Partial<SocketIoWrapper>,
-  Partial<GraphqlRequestWrapperTabInterface>,
+    Partial<FolderWrapper>,
+    Partial<MockHistoryWrapper>,
+    Partial<CollectionWrapper>,
+    Partial<WorkspaceWrapper>,
+    Partial<WebSocketWrapper>,
+    Partial<TFTabItemWrapperType>,
+    Partial<SocketIoWrapper>,
+    Partial<GraphqlRequestWrapperTabInterface>,
     Partial<HttpRequestMockWrapperTabInterface>,
-  Partial<HttpRequestSavedWrapperTabInterface>,
-  Partial<AiRequestWrapper> { }
+    Partial<HttpRequestSavedWrapperTabInterface>,
+    Partial<AiRequestWrapper>,
+    Partial<HubWrapper> {}
 
 export interface PropertyWrapper {
   property: Property;
@@ -113,17 +123,18 @@ export interface PropertyWrapper {
 
 export interface Tab
   extends ActiveSyncWrapper,
-  DescriptionWrapper,
-  IdWrapper,
-  IndexWrapper,
-  IsActiveWrapper,
-  IsDeletedWrapper,
-  IsSavedWrapper,
-  NameWrapper,
-  PathWrapper,
-  SourceWrapper,
-  TabIdWrapper,
-  TimestampWrapper,
-  TypeWrapper,
-  PersistenceWrapper,
-  PropertyWrapper { }
+    DescriptionWrapper,
+    IdWrapper,
+    IndexWrapper,
+    IsActiveWrapper,
+    IsDeletedWrapper,
+    IsSavedWrapper,
+    NameWrapper,
+    PathWrapper,
+    SourceWrapper,
+    TabIdWrapper,
+    TimestampWrapper,
+    TypeWrapper,
+    PersistenceWrapper,
+    LabelWrapper,
+    PropertyWrapper {}

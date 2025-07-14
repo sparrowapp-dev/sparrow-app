@@ -15,6 +15,9 @@
     help,
     hoveredHelp,
     selectedHelp,
+    hoveredMarketplace,
+    Marketplace,
+    selectedMarketplace,
   } from "../images";
   import SidebarItem from "../components/SidebarItem.svelte";
 
@@ -24,6 +27,7 @@
     SidebarItemPositionBaseEnum,
     type SidebarItemBaseAllIconInterface,
   } from "../../../types/sidebar/sidebar-base";
+  import { planBannerisOpen } from "../../../store";
 
   export let sidebarItems: SidebarItemBaseInterface[] = [];
   const SidebarImageItem: SidebarItemBaseAllIconInterface[] = [];
@@ -67,6 +71,12 @@
         sidebarItemWithIcons.defaultLogo = collections;
         sidebarItemWithIcons.hoveredLogo = hoveredCollections;
         sidebarItemWithIcons.selectedLogo = selectedCollections;
+        break;
+
+      case SidebarItemImgEnum.MARKETPLACE:
+        sidebarItemWithIcons.defaultLogo = Marketplace;
+        sidebarItemWithIcons.hoveredLogo = hoveredMarketplace;
+        sidebarItemWithIcons.selectedLogo = selectedMarketplace;
         break;
 
       case SidebarItemImgEnum.COMMUNITY:
@@ -118,6 +128,10 @@
       logPositions(id);
     }
   };
+
+  $: if ($planBannerisOpen) {
+    handleResize();
+  }
 </script>
 
 <div class={`sidebar ${componentClass}`}>
@@ -129,7 +143,6 @@
           {item}
           {slidebarPlace}
           on:click={(event) => handleCompo(event.detail)}
-          
         />
       </div>
     {/each}

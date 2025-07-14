@@ -194,7 +194,7 @@
     class="{isHover
       ? `tooltip-text-hover ${'tooltip-text-hover-' + placement.toString()}`
       : ''} tooltip-text invisible m-auto text-center position-fixed justify-content-center align-items-center opacity-0
- {placement.toString()} "
+ {placement.toString()} tooltip-animate-text {show ? 'tooltip-animate' : ''} "
     style="top: {top}; left: {left}; right: {right}; bottom: {bottom}; transition: {transitionTime} ; padding:{spacing}; font-size:12px; z-index : {zIndex} ; 
            border-radius: {styles.borderRadius}; 
            box-shadow: {styles.boxShadow}; {styleProp}
@@ -327,6 +327,10 @@
     transform: translateX(-100%) scale(1);
   }
 
+  /* .tooltip-wrapper {
+    width: fit-content;
+  } */
+
   .bottom-left {
     transform: translateX(0) scale(0.5);
   }
@@ -388,5 +392,22 @@
   }
   .small-txt {
     font-weight: 400;
+  }
+  .tooltip-animate-text {
+    opacity: 0;
+    transition:
+      opacity 120ms ease-out 120ms,
+      transform 120ms ease-out 120ms;
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  .tooltip-animate {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+    transition:
+      opacity 120ms ease-out 120ms,
+      transform 120ms ease-out 120ms;
   }
 </style>

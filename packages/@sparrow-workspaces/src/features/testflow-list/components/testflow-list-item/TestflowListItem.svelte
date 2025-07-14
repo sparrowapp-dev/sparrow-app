@@ -205,12 +205,11 @@
   <Options
     xAxis={testflowTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
-      testflowTabWrapper.getBoundingClientRect().top + 20,
+      testflowTabWrapper.getBoundingClientRect().top - 5,
       testflowTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={500}
     {menuItems}
-    {noOfColumns}
   />
 {/if}
 
@@ -219,7 +218,7 @@
   on:contextmenu|preventDefault={handleSelectClick}
 />
 
-<div style="" class="testflow-tab mb-1" bind:this={testflowTabWrapper}>
+<div style="" class="testflow-tab" bind:this={testflowTabWrapper}>
   <button
     tabindex="0"
     style="height:32px; gap:4px; border-color: {showMenu ? '#ff7878' : ''}"

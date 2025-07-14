@@ -1,6 +1,6 @@
 {
   "name": "@sparrow/workspaces",
-  "version": "2.23.1",
+  "version": "2.28.0",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
@@ -23,6 +23,7 @@
     "./features/socketio-explorer/utils": "./src/features/socketio-explorer/utils/index.ts",
     "./features/rest-explorer/store": "./src/features/rest-explorer/store/index.ts",
     "./features/ai-request-explorer/store": "./src/features/ai-request-explorer/store/index.ts",
+    "./features/ai-request-explorer/constants": "./src/features/ai-request-explorer/constants/index.ts",
     "./features/graphql-explorer/store": "./src/features/graphql-explorer/store/index.ts",
     "./features/socket-explorer/store": "./src/features/socket-explorer/store/index.ts",
     "./features/socketio-explorer/store": "./src/features/socketio-explorer/store/index.ts",

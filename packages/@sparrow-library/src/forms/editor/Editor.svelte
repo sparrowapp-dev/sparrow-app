@@ -1,6 +1,6 @@
 <script lang="ts">
   import { afterUpdate, onDestroy, onMount } from "svelte";
-  import { basicSetup, basicTheme } from "./theme";
+  import { getBasicSetup, getTheme } from "./theme";
   import { EditorState, Compartment, type Extension } from "@codemirror/state";
   import handleCodeMirrorSyntaxFormat from "./editor";
   import { EditorView } from "codemirror";
@@ -25,8 +25,15 @@
   } from "@sparrow/common/utils";
   import MergeView from "./MergeView.svelte";
 
-  export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" | "Graphql" =
-    "Text";
+  export let lang:
+    | "HTML"
+    | "JSON"
+    | "XML"
+    | "JavaScript"
+    | "Text"
+    | "Graphql"
+    | "Python"
+    | "Curl" = "Text";
   export let value = "";
   export let customSuggestions = false;
   export let isEnterKeyNotAllowed = false;
@@ -45,6 +52,9 @@
   export let cursorPosition: number | null = null;
   export let handleOpenDE;
   export let dispatcher;
+  export let showLineNumbers = true;
+  export let highlightActiveLine = true;
+  export let highlightActiveLineGutter = true;
 
   // For merge view props
   export let isMergeViewEnabled = false;
@@ -58,6 +68,8 @@
   const languageConf = new Compartment();
   const lintConf = new Compartment(); // Compartment for linting
   const mergeConf = new Compartment(); // Compartment for diff/merge view
+  const themeConf = new Compartment(); // Compartment for theme
+  const setupConf = new Compartment(); // Compartment for basic setup
   let codeMirrorEditorDiv: HTMLDivElement;
   let codeMirrorView: EditorView;
 
@@ -276,11 +288,17 @@
   );
 
   function initalizeCodeMirrorEditor(value: string) {
+    const editorOptions = {
+      showLineNumbers,
+      highlightActiveLine,
+      highlightActiveLineGutter,
+    };
+
     let extensions: Extension[];
     extensions = [
       ...(isEnterKeyNotAllowed ? [keyBindings] : []),
-      basicSetup,
-      basicTheme,
+      setupConf.of(getBasicSetup(editorOptions)),
+      themeConf.of(getTheme(editorOptions)),
       expressionPlugin,
       dragDropPlugin,
       languageConf.of([]),

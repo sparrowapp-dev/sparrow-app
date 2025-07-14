@@ -20,7 +20,7 @@
   import { pagesMotion } from "../../constants";
   import { version } from "../../../src-tauri/tauri.conf.json";
 
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { Motion } from "svelte-motion";
   import { user } from "../../store/auth.store";
   import { WithButton } from "@sparrow/workspaces/hoc";
@@ -34,6 +34,12 @@
   import { TeamTabsEnum } from "@sparrow/teams/constants/TeamTabs.constants";
   import { CreateTeam } from "@sparrow/common/features";
   import { open } from "@tauri-apps/plugin-shell";
+  import {
+    GithubStarRedirect,
+    UpgradePlanBanner,
+    UpgradePlanPopUp,
+  } from "@sparrow/common/components";
+  import { shouldRunThrottled } from "@sparrow/common/store";
 
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
@@ -43,6 +49,7 @@
   const modifyTeam = _viewModel.modifyTeam;
 
   let isCreateTeamModalOpen: boolean = false;
+  let isUpgradePlanModelOpen: boolean = false;
   const collectionList = _viewModel.collection;
   const onApiClick = _viewModel.handleApiClick;
   const OnWorkspaceSwitch = _viewModel.handleSwitchWorkspace;
@@ -53,7 +60,7 @@
   let githubRepoData: GithubRepoDocType;
   let isGuestUser = false;
   let userId = "";
-  user.subscribe(async (value) => {
+  const userSubscriber = user.subscribe(async (value) => {
     if (value) {
       userId = value._id;
     }
@@ -61,9 +68,17 @@
 
   const externalSparrowGithub = constants.SPARROW_GITHUB;
 
+  const sparrowAdminUrl = constants.ADMIN_URL;
+
   onMount(async () => {
-    _viewModel.refreshTeams(userId);
-    _viewModel.refreshWorkspaces(userId);
+    if (userId && shouldRunThrottled(userId)) {
+      await Promise.all([
+        _viewModel.refreshTeams(userId),
+        _viewModel.refreshWorkspaces(userId),
+      ]);
+    } else {
+      console.error(`Throttled for ${userId}`);
+    }
 
     let githubRepo = await _viewModel.getGithubRepo();
     githubRepoData = githubRepo?.getLatest().toMutableJSON();
@@ -102,6 +117,10 @@
       return version;
     }
   };
+
+  onDestroy(() => {
+    userSubscriber();
+  });
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -188,23 +207,12 @@
                 style="z-index: 4;"
               >
                 <Tooltip title={"Star Us On GitHub"} placement={"top-center"}>
-                  <div
-                    class="githubStar px-2 py-1 border-radius-2 d-flex align-items-center"
-                    on:click={async () => {
+                  <GithubStarRedirect
+                    onClick={async () => {
                       await open(externalSparrowGithub);
                     }}
-                  >
-                    <GithubIcon
-                      height={"18px"}
-                      width={"18px"}
-                      color={"var(--bg-ds-neutral-50)"}
-                    />
-                    <span
-                      class="text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
-                    >
-                      {githubRepoData?.stargazers_count || ""}
-                    </span>
-                  </div>
+                    count={githubRepoData?.stargazers_count || ""}
+                  />
                 </Tooltip>
 
                 <div class="d-flex align-items-center">
@@ -232,7 +240,7 @@
         minSize={60}
         class="bg-secondary-800-important"
       >
-        <TeamExplorerPage />
+        <TeamExplorerPage {sparrowAdminUrl} />
       </Pane>
     </Splitpanes>
   </div>
@@ -257,30 +265,6 @@
 </Modal>
 
 <style>
-  .githubStar {
-    background-color: transparent;
-    height: 28px;
-    gap: 4px;
-    padding: 4px;
-    padding-right: 8px;
-    color: var(--bg-ds-neutral-100);
-  }
-  .githubStar:hover {
-    border-radius: 4px;
-    background-color: var(--bg-ds-surface-300);
-    color: var(--bg-ds-neutral-100);
-  }
-  .githubStar:active {
-    color: var(--bg-ds-primary-300);
-    background-color: var(--bg-ds-surface-400);
-    border-radius: 4px;
-  }
-  .githubStar:focus-visible {
-    color: var(--text-ds-neutral-50);
-    border-radius: 4px;
-    outline: none;
-    border: 2px solid var(--border-ds-primary-300);
-  }
   :global(.team-splitter .splitpanes__splitter) {
     width: 6px !important;
     height: auto !important;

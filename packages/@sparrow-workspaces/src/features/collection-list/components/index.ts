@@ -8,3 +8,5 @@ export { default as SocketIo } from "./socket-io/SocketIo.svelte";
 export { default as Graphql } from "./graphql/Graphql.svelte";
 export { default as SavedRequest } from "./saved-request/SavedRequest.svelte";
 export { default as MockRequest } from "./mock-request/MockRequest.svelte";
+export { default as AiRequest } from "./ai-request/AiRequest.svelte";
+export { default as CollectionManager } from "./collection-manager/CollectionManager.svelte";

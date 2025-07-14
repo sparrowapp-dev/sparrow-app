@@ -2,7 +2,10 @@
   import {
     LoginBanner,
     LoginSignupConfirmation,
+    PlanUpgradeModal,
     SwitchWorkspace,
+    UpgradePlanBanner,
+    UpgradePlanPopUp,
   } from "@sparrow/common/components";
   import { Sidebar } from "@sparrow/common/features";
   import { Route, navigate } from "svelte-navigator";
@@ -42,21 +45,34 @@
   } from "@sparrow/common/types/sidebar/sidebar-base";
   import { GlobalSearch } from "@sparrow/common/features";
   import * as Sentry from "@sentry/svelte";
+  import MarketplacePage from "../marketplace-page/MarketplacePage.svelte";
+  import { ResponseMessage, TeamRole } from "@sparrow/common/enums";
+  import { planInfoByRole } from "@sparrow/common/utils";
+  import { planBannerisOpen, shouldRunThrottled } from "@sparrow/common/store";
 
   const _viewModel = new DashboardViewModel();
-  let userId;
+  const osDetector = new OSDetector();
+
+  let userId: string;
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
-      // await _viewModel.refreshTeams(value._id);
-      // await _viewModel.refreshWorkspaces(value._id);
       userId = value?._id;
-      await _viewModel.refreshTeamsWorkspaces(value._id);
+      if (userId && shouldRunThrottled(userId)) {
+        await Promise.all([
+          _viewModel.refreshTeams(userId),
+          _viewModel.refreshWorkspaces(userId),
+        ]);
+      } else {
+        console.error(`Throttled for ${userId}`);
+      }
     }
   });
   const environments = _viewModel.environments;
   const activeWorkspace = _viewModel.getActiveWorkspace();
   let workspaceDocuments: Observable<WorkspaceDocument[]>;
   let collectionDocuments: Observable<CollectionDocument[]>;
+  let recentVisitedWorkspaces: Observable<RecentWorkspaceDocument[]> =
+    _viewModel.recentVisitedWorkspaces;
 
   let currentEnvironment = {
     id: "none",
@@ -73,6 +89,12 @@
   let switchWorkspaceName = "";
   let switchRequestName = "";
   let switchWorkspaceId = "";
+  let upgradePlanModalWorkspace: boolean = false;
+  let planContent: any;
+  let userRole: string = "";
+  let userLimits: any;
+  let teamDetails: {};
+  let isUpgradePlanModelOpen: boolean = false;
 
   const openDefaultBrowser = async () => {
     await open(externalSparrowLink);
@@ -92,11 +114,18 @@
     switchWorkspaceId = _workspaceId;
   };
 
+  const handleLimits = async (currentTeamId: string) => {
+    const data = await _viewModel.userPlanLimits(currentTeamId);
+    userLimits = data;
+  };
+
   let currentWorkspaceId = "";
   let currentWorkspaceName = "";
   let currentTeamName = "";
   let currentTeamId = "";
+  let currentWorkspaceType = "";
   let selectedType = "";
+  let currentWorkspaceCount = 1;
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       const activeWorkspaceRxDoc = value;
@@ -105,6 +134,20 @@
         currentWorkspaceName = activeWorkspaceRxDoc.name;
         currentTeamName = activeWorkspaceRxDoc.team?.teamName;
         currentTeamId = activeWorkspaceRxDoc.team?.teamId;
+        currentWorkspaceType = activeWorkspaceRxDoc?.workspaceType;
+
+        const user = activeWorkspaceRxDoc?._data.users.find(
+          (u) => u.id === userId,
+        );
+        userRole = user?.role || "";
+        const OwnerDetails = activeWorkspaceRxDoc?._data.users[0];
+        teamDetails = {
+          teamId: OwnerDetails?.id,
+          teamName: OwnerDetails?.name,
+          teamEmail: OwnerDetails?.email,
+        };
+        handlegetWorkspaceCount(currentTeamId);
+        handleLimits(currentTeamId);
         const envIdInitiatedToWorkspace =
           activeWorkspaceRxDoc.get("environmentId");
         if (envIdInitiatedToWorkspace) {
@@ -119,6 +162,10 @@
       }
     },
   );
+
+  const handlegetWorkspaceCount = async (teamId: string) => {
+    currentWorkspaceCount = await _viewModel.getWorkspaceCount(teamId);
+  };
 
   const onModalStateChanged = (flag: boolean) => {
     isPopupOpen = flag;
@@ -145,8 +192,7 @@
   let teamDocuments: Observable<TeamDocument[]>;
 
   const decidingKey = (event) => {
-    const os = new OSDetector();
-    if (os.getOS() == "macos") {
+    if (osDetector.getOS() == "macos") {
       if (event.metaKey) return true;
       else return false;
     } else {
@@ -269,7 +315,7 @@
     try {
       updater = await check();
       if (updater?.available) {
-        notifications.warning("Update Available");
+        // notifications.warning("Update Available");
         newAppVersion = updater.version;
         updateAvailable = true;
       }
@@ -318,6 +364,13 @@
       route: "collections",
       heading: "Workspace",
       disabled: false,
+      position: SidebarItemPositionBaseEnum.PRIMARY,
+    },
+    {
+      id: SidebarItemIdEnum.MARKETPLACE,
+      route: "marketplace",
+      heading: "Marketplace",
+      disabled: !isGuestUser ? false : true,
       position: SidebarItemPositionBaseEnum.PRIMARY,
     },
     {
@@ -527,17 +580,67 @@
       handlehideGlobalSearch(false);
     }
   };
+
+  const openUpdateDocs = async () => {
+    if (osDetector.getOS() === "linux") {
+      await open(constants.LINUX_INSTALL_DOCS);
+      return;
+    }
+  };
+  const handleCreateWorkspace = async (
+    workspaceName: string,
+    teamId: string,
+  ) => {
+    const response = await _viewModel.handleCreateWorkspace(
+      workspaceName,
+      teamId,
+    );
+    const limits = await _viewModel.userPlanLimits(teamId);
+    userLimits?.workspacesPerHub?.value;
+    userLimits = limits;
+    handlegetWorkspaceCount(teamId);
+    if (response?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
+      isWorkspaceModalOpen = false;
+      upgradePlanModalWorkspace = true;
+    }
+    return response;
+  };
+
+  const handleRequestOwner = async () => {
+    await _viewModel.requestToUpgradePlan(currentTeamId);
+    upgradePlanModalWorkspace = true;
+  };
+
+  const handleRedirectToAdminPanel = async () => {
+    await _viewModel.handleRedirectToAdminPanel(currentTeamId);
+    upgradePlanModalWorkspace = true;
+  };
+
+  const handleRedirectToAdmin = async () => {
+    await _viewModel.handleRedirectToAdminPanel(currentTeamId);
+    planBannerisOpen.set(false);
+    isUpgradePlanModelOpen = false;
+  };
+
+  $: {
+    if (userRole) {
+      planContent = planInfoByRole(userRole);
+    }
+  }
 </script>
 
 {#if isGlobalSearchOpen && !hideGlobalSearch}
   <div
     class="global-search-overlay"
-    transition:fade={{ duration: 300 }}
+    style=" background: var(--background-hover);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);"
+    transition:fade={{ duration: 200 }}
     on:mousedown|self={closeGlobalSearch}
   >
     <div
       class="global-search-container"
-      transition:fade={{ duration: 300, delay: 150 }}
+      transition:fade={{ duration: 200, delay: 50 }}
     >
       <GlobalSearch
         {isGuestUser}
@@ -559,10 +662,7 @@
     </div>
   </div>
 {/if}
-<div
-  class="dashboard d-flex flex-column {isGlobalSearchOpen ? 'blurred' : ''}"
-  style="height: 100vh;"
->
+<div class="dashboard d-flex flex-column" style="height: 100vh;">
   <Header
     environments={$environments?.filter((element) => {
       return element?.workspaceId === currentWorkspaceId;
@@ -573,6 +673,7 @@
     {currentWorkspaceName}
     {currentTeamName}
     {currentTeamId}
+    {currentWorkspaceType}
     {isGuestUser}
     {isLoginBannerActive}
     onLoginUser={handleGuestLogin}
@@ -586,6 +687,8 @@
     onSearchClick={handleViewGlobalSearch}
     handleDocsRedirect={_viewModel.redirectDocs}
     handleFeaturesRedirect={_viewModel.redirectFeatureUpdates}
+    onAdminRedirect={_viewModel.onAdminRedirect}
+    recentVisitedWorkspaces={$recentVisitedWorkspaces}
   />
 
   <!--
@@ -596,7 +699,12 @@
       show={updaterVisible && updateAvailable}
       {hideUpdater}
       onUpdate={initiateUpdate}
+      updateDoc={openUpdateDocs}
     />
+  {/if}
+
+  {#if (userRole === TeamRole.TEAM_ADMIN && $planBannerisOpen) || (userRole === TeamRole.TEAM_OWNER && $planBannerisOpen)}
+    <UpgradePlanBanner bind:isUpgradePlanModelOpen />
   {/if}
 
   <!-- 
@@ -639,6 +747,10 @@
       <!-- Route for Team and workspaces - Home Tab -->
       <Route path="/home/*"><Teams /></Route>
 
+      <Route path="/marketplace/*">
+        <MarketplacePage />
+      </Route>
+
       <!-- Route for Help -->
       <Route path="/help/*"><HelpPage /></Route>
 
@@ -677,7 +789,7 @@
     handleModalState={(flag = false) => {
       isWorkspaceModalOpen = flag;
     }}
-    onCreateWorkspace={_viewModel.handleCreateWorkspace}
+    onCreateWorkspace={handleCreateWorkspace}
   />
 </Modal>
 
@@ -699,6 +811,43 @@
     {handlehideGlobalSearch}
   />
 </Modal>
+
+<Modal
+  title={"Time to Unlock More Features"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isUpgradePlanModelOpen}
+  handleModalState={(flag) => {
+    isUpgradePlanModelOpen = flag;
+    planBannerisOpen.set(false);
+  }}
+>
+  <UpgradePlanPopUp
+    bind:isUpgradePlanModelOpen
+    handleSubmit={handleRedirectToAdmin}
+  />
+</Modal>
+
+<PlanUpgradeModal
+  bind:isOpen={upgradePlanModalWorkspace}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Workspaces"
+  planLimitValue={userLimits?.workspacesPerHub?.value}
+  currentPlanValue={currentWorkspaceCount}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  handleContactSales={_viewModel.handleContactSales}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName || ""}
+  userEmail={teamDetails?.teamEmail || ""}
+  submitButtonName={planContent?.buttonName}
+/>
 
 <style>
   .dashboard {

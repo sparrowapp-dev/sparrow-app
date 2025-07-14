@@ -187,13 +187,13 @@ const makeRequest = async (
       const _viewModel = new DashboardViewModel();
       await _viewModel.clientLogout();
       return error("Unauthorized");
-    } else if (e.response?.data?.statusCode === 401) {
+    }  else if (e.response?.data?.statusCode === 401) {
       return error("Unauthorized");
     }
     if (e.code === "ERR_NETWORK") {
       return error(e.message);
     } else if (e.response?.data) {
-      return error(e.response?.data?.message);
+      return error(e.response?.data?.message, e.response?.data);
     }
     return error(e);
   } finally {
@@ -622,9 +622,9 @@ const connectWebSocket = async (
 };
 
 /**
- * 
+ *
  * @param signal - AbortSignal to listen for abort events
- * @returns 
+ * @returns
  */
 const waitForAbort = (signal: AbortSignal): Promise<never> => {
   return new Promise((_, reject) => {
@@ -633,7 +633,7 @@ const waitForAbort = (signal: AbortSignal): Promise<never> => {
     }
 
     signal?.addEventListener("abort", () => {
-      reject(new Error("Aborted during request"));
+        reject(new Error("Aborted during request"));
     }, { once: true });
   });
 }
@@ -664,9 +664,9 @@ const makeHttpRequestV2 = async (
     if (selectedAgent === "Cloud Agent") {
       const proxyUrl = constants.PROXY_SERVICE + "/proxy/http-request";
       response = await Promise.race([axios({
-        data: { url, method, headers, body, contentType },
-        url: proxyUrl,
-        method: "POST",
+          data: { url, method, headers, body, contentType },
+          url: proxyUrl,
+          method: "POST",
       }), waitForAbort(signal)]); 
     } else {
       try {
@@ -733,18 +733,40 @@ const makeHttpRequestV2 = async (
           url,
           data: requestData || {},
           headers: { ...headersObject },
+          responseType: 'arraybuffer',
           validateStatus: function (status) {
             return true;
           },
         }), waitForAbort(signal)]);
+        let responseData = "";
+        const responseContentType = axiosResponse.headers['content-type'] || '';
+        if(responseContentType.startsWith('image/')){
+          const base64 = btoa(
+            new Uint8Array(axiosResponse.data)
+              .reduce((data, byte) => data + String.fromCharCode(byte), '')
+          );
+      
+          responseData = `data:${contentType};base64,${base64}`;
+
+          response = {
+            data: {
+              status: `${axiosResponse.status} ${axiosResponse.statusText || new StatusCode().getText(axiosResponse.status)}`,
+              data: `${responseData}`,
+              headers: Object.fromEntries(Object.entries(axiosResponse.headers)),
+            },
+          };
+        }else{
+          responseData = new TextDecoder('utf-8').decode(axiosResponse.data);
+          response = {
+            data: {
+              status: `${axiosResponse.status} ${new StatusCode().getText(axiosResponse.status)}`,
+              data: responseData,
+              headers: Object.fromEntries(Object.entries(axiosResponse.headers)),
+            },
+          };
+        }
+
         
-        response = {
-          data: {
-            status: `${axiosResponse.status} ${axiosResponse.statusText}`,
-            data: axiosResponse.data,
-            headers: Object.fromEntries(Object.entries(axiosResponse.headers)),
-          },
-        };
       } catch (axiosError: any) {
         if (signal?.aborted) {
           throw new Error();

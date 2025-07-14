@@ -38,6 +38,7 @@
     AiRequestExplorerDataStore,
     type AiRequestExplorerData,
   } from "@sparrow/workspaces/features/ai-request-explorer/store";
+  import { FileItem } from "../../..";
 
   export let message: string;
   export let messageId: string;
@@ -49,12 +50,13 @@
   export let isLastRecieverMessage;
   export let status;
   export let isResponseGenerating;
-  export let chatResponse: AiRequestExplorerData;
+  // export let chatResponse: AiRequestExplorerData;
   export let modelVariant: string;
-  export let aiResponseMetrices;
+  export let aiResponseMetrices: AiRequestExplorerData;
 
   export let onClickCodeBlockPreview;
   export let handleApplyChangeOnAISuggestion;
+  export let attachedFilesWithMsg;
   let showTickIcon: boolean = false;
 
   /**
@@ -513,14 +515,22 @@
     <div class="send-item">
       <ResponseStatus
         response={{
-          tokenCount: isResponseGenerating
-            ? 0
-            : aiResponseMetrices?.response.inputTokens || 0,
-          AI_Model_Variant: modelVariant,
+          tokenCount: aiResponseMetrices?.response.inputTokens || 0,
+          AI_Model_Variant: aiResponseMetrices?.response.modelVariant || "",
+          AI_Model_Provider: aiResponseMetrices?.response.modelProvider || "",
         }}
         responseType={"Sender"}
       />
 
+      {#if attachedFilesWithMsg && attachedFilesWithMsg.length}
+        <div
+          class="attached-files-container d-flex flex-wrap align-items-end justify-content-end p-1 gap-1 w-100"
+        >
+          {#each attachedFilesWithMsg as attachedFile}
+            <FileItem file={attachedFile} />
+          {/each}
+        </div>
+      {/if}
       <p
         class=" px-3 text-fs-12"
         style="background-color: var(--bg-ds-surface-500); 
@@ -548,17 +558,17 @@
     -- 
     -->
     <div class="recieve-item p-2">
-      {#if !isResponseGenerating}
-        <ResponseStatus
-          response={{
-            time: aiResponseMetrices?.response.time || 0,
-            status: aiResponseMetrices?.response.statusCode || "",
-            tokenCount: aiResponseMetrices?.response.outputTokens || 0,
-            AI_Model_Variant: OpenAIModelEnum.GPT_4o,
-          }}
-          responseType={"Receiver"}
-        />
-      {/if}
+      <!-- {#if !isResponseGenerating} -->
+      <ResponseStatus
+        response={{
+          time: aiResponseMetrices?.response.time || 0,
+          status: aiResponseMetrices?.response.statusCode || "",
+          tokenCount: aiResponseMetrices?.response.outputTokens || 0,
+          AI_Model_Variant: aiResponseMetrices?.response.modelVariant || "",
+        }}
+        responseType={"Receiver"}
+      />
+      <!-- {/if} -->
       {#if status}
         <div class="markdown">
           {@html extractedMessage}
@@ -568,7 +578,7 @@
           <p class="mb-0">{message}</p>
         </div>
       {/if}
-      <div class="d-flex gap-1">
+      <div class="d-flex gap-0">
         <!--
         -- 
         -- REGENERATE / COPY
@@ -594,7 +604,7 @@
               {/if}
             </button>
           </Tooltip>
-          <Tooltip placement="top-center" title="Like" distance={13}>
+          <!-- <Tooltip placement="top-center" title="Like" distance={13}>
             <span
               role="button"
               class="action-button d-flex align-items-center justify-content-center border-radius-4"
@@ -625,7 +635,7 @@
                 <ThumbDislikeRegular size={"16px"} />
               {/if}
             </span>
-          </Tooltip>
+          </Tooltip> -->
           <Tooltip placement="top-center" title="Regenerate" distance={13}>
             <button
               class="action-button d-flex align-items-center justify-content-center border-radius-4"

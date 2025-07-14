@@ -16,9 +16,15 @@ import type { HttpClientResponseInterface } from "@app/types/http-client";
 import type { Team } from "@sparrow/common/interfaces";
 import { UserService } from "../../services/user.service";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
-import { Events } from "@sparrow/common/enums";
+import { Events, planType } from "@sparrow/common/enums";
 import { WorkspaceService } from "@app/services/workspace.service";
 import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
+import { EnvironmentRepository } from "@app/repositories/environment.repository";
+import { TestflowRepository } from "@app/repositories/testflow.repository";
+import { PlanRepository } from "@app/repositories/plan.repository";
+import { PlanService } from "@app/services/plan.service";
+import constants from "@app/constants/constants";
+import { planBannerisOpen } from "@sparrow/common/store";
 
 export class TeamsViewModel {
   constructor() {}
@@ -30,9 +36,13 @@ export class TeamsViewModel {
   private githubService = new GithubService();
   private guestUserRepository = new GuestUserRepository();
   private workspaceService = new WorkspaceService();
+  private planRepository = new PlanRepository();
+  private planService = new PlanService();
 
   private collectionRepository = new CollectionRepository();
   private userService = new UserService();
+  private environmentRepository = new EnvironmentRepository();
+  private testflowRepository = new TestflowRepository();
 
   /**
    * @description - get environment list from local db
@@ -65,9 +75,11 @@ export class TeamsViewModel {
     if (!userId) return;
     const response = await this.teamService.fetchTeams(userId);
     let isAnyTeamsOpen: undefined | string = undefined;
+    const userPlans = [];
     if (response?.isSuccessful && response?.data?.data) {
       const data = [];
       for (const elem of response.data.data) {
+        userPlans.push(elem?.plan?.id.toString());
         const {
           _id,
           name,
@@ -78,6 +90,7 @@ export class TeamsViewModel {
           linkedinUrl,
           description,
           logo,
+          plan,
           workspaces,
           owner,
           admins,
@@ -104,6 +117,7 @@ export class TeamsViewModel {
           users,
           description,
           logo,
+          plan,
           workspaces: updatedWorkspaces,
           owner,
           admins,
@@ -118,7 +132,7 @@ export class TeamsViewModel {
         };
         data.push(item);
       }
-
+  
       await this.teamRepository.bulkInsertData(data);
       await this.teamRepository.deleteOrphanTeams(
         data.map((_team) => {
@@ -129,6 +143,7 @@ export class TeamsViewModel {
         this.teamRepository.setOpenTeam(data[0].teamId);
         return;
       }
+
     }
   };
 
@@ -163,8 +178,11 @@ export class TeamsViewModel {
       await this.teamRepository.insert(adaptedTeam);
       await this.teamRepository.setOpenTeam(response.data.data?._id);
       notifications.success(`New hub ${team.name} is created.`);
+      if (response?.data?.data.plan?.name === planType.COMMUNITY) {
+        planBannerisOpen.set(true);
+      }
     } else {
-      notifications.error("Failed to create hub. Please try again.");
+        notifications.error("Failed to create hub. Please try again.");
     }
     MixpanelEvent(Events.CREATE_NEW_TEAM);
     return response;
@@ -201,6 +219,10 @@ export class TeamsViewModel {
    */
   public setOpenTeam = async (id: string) => {
     await this.teamRepository.setOpenTeam(id);
+    const team = await this.teamRepository.getTeamDoc(id);
+    if (team._data.plan?.name !== planType.COMMUNITY) {
+      planBannerisOpen.set(false);
+    }
   };
 
   /**
@@ -353,12 +375,26 @@ export class TeamsViewModel {
         data.push(item);
       }
       await this.workspaceRepository.bulkInsertData(data);
-      await this.workspaceRepository.deleteOrphanWorkspaces(
-        data.map((_workspace) => {
-          return _workspace._id;
-        }),
-      );
-      if (!isAnyWorkspaceActive) {
+      const selectedWorkspacesToBeDeleted =
+        await this.workspaceRepository.deleteOrphanWorkspaces(
+          data.map((_workspace) => {
+            return _workspace._id;
+          }),
+        );
+      if (selectedWorkspacesToBeDeleted?.length > 0) {
+        await this.collectionRepository.removeCollectionsByWorkspaceIds(
+          selectedWorkspacesToBeDeleted,
+        );
+        await this.environmentRepository.removeEnvironmentsByWorkspaceIds(
+          selectedWorkspacesToBeDeleted,
+        );
+        await this.testflowRepository.removeTestflowsByWorkspaceIds(
+          selectedWorkspacesToBeDeleted,
+        );
+      }
+      const isSharedWorkspaceActive =
+        await this.workspaceRepository.getSharedPublicActiveWorkspace();
+      if (!isAnyWorkspaceActive && !isSharedWorkspaceActive) {
         this.workspaceRepository.setActiveWorkspace(data[0]._id);
         return;
       }

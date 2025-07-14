@@ -34,9 +34,8 @@ class InitAiRequestTab {
             activeSync: false,
             property: {
                 aiRequest: {
-                    // AI_Model_Provider: LLMProviderEnum.OpenAI,
-                    aiModelProvider: 'openai',
-                    aiModelVariant: 'gpt-4o',
+                    aiModelProvider: "",
+                    aiModelVariant: "",
                     systemPrompt: "",
                     auth: {
                         bearerToken: "",
@@ -50,13 +49,47 @@ class InitAiRequestTab {
                             addTo: CollectionRequestAddToBaseEnum.HEADER, // ToDo (remove while pushing): This "addTo" needs to removed, because api key handling is done from backend so on frontend no need to decided headers or params
                         },
                     },
+                    configurations: {
+                        openai: {
+                            streamResponse: true,
+                            jsonResponseFormat: false,
+                            temperature: 0.5,
+                            presencePenalty: 0.5,
+                            frequencyPenalty: 0.5,
+                            maxTokens: -1,
+                        },
+                        deepseek: {
+                            streamResponse: true,
+                            jsonResponseFormat: false,
+                            temperature: 0.5,
+                            presencePenalty: 0.5,
+                            frequencyPenalty: 0.5,
+                            maxTokens: -1,
+                        },
+                        anthropic: {
+                            streamResponse: true,
+                            maxTokens: -1,
+                            temperature: 0.5,
+                            top_p: 0.95,
+                        },
+                        google: {
+                            streamResponse: true,
+                            jsonResponseFormat: false,
+                            temperature: 0.5,
+                            maxTokens: -1,
+                            top_p: 0.95,
+                        },
+                    },
                     ai: {
                         prompt: "",
                         conversations: [],
-                        threadId: "",
+                        conversationId: "",
+                        lastActiveChatBackup: [],
+                        isoldChatPreviewActive: false,
+                        conversationTitle: "New Conversation",
                     },
                     state: {
-                        aiAuthNavigation: AiRequestAuthTypeBaseEnum.NO_AUTH,
+                        aiAuthNavigation: AiRequestAuthTypeBaseEnum.API_KEY,
                         aiNavigation: AiRequestSectionEnum.SYSTEM_PROMPT,
                         aiLeftSplitterWidthPercentage: 50,
                         aiRightSplitterWidthPercentage: 50,
@@ -64,8 +97,13 @@ class InitAiRequestTab {
                         isSaveDescriptionInProgress: false,
                         isSaveRequestInProgress: false,
                         isChatbotActive: true,
+                        isChatAutoClearActive: false,
                         isChatbotSuggestionsActive: true,
                         isChatbotGeneratingResponse: false,
+                        isChatbotConversationLoading: false,
+                        isConversationHistoryPanelOpen: false,
+                        isConversationHistoryLoading: false,
+                        isChatbotPromptBoxActive: false, 
                     },
                 },
             },
@@ -113,19 +151,22 @@ class InitAiRequestTab {
             this._tab.property.aiRequest.aiModelVariant = _modalVariantName;
         }
     }
+    public updateAISystemPrompt(_systemPrompt: string) {
+        if (_systemPrompt && this._tab.property.aiRequest) {
+            this._tab.property.aiRequest.systemPrompt = _systemPrompt;
+        }
+    }
+    // ToDo: Method to update AI modal configurations
+    // public updateAIConfigurations(_configurations) {
+    //     if (_configurations && this._tab.property.aiRequest) {
+    //         this._tab.property.aiRequest.configurations = _configurations;
+    //     }
+    // }
     public updateAuth(_auth: Auth) {
         if (_auth && this._tab.property.aiRequest) {
             this._tab.property.aiRequest.auth = _auth;
         }
     }
-
-    // ToDo: Method to update AI modal configurations
-    // public updateAIConfigurations(_headers: KeyValueChecked[]) {
-    //     if (_headers && this._tab.property.aiRequest) {
-    //         this._tab.property.aiRequest.Configurations = _headers;
-    //     }
-    // }
-
     public updateIsSave(_isSave: boolean) {
         this._tab.isSaved = _isSave;
     }

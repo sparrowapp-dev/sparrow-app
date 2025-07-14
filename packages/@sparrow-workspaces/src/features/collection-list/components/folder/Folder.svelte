@@ -17,7 +17,7 @@
   } from "@sparrow/library/icons";
 
   import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
-
+  import { slide } from "svelte/transition";
   // ---- Components
   import {
     Spinner,
@@ -49,6 +49,8 @@
     removeCollectionItem,
   } from "../../../../stores/recent-left-panel";
   import MockRequest from "../mock-request/MockRequest.svelte";
+  import AiRequest from "../ai-request/AiRequest.svelte";
+  import { inview } from "svelte-inview";
   /**
    * Callback for Item created
    * @param entityType - type of item to create like request/folder
@@ -100,7 +102,7 @@
   export let isWebApp = false;
   export let isSharedWorkspace = false;
 
-  let expand: boolean = false;
+  export let expand: boolean = false;
   let deleteLoader: boolean = false;
   let showMenu: boolean = false;
   let isFolderPopup: boolean = false;
@@ -108,6 +110,7 @@
   let isRenaming = false;
   let requestCount: number;
   let mockRequestCount: number = 0;
+  let aiRequestCount: number = 0;
   let graghQlCount: number;
   let webSocketCount: number;
   let socketIoCount: number;
@@ -117,25 +120,48 @@
   let verticalFolderLine = false;
   export let isMockCollection = false;
 
-  $: {
-    if (explorer.type === "FOLDER") {
-      if (explorer.items.find((item) => item.id === activeTabId)) {
-        verticalFolderLine = true;
-      } else {
-        verticalFolderLine = false;
-      }
-    }
-  }
+  // let visibleItems = [];
+  // let renderBatchSize = 10;
 
-  $: {
-    if (searchData) {
-      expand = true;
-    }
-    // if (activeTabPath) {
-    // if (activeTabPath?.folderId === explorer.id) {
-    //   expand = true;
-    // }
-    // }
+  // function waitNextFrames(frameCount = 1): Promise<void> {
+  //   return new Promise((resolve) => {
+  //     function next(n: number) {
+  //       if (n <= 0) return resolve();
+  //       requestAnimationFrame(() => next(n - 1));
+  //     }
+  //     next(frameCount);
+  //   });
+  // }
+
+  // async function renderInBatches(items: any[], batchSize = 10) {
+  //   visibleItems = [];
+
+  //   for (let i = 0; i < items.length; i += batchSize) {
+  //     const nextBatch = items.slice(i, i + batchSize);
+  //     visibleItems = [...visibleItems, ...nextBatch];
+  //     if (searchData) {
+  //       await waitNextFrames(100); // let UI update
+  //     } else {
+  //       await waitNextFrames(10); // let UI update
+  //     }
+  //   }
+  // }
+
+  // $: if (expand && explorer?.items?.length) {
+  //   renderInBatches(explorer.items, renderBatchSize);
+  // }
+
+  // $: {
+  //   if (explorer.type === "FOLDER") {
+  //     if (explorer.items.find((item) => item.id === activeTabId)) {
+  //       verticalFolderLine = true;
+  //     } else {
+  //       verticalFolderLine = false;
+  //     }
+  //   }
+  // }
+
+  $: if (isFolderPopup) {
     if (explorer) {
       requestIds = [];
       requestCount = 0;
@@ -161,10 +187,23 @@
           } else if (item.type === CollectionItemTypeBaseEnum.MOCK_REQUEST) {
             mockRequestCount++;
             requestIds.push(item.id);
+          } else if (item.type === CollectionItemTypeBaseEnum.AI_REQUEST) {
+            aiRequestCount++;
+            requestIds.push(item.id);
           }
         });
       }
     }
+  }
+  $: {
+    if (searchData) {
+      // expand = true;
+    }
+    // if (activeTabPath) {
+    // if (activeTabPath?.folderId === explorer.id) {
+    //   expand = true;
+    // }
+    // }
   }
 
   // const selectedMethodUnsubscibe = selectMethodsStore.subscribe((value) => {
@@ -220,17 +259,18 @@
     }
   };
 
-  $: {
-    if ($openedComponent.has(explorer.id)) {
-      expand = true;
-    }
-  }
+  // $: {
+  //   if ($openedComponent.has(explorer.id)) {
+  //     expand = true;
+  //   }
+  // }
 </script>
 
 <svelte:window
   on:click={handleSelectClick}
   on:contextmenu|preventDefault={handleSelectClick}
 />
+
 <div>
   <Modal
     title={isMockCollection ? "Delete Folder" : "Delete Folder?"}
@@ -319,21 +359,21 @@
     <Options
       xAxis={folderTabWrapper.getBoundingClientRect().right - 30}
       yAxis={[
-        folderTabWrapper.getBoundingClientRect().top - 0,
+        folderTabWrapper.getBoundingClientRect().top - 5,
         folderTabWrapper.getBoundingClientRect().bottom + 5,
       ]}
       zIndex={500}
       menuItems={[
         {
           onClick: () => {
-            expand = true;
-            if (expand) {
-              onItemOpened("folder", {
-                workspaceId: collection.workspaceId,
-                collection,
-                folder: explorer,
-              });
-            }
+            // expand = true;
+            // if (expand) {
+            onItemOpened("folder", {
+              workspaceId: collection.workspaceId,
+              collection,
+              folder: explorer,
+            });
+            // }
           },
           displayText: "Open Folder",
           disabled: false,
@@ -341,7 +381,7 @@
         },
         {
           onClick: () => {
-            expand = false;
+            // expand = false;
             isRenaming = true;
           },
           displayText: "Rename Folder",
@@ -423,6 +463,23 @@
         },
         {
           onClick: () => {
+            onItemCreated("aiRequestFolder", {
+              workspaceId: collection.workspaceId,
+              collection,
+              folder: explorer,
+            });
+          },
+          displayText: `Add AI Request`,
+          disabled: false,
+          hidden:
+            !isMockCollection &&
+            (!collection.activeSync ||
+              (explorer?.source === "USER" && collection.activeSync))
+              ? false
+              : true,
+        },
+        {
+          onClick: () => {
             isFolderPopup = true;
           },
           displayText: "Delete",
@@ -434,7 +491,6 @@
               : true,
         },
       ]}
-      {noOfColumns}
     />
   {/if}
 
@@ -446,7 +502,7 @@
         style="height:32px; padding-left:30px; margin-bottom:{explorer.id ===
         activeTabId
           ? '0px'
-          : '2px'} ; "
+          : '0px'} ; "
         class=" d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
@@ -457,19 +513,19 @@
           style=" height:32px; "
           class="main-folder pe-1 d-flex align-items-center pe-0 border-0 bg-transparent"
           on:contextmenu|preventDefault={rightClickContextMenu}
-          on:click|preventDefault={() => {
+          on:click|preventDefault|stopPropagation={(e) => {
             if (!isRenaming) {
               if (!explorer.id.includes(UntrackedItems.UNTRACKED)) {
-                expand = !expand;
+                // expand = !expand;
                 if (expand) {
-                  addCollectionItem(explorer.id, "Folder");
+                  removeCollectionItem(explorer.id);
+                } else {
                   onItemOpened("folder", {
                     workspaceId: collection.workspaceId,
                     collection,
                     folder: explorer,
                   });
-                } else {
-                  removeCollectionItem(explorer.id);
+                  addCollectionItem(explorer.id, "Folder");
                 }
               }
             }
@@ -483,7 +539,12 @@
               type="teritiary-regular"
               onClick={(e) => {
                 e.stopPropagation();
-                expand = !expand;
+                // expand = !expand;
+                if (expand) {
+                  removeCollectionItem(explorer.id);
+                } else {
+                  addCollectionItem(explorer.id, "Folder");
+                }
               }}
             />
           </span>
@@ -560,7 +621,7 @@
                   startIcon={ArrowSwapRegular}
                   onClick={(e) => {
                     e.stopPropagation();
-                    expand = true;
+                    // expand = true;
                     if (isMockCollection) {
                       onItemCreated("requestMockFolder", {
                         workspaceId: collection.workspaceId,
@@ -600,153 +661,49 @@
           </Tooltip>
         {/if}
       </div>
-      <div style="padding-left: 0; display: {expand ? 'block' : 'none'};">
-        <div
-          class="sub-files position-relative"
-          style={` background-color: ${explorer.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"};`}
-        >
-          {#if explorer?.items?.length > 0}
-            <div
-              class="box-line"
-              style="background-color: {verticalFolderLine
-                ? 'var(--bg-ds-neutral-500)'
-                : 'var(--bg-ds-surface-100)'}"
-            ></div>
-          {/if}
-          {#each explorer?.items || [] as exp}
-            <svelte:self
-              {userRole}
-              {isSharedWorkspace}
-              {onItemCreated}
-              {onItemDeleted}
-              {onItemRenamed}
-              {onItemOpened}
-              {activeTabType}
-              {collection}
-              {userRoleInWorkspace}
-              {activeTabPath}
-              explorer={exp}
-              folder={explorer}
-              {activeTabId}
-              {isWebApp}
-            />
-          {/each}
-          {#if !explorer?.items?.length}
-            <p
-              class="text-ds-font-size-12 my-2 text-secondary-300"
-              style="padding-left: 90px;"
-            >
-              This folder is empty
-            </p>
-          {/if}
-          <!-- {#if   showFolderAPIButtons && explorer?.source === "USER"}
-            <div class="mt-2 mb-2 ms-0">
-              <Tooltip
-                classProp="mt-2 mb-2 ms-0"
-                title={PERMISSION_NOT_FOUND_TEXT}
-                show={!hasWorkpaceLevelPermission(
-                  userRoleInWorkspace,
-                  workspaceLevelPermissions.SAVE_REQUEST,
-                )}
+      {#if expand}
+        <div transition:slide={{ duration: 250 }} style="padding-left: 0;">
+          <div
+            class="sub-files position-relative"
+            style={` background-color: ${explorer.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"};`}
+          >
+            <!-- {#if explorer?.items?.length > 0}
+                  <div
+                    class="box-line"
+                    style="background-color: {verticalFolderLine
+                      ? 'var(--bg-ds-neutral-500)'
+                      : 'var(--bg-ds-surface-100)'}"
+                  ></div>
+                {/if}  -->
+            <!-- {#each explorer?.items || [] as exp}
+                  <svelte:self
+                    {userRole}
+                    {isSharedWorkspace}
+                    {onItemCreated}
+                    {onItemDeleted}
+                    {onItemRenamed}
+                    {onItemOpened}
+                    {activeTabType}
+                    {collection}
+                    {userRoleInWorkspace}
+                    {activeTabPath}
+                    explorer={exp}
+                    folder={explorer}
+                    {activeTabId}
+                    {isWebApp}
+                  />
+                {/each} -->
+            {#if !explorer?.items?.length}
+              <p
+                class="text-ds-font-size-12 mb-0 text-secondary-300"
+                style="padding-left: 90px;"
               >
-                <img
-                  class="list-icons"
-                  src={requestIcon}
-                  alt="+ API Request"
-                  on:click={() => {
-                    onItemCreated("requestFolder", {
-                      workspaceId: collection.workspaceId,
-                      collection,
-                      folder: explorer,
-                    });
-                    MixpanelEvent(Events.ADD_NEW_API_REQUEST, {
-                      source: "Side Panel Collection List",
-                    });
-                  }}
-                />
-              </Tooltip>
-            </div>
-          {/if} -->
+                This folder is empty
+              </p>
+            {/if}
+          </div>
         </div>
-      </div>
-    {:else if explorer.type === CollectionItemTypeBaseEnum.REQUEST}
-      <div style={`cursor: pointer; `}>
-        <Request
-          {userRole}
-          {isSharedWorkspace}
-          api={explorer}
-          {onItemRenamed}
-          {onItemDeleted}
-          {onItemOpened}
-          {activeTabPath}
-          {searchData}
-          {activeTabType}
-          {folder}
-          {collection}
-          {activeTabId}
-          {isWebApp}
-        />
-      </div>
-    {:else if explorer.type === CollectionItemTypeBaseEnum.WEBSOCKET}
-      <div style="cursor:pointer;">
-        <WebSocket
-          {userRole}
-          {isSharedWorkspace}
-          api={explorer}
-          {onItemRenamed}
-          {onItemDeleted}
-          {onItemOpened}
-          {folder}
-          {collection}
-          {activeTabId}
-        />
-      </div>
-    {:else if explorer.type === CollectionItemTypeBaseEnum.SOCKETIO}
-      <div style="cursor:pointer;">
-        <SocketIo
-          {userRole}
-          {isSharedWorkspace}
-          socketIo={explorer}
-          {onItemRenamed}
-          {onItemDeleted}
-          {onItemOpened}
-          {folder}
-          {collection}
-          {activeTabId}
-        />
-      </div>
-    {:else if explorer.type === CollectionItemTypeBaseEnum.GRAPHQL}
-      <div style="cursor:pointer;">
-        <Graphql
-          {userRole}
-          {isSharedWorkspace}
-          graphql={explorer}
-          {onItemRenamed}
-          {onItemDeleted}
-          {onItemOpened}
-          {folder}
-          {collection}
-          {activeTabId}
-        />
-      </div>
-    {:else if explorer.type === CollectionItemTypeBaseEnum.MOCK_REQUEST}
-      <div style={`cursor: pointer; `}>
-        <MockRequest
-          {userRole}
-          {isSharedWorkspace}
-          api={explorer}
-          {onItemRenamed}
-          {onItemDeleted}
-          {onItemOpened}
-          {activeTabPath}
-          {searchData}
-          {activeTabType}
-          {folder}
-          {collection}
-          {activeTabId}
-          {isWebApp}
-        />
-      </div>
+      {/if}
     {/if}
   {/if}
 </div>

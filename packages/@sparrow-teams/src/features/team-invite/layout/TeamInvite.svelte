@@ -173,6 +173,9 @@
           const response = await onInviteClick(teamId, teamName, data, userId);
           if (response.isSuccessful) {
             handleModalState(false);
+          } else {
+            loader = false;
+            handleModalState(false);
           }
         }
       } else {
@@ -184,6 +187,9 @@
         const response = await onInviteClick(teamId, teamName, data, userId);
         if (response.isSuccessful) {
           handleModalState(false);
+        } else {
+          loader = false;
+          handleModalState(false);
         }
       }
     }
@@ -193,6 +199,7 @@
   const handleDropdown = (id) => {
     selectedRole = id;
   };
+
   const handleCheckSelectDropdown = (items: any[]) => {
     teamSpecificWorkspace = items;
   };

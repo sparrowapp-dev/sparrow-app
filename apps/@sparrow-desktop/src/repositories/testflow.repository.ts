@@ -30,6 +30,15 @@ export class TestflowRepository {
   };
 
   /**
+   * Retrieves the list of test flow documents from the database.
+   *
+   * @returns array of test flow documents, sorted by their creation date in ascending order.
+   */
+  public getTestflowDoc = async (): Promise<any> => {
+    return await this.rxdb?.find().sort({ createdAt: "asc" }).exec();
+  };
+
+  /**
    * Updates a test flow with the provided data.
    *
    * @param uuid - The unique identifier of the test flow (reference to mongoId).
@@ -168,18 +177,18 @@ export class TestflowRepository {
   };
 
   public searchTestflows = async (
-    _query: string
+    _query: string,
   ): Promise<TFRxHandlerType[] | undefined> => {
     const testflows = await this.rxdb
       ?.find({
         selector: {
           name: {
-            $regex: new RegExp(_query, 'i')
-          }
-        }
+            $regex: new RegExp(_query, "i"),
+          },
+        },
       })
       .exec();
-    
+
     return testflows;
   };
 
@@ -189,13 +198,32 @@ export class TestflowRepository {
    * @param _limit - The maximum number of test flows to return (defaults to 5).
    * @returns A promise that resolves to an array of the most recent test flow documents.
    */
-  public getRecentTestflows = async (
-  ): Promise<TFRxHandlerType[] | undefined> => {
+  public getRecentTestflows = async (): Promise<
+    TFRxHandlerType[] | undefined
+  > => {
     const testflows = await this.rxdb
       ?.find()
-      .sort({ updatedAt: 'desc' })
+      .sort({ updatedAt: "desc" })
       .exec();
-    
+
     return testflows;
+  };
+
+  /* Remove testflows by multiple workspaceIds
+   * @param _workspaceIds - Single workspaceId or array of workspaceIds to filter testflows
+   * @returns Promise resolving to the result of the removal operation
+   */
+  public removeTestflowsByWorkspaceIds = async (
+    _workspaceIds: string[],
+  ): Promise<any> => {
+    return await RxDB.getInstance()
+      .rxdb?.testflow.find({
+        selector: {
+          workspaceId: {
+            $in: _workspaceIds,
+          },
+        },
+      })
+      .remove();
   };
 }

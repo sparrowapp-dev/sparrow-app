@@ -23,18 +23,15 @@
   export let tab;
   export let isTourGuideOpen = false;
   let isLoginBannerActive = false;
-  const _viewModel = new RestExplorerMockViewModel(tab);
-  const collectionObs = _viewModel.collectionSubscriber(tab.path.collectionId);
+
+  let _viewModel;
+  let collectionObs;
 
   let collection: CollectionDocType;
-  const collectionSubscriber = collectionObs.subscribe(
-    (data: RxDocument<CollectionDocument>) => {
-      collection = data?.toMutableJSON();
-    },
-  );
+  let collectionSubscriber;
 
-  const environments = _viewModel.environments;
-  const activeWorkspace = _viewModel.activeWorkspace;
+  let environments;
+  let activeWorkspace;
   let isGuestUser = false;
   let userId = "";
   let userRole = "";
@@ -49,15 +46,11 @@
     }
   });
 
-  const renameWithCollectionList = new Debounce().debounce(
-    _viewModel.updateNameWithCollectionList as any,
-    1000,
-  );
-  const debouncedAPIUpdater = new Debounce().debounce(
-    _viewModel?.refreshTabData as any,
-    1000,
-  );
+  let renameWithCollectionList;
+  let debouncedAPIUpdater;
+
   let prevTabName = "";
+  let prevTabId = "";
   /**
    * Find the role of user in active workspace
    */
@@ -73,12 +66,58 @@
   };
   $: {
     if (tab) {
-      if (tab?.name && prevTabName !== tab.name) {
+      if (prevTabId !== tab?.tabId) {
+        (async () => {
+          /**
+           * @description - Initialize the view model for the new http request tab
+           */
+          _viewModel = new RestExplorerMockViewModel(tab);
+          collectionObs = _viewModel.collectionSubscriber(
+            tab.path.collectionId,
+          );
+
+          collectionSubscriber = collectionObs.subscribe(
+            (data: RxDocument<CollectionDocument>) => {
+              collection = data?.toMutableJSON();
+            },
+          );
+
+          environments = _viewModel.environments;
+          activeWorkspace = _viewModel.activeWorkspace;
+
+          renameWithCollectionList = new Debounce().debounce(
+            _viewModel.updateNameWithCollectionList as any,
+            1000,
+          );
+          debouncedAPIUpdater = new Debounce().debounce(
+            _viewModel?.refreshTabData as any,
+            1000,
+          );
+
+          activeWorkspaceSubscriber = activeWorkspace.subscribe(
+            async (value: WorkspaceDocument) => {
+              const activeWorkspaceRxDoc = value;
+              if (activeWorkspaceRxDoc) {
+                currentWorkspace = activeWorkspaceRxDoc;
+                currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
+                environmentId = activeWorkspaceRxDoc.get("environmentId");
+              }
+            },
+          );
+
+          const guestUser = await _viewModel.getGuestUser();
+          if (guestUser?.isBannerActive) {
+            isLoginBannerActive = guestUser?.isBannerActive;
+          }
+
+          findUserRole();
+        })();
+      } else if (tab?.name && prevTabName !== tab.name) {
         renameWithCollectionList(tab.name);
       }
-      prevTabName = tab.name;
-      findUserRole();
       debouncedAPIUpdater(tab);
+      prevTabName = tab?.name || "";
+      prevTabId = tab?.tabId || "";
     }
   }
 
@@ -87,16 +126,7 @@
   let currentWorkspaceId = "";
   let currentWorkspace;
 
-  const activeWorkspaceSubscriber = activeWorkspace.subscribe(
-    async (value: WorkspaceDocument) => {
-      const activeWorkspaceRxDoc = value;
-      if (activeWorkspaceRxDoc) {
-        currentWorkspace = activeWorkspaceRxDoc;
-        currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
-        environmentId = activeWorkspaceRxDoc.get("environmentId");
-      }
-    },
-  );
+  let activeWorkspaceSubscriber;
 
   /**
    * @description - refreshes the environment everytime workspace changes
@@ -148,21 +178,21 @@
       refreshEnvironment();
     }
   }
-  onMount(async () => {
-    const guestUser = await _viewModel.getGuestUser();
-    if (guestUser?.isBannerActive) {
-      isLoginBannerActive = guestUser?.isBannerActive;
-    }
-  });
 
   let restExplorerData: restExplorerData | undefined;
-  restExplorerDataStore.subscribe((webSocketMap) => {
-    restExplorerData = webSocketMap.get(tab.tabId);
+  let webSocketMap;
+
+  $: {
+    restExplorerData = webSocketMap?.get(tab.tabId);
+  }
+
+  restExplorerDataStore.subscribe((_webSocketMap) => {
+    webSocketMap = _webSocketMap;
   });
 
   onDestroy(() => {
-    collectionSubscriber.unsubscribe();
-    activeWorkspaceSubscriber.unsubscribe();
+    collectionSubscriber?.unsubscribe();
+    activeWorkspaceSubscriber?.unsubscribe();
   });
 </script>
 
@@ -217,4 +247,10 @@
   onGenerateAiResponse={_viewModel.generateAIResponseWS}
   onToggleLike={_viewModel.toggleChatMessageLike}
   onUpdateAiModel={_viewModel.updateAIModel}
+  onCreateMockResponse={_viewModel.handleCreateMockResponse}
+  onHandleMockResponseState={_viewModel.handleMockResponseState}
+  onRenameMockResponse={_viewModel.handleRenameMockResponse}
+  onDeleteMockResponse={_viewModel.handleDeleteMockResponse}
+  onUpdateResponseHeaders={_viewModel.updateResponseHeaders}
+  onUpdateResponseRatios={_viewModel.updateResponseRatios}
 />

@@ -9,3 +9,11 @@ export { default as WelcomePopUpWeb } from "./welcome-pop-up-web/WelcomePopUpWeb
 export { default as DefaultHeader } from "./default-header/DefaultHeader.svelte";
 export { default as LaunchDesktop } from "./lanuch-desktop/LanuchDesktop.svelte";
 export { default as SwitchWorkspace } from "./switch-workspace/SwitchWorkspace.svelte";
+export { default as WorkspaceGrid } from "./workspace-grid/WorkspaceGrid.svelte";
+export { default as MenuView } from "./menu-view/MenuView.svelte";
+export { default as Card } from "./card/Card.svelte";
+export { default as UpgradePlanBanner } from "./upgrade-plan/UpgradePlanBanner.svelte";
+export { default as UpgradePlanPopUp } from "./upgrade-plan-pop-up/UpgradePlanPopUp.svelte";
+export { default as PlanUpgradeModal } from "./plan-upgrade-modal/PlanUpgradeModal.svelte";
+export { default as NumberInput } from "./number-input/NumberInput.svelte";
+export { default as GithubStarRedirect } from "./github-star-redirect/GithubStarRedirect.svelte";

@@ -3,7 +3,7 @@
   "private": true,
   "author": "Sparrow",
   "description": "The Sparrow App is your next go to API development buddy which can help you test, debug, distribute better APIs while collaborating with your colleagues and making you a better programmer.",
-  "version": "2.23.1",
+  "version": "2.28.0",
   "type": "module",
   "workspaces": [
     "./apps/@sparrow-web",
@@ -13,7 +13,8 @@
     "./packages/@sparrow-common",
     "./packages/@sparrow-teams",
     "./packages/@sparrow-workspaces",
-    "./packages/@sparrow-support"
+    "./packages/@sparrow-support",
+    "./packages/@sparrow-marketplace"
   ],
   "scripts": {
     "desktop-start": "yarn workspace @sparrow/desktop tauri dev",
@@ -46,14 +47,19 @@
     "support-pretty": "yarn workspace @sparrow/support pretty",
     "common-lint": "yarn workspace @sparrow/common lint",
     "common-pretty": "yarn workspace @sparrow/common pretty",
+    "marketplace-lint": "yarn workspace @sparrow/marketplace lint",
+    "marketplace-pretty": "yarn workspace @sparrow/marketplace pretty",
+    "sync-version": "node scripts/sync-version.js",
     "postinstall": "husky install"
   },
   "dependencies": {
     "@codemirror/lang-html": "^6.4.7",
     "@codemirror/lang-javascript": "^6.2.1",
     "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/lang-python": "6.0.4",
     "@codemirror/lang-xml": "^6.0.2",
     "@codemirror/language": "^6.10.0",
+    "@codemirror/legacy-modes": "^6.5.1",
     "@codemirror/lint": "^6.8.4",
     "@codemirror/merge": "^6.10.0",
     "@codemirror/state": "^6.4.0",
@@ -78,7 +84,6 @@
     "@tauri-apps/plugin-updater": "^2.2.0",
     "@xyflow/svelte": "^0.1.17",
     "axios": "^1.5.1",
-    "posthog-js": "1.236.7",
     "body-scroll-lock": "^4.0.0-beta.0",
     "bootstrap": "^5.3.1",
     "btoa": "^1.2.1",
@@ -95,6 +100,7 @@
     "mixpanel-browser": "^2.48.1",
     "monaco-editor": "^0.44.0",
     "path": "^0.12.7",
+    "posthog-js": "1.236.7",
     "rxdb": "^14.17.1",
     "rxjs": "^7.8.1",
     "socket.io-client": "^4.7.5",
@@ -108,7 +114,10 @@
     "svelte-splitpanes": "^8.0.9",
     "svelte-toasts": "^1.1.2",
     "uuid": "^9.0.1",
-    "yup": "^1.2.0"
+    "yup": "^1.2.0",
+    "svelte-virtual-list": "^3.0.1",
+    "@sveltejs/svelte-virtual-list":"^3.0.1",
+    "svelte-virtual-scroll-list":"^1.3.0"
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",
@@ -168,23 +177,27 @@
           "assets": [
             {
               "path": "/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg",
-              "label": "Sparrow_2.23.1.dmg"
+              "label": "Sparrow_2.28.0.dmg"
             },
             {
               "path": "msi_files/*.exe",
-              "label": "Sparrow_2.23.1.exe"
+              "label": "Sparrow_2.28.0.exe"
             },
             {
               "path": "msi_files/*.msi",
-              "label": "Sparrow_2.23.1.msi"
+              "label": "Sparrow_2.28.0.msi"
             },
             {
               "path": "msi_files/*.zip",
-              "label": "Sparrow_2.23.1_x64_en-US.msi.zip"
+              "label": "Sparrow_2.28.0_x64_en-US.msi.zip"
             },
             {
               "path": "/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/Sparrow.app.tar.gz",
               "label": "Sparrow.app.tar.gz"
+            },
+            {
+              "path": "deb_files/*.deb",
+              "label": "sparrow_2.28.0_amd64.deb"
             }
           ]
         }

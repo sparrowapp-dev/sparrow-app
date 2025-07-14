@@ -185,7 +185,7 @@
   <Options
     xAxis={requestTabWrapper.getBoundingClientRect().right - 30}
     yAxis={[
-      requestTabWrapper.getBoundingClientRect().top - 0,
+      requestTabWrapper.getBoundingClientRect().top - 5,
       requestTabWrapper.getBoundingClientRect().bottom + 5,
     ]}
     zIndex={500}
@@ -230,7 +230,6 @@
             : true,
       },
     ]}
-    {noOfColumns}
   />
 {/if}
 
@@ -241,7 +240,7 @@
   activeTabId
     ? 'active-request-tab'
     : ''} "
-  style="height:32px; padding-left:3px; margin-bottom:2px;"
+  style="height:32px; padding-left:3px;"
 >
   <button
     tabindex="-1"

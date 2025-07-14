@@ -15,25 +15,91 @@
     EnvironmentLocalGlobalJoinBaseInterface,
   } from "@sparrow/common/types/workspace/environment-base";
   import { getClientUser } from "@app/utils/jwt";
-  export let tab;
+  import { user } from "@app/store/auth.store";
 
-  const _viewModel = new GraphqlExplorerViewModel(tab);
-  const environments = _viewModel.environments;
-  const activeWorkspace = _viewModel.activeWorkspace;
+  export let tab;
+  let userId = "";
+  let userRole = "";
+
+  let _viewModel;
+  let environments;
+  let activeWorkspace;
   let isGraphqlEditable = false;
 
-  const renameWithCollectionList = new Debounce().debounce(
-    _viewModel.updateNameWithCollectionList as any,
-    1000,
-  );
+  let renameWithCollectionList;
+  user.subscribe((value) => {
+    if (value) {
+      userId = value._id;
+    }
+  });
+
+  /**
+   * Find the role of user in active workspace
+   */
+  const findUserRole = async () => {
+    const workspace = await _viewModel.getWorkspaceById(
+      tab?.path?.workspaceId as string,
+    );
+    workspace.users?.forEach((value) => {
+      if (value.id === userId) {
+        userRole = value.role as string;
+      }
+    });
+  };
 
   let prevTabName = "";
+  let prevTabId = "";
   $: {
     if (tab) {
-      if (tab?.name && prevTabName !== tab.name) {
+      if (prevTabId !== tab?.tabId) {
+        (async () => {
+          /**
+           * @description - Initialize the view model for the new http request tab
+           */
+          _viewModel = new GraphqlExplorerViewModel(tab);
+          environments = _viewModel.environments;
+          activeWorkspace = _viewModel.activeWorkspace;
+
+          activeWorkspaceSubscribe = activeWorkspace.subscribe(
+            async (value: WorkspaceDocument) => {
+              const activeWorkspaceRxDoc = value.toMutableJSON();
+              if (activeWorkspaceRxDoc) {
+                currentWorkspace = activeWorkspaceRxDoc;
+                currentWorkspaceId = activeWorkspaceRxDoc._id;
+                environmentId = activeWorkspaceRxDoc.environmentId as string;
+                const clientUserId = getClientUser().id;
+                if (clientUserId) {
+                  let isUserViewer = false;
+                  activeWorkspaceRxDoc.users?.forEach((_user) => {
+                    if (_user.id === clientUserId) {
+                      if (_user.role === WorkspaceRole.WORKSPACE_VIEWER) {
+                        isUserViewer = true;
+                      }
+                    }
+                  });
+                  if (isUserViewer) {
+                    isGraphqlEditable = false;
+                  } else {
+                    isGraphqlEditable = true;
+                  }
+                } else {
+                  isGraphqlEditable = true;
+                }
+              }
+            },
+          );
+
+          renameWithCollectionList = new Debounce().debounce(
+            _viewModel.updateNameWithCollectionList as any,
+            1000,
+          );
+        })();
+      } else if (tab?.name && prevTabName !== tab.name) {
         renameWithCollectionList(tab.name);
       }
-      prevTabName = tab.name;
+      findUserRole();
+      prevTabId = tab?.tabId || "";
+      prevTabName = tab?.name || "";
     }
   }
 
@@ -42,34 +108,7 @@
   let currentWorkspaceId = "";
   let currentWorkspace;
 
-  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
-    async (value: WorkspaceDocument) => {
-      const activeWorkspaceRxDoc = value.toMutableJSON();
-      if (activeWorkspaceRxDoc) {
-        currentWorkspace = activeWorkspaceRxDoc;
-        currentWorkspaceId = activeWorkspaceRxDoc._id;
-        environmentId = activeWorkspaceRxDoc.environmentId as string;
-        const clientUserId = getClientUser().id;
-        if (clientUserId) {
-          let isUserViewer = false;
-          activeWorkspaceRxDoc.users?.forEach((_user) => {
-            if (_user.id === clientUserId) {
-              if (_user.role === WorkspaceRole.WORKSPACE_VIEWER) {
-                isUserViewer = true;
-              }
-            }
-          });
-          if (isUserViewer) {
-            isGraphqlEditable = false;
-          } else {
-            isGraphqlEditable = true;
-          }
-        } else {
-          isGraphqlEditable = true;
-        }
-      }
-    },
-  );
+  let activeWorkspaceSubscribe;
 
   /**
    * @description - refreshes the environment everytime workspace changes
@@ -123,8 +162,14 @@
   }
 
   let restExplorerData: graphqlExplorerData | undefined;
-  graphqlExplorerDataStore.subscribe((webSocketMap) => {
-    restExplorerData = webSocketMap.get(tab.tabId);
+  let webSocketMap;
+
+  $: {
+    restExplorerData = webSocketMap?.get(tab.tabId);
+  }
+
+  graphqlExplorerDataStore.subscribe((_webSocketMap) => {
+    webSocketMap = _webSocketMap;
   });
   onDestroy(() => {
     activeWorkspaceSubscribe.unsubscribe();
@@ -132,6 +177,7 @@
 </script>
 
 <GraphqlExplorer
+  bind:userRole
   collections={_viewModel.collection}
   tab={_viewModel.tab}
   requestAuthHeader={_viewModel.authHeader}

@@ -7,19 +7,23 @@
     WorkspaceDocument,
   } from "@app/database/database";
   import { testFlowDataStore } from "@sparrow/workspaces/features/testflow-explorer/store";
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount, tick } from "svelte";
   import type { TFDataStoreType } from "@sparrow/common/types/workspace/testflow";
   import { isGuestUserActive, user } from "@app/store/auth.store";
-  import { environmentType, WorkspaceRole } from "@sparrow/common/enums";
+  import {
+    environmentType,
+    ResponseMessage,
+    WorkspaceRole,
+  } from "@sparrow/common/enums";
   import { Debounce } from "@sparrow/common/utils";
   import constants from "@app/constants/constants";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
   export let tab;
-  const _viewModel = new TestflowExplorerPageViewModel(tab);
-  let collectionList: Observable<CollectionDocument[]> =
-    _viewModel.getCollectionList();
+  export let teamDetails;
+  export let upgradePlanModel;
+  let _viewModel;
+  let collectionList: Observable<CollectionDocument[]>;
 
-  let deleteNodeResponse = _viewModel.deleteNodesLessThanId;
   let userId = "";
   let userRole = "";
   let render = false;
@@ -31,9 +35,17 @@
   let isGuestUser = false;
   let currentWorkspaceId = "";
   let currentWorkspace;
+  let planLimitTestFlowBlocks: number = 5;
+  let planLimitTestflow: number = 3;
+  let currentTestflowCount: number = 1;
+  let testflowBlocksPlanModalOpen: boolean = false;
+  let runHistoryPlanModalOpen: boolean = false;
+  let selectiveRunTestflow: boolean = false;
+  let selectiveRunModalOpen: boolean = false;
+  let planLimitRunHistoryCount: number = 5;
 
-  const environments = _viewModel.environments;
-  const activeWorkspace = _viewModel.activeWorkspace;
+  let environments;
+  let activeWorkspace;
 
   isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
@@ -84,16 +96,22 @@
     }
   };
 
-  const sub = _viewModel.tab.subscribe((val) => {
-    if (val?.tabId) {
-      render = true;
-    }
-  });
+  let sub;
 
-  testFlowDataStore.subscribe((val) => {
-    if (val) {
-      testflowStore = val.get(tab?.tabId) as TFDataStoreType;
+  const handleBlockLimitTestflow = async () => {
+    const planlimits = await _viewModel?.userLimitBlockPerTestflow();
+    if (planlimits) {
+      planLimitTestFlowBlocks = planlimits?.blocksPerTestflow?.value || 5;
+      planLimitTestflow = planlimits?.testflowPerWorkspace?.value || 3;
+      selectiveRunTestflow = planlimits?.selectiveTestflowRun?.active || false;
+      planLimitRunHistoryCount = planlimits?.testflowRunHistory?.value || 5;
     }
+  };
+
+  let testflowStoreMap;
+
+  $: {
+    testflowStore = testflowStoreMap?.get(tab?.tabId) as TFDataStoreType;
     const nodes = testflowStore?.nodes ?? [];
     const hasEmptyResponseStatus = nodes.some(
       (node) => !node.response?.status || node.response?.status === "",
@@ -103,6 +121,13 @@
     } else {
       isTestFlowEmpty = false;
     }
+    handleBlockLimitTestflow();
+  }
+
+  testFlowDataStore.subscribe((_testflowStoreMap) => {
+    if (_testflowStoreMap) {
+      testflowStoreMap = _testflowStoreMap;
+    }
   });
 
   const userSubscriber = user.subscribe((value) => {
@@ -111,27 +136,7 @@
     }
   });
 
-  const activeWorkspaceSubscriber = activeWorkspace.subscribe((_workspace) => {
-    const workspaceDoc = _workspace?.toMutableJSON();
-
-    if (workspaceDoc) {
-      currentWorkspace = _workspace;
-      currentWorkspaceId = _workspace.get("_id");
-      environmentId = _workspace.get("environmentId");
-    }
-
-    if (workspaceDoc) {
-      workspaceDoc.users?.forEach((_user) => {
-        if (_user.id === userId) {
-          if (_user.role !== WorkspaceRole.WORKSPACE_VIEWER) {
-            isTestflowEditable = true;
-          } else {
-            isTestflowEditable = false;
-          }
-        }
-      });
-    }
-  });
+  let activeWorkspaceSubscriber;
 
   /**
    * Find the role of user in active workspace
@@ -148,29 +153,78 @@
   };
 
   onDestroy(() => {
-    sub.unsubscribe();
+    sub?.unsubscribe();
     activeWorkspaceSubscriber.unsubscribe();
     userSubscriber();
   });
 
-  const renameWithTestFlowList = new Debounce().debounce(
-    _viewModel.updateNameWithTestFlowList as any,
-    1000,
-  );
+  let renameWithTestFlowList;
+  const handleTestflowCount = async () => {
+    const data = await _viewModel?.fetchCountofTestFlow();
+    currentTestflowCount = data;
+  };
 
   let prevTabName = "";
+  let prevTabId = "";
   $: {
     if (tab) {
-      if (tab?.name && prevTabName !== tab?.name) {
+      if (prevTabId !== tab?.tabId) {
+        (async () => {
+          /**
+           * @description - Initialize the view model for the new http request tab
+           */
+
+          _viewModel = new TestflowExplorerPageViewModel(tab);
+          collectionList = _viewModel.getCollectionList();
+          environments = _viewModel.environments;
+          activeWorkspace = _viewModel.activeWorkspace;
+
+          render = true;
+
+          activeWorkspaceSubscriber = activeWorkspace.subscribe(
+            (_workspace) => {
+              const workspaceDoc = _workspace?.toMutableJSON();
+
+              if (workspaceDoc) {
+                currentWorkspace = _workspace;
+                currentWorkspaceId = _workspace.get("_id");
+                environmentId = _workspace.get("environmentId");
+              }
+
+              if (workspaceDoc) {
+                workspaceDoc.users?.forEach((_user) => {
+                  if (_user.id === userId) {
+                    if (_user.role !== WorkspaceRole.WORKSPACE_VIEWER) {
+                      isTestflowEditable = true;
+                    } else {
+                      isTestflowEditable = false;
+                    }
+                  }
+                });
+              }
+            },
+          );
+
+          renameWithTestFlowList = new Debounce().debounce(
+            _viewModel.updateNameWithTestFlowList as any,
+            1000,
+          );
+          handleBlockLimitTestflow();
+        })();
+      } else if (tab?.name && prevTabName !== tab?.name) {
         renameWithTestFlowList(tab.name);
       }
-      prevTabName = tab.name;
+      prevTabId = tab?.tabId || "";
+      prevTabName = tab?.name || "";
       findUserRole();
     }
+  }
 
+  $: {
     if (environmentId || $environments || currentWorkspaceId) {
       refreshEnvironment();
     }
+    handleTestflowCount();
   }
   const handleEventOnClickQuestionMark = () => {
     captureEvent("documentation_link_clicked", {
@@ -178,6 +232,39 @@
       targetUrl: constants.TESTFLOW_DOCS_URL,
     });
   };
+
+  const handleRequestOwner = async () => {
+    if ($activeWorkspace?._data?.team?.teamId) {
+      await _viewModel.requestToUpgradePlan(
+        $activeWorkspace?._data?.team?.teamId,
+      );
+      testflowBlocksPlanModalOpen = false;
+      runHistoryPlanModalOpen = false;
+      selectiveRunModalOpen = false;
+    }
+  };
+
+  const handleRedirectAdminPanel = async () => {
+    if ($activeWorkspace?._data?.team?.teamId) {
+      await _viewModel.handleRedirectToAdminPanel(
+        $activeWorkspace?._data?.team?.teamId,
+      );
+      testflowBlocksPlanModalOpen = false;
+      runHistoryPlanModalOpen = false;
+      selectiveRunModalOpen = false;
+    }
+  };
+
+  const handleSaveTestflow = async () => {
+    const response = await _viewModel.saveTestflow();
+    if (response?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
+      upgradePlanModel = true;
+    }
+  };
+
+  onMount(() => {
+    handleBlockLimitTestflow();
+  });
 </script>
 
 {#if render}
@@ -197,10 +284,11 @@
     onRedrectRequest={_viewModel.redirectRequest}
     onUpdateTestFlowName={_viewModel.updateName}
     onUpdateBlockData={_viewModel.updateBlockData}
-    onSaveTestflow={_viewModel.saveTestflow}
+    onSaveTestflow={handleSaveTestflow}
     onClickStop={_viewModel.handleStopApis}
     onClearTestflow={_viewModel.clearTestFlowData}
     {isTestFlowEmpty}
+    {isGuestUser}
     isWebApp={false}
     onSelectRequest={_viewModel.getRequestdata}
     checkRequestExistInNode={_viewModel.checkRequestExistInNode}
@@ -210,5 +298,17 @@
     onPreviewExpression={_viewModel.handlePreviewExpression}
     redirectDocsTestflow={_viewModel.redirectDocsTestflow}
     {handleEventOnClickQuestionMark}
+    {planLimitTestFlowBlocks}
+    {planLimitTestflow}
+    {planLimitRunHistoryCount}
+    testflowCount={currentTestflowCount}
+    {teamDetails}
+    bind:testflowBlocksPlanModalOpen
+    bind:runHistoryPlanModalOpen
+    bind:selectiveRunModalOpen
+    handleRedirectToAdminPanel={handleRedirectAdminPanel}
+    {handleRequestOwner}
+    {selectiveRunTestflow}
+    handleContactSales={_viewModel.handleContactSales}
   />
 {/if}

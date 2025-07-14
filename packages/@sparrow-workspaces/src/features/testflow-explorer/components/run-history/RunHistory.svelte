@@ -12,11 +12,15 @@
   import { FormatTime } from "@sparrow/common/utils";
   import { ResponseStatusCode } from "@sparrow/common/enums";
   import { HistoryRegular } from "../../icons";
+  import { onMount } from "svelte";
   const formatTimeAgo = new FormatTime().formatTimeAgo;
   export let testflowStore;
   export let testflowName = "";
   export let toggleHistoryDetails;
   export let toggleHistoryContainer;
+  export let planLimitRunHistoryCount;
+  export let runHistoryPlanModalOpen = false;
+  export let isGuestUser = false;
 
   /**
    * Checks if the current request was successful based on the response status.
@@ -260,6 +264,20 @@
                   </div>
                 {/each}
               {/if}
+              {#if testflowStore?.history.length > 0 && testflowStore?.history.length === planLimitRunHistoryCount && !isGuestUser}
+                <div
+                  class="d-flex flex-row justify-content-center align-items-center"
+                >
+                  <Button
+                    type="secondary"
+                    title="more"
+                    size="small"
+                    onClick={() => {
+                      runHistoryPlanModalOpen = true;
+                    }}
+                  />
+                </div>
+              {/if}
             </div>
 
             {#if !testflowStore?.history || testflowStore?.history.length === 0}
@@ -422,5 +440,20 @@
     font-weight: 400;
     font-size: 12px;
     color: var(--text-ds-neutral-300);
+  }
+  .history-upgrade-box {
+    margin: 16px 0;
+    padding: 12px 25px;
+    background-color: var(--bg-ds-surface-400);
+    border: 1px solid var(--border-ds-warning-300);
+    font-family: "Inter", sans-serif;
+    border-radius: 8px;
+  }
+
+  .history-upgrade-text {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text-ds-neutral-50);
+    margin: 0;
   }
 </style>

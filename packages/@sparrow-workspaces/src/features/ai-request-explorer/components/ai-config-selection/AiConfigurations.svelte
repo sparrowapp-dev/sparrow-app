@@ -1,180 +1,221 @@
-<!-- This component is functional yet -->
-<script>
-  import { Input } from "@sparrow/library/forms";
-  import { Toggle, Tooltip } from "@sparrow/library/ui";
+<script lang="ts">
+  import type {
+    AIModelVariant,
+    modelsConfigType,
+  } from "@sparrow/common/types/workspace/ai-request-base";
+  import type { AiModelProviderEnum } from "@sparrow/common/types/workspace/ai-request-base";
+  import { configFormat } from "../../constants";
+  import { Button, Toggle } from "@sparrow/library/ui";
 
-  // Dummy config data
-  //   export let config = {
-  let config = {
-    streamResponse: true,
-    responseFormat: true,
-    temperature: 0.5,
-    presencePenalty: 0.5,
-    frequencyPenalty: 0.5,
-    maxTokens: -1,
-  };
+  export let isActive = true;
+  export let currSelectedModel: AiModelProviderEnum;
+  export let currSelectedModelVariant: AIModelVariant;
+  export let onUpdateAiConfigurations: (updates: Record<string, any>) => void;
+  export let config: modelsConfigType;
+
+  $: currentModelConfig =
+    configFormat[currSelectedModel]?.[currSelectedModelVariant] || {}; // Get current model configuration metadata
+  $: configEntries = Object.entries(currentModelConfig); // Get configuration entries for the current model
 
   // Event handler for config changes
-  function handleConfigChange(key, value) {
-    config[key] = value;
-  }
+  const handleConfigChange = (key, value) => {
+    const updatedConfig = { ...config, [key]: value };
+    onUpdateAiConfigurations(currSelectedModel, updatedConfig); // Call the update function to persist changes
+  };
+
+  // Check if any configuration has been changed from default
+  $: hasChanges = configEntries.some(([key, metadata]) => {
+    const currentValue =
+      config[key] !== undefined ? config[key] : metadata.defaultValue;
+    return currentValue !== metadata.defaultValue;
+  });
+
+  // Reset to default values
+  // Reset to default values
+  const handleResetToDefault = () => {
+    const defaultConfig = {};
+    Object.entries(currentModelConfig).forEach(
+      ([key, metadata]: [string, any]) => {
+        defaultConfig[key] = metadata.defaultValue;
+
+        // Update the UI elements directly
+        if (metadata.dataType === "int" || metadata.dataType === "float") {
+          const inputElement = document.getElementById(
+            `config-field-${metadata.displayName}`,
+          );
+          if (inputElement) {
+            inputElement.value = metadata.defaultValue || 0;
+          }
+        } else if (metadata.dataType === "boolean") {
+          const toggleElement = document.getElementById(
+            `toggle-field-${metadata.displayName}`,
+          );
+          if (toggleElement) {
+            toggleElement.checked = metadata.defaultValue || false;
+          }
+        }
+      },
+    );
+
+    onUpdateAiConfigurations(currSelectedModel, defaultConfig);
+  };
+
+  // Handle input changes for different types
+  const handleInputChange = (key, event) => {
+    const format = configFormat[currSelectedModel][currSelectedModelVariant];
+    let value = event.target.value;
+
+    if (format[key].dataType === "int" || format[key].dataType === "float") {
+      value = parseFloat(value);
+      if (isNaN(value)) value = format[key].defaultValue || 0;
+
+      if (format[key].dataType === "int") value = Math.floor(value);
+
+      // Apply min/max constraints
+      if (
+        format[key].min !== undefined &&
+        value < parseFloat(format[key].min)
+      ) {
+        value = parseFloat(format[key].min);
+      }
+      if (
+        format[key].max !== undefined &&
+        value > parseFloat(format[key].max)
+      ) {
+        value = parseFloat(format[key].max);
+      }
+
+      // Update the input field directly with the constrained value
+      const inputElement = document.getElementById(
+        `config-field-${format[key].displayName}`,
+      );
+      if (inputElement) {
+        inputElement.value = value;
+      }
+    }
+
+    handleConfigChange(key, value);
+  };
+
+  // Handle toggle changes
+  const handleToggleChange = (key, value) => {
+    handleConfigChange(key, value);
+  };
+
+  const getCurrentValue = (key: string, metadata: any) => {
+    return config[key] !== undefined ? config[key] : metadata.defaultValue;
+  };
 </script>
 
 <div class="ai-config-container">
-  <!-- <Tooltip title={"Coming Soon"} placement={"top-center"}></Tooltip> -->
   <div
     class="d-flex justify-content-between align-items-start mb-3"
-    style="border-bottom: 0.8px solid var(--bg-ds-surface-300); height: 34px;"
+    style="border-bottom: 0.2px solid var(--bg-ds-surface-300); height: 34px; position: sticky;
+      top: 0;
+      z-index: 10;
+      padding-bottom: 5px;"
   >
-    <p class="config-header mb-0">Configuration</p>
-    <button
-      class="btn btn-sm btn-link text-ds-font-size-12 disabled"
-      style="color: var(--bg-ds-neutral-500); text-decoration: none; font-size: 12px;"
-      on:click={() => handleConfigChange("reset", true)}
+    <p
+      class="config-header text-ds-font-size-14 text-ds-font-weight-medium mb-0"
     >
-      Reset to default
-    </button>
+      Configurations
+    </p>
+    <Button
+      title={"Reset to default"}
+      size={"extra-small"}
+      type={"teritiary-regular"}
+      disable={!isActive || !hasChanges}
+      onClick={handleResetToDefault}
+    ></Button>
   </div>
 
-  <div class="config-item mb-3 option-disabled">
-    <div class="d-flex justify-content-between align-items-start mb-2">
-      <div>
-        <div class="fw-medium">Stream Response</div>
-        <div class="config-desc">
-          Enables real-time output of the model's generated content.
-        </div>
+  <div class="config-section">
+    {#if configEntries.length === 0}
+      <div class="text-center py-4">
+        <p class="text-muted">
+          No configuration options available for the selected model.
+        </p>
       </div>
-      <Toggle isActive={true} disabled={true} onChange={() => {}} />
-    </div>
-  </div>
+    {:else}
+      {#each configEntries as [key, metadata]}
+        {#if !metadata.hidden}
+          <!-- Render configuration item -->
+          <div
+            class="config-item text-ds-font-size-12 mb-3"
+            class:option-disabled={metadata.disabled || !isActive}
+          >
+            <div
+              class="d-flex justify-content-between align-items-start mb-2 gap-1"
+            >
+              <div>
+                <div class="fw-medium">{metadata.displayName || key}</div>
+                <div class="config-desc text-ds-font-size-11">
+                  {metadata.description || ""}
+                </div>
+              </div>
 
-  <div class="config-item mb-3 option-disabled">
-    <div class="d-flex justify-content-between align-items-start mb-2">
-      <div>
-        <div class="fw-medium">Response Format (JSON)</div>
-        <div class="config-desc">
-          Forces the model to adhere strictly to JSON formatting in its output.
-        </div>
-      </div>
-      <Toggle isActive={false} disabled={true} onChange={() => {}} />
-    </div>
-  </div>
-
-  <div class="config-item mb-3 option-disabled">
-    <div class="d-flex justify-content-between align-items-start mb-2">
-      <div>
-        <div class="fw-medium">Temperature</div>
-        <div class="config-desc">
-          Adjusts the creativity level of the model's responses; higher values
-          increase output variability.
-        </div>
-      </div>
-      <div class="config-value d-flex justify-content-end input-disabled">
-        <input
-          type="text"
-          class="form-control form-control-sm config-input"
-          value={config.temperature}
-          disabled={true}
-          on:input={(e) =>
-            handleConfigChange("temperature", parseFloat(e.target.value))}
-        />
-      </div>
-    </div>
-  </div>
-
-  <div class="config-item mb-3 option-disabled">
-    <div class="d-flex justify-content-between align-items-start mb-2">
-      <div>
-        <div class="fw-medium">Presence Penalty</div>
-        <div class="config-desc">
-          Controls the frequency with which the model introduces novel or
-          unrelated topics.
-        </div>
-      </div>
-      <div class="config-value d-flex justify-content-end">
-        <input
-          type="text"
-          class="form-control form-control-sm config-input"
-          value={config.presencePenalty}
-          disabled={true}
-          on:input={(e) =>
-            handleConfigChange("presencePenalty", parseFloat(e.target.value))}
-        />
-      </div>
-    </div>
-  </div>
-
-  <!-- <div class="config-item mb-3 option-disabled">
-    <div class="d-flex justify-content-between align-items-start mb-2">
-      <div>
-        <div class="fw-medium">Frequency Penalty</div>
-        <div class="config-desc">
-          Manages the repetition of terms and phrases within the model's output.
-        </div>
-      </div>
-      <div class="config-value d-flex justify-content-end">
-        <input
-          type="text"
-          class="form-control form-control-sm config-input"
-          value={config.frequencyPenalty}
-          disabled={true}
-          on:input={(e) =>
-            handleConfigChange("frequencyPenalty", parseFloat(e.target.value))}
-        />
-      </div>
-    </div>
-  </div> -->
-
-  <div class="config-item mb-3 option-disabled">
-    <div class="d-flex justify-content-between align-items-start mb-2">
-      <div>
-        <div class="fw-medium">Max Tokens</div>
-        <div class="config-desc">
-          Specifies the maximum length of the model's response in tokens (-1
-          indicates no limit).
-        </div>
-      </div>
-      <div class="config-value d-flex justify-content-end">
-        <input
-          type="text"
-          class="form-control form-control-sm config-input"
-          value={config.maxTokens}
-          disabled={true}
-          on:input={(e) => {
-            handleConfigChange("maxTokens", parseInt(e.target.value));
-          }}
-        />
-        <!-- <Input
-          type={"text"}
-          size={"medium"}
-          maxlength={500}
-          id={"environment-name"}
-          value={2.0}
-          variant={"inline"}
-          placeholder={""}
-          width={"100px"}
-          disabled={false}
-        /> -->
-      </div>
-    </div>
+              {#if metadata.dataType === "boolean"}
+                <Toggle
+                  id={`toggle-field-${metadata.displayName}`}
+                  isActive={config[key]}
+                  disabled={!isActive}
+                  onChange={(event) => {
+                    handleToggleChange(key, event.target.checked);
+                  }}
+                />
+              {:else if metadata.dataType === "int" || metadata.dataType === "float"}
+                <div class="config-value d-flex justify-content-end">
+                  <input
+                    id={`config-field-${metadata.displayName}`}
+                    type="number"
+                    class="form-control form-control-sm config-input"
+                    value={getCurrentValue(key, metadata) || 0}
+                    min={metadata.min}
+                    max={metadata.max}
+                    step={metadata.dataType === "int" ? 1 : 0.1}
+                    disabled={!isActive}
+                    on:change={(e) => handleInputChange(key, e)}
+                  />
+                </div>
+              {:else}
+                <!-- <div class="config-value d-flex justify-content-end">
+              <input
+                type="text"
+                class="form-control form-control-sm config-input"
+                value={value || ""}
+                disabled={!isActive}
+                on:input={(e) => handleInputChange(key, e)}
+              />
+            </div> -->
+              {/if}
+            </div>
+          </div>
+        {/if}
+      {/each}
+    {/if}
   </div>
 </div>
 
 <style>
-  .config-header {
-    font-size: 14px;
-    font-weight: 400;
-    font-style: inter, "sans-serif";
+  .ai-config-container {
+    font-family: inter, "sans-serif";
+    height: 100%; /* Make sure container has defined height */
+    display: flex;
+    flex-direction: column;
   }
 
-  .config-item {
-    font-size: 12px;
-    font-style: inter, "sans-serif";
+  .config-section {
+    flex: 1; /* Take remaining space */
+    overflow-y: auto; /* Enable vertical scrolling */
+    padding-right: 4px; /* Add some padding for scrollbar */
   }
 
   .config-desc {
     color: var(--text-ds-neutral-200);
+    font-size: 12px;
+    margin-top: 2px;
   }
+
   .ai-config-container {
     padding: 0;
     height: 100%;
@@ -185,12 +226,19 @@
 
   .config-input {
     font-size: 12px;
-    font-style: inter, "sans-serif";
-    width: 60px;
+    width: 70px;
     text-align: right;
     background-color: var(--bg-ds-surface-400);
     color: var(--white-color);
-    border: none;
+    border: 1px solid var(--bg-ds-surface-300);
+    border-radius: 4px;
+    padding: 4px 0px;
+  }
+
+  .config-input:focus {
+    border-color: var(--bg-ds-primary-500);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(var(--bg-ds-primary-500-rgb), 0.2);
   }
 
   .config-value {
@@ -200,11 +248,15 @@
 
   .option-disabled {
     opacity: 0.5;
+    pointer-events: none;
   }
 
+  /* .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  } */
+
   :global(.form-control:focus) {
-    /* background-color: #212529;
-    border-color: #0d6efd; */
     color: var(--white-color);
     box-shadow: none;
   }

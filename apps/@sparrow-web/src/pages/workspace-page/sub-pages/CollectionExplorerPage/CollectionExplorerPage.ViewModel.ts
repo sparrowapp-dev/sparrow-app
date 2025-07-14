@@ -18,6 +18,7 @@ import { notifications } from "@sparrow/library/ui";
 import {
   createDeepCopy,
   Debounce,
+  InitAiRequestTab,
   InitFolderTab,
   InitMockRequestTab,
   InitWebSocketTab,
@@ -63,6 +64,8 @@ import type { SocketIORequestCreateUpdateInCollectionPayloadDtoInterface } from 
 import type { HttpRequestBaseInterface } from "@sparrow/common/types/workspace/http-request-base";
 import constants from "src/constants/constants";
 import * as Sentry from "@sentry/svelte";
+import { MockHistoryTabAdapter } from "src/adapter/mock-history-tab";
+import type { AiRequestBaseInterface } from "@sparrow/common/types/workspace/ai-request-base";
 
 class CollectionExplorerPage {
   // Private Repositories
@@ -794,6 +797,7 @@ class CollectionExplorerPage {
     let totalSocketIo = 0;
     let totalGraphQl = 0;
     let totalMockRequests = 0;
+    let totalAiRequests = 0;
 
     if (collection?.items) {
       collection?.items.forEach((collectionItem: CollectionItemsDto) => {
@@ -807,6 +811,8 @@ class CollectionExplorerPage {
           totalGraphQl++;
         } else if (collectionItem.type === ItemType.MOCK_REQUEST) {
           totalMockRequests++;
+        } else if (collectionItem.type === ItemType.AI_REQUEST) {
+          totalAiRequests++;
         } else if (collectionItem.type === ItemType.FOLDER) {
           totalFolders++;
           if (collectionItem?.items)
@@ -821,6 +827,8 @@ class CollectionExplorerPage {
                 totalGraphQl++;
               } else if (item.type === ItemType.MOCK_REQUEST) {
                 totalMockRequests++;
+              } else if (item.type === ItemType.AI_REQUEST) {
+                totalAiRequests++;
               }
             });
         }
@@ -859,6 +867,7 @@ class CollectionExplorerPage {
       totalFolders,
       lastUpdated,
       totalMockRequests,
+      totalAiRequests,
     };
   };
 
@@ -1159,7 +1168,7 @@ class CollectionExplorerPage {
         description: "",
         mockRequest: {
           method: request?.getValue().property?.mockRequest?.method,
-          url: collection?.mockCollectionUrl,
+          url: "",
         } as HttpRequestBaseInterface,
       },
     };
@@ -1221,7 +1230,10 @@ class CollectionExplorerPage {
         folderId: "",
       });
       request.updateIsSave(true);
-      request.updateUrl(collection?.mockCollectionUrl);
+      if ((collection.collectionType = CollectionTypeBaseEnum.MOCK)) {
+        request.updateLabel(CollectionTypeBaseEnum.MOCK);
+      }
+      // request.updateUrl(collection?.mockCollectionUrl);
       this.tabRepository.createTab(request.getValue());
       moveNavigation("right");
       return;
@@ -1229,6 +1241,116 @@ class CollectionExplorerPage {
       this.collectionRepository.deleteRequestOrFolderInCollection(
         collection.id,
         request.getValue().id,
+      );
+      notifications.error(response.message);
+    }
+  };
+
+  /**
+   * Handle creating a new AI request in a collection
+   * @param workspaceId :string
+   * @param collection :CollectionDocument - the collection in which new request is going to be created
+   * @returns :void
+   */
+  private handleCreateAiRequestInCollection = async (
+    workspaceId: string,
+    collection: CollectionDto,
+  ) => {
+    const aiRequest = new InitAiRequestTab(
+      UntrackedItems.UNTRACKED + uuidv4(),
+      workspaceId,
+    );
+
+    let userSource = {};
+    if (collection?.activeSync) {
+      userSource = {
+        currentBranch: collection?.currentBranch
+          ? collection?.currentBranch
+          : collection?.primaryBranch,
+        source: "USER",
+      };
+    }
+    const aiRequestObj = {
+      collectionId: collection.id,
+      workspaceId: workspaceId,
+      ...userSource,
+      items: {
+        name: aiRequest.getValue().name,
+        type: aiRequest.getValue().type,
+        description: "",
+        aiRequest: {
+          aiModelProvider:
+            aiRequest?.getValue().property?.aiRequest?.aiModelProvider,
+          aiModelVariant:
+            aiRequest?.getValue().property?.aiRequest?.aiModelVariant,
+        } as AiRequestBaseInterface,
+      },
+    };
+    await this.collectionRepository.addRequestOrFolderInCollection(
+      collection.id,
+      {
+        ...aiRequestObj.items,
+        id: aiRequest.getValue().id,
+      },
+    );
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser === true) {
+      const res =
+        await this.collectionRepository.readRequestOrFolderInCollection(
+          aiRequestObj.collectionId,
+          aiRequest.getValue().id,
+        );
+      if (res) {
+        res.id = uuidv4();
+      }
+      await this.collectionRepository.updateRequestOrFolderInCollection(
+        collection.id,
+        aiRequest.getValue().id,
+        res,
+      );
+
+      aiRequest.updateId(res?.id as string);
+      aiRequest.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: "",
+      });
+      aiRequest.updateIsSave(true);
+      await this.tabRepository.createTab(aiRequest.getValue());
+      moveNavigation("right");
+      return;
+    }
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const response = await this.collectionService.addAiRequestInCollection(
+      aiRequestObj,
+      baseUrl,
+    );
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+
+      this.collectionRepository.updateRequestOrFolderInCollection(
+        collection.id,
+        aiRequest.getValue().id,
+        res,
+      );
+      aiRequest.updateId(res.id);
+      aiRequest.updatePath({
+        workspaceId: workspaceId,
+        collectionId: collection.id,
+        folderId: "",
+      });
+      aiRequest.updateIsSave(true);
+      this.tabRepository.createTab(aiRequest.getValue());
+      moveNavigation("right");
+      return;
+    } else {
+      this.collectionRepository.deleteRequestOrFolderInCollection(
+        collection.id,
+        aiRequest.getValue().id,
       );
       notifications.error(response.message);
     }
@@ -1341,6 +1463,9 @@ class CollectionExplorerPage {
       sampleFolder.updateName(response.data.data.name);
       sampleFolder.updatePath(path);
       sampleFolder.updateIsSave(true);
+      if (collection?.collectionType === CollectionTypeBaseEnum.MOCK) {
+        sampleFolder.updateLabel(CollectionTypeBaseEnum.MOCK);
+      }
 
       this.tabRepository.createTab(sampleFolder.getValue());
       moveNavigation("right");
@@ -1639,6 +1764,18 @@ class CollectionExplorerPage {
     }
   };
 
+  public handleOpenMockHistory = (
+    workspaceId: string,
+    collection: CollectionDto,
+  ) => {
+    const mockHistroyTab = new MockHistoryTabAdapter().adapt(
+      workspaceId,
+      collection.id,
+    );
+    this.tabRepository.createTab(mockHistroyTab);
+    moveNavigation("right");
+  };
+
   /**
    * Handle control of creating items
    * @param entityType :string - type of entity, collection, folder or request
@@ -1682,6 +1819,18 @@ class CollectionExplorerPage {
         break;
       case "graphqlCollection":
         await this.handleCreateGraphqlInCollection(
+          args.collection.workspaceId,
+          args.collection as CollectionDto,
+        );
+        break;
+      case "mockHistory":
+        this.handleOpenMockHistory(
+          args.collection.workspaceId,
+          args.collection as CollectionDto,
+        );
+        break;
+      case "aiRequestCollection":
+        await this.handleCreateAiRequestInCollection(
           args.collection.workspaceId,
           args.collection as CollectionDto,
         );

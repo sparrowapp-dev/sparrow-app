@@ -19,7 +19,7 @@
     RequestSchema,
     GenerateQuery,
   } from "../components";
-  import { Loader } from "@sparrow/library/ui";
+  import { Alert, Loader } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";
   import { Splitpanes, Pane } from "svelte-splitpanes";
   import { Button } from "@sparrow/library/ui";
@@ -76,13 +76,14 @@
   export let onUpdateVariables;
   export let updateOperationSearch;
   export let checkQueryErrorStatus;
+  export let userRole;
 
   export let isWebApp;
   const loading = writable<boolean>(false);
+  const isSchemaFetching = writable<boolean>(false);
 
   let isExposeSaveAsRequest = false;
   let isLoading = true;
-  let isSchemaFetching = false;
   let isQueryInvalid = false;
   let errorStartIndex = 0;
   let errorEndIndex = 0;
@@ -105,9 +106,7 @@
    * Sets the `isSchemaFetching` flag while fetching and resets it after completion.
    */
   const handleFetchSchema = async () => {
-    isSchemaFetching = true;
     await onFetchSchema(environmentVariables?.filtered || []);
-    isSchemaFetching = false;
   };
 
   /**
@@ -167,6 +166,15 @@
   };
 
   loadingState.subscribe((tab) => {
+    const tabIdValue = tab.get($tab.tabId + "fetchGraphqlSchema");
+    if (tabIdValue === undefined) {
+      isSchemaFetching.set(false);
+    } else {
+      isSchemaFetching.set(tabIdValue);
+    }
+  });
+
+  loadingState.subscribe((tab) => {
     const tabIdValue = tab.get($tab.tabId);
     if (tabIdValue === undefined) {
       loading.set(false);
@@ -176,321 +184,321 @@
   });
 </script>
 
-{#if $tab.tabId}
-  <div class="d-flex rest-explorer-layout h-100">
-    <div class="w-100 d-flex flex-column h-100 p-3">
-      <!-- Request Name Header -->
-      <!-- 
+<div class="d-flex rest-explorer-layout h-100">
+  <div class="w-100 d-flex flex-column h-100 p-3">
+    <!-- Request Name Header -->
+    <!-- 
         --
         -- Rest name header is set to display none 
         --
       -->
-      <div class="d-flex justify-content-between w-100 p-3 d-none">
-        <RequestName name={$tab.name} {onUpdateRequestName} />
+    <div class="d-flex justify-content-between w-100 p-3 d-none">
+      <RequestName name={$tab.name} {onUpdateRequestName} />
 
-        <div class="d-flex justify-content-between">
-          <Button
-            title="Save Request"
-            type={"secondary"}
-            loader={false}
-            buttonClassProp="ms-2"
-            buttonStartIcon={floppyDisk}
-            onClick={async () => {
-              const x = await onSaveRequest();
-              if (
-                x.status === "error" &&
-                x.message ===
-                  "request is not a part of any workspace or collection"
-              ) {
-                isExposeSaveAsRequest = true;
-              } else if (x.status === "success") {
-                notifications.success("API request saved successfully.");
-              }
-            }}
-          />
+      <div class="d-flex justify-content-between">
+        <Button
+          title="Save Request"
+          type={"secondary"}
+          loader={false}
+          buttonClassProp="ms-2"
+          buttonStartIcon={floppyDisk}
+          onClick={async () => {
+            const x = await onSaveRequest();
+            if (
+              x.status === "error" &&
+              x.message ===
+                "request is not a part of any workspace or collection"
+            ) {
+              isExposeSaveAsRequest = true;
+            } else if (x.status === "success") {
+              notifications.success("API request saved successfully.");
+            }
+          }}
+        />
 
-          <span class="position-relative" style="width:35px;"> </span>
-          <Button
-            title="Share"
-            type={"secondary"}
-            buttonClassProp="ms-2"
-            onClick={() => {}}
-          />
-        </div>
+        <span class="position-relative" style="width:35px;"> </span>
+        <Button
+          title="Share"
+          type={"secondary"}
+          buttonClassProp="ms-2"
+          onClick={() => {}}
+        />
       </div>
+    </div>
 
-      <!-- HTTP URL Section -->
-      <HttpUrlSection
-        class=""
-        isSaveLoad={$loading}
-        isSave={$tab.isSaved}
-        {isGraphqlEditable}
-        requestUrl={$tab.property.graphql.url}
-        isSendRequestInProgress={storeData?.isSendRequestInProgress}
-        onSendButtonClicked={onSendRequest}
-        onCancelButtonClicked={onCancelRequest}
-        {onUpdateEnvironment}
-        {environmentVariables}
-        {onUpdateRequestUrl}
-        {toggleSaveRequest}
-        {onSaveRequest}
-      />
-      <!--Disabling the Quick Help feature, will be taken up in next release-->
-      <div class="" style="margin-top: 12px;"></div>
-      <div style="flex:1; overflow:auto;">
-        {#if !isLoading}
-          <Splitpanes
-            class="graph-ql-splitter w-100 h-100"
-            id={""}
-            horizontal={true}
-            dblClickSplitter={false}
-            on:resize={(e) => {
-              onUpdateRequestState({
-                requestBuilderLeftSplitterWidthPercentage: e.detail[0].size,
-              });
-              onUpdateRequestState({
-                requestBuilderRightSplitterWidthPercentage: e.detail[1].size,
-              });
-            }}
+    <!-- HTTP URL Section -->
+    <HttpUrlSection
+      class=""
+      isSaveLoad={$loading}
+      isSave={$tab.isSaved}
+      {isGraphqlEditable}
+      requestUrl={$tab.property?.graphql.url}
+      isSendRequestInProgress={storeData?.isSendRequestInProgress}
+      onSendButtonClicked={onSendRequest}
+      onCancelButtonClicked={onCancelRequest}
+      {onUpdateEnvironment}
+      {environmentVariables}
+      {onUpdateRequestUrl}
+      {toggleSaveRequest}
+      {onSaveRequest}
+      {userRole}
+    />
+    <!--Disabling the Quick Help feature, will be taken up in next release-->
+    <div class="" style="margin-top: 12px;"></div>
+    <div style="flex:1; overflow:auto;">
+      {#if !isLoading}
+        <Splitpanes
+          class="graph-ql-splitter w-100 h-100"
+          id={""}
+          horizontal={true}
+          dblClickSplitter={false}
+          on:resize={(e) => {
+            onUpdateRequestState({
+              requestBuilderLeftSplitterWidthPercentage: e.detail[0].size,
+            });
+            onUpdateRequestState({
+              requestBuilderRightSplitterWidthPercentage: e.detail[1].size,
+            });
+          }}
+        >
+          <Pane
+            minSize={30}
+            size={$tab.property?.graphql?.state
+              ?.requestBuilderLeftSplitterWidthPercentage}
+            class="position-relative bg-transparent"
           >
-            <Pane
-              minSize={30}
-              size={$tab.property.graphql?.state
-                ?.requestBuilderLeftSplitterWidthPercentage}
-              class="position-relative bg-transparent"
-            >
-              <div class="h-100">
-                <Splitpanes
-                  class="graph-rest-splitter w-100 h-100"
-                  id={""}
-                  horizontal={false}
-                  dblClickSplitter={false}
-                  on:resize={(e) => {
-                    onUpdateRequestState({
-                      requestLeftSplitterWidthPercentage: e.detail[0].size,
-                    });
-                    onUpdateRequestState({
-                      requestRightSplitterWidthPercentage: e.detail[1].size,
-                    });
-                  }}
+            <div class="h-100">
+              <Splitpanes
+                class="graph-rest-splitter w-100 h-100"
+                id={""}
+                horizontal={false}
+                dblClickSplitter={false}
+                on:resize={(e) => {
+                  onUpdateRequestState({
+                    requestLeftSplitterWidthPercentage: e.detail[0].size,
+                  });
+                  onUpdateRequestState({
+                    requestRightSplitterWidthPercentage: e.detail[1].size,
+                  });
+                }}
+              >
+                <Pane
+                  minSize={30}
+                  size={$tab.property?.graphql?.state
+                    ?.requestLeftSplitterWidthPercentage}
+                  class="position-relative bg-transparent"
                 >
-                  <Pane
-                    minSize={30}
-                    size={$tab.property.graphql?.state
-                      ?.requestLeftSplitterWidthPercentage}
-                    class="position-relative bg-transparent"
+                  <!-- Request Pane -->
+                  <div class="h-100 d-flex flex-column position-relative pe-2">
+                    <RequestNavigator
+                      requestStateSection={$tab.property?.graphql?.state
+                        ?.requestNavigation}
+                      {onUpdateRequestState}
+                      authHeaderLength={$requestAuthHeader.value ? 1 : 0}
+                      headersLength={$tab.property?.graphql?.headers?.length ||
+                        0}
+                      autoGeneratedHeadersLength={$tab.property?.graphql
+                        ?.autoGeneratedHeaders?.length || 0}
+                      onRefreshSchema={handleFetchSchema}
+                      isSchemaFetching={$isSchemaFetching}
+                    />
+                    <div style="flex:1; overflow:auto;" class="p-0">
+                      {#if $tab.property?.graphql?.state?.requestNavigation === GraphqlRequestSectionTabEnum.QUERY}
+                        <RequestQuery
+                          value={$tab.property?.graphql.state
+                            .operationNavigation ===
+                          GraphqlRequestOperationTabEnum.MUTATION
+                            ? $tab.property?.graphql.mutation
+                            : $tab.property?.graphql.query}
+                          onUpdateRequestQuery={handleUpdateRequestQuery}
+                          isError={isQueryInvalid}
+                          errorMessage={queryErrorMessage}
+                          {errorStartIndex}
+                          {errorEndIndex}
+                          {onClearQuery}
+                        />
+                      {:else if $tab.property?.graphql?.state?.requestNavigation === GraphqlRequestSectionTabEnum.VARIABLES}
+                        <RequestVariables
+                          value={$tab.property?.graphql.variables}
+                          onUpdateRequestVariable={onUpdateVariables}
+                          {onClearQuery}
+                        />
+                      {:else if $tab.property?.graphql?.state?.requestNavigation === RequestSectionEnum.HEADERS}
+                        <RequestHeaders
+                          isBulkEditActive={$tab?.property?.graphql.state
+                            ?.isHeaderBulkEditActive}
+                          {onUpdateRequestState}
+                          {environmentVariables}
+                          {onUpdateEnvironment}
+                          headers={$tab.property?.graphql.headers}
+                          autoGeneratedHeaders={$tab.property?.graphql
+                            .autoGeneratedHeaders}
+                          authHeader={$requestAuthHeader}
+                          onHeadersChange={onUpdateHeaders}
+                          onAutoGeneratedHeadersChange={onUpdateAutoGeneratedHeaders}
+                        />
+                      {:else if $tab.property?.graphql?.state?.requestNavigation === RequestSectionEnum.AUTHORIZATION}
+                        <RequestAuth
+                          requestStateAuth={$tab.property?.graphql.state
+                            .requestAuthNavigation}
+                          {onUpdateRequestState}
+                          auth={$tab.property?.graphql.auth}
+                          {onUpdateRequestAuth}
+                          {onUpdateEnvironment}
+                          {environmentVariables}
+                        />
+                      {/if}
+                    </div>
+                  </div>
+                </Pane>
+                <Pane
+                  minSize={30}
+                  size={$tab.property?.graphql?.state
+                    ?.requestRightSplitterWidthPercentage}
+                  class="bg-transparent position-relative"
+                >
+                  <!-- Response Pane -->
+                  <div
+                    class="d-flex flex-column h-100 ps-2"
+                    style="overflow:auto;"
                   >
-                    <!-- Request Pane -->
-                    <div
-                      class="h-100 d-flex flex-column position-relative pe-2"
-                    >
-                      <RequestNavigator
-                        requestStateSection={$tab.property.graphql?.state
-                          ?.requestNavigation}
-                        {onUpdateRequestState}
-                        authHeaderLength={$requestAuthHeader.value ? 1 : 0}
-                        headersLength={$tab.property?.graphql?.headers
-                          ?.length || 0}
-                        autoGeneratedHeadersLength={$tab.property?.graphql
-                          ?.autoGeneratedHeaders?.length || 0}
-                        onRefreshSchema={handleFetchSchema}
-                        {isSchemaFetching}
-                      />
-                      <div style="flex:1; overflow:auto;" class="p-0">
-                        {#if $tab.property.graphql?.state?.requestNavigation === GraphqlRequestSectionTabEnum.QUERY}
-                          <RequestQuery
-                            value={$tab.property.graphql.state
-                              .operationNavigation ===
-                            GraphqlRequestOperationTabEnum.MUTATION
-                              ? $tab.property.graphql.mutation
-                              : $tab.property.graphql.query}
-                            onUpdateRequestQuery={handleUpdateRequestQuery}
-                            isError={isQueryInvalid}
-                            errorMessage={queryErrorMessage}
-                            {errorStartIndex}
-                            {errorEndIndex}
-                            {onClearQuery}
-                          />
-                        {:else if $tab.property.graphql?.state?.requestNavigation === GraphqlRequestSectionTabEnum.VARIABLES}
-                          <RequestVariables
-                            value={$tab.property.graphql.variables}
-                            onUpdateRequestVariable={onUpdateVariables}
-                            {onClearQuery}
-                          />
-                        {:else if $tab.property.graphql?.state?.requestNavigation === RequestSectionEnum.HEADERS}
-                          <RequestHeaders
-                            isBulkEditActive={$tab?.property?.graphql.state
-                              ?.isHeaderBulkEditActive}
-                            {onUpdateRequestState}
-                            {environmentVariables}
-                            {onUpdateEnvironment}
-                            headers={$tab.property.graphql.headers}
-                            autoGeneratedHeaders={$tab.property.graphql
-                              .autoGeneratedHeaders}
-                            authHeader={$requestAuthHeader}
-                            onHeadersChange={onUpdateHeaders}
-                            onAutoGeneratedHeadersChange={onUpdateAutoGeneratedHeaders}
-                          />
-                        {:else if $tab.property.graphql?.state?.requestNavigation === RequestSectionEnum.AUTHORIZATION}
-                          <RequestAuth
-                            requestStateAuth={$tab.property.graphql.state
-                              .requestAuthNavigation}
-                            {onUpdateRequestState}
-                            auth={$tab.property.graphql.auth}
-                            {onUpdateRequestAuth}
-                            {onUpdateEnvironment}
-                            {environmentVariables}
-                          />
+                    <div class="h-100 d-flex flex-column">
+                      <div style="flex:1; overflow:auto;">
+                        {#if storeData?.isSendRequestInProgress}
+                          <ResponseDefaultScreen {isWebApp} />
+                          <div
+                            style="top: 0px; left: 0; right: 0; bottom: 0; z-index:3; position:absolute;"
+                          >
+                            <Loader loaderSize={"20px"} />
+                          </div>
+                        {:else if !storeData?.response.status}
+                          <ResponseDefaultScreen {isWebApp} />
+                        {:else if storeData?.response.status === ResponseStatusCode.ERROR}
+                          <ResponseErrorScreen response={storeData.response} />
+                        {:else if storeData?.response.status}
+                          <div class="h-100 d-flex flex-column">
+                            <ResponseNavigator
+                              requestStateSection={storeData?.response
+                                .navigation}
+                              {onUpdateResponseState}
+                              responseHeadersLength={storeData?.response.headers
+                                ?.length || 0}
+                              response={storeData?.response}
+                            />
+                            {#if storeData?.response.navigation === ResponseSectionEnum.RESPONSE}
+                              <div style="flex:1; overflow:auto;">
+                                <ResponseBody
+                                  response={storeData?.response}
+                                  {isWebApp}
+                                />
+                              </div>
+                            {:else if storeData?.response.navigation === ResponseSectionEnum.HEADERS}
+                              <div style="flex:1; overflow:auto;">
+                                <ResponseHeaders
+                                  responseHeader={storeData.response?.headers}
+                                />
+                              </div>
+                            {/if}
+                          </div>
                         {/if}
                       </div>
                     </div>
-                  </Pane>
-                  <Pane
-                    minSize={30}
-                    size={$tab.property.graphql?.state
-                      ?.requestRightSplitterWidthPercentage}
-                    class="bg-transparent position-relative"
-                  >
-                    <!-- Response Pane -->
-                    <div
-                      class="d-flex flex-column h-100 ps-2"
-                      style="overflow:auto;"
-                    >
-                      <div class="h-100 d-flex flex-column">
-                        <div style="flex:1; overflow:auto;">
-                          {#if storeData?.isSendRequestInProgress}
-                            <ResponseDefaultScreen {isWebApp} />
-                            <div
-                              style="top: 0px; left: 0; right: 0; bottom: 0; z-index:3; position:absolute;"
-                            >
-                              <Loader loaderSize={"20px"} />
-                            </div>
-                          {:else if !storeData?.response.status}
-                            <ResponseDefaultScreen {isWebApp} />
-                          {:else if storeData?.response.status === ResponseStatusCode.ERROR}
-                            <ResponseErrorScreen
-                              response={storeData.response}
-                            />
-                          {:else if storeData?.response.status}
-                            <div class="h-100 d-flex flex-column">
-                              <ResponseNavigator
-                                requestStateSection={storeData?.response
-                                  .navigation}
-                                {onUpdateResponseState}
-                                responseHeadersLength={storeData?.response
-                                  .headers?.length || 0}
-                                response={storeData?.response}
-                              />
-                              {#if storeData?.response.navigation === ResponseSectionEnum.RESPONSE}
-                                <div style="flex:1; overflow:auto;">
-                                  <ResponseBody
-                                    response={storeData?.response}
-                                    {isWebApp}
-                                  />
-                                </div>
-                              {:else if storeData?.response.navigation === ResponseSectionEnum.HEADERS}
-                                <div style="flex:1; overflow:auto;">
-                                  <ResponseHeaders
-                                    responseHeader={storeData.response?.headers}
-                                  />
-                                </div>
-                              {/if}
-                            </div>
-                          {/if}
-                        </div>
-                      </div>
-                    </div></Pane
-                  >
-                </Splitpanes>
-              </div></Pane
-            >
-            <Pane
-              minSize={30}
-              size={$tab.property.graphql?.state
-                ?.requestBuilderRightSplitterWidthPercentage}
-              class="position-relative bg-transparent"
-            >
-              <div class="h-100 d-flex flex-column">
-                <!-- <div class="mb-2 pt-1">
+                  </div></Pane
+                >
+              </Splitpanes>
+            </div></Pane
+          >
+          <Pane
+            minSize={30}
+            size={$tab.property?.graphql?.state
+              ?.requestBuilderRightSplitterWidthPercentage}
+            class="position-relative bg-transparent"
+          >
+            <div class="h-100 d-flex flex-column">
+              <!-- <div class="mb-2 pt-1">
                   <ResponseStatus
                     response={storeData?.response}
                     {onClearQuery}
-                    value={$tab.property.graphql.state.operationNavigation ===
+                    value={$tab.property?.graphql.state.operationNavigation ===
                     GraphqlRequestOperationTabEnum.MUTATION
-                      ? $tab.property.graphql.mutation
-                      : $tab.property.graphql.query}
+                      ? $tab.property?.graphql.mutation
+                      : $tab.property?.graphql.query}
                   />
                 </div> -->
-                <div style="flex:1; overflow: auto;">
-                  {#if $tab.property.graphql.state.isRequestSchemaFetched}
+              <div style="flex:1; overflow: auto;">
+                {#if $isSchemaFetching && !$tab.property?.graphql.schema.length}
+                  <div
+                    style="display: flex; align-items: center; justify-content: center; height: 100%;"
+                  >
+                    <Loader loaderSize="20px" />
+                  </div>
+                {:else if $tab.property?.graphql.state.isRequestSchemaFetched}
+                  {#if $tab.property?.graphql.schema.length > 0}
                     <GenerateQuery
-                      schema={$tab.property.graphql.schema}
+                      schema={$tab.property?.graphql.schema}
                       updateSchema={handleUpdateSchema}
-                      requestOperationSection={$tab.property.graphql?.state
+                      requestOperationSection={$tab.property?.graphql?.state
                         ?.operationNavigation}
                       onUpdateRequestState={handleUpdateRequestState}
-                      operationSearch={$tab.property.graphql?.operationSearch}
+                      operationSearch={$tab.property?.graphql?.operationSearch}
                       {updateOperationSearch}
                       onRefreshSchema={handleFetchSchema}
-                      {isSchemaFetching}
+                      isSchemaFetching={$isSchemaFetching}
                     />
                   {:else}
-                    <div style="flex: 1;">
-                      <div class="error-message">
-                        <div class="error-icon">
-                          <WarningIcon
-                            height="16"
-                            width="16"
-                            color="var(--icon-danger-200)"
-                          />
-                        </div>
-                        <span class="error-text"
-                          >"Unable to load schema. Please check the URL and try
-                          again."</span
-                        >
-                      </div>
+                    <div
+                      class="d-flex justify-content-center align-items-center"
+                      style="margin-top: 44px;"
+                    >
+                      <Alert
+                        varient="error"
+                        description={"Unable to load schema. Please check the URL and try again."}
+                        heading={"Error"}
+                        ctaShow={true}
+                        onClick={handleFetchSchema}
+                      />
                     </div>
                   {/if}
-                </div>
+                {/if}
               </div>
-            </Pane>
-          </Splitpanes>
-        {:else}
-          <!-- loading state -->
-          <ResponseDefaultScreen {isWebApp} isMainScreen={true} />
-        {/if}
-      </div>
+            </div>
+          </Pane>
+        </Splitpanes>
+      {:else}
+        <!-- loading state -->
+        <ResponseDefaultScreen {isWebApp} isMainScreen={true} />
+      {/if}
     </div>
   </div>
-  <Modal
-    title={"Save Request"}
-    type={"dark"}
-    width={"55%"}
-    zIndex={10000}
-    isOpen={isExposeSaveAsRequest}
-    handleModalState={(flag = false) => {
+</div>
+<Modal
+  title={"Save Request"}
+  type={"dark"}
+  width={"55%"}
+  zIndex={10000}
+  isOpen={isExposeSaveAsRequest}
+  handleModalState={(flag = false) => {
+    isExposeSaveAsRequest = flag;
+  }}
+>
+  <SaveAsCollectionItem
+    onClick={(flag = false) => {
       isExposeSaveAsRequest = flag;
     }}
-  >
-    <SaveAsCollectionItem
-      onClick={(flag = false) => {
-        isExposeSaveAsRequest = flag;
-      }}
-      requestMethod={TabTypeEnum.GRAPHQL}
-      requestUrl={$tab.property.graphql?.url}
-      requestName={$tab.name}
-      requestDescription={$tab.description}
-      requestPath={$tab.path}
-      collections={$collections}
-      {readWorkspace}
-      onSave={onSaveAsRequest}
-      {onCreateFolder}
-      {onCreateCollection}
-      {onRenameCollection}
-      {onRenameFolder}
-    />
-  </Modal>
-{/if}
+    requestMethod={TabTypeEnum.GRAPHQL}
+    requestUrl={$tab.property?.graphql?.url}
+    requestName={$tab.name}
+    requestDescription={$tab.description}
+    requestPath={$tab.path}
+    collections={$collections}
+    {readWorkspace}
+    onSave={onSaveAsRequest}
+    {onCreateFolder}
+    {onCreateCollection}
+    {onRenameCollection}
+    {onRenameFolder}
+  />
+</Modal>
 
 <style>
   .rest-explorer-layout {

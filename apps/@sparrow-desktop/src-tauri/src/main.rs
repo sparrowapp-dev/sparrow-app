@@ -166,15 +166,32 @@ impl<R: Runtime> WindowExt for WebviewWindow<R> {
     }
 }
 
-// Windows/Linux placeholder implementation (no-op)
-#[cfg(not(target_os = "macos"))]
+#[cfg(target_os = "linux")]
 impl<R: Runtime> WindowExt for WebviewWindow<R> {
-    fn set_transparent_titlebar(&self, _title_transparent: bool, _remove_toolbar: bool) {
-        // No-op: Not supported on Windows or Linux
+    fn set_transparent_titlebar(&self, title_transparent: bool, remove_toolbar: bool) {
+        use gtk::prelude::*;
+        if let Ok(gtk_window) = self.gtk_window() {
+            if title_transparent {
+                gtk_window.set_decorated(false);
+            } else {
+                gtk_window.set_decorated(true);
+            }
+        }
     }
 
-    fn set_toolbar_visibility(&self, _visible: bool) {
-        // No-op: Not supported on Windows or Linux
+    fn set_toolbar_visibility(&self, visible: bool) {
+        // No-op: Not supported on Linux
+    }
+}
+
+#[cfg(target_os = "windows")]
+impl<R: Runtime> WindowExt for WebviewWindow<R> {
+    fn set_transparent_titlebar(&self, title_transparent: bool, remove_toolbar: bool) {
+        // No-op: Not supported on Windows
+    }
+
+    fn set_toolbar_visibility(&self, visible: bool) {
+        // No-op: Not supported on Windows
     }
 }
 
@@ -383,7 +400,10 @@ async fn make_request_v2(
     request: &str,
 ) -> Result<String, std::io::Error> {
     // Create a client
-    let client = Client::new();
+    let client = reqwest::Client::builder()
+    .danger_accept_invalid_certs(true)
+    .build()
+    .unwrap();
 
     // Convert method string to reqwest::Method
     let reqwest_method = match method {
@@ -1173,7 +1193,10 @@ async fn send_graphql_request(
     variables: Option<String>,
 ) -> Result<String, String> {
     // Initialize an HTTP client for making requests.
-    let client = Client::new();
+    let client = reqwest::Client::builder()
+    .danger_accept_invalid_certs(true)
+    .build()
+    .unwrap();
 
     // Deserialize the JSON string `headers` into a Vec of key-value pairs.
     // Each key-value pair is represented by the KeyValue struct.
@@ -1256,6 +1279,11 @@ fn main() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
             // Get the main window (fallback to "windows" if "main" isn't available)
+            #[cfg(any(target_os = "linux", all(debug_assertions, windows)))]
+            {
+                use tauri_plugin_deep_link::DeepLinkExt;
+                app.deep_link().register_all();
+            }
             let window = if app.get_webview_window("main").is_some() {
                 app.get_webview_window("main").unwrap()
             } else {
@@ -1265,23 +1293,27 @@ fn main() {
             let _ = window.unminimize();
             let _ = window.show();
             let _ = window.set_focus();
-        
+
             // Emit general single-instance payload
-            let _ = app.emit(
-                "single-instance",
-                SingleInstancePayload {
-                    args: argv.clone(),
-                    cwd: _cwd,
-                },
-            ).unwrap();
+            let _ = app
+                .emit(
+                    "single-instance",
+                    SingleInstancePayload {
+                        args: argv.clone(),
+                        cwd: _cwd,
+                    },
+                )
+                .unwrap();
 
             if argv.len() > 1 {
-                let _ = app.emit(
-                    "deep-link-urls",
-                    Payload {
-                        url: argv[1].to_string(),
-                    },
-                ).unwrap();
+                let _ = app
+                    .emit(
+                        "deep-link-urls",
+                        Payload {
+                            url: argv[1].to_string(),
+                        },
+                    )
+                    .unwrap();
             } else {
                 // Handle the case where argv is empty or doesn't have enough elements
                 println!("No URL provided in command line arguments.");
@@ -1300,7 +1332,7 @@ fn main() {
 
             // Hide Titlebar for MacOS and close the additional window
             let platform_name = platform();
-            if platform_name == "macos" {
+            if platform_name == "macos" || platform_name == "linux" {
                 // Fetch tauri windows
                 let macos_window = app.get_webview_window("main").unwrap();
                 let windows_window: WebviewWindow = app.get_webview_window("windows").unwrap();

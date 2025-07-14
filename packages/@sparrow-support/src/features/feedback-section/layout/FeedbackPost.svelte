@@ -3,8 +3,13 @@
   import { Input, Select, Textarea } from "@sparrow/library/forms";
   import {
     AttachmentIcon,
+    AttachRegular,
     CategoryIcon,
+    ChatMultipleRegular,
+    ChevronLeftRegular,
     CrossIcon,
+    DismissRegular,
+    FilterRegular,
     MessageIcon,
     SortIcon,
     StatusIcon,
@@ -157,6 +162,9 @@
   const handleLogoInputChange = (e: InputEvent) => {
     const errorMessage =
       "Failed to upload the file. You are allowed to upload only 5 files per feedback.";
+    const formatErrorMessage =
+      "This file type isn’t supported. Upload in SVG, JPEG, JPG, or PNG.";
+    const sizeErrorMessage = "Upload limit exceeded. Choose a file under 2 MB.";
 
     let targetFile = [
       ...uploadFeedback.file.value,
@@ -166,12 +174,24 @@
     if (targetFile?.length === 0) {
       return;
     }
-    let isErrorThrown = false;
+    let isLimitError = false;
+    let isFormatError = false;
+    let isSizeError = false;
 
     const selectedFiles = targetFile.filter((file) => {
       let fileType = "mp4";
       if (file.name) {
         fileType = `.${(file?.name).split(".").pop().toLowerCase()}`;
+      }
+
+      if (
+        fileType !== ".jpg" &&
+        fileType !== ".jpeg" &&
+        fileType !== ".png" &&
+        fileType !== ".svg"
+      ) {
+        isFormatError = true;
+        return false;
       }
 
       if (
@@ -182,12 +202,12 @@
       ) {
         if (file.size > maxImageSize) {
           // image size exceeded
-          isErrorThrown = true;
+          isSizeError = true;
           return false;
         }
         return true;
       } else {
-        isErrorThrown = true;
+        isLimitError = true;
         return false;
       }
     });
@@ -195,12 +215,19 @@
     let totalImagesCount = selectedFiles.length + tempImageURLsArray.length;
     if (totalImagesCount > 5) {
       selectedFiles.length = 5 - tempImageURLsArray.length;
-      isErrorThrown = true;
+      isLimitError = true;
     }
 
-    if (isErrorThrown) {
+    if (isLimitError) {
       notifications.error(errorMessage);
     }
+    if (isSizeError) {
+      notifications.error(sizeErrorMessage);
+    }
+    if (isFormatError) {
+      notifications.error(formatErrorMessage);
+    }
+
     uploadFeedback.file.value = selectedFiles;
   };
 
@@ -336,34 +363,38 @@
   };
 </script>
 
-<div class="d-flex flex-row" style="margin-top: 51px; ">
+<div class="d-flex flex-row justify-content-between" style="margin-top: 24px; ">
   <!-- Back Button -->
-  <div
-    class="back-button"
-    on:click={() => {
-      isPostopen = false;
-      handleUpvote();
-    }}
-  >
-    <LeftIcon color={"var(--text-secondary-100)"} />
-    <span class="px-2 text-ds-font-size-14">back</span>
+  <div style="margin-right: 28px;">
+    <Button
+      title="Back"
+      type="teritiary-regular"
+      size="medium"
+      startIcon={ChevronLeftRegular}
+      onClick={() => {
+        isPostopen = false;
+        handleUpvote();
+      }}
+      buttonClassProp={"ps-0"}
+    />
   </div>
 
   <!-- Post Card -->
 
   {#if isLoading}
-    <div style="margin-left: 200px;" class="mt-5">
-      <Loader loaderSize={"20px"} loaderMessage="Please Wait..." />
+    <div style="width:100%; margin-top: 64px;" class="">
+      <Loader loaderSize={"20px"} loaderMessage="Loading..." />
     </div>
   {:else}
-    <div style="gap:26px; width:calc(100% - 187px ); ">
+    <div style="gap:26px; width:calc(100% - 187px ); padding-inline: 12px;">
       <div>
         <div
-          class="flex-column"
+          class="flex-column mt-3"
           style="display: flex; height:50px;  margin-bottom: 12px; justify-content: space-between;"
         >
-          <span class="text-ds-font-size-18 text-ds-font-weight-medium"
-            >{post?.title}</span
+          <span
+            class="text-ds-font-size-16 text-ds-font-weight-semi-bold"
+            style="color: var(--text-ds-neutral-50);">{post?.title}</span
           >
           <Tag type={getColor(post?.status)} text={post?.status || ""} />
         </div>
@@ -375,21 +406,24 @@
             <div style="display: flex; align-items: center; gap: 12px;">
               <Avatar
                 type={"letter"}
-                size={"large"}
+                size={"extra-small"}
                 letter={post?.author?.name?.charAt(0)}
-                bgColor={"var(--text-secondary-600)"}
+                bgColor={"var(--bg-ds-surface-500)"}
               />
-              <div class="text-ds-font-size-14 text-ds-font-weight-medium">
+              <div
+                class="text-ds-font-size-14 text-ds-font-weight-semi-bold"
+                style="color: var(--text-ds-neutral-50);"
+              >
                 {post?.author?.name}
               </div>
             </div>
             <div
-              class="text-ds-font-size-12 text-ds-font-weight-regular"
-              style=" padding-left:45px; "
+              class="text-ds-font-size-14 text-ds-font-weight-regular mt-2"
+              style=" padding-left:36px; color: var(--text-ds-neutral-200);"
             >
               {post?.details}
             </div>
-            <div class="ms-4 ps-3">
+            <div class="ms-4">
               <div>
                 {#each postImages as postImage}
                   <img
@@ -399,7 +433,7 @@
                     }}
                     src={postImage}
                     alt="post image"
-                    style="display:inline; height: 100px; margin-top: 20px; border-radius: 2px; margin:10px;   object-fit: contain;   max-width: 100%; "
+                    style="display:inline; height: 100px; margin-top: 20px; border-radius: 2px; margin:12px;   object-fit: contain;   max-width: 100%; "
                   />
                   <ImageModal
                     isOpen={isImageOpen}
@@ -421,10 +455,10 @@
               </div>
 
               <div
-                class="mb-3"
-                style="display: flex; align-items: center; font-size: 12px; margin-top:10px; color:var(--text-secondary-50) !important;"
+                class="mt-2"
+                style="display: flex; align-items: center; font-size: 12px; color:var(--text-ds-neutral-400) !important;"
               >
-                <span style="padding-left:4px;">{createdAt} </span>
+                <span style="padding-left:14px;">{createdAt} </span>
 
                 {#if isAuthor}
                   <span class="px-2">|</span>
@@ -438,7 +472,7 @@
                       : 'grey'}; text-decoration: {isEditingPost
                       ? 'underline'
                       : 'none'};"
-                    class="px-2"
+                    class=""
                     on:click={() => {
                       isExposeFeedbackForm = true;
                       MixpanelEvent(Events.Edit_Post);
@@ -449,7 +483,7 @@
             </div>
           </div>
 
-          <div class="mt-1" style="cursor: pointer;">
+          <div class="" style="cursor: pointer; margin-top: 36px;">
             <Upvote
               isPostLiked={post?.isPostLiked}
               upvote={post?.score}
@@ -463,10 +497,10 @@
 
       <!-- Add comment input -->
       <div
-        class={`d-flex align-items-start search-input-container  mb-5 mt-3 p-1 px-2`}
-        style=" display:felx; flex-direction:column;"
+        class={`d-flex align-items-start search-input-container mt-3 p-1 px-2`}
+        style=" display:flex; flex-direction:column; margin-bottom: 36px;"
       >
-        <div class="d-flex justify-content-end" style="width: 100%;">
+        <div class="d-flex justify-content-between gap-3" style="width: 100%;">
           <input
             type="text"
             id="search-input"
@@ -476,15 +510,17 @@
             bind:value={commentValue}
           />
 
-          <div class="d-flex align-items-center gap-2 ms-1">
+          <div class="d-flex align-items-center gap-3">
             <Attachment onFileSelect={handleInputAttachment} {inputId} />
 
             <Button
               title={`Add`}
               type={`primary`}
+              size={"small"}
               loaderSize={13}
+              customWidth={"72px"}
               textStyleProp={"font-size:11px;"}
-              buttonStyleProp={`height: 20px; width:35px; justify-content:center;`}
+              buttonStyleProp={`justify-content:center;`}
               loader={isCommenting}
               onClick={() => handleAddComment(postId)}
               disable={commentValue.trim() === "" || isCommenting}
@@ -494,31 +530,28 @@
 
         <div class="">
           {#if uploadedImageAttachment?.file?.value?.length > 0}
-            <div class="mt-2 file-scroller mb-1 d-flex gap-1 flex-wrap">
+            <div class="mt-2 file-scroller d-flex gap-2 flex-wrap">
               {#each uploadedImageAttachment.file.value as file, index}
                 <div
-                  class="files d-flex align-items-center bg-tertiary-300 mb-1 px-3 py-1 border-radius-4"
+                  class="files d-flex align-items-center mb-1 px-1 py-1 border-radius-4"
                 >
                   <span>
-                    <AttachmentIcon
-                      height={"12px"}
-                      width={"12px"}
-                      color={"var(--text-secondary-200)"}
+                    <AttachRegular
+                      size={"16px"}
+                      color={"var(--text-ds-neutral-100)"}
                     />
                   </span>
                   <span class="mb-0 text-ds-font-size-12 px-2 ellipsis"
                     >{file?.name}</span
                   >
-                  <span
-                    on:click={() => {
+                  <Button
+                    startIcon={DismissRegular}
+                    size="extra-small"
+                    type="teritiary-regular"
+                    onClick={() => {
                       removeCommentAttachment(index);
                     }}
-                    ><CrossIcon
-                      height={"12px"}
-                      width={"9px"}
-                      color={"var(--text-secondary-200)"}
-                    /></span
-                  >
+                  />
                 </div>
               {/each}
             </div>
@@ -528,45 +561,54 @@
       {#if nestedComments.length > 0}
         <div>
           <div class="d-flex align-items-center justify-content-between mb-3">
-            <h6 class="text-ds-font-size-14">Activity Feed</h6>
+            <h6
+              class="text-ds-font-size-16"
+              style="color: var(--text-ds-neutral-50);"
+            >
+              Activity Feed
+            </h6>
 
-            <Select
-              data={[
-                {
-                  name: "New First ",
-                  id: "new first",
-                },
-                {
-                  name: "Old First",
-                  id: "old first",
-                },
-              ]}
-              onclick={(id = "") => {
-                type = id;
-                handleSortChange(id);
-              }}
-              titleId={type}
-              placeholderText={"Sort By"}
-              zIndex={499}
-              disabled={false}
-              iconRequired={true}
-              icon={SortIcon}
-              borderType={"none"}
-              borderActiveType={"none"}
-              borderHighlight={"hover-active"}
-              headerHighlight={"hover-active"}
-              headerHeight={"26px"}
-              minBodyWidth={"150px"}
-              minHeaderWidth={"150px"}
-              maxHeaderWidth={"200px"}
-              borderRounded={"2px"}
-              headerTheme={"violet2"}
-              bodyTheme={"violet"}
-              menuItem={"v2"}
-              headerFontSize={"10px"}
-              isDropIconFilled={true}
-              position={"absolute"}
-            />
+            <div style="margin-right: -8px;">
+              <Select
+                data={[
+                  {
+                    name: "New First ",
+                    id: "new first",
+                  },
+                  {
+                    name: "Old First",
+                    id: "old first",
+                  },
+                ]}
+                onclick={(id = "") => {
+                  type = id;
+                  handleSortChange(id);
+                }}
+                titleId={type}
+                placeholderText={"Sort By"}
+                zIndex={499}
+                disabled={false}
+                iconRequired={true}
+                icon={FilterRegular}
+                iconColor={"var(--icon-primary-300)"}
+                borderType={"none"}
+                borderActiveType={"none"}
+                borderHighlight={"hover-active"}
+                headerHighlight={"hover-active"}
+                headerHeight={"28px"}
+                minBodyWidth={"150px"}
+                minHeaderWidth={"150px"}
+                maxHeaderWidth={"200px"}
+                borderRounded={"2px"}
+                headerTheme={"violet2"}
+                bodyTheme={"violet"}
+                menuItem={"v2"}
+                headerFontSize={"10px"}
+                isDropIconFilled={true}
+                position={"absolute"}
+                variant={"secondary"}
+              />
+            </div>
           </div>
 
           <!-- List of comments -->
@@ -587,19 +629,18 @@
       {:else}
         <div
           class="d-flex"
-          style="display: flex; flex-direction:column; justify-content:center; align-items:center;"
+          style="display: flex; flex-direction:column; justify-content:center; align-items:center; margin-top: 64px;"
         >
-          <MessageIcon
-            height={"30px"}
-            width={"30px"}
-            color={"var(--icon-primary-300)"}
+          <ChatMultipleRegular
+            size={"32px"}
+            color={"var(--text-secondary-550)"}
           />
 
           <p
-            class="mx-1 text-ds-font-size-14 text-ds-font-weight-500 mb-0 text-center"
+            class="mx-1 text-ds-font-size-14 text-ds-font-weight-500 mb-0 mt-4 text-center"
             style="color: var(--text-secondary-550); letter-spacing: 0.5px;"
           >
-            No comments yet
+            No result found.
           </p>
         </div>
       {/if}
@@ -622,18 +663,24 @@
     <div class="pt-2"></div>
 
     <div style="">
-      <p class="text-ds-font-size-14 mb-0 text-secondary-150">Description</p>
-      <p class="text-ds-font-size-12 text-secondary-200 mb-0">
+      <p
+        class="text-ds-font-size-14 mb-0"
+        style="color: var(--text-ds-neutral-200);"
+      >
+        Description
+      </p>
+      <p
+        class="text-ds-font-size-12 mb-2"
+        style="color: var(--text-ds-neutral-400);"
+      >
         {feedbackDescription.length} / 200
       </p>
 
       <div
-        class="p-2 bg-tertiary-300 {isDescriptionEmpty ||
-        isSubjectEmpty ||
-        isTextArea
+        class="p-2 {isDescriptionEmpty || isSubjectEmpty || isTextArea
           ? 'empty-data-error mb-0'
           : 'mb-3'}"
-        style="height: 137px; border-radius: 4px; color:#676A80; "
+        style="height: 137px; border-radius: 4px; color: var(--text-ds-neutral-400); background-color: var(--bg-ds-surface-400);"
       >
         <Input
           on:input={() => {
@@ -645,6 +692,7 @@
           id="feedback-subject"
           width={"100%"}
           type="text"
+          size={"large"}
           isEditIconRequired={false}
           bind:value={feedbackSubject}
           defaultBorderColor="transparent"
@@ -656,7 +704,7 @@
           placeholder="Subject"
           maxlength={200}
         />
-        <hr style="margin:0px; padding-bottom:8px;" />
+        <hr class="m-0 ms-2" style="padding-bottom:5px; border-width: 2px;" />
         <Textarea
           width={"100%"}
           on:input={() => {
@@ -666,8 +714,11 @@
             }
           }}
           id="feedback-description"
-          height={"90px"}
+          height={"76px"}
           bind:value={feedbackDescription}
+          defaultBorderColor="transparent"
+          hoveredBorderColor="transparent"
+          focusedBorderColor={"transparent"}
           blankTextarea={true}
           class="text-fs-14 bg-transparent ellipsis fw-normal px-2"
           style="outline:none;
@@ -679,16 +730,29 @@
       </div>
 
       {#if isSubjectEmpty}
-        <p class="error-message">Enter a relevant subject for feedback.</p>
+        <p class="error-message">Enter a suitable subject for feedback.</p>
       {/if}
       {#if isDescriptionEmpty}
-        <p class="error-message">Enter a relevant description for feedback.</p>
+        <p class="error-message">Enter relevant description for feedback.</p>
       {/if}
       {#if isTextArea}
         <p class="error-message">
           Please enter subject and description for adding a feedback.
         </p>
       {/if}
+
+      <p
+        class="text-ds-font-size-14 text-ds-font-weight-regular mb-0"
+        style="color: var(--text-ds-neutral-200);"
+      >
+        Upload Files
+      </p>
+      <p
+        class="text-ds-font-size-12 mb-2"
+        style="color: var(--text-ds-neutral-400);"
+      >
+        Upload up to 5 images. Max size: 2MB each.
+      </p>
 
       <div class="drop-box mb-2" style="">
         <Drop
@@ -699,7 +763,7 @@
           inputId="upload--feedback-file-input"
           inputPlaceholder="Drag and Drop or"
           supportedFileTypes={[".png", ".jpg", ".jpeg", ".svg"]}
-          height={"80px"}
+          height={"120px"}
           infoMessage={"Images: SVG, PNG, JPG, JPEG <br/> (limit 2MB each)<br/> No video files, only images <br/> are accepted"}
         />
         <div class="d-flex justify-content-between">
@@ -713,64 +777,52 @@
         </div>
       </div>
     </div>
-    <div class="d-flex gap-1 file-scroller flex-wrap">
+    <div class="d-flex file-scroller gap-2 flex-wrap">
       {#if tempImageURLsArray.length > 0}
-        <div class="file-scroller mb-2 d-flex gap-1 flex-wrap">
+        <div class="file-scroller mb-2 d-flex gap-2 flex-wrap">
           {#each tempImageURLsArray as file, index}
             <div
-              class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
+              class="files d-flex align-items-center mb-2 px-1 border-radius-4"
             >
-              <span>
-                <AttachmentIcon
-                  height={"12px"}
-                  width={"12px"}
-                  color={"var(--text-secondary-200)"}
-                />
+              <span class="flex-shrink-0">
+                <AttachRegular size={"16px"} />
               </span>
-              <span class="mb-0 text-ds-font-size-12 px-2 ellipsis"
+              <span class="mb-0 text-ds-font-size-12 px-2 filename-ellipsis"
                 >{file?.name || file?.slice(-10)}</span
               >
-              <span
-                on:click={() => {
+              <Button
+                startIcon={DismissRegular}
+                size="extra-small"
+                type="teritiary-regular"
+                onClick={() => {
                   removeFile(index, true);
                 }}
-                ><CrossIcon
-                  height={"12px"}
-                  width={"9px"}
-                  color={"var(--text-secondary-200)"}
-                /></span
-              >
+              />
             </div>
           {/each}
         </div>
       {/if}
 
       {#if uploadFeedback?.file?.value?.length > 0}
-        <div class="file-scroller mb-2 d-flex gap-1 flex-wrap">
+        <div class="file-scroller mb-2 d-flex gap-2 flex-wrap">
           {#each uploadFeedback?.file?.value as file, index}
             <div
-              class="files d-flex align-items-center bg-tertiary-300 mb-2 px-3 py-1 border-radius-4"
+              class="files d-flex align-items-center mb-2 px-1 border-radius-4"
             >
-              <span>
-                <AttachmentIcon
-                  height={"12px"}
-                  width={"12px"}
-                  color={"var(--text-secondary-200)"}
-                />
+              <span class="flex-shrink-0">
+                <AttachRegular size={"16px"} />
               </span>
-              <span class="mb-0 text-ds-font-size-12 px-2 ellipsis"
+              <span class="mb-0 text-ds-font-size-12 px-2 filename-ellipsis"
                 >{file?.name || file?.slice(-10)}</span
               >
-              <span
-                on:click={() => {
+              <Button
+                startIcon={DismissRegular}
+                size="extra-small"
+                type="teritiary-regular"
+                onClick={() => {
                   removeFile(index);
                 }}
-                ><CrossIcon
-                  height={"12px"}
-                  width={"9px"}
-                  color={"var(--text-secondary-200)"}
-                /></span
-              >
+              />
             </div>
           {/each}
         </div>
@@ -781,6 +833,7 @@
         <Button
           type={"secondary"}
           title={"Cancel"}
+          customWidth={"96px"}
           buttonClassProp={"me-2"}
           onClick={async () => {
             isExposeFeedbackForm = false;
@@ -799,8 +852,9 @@
           }}
         />
         <Button
-          type={"secondary"}
+          type={"primary"}
           title={"Save"}
+          customWidth={"96px"}
           loader={isSaving}
           onClick={async () => {
             isSaving = true;
@@ -847,29 +901,14 @@
   .visually-hidden {
     display: none;
   }
-  .back-button {
-    width: 187px;
-    margin-right: 28px;
-    height: 29px;
-    display: flex;
-    align-items: center;
-    border-radius: 2px;
-    cursor: pointer;
-    padding-left: 10px;
-  }
-
-  .back-button:hover {
-    background-color: #232424;
-  }
 
   .search-input-container {
-    background: var(--bg-secondary-800);
+    background: var(--bg-ds-surface-400);
     width: 100%;
-    font-size: 12px;
-
+    font-size: 14px;
+    border: 1px solid var(--bg-ds-surface-400);
     position: relative;
-    border: 1px solid var(--border-secondary-310);
-    border-radius: 2px;
+    border-radius: 4px;
   }
 
   .search-input-container:focus-within {
@@ -895,5 +934,19 @@
 
   .file-scroller::-webkit-scrollbar {
     display: none;
+  }
+
+  .filename-ellipsis {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+  }
+
+  .files {
+    max-width: 200px;
+    padding: 2px;
+    background-color: var(--bg-ds-surface-200);
   }
 </style>

@@ -13,6 +13,7 @@
     AiRequestExplorerDataStore,
     type AiRequestExplorerData,
   } from "@sparrow/workspaces/features/ai-request-explorer/store";
+  import type { PromptFileAttachment } from "@sparrow/common/types/workspace/ai-request-base";
 
   export let tab: Observable<RequestTab>;
   export let onUpdateAiPrompt;
@@ -22,27 +23,63 @@
   export let onStopGeneratingAIResponse;
   export let onToggleLike;
   export let handleApplyChangeOnAISuggestion;
-  export let responseData: AiRequestExplorerData | undefined;
+  export let responseData: AiRequestExplorerData;
+  export let disabled = true;
+  export let conversationsHistory;
+  export let onOpenConversationHistoryPanel;
+  export let onCloseConversationHistoryPanel;
+  export let onSwitchConversation;
+  export let onRenameConversation;
+  export let onDeleteConversation;
+  export let onClearConversation;
+  export let isConversationHistoryPanelOpen: boolean;
+  export let isConversationHistoryLoading: boolean;
+  export let activateGeneratePromptModal;
+  export let isGuestUser: boolean;
+  export let onUploadFiles;
 
   let scrollList: ScrollList;
 
-  const sendPrompt = async (text: string) => {
+  const sendPrompt = async (
+    text: string,
+    attachedFiles: PromptFileAttachment[],
+  ) => {
     if (text) {
-      onUpdateAiConversation([
-        // ...$tab?.property?.aiRequest?.ai?.conversations,
-        {
-          message: text,
-          messageId: "",
-          type: MessageTypeEnum.SENDER,
-          isLiked: false,
-          isDisliked: false,
-          status: true,
-        },
-      ]);
+      const isAutoClearEnabled =
+        $tab?.property?.aiRequest?.state?.isChatAutoClearActive || false;
+      const updatedConverstaion = isAutoClearEnabled
+        ? [
+            {
+              message: text,
+              messageId: "",
+              type: MessageTypeEnum.SENDER,
+              isLiked: false,
+              isDisliked: false,
+              status: true,
+              modelProvider: $tab?.property?.aiRequest?.aiModelProvider,
+              modelVariant: $tab?.property?.aiRequest?.aiModelVariant,
+              attachedFiles,
+            },
+          ]
+        : [
+            ...$tab?.property?.aiRequest?.ai?.conversations,
+            {
+              message: text,
+              messageId: "",
+              type: MessageTypeEnum.SENDER,
+              isLiked: false,
+              isDisliked: false,
+              status: true,
+              modelProvider: $tab?.property?.aiRequest?.aiModelProvider,
+              modelVariant: $tab?.property?.aiRequest?.aiModelVariant,
+              attachedFiles,
+            },
+          ];
+      onUpdateAiConversation(updatedConverstaion);
       setTimeout(() => {
         if (scrollList) scrollList("bottom", -1, "smooth");
       }, 10);
-      const response = await onGenerateAiResponse(text, "", "");
+      const response = await onGenerateAiResponse(text, attachedFiles);
       setTimeout(() => {
         if (scrollList) scrollList("bottom", -1, "smooth");
       }, 10);
@@ -58,6 +95,10 @@
   const regenerateAiResponse = async () => {
     const regenerateConversation =
       $tab?.property?.aiRequest?.ai?.conversations.slice(0, -1);
+    regenerateConversation[regenerateConversation.length - 1].modelProvider =
+      $tab.property.aiRequest.aiModelProvider;
+    regenerateConversation[regenerateConversation.length - 1].modelVariant =
+      $tab.property.aiRequest.aiModelVariant;
     onUpdateAiConversation(regenerateConversation);
     const response = await onGenerateAiResponse(
       regenerateConversation[regenerateConversation.length - 1].message,
@@ -67,27 +108,52 @@
 </script>
 
 {#if $tab?.property?.aiRequest?.state?.isChatbotActive}
-  <div class="h-100">
+  <div class="h-100" class:disabled-chatbot={disabled}>
     <AIChatInterface
-      conversations={$tab?.property?.aiRequest?.ai?.conversations}
+      {isGuestUser}
       {responseData}
-      prompt={$tab?.property?.aiRequest?.ai?.prompt}
+      bind:scrollList
       {onUpdateAiPrompt}
       {sendPrompt}
-      isResponseGenerating={$tab?.property?.aiRequest?.state
-        ?.isChatbotGeneratingResponse}
       {onToggleLike}
       {regenerateAiResponse}
       {onUpdateRequestState}
       {onStopGeneratingAIResponse}
       {handleApplyChangeOnAISuggestion}
-      modelVariant={$tab?.property?.aiRequest?.aiModelVariant}
-      bind:scrollList
+      {conversationsHistory}
+      {onOpenConversationHistoryPanel}
+      {onCloseConversationHistoryPanel}
+      {onSwitchConversation}
+      {onRenameConversation}
+      {onDeleteConversation}
+      {onClearConversation}
+      currentProvider={$tab?.property?.aiRequest?.aiModelProvider}
+      currentModel={$tab?.property?.aiRequest?.aiModelVariant}
+      conversations={$tab?.property?.aiRequest?.ai?.conversations}
+      prompt={$tab?.property?.aiRequest?.ai?.prompt}
+      isPromptBoxActive={$tab?.property?.aiRequest?.state
+        ?.isChatbotPromptBoxActive}
+      chatPanelTitle={$tab.property?.aiRequest?.ai.conversationTitle}
+      isResponseGenerating={$tab?.property?.aiRequest?.state
+        ?.isChatbotGeneratingResponse}
+      isChatAutoClearActive={$tab?.property?.aiRequest?.state
+        ?.isChatAutoClearActive}
+      isChatPanelLoadingActive={$tab?.property?.aiRequest?.state
+        ?.isChatbotConversationLoading}
+      currTabAiInfo={$tab.property?.aiRequest?.ai}
+      bind:isConversationHistoryPanelOpen
+      bind:isConversationHistoryLoading
+      {activateGeneratePromptModal}
+      {onUploadFiles}
     />
   </div>
 {/if}
 
 <style lang="scss">
+  .disabled-chatbot {
+    pointer-events: none;
+    opacity: 0.6;
+  }
   .chatten-box {
     background-color: var(--bg-ds-primary-400);
     height: 40px;

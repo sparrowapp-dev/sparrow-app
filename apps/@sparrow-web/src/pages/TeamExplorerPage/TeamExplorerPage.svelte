@@ -17,6 +17,9 @@
   import { navigate } from "svelte-navigator";
   import constants from "src/constants/constants";
   import { copyToClipBoard } from "@sparrow/common/utils";
+  import type { InviteBody } from "@sparrow/common/dto/team-dto";
+  import { ResponseMessage } from "@sparrow/common/enums";
+  import type { addUsersInWorkspacePayload } from "@sparrow/common/dto";
 
   export let activeTeamTab;
   export let onUpdateActiveTab;
@@ -24,6 +27,9 @@
   let isDeleteWorkspaceModalOpen = false;
   let selectedWorkspace: WorkspaceDocument;
   const _viewModel = new TeamExplorerPageViewModel();
+  let upgradePlanModalInvite = false;
+  let upgradePlanModal = false;
+  let usersInvitePlanCount: number = 5;
 
   let isWorkspaceInviteModalOpen = false;
   let isWebEnvironment = true;
@@ -35,7 +41,7 @@
   const OnleaveTeam = _viewModel.leaveTeam;
   let userId = "";
   let userRole = "";
-  user.subscribe(async (value) => {
+  const userSubscriber = user.subscribe(async (value) => {
     if (value) {
       userId = value._id;
     }
@@ -64,7 +70,7 @@
     });
   };
 
-  const activeWorkspaceSubscribe = activeWorkspace.subscribe(
+  const activeWorkspaceSubscriber = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       if (value?._data) {
         currentWorkspace = {
@@ -80,21 +86,42 @@
   );
   let isWorkspaceOpen = false;
 
-  activeTeam.subscribe((value) => {
+  const activeTeamSubscriber = activeTeam.subscribe((value) => {
     if (value) {
       currentTeam.name = value.name;
       currentTeam.users = value.users;
+      usersInvitePlanCount = value?._data?.users?.length || 5;
       isWorkspaceOpen = false;
     }
   });
 
   let isTeamInviteModalOpen = false;
   let isLeaveTeamModelOpen = false;
+  let invitedCount = 0;
   let isGuestUser;
 
   const handleDeleteWorkspace = (workspace: WorkspaceDocument) => {
     selectedWorkspace = workspace;
     isDeleteWorkspaceModalOpen = true;
+  };
+
+  const handleSendInvite = async (
+    teamId: string,
+    teamName: string,
+    inviteBody: InviteBody,
+    userId: string,
+  ) => {
+    invitedCount = inviteBody?.users.length;
+    const response = await _viewModel.handleTeamInvite(
+      teamId,
+      teamName,
+      inviteBody,
+      userId,
+    );
+    if (response?.message === "Plan limit reached") {
+      upgradePlanModalInvite = true;
+    }
+    return response;
   };
 
   onMount(async () => {
@@ -149,13 +176,56 @@
   }
 
   onDestroy(() => {
-    activeWorkspaceSubscribe.unsubscribe();
+    activeWorkspaceSubscriber.unsubscribe();
+    activeTeamSubscriber.unsubscribe();
+    userSubscriber();
   });
 
   const handleCopyPublicWorkspaceLink = async (workspaceId: string) => {
     await copyToClipBoard(
       `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${workspaceId}`,
     );
+  };
+
+  const handleUserLimits = async () => {
+    const data = await _viewModel.userPlanLimits($activeTeam?.teamId);
+    usersInvitePlanCount = data?.usersPerHub.value || 5;
+    return data;
+  };
+
+  const handleRequestPlan = async () => {
+    await _viewModel.requestToUpgradePlan($activeTeam?.teamId);
+  };
+
+  const handleRedirectAdminPanel = async () => {
+    await _viewModel.handleRedirectToAdminPanel($activeTeam?.teamId);
+  };
+
+  const handleCreateWorkspace = async (teamId: string) => {
+    const response = await _viewModel.handleCreateWorkspace(teamId);
+    if (response?.data?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
+      upgradePlanModal = true;
+    }
+  };
+
+  const handleAddWorkspace = async (
+    workspaceId: string,
+    workspaceName: string,
+    data: addUsersInWorkspacePayload,
+    invitedUserCount: number,
+  ) => {
+    invitedCount = invitedUserCount;
+    const response = await _viewModel.inviteUserToWorkspace(
+      workspaceId,
+      workspaceName,
+      data,
+      invitedUserCount,
+    );
+    if (response?.data.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
+      isWorkspaceInviteModalOpen = false;
+      upgradePlanModalInvite = true;
+    }
+    return response;
   };
 </script>
 
@@ -210,13 +280,16 @@
     bind:userId
     bind:isTeamInviteModalOpen
     bind:isLeaveTeamModelOpen
+    bind:upgradePlanModalInvite
+    bind:upgradePlanModal
+    bind:invitedCount
     onAddMember={handleWorkspaceDetails}
     openTeam={$activeTeam}
     workspaces={$workspaces}
     {activeTeamTab}
     onDeleteWorkspace={handleDeleteWorkspace}
     {onUpdateActiveTab}
-    onCreateWorkspace={_viewModel.handleCreateWorkspace}
+    onCreateWorkspace={handleCreateWorkspace}
     onSwitchWorkspace={async (item) => {
       await _viewModel.handleSwitchWorkspace(item);
       // isWorkspaceOpen = true;
@@ -236,6 +309,10 @@
     onAcceptInvite={_viewModel.acceptInvite}
     onIgnoreInvite={_viewModel.ignoreInvite}
     onCopyLink={handleCopyPublicWorkspaceLink}
+    planLimits={handleUserLimits}
+    contactOwner={handleRequestPlan}
+    {handleRedirectAdminPanel}
+    handleContactSales={_viewModel.handleContactSales}
   />
 {/if}
 
@@ -252,7 +329,7 @@
   <TeamInvite
     {userId}
     teamLogo={$activeTeam?.logo}
-    onInviteClick={_viewModel.handleTeamInvite}
+    onInviteClick={handleSendInvite}
     teamName={$activeTeam?.name}
     users={$activeTeam?.users}
     teamId={$activeTeam?.teamId}
@@ -329,6 +406,6 @@
     currentWorkspaceDetails={currentWorkspace}
     users={currentTeam?.users}
     teamName={currentTeam?.name}
-    onInviteUserToWorkspace={_viewModel.inviteUserToWorkspace}
+    onInviteUserToWorkspace={handleAddWorkspace}
   />
 </Modal>

@@ -18,7 +18,7 @@
   import { Motion } from "svelte-motion";
   import { scaleMotionProps } from "@app/constants";
 
-  import { onDestroy } from "svelte";
+  import { onDestroy, tick } from "svelte";
   // ---- Components
   import {
     RestExplorerPage,
@@ -93,6 +93,13 @@
   import { Spinner } from "@sparrow/library/ui";
   import { OpenRegular } from "@sparrow/library/icons";
   import RestExplorerMockPage from "./sub-pages/RestExplorerMockPage/RestExplorerMockPage.svelte";
+  import MockHistoryExplorerPage from "./sub-pages/MockHistroyExplorerPage/MockHistoryExplorerPage.svelte";
+  import HubExplorerPage from "./sub-pages/HubExplorerPage/HubExplorerPage.svelte";
+  import { PlanUpgradeModal } from "@sparrow/common/components";
+  import { planInfoByRole, planContentDisable } from "@sparrow/common/utils";
+  import { TeamRole } from "@sparrow/common/enums/team.enum";
+  import { ResponseMessage } from "@sparrow/common/enums";
+  import { shouldRunThrottled } from "@sparrow/common/store";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -108,6 +115,7 @@
 
   let removeTab: Tab;
   let isPopupClosed: boolean = false;
+  let teamDetails: any;
 
   // Tab Controls Properties - st
   let isForceCloseTabPopupOpen: boolean = false;
@@ -140,15 +148,9 @@
   let currentWOrkspaceValue: Observable<WorkspaceDocument>;
   const externalSparrowGithub = constants.SPARROW_GITHUB;
 
-  environments.subscribe((value) => {
+  const environmentsSubscriber = environments.subscribe((value) => {
     if (value) {
       environmentsValues = value;
-    }
-  });
-
-  currentWorkspace.subscribe((value) => {
-    if (value) {
-      currentWOrkspaceValue = value;
     }
   });
 
@@ -213,11 +215,11 @@
     scrollList("bottom");
   }
 
-  isGuestUserActive.subscribe((value) => {
+  const isGuestUserActiveSubscriber = isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
   });
 
-  user.subscribe((value) => {
+  const userSubscriber = user.subscribe((value) => {
     userId = value?._id;
   });
 
@@ -247,6 +249,7 @@
         tab?.type === TabTypeEnum.SOCKET_IO ||
         tab?.type === TabTypeEnum.SAVED_REQUEST ||
         tab?.type === TabTypeEnum.MOCK_REQUEST ||
+        tab?.type === TabTypeEnum.AI_REQUEST ||
         tab?.type === TabTypeEnum.COLLECTION ||
         tab?.type === TabTypeEnum.FOLDER ||
         tab?.type === TabTypeEnum.WORKSPACE ||
@@ -404,6 +407,7 @@
       removeTab.type === TabTypeEnum.SOCKET_IO ||
       removeTab.type === TabTypeEnum.SAVED_REQUEST ||
       removeTab.type === TabTypeEnum.MOCK_REQUEST ||
+      removeTab.type === TabTypeEnum.AI_REQUEST ||
       removeTab.type === TabTypeEnum.GRAPHQL ||
       removeTab.type === TabTypeEnum.FOLDER
     ) {
@@ -426,6 +430,14 @@
             _viewModel.handleRemoveTab(id);
             isPopupClosed = false;
             notifications.success("Mock Request saved successfully.");
+          }
+        } else if (removeTab.type === TabTypeEnum.AI_REQUEST) {
+          const res = await _viewModel.saveAiRequest(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+            notifications.success("AI Request saved successfully.");
           }
         } else if (removeTab.type === TabTypeEnum.SAVED_REQUEST) {
           const res = await _viewModel.saveSavedRequest(removeTab);
@@ -516,6 +528,50 @@
   let isSyncModalOpen = false;
   let isCollectionSyncing = false;
   let isReplaceCollectionModalOpen = false;
+  let userLimits: any;
+  let upgradePlanModel: boolean = false;
+  let isActiveSyncPlanModalOpen = false;
+  let planContent: any;
+  let planContentNonActive: any;
+  let currentTestflow: number = 3;
+
+  const handleLimits = async () => {
+    if ($currentWorkspace?._data?.team?.teamId) {
+      const data = await _viewModel.userPlanLimits(
+        $currentWorkspace?._data?.team?.teamId,
+      );
+      userLimits = data;
+    }
+  };
+
+  const handleCreateTestflowCheck = async () => {
+    currentTestflow = await _viewModel3.currentTestflowCount(
+      $currentWorkspace?._id,
+    );
+    const response = await _viewModel3.handleCreateTestflow();
+    handleLimits();
+    if (response?.data?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
+      upgradePlanModel = true;
+    }
+  };
+
+  const handleRequestOwner = async () => {
+    if ($currentWorkspace?._data?.team?.teamId) {
+      await _viewModel.requestToUpgradePlan(
+        $currentWorkspace?._data?.team?.teamId,
+      );
+      upgradePlanModel = false;
+    }
+  };
+
+  const handleRedirectToAdminPanel = async () => {
+    if ($currentWorkspace?._data?.team?.teamId) {
+      await _viewModel.handleRedirectToAdminPanel(
+        $currentWorkspace?._data?.team?.teamId,
+      );
+      upgradePlanModel = false;
+    }
+  };
 
   // Add userValidation state
   let userValidation = {
@@ -533,7 +589,7 @@
         _viewModel2.refreshEnvironment(workspaceId),
         _viewModel3.refreshTestflow(workspaceId),
       ]);
-
+      await tick();
       const collectionTabsToBeDeleted =
         fetchCollectionsResult?.collectionItemTabsToBeDeleted || [];
       const environmentTabsToBeDeleted =
@@ -558,40 +614,58 @@
 
   let isInitialDataLoading = true;
 
-  const cw = currentWorkspace.subscribe(async (value) => {
-    if (value) {
-      if (prevWorkspaceId !== value._id) {
-        isInitialDataLoading = true;
-        activeTab = undefined;
-        await handleRefreshApicalls(value?._id);
+  const userValidationStoreSubscriber = userValidationStore.subscribe(
+    (validation) => {
+      if (!validation.isValid) {
+        isAccessDeniedModalOpen = true;
+        isWelcomePopupOpen = false;
+      }
+    },
+  );
 
-        userValidationStore.subscribe((validation) => {
-          if (!validation.isValid) {
-            isAccessDeniedModalOpen = true;
-            isWelcomePopupOpen = false;
+  const currentWorkspaceSubscriber = currentWorkspace.subscribe(
+    async (value) => {
+      if (value) {
+        currentWOrkspaceValue = value;
+        if (prevWorkspaceId !== value._id) {
+          isInitialDataLoading = true;
+          activeTab = undefined;
+          if (value?._id && shouldRunThrottled(value?._id)) {
+            handleRefreshApicalls(value?._id);
+          } else {
+            console.error(`Throttled for ${value?._id}`);
+          }
+
+          teamDetails = {
+            teamId: value?._data?.team?.teamId || "",
+            teamName: value?._data?.team?.teamName || "",
+            teamOwnerEmail: value?._data?.users[0]?.email,
+          };
+          if (teamDetails.teamId) {
+            handleLimits();
+          }
+          tabList = _viewModel.getTabListWithWorkspaceId(value._id);
+          activeTab = _viewModel.getActiveTab(value._id);
+          totalTeamCount = value._data?.users?.length;
+
+          isInitialDataLoading = false;
+        }
+        prevWorkspaceId = value._id;
+        if (count == 0) {
+          let url = window.location.href;
+          const params = new URLSearchParams(url.split("?")[1]);
+          const isNew = params.get("first");
+          if (isNew === "true") _viewModel.createNewTabWithData();
+          count = count + 1;
+        }
+        value.users?.forEach((user) => {
+          if (user.id === userId) {
+            userRole = user.role as string;
           }
         });
-        tabList = _viewModel.getTabListWithWorkspaceId(value._id);
-        activeTab = _viewModel.getActiveTab(value._id);
-        totalTeamCount = value._data?.users?.length;
-
-        isInitialDataLoading = false;
       }
-      prevWorkspaceId = value._id;
-      if (count == 0) {
-        let url = window.location.href;
-        const params = new URLSearchParams(url.split("?")[1]);
-        const isNew = params.get("first");
-        if (isNew === "true") _viewModel.createNewTabWithData();
-        count = count + 1;
-      }
-      value.users?.forEach((user) => {
-        if (user.id === userId) {
-          userRole = user.role as string;
-        }
-      });
-    }
-  });
+    },
+  );
 
   const handleAccessDeniedClose = () => {
     isAccessDeniedModalOpen = false;
@@ -609,7 +683,7 @@
 
   let isWelcomePopupOpen = false;
   let isTourGuideOpen = false;
-  isUserFirstSignUp.subscribe((value) => {
+  const isUserFirstSignUpSubscriber = isUserFirstSignUp.subscribe((value) => {
     if (value) {
       isWelcomePopupOpen = value;
       isExpandCollection.set(value);
@@ -617,14 +691,15 @@
       isFirstCollectionExpand = value;
     }
   });
-  onDestroy(() => {
-    cw.unsubscribe();
-  });
 
-  collectionList.subscribe((collections) => {
+  let tourGuideCollectionId;
+  const collectionListSubscriber = collectionList.subscribe((collections) => {
     let count = 0;
-    collections.forEach((collection) => {
+    collections.forEach((collection, index) => {
       const collectionData = collection.toMutableJSON();
+      if (index === 0) {
+        tourGuideCollectionId = collectionData.id;
+      }
       count += collectionData.items.length || 0;
     });
     totalCollectionCount.set(count);
@@ -727,6 +802,36 @@
     mockCollectionUrl = url;
     isMockURLModelOpen = true;
   };
+
+  let createMockCollection = false;
+  let currentCollectionId: string;
+  let currentWorkspaceId: string;
+  let isCreateMockCollectionPopup: boolean;
+  const handleCreateMockCollectionModel = (
+    collectionId: string,
+    workspaceId: string,
+  ) => {
+    currentCollectionId = collectionId;
+    currentWorkspaceId = workspaceId;
+    isCreateMockCollectionPopup = true;
+  };
+  $: {
+    handleLimits();
+    if (userRole) {
+      planContent = planInfoByRole(userRole);
+      planContentNonActive = planContentDisable();
+    }
+  }
+
+  onDestroy(() => {
+    currentWorkspaceSubscriber.unsubscribe();
+    isGuestUserActiveSubscriber();
+    userSubscriber();
+    collectionListSubscriber.unsubscribe();
+    isUserFirstSignUpSubscriber();
+    userValidationStoreSubscriber();
+    environmentsSubscriber.unsubscribe();
+  });
 </script>
 
 <Motion {...pagesMotion} let:motion>
@@ -782,7 +887,7 @@
           onUpdateEnvironment={_viewModel2.onUpdateEnvironment}
           onOpenEnvironment={_viewModel2.onOpenEnvironment}
           onSelectEnvironment={_viewModel2.onSelectEnvironment}
-          onCreateTestflow={_viewModel3.handleCreateTestflow}
+          onCreateTestflow={handleCreateTestflowCheck}
           testflows={_viewModel3.testflows}
           onDeleteTestflow={_viewModel3.handleDeleteTestflow}
           onUpdateTestflow={_viewModel3.handleUpdateTestflow}
@@ -793,6 +898,7 @@
           onSyncCollection={handleSyncCollection}
           onUpdateRunningState={_viewModel.handleMockCollectionState}
           onOpenWorkspace={_viewModel.handleOpenWorkspace}
+          onCreateMockCollection={handleCreateMockCollectionModel}
         />
       </Pane>
       <Pane size={$leftPanelCollapse ? 100 : $rightPanelWidth} minSize={60}>
@@ -827,7 +933,7 @@
                 {#if true}
                   {#if $activeTab?.type === TabTypeEnum.REQUEST}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <RestExplorerPage
                           bind:isTourGuideOpen
                           tab={$activeTab}
@@ -836,13 +942,13 @@
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.AI_REQUEST}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <AiRequestExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.COLLECTION}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <CollectionExplorerPage
                           tab={$activeTab}
                           onSyncCollection={handleSyncCollection}
@@ -852,72 +958,89 @@
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.FOLDER}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <FolderExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.ENVIRONMENT}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <EnvironmentExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.WORKSPACE}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <WorkspaceExplorerPage
                           {collectionList}
                           tab={$activeTab}
+                          {teamDetails}
                         />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.WEB_SOCKET}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <WebSocketExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.TESTFLOW}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
-                        <TestFlowExplorerPage tab={$activeTab} />
+                      <div class="h-100">
+                        <TestFlowExplorerPage
+                          tab={$activeTab}
+                          {teamDetails}
+                          bind:upgradePlanModel
+                        />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.SOCKET_IO}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <SocketIoExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.GRAPHQL}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <GraphqlExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.SAVED_REQUEST}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <RestExplorerSavedPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.MOCK_REQUEST}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <RestExplorerMockPage
                           bind:isTourGuideOpen
                           tab={$activeTab}
                         />
                       </div>
                     </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.MOCK_HISTORY}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100">
+                        <MockHistoryExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.HUB}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100">
+                        <HubExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
                   {:else if !$tabList?.length}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <WorkspaceDefault
                           {currentWorkspace}
                           {handleCreateEnvironment}
-                          onCreateTestflow={() => {
-                            _viewModel3.handleCreateTestflow();
+                          onCreateTestflow={async () => {
+                            await handleCreateTestflowCheck();
                             isExpandTestflow.set(true);
                           }}
                           showImportCollectionPopup={() =>
@@ -968,7 +1091,7 @@
       }}
       disabled={false}
     />
-    <p class="m-0">I understand, don't show this agian.</p>
+    <p class="m-0">I understand, don't show this again.</p>
   </div>
 
   <div
@@ -1064,6 +1187,7 @@
       defaultCurrentStep.set(1);
       isDefaultTourGuideOpen.set(true);
     }}
+    {tourGuideCollectionId}
   />
 </Modal>
 <WorkspaceTourGuide />
@@ -1146,6 +1270,21 @@
       }
       return response;
     }}
+    onImportPostmanCollection={async (
+      currentWorkspaceId,
+      postmanCollectionJson,
+    ) => {
+      const response = await _viewModel.importPostmanCollection(
+        currentWorkspaceId,
+        postmanCollectionJson,
+      );
+      if (response.isSuccessful) {
+        setTimeout(() => {
+          scrollList("bottom");
+        }, 1000);
+      }
+      return response;
+    }}
     onImportCollectionURL={async (
       currentWorkspaceId,
       requestBody,
@@ -1166,6 +1305,8 @@
     onGetOapiTextFromURL={_viewModel.getOapiJsonFromURL}
     onValidateOapiText={_viewModel.validateOapiDataSyntax}
     onValidateOapiFile={_viewModel.validateOapiFileSyntax}
+    isActiveSyncRequired={userLimits?.activeSync?.active || false}
+    bind:isActiveSyncPlanModalOpen
   />
 </Modal>
 
@@ -1594,7 +1735,7 @@
         <p class="text-ds-font-size-14" style="margin-bottom: 0px;">
           Need more details?
         </p>
-        <Tooltip title={"Coming Soon"} placement={"top-center"}>
+        <Tooltip title={"Coming Soon"} placement={"top-center"} distance={4}>
           <Button
             size="small"
             customWidth={"220px"}
@@ -1609,6 +1750,95 @@
     </div>
   </div>
 </Modal>
+
+<Modal
+  title={"Create Mock Collection"}
+  width={"36%"}
+  zIndex={1000}
+  isOpen={isCreateMockCollectionPopup}
+  handleModalState={() => (isCreateMockCollectionPopup = false)}
+>
+  <div class="text-lightGray mb-4 mt-2">
+    <p
+      class="text-ds-font-size-14 text-ds-line-height-120 text-ds-font-weight-medium"
+    >
+      The mock collection only supports REST API requests. Requests using
+      GraphQL, WebSocket, or other request types will be excluded.
+      <br />
+      Do you want to continue?
+    </p>
+  </div>
+  <div
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
+  >
+    <Button
+      disable={createMockCollection}
+      title={"Cancel"}
+      textStyleProp={"font-size: var(--base-text)"}
+      type={"secondary"}
+      loader={false}
+      onClick={() => {
+        isCreateMockCollectionPopup = false;
+      }}
+    />
+
+    <Button
+      disable={createMockCollection}
+      title={"Yes, Continue"}
+      textStyleProp={"font-size: var(--base-text)"}
+      loaderSize={18}
+      type={"primary"}
+      loader={createMockCollection}
+      onClick={async () => {
+        createMockCollection = true;
+        await _viewModel.handleCreateMockCollectionFromExisting(
+          currentCollectionId,
+          currentWorkspaceId,
+        );
+        createMockCollection = false;
+        isCreateMockCollectionPopup = false;
+      }}
+    />
+  </div>
+</Modal>
+<PlanUpgradeModal
+  bind:isOpen={upgradePlanModel}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Testflow"
+  planLimitValue={userLimits?.testflowPerWorkspace?.value}
+  currentPlanValue={currentTestflow}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  handleContactSales={_viewModel.handleContactSales}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName}
+  userEmail={teamDetails?.teamOwnerEmail}
+  submitButtonName={planContent?.buttonName}
+/>
+
+<PlanUpgradeModal
+  bind:isOpen={isActiveSyncPlanModalOpen}
+  title={planContent?.title}
+  description={planContentNonActive?.description}
+  planType="Active Sync"
+  activePlan={"disabled"}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  handleContactSales={_viewModel.handleContactSales}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName}
+  userEmail={teamDetails?.teamOwnerEmail}
+  submitButtonName={planContent?.buttonName}
+/>
 
 <style>
   :global(.collection-splitter .splitpanes__splitter) {

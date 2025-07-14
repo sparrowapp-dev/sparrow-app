@@ -4,26 +4,43 @@
     ModelSector,
     RequestNavigator,
     RequestAuth,
-    RequestName,
     ChatBot,
     RequestDoc,
     AiConfigs,
+    GetCode,
+    GeneratePromptModal,
   } from "../components";
   import { Splitpanes, Pane } from "svelte-splitpanes";
-  import type { CollectionDocument } from "@app/database/database";
-  import type { Observable } from "rxjs";
   import type {
-    SaveRequestType,
-    UpdateRequestAuthType,
-    UpdateRequestDescriptionType,
-    UpdateRequestNameType,
-    UpdateRequestStateType,
-  } from "@sparrow/workspaces/type";
-  import { AiRequestSectionEnum } from "@sparrow/common/types/workspace/ai-request-tab";
+    CollectionDocument,
+    AiRequestConversationsDocument,
+  } from "@app/database/database";
+  import type { Observable } from "rxjs";
+  import {
+    AiRequestSectionEnum,
+    type Conversation,
+  } from "@sparrow/common/types/workspace/ai-request-tab";
+  import {
+    ModelIdNameMapping,
+    ModelVariantIdNameMapping,
+  } from "@sparrow/common/types/workspace/ai-request-base";
   import type { AiRequestExplorerData } from "../store/ai-request-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import { onDestroy, onMount } from "svelte";
   import { writable } from "svelte/store";
+  import { disabledModelFeatures, modelCodeTemplates } from "../constants";
+
+  import {
+    BotRegular,
+    SettingsRegular,
+    BotSparkleRegular,
+    DismissRegular,
+  } from "@sparrow/library/icons";
+  import { SaveAsCollectionItem } from "../../save-as-request";
+  import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
+  import { Alert, Button, Modal, notifications } from "@sparrow/library/ui";
+  import { Textarea } from "@sparrow/library/forms";
+  import { Sleep } from "@sparrow/common/utils";
 
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -31,7 +48,7 @@
   export let onUpdateRequestAuth;
   export let onUpdateRequestState;
   export let onUpdateAiSystemPrompt;
-  export let onSaveRequest;
+  export let onSaveAiRequest;
   export let onOpenCollection;
   export let onUpdateEnvironment;
   export let environmentVariables;
@@ -42,24 +59,63 @@
   export let onUpdateAiConversation;
   export let onStopGeneratingAIResponse;
   export let onToggleLike;
+  export let onUpdateAiConfigurations;
+  export let readWorkspace;
+  export let onSave;
+  export let onCreateFolder;
+  export let onCreateCollection;
+  export let onRenameCollection;
+  export let onRenameFolder;
+  export let onClearConversation;
+  export let onUploadFiles;
+
+  let isGeneratePromptModalOpen = false;
+  let isConversationHistoryLoading = false;
+  let isConversationHistoryPanelOpened = false;
+  let generatePromptTarget: "UserPrompt" | "SystemPrompt" | "None" = "None";
+
+  // Conversations History Props
+  export let conversationsHistory: AiRequestConversationsDocument[];
+  export let onSelectConversation: (id: string) => void;
+  export let onRenameConversation: (
+    conversationId: string,
+    conversationTitle: string,
+  ) => void;
+  export let onDeleteConversation: (
+    conversationId: string,
+    conversationTitle: string,
+  ) => void;
+  export let onSwitchConversation: (
+    conversationId: string,
+    conversationTitle: string,
+    conversation: Conversation[],
+  ) => void;
+  export let fetchConversations: () => Promise<void>;
+  export let getConversationsList: () => Observable<
+    AiRequestConversationsDocument[]
+  >;
+  export let onGenerateAiPrompt;
 
   // Role of user in active workspace
   export let userRole;
   export let storeData: AiRequestExplorerData | undefined;
   export let isWebApp = false;
-  export let onSaveResponse;
   export let collectionAuth;
   export let collection;
+  export let onHandleInsertPrompt;
   const loading = writable<boolean>(false);
+  let isExposeSaveAsRequest = false;
 
   // Reference to the splitpane container element
   let splitpaneContainer;
   let splitpaneContainerWidth = 0;
 
   // Chatbot pane size constraints in pixels (based on Figma design)
-  const minPx = 343;
-  const maxPx = 525;
-  const defaultPx = 452;
+  // const minPx = 343;
+  // const maxPx = 525;
+  let minPx = 343;
+  let maxPx = 525;
+  let defaultPx = 452;
 
   // Chatbot pane size constraints in percentage (calculated at runtime)
   let minSizePct = 0;
@@ -83,6 +139,54 @@
     defaultSizePct = (defaultPx / splitpaneContainerWidth) * 100;
   }
 
+  const toggleSaveRequest = (flag: boolean): void => {
+    isExposeSaveAsRequest = flag;
+  };
+
+  let isConversationHistoryPanelOpen = false;
+  const onOpenConversationHistoryPanel = async () => {
+    // fetchConversations(); // fetch the updated state from DB
+    // await new Sleep().setTime(1500).exec(); // wait for UI to load
+    await fetchConversations();
+    const result = getConversationsList();
+    maxPx += 230;
+    defaultPx += 220;
+    minPx += 300;
+    updateSplitpaneContSizes();
+    isConversationHistoryPanelOpen = true;
+    return result;
+  };
+  const onCloseConversationHistoryPanel = () => {
+    maxPx -= 230;
+    defaultPx -= 220;
+    minPx -= 300;
+    updateSplitpaneContSizes();
+    isConversationHistoryPanelOpen = false;
+  };
+
+  const handleOnClickUpdateRequestAuth = async () => {
+    if (!isGuestUser && isConversationHistoryPanelOpen) {
+      isConversationHistoryLoading = true;
+      const res = await fetchConversations();
+      const result = getConversationsList();
+      isConversationHistoryLoading = false;
+    }
+    onUpdateRequestAuth();
+  };
+
+  let isGetCodePopupOpen = false;
+  const onClickOpenGetCodePopup = async () => {
+    isGetCodePopupOpen = true;
+  };
+
+  // Update the activateGeneratePromptModal function:
+  const activateGeneratePromptModal = (
+    target: "UserPrompt" | "SystemPrompt",
+  ) => {
+    generatePromptTarget = target;
+    isGeneratePromptModalOpen = true;
+  };
+
   onMount(async () => {
     // Delay to ensure DOM is ready before measuring container width
     setTimeout(() => {
@@ -96,96 +200,260 @@
     }, 0);
   });
   onDestroy(() => {});
-
 </script>
 
-{#if $tab.tabId}
-  <div class="d-flex ai-request-explorer-layout h-100">
-    <div class="w-100 d-flex flex-column h-100 p-3">
-      <div class="d-flex justify-content-between w-100 p-3 d-none">
-        <RequestName name={$tab.name} {onUpdateRequestName} />
+<div class="d-flex ai-request-explorer-layout h-100">
+  <div class="w-100 d-flex flex-column h-100 p-3">
+    <!-- HTTP URL Section -->
+    <ModelSector
+      class=""
+      isSaveLoad={$loading}
+      isSave={$tab.isSaved}
+      bind:userRole
+      {onUpdateEnvironment}
+      {environmentVariables}
+      {onUpdateAIModel}
+      {toggleSaveRequest}
+      onSaveRequest={onSaveAiRequest}
+      selectedModelProvider={$tab.property?.aiRequest?.aiModelProvider}
+      selectedModel={$tab.property?.aiRequest?.aiModelVariant}
+      {onUpdateAiConversation}
+      onModelSwitch={async () => {
+        onSwitchConversation("", "New Conversation", []);
+        if (isConversationHistoryPanelOpen) {
+          onCloseConversationHistoryPanel();
+        }
+        // if (!isGuestUser && isConversationHistoryPanelOpen) {
+        //   isConversationHistoryLoading = true;
+        //   const res = await fetchConversations();
+        //   const result = getConversationsList();
+        //   isConversationHistoryLoading = false;
+        // }
+      }}
+      openGetCodePopup={onClickOpenGetCodePopup}
+    />
 
-        <div class="d-flex justify-content-between"></div>
-      </div>
-
-      <!-- HTTP URL Section -->
-      <ModelSector
-        class=""
-        isSaveLoad={$loading}
-        isSave={$tab.isSaved}
-        bind:userRole
-        {onUpdateEnvironment}
-        {environmentVariables}
-        {onUpdateAIModel}
-        toggleSaveRequest={() => {}}
-        {onSaveRequest}
-        {isGuestUser}
-        selectedModelProvider={$tab.property.aiRequest?.aiModelProvider}
-        selectedModel={$tab.property.aiRequest?.aiModelVariant}
-      />
-
-      <div
-        bind:this={splitpaneContainer}
-        style="flex:1; overflow:auto; margin-top: 12px;"
-      >
-        <Splitpanes class="explorer-chatbot-splitter">
-          <Pane class="position-relative bg-transparent">
-            <!-- Request Pane -->
-            <div class="h-100 d-flex flex-column position-relative">
-              <RequestNavigator
-                requestStateSection={$tab.property.aiRequest?.state
-                  ?.aiNavigation}
-                {onUpdateRequestState}
-              />
-              <div style="flex:1; overflow:auto;" class="p-0">
-                {#if $tab.property.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.SYSTEM_PROMPT}
+    <div
+      bind:this={splitpaneContainer}
+      style="flex:1; overflow:auto; margin-top: 12px;"
+    >
+      <Splitpanes class="explorer-chatbot-splitter">
+        <Pane class="position-relative bg-transparent">
+          <!-- Request Pane -->
+          <div class="h-100 d-flex flex-column position-relative">
+            <RequestNavigator
+              requestStateSection={$tab.property?.aiRequest?.state
+                ?.aiNavigation}
+              {onUpdateRequestState}
+            />
+            <div style="flex:1; overflow:auto;" class="p-0">
+              {#if $tab.property?.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.SYSTEM_PROMPT}
+                {#if $tab.property?.aiRequest?.aiModelProvider}
                   <RequestDoc
                     {onUpdateAiSystemPrompt}
-                    requestDoc={$tab.property.aiRequest.systemPrompt}
+                    isEditable={true}
+                    requestDoc={$tab.property?.aiRequest?.systemPrompt}
+                    {activateGeneratePromptModal}
+                    isAutoPromptGenerationInProgress={$tab.property?.aiRequest
+                      .state.isSaveDescriptionInProgress}
+                    {isGuestUser}
                   />
-                {:else if $tab.property.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.AUTHORIZATION}
+                {:else}
+                  <div
+                    style="font-family: Inter, sans-serif;"
+                    class="d-flex flex-column align-items-center justify-content-center h-100 text-center text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+                  >
+                    <div class="mb-3">
+                      <BotSparkleRegular
+                        size={"48px"}
+                        color={"var(--icon-ds-neutral-500)"}
+                      />
+                    </div>
+                    <p
+                      class="text-muted mb-0 px-3"
+                      style="font-family: Inter, sans-serif; color=var(--icon-ds-neutral-500)"
+                    >
+                      No model selected. Please choose a model to set its
+                      context for tailored responses.
+                    </p>
+                  </div>
+                {/if}
+              {:else if $tab.property?.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.AUTHORIZATION}
+                {#if $tab.property?.aiRequest?.aiModelProvider}
                   <RequestAuth
-                    requestStateAuth={$tab.property.aiRequest.state
+                    requestStateAuth={$tab.property?.aiRequest.state
                       .aiAuthNavigation}
-                    auth={$tab.property.aiRequest.auth}
+                    auth={$tab.property?.aiRequest.auth}
+                    selectedModelProvider={$tab.property?.aiRequest
+                      ?.aiModelProvider}
                     collectionAuth={$collectionAuth}
                     {onUpdateRequestState}
-                    {onUpdateRequestAuth}
+                    onUpdateRequestAuth={handleOnClickUpdateRequestAuth}
                     {onUpdateEnvironment}
                     {environmentVariables}
                     {collection}
                     {onOpenCollection}
                   />
-                {:else if $tab.property.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.AI_MODAL_CONFIGURATIONS}
-                  <AiConfigs {onUpdateRequestState} />
+                {:else}
+                  <div
+                    style="font-family: Inter, sans-serif;"
+                    class="d-flex flex-column align-items-center justify-content-center h-100 text-center text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+                  >
+                    <div class="mb-3">
+                      <BotSparkleRegular
+                        size={"48px"}
+                        color={"var(--icon-ds-neutral-500)"}
+                      />
+                    </div>
+                    <p
+                      class="text-muted mb-0 px-3"
+                      style="font-family: Inter, sans-serif; color=var(--icon-ds-neutral-500)"
+                    >
+                      No model selected. Please select a model to add
+                      authentication.
+                    </p>
+                  </div>
                 {/if}
-              </div>
+              {:else if $tab.property?.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.AI_MODAL_CONFIGURATIONS}
+                {#if $tab.property?.aiRequest?.aiModelProvider}
+                  <AiConfigs
+                    currSelectedModel={$tab.property?.aiRequest
+                      ?.aiModelProvider}
+                    currSelectedModelVariant={$tab.property?.aiRequest
+                      ?.aiModelVariant}
+                    config={$tab.property?.aiRequest?.configurations?.[
+                      $tab.property?.aiRequest?.aiModelProvider
+                    ]}
+                    {onUpdateAiConfigurations}
+                  />
+                {:else}
+                  <div
+                    style="font-family: Inter, sans-serif;"
+                    class="d-flex flex-column align-items-center justify-content-center h-100 text-center text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+                  >
+                    <div class="mb-3">
+                      <SettingsRegular
+                        size={"48px"}
+                        color={"var(--icon-ds-neutral-500)"}
+                      />
+                    </div>
+                    <p
+                      class="text-muted mb-0 px-3"
+                      style="font-family: Inter, sans-serif; color=var(--icon-ds-neutral-500)"
+                    >
+                      No model selected. Please choose a model to configure its
+                      settings.
+                    </p>
+                  </div>
+                {/if}
+              {/if}
             </div>
-          </Pane>
+          </div>
+        </Pane>
 
-          <Pane
-            class="position-relative bg-transparent"
-            minSize={minSizePct}
-            size={defaultSizePct}
-            maxSize={maxSizePct}
-          >
-            <ChatBot
-              {tab}
-              responseData={storeData}
-              {onUpdateAiPrompt}
-              {onUpdateAiConversation}
-              {onUpdateRequestState}
-              {onGenerateAiResponse}
-              {onStopGeneratingAIResponse}
-              {onToggleLike}
-              handleApplyChangeOnAISuggestion={() => {}}
-            />
-          </Pane>
-        </Splitpanes>
-      </div>
+        <Pane
+          class="position-relative bg-transparent"
+          minSize={minSizePct}
+          size={defaultSizePct}
+          maxSize={maxSizePct}
+        >
+          <ChatBot
+            {tab}
+            {isGuestUser}
+            disabled={!$tab.property?.aiRequest?.aiModelProvider}
+            responseData={storeData}
+            {onUpdateAiPrompt}
+            {onUpdateAiConversation}
+            {onUpdateRequestState}
+            {onGenerateAiResponse}
+            {onStopGeneratingAIResponse}
+            {activateGeneratePromptModal}
+            {onToggleLike}
+            {conversationsHistory}
+            {onOpenConversationHistoryPanel}
+            {onCloseConversationHistoryPanel}
+            {onSwitchConversation}
+            {onRenameConversation}
+            {onDeleteConversation}
+            {onClearConversation}
+            {onUploadFiles}
+            bind:isConversationHistoryPanelOpen
+            bind:isConversationHistoryLoading
+          />
+        </Pane>
+      </Splitpanes>
     </div>
   </div>
-{/if}
+</div>
+
+<Modal
+  title={"Save AI Request"}
+  type={"dark"}
+  width={"55%"}
+  zIndex={10000}
+  isOpen={isExposeSaveAsRequest}
+  handleModalState={(flag = false) => {
+    isExposeSaveAsRequest = flag;
+  }}
+>
+  <SaveAsCollectionItem
+    onClick={(flag = false) => {
+      isExposeSaveAsRequest = flag;
+    }}
+    requestMethod={TabTypeEnum.AI_REQUEST}
+    requestUrl={ModelIdNameMapping[$tab.property?.aiRequest?.aiModelProvider]}
+    requestName={$tab.name}
+    requestDescription={$tab.description}
+    requestPath={$tab.path}
+    collections={$collections}
+    {readWorkspace}
+    {onSave}
+    {onCreateFolder}
+    {onCreateCollection}
+    {onRenameCollection}
+    {onRenameFolder}
+  />
+</Modal>
+
+<Modal
+  title={`Code for "${ModelVariantIdNameMapping[$tab?.property?.aiRequest?.aiModelVariant]}" API`}
+  type={"dark"}
+  zIndex={1000}
+  isOpen={isGetCodePopupOpen}
+  width={"40%"}
+  handleModalState={() => {
+    isGetCodePopupOpen = false;
+  }}
+>
+  <GetCode
+    selectedModelVariant={$tab?.property?.aiRequest?.aiModelVariant}
+    aiModelProvider={$tab?.property?.aiRequest?.aiModelProvider}
+    providerApiKey={$tab?.property?.aiRequest?.auth?.apiKey?.authValue}
+    configurations={$tab?.property?.aiRequest?.configurations}
+  />
+</Modal>
+
+<Modal
+  title={`Generate ${generatePromptTarget === "UserPrompt" ? "User Prompt" : "System Prompt"}`}
+  zIndex={1000}
+  isOpen={isGeneratePromptModalOpen}
+  width="35%"
+  handleModalState={() => {
+    isGeneratePromptModalOpen = false;
+    generatePromptTarget = "None";
+  }}
+>
+  <GeneratePromptModal
+    {generatePromptTarget}
+    {onGenerateAiPrompt}
+    {onHandleInsertPrompt}
+    on:close={() => {
+      isGeneratePromptModalOpen = false;
+      generatePromptTarget = "None";
+    }}
+    on:insert={(event) => {}}
+  />
+</Modal>
 
 <style>
   .ai-request-explorer-layout {

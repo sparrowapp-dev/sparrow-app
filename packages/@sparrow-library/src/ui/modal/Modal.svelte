@@ -5,7 +5,7 @@
     QuestionCircleRegular,
   } from "@sparrow/library/icons";
 
-  import { scale, fade } from "svelte/transition";
+  import { fade } from "svelte/transition";
   import { downloadWarningIcon as warningIcon } from "@sparrow/library/assets";
   import { onDestroy } from "svelte";
   import { Button } from "../button";
@@ -59,8 +59,7 @@
   <div
     class="sparrow-modal-container"
     style={`z-index: ${zIndex + 1};`}
-    in:scale={{ start: 0.8, duration: 300 }}
-    out:scale={{ start: 0.8, duration: 300 }}
+    transition:fade={{ delay: 50, duration: 200 }}
   >
     <div
       on:click={canClose ? handleModalState(false) : null}
@@ -84,7 +83,7 @@
                 <h3
                   class="text-ds-font-size-20 text-ds-line-height-120 text-ds-font-weight-semi-bold ellipsis"
                   style="color: var(--text-ds-neutral-50);"
-              >
+                >
                   {title}
                 </h3>
                 {#if helpingIcon}
