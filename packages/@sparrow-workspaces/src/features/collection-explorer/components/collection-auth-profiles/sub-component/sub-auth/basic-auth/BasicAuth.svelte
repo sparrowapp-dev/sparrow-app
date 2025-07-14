@@ -18,7 +18,9 @@
   <div class="mb-3" style="font-size: 12px; font-weight:500">
     <p class="mb-2 text-secondary-100">Username</p>
     <div class="position-relative" style="padding-bottom: 40px;">
-      <div class="position-absolute top-0 auth-input-container">
+      <div
+        class="position-absolute top-0 auth-input-container auth-profile-basic-auth"
+      >
         <CodeMirrorInput
           bind:value={basicAuth.username}
           onUpdateInput={() => {
@@ -36,7 +38,9 @@
   <div class="mb-3" style="font-size: 12px; font-weight:500">
     <p class="mb-2 text-secondary-100">Password</p>
     <div class="position-relative" style="padding-bottom: 40px;">
-      <div class="position-absolute top-0 auth-input-container">
+      <div
+        class="position-absolute top-0 auth-input-container auth-profile-basic-auth"
+      >
         <CodeMirrorInput
           bind:value={basicAuth.password}
           onUpdateInput={() => {
@@ -56,5 +60,9 @@
   .auth-input-container {
     max-width: 615px;
     width: 100%;
+  }
+
+  :global(.auth-profile-basic-auth .cm-content) {
+    background-color: var(--bg-ds-surface-400) !important;
   }
 </style>

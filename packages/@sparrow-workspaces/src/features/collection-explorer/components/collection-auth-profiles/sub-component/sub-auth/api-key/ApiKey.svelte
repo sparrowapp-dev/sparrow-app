@@ -52,7 +52,9 @@
   <div class="mb-2" style="font-size: 12px; font-weight: 500">
     <p style="color: var(--text-ds-neutral-200);" class="mb-2">Key</p>
     <div class="position-relative" style="padding-bottom: 30px">
-      <div class="position-absolute top-0 auth-input-container">
+      <div
+        class="position-absolute top-0 auth-input-container auth-profile-api-key"
+      >
         <CodeMirrorInput
           bind:value={apiData.authKey}
           onUpdateInput={() => {
@@ -70,7 +72,9 @@
   <div class="mb-2" style="font-size: 12px; font-weight: 500">
     <p style="color: var(--text-ds-neutral-200);" class="mb-2">Value</p>
     <div class="position-relative" style="padding-bottom: 30px">
-      <div class="position-absolute top-0 auth-input-container">
+      <div
+        class="position-absolute top-0 auth-input-container auth-profile-api-key"
+      >
         <CodeMirrorInput
           bind:value={apiData.authValue}
           onUpdateInput={() => {
@@ -90,6 +94,10 @@
   .auth-input-container {
     max-width: 615px;
     width: 100%;
+  }
+
+  :global(.auth-profile-api-key .cm-content) {
+    background-color: var(--bg-ds-surface-400) !important;
   }
 
   .radio {

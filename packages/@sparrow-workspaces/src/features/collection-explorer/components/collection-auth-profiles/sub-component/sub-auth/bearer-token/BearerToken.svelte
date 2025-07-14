@@ -16,7 +16,9 @@
 <div class="d-flex flex-column w-100 pt-2 pe-1">
   <div style="font-size: 12px; font-weight:500">
     <p class="mb-2 text-secondary-100">Token</p>
-    <div class="position-relative auth-input-container">
+    <div
+      class="position-relative auth-input-container auth-profile-bearer-token"
+    >
       <CodeMirrorInput
         bind:value={bearerToken}
         onUpdateInput={() => {
@@ -34,5 +36,9 @@
 <style>
   .auth-input-container {
     max-width: 615px;
+  }
+
+  :global(.auth-profile-bearer-token .cm-content) {
+    background-color: var(--bg-ds-surface-400) !important;
   }
 </style>

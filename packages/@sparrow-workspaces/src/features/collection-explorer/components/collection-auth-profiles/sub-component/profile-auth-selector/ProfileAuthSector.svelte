@@ -17,55 +17,27 @@
 
   $: auth = profileForm.auth.values;
   $: requestStateAuth = profileForm.authType.value;
+  $: showErrors = profileForm.auth.invalid || profileForm.authType.invalid;
 
   const onUpdateRequestState = async (
     selectedRequestStateId: CollectionAuthTypeBaseEnum,
   ) => {
     profileForm.authType.value = selectedRequestStateId;
+    // if (showErrors) {
+    profileForm.authType.invalid = false;
+    showErrors = false;
+    // }
   };
   const onUpdateRequestAuth = async (updatedAuthData) => {
     profileForm.auth.values = {
       ...profileForm.auth.values,
       ...updatedAuthData,
     };
+    // if (showErrors) {
+    profileForm.auth.invalid = false;
+    showErrors = false;
+    // }
   };
-
-  //   onMount(() => {
-  //     setTimeout(() => {
-  //       const selectElement = document.getElementById(
-  //         "color-select-auth-profile-selection",
-  //       );
-  //       console.log("came 0", selectElement);
-  //       if (selectElement) {
-  //         // Listen for clicks on the select element to detect when dropdown opens
-  //         selectElement.addEventListener("click", () => {
-  //           dropdownOpened = true;
-  //           showErrors = false;
-  //         });
-
-  //         // Listen for clicks outside the select element to detect when dropdown closes
-  //         const handleClickOutside = (event) => {
-  //           console.log("camer 1");
-  //           if (!selectElement.contains(event.target)) {
-  //             console.log("camer 2");
-  //             // If dropdown was opened and user clicked outside without selecting
-  //             if (dropdownOpened && selectedAuth === defaultAuth) {
-  //               showErrors = true;
-  //               hasInteracted = true;
-  //             }
-  //             dropdownOpened = false;
-  //           }
-  //         };
-
-  //         document.addEventListener("click", handleClickOutside);
-
-  //         // Cleanup event listener
-  //         return () => {
-  //           document.removeEventListener("click", handleClickOutside);
-  //         };
-  //       }
-  //     }, 2);
-  //   });
 </script>
 
 <div class="d-flex flex-column w-100 h-100">
@@ -122,10 +94,14 @@
         variant={"tertiary"}
         minHeaderWidth={"100%"}
         size={"medium"}
-        isError={showErrors && selectedAuth === defaultAuth && hasInteracted}
+        isError={showErrors}
       />
-      {#if showErrors && selectedAuth === defaultAuth && hasInteracted}
-        <p class="error-text sparrow-fs-12 m-0">Auth cannot be empty.</p>
+      <!-- isError={showErrors && selectedAuth === defaultAuth && hasInteracted} -->
+      <!-- {#if showErrors && selectedAuth === defaultAuth && hasInteracted} -->
+      {#if showErrors}
+        <p class="error-text sparrow-fs-12 m-0">
+          Please select a valid auth type and fill in the details properly.
+        </p>
       {/if}
     </LabelField>
   </div>

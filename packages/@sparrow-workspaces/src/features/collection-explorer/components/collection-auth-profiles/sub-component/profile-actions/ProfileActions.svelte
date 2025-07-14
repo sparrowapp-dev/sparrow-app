@@ -34,23 +34,33 @@
     profileForm.auth.isTouched = true;
 
     if (!profileForm.name.value || profileForm.name.invalid) return false;
-    if (profileForm.authType.value === "select") return false;
+    if (profileForm.authType.value === "select") {
+      profileForm.authType.invalid = true;
+      return false;
+    }
 
     // Validate auth fields based on auth type
     if (profileForm.authType.value === "Bearer Token") {
-      if (!profileForm.auth.values.bearerToken) return false;
+      if (!profileForm.auth.values.bearerToken) {
+        profileForm.auth.invalid = true;
+        return false;
+      }
     } else if (profileForm.authType.value === "Basic Auth") {
       if (
         !profileForm.auth.values.basicAuth.username ||
         !profileForm.auth.values.basicAuth.password
-      )
+      ) {
+        profileForm.auth.invalid = true;
         return false;
+      }
     } else if (profileForm.authType.value === "API Key") {
       if (
         !profileForm.auth.values.apiKey.authKey ||
         !profileForm.auth.values.apiKey.authValue
-      )
+      ) {
+        profileForm.auth.invalid = true;
         return false;
+      }
     }
 
     return true;
