@@ -2008,8 +2008,6 @@ class CollectionExplorerPage {
             updatedAuthProfileObj.authId,
           );
 
-        console.log("auth pro :>> ", _authProfileId);
-        console.log("in update res ;>> ", res, updatedAuthProfileObj);
         await this.collectionRepository.updateAuthProfile(
           _collection.id as string,
           _authProfileId,

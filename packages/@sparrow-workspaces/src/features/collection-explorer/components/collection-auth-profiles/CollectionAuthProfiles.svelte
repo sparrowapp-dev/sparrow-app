@@ -103,7 +103,6 @@
   // Handle default key change
   const handleDefaultKeyChange = (authId, authProfile) => {
     selectedDefaultKey = authId;
-    console.log("Selected Default Key:", selectedDefaultKey, authProfile);
     authProfile.defaultKey = true; // Mark the selected item as default
     // onUpdateRequestState({ selectedAuthType: authId });
     onUpdateAuthProfile(authId, authProfile);

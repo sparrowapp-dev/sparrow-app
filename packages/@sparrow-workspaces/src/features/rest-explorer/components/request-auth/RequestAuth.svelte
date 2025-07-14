@@ -50,7 +50,6 @@
       //   (profile) => profile.defaultKey,
       // );
 
-      console.log("** Auto Selecting default key ** ;>> ", authProfile);
       if (!authProfile) {
         onUpdateRequestState({
           // selectedRequestAuthProfileId: collection.defaultSelectedAuthProfile || defaultAuthProfile,
