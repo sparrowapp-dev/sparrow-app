@@ -970,7 +970,7 @@
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.WORKSPACE}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <WorkspaceExplorerPage
                           {collectionList}
                           tab={$activeTab}
@@ -1029,7 +1029,7 @@
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.HUB}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <HubExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
