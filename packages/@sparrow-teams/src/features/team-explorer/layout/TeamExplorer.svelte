@@ -695,7 +695,7 @@
               title="Accept"
               onClick={async () => {
                 isInviteAcceptProgress = true;
-                await onAcceptInvite(openTeam?.teamId);
+                await onAcceptInvite(openTeam?.teamId, userId);
                 isInviteAcceptProgress = false;
               }}
               loader={isInviteAcceptProgress}

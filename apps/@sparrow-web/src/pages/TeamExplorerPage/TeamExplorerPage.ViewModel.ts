@@ -1016,11 +1016,12 @@ export class TeamExplorerPageViewModel {
     }
   };
 
-  public acceptInvite = async (teamId: string) => {
+  public acceptInvite = async (teamId: string, userId: string) => {
     const baseUrl = await this.constructBaseUrl(teamId);
     const response = await this.teamService.acceptInvite(teamId, baseUrl);
     if (response.isSuccessful) {
       this.teamRepository.modifyTeam(teamId, response.data.data);
+      await this.refreshWorkspaces(userId);
       notifications.success(
         `You are now a member ${response?.data?.data.name} Hub.`,
       );
