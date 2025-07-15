@@ -127,7 +127,7 @@
 <div on:click={handleDropdownClick}>
   <div
     id={`check-dropdown-${id}`}
-    class="parent-dropdown display-inline-block"
+    class="parent-dropdown display-inline-block z-4"
     style=" position: relative;"
   >
     <div on:click={toggleDropdown}>
@@ -366,6 +366,7 @@
   }
 
   .select-data {
+    z-index: 888;
     color: white;
     border: 1px solid rgb(44, 44, 44);
     transition: 0.3s ease;

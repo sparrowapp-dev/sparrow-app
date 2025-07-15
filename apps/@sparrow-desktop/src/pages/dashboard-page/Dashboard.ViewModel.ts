@@ -95,6 +95,13 @@ export class DashboardViewModel {
     return this.environmentRepository.getEnvironment();
   }
 
+   /**
+   * @description - get open team from local db
+   */
+  public get openTeam() {
+    return this.teamRepository.getOpenTeam();
+  }
+
   /**
    * @description - get recent visited public workspace list from local db
    */

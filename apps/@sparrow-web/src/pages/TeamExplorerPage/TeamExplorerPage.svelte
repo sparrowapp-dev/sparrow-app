@@ -50,6 +50,7 @@
   let currentTeam = {
     name: "",
     users: [],
+    plan: {},
   };
   let currentWorkspace = {
     id: "",
@@ -90,6 +91,7 @@
     if (value) {
       currentTeam.name = value.name;
       currentTeam.users = value.users;
+      currentTeam.plan = value.plan;
       usersInvitePlanCount = value?._data?.users?.length || 5;
       isWorkspaceOpen = false;
     }
@@ -333,6 +335,7 @@
     teamName={$activeTeam?.name}
     users={$activeTeam?.users}
     teamId={$activeTeam?.teamId}
+    plan={$activeTeam?.plan}
     workspaces={$workspaces.filter((elem) => {
       return elem?.team?.teamId === $activeTeam?.teamId;
     })}
@@ -406,6 +409,7 @@
     currentWorkspaceDetails={currentWorkspace}
     users={currentTeam?.users}
     teamName={currentTeam?.name}
+    plan={currentTeam?.plan}
     onInviteUserToWorkspace={handleAddWorkspace}
   />
 </Modal>
