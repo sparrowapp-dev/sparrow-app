@@ -8,7 +8,7 @@ on:
   push:
     # Trigger on push to the <branch_name> branch. Make sure to remove the branch name from the branches list below, once you are done testing.
     branches:
-      - <branch_name>
+      - fix/snap-build
   workflow_dispatch:
 
 env:
@@ -42,5 +42,72 @@ env:
   VITE_SPARROW_ADMIN_URL: ${{ vars.VITE_SPARROW_ADMIN_URL }}
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
   CI: false
+  SNAPCRAFT_STORE_CREDENTIALS: ${{ vars.SNAPCRAFT_STORE_CREDENTIALS }}
 
 jobs:
+  build-snap:
+    runs-on: ubuntu-latest
+    environment: production
+    # if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+
+    env:
+      SNAP_CHANNEL: ${{ vars.SNAP_RELEASE_CHANNEL || 'edge' }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      # - name: Install Snapd
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y snapd
+
+      # - name: Install Snapcraft
+      #   run: |
+            #     sudo snap install snapcraft --classic
+
+      # - name: Check Snapcraft Credentials
+      #   run: |
+      #     snapcraft whoami
+
+      - name: Set up Sparrow APT Repo
+        run: |
+          sudo mkdir -p /etc/apt/keyrings
+
+          curl -fsSL https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/sparrow-repo-key.gpg | sudo tee /etc/apt/keyrings/sparrow.asc > /dev/null
+
+          echo "deb [signed-by=/etc/apt/keyrings/sparrow.asc] https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com stable main" | sudo tee /etc/apt/sources.list.d/sparrow.list
+
+          sudo apt-get update
+
+      # - name: Download Latest Sparrow DEB
+      #   run: |
+      #     apt download sparrow
+      #     deb_file=$(ls sparrow.deb | head -n 1)
+      #     mv "$deb_file" sparrow.deb
+
+      - name: Download Latest Sparrow DEB
+        run: |
+          wget -O sparrow.deb https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/pool/stable/main/binary-amd64/sparrow.deb
+
+      - name: Install envsubst
+        run: sudo apt-get install -y gettext
+
+      - name: Set Version and Generate snapcraft.yaml
+        run: |
+          export SPARROW_VERSION=$(dpkg-deb -f sparrow.deb Version)
+          echo "Using Sparrow version: $SPARROW_VERSION"
+          envsubst < snapcraft.yaml.in > snapcraft.yaml
+
+      - name: Build Snap in Docker
+        uses: docker://snapcore/snapcraft:edge    # use the latest Snapcraft 8 builder :contentReference[oaicite:1]{index=1}
+        env:
+          SNAPCRAFT_ENABLE_EXPERIMENTAL_EXTENSIONS: "1"  # un‑flag the new gnome extension :contentReference[oaicite:2]{index=2}
+        with:
+          args: snapcraft --destructive-mode pack . --output=sparrow.snap
+
+      - name: Upload Snap to Snap Store
+        run: |
+          SNAP_FILE=$(ls *.snap | head -n 1)
+          echo "Uploading the $SNAP_FILE to $SNAP_CHANNEL"
+          snapcraft upload "$SNAP_FILE" --release "$SNAP_CHANNEL"
