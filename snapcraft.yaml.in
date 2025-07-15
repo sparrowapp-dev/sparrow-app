@@ -54,15 +54,13 @@ parts:
       - libssl-dev
       - librsvg2-dev
       - dpkg
-    override-pull: |
-      snapcraftctl pull
-      wget -O "$CRAFT_PART_SRC/sparrow.deb" \
-        https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/pool/stable/main/binary-amd64/sparrow.deb
     override-build: |
       set -eux
-      echo "DEBUG: CRAFT_PART_INSTALL='${CRAFT_PART_INSTALL}'"
-      dpkg -x "$CRAFT_PART_SRC/sparrow.deb" "${CRAFT_PART_INSTALL}"
+      # Hard‑coded install folder under project root
+      dpkg -x sparrow.deb parts/sparrow/install
+      # Patch the desktop file icon
       sed -i \
         's|Icon=sparrow|Icon=/usr/share/icons/hicolor/32x32/apps/sparrow.png|' \
-        "${CRAFT_PART_INSTALL}/usr/share/applications/sparrow.desktop"
+        parts/sparrow/install/usr/share/applications/sparrow.desktop
+      # Continue with default dump behavior
       snapcraftctl build
