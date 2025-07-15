@@ -35,7 +35,6 @@
   import * as Sentry from "@sentry/svelte";
   import { identifyUser } from "@app/utils/posthog/posthogConfig";
   import { policyConfig } from "@sparrow/common/store";
-  import { invoke } from "@tauri-apps/api/core";
 
   let isEntry = false;
   let isHover = false;
@@ -45,26 +44,7 @@
   const externalSparrowGithub = constants.SPARROW_GITHUB;
   const _viewModel = new AuthViewModel();
   const openDefaultBrowser = async () => {
-    try {
-      console.log("Attempting to open:", externalSparrowLink);
-      await open(externalSparrowLink);
-      const testUrl = "https://apple.com"; // Test with this first
-      await open(testUrl);
-      console.log("Open command completed without errors");
-      console.log("VITE_AUTH_URL:", import.meta.env.VITE_AUTH_URL);
-    } catch (e) {
-      console.error("Detailed shell error:", e);
-      try {
-        console.log("Attempting to open:", externalSparrowLink);
-
-        // Alternative method using Tauri's core command
-        await invoke("open_url", { url: externalSparrowLink });
-
-        console.log("Open command completed without errors");
-      } catch (e) {
-        console.error("Detailed shell error:", e);
-      }
-    }
+    await open(externalSparrowLink);
   };
   const handleRedirect = (value: boolean) => {
     isEntry = value;
