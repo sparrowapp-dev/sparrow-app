@@ -134,27 +134,9 @@ jobs:
           sudo snapcraft --destructive-mode
 
       - name: Upload Snap to Snap Store
+      - uses: snapcore/action-publish@v1
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ vars.SNAPCRAFT_STORE_CREDENTIALS }}
-        run: |
-          # Install snapcraft if not already present
-          if ! command -v snapcraft &> /dev/null; then
-            sudo snap install snapcraft --classic
-          fi
-
-          # Create credentials file
-          mkdir -p ~/.snap
-          echo "$SNAPCRAFT_STORE_CREDENTIALS" > ~/.snap/credentials.json
-          chmod 600 ~/.snap/credentials.json
-
-          # Verify authentication
-          echo "Verifying store authentication..."
-          snapcraft whoami
-
-          # Upload the snap
-          SNAP_FILE=$(ls *.snap | head -n 1)
-          echo "Uploading $SNAP_FILE to ${{ inputs.channel || 'edge' }}"
-          snapcraft upload --release="${{ inputs.channel || 'edge' }}" "$SNAP_FILE"
-
-          # Cleanup credentials
-          rm -f ~/.snap/credentials.json
+        with:
+          snap: ${{ steps.build.outputs.snap }}
+          release: edge
