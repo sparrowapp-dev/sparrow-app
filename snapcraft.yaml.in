@@ -56,10 +56,9 @@ parts:
       - dpkg
     override-build: |
       set -eux
-      # Extract the downloaded .deb into the snap install area
-      dpkg -x sparrow.deb "$SNAPCRAFT_PART_INSTALL/"
-      # Patch the desktop file icon path
-      if [ -f "$SNAPCRAFT_PART_INSTALL/usr/share/applications/sparrow.desktop" ]; then
-        sed -i 's|Icon=sparrow|Icon=/usr/share/icons/hicolor/32x32/apps/sparrow.png|' \
-            "$SNAPCRAFT_PART_INSTALL/usr/share/applications/sparrow.desktop"
-      fi
+      echo "DEBUG: SNAPCRAFT_PART_INSTALL='$SNAPCRAFT_PART_INSTALL'"
+      dpkg -x sparrow.deb "$SNAPCRAFT_PART_INSTALL"
+      # Patch the desktop file icon
+      sed -i \
+        's|Icon=sparrow|Icon=/usr/share/icons/hicolor/32x32/apps/sparrow.png|' \
+        "$SNAPCRAFT_PART_INSTALL/usr/share/applications/sparrow.desktop"
