@@ -5,6 +5,7 @@ import {
   MarkdownFormatter,
   moveNavigation,
   Sleep,
+  scrollToTab
 } from "@sparrow/common/utils";
 import {
   DecodeRequest,
@@ -770,7 +771,7 @@ class AiRequestExplorerViewModel {
         );
       }
     } catch (error) {
-      console.error("Something went wrong while updating title :>> ", error);
+      console.log("Something went wrong while updating title :>> ", error);
     }
   };
 
@@ -1391,7 +1392,7 @@ class AiRequestExplorerViewModel {
             initAiRequestTab.updateAuth(req.aiRequest.auth);
 
             this.tabRepository.createTab(initAiRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1469,7 +1470,7 @@ class AiRequestExplorerViewModel {
             initAiRequestTab.updateAuth(res.data.data.aiRequest.auth);
 
             this.tabRepository.createTab(initAiRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1535,7 +1536,7 @@ class AiRequestExplorerViewModel {
             initAiRequestTab.updateAISystemPrompt(req.aiRequest.systemPrompt);
             initAiRequestTab.updateAuth(req.aiRequest.auth);
             this.tabRepository.createTab(initAiRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1609,7 +1610,7 @@ class AiRequestExplorerViewModel {
             );
             initAiRequestTab.updateAuth(res.data.data.aiRequest.auth);
             this.tabRepository.createTab(initAiRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",

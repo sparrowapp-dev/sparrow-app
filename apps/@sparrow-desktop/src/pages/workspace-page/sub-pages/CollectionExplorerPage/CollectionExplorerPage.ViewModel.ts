@@ -21,7 +21,7 @@ import {
   InitFolderTab,
   InitMockRequestTab,
   InitWebSocketTab,
-  moveNavigation,
+  scrollToTab,
   InitAiRequestTab,
 } from "@sparrow/common/utils";
 import {
@@ -952,7 +952,7 @@ class CollectionExplorerPage {
       });
       initRequestTab.updateIsSave(true);
       this.tabRepository.createTab(initRequestTab.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     } else {
       const baseUrl = await this.constructBaseUrl(collection.workspaceId);
@@ -990,7 +990,7 @@ class CollectionExplorerPage {
         //   request,
         // );
         this.tabRepository.createTab(initRequestTab.getValue());
-        moveNavigation("right");
+        scrollToTab("");
         return;
       } else {
         notifications.error(response.message);
@@ -1102,7 +1102,7 @@ class CollectionExplorerPage {
       });
       request.updateIsSave(true);
       await this.tabRepository.createTab(request.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     }
     const baseUrl = await this.constructBaseUrl(workspaceId);
@@ -1126,7 +1126,7 @@ class CollectionExplorerPage {
       });
       request.updateIsSave(true);
       this.tabRepository.createTab(request.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     } else {
       this.collectionRepository.deleteRequestOrFolderInCollection(
@@ -1210,7 +1210,7 @@ class CollectionExplorerPage {
       });
       request.updateIsSave(true);
       await this.tabRepository.createTab(request.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     }
     const baseUrl = await this.constructBaseUrl(workspaceId);
@@ -1238,7 +1238,7 @@ class CollectionExplorerPage {
       }
       // request.updateUrl(collection?.mockCollectionUrl);
       this.tabRepository.createTab(request.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     } else {
       this.collectionRepository.deleteRequestOrFolderInCollection(
@@ -1324,7 +1324,7 @@ class CollectionExplorerPage {
       });
       aiRequest.updateIsSave(true);
       await this.tabRepository.createTab(aiRequest.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     }
     const baseUrl = await this.constructBaseUrl(workspaceId);
@@ -1348,7 +1348,7 @@ class CollectionExplorerPage {
       });
       aiRequest.updateIsSave(true);
       this.tabRepository.createTab(aiRequest.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     } else {
       this.collectionRepository.deleteRequestOrFolderInCollection(
@@ -1424,7 +1424,7 @@ class CollectionExplorerPage {
       sampleFolder.updateIsSave(true);
 
       this.tabRepository.createTab(sampleFolder.getValue());
-      moveNavigation("right");
+      scrollToTab("");
 
       // Update the locally added folder with server response
       const folderObj = data;
@@ -1471,7 +1471,7 @@ class CollectionExplorerPage {
       }
 
       this.tabRepository.createTab(sampleFolder.getValue());
-      moveNavigation("right");
+      scrollToTab("");
 
       // Update the locally added folder with server response
       const folderObj = response.data.data;
@@ -1559,7 +1559,7 @@ class CollectionExplorerPage {
       });
       websocket.updateIsSave(true);
       await this.tabRepository.createTab(websocket.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     }
     const baseUrl = await this.constructBaseUrl(workspaceId);
@@ -1585,7 +1585,7 @@ class CollectionExplorerPage {
       websocket.updateIsSave(true);
 
       this.tabRepository.createTab(websocket.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     } else {
       this.collectionRepository.deleteRequestOrFolderInCollection(
@@ -1642,7 +1642,7 @@ class CollectionExplorerPage {
       });
       socketIoTab.updateIsSave(true);
       await this.tabRepository.createTab(socketIoTab.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     }
 
@@ -1670,7 +1670,7 @@ class CollectionExplorerPage {
       socketIoTab.updateIsSave(true);
 
       this.tabRepository.createTab(socketIoTab.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     } else {
       this.collectionRepository.deleteRequestOrFolderInCollection(
@@ -1727,7 +1727,7 @@ class CollectionExplorerPage {
       });
       graphqlTab.updateIsSave(true);
       await this.tabRepository.createTab(graphqlTab.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     }
 
@@ -1755,7 +1755,7 @@ class CollectionExplorerPage {
       graphqlTab.updateIsSave(true);
 
       this.tabRepository.createTab(graphqlTab.getValue());
-      moveNavigation("right");
+      scrollToTab("");
 
       return;
     } else {
@@ -1776,7 +1776,7 @@ class CollectionExplorerPage {
       collection.id,
     );
     this.tabRepository.createTab(mockHistroyTab);
-    moveNavigation("right");
+    scrollToTab("");
   };
 
   /**

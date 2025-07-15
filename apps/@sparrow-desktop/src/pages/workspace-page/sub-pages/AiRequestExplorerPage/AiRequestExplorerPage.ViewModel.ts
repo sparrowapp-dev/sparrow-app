@@ -3,7 +3,7 @@ import {
   createDeepCopy,
   InitAiRequestTab,
   MarkdownFormatter,
-  moveNavigation,
+  scrollToTab,
   Sleep,
 } from "@sparrow/common/utils";
 import {
@@ -72,6 +72,7 @@ import {
   AiModelProviderEnum,
   OpenAIModelEnum,
   type modelsConfigType,
+ 
   type PromptFileAttachment,
   AiRequestAuthTypeBaseEnum,
 } from "@sparrow/common/types/workspace/ai-request-base";
@@ -1386,7 +1387,7 @@ class AiRequestExplorerViewModel {
             initAiRequestTab.updateAuth(req.aiRequest.auth);
 
             this.tabRepository.createTab(initAiRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1464,7 +1465,7 @@ class AiRequestExplorerViewModel {
             initAiRequestTab.updateAuth(res.data.data.aiRequest.auth);
 
             this.tabRepository.createTab(initAiRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1530,7 +1531,7 @@ class AiRequestExplorerViewModel {
             initAiRequestTab.updateAISystemPrompt(req.aiRequest.systemPrompt);
             initAiRequestTab.updateAuth(req.aiRequest.auth);
             this.tabRepository.createTab(initAiRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1604,7 +1605,7 @@ class AiRequestExplorerViewModel {
             );
             initAiRequestTab.updateAuth(res.data.data.aiRequest.auth);
             this.tabRepository.createTab(initAiRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",

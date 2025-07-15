@@ -18,7 +18,7 @@ import {
   Debounce,
   InitMockRequestTab,
   InitWebSocketTab,
-  moveNavigation,
+  scrollToTab,
   InitAiRequestTab,
 } from "@sparrow/common/utils";
 import { Events, ItemType, UntrackedItems } from "@sparrow/common/enums";
@@ -420,7 +420,7 @@ class FolderExplorerPage {
       sampleRequest.updateIsSave(true);
       this.tabRepository.createTab(sampleRequest.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
       MixpanelEvent(Events.CREATE_REQUEST, {
         source: "Collection list",
       });
@@ -450,7 +450,7 @@ class FolderExplorerPage {
       sampleRequest.updateIsSave(true);
       this.tabRepository.createTab(sampleRequest.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
       MixpanelEvent(Events.CREATE_REQUEST, {
         source: "Collection list",
       });
@@ -547,7 +547,7 @@ class FolderExplorerPage {
       sampleRequest.updateIsSave(true);
       this.tabRepository.createTab(sampleRequest.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
       MixpanelEvent(Events.CREATE_REQUEST, {
         source: "Collection list",
       });
@@ -578,7 +578,7 @@ class FolderExplorerPage {
       // sampleRequest.updateUrl(collection?.mockCollectionUrl);
       this.tabRepository.createTab(sampleRequest.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
       // MixpanelEvent(Events.CREATE_REQUEST, {
       //   source: "Collection list",
       // });
@@ -671,7 +671,7 @@ class FolderExplorerPage {
       websocket.updateIsSave(true);
       this.tabRepository.createTab(websocket.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
       MixpanelEvent(Events.CREATE_REQUEST, {
         source: "Collection list",
       });
@@ -701,7 +701,7 @@ class FolderExplorerPage {
       websocket.updateIsSave(true);
       this.tabRepository.createTab(websocket.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
       MixpanelEvent(Events.CREATE_REQUEST, {
         source: "Collection list",
       });
@@ -778,7 +778,7 @@ class FolderExplorerPage {
         .updateIsSave(true);
       this.tabRepository.createTab(socketIoTab.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
       MixpanelEvent(Events.CREATE_REQUEST, {
         source: "Collection list",
       });
@@ -810,7 +810,7 @@ class FolderExplorerPage {
         .updateIsSave(true);
       this.tabRepository.createTab(socketIoTab.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
       MixpanelEvent(Events.CREATE_REQUEST, {
         source: "Collection list",
       });
@@ -887,7 +887,7 @@ class FolderExplorerPage {
         .updateIsSave(true);
       this.tabRepository.createTab(graphqlTab.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
 
       return;
     }
@@ -917,7 +917,7 @@ class FolderExplorerPage {
         .updateIsSave(true);
       this.tabRepository.createTab(graphqlTab.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
       return;
     } else {
       this.collectionRepository.deleteRequestInFolder(
@@ -1013,7 +1013,7 @@ class FolderExplorerPage {
       aiRequest.updateIsSave(true);
       this.tabRepository.createTab(aiRequest.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
       // MixpanelEvent(Events.CREATE_REQUEST, {
       //   source: "Collection list",
       // });
@@ -1044,7 +1044,7 @@ class FolderExplorerPage {
       aiRequest.updateIsSave(true);
       this.tabRepository.createTab(aiRequest.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
       // MixpanelEvent(Events.CREATE_REQUEST, {
       //   source: "Collection list",
       // });

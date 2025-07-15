@@ -45,7 +45,7 @@ import {
 } from "@sparrow/common/enums";
 //-----
 
-import { moveNavigation, scrollToTab } from "@sparrow/common/utils/navigation";
+import { scrollToTab } from "@sparrow/common/utils/navigation";
 import { GuideRepository } from "../../repositories/guide.repository";
 import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
@@ -57,7 +57,10 @@ import {
   InitWebSocketTab,
 } from "@sparrow/common/utils";
 import { InitFolderTab } from "@sparrow/common/utils";
-import { addCollectionItem, tabsSplitterDirection } from "@sparrow/workspaces/stores";
+import {
+  addCollectionItem,
+  tabsSplitterDirection,
+} from "@sparrow/workspaces/stores";
 import {
   insertCollectionRequest,
   updateCollectionRequest,
@@ -192,7 +195,7 @@ export default class CollectionsViewModel {
    * @param workspaceId - id of current workspace
    */
   public fetchCollections = async (
-    workspaceId: string
+    workspaceId: string,
   ): Promise<{ collectionItemTabsToBeDeleted?: string[] }> => {
     const isGuestUser = await this.getGuestUserState();
     if (!workspaceId || isGuestUser) {
@@ -201,7 +204,7 @@ export default class CollectionsViewModel {
 
     const getCollectionItemIds = (
       collectionItem: any,
-      collectedIds: string[]
+      collectedIds: string[],
     ): void => {
       const stack = [collectionItem];
       while (stack.length > 0) {
@@ -223,7 +226,8 @@ export default class CollectionsViewModel {
     };
 
     const baseUrl = await this.constructBaseUrl(workspaceId);
-    const workspaceData = await this.workspaceRepository.readWorkspace(workspaceId);
+    const workspaceData =
+      await this.workspaceRepository.readWorkspace(workspaceId);
 
     let res;
     if (
@@ -233,7 +237,7 @@ export default class CollectionsViewModel {
     ) {
       res = await this.collectionService.fetchPublicCollection(
         workspaceId,
-        constants.API_URL
+        constants.API_URL,
       );
     } else {
       res = await this.collectionService.fetchCollection(workspaceId, baseUrl);
@@ -263,8 +267,14 @@ export default class CollectionsViewModel {
       await new Promise((res) => setTimeout(res)); // yield to UI
     }
 
-    await this.collectionRepository.bulkInsertData(workspaceId, processedCollections);
-    await this.collectionRepository.deleteOrphanCollections(workspaceId, collectionIds);
+    await this.collectionRepository.bulkInsertData(
+      workspaceId,
+      processedCollections,
+    );
+    await this.collectionRepository.deleteOrphanCollections(
+      workspaceId,
+      collectionIds,
+    );
 
     const collectionItemIds: string[] = [];
     for (const collection of collections) {
@@ -274,14 +284,13 @@ export default class CollectionsViewModel {
     const collectionItemTabsToBeDeleted =
       await this.tabRepository.getIdOfTabsThatDoesntExistAtCollectionLevel(
         workspaceId,
-        collectionItemIds
+        collectionItemIds,
       );
 
     return {
       collectionItemTabsToBeDeleted,
     };
   };
-
 
   public deleteTabsWithTabIdInAWorkspace = (
     _workspaceId: string,
@@ -366,7 +375,7 @@ export default class CollectionsViewModel {
       this.tabRepository.createTab(
         new InitRequestTab("UNTRACKED-" + uuidv4(), ws._id).getValue(),
       );
-      moveNavigation("right");
+      scrollToTab("");
       MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
     } else {
       setTimeout(() => {
@@ -389,7 +398,7 @@ export default class CollectionsViewModel {
       );
       initRequestTab.updateChatbotState(true);
       this.tabRepository.createTab(initRequestTab.getValue());
-      moveNavigation("right");
+      scrollToTab("");
     } else {
       setTimeout(() => {
         this.createNewTabWithData(_limit - 1);
@@ -406,7 +415,7 @@ export default class CollectionsViewModel {
       this.tabRepository.createTab(
         this.initTab.webSocket("UNTRACKED-" + uuidv4(), ws._id).getValue(),
       );
-      moveNavigation("right");
+      scrollToTab("");
       MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
     } else {
       console.error("No active workspace found!");
@@ -422,7 +431,7 @@ export default class CollectionsViewModel {
       this.tabRepository.createTab(
         this.initTab.socketIo("UNTRACKED-" + uuidv4(), ws._id).getValue(),
       );
-      moveNavigation("right");
+      scrollToTab("");
     } else {
       console.error("No active workspace found!");
     }
@@ -437,7 +446,7 @@ export default class CollectionsViewModel {
       this.tabRepository.createTab(
         this.initTab.graphQl("UNTRACKED-" + uuidv4(), ws._id).getValue(),
       );
-      moveNavigation("right");
+      scrollToTab("");
     } else {
       console.error("No active workspace found!");
     }
@@ -452,7 +461,7 @@ export default class CollectionsViewModel {
       this.tabRepository.createTab(
         this.initTab.aiRequest("UNTRACKED-" + uuidv4(), ws._id).getValue(),
       );
-      moveNavigation("right");
+      scrollToTab("");
     } else {
       console.error("No active workspace found!");
     }
@@ -503,7 +512,7 @@ export default class CollectionsViewModel {
       newRequestTab.updateIsSave(false);
 
       this.tabRepository.createTab(newRequestTab.getValue());
-      moveNavigation("right");
+      scrollToTab("");
     }
   };
 
@@ -546,7 +555,7 @@ export default class CollectionsViewModel {
       newWebSocketTab.updateIsSave(false);
 
       this.tabRepository.createTab(newWebSocketTab.getValue());
-      moveNavigation("right");
+      scrollToTab("");
     }
   };
 
@@ -593,7 +602,7 @@ export default class CollectionsViewModel {
       newSocketIOTab.updateIsSave(false);
 
       this.tabRepository.createTab(newSocketIOTab.getValue());
-      moveNavigation("right");
+      scrollToTab("");
     }
   };
 
@@ -640,7 +649,7 @@ export default class CollectionsViewModel {
       newGraphQLTab.updateIsSave(false);
 
       this.tabRepository.createTab(newGraphQLTab.getValue());
-      moveNavigation("right");
+      scrollToTab("");
     }
   };
 
@@ -682,7 +691,7 @@ export default class CollectionsViewModel {
       newAiRequestTab.updateIsSave(false);
 
       this.tabRepository.createTab(newAiRequestTab.getValue());
-      moveNavigation("right");
+      scrollToTab("");
     }
   };
 
@@ -1359,7 +1368,7 @@ export default class CollectionsViewModel {
         });
 
         this.tabRepository.createTab(adaptCollection);
-        moveNavigation("right");
+        scrollToTab("");
 
         await this.workspaceRepository.updateCollectionInWorkspace(
           workspaceId,
@@ -1396,7 +1405,7 @@ export default class CollectionsViewModel {
       const adaptCollection = new CollectionTabAdapter().adapt(workspaceId, dt);
 
       this.tabRepository.createTab(adaptCollection);
-      moveNavigation("right");
+      scrollToTab("");
 
       await this.workspaceRepository.updateCollectionInWorkspace(workspaceId, {
         id: dt.id,
@@ -1459,7 +1468,7 @@ export default class CollectionsViewModel {
         });
 
         this.tabRepository.createTab(adaptCollection);
-        moveNavigation("right");
+        scrollToTab("");
 
         await this.workspaceRepository.updateCollectionInWorkspace(
           workspaceId,
@@ -1502,7 +1511,7 @@ export default class CollectionsViewModel {
       const adaptCollection = new CollectionTabAdapter().adapt(workspaceId, dt);
 
       this.tabRepository.createTab(adaptCollection);
-      moveNavigation("right");
+      scrollToTab("");
 
       await this.workspaceRepository.updateCollectionInWorkspace(workspaceId, {
         id: dt.id,
@@ -1540,7 +1549,7 @@ export default class CollectionsViewModel {
       );
       adaptedRequest.isSaved = false;
       await this.tabRepository.createTab(adaptedRequest);
-      moveNavigation("right");
+      scrollToTab("");
 
       notifications.success("cURL imported successfully.");
     } else {
@@ -1682,7 +1691,7 @@ export default class CollectionsViewModel {
       });
       request.updateIsSave(true);
       await this.tabRepository.createTab(request.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       MixpanelEvent(Events.CREATE_REQUEST, {
         source: "Collection list",
       });
@@ -1724,7 +1733,7 @@ export default class CollectionsViewModel {
       //   request,
       // );
       this.tabRepository.createTab(request.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       MixpanelEvent(Events.CREATE_REQUEST, {
         source: "Collection list",
       });
@@ -1811,7 +1820,7 @@ export default class CollectionsViewModel {
       });
       mockRequest.updateIsSave(true);
       await this.tabRepository.createTab(mockRequest.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       // MixpanelEvent(Events.CREATE_REQUEST, {
       //   source: "Collection list",
       // });
@@ -1857,7 +1866,7 @@ export default class CollectionsViewModel {
       //   request,
       // );
       this.tabRepository.createTab(mockRequest.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       // MixpanelEvent(Events.CREATE_REQUEST, {
       //   source: "Collection list",
       // });
@@ -1948,7 +1957,7 @@ export default class CollectionsViewModel {
       });
       aiRequest.updateIsSave(true);
       await this.tabRepository.createTab(aiRequest.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       // MixpanelEvent(Events.CREATE_REQUEST, {
       //   source: "Collection list",
       // });
@@ -1977,7 +1986,7 @@ export default class CollectionsViewModel {
       aiRequest.updateIsSave(true);
 
       this.tabRepository.createTab(aiRequest.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       // MixpanelEvent(Events.CREATE_REQUEST, {
       //   source: "Collection list",
       // });
@@ -2061,7 +2070,7 @@ export default class CollectionsViewModel {
       });
       websocket.updateIsSave(true);
       await this.tabRepository.createTab(websocket.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       MixpanelEvent(Events.CREATE_REQUEST, {
         source: "Collection list",
       });
@@ -2090,7 +2099,7 @@ export default class CollectionsViewModel {
       websocket.updateIsSave(true);
 
       this.tabRepository.createTab(websocket.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       MixpanelEvent(Events.CREATE_REQUEST, {
         source: "Collection list",
       });
@@ -2150,7 +2159,7 @@ export default class CollectionsViewModel {
       });
       socketIoTab.updateIsSave(true);
       await this.tabRepository.createTab(socketIoTab.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       MixpanelEvent(Events.CREATE_REQUEST, {
         source: "Collection list",
       });
@@ -2181,7 +2190,7 @@ export default class CollectionsViewModel {
       socketIoTab.updateIsSave(true);
 
       this.tabRepository.createTab(socketIoTab.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       MixpanelEvent(Events.CREATE_REQUEST, {
         source: "Collection list",
       });
@@ -2241,7 +2250,7 @@ export default class CollectionsViewModel {
       });
       graphqlTab.updateIsSave(true);
       await this.tabRepository.createTab(graphqlTab.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     }
 
@@ -2269,7 +2278,7 @@ export default class CollectionsViewModel {
       graphqlTab.updateIsSave(true);
 
       this.tabRepository.createTab(graphqlTab.getValue());
-      moveNavigation("right");
+      scrollToTab("");
 
       return;
     } else {
@@ -2364,7 +2373,7 @@ export default class CollectionsViewModel {
       sampleRequest.updateIsSave(true);
       this.tabRepository.createTab(sampleRequest.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
       MixpanelEvent(Events.CREATE_REQUEST, {
         source: "Collection list",
       });
@@ -2394,7 +2403,7 @@ export default class CollectionsViewModel {
       sampleRequest.updateIsSave(true);
       this.tabRepository.createTab(sampleRequest.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
       MixpanelEvent(Events.CREATE_REQUEST, {
         source: "Collection list",
       });
@@ -2491,7 +2500,7 @@ export default class CollectionsViewModel {
       sampleMockRequest.updateIsSave(true);
       this.tabRepository.createTab(sampleMockRequest.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
       // MixpanelEvent(Events.CREATE_REQUEST, {
       //   source: "Collection list",
       // });
@@ -2525,7 +2534,7 @@ export default class CollectionsViewModel {
       // sampleMockRequest.updateUrl(collection?.mockCollectionUrl);
       this.tabRepository.createTab(sampleMockRequest.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
       // MixpanelEvent(Events.CREATE_REQUEST, {
       //   source: "Collection list",
       // });
@@ -2625,7 +2634,7 @@ export default class CollectionsViewModel {
       aiRequest.updateIsSave(true);
       this.tabRepository.createTab(aiRequest.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
       // MixpanelEvent(Events.CREATE_REQUEST, {
       //   source: "Collection list",
       // });
@@ -2655,7 +2664,7 @@ export default class CollectionsViewModel {
       aiRequest.updateIsSave(true);
       this.tabRepository.createTab(aiRequest.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
       // MixpanelEvent(Events.CREATE_REQUEST, {
       //   source: "Collection list",
       // });
@@ -2748,7 +2757,7 @@ export default class CollectionsViewModel {
       websocket.updateIsSave(true);
       this.tabRepository.createTab(websocket.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
       MixpanelEvent(Events.CREATE_REQUEST, {
         source: "Collection list",
       });
@@ -2778,7 +2787,7 @@ export default class CollectionsViewModel {
       websocket.updateIsSave(true);
       this.tabRepository.createTab(websocket.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
       MixpanelEvent(Events.CREATE_REQUEST, {
         source: "Collection list",
       });
@@ -2855,7 +2864,7 @@ export default class CollectionsViewModel {
         .updateIsSave(true);
       this.tabRepository.createTab(socketIoTab.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
       MixpanelEvent(Events.CREATE_REQUEST, {
         source: "Collection list",
       });
@@ -2887,7 +2896,7 @@ export default class CollectionsViewModel {
         .updateIsSave(true);
       this.tabRepository.createTab(socketIoTab.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
       MixpanelEvent(Events.CREATE_REQUEST, {
         source: "Collection list",
       });
@@ -2964,7 +2973,7 @@ export default class CollectionsViewModel {
         .updateIsSave(true);
       this.tabRepository.createTab(graphqlTab.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
 
       return;
     }
@@ -2994,7 +3003,7 @@ export default class CollectionsViewModel {
         .updateIsSave(true);
       this.tabRepository.createTab(graphqlTab.getValue());
 
-      moveNavigation("right");
+      scrollToTab("");
       return;
     } else {
       this.collectionRepository.deleteRequestInFolder(
@@ -3071,7 +3080,7 @@ export default class CollectionsViewModel {
       sampleFolder.updateIsSave(true);
 
       this.handleCreateTab(sampleFolder.getValue());
-      moveNavigation("right");
+      scrollToTab("");
 
       // Update the locally added folder with server response
       const folderObj = data;
@@ -3122,7 +3131,7 @@ export default class CollectionsViewModel {
       }
 
       this.handleCreateTab(sampleFolder.getValue());
-      moveNavigation("right");
+      scrollToTab("");
 
       // Update the locally added folder with server response
       const folderObj = response.data.data;
@@ -3447,7 +3456,7 @@ export default class CollectionsViewModel {
     );
     adaptedAiRequest.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedAiRequest);
-    moveNavigation("right");
+    scrollToTab("");
   };
 
   /**
@@ -6204,7 +6213,7 @@ export default class CollectionsViewModel {
           },
         );
         this.tabRepository.createTab(collectionTab);
-        moveNavigation("right");
+        scrollToTab("");
 
         this.workspaceRepository.updateCollectionInWorkspace(
           currentWorkspaceId,
@@ -6263,7 +6272,7 @@ export default class CollectionsViewModel {
           },
         );
         this.tabRepository.createTab(collectionTab);
-        moveNavigation("right");
+        scrollToTab("");
 
         this.workspaceRepository.updateCollectionInWorkspace(
           currentWorkspaceId,
@@ -6353,7 +6362,7 @@ export default class CollectionsViewModel {
         }
 
         this.tabRepository.createTab(collectionTab);
-        moveNavigation("right");
+        scrollToTab("");
 
         MixpanelEvent(Events.IMPORT_COLLECTION, {
           collectionName: response.data.data.collection.name,
@@ -8222,7 +8231,7 @@ export default class CollectionsViewModel {
           id: res._id,
         });
         this.tabRepository.createTab(adaptCollection);
-        moveNavigation("right");
+        scrollToTab("");
 
         await this.workspaceRepository.updateCollectionInWorkspace(
           workspaceId,

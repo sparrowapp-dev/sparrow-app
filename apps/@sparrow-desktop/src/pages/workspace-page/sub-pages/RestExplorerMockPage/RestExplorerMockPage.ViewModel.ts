@@ -6,7 +6,7 @@ import {
   ReduceAuthHeader,
   ReduceAuthParameter,
 } from "@sparrow/workspaces/features/rest-explorer/utils";
-import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import { createDeepCopy, scrollToTab } from "@sparrow/common/utils";
 import {
   startLoading,
   stopLoading,
@@ -716,7 +716,7 @@ class RestExplorerMockViewModel {
         type: "REST",
         status_code: responseCode,
       });
-      moveNavigation("right");
+      scrollToTab("");
     }
   };
 
@@ -1172,7 +1172,7 @@ class RestExplorerMockViewModel {
     initRequestTab.updateIsSave(false);
     // MixpanelEvent(Events.TRY_RESPONSE);
     this.tabRepository.createTab(initRequestTab.getValue());
-    moveNavigation("right");
+    scrollToTab("");
   };
 
   /**
@@ -1583,7 +1583,7 @@ class RestExplorerMockViewModel {
     return this.collectionRepository.getCollection();
   }
 
-  set collection(e) { }
+  set collection(e) {}
 
   /**
    *
@@ -1741,7 +1741,7 @@ class RestExplorerMockViewModel {
             initRequestTab.updateHeaders(req.request.headers);
 
             this.tabRepository.createTab(initRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1833,7 +1833,7 @@ class RestExplorerMockViewModel {
             initRequestTab.updateHeaders(res.data.data.request.headers);
 
             this.tabRepository.createTab(initRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1917,7 +1917,7 @@ class RestExplorerMockViewModel {
             initRequestTab.updateAuth(req.request.auth);
             initRequestTab.updateHeaders(req.request.headers);
             this.tabRepository.createTab(initRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -2005,7 +2005,7 @@ class RestExplorerMockViewModel {
             initRequestTab.updateAuth(res.data.data.request.auth);
             initRequestTab.updateHeaders(res.data.data.request.headers);
             this.tabRepository.createTab(initRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -3180,8 +3180,7 @@ class RestExplorerMockViewModel {
           if (item.id === mockResponseId) {
             item.mockRequestResponse.isMockResponseActive =
               isMockResponseActive;
-              item.mockRequestResponse.responseWeightRatio =
-              0;
+            item.mockRequestResponse.responseWeightRatio = 0;
           }
         });
 
@@ -3332,22 +3331,29 @@ class RestExplorerMockViewModel {
    * @param mockResponseRatios - Array of response ratios to update
    * @returns Promise resolving to true if successful, false otherwise
    */
-  public updateResponseRatios = async (mockResponseRatios: Array<{ mockResponseId: string, responseWeightRatio: number }>) => {
+  public updateResponseRatios = async (
+    mockResponseRatios: Array<{
+      mockResponseId: string;
+      responseWeightRatio: number;
+    }>,
+  ) => {
     try {
       const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
-      const baseUrl = await this.constructBaseUrl(progressiveTab.path.workspaceId);
+      const baseUrl = await this.constructBaseUrl(
+        progressiveTab.path.workspaceId,
+      );
 
       const updatePayload = {
         collectionId: progressiveTab.path.collectionId,
         workspaceId: progressiveTab.path.workspaceId,
         mockRequestId: progressiveTab.id,
         folderId: progressiveTab.path.folderId || "",
-        mockResponseRatios: mockResponseRatios
+        mockResponseRatios: mockResponseRatios,
       };
 
       const response = await this.collectionService.updateMockResponseRatios(
         updatePayload,
-        baseUrl
+        baseUrl,
       );
 
       if (response?.isSuccessful) {
@@ -3356,41 +3362,46 @@ class RestExplorerMockViewModel {
             progressiveTab.path.collectionId,
             progressiveTab.path.folderId,
             progressiveTab.id,
-            mockResponseRatios
+            mockResponseRatios,
           );
         } else {
           this.collectionRepository.updateMockResponseRatiosInCollection(
             progressiveTab.path.collectionId,
             progressiveTab.id,
-            mockResponseRatios
+            mockResponseRatios,
           );
         }
 
         if (progressiveTab.property?.mockRequest?.items) {
-          progressiveTab.property.mockRequest.items = progressiveTab.property.mockRequest.items.map(item => {
-            const ratioUpdate = mockResponseRatios.find(ratio => ratio.mockResponseId === item.id);
-            if (ratioUpdate) {
-              return {
-                ...item,
-                mockRequestResponse: {
-                  ...item.mockRequestResponse,
-                  responseWeightRatio: ratioUpdate.responseWeightRatio
-                }
-              };
-            }
-            return item;
-          });
+          progressiveTab.property.mockRequest.items =
+            progressiveTab.property.mockRequest.items.map((item) => {
+              const ratioUpdate = mockResponseRatios.find(
+                (ratio) => ratio.mockResponseId === item.id,
+              );
+              if (ratioUpdate) {
+                return {
+                  ...item,
+                  mockRequestResponse: {
+                    ...item.mockRequestResponse,
+                    responseWeightRatio: ratioUpdate.responseWeightRatio,
+                  },
+                };
+              }
+              return item;
+            });
           this.tab = progressiveTab;
           await this.tabRepository.updateTab(
             progressiveTab.tabId,
-            progressiveTab
+            progressiveTab,
           );
         }
 
         notifications.success("Response ratios updated successfully.");
         return true;
       } else {
-        notifications.error(response?.message || "Failed to update response ratios.");
+        notifications.error(
+          response?.message || "Failed to update response ratios.",
+        );
         return false;
       }
     } catch (error) {
