@@ -43,7 +43,6 @@ env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
   CI: false
   SNAPCRAFT_STORE_CREDENTIALS: ${{ vars.SNAPCRAFT_STORE_CREDENTIALS }}
-  SNAP_CHANNEL: edge
 
 jobs:
   build-snap:
@@ -54,29 +53,42 @@ jobs:
       SNAP_CHANNEL: ${{ vars.SNAP_RELEASE_CHANNEL || 'edge' }}
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Install Snapcraft
+        run: |
+          sudo snap install snapcraft --classic
+
+      - name: Check Snapcraft Credentials
+        run: |
+          snapcraft whoami
+
+      - name: Set up Sparrow APT Repo
+        run: |
+          sudo mkdir -p /etc/apt/keyrings
+          curl -fsSL https://sparrow-assest.s3.us-east-1.amazonaws.com/linux/sparrow-repo-key.gpg | sudo tee /etc/apt/keyrings/sparrow.asc > /dev/null
+          echo "deb [signed-by=/etc/apt/keyrings/sparrow.asc] https://sparrow-assest.s3.us-east-1.amazonaws.com/linux stable main" | sudo tee /etc/apt/sources.list.d/sparrow.list
+          sudo apt-get update
 
       - name: Download Latest Sparrow DEB
         run: |
-          wget -O sparrow.deb \
-            https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/pool/stable/main/binary-amd64/sparrow.deb
-
-      - name: Install envsubst
-        run: sudo apt-get update && sudo apt-get install -y gettext
+          apt download sparrow
+          deb_file=$(ls sparrow_*.deb | head -n 1)
+          mv "$deb_file" sparrow.deb
 
       - name: Set Version and Generate snapcraft.yaml
         run: |
           export SPARROW_VERSION=$(dpkg-deb -f sparrow.deb Version)
+          echo "Using Sparrow version: $SPARROW_VERSION"
           envsubst < snapcraft.yaml.in > snapcraft.yaml
 
-      - name: Build Snap in Docker
-        uses: docker://snapcore/snapcraft:edge
-        env:
-          SNAPCRAFT_ENABLE_EXPERIMENTAL_EXTENSIONS: "1"
-        with:
-          args: snapcraft --destructive-mode
+      - name: Build Snap from DEB
+        run: |
+          sudo snapcraft --destructive-mode
 
       - name: Upload Snap to Snap Store
         run: |
           SNAP_FILE=$(ls *.snap | head -n 1)
+          echo "Uploading the $SNAP_FILE to $SNAP_CHANNEL"
           snapcraft upload "$SNAP_FILE" --release "$SNAP_CHANNEL"
