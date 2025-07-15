@@ -1,6 +1,6 @@
 name: sparrow-app
 title: Sparrow App
-base: core24
+base: core20
 version: '${SPARROW_VERSION}'
 
 summary: An API management platform that streamlines software development.
@@ -9,14 +9,11 @@ description: |
 grade: stable
 confinement: strict
 
-layout:
-  /usr/lib/x86_64-linux-gnu/webkit2gtk-4.1:
-    bind: $SNAP/usr/lib/x86_64-linux-gnu/webkit2gtk-4.1
-
 apps:
   sparrow:
     command: usr/bin/sparrow
     desktop: usr/share/applications/sparrow.desktop
+    extensions: [gnome-3-38]
     plugs:
       - network
       - network-status
