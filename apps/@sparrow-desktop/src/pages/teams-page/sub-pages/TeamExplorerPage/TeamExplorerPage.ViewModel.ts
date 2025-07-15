@@ -465,7 +465,7 @@ export class TeamExplorerPageViewModel {
       if (response?.message === "Plan limit reached") {
         // notifications.error("Failed to send invite. please upgrade your plan.");
       } else {
-        notifications.error("Failed to Sent request. Please try again.");
+        notifications.error(response?.message || "Failed to send invite. Please try again.");
       }
     }
     return response;
