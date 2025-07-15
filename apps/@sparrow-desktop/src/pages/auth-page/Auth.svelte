@@ -48,7 +48,10 @@
     try {
       console.log("Attempting to open:", externalSparrowLink);
       await open(externalSparrowLink);
+      const testUrl = "https://apple.com"; // Test with this first
+      await open(testUrl);
       console.log("Open command completed without errors");
+      console.log("VITE_AUTH_URL:", import.meta.env.VITE_AUTH_URL);
     } catch (e) {
       console.error("Detailed shell error:", e);
       try {
