@@ -133,19 +133,22 @@ jobs:
         run: |
           sudo snapcraft --destructive-mode
 
-      - name: Upload Snap to Snap Store
+      - name: Prepare Snapcraft credentials
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ vars.SNAPCRAFT_STORE_CREDENTIALS }}
         run: |
-          # Create credentials file
-          mkdir -p ~/.snap
-          echo "$SNAPCRAFT_STORE_CREDENTIALS" > ~/.snap/credentials.json
-          chmod 600 ~/.snap/credentials.json
+          # ensure the credentials directory exists
+          mkdir -p ~/.config/snapcraft
 
-          # Upload the snap
-          SNAP_FILE=$(ls *.snap | head -n 1)
-          echo "Uploading $SNAP_FILE to ${{ inputs.channel || 'edge' }}"
+          # write the exported credentials JSON (the long base64/macaroon string) into the file
+          echo "$SNAPCRAFT_STORE_CREDENTIALS" > ~/.config/snapcraft/credentials.json
+          chmod 600 ~/.config/snapcraft/credentials.json
+
+      - name: Upload Snap to Snap Store
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ vars.SNAPCRAFT_STORE_CREDENTIALS }}
+          SNAP_CHANNEL: ${{ vars.SNAP_RELEASE_CHANNEL || 'edge' }}
+        run: |
+          SNAP_FILE=$(ls *.snap | head -n1)
+          echo "Uploading $SNAP_FILE to $SNAP_CHANNEL"
           snapcraft upload "$SNAP_FILE" --release "$SNAP_CHANNEL"
-
-          # Cleanup credentials
-          rm -f ~/.snap/credentials.json
