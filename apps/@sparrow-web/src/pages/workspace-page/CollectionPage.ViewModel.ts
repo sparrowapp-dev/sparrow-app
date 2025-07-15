@@ -78,6 +78,7 @@ import {
   type CollectionItemBaseInterface as CollectionItemsDto,
   CollectionItemTypeBaseEnum,
   CollectionTypeBaseEnum,
+  type TransformedRequest,
 } from "@sparrow/common/types/workspace/collection-base";
 import type { HttpRequestBaseInterface as RequestDto } from "@sparrow/common/types/workspace/http-request-base";
 import {
@@ -1526,16 +1527,13 @@ export default class CollectionsViewModel {
 
   /**
    * Handle Import Api using Curl
-   * @param importCurl: string - Curl string
+   * @param parsedCurlData: TransformedRequest - Curl JSON
    */
   private handleImportCurl = async (
     workspaceId: string,
-    importCurl: string,
+    parsedCurlData: TransformedRequest | undefined,
   ) => {
-    const response =
-      await this.collectionService.importCollectionFromCurl(importCurl);
-
-    if (response.isSuccessful) {
+    if (parsedCurlData) {
       const requestTabAdapter = new RequestTabAdapter();
       const tabId = UntrackedItems.UNTRACKED + uuidv4();
       const adaptedRequest = requestTabAdapter.adapt(
@@ -1543,7 +1541,7 @@ export default class CollectionsViewModel {
         "",
         "",
         {
-          ...response.data.data,
+          ...parsedCurlData,
           id: tabId,
         },
       );
@@ -1553,37 +1551,11 @@ export default class CollectionsViewModel {
 
       notifications.success("cURL imported successfully.");
     } else {
-      if (response.message === "Network Error") {
-        notifications.error(response.message);
-      } else {
-        notifications.error("Failed to import cURL. Please try again.");
-      }
+      notifications.error("Failed to import cURL. Please try again.");
     }
     MixpanelEvent(Events.IMPORT_API_VIA_CURL, {
       source: "curl import popup",
     });
-    return response;
-  };
-
-  /**
-   * Validates Curl
-   * @param importCurl: string - Curl string
-   */
-  public handleValidateCurl = async (importCurl: string) => {
-    const response =
-      await this.collectionService.importCollectionFromCurl(importCurl);
-    if (response.isSuccessful) {
-      const method = await response?.data?.data?.request?.method;
-      const isSuccessful = response.isSuccessful;
-      return {
-        isSuccessful: isSuccessful,
-        method: method,
-      };
-    } else {
-      return {
-        isSuccessful: false,
-      };
-    }
   };
 
   /**
@@ -6079,7 +6051,7 @@ export default class CollectionsViewModel {
       case "curl":
         response = await this.handleImportCurl(
           args.workspaceId,
-          args.importCurl as string,
+          args.parsedCurlData,
         );
         break;
     }

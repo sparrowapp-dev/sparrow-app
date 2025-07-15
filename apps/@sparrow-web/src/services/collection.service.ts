@@ -456,19 +456,6 @@ export class CollectionService {
     return response;
   };
 
-  public importCollectionFromCurl = async (curl: string) => {
-    const response = await makeRequest("POST", `${this.apiUrl}/curl`, {
-      body: {
-        curl: curl,
-      },
-      headers: {
-        ...getAuthHeaders(),
-        "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
-      },
-    });
-    return response;
-  };
-
   public parseOAPIJSONToCollection = async (
     json: string,
     contentType: ContentTypeEnum,

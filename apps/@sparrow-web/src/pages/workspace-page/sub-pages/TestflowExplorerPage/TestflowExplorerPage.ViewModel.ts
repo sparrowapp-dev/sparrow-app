@@ -587,7 +587,6 @@ export class TestflowExplorerPageViewModel {
             selectedAgent,
             signal,
           );
-          debugger;
           const end = Date.now();
           const duration = end - start;
 
