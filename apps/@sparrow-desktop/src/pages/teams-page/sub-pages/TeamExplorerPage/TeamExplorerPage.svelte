@@ -43,12 +43,14 @@
   let currentTeam = {
     name: "",
     users: [],
+    plan: {},
   };
 
   const activeTeamSubscriber = activeTeam.subscribe((value) => {
     if (value) {
       currentTeam.name = value.name;
       currentTeam.users = value.users;
+      currentTeam.plan = value.plan;
       usersInvitePlanCount = value?._data?.users?.length || 5;
     }
   });
@@ -203,6 +205,7 @@
     teamName={$activeTeam?.name}
     users={$activeTeam?.users}
     teamId={$activeTeam?.teamId}
+    plan={$activeTeam?.plan}
     workspaces={$workspaces.filter((elem) => {
       return elem?.team?.teamId === $activeTeam?.teamId;
     })}
@@ -275,6 +278,7 @@
     currentWorkspaceDetails={workspaceDetails}
     users={currentTeam?.users}
     teamName={currentTeam?.name}
+    plan={currentTeam?.plan}
     onInviteUserToWorkspace={handleAddWorkspace}
   />
 </Modal>

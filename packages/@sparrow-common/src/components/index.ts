@@ -17,3 +17,4 @@ export { default as UpgradePlanPopUp } from "./upgrade-plan-pop-up/UpgradePlanPo
 export { default as PlanUpgradeModal } from "./plan-upgrade-modal/PlanUpgradeModal.svelte";
 export { default as NumberInput } from "./number-input/NumberInput.svelte";
 export { default as GithubStarRedirect } from "./github-star-redirect/GithubStarRedirect.svelte";
+export {default as HubPaymentFailed } from "./hub-payment-failed/HubPaymentFailed.svelte";
