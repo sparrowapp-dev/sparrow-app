@@ -114,7 +114,7 @@
   on:mouseup={() => {
     isMenuItemClicked = false;
   }}
-  class="d-flex px-2 py-2 justify-content-between highlight border-radius-2 select-option-container {extractHeaderHighlight(
+  class="d-flex px-2 py-2 justify-content-between align-items-center highlight border-radius-2 select-option-container {extractHeaderHighlight(
     variant,
     isMenuItemHover,
     isMenuItemClicked,
@@ -132,7 +132,7 @@
     </div>
   {/if}
 
-  <div class="content-wrapper d-flex align-items-center">
+  <div class="content-wrapper">
     <p
       style="font-size: {fontSize}"
       class="m-0 p-0 ellipsis option-name {getTextColor(
