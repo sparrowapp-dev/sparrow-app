@@ -7,7 +7,6 @@ on:
       - completed
     branches:
       - main
-      - build/app-store-build
   workflow_dispatch:
 env:
   VITE_API_URL: ${{vars.VITE_API_URL}}
