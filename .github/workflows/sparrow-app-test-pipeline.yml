@@ -46,33 +46,37 @@ env:
   SNAP_CHANNEL: edge
 
 jobs:
-  build-and-publish:
+  build-snap:
     runs-on: ubuntu-latest
+    environment: production
+
+    env:
+      SNAP_CHANNEL: ${{ vars.SNAP_RELEASE_CHANNEL || 'edge' }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Download latest Sparrow DEB
+      - name: Download Latest Sparrow DEB
         run: |
           wget -O sparrow.deb \
             https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/pool/stable/main/binary-amd64/sparrow.deb
 
-      - name: Set SPARROW_VERSION and generate snapcraft.yaml
+      - name: Install envsubst
+        run: sudo apt-get update && sudo apt-get install -y gettext
+
+      - name: Set Version and Generate snapcraft.yaml
         run: |
           export SPARROW_VERSION=$(dpkg-deb -f sparrow.deb Version)
           envsubst < snapcraft.yaml.in > snapcraft.yaml
 
-      - name: Build snap
-        uses: snapcore/action-build@v1
-        id: snapcraft
-        with:
-          snapcraft-args: --enable-experimental-extensions
-
-      - name: Publish to Snap Store
-        uses: snapcore/action-publish@v1
-        with:
-          snap: ${{ steps.snapcraft.outputs.snap }}
-          release: ${{ env.SNAP_CHANNEL }}
+      - name: Build Snap in Docker
+        uses: docker://snapcore/snapcraft:edge
         env:
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+          SNAPCRAFT_ENABLE_EXPERIMENTAL_EXTENSIONS: "1"
+        with:
+          args: snapcraft --destructive-mode
+
+      - name: Upload Snap to Snap Store
+        run: |
+          SNAP_FILE=$(ls *.snap | head -n 1)
+          snapcraft upload "$SNAP_FILE" --release "$SNAP_CHANNEL"
