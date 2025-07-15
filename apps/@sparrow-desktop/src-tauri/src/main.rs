@@ -1267,16 +1267,6 @@ async fn send_graphql_request(
     };
 }
 
-#[tauri::command]
-fn open_url(url: String) -> Result<(), String> {
-    std::process::Command::new("osascript")
-        .arg("-e")
-        .arg(format!("open location \"{}\"", url))
-        .output()
-        .map_err(|e| e.to_string())?;
-    Ok(())
-}
-
 // Driver Function
 fn main() {
     // Initiate Tauri Runtime
@@ -1378,8 +1368,7 @@ fn main() {
             send_socket_io_message,
             send_graphql_request,
             show_toolbar,
-            hide_toolbar,
-            open_url
+            hide_toolbar
         ])
         .on_page_load(|wry_window, _payload| {
             if let Ok(url) = wry_window.url() {

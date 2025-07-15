@@ -8,7 +8,7 @@ on:
   push:
     # Trigger on push to the <branch_name> branch. Make sure to remove the branch name from the branches list below, once you are done testing.
     branches:
-      - build/app-store-build
+      - <branch_name>
   workflow_dispatch:
 env:
   VITE_API_URL: ${{vars.VITE_API_URL}}

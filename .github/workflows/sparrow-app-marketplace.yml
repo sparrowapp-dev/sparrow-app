@@ -7,8 +7,39 @@ on:
       - completed
     branches:
       - main
+      - build/app-store-build
   workflow_dispatch:
 env:
+  VITE_API_URL: ${{vars.VITE_API_URL}}
+  VITE_MIX_PANEL_TOKEN: ${{vars.VITE_MIX_PANEL_TOKEN}}
+  VITE_ENABLE_MIX_PANEL: ${{vars.VITE_ENABLE_MIX_PANEL}}
+  VITE_API_TIMEOUT: ${{vars.VITE_API_TIMEOUT}}
+  VITE_SPARROW_SUPPORT_EMAIL: ${{ vars.VITE_SPARROW_SUPPORT_EMAIL }}
+  VITE_AUTH_URL: ${{ vars.VITE_AUTH_URL }}
+  VITE_SPARROW_GITHUB: ${{ vars.VITE_SPARROW_GITHUB }}
+  VITE_SPARROW_DOWNLOAD_LINK: ${{ vars.VITE_SPARROW_DOWNLOAD_LINK }}
+  VITE_RELEASE_NOTES_PAT_TOKEN: ${{ secrets.VITE_RELEASE_NOTES_PAT_TOKEN }}
+  VITE_RELEASE_NOTES_API: ${{ vars.VITE_RELEASE_NOTES_API }}
+  VITE_AZURE_CDN_URL: ${{ vars.VITE_AZURE_CDN_URL }}
+  VITE_AZURE_INSIGHTS_CONNECTION_STRING: ${{ vars.VITE_AZURE_INSIGHTS_CONNECTION_STRING }}
+  VITE_CANNY_API: ${{ vars.VITE_CANNY_API }}
+  VITE_CANNY_URL: ${{ vars.VITE_CANNY_URL }}
+  VITE_BASE_URL: ${{ vars.VITE_BASE_URL }}
+  VITE_SPARROW_LINKEDIN: ${{ vars.VITE_SPARROW_LINKEDIN }}
+  VITE_WEB_SOCKET_IO_API_URL: ${{ vars.VITE_WEB_SOCKET_IO_API_URL }}
+  VITE_SPARROW_DOCS: ${{ vars.VITE_SPARROW_DOCS }}
+  VITE_SPARROW_AI_WEBSOCKET: ${{ vars.VITE_SPARROW_AI_WEBSOCKET }}
+  VITE_APP_ENVIRONMENT_PATH: ${{ vars.VITE_APP_ENVIRONMENT_PATH }}
+  VITE_CANNY_FEEDBACK_URL: ${{ vars.VITE_CANNY_FEEDBACK_URL }}
+  VITE_SPARROW_WEB_APP_URL: ${{ vars.VITE_SPARROW_WEB_APP_URL }}
+  VITE_MARKETING_URL: ${{ vars.VITE_MARKETING_URL }}
+  VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
+  VITE_APP_ENVIRONMENT: ${{ vars.VITE_APP_ENVIRONMENT }}
+  VITE_POSTHOG_CONNECTION_API_KEY: ${{ vars.VITE_POSTHOG_CONNECTION_API_KEY }}
+  VITE_POSTHOG_API_URL: ${{ vars.VITE_POSTHOG_API_URL }}
+  VITE_SPARROW_ADMIN_URL: ${{ vars.VITE_SPARROW_ADMIN_URL }}
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+  CI: false
   SNAPCRAFT_STORE_CREDENTIALS: ${{ vars.SNAPCRAFT_STORE_CREDENTIALS }}
 
 jobs:
@@ -141,14 +172,6 @@ jobs:
       - name: Sync version across all files
         run: yarn sync-version
 
-      # Commenting this out as it is not needed for the App Store build as updates will be handled by the App Store
-      # - name: Update updater endpoint in tauri.conf.json file
-      #   run: |
-      #     content=$(<apps/@sparrow-desktop/src-tauri/tauri.conf.json)
-      #     newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_DEV }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
-      #     echo "$newContent" > apps/@sparrow-desktop/src-tauri/tauri.conf.json
-      #   shell: bash
-
       - name: Increase Yarn network timeout
         run: yarn config set network-timeout 600000
 
@@ -204,19 +227,18 @@ jobs:
         run: |
           yarn cache clean
           yarn install
-          yarn workspace @sparrow/desktop tauri build --debug
+          yarn workspace @sparrow/desktop tauri build --debug --verbose
         env:
           APPLE_SIGNING_IDENTITY: "${{ env.CODESIGN_ID }}" 
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
-          CI: false
 
       - name: Create signed .pkg for App Store
         run: |
           APP_NAME="Sparrow"
-          BUNDLE_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/macos/${APP_NAME}.app"
-          PKG_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/${APP_NAME}.pkg"
+          BUNDLE_PATH="apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/${APP_NAME}.app"
+          PKG_PATH="apps/@sparrow-desktop/src-tauri/target/debug/bundle/${APP_NAME}.pkg"
 
           if [ ! -d "$BUNDLE_PATH" ]; then
             echo "::error::App bundle not found at $BUNDLE_PATH"
@@ -238,7 +260,7 @@ jobs:
 
       - name: Upload to App Store Connect
         env:
-          PKG_PATH: "apps/@sparrow-desktop/src-tauri/target/release/bundle/Sparrow.pkg"
+          PKG_PATH: "apps/@sparrow-desktop/src-tauri/target/debug/bundle/Sparrow.pkg"
           APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
