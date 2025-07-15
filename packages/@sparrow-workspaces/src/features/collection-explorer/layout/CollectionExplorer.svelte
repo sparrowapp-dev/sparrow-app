@@ -72,7 +72,11 @@
   // import { PERMISSION_NOT_FOUND_TEXT } from "@sparrow/common/constants/permissions.constant";
   // import type { CollectionDocument, TabDocument } from "@app/database/database";
   // import { WorkspaceRole } from "@sparrow/common/enums";
-  import { CollectionAuth, CollectionNavigator } from "../components";
+  import {
+    CollectionAuth,
+    CollectionAuthProfiles,
+    CollectionNavigator,
+  } from "../components";
   import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection";
   import {
     Button,
@@ -107,7 +111,11 @@
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { Input } from "@sparrow/library/forms";
   import { onDestroy, onMount } from "svelte";
-  import { CollectionTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+  import {
+    CollectionTypeBaseEnum,
+    type CollectionAuthProifleBaseInterface as AuthProfileDto,
+    type CollectionAuthProifleBaseInterface,
+  } from "@sparrow/common/types/workspace/collection-base";
   import { getMethodStyle } from "@sparrow/common/utils";
   import { WorkspaceRole, WorkspaceType } from "@sparrow/common/enums";
 
@@ -120,6 +128,9 @@
   export let onItemCreated;
   export let onUpdateRunningState;
   export let userRole;
+  export let onCreateAuthProfile;
+  export let onUpdateAuthProfile;
+  export let onDeleteAuthProfile;
 
   /**
    * Local variables
@@ -141,6 +152,8 @@
   let collectionTabButtonWrapper: HTMLElement;
   let noOfColumns = 180;
   let isCollectionSyncing = false;
+  let authProfilesList: CollectionAuthProifleBaseInterface[] = [];
+  $: authProfilesList = collection?.authProfiles || [];
 
   /**
    * Function to update isSynced, totalRequests and totalFolders, and lastUpdated
@@ -348,6 +361,27 @@
     isMockRunning = !isMockRunning;
   };
   export let currentWorkspace;
+
+  // Auth Profile wrapper functions/handlers
+  const handleOnCreateAuthProfile = async (authProfileData: AuthProfileDto) => {
+    const response = await onCreateAuthProfile(collection, authProfileData);
+    return response;
+  };
+  const handleOnUpdateAuthProfile = async (
+    authId: string,
+    updatedAuthProfileData: AuthProfileDto,
+  ) => {
+    const response = await onUpdateAuthProfile(
+      collection,
+      authId,
+      updatedAuthProfileData,
+    );
+    return response;
+  };
+  const handleOnDeleteAuthProfile = async (authId: string) => {
+    const response = await onDeleteAuthProfile(collection, authId);
+    return response;
+  };
 </script>
 
 <div class="main-container d-flex h-100">
@@ -597,17 +631,21 @@
               />
             </Dropdown>
           </div>
-          <Button
-            disable={$tab?.isSaved || !isCollectionEditable
-              ? true
-              : false || isSharedWorkspace}
-            startIcon={SaveRegular}
-            type={"secondary"}
-            onClick={() => {
-              onSaveCollection();
-              handlecollection_collection_saved({ name: "Collection Saved" });
-            }}
-          />
+
+          <!-- Show save button only for overview tab, not for collection auth -->
+          {#if $tab?.property?.collection?.state?.collectionNavigation !== CollectionNavigationTabEnum.AUTH_PROFILES}
+            <Button
+              disable={$tab?.isSaved || !isCollectionEditable
+                ? true
+                : false || isSharedWorkspace}
+              startIcon={SaveRegular}
+              type={"secondary"}
+              onClick={() => {
+                onSaveCollection();
+                handlecollection_collection_saved({ name: "Collection Saved" });
+              }}
+            />
+          {/if}
         </div>
       {/if}
     </div>
@@ -977,7 +1015,7 @@ margin-right: 8px;
             />
           </div>
         </div>
-      {:else}
+      {:else if $tab?.property?.collection?.state?.collectionNavigation === CollectionNavigationTabEnum.AUTH}
         <CollectionAuth
           auth={$tab?.property?.collection?.auth}
           requestStateAuth={$tab?.property?.collection?.state
@@ -986,6 +1024,14 @@ margin-right: 8px;
           onUpdateRequestState={onUpdateCollectionState}
           {onUpdateEnvironment}
           {environmentVariables}
+        />
+      {:else}
+        <CollectionAuthProfiles
+          {authProfilesList}
+          onCreateAuthProfile={handleOnCreateAuthProfile}
+          onUpdateAuthProfile={handleOnUpdateAuthProfile}
+          onDeleteAuthProfile={handleOnDeleteAuthProfile}
+          onUpdateRequestState={onUpdateCollectionState}
         />
       {/if}
     {/if}

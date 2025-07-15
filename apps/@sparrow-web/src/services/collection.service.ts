@@ -44,7 +44,10 @@ import type {
   GraphqlRequestDeletePayloadDtoInterface,
   GraphqlRequestKeyValueDtoInterface,
 } from "@sparrow/common/types/workspace/graphql-request-dto";
-import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+import {
+  CollectionItemTypeBaseEnum,
+  type CollectionAuthProifleBaseInterface,
+} from "@sparrow/common/types/workspace/collection-base";
 import type { GraphqlRequestAuthModeBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
 import type {
   HttpRequestSavedCreateUpdatePayloadDtoInterface,
@@ -64,7 +67,7 @@ import type {
 } from "@sparrow/common/types/workspace/http-response-mock-dto";
 
 export class CollectionService {
-  constructor() { }
+  constructor() {}
 
   private apiUrl: string = constants.API_URL;
   private collectionRepository = new CollectionRepository();
@@ -536,7 +539,7 @@ export class CollectionService {
 
   public addAiRequestInCollection = async (
     _aiRequest:
-      AiRequestCreateUpdateInCollectionPayloadDtoInterface
+      | AiRequestCreateUpdateInCollectionPayloadDtoInterface
       | AiRequestCreateUpdateInFolderPayloadDtoInterface,
     baseUrl: string,
   ): Promise<
@@ -932,6 +935,64 @@ export class CollectionService {
       `${baseUrl}/api/collection/mock-response/ratios`,
       {
         body: payload,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public addAuthProfile = async (
+    baseUrl: string,
+    updatedPayload: CollectionAuthProifleBaseInterface & {
+      collectionId: string;
+      workspaceId: string;
+    },
+  ) => {
+    const response = await makeRequest(
+      "POST", 
+      `${baseUrl}/api/collection/auth-profiles`,
+      {
+        body: updatedPayload,
+        headers: getAuthHeaders(),
+      },
+    );
+
+    return response;
+  };
+
+  public updateAuthProfile = async (
+    _baseUrl: string,
+    authProfileId: string,
+    _updateedAuthProfilePayload: CollectionAuthProifleBaseInterface & {
+      collectionId: string;
+      workspaceId: string;
+    },
+  ) => {
+    const response = await makeRequest(
+      "PUT",
+      `${_baseUrl}/api/collection/auth-profiles`,
+      {
+        body: _updateedAuthProfilePayload,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public deleteAuthProfile = async (
+    _baseUrl: string,
+    _authProfileId: string,
+    _authProfileDeletionPayload: {
+      collectionId: string;
+      workspaceId: string;
+      authId: string;
+    },
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${_baseUrl}/api/collection/auth-profiles`,
+      {
+        body: _authProfileDeletionPayload,
         headers: getAuthHeaders(),
       },
     );
