@@ -28,6 +28,16 @@
         <string>com.apple.launchservices.open</string>
     </array>
 
+    <key>com.apple.security.temporary-exception.mach-lookup.global-name</key>
+    <array>
+    <string>com.apple.launchservices.LaunchServicesAgent</string>
+    </array>
+
+    <key>com.apple.security.cs.allow-jit</key>
+    <true/>
+    <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+    <true/>
+
     <!-- For opening HTTP URLs in default browser (Apple Events) -->
     <key>com.apple.security.temporary-exception.apple-events</key>
     <array>

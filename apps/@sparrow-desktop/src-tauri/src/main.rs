@@ -401,9 +401,9 @@ async fn make_request_v2(
 ) -> Result<String, std::io::Error> {
     // Create a client
     let client = reqwest::Client::builder()
-    .danger_accept_invalid_certs(true)
-    .build()
-    .unwrap();
+        .danger_accept_invalid_certs(true)
+        .build()
+        .unwrap();
 
     // Convert method string to reqwest::Method
     let reqwest_method = match method {
@@ -1194,9 +1194,9 @@ async fn send_graphql_request(
 ) -> Result<String, String> {
     // Initialize an HTTP client for making requests.
     let client = reqwest::Client::builder()
-    .danger_accept_invalid_certs(true)
-    .build()
-    .unwrap();
+        .danger_accept_invalid_certs(true)
+        .build()
+        .unwrap();
 
     // Deserialize the JSON string `headers` into a Vec of key-value pairs.
     // Each key-value pair is represented by the KeyValue struct.
@@ -1265,6 +1265,16 @@ async fn send_graphql_request(
         Ok(value) => Ok(value.to_string()),
         Err(err) => Err(err.to_string()),
     };
+}
+
+#[tauri::command]
+fn open_url(url: String) -> Result<(), String> {
+    std::process::Command::new("osascript")
+        .arg("-e")
+        .arg(format!("open location \"{}\"", url))
+        .output()
+        .map_err(|e| e.to_string())?;
+    Ok(())
 }
 
 // Driver Function
@@ -1368,7 +1378,8 @@ fn main() {
             send_socket_io_message,
             send_graphql_request,
             show_toolbar,
-            hide_toolbar
+            hide_toolbar,
+            open_url
         ])
         .on_page_load(|wry_window, _payload| {
             if let Ok(url) = wry_window.url() {
