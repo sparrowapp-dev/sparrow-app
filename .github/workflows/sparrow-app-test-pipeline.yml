@@ -135,7 +135,7 @@ jobs:
 
       - name: Upload Snap to Snap Store
         env:
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ vars.SNAPCRAFT_STORE_CREDENTIALS }}
         run: |
           # Install snapcraft if not already present
           if ! command -v snapcraft &> /dev/null; then
