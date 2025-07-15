@@ -137,17 +137,26 @@ jobs:
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ vars.SNAPCRAFT_STORE_CREDENTIALS }}
         run: |
-          # ensure the credentials directory exists
-          mkdir -p ~/.config/snapcraft
+          # 1. Override XDG_CONFIG_HOME to a .config folder in the workspace
+          export XDG_CONFIG_HOME="$PWD/.config"
 
-          # write the exported credentials JSON (the long base64/macaroon string) into the file
-          echo "$SNAPCRAFT_STORE_CREDENTIALS" > ~/.config/snapcraft/credentials.json
-          chmod 600 ~/.config/snapcraft/credentials.json
+          # 2. Create the snapcraft subfolder under that config
+          mkdir -p "$XDG_CONFIG_HOME/snapcraft"
 
+          # 3. Write the exported credentials JSON (your long token) to the file
+          echo "$SNAPCRAFT_STORE_CREDENTIALS" > "$XDG_CONFIG_HOME/snapcraft/credentials.json"
+          chmod 600 "$XDG_CONFIG_HOME/snapcraft/credentials.json"
+
+          echo "Stored Snapcraft creds in $XDG_CONFIG_HOME/snapcraft/credentials.json"
+
+      # Now run the upload—Snapcraft will auto‑pick the creds file
       - name: Upload Snap to Snap Store
         env:
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ vars.SNAPCRAFT_STORE_CREDENTIALS }}
           SNAP_CHANNEL: ${{ vars.SNAP_RELEASE_CHANNEL || 'edge' }}
+          # Keep the env var for any other Snapcraft steps
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ vars.SNAPCRAFT_STORE_CREDENTIALS }}
+          # Ensure Snapcraft looks in our workspace .config
+          XDG_CONFIG_HOME: "$PWD/.config"
         run: |
           SNAP_FILE=$(ls *.snap | head -n1)
           echo "Uploading $SNAP_FILE to $SNAP_CHANNEL"
