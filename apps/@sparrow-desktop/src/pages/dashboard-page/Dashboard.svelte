@@ -175,7 +175,6 @@
   const activeTeamSubscriber = activeTeam.subscribe((value) => {
     if (value) {
       openTeam = value?.toMutableJSON();
-      console.log(openTeam);
     }
   });
 
