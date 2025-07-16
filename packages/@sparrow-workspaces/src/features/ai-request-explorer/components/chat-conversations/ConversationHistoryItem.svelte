@@ -7,6 +7,7 @@
     DeleteRegular,
     EditRegular,
     MoreHorizontalRegular,
+    CodeRegular,
   } from "@sparrow/library/icons";
   import { Button, Modal, notifications, Options } from "@sparrow/library/ui";
 
@@ -181,12 +182,25 @@
       {#if conversation.authoredBy}
         <span
           class="updated-by text-truncate"
-          style="width: 40%; text-align: right; display: inline-block;"
+          style="width: 40%; text-align: right; display: inline-blockhhh;"
         >
           {`By ${conversation.authoredBy}`}
         </span>
       {/if}
     </div>
+
+    <!-- Variables list -->
+    {#if conversation.variables && conversation.variables.length > 0}
+      <div class="d-flex align-items-center gap-2 mt-1 flex-wrap">
+        <CodeRegular size="16px" color="var(--text-ds-neutral-500)" />
+        <!-- Variable List -->
+          {#each conversation.variables as variable}
+          <span class="conversation-variables text-ds-font-weight-semi-bold">
+            &#123;&#123;{variable.key}&#125;&#125;
+          </span>
+          {/each}
+      </div>
+    {/if}
   </div>
 
   <div
@@ -375,6 +389,13 @@
     font-family: Inter, sans-serif;
     font-size: 10px;
     color: var(--text-ds-neutral-300);
+    font-weight: 600;
+  }
+
+  .conversation-variables {
+    font-family: Inter, sans-serif;
+    font-size: 12px;
+    color: var(--text-ds-primary-300);
     line-height: 1;
     font-weight: 500;
   }
