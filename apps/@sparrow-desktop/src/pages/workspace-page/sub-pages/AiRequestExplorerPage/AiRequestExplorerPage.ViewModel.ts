@@ -3,9 +3,16 @@ import {
   createDeepCopy,
   InitAiRequestTab,
   MarkdownFormatter,
-  moveNavigation,
+  scrollToTab,
   Sleep,
 } from "@sparrow/common/utils";
+import {
+  DecodeRequest,
+  ReduceRequestURL,
+  ReduceQueryParams,
+  ReduceAuthHeader,
+  ReduceAuthParameter,
+} from "@sparrow/workspaces/features/rest-explorer/utils";
 
 // ---- DB
 import type {
@@ -41,6 +48,8 @@ import {
   type StatePartial,
   type Conversation,
   MessageTypeEnum,
+  type HttpRequestCollectionLevelAuthTabInterface,
+  type HttpRequestCollectionLevelAuthProfileTabInterface,
 } from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
 import { GuestUserRepository } from "../../../../repositories/guest-user.repository";
@@ -52,14 +61,20 @@ import {
   AiRequestExplorerDataStore,
   type AiRequestExplorerData,
 } from "@sparrow/workspaces/features/ai-request-explorer/store";
-import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  type Tab,
+} from "@sparrow/common/types/workspace/tab";
 import { getClientUser } from "@app/utils/jwt";
 import constants from "@app/constants/constants";
 import * as Sentry from "@sentry/svelte";
 import {
   AiModelProviderEnum,
   OpenAIModelEnum,
-  type modelsConfigType, type PromptFileAttachment,
+  type modelsConfigType,
+ 
+  type PromptFileAttachment,
+  AiRequestAuthTypeBaseEnum,
 } from "@sparrow/common/types/workspace/ai-request-base";
 import {
   configFormat,
@@ -75,6 +90,10 @@ import { CompareArray, Debounce } from "@sparrow/common/utils";
 import {
   CollectionItemTypeBaseEnum,
   type CollectionItemBaseInterface,
+  CollectionRequestAddToBaseEnum,
+  CollectionAuthTypeBaseEnum,
+  type CollectionAuthBaseInterface,
+  type CollectionAuthProifleBaseInterface,
 } from "@sparrow/common/types/workspace/collection-base";
 import type {
   AiRequestCreateUpdateInCollectionPayloadDtoInterface,
@@ -84,6 +103,10 @@ import { AiRequestTabAdapter, CollectionTabAdapter } from "@app/adapter";
 import { AiRequestRepository } from "../../../../repositories/ai-request.repository";
 import { type StatePartial as AiStateParital } from "@sparrow/common/types/workspace/ai-request-tab";
 import { AiRequestService } from "../../../../services/ai-request.service";
+import type {
+  AiRequestCollectionLevelAuthProfileTabInterface,
+  AiRequestCollectionLevelAuthTabInterface,
+} from "@sparrow/common/types/workspace/ai-request-base";
 
 class AiRequestExplorerViewModel {
   // Repository
@@ -102,11 +125,62 @@ class AiRequestExplorerViewModel {
   private aiRequestService = new AiRequestService();
   private aiAssistentWebSocketService =
     AiAssistantWebSocketService.getInstance();
+
+  /**
+   * tools
+   */
+  private _authHeader: BehaviorSubject<KeyValue> = new BehaviorSubject({
+    key: "",
+    value: "",
+  });
+
+  private _authParameter: BehaviorSubject<KeyValue> = new BehaviorSubject({
+    key: "",
+    value: "",
+  });
+
+  private _collectionAuth = new BehaviorSubject<
+    Partial<AiRequestCollectionLevelAuthTabInterface>
+  >({});
+
+  private _collectionAuthProfile = new BehaviorSubject<
+    Partial<AiRequestCollectionLevelAuthProfileTabInterface>
+  >({});
+
   private _tab: BehaviorSubject<RequestTab> = new BehaviorSubject({});
 
   public collectionSubscriber(_collectionId: string) {
     return this.collectionRepository.subscribeCollection(_collectionId);
   }
+
+  private fetchCollection = async (_collectionId: string) => {
+    const collectionRx =
+      await this.collectionRepository.readCollection(_collectionId);
+    const collectionDoc = collectionRx?.toMutableJSON();
+    if (collectionDoc?.auth) {
+      this.collectionAuth = {
+        auth: collectionDoc?.auth,
+        collectionAuthNavigation: collectionDoc?.selectedAuthType,
+      } as HttpRequestCollectionLevelAuthTabInterface;
+    } else {
+      this.collectionAuth = {
+        auth: {
+          bearerToken: "",
+          basicAuth: {
+            username: "",
+            password: "",
+          },
+          apiKey: {
+            authKey: "",
+            authValue: "",
+            addTo: CollectionRequestAddToBaseEnum.HEADER,
+          },
+        },
+        collectionAuthNavigation: CollectionAuthTypeBaseEnum.NO_AUTH,
+      };
+    }
+    return collectionDoc;
+  };
 
   public constructor(doc: TabDocument) {
     if (doc?.isActive) {
@@ -116,6 +190,74 @@ class AiRequestExplorerViewModel {
         delete t.index;
         t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
+
+        const collectionDoc = await this.fetchCollection(
+          t.path.collectionId as string,
+        );
+        const m = this._tab.getValue() as Tab;
+
+        // if (!m.property.aiRequest?.state?.selectedRequestAuthProfileId) {
+        //   const defaultAuthProfileId =
+        //     collectionDoc?.defaultSelectedAuthProfile;
+        //   this.updateRequestState({
+        //     selectedRequestAuthProfileId: defaultAuthProfileId,
+        //   });
+        // }
+
+        if (
+          m.property.aiRequest?.state.aiAuthNavigation ===
+          AiRequestAuthTypeBaseEnum.INHERIT_AUTH
+        ) {
+          this.authHeader = new ReduceAuthHeader(
+            this._collectionAuth.getValue()
+              .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
+            this._collectionAuth.getValue().auth as CollectionAuthBaseInterface,
+          ).getValue();
+          this.authParameter = new ReduceAuthParameter(
+            this._collectionAuth.getValue()
+              .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
+            this._collectionAuth.getValue().auth as CollectionAuthBaseInterface,
+          ).getValue();
+        } else if (
+          m.property.aiRequest?.state.aiAuthNavigation ===
+          AiRequestAuthTypeBaseEnum.AUTH_PROFILES
+        ) {
+          const authProfilesList = collectionDoc?.authProfiles || []; // ToDo: Ensure at least one default profile exists
+          const selectedProfileId =
+            m.property.aiRequest?.state?.selectedRequestAuthProfileId;
+
+          const selectedProfile = selectedProfileId
+            ? authProfilesList.find((pf) => pf.authId === selectedProfileId)
+            : authProfilesList.find((pf) => pf.defaultKey);
+
+          this.collectionAuthProfile = {
+            auth: selectedProfile?.auth,
+            authId: selectedProfileId as string,
+            authType: selectedProfile?.authType,
+          };
+
+          this.authHeader = new ReduceAuthHeader(
+            this._collectionAuthProfile.getValue()
+              .authType as CollectionAuthTypeBaseEnum,
+            this._collectionAuthProfile.getValue()
+              .auth as CollectionAuthBaseInterface,
+          ).getValue();
+          this.authParameter = new ReduceAuthParameter(
+            this._collectionAuthProfile.getValue()
+              .authType as CollectionAuthTypeBaseEnum,
+            this._collectionAuthProfile.getValue()
+              .auth as CollectionAuthBaseInterface,
+          ).getValue();
+        } else {
+          this.authHeader = new ReduceAuthHeader(
+            this._tab.getValue().property.aiRequest?.state.aiAuthNavigation,
+            this._tab.getValue().property.aiRequest?.auth,
+          ).getValue();
+          this.authParameter = new ReduceAuthParameter(
+            this._tab.getValue().property.aiRequest?.state.aiAuthNavigation,
+            this._tab.getValue().property.aiRequest?.auth,
+          ).getValue();
+        }
       }, 0);
     }
   }
@@ -134,6 +276,49 @@ class AiRequestExplorerViewModel {
 
   private set tab(value: RequestTab) {
     this._tab.next(value);
+  }
+
+  public get collectionAuth(): Observable<
+    Partial<HttpRequestCollectionLevelAuthTabInterface>
+  > {
+    return this._collectionAuth.asObservable();
+  }
+
+  private set collectionAuth(
+    value: HttpRequestCollectionLevelAuthTabInterface,
+  ) {
+    this._collectionAuth.next(value);
+  }
+
+  public get collectionAuthProfile(): Observable<
+    Partial<HttpRequestCollectionLevelAuthProfileTabInterface>
+  > {
+    return this._collectionAuthProfile.asObservable();
+  }
+
+  private set collectionAuthProfile(
+    value: HttpRequestCollectionLevelAuthProfileTabInterface,
+  ) {
+    this._collectionAuthProfile.next(value);
+  }
+
+  public get authHeader(): Observable<{
+    key: string;
+    value: string;
+  }> {
+    return this._authHeader.asObservable();
+  }
+
+  private set authHeader(value: KeyValue) {
+    this._authHeader.next(value);
+  }
+
+  public get authParameter(): Observable<KeyValue> {
+    return this._authParameter.asObservable();
+  }
+
+  private set authParameter(value: { key: string; value: string }) {
+    this._authParameter.next(value);
   }
 
   public openCollection = async () => {
@@ -283,8 +468,10 @@ class AiRequestExplorerViewModel {
 
     const componentData = this._tab.getValue();
     const provider = componentData.property.aiRequest.aiModelProvider;
-    const providerAuthKey =
-      componentData.property.aiRequest.auth.apiKey.authValue;
+    const providerAuthKey = this.decodeAiRequestAuth(
+      componentData.property.aiRequest,
+      this._collectionAuthProfile.getValue(),
+    ).apiKey.authValue;
 
     if (!providerAuthKey || !provider) {
       console.error(
@@ -323,8 +510,10 @@ class AiRequestExplorerViewModel {
   public getConversationsList = () => {
     const componentData = this._tab.getValue();
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
-    const providerAuthKey =
-      componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+    const providerAuthKey = this.decodeAiRequestAuth(
+      componentData.property.aiRequest,
+      this._collectionAuthProfile.getValue(),
+    ).apiKey.authValue;
 
     if (!provider || !providerAuthKey) {
       console.error(
@@ -371,8 +560,10 @@ class AiRequestExplorerViewModel {
       componentData?.property?.aiRequest?.ai?.conversationId;
     const conversationTitle =
       componentData?.property?.aiRequest?.ai?.conversationTitle;
-    const providerAuthKey =
-      componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+    const providerAuthKey = this.decodeAiRequestAuth(
+      componentData.property.aiRequest,
+      this._collectionAuthProfile.getValue(),
+    ).apiKey.authValue;
 
     // if (!conversations.length || !provider || !providerAuthKey) {
     if (!provider || !providerAuthKey) {
@@ -501,7 +692,8 @@ class AiRequestExplorerViewModel {
     }
 
     // Get the index of the (n-maxReceivers)th Receiver from the end
-    const startReceiverIndex = receiverIndices[receiverIndices.length - maxReceivers];
+    const startReceiverIndex =
+      receiverIndices[receiverIndices.length - maxReceivers];
 
     // Find the first Sender before this Receiver (if any) to maintain conversation context
     let startIndex = startReceiverIndex;
@@ -537,8 +729,10 @@ class AiRequestExplorerViewModel {
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const currTabConversationId =
       componentData?.property?.aiRequest?.ai?.conversationId;
-    const providerAuthKey =
-      componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+    const providerAuthKey = this.decodeAiRequestAuth(
+      componentData.property.aiRequest,
+      this._collectionAuthProfile.getValue(),
+    ).apiKey.authValue;
 
     if (!provider || !providerAuthKey) {
       console.error("Missing provider, conversations, or authKey.");
@@ -581,7 +775,7 @@ class AiRequestExplorerViewModel {
     conversationTitle: string,
   ) => {
     let isGuestUser = await this.getGuestUser();
-    if  (isGuestUser) {
+    if (isGuestUser) {
       return; // Not storing conversation for guest users
     }
 
@@ -597,8 +791,10 @@ class AiRequestExplorerViewModel {
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const currTabConversationId =
       componentData?.property?.aiRequest?.ai?.conversationId;
-    const providerAuthKey =
-      componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+    const providerAuthKey = this.decodeAiRequestAuth(
+      componentData.property.aiRequest,
+      this._collectionAuthProfile.getValue(),
+    ).apiKey.authValue;
 
     if (!conversationId || !provider || !providerAuthKey) {
       console.error("Missing provider or authKey.");
@@ -631,10 +827,10 @@ class AiRequestExplorerViewModel {
         error,
       );
     }
-  }
+  };
 
   /**
-   * 
+   *
    * @param filesToUpload takes the file obj to upload on azure and model's context
    * @returns Array of objects containing uploaded file urls and fileIds by models context set
    */
@@ -642,28 +838,39 @@ class AiRequestExplorerViewModel {
     const componentData = this._tab.getValue();
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const providerModel = componentData?.property?.aiRequest?.aiModelVariant;
-    const providerAuthKey = componentData?.property?.aiRequest?.auth?.apiKey.authValue;
+    const providerAuthKey = this.decodeAiRequestAuth(
+      componentData.property.aiRequest,
+      this._collectionAuthProfile.getValue(),
+    ).apiKey.authValue;
 
     // Don't allow file uploads when auth key is not present.
     if (!provider || !providerAuthKey) {
       console.error("Missing provider or authKey.");
-      return Promise.reject("API key missing. Please authenticate before uploading the files.");
+      return Promise.reject(
+        "API key missing. Please authenticate before uploading the files.",
+      );
     }
 
     try {
-      const response = await this.aiRequestService.uploadRAGfiles(provider, providerAuthKey, providerModel, filesToUpload);
+      const response = await this.aiRequestService.uploadRAGfiles(
+        provider,
+        providerAuthKey,
+        providerModel,
+        filesToUpload,
+      );
       if (response.isSuccessful) {
         return response.data.data;
       } else {
-        const errorMsg = response?.message || response?.data?.message || 'Failed to upload files. Please try again.';
+        const errorMsg =
+          response?.message ||
+          response?.data?.message ||
+          "Failed to upload files. Please try again.";
         notifications.error(errorMsg);
       }
-    }
-    catch (error) {
+    } catch (error) {
       console.error("Something went wrong while uploading files. :>> ", error);
     }
-  }
-
+  };
 
   /**
    *
@@ -1180,7 +1387,7 @@ class AiRequestExplorerViewModel {
             initAiRequestTab.updateAuth(req.aiRequest.auth);
 
             this.tabRepository.createTab(initAiRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1258,7 +1465,7 @@ class AiRequestExplorerViewModel {
             initAiRequestTab.updateAuth(res.data.data.aiRequest.auth);
 
             this.tabRepository.createTab(initAiRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1324,7 +1531,7 @@ class AiRequestExplorerViewModel {
             initAiRequestTab.updateAISystemPrompt(req.aiRequest.systemPrompt);
             initAiRequestTab.updateAuth(req.aiRequest.auth);
             this.tabRepository.createTab(initAiRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1398,7 +1605,7 @@ class AiRequestExplorerViewModel {
             );
             initAiRequestTab.updateAuth(res.data.data.aiRequest.auth);
             this.tabRepository.createTab(initAiRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1975,6 +2182,79 @@ class AiRequestExplorerViewModel {
     };
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+
+    if (_state.aiAuthNavigation || _state.selectedRequestAuthProfileId) {
+      if (_state.aiAuthNavigation === AiRequestAuthTypeBaseEnum.INHERIT_AUTH) {
+        this.authHeader = new ReduceAuthHeader(
+          this._collectionAuth.getValue()
+            .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
+          this._collectionAuth.getValue().auth as CollectionAuthBaseInterface,
+        ).getValue();
+        this.authParameter = new ReduceAuthParameter(
+          this._collectionAuth.getValue()
+            .collectionAuthNavigation as CollectionAuthTypeBaseEnum,
+          this._collectionAuth.getValue().auth as CollectionAuthBaseInterface,
+        ).getValue();
+      } else if (
+        _state.aiAuthNavigation === AiRequestAuthTypeBaseEnum.AUTH_PROFILES
+      ) {
+        this.authHeader = new ReduceAuthHeader(
+          this._collectionAuthProfile.getValue()
+            .authType as CollectionAuthTypeBaseEnum,
+          this._collectionAuthProfile.getValue()
+            .auth as CollectionAuthBaseInterface,
+        ).getValue();
+        this.authParameter = new ReduceAuthParameter(
+          this._collectionAuthProfile.getValue()
+            .authType as CollectionAuthTypeBaseEnum,
+          this._collectionAuthProfile.getValue()
+            .auth as CollectionAuthBaseInterface,
+        ).getValue();
+      } else if (_state.selectedRequestAuthProfileId) {
+        const m = this._tab.getValue() as Tab;
+        const collectionDoc = await this.fetchCollection(
+          m.path.collectionId as string,
+        );
+
+        const authProfilesList: CollectionAuthProifleBaseInterface[] =
+          collectionDoc?.authProfiles || []; // ToDo: Ensure at least one default profile exists
+        const selectedProfileId =
+          m.property.aiRequest?.state?.selectedRequestAuthProfileId;
+
+        const selectedProfile = selectedProfileId
+          ? authProfilesList.find((pf) => pf.authId === selectedProfileId)
+          : authProfilesList.find((pf) => pf.defaultKey);
+
+        this.collectionAuthProfile = {
+          auth: selectedProfile?.auth,
+          authId: selectedProfileId as string,
+          authType: selectedProfile?.authType,
+        };
+
+        this.authHeader = new ReduceAuthHeader(
+          this._collectionAuthProfile.getValue()
+            .authType as CollectionAuthTypeBaseEnum,
+          this._collectionAuthProfile.getValue()
+            .auth as CollectionAuthBaseInterface,
+        ).getValue();
+        this.authParameter = new ReduceAuthParameter(
+          this._collectionAuthProfile.getValue()
+            .authType as CollectionAuthTypeBaseEnum,
+          this._collectionAuthProfile.getValue()
+            .auth as CollectionAuthBaseInterface,
+        ).getValue();
+      } else {
+        this.authHeader = new ReduceAuthHeader(
+          progressiveTab.property.aiRequest.state.aiAuthNavigation,
+          progressiveTab.property.aiRequest.auth,
+        ).getValue();
+        this.authParameter = new ReduceAuthParameter(
+          progressiveTab.property.aiRequest.state.aiAuthNavigation,
+          progressiveTab.property.aiRequest.auth,
+        ).getValue();
+      }
+    }
+    this.compareRequestWithServer();
   };
 
   /**
@@ -2066,17 +2346,64 @@ class AiRequestExplorerViewModel {
     // this.compareRequestWithServer();
   };
 
+  private decodeAiRequestAuth = (
+    aiRequest: AiRequestType,
+    _collectionLevelAuth: Partial<AiRequestCollectionLevelAuthProfileTabInterface>,
+  ): Auth | CollectionAuthBaseInterface => {
+    // Default empty auth to ensure fallback error
+    let auth: Auth = {
+      apiKey: {
+        authKey: "",
+        authValue: "",
+        addTo: "Header" as CollectionRequestAddToBaseEnum,
+      },
+      bearerToken: "",
+      basicAuth: { username: "", password: "" },
+    };
+
+    if (
+      [
+        AiRequestAuthTypeBaseEnum.INHERIT_AUTH,
+        AiRequestAuthTypeBaseEnum.AUTH_PROFILES,
+      ].includes(aiRequest.state.aiAuthNavigation)
+    ) {
+      if (
+        [
+          CollectionAuthTypeBaseEnum.BEARER_TOKEN,
+          CollectionAuthTypeBaseEnum.API_KEY,
+        ].includes(_collectionLevelAuth.authType)
+      ) {
+        auth = createDeepCopy(_collectionLevelAuth.auth);
+        if (
+          _collectionLevelAuth.authType ===
+          CollectionAuthTypeBaseEnum.BEARER_TOKEN
+        ) {
+          auth.apiKey.authValue = auth.bearerToken;
+        }
+      }
+    } else {
+      auth = createDeepCopy(aiRequest.auth);
+    }
+    return auth;
+  };
+
   /**
    * Generates the AI Response from server with websocket communication protocol
    * @param Prompt - Prompt from the user
    */
-  public generateAIResponseWS = async (prompt = "", fileAttachments: PromptFileAttachment[]) => {
+  public generateAIResponseWS = async (
+    prompt = "",
+    fileAttachments: PromptFileAttachment[],
+  ) => {
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
     const tabId = componentData.tabId;
     const modelProvider = componentData.property.aiRequest.aiModelProvider;
     const modelVariant = componentData.property.aiRequest.aiModelVariant;
-    const authKey = componentData.property.aiRequest.auth.apiKey;
+    const authKey = this.decodeAiRequestAuth(
+      componentData.property.aiRequest,
+      this._collectionAuthProfile.getValue(),
+    ).apiKey;
     const systemPrompt = componentData.property.aiRequest.systemPrompt;
     const currConfigurations = componentData.property.aiRequest.configurations;
     const isChatAutoClearActive =
@@ -2103,7 +2430,7 @@ class AiRequestExplorerViewModel {
       !isChatAutoClearActive,
       componentData?.property?.aiRequest?.ai?.conversations || [],
       isJsonFormatEnabed,
-      fileAttachments
+      fileAttachments,
     );
 
     const modelSpecificConfig: modelsConfigType = {};
@@ -2193,12 +2520,19 @@ class AiRequestExplorerViewModel {
               } else if (response.message.includes("Some Issue Occurred")) {
                 errorMessage =
                   "Some issue occurred from server while processing your request, please try again.";
-              } else if (response.message.includes("exceeds the maximum limit") || 
-                  response.message.includes("Total file size exceeds the limit") ) 
-              {
-                errorMessage = response.message + " Please start a new conversation to continue exploring!"; 
-                await this.updateRequestState({ isChatbotPromptBoxActive: false });
-              } else { errorMessage = response.message; } // Use the actual error message from the response
+              } else if (
+                response.message.includes("exceeds the maximum limit") ||
+                response.message.includes("Total file size exceeds the limit")
+              ) {
+                errorMessage =
+                  response.message +
+                  " Please start a new conversation to continue exploring!";
+                await this.updateRequestState({
+                  isChatbotPromptBoxActive: false,
+                });
+              } else {
+                errorMessage = response.message;
+              } // Use the actual error message from the response
 
               await this.updateRequestAIConversation([
                 ...(componentData?.property?.aiRequest?.ai?.conversations ||

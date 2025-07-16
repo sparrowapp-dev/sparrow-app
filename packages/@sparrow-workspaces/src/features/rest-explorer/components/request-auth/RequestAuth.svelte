@@ -1,13 +1,22 @@
 <script lang="ts">
-  import { ApiKey, BasicAuth, BearerToken, NoAuth } from "./sub-auth";
+  import {
+    ApiKey,
+    AuthProfile,
+    BasicAuth,
+    BearerToken,
+    NoAuth,
+  } from "./sub-auth";
   import { WithSelect } from "@sparrow/workspaces/hoc";
   import type { HttpRequestCollectionLevelAuthTabInterface } from "@sparrow/common/types/workspace";
-  import { CollectionAuthTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+  import {
+    CollectionAuthTypeBaseEnum,
+    type CollectionAuthProifleBaseInterface as AuthProfileDto,
+  } from "@sparrow/common/types/workspace/collection-base";
   import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
-  import { Button } from "@sparrow/library/ui";
+  import { Button, notifications } from "@sparrow/library/ui";
   import { OpenRegular } from "@sparrow/library/icons";
-
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
+
   export let auth;
   export let environmentVariables;
   export let requestStateAuth;
@@ -17,6 +26,8 @@
   export let collectionAuth: HttpRequestCollectionLevelAuthTabInterface;
   export let collection;
   export let onOpenCollection;
+  export let requestStateAuthProfile;
+
   const handlecollection_restapi_auth_changed = ({
     requestAuthNavigation,
   }: {
@@ -28,6 +39,31 @@
       destination: requestAuthNavigation,
     });
   };
+
+  // Setting default auth profile if the selected one is deleted from the collection
+  $: {
+    if (
+      requestStateAuth === HttpRequestAuthTypeBaseEnum.AUTH_PROFILES &&
+      collection?.authProfiles
+    ) {
+      const authProfile = collection?.authProfiles.find(
+        (profile: AuthProfileDto) => profile.authId === requestStateAuthProfile,
+      );
+
+      if (!authProfile) {
+        onUpdateRequestState({
+          selectedRequestAuthProfileId: collection.defaultSelectedAuthProfile,
+        });
+
+        // If previous selected profiles didn't found
+        if (requestStateAuthProfile) {
+          notifications.info(
+            "Selected auth profile not found. Resetting to default.",
+          );
+        }
+      }
+    }
+  }
 </script>
 
 <div class="d-flex flex-column w-100 h-100">
@@ -58,6 +94,11 @@
                 name: "Basic Auth",
                 id: HttpRequestAuthTypeBaseEnum.BASIC_AUTH,
               },
+              {
+                name: "Auth Profiles",
+                id: HttpRequestAuthTypeBaseEnum.AUTH_PROFILES,
+                disabled: !collection?.authProfiles?.length,
+              },
             ]}
             zIndex={499}
             titleId={requestStateAuth}
@@ -81,7 +122,7 @@
       The auth header will be automatically generated when you send the request.
     </p>
   </div>
-  <section class="w-100" style="flex:1; overflow:auto;">
+  <section class="w-100" style="flex:1; overflow:hidden;">
     {#if requestStateAuth === HttpRequestAuthTypeBaseEnum.NO_AUTH}
       <NoAuth />
     {:else if requestStateAuth === HttpRequestAuthTypeBaseEnum.API_KEY}
@@ -143,6 +184,42 @@
           style="color:var(--text-ds-neutral-400); max-width:600px;"
         >
           The authorization setting is inherited from the collection '<span
+            style="color:var(--text-ds-neutral-100)"
+            >{collection?.name || "Collection Not Found"}</span
+          >'. To make changes,
+        </p>
+        <p class="d-flex">
+          <span
+            class="pt-1 text-fs-12 me-1"
+            style="color:var(--text-ds-neutral-400)"
+          >
+            navigate to
+          </span>
+          <Button
+            type={"link-primary"}
+            onClick={() => {
+              onOpenCollection();
+            }}
+            title={collection?.name?.length > 25
+              ? collection?.name?.slice(0, 25) + "..."
+              : collection?.name || "Collection Not Found"}
+            size={"small"}
+            endIcon={OpenRegular}
+          />
+        </p>
+      {/if}
+    {:else if requestStateAuth === HttpRequestAuthTypeBaseEnum.AUTH_PROFILES}
+      <AuthProfile
+        currSelectedAuthProfileId={requestStateAuthProfile}
+        callback={onUpdateRequestState}
+        authProfilesList={collection?.authProfiles}
+      />
+      {#if collection}
+        <p
+          class="text-fs-12 mb-1"
+          style="color:var(--text-ds-neutral-400); max-width:600px;"
+        >
+          The authorization profile is inherited from the collection '<span
             style="color:var(--text-ds-neutral-100)"
             >{collection?.name || "Collection Not Found"}</span
           >'. To make changes,

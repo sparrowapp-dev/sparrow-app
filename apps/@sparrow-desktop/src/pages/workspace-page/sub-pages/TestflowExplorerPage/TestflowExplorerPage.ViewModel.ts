@@ -4,7 +4,7 @@ import { environmentType } from "@sparrow/common/enums";
 import {
   createDeepCopy,
   InitRequestTab,
-  moveNavigation,
+  scrollToTab,
 } from "@sparrow/common/utils";
 import { RequestTabAdapter, TestflowTabAdapter } from "../../../../adapter";
 import type {
@@ -633,63 +633,78 @@ export class TestflowExplorerPageViewModel {
                 };
                 history.requests.push(req);
 
-                const responseHeader = this._decodeRequest.setResponseContentType(
-                  formattedHeaders,
-                );
-  
+                const responseHeader =
+                  this._decodeRequest.setResponseContentType(formattedHeaders);
+
                 const reqParam = {};
                 const params = new URL(decodeData[0]).searchParams;
-                
-                
+
                 for (const [key, value] of params.entries()) {
                   reqParam[key] = value;
                 }
-                  
-                  const headersObject = Object.fromEntries(
-                    JSON.parse(decodeData[2]).map(({ key, value }) => [key, value])
+
+                const headersObject = Object.fromEntries(
+                  JSON.parse(decodeData[2]).map(({ key, value }) => [
+                    key,
+                    value,
+                  ]),
+                );
+
+                let reqBody;
+                if (decodeData[4] === "application/json") {
+                  // tried to handle js but that is treated as text/plain, skipping that for now
+                  try {
+                    reqBody = JSON.parse(decodeData[3]);
+                  } catch (e) {
+                    reqBody = {};
+                  }
+                } else if (
+                  decodeData[4] === "multipart/form-data" ||
+                  decodeData[4] === "application/x-www-form-urlencoded"
+                ) {
+                  const formDataObject = Object.fromEntries(
+                    JSON.parse(decodeData[3]).map(({ key, value }) => [
+                      key,
+                      value,
+                    ]),
                   );
-                  
-  
-                  let reqBody;
-                  if(decodeData[4] === "application/json"){ // tried to handle js but that is treated as text/plain, skipping that for now
-                    try{
-                      reqBody = JSON.parse(decodeData[3]);
-                    }
-                    catch(e){
-                      reqBody = {};
-                    }
-                  }
-                  else if (decodeData[4] === "multipart/form-data" || decodeData[4] === "application/x-www-form-urlencoded"){
-                    const formDataObject = Object.fromEntries(
-                      JSON.parse(decodeData[3]).map(({ key, value }) => [key, value])
-                    );
-                    reqBody = formDataObject || {}
-                  }
-                  else{
-                    reqBody = decodeData[3];
-                  }
-                  requestChainResponse["$$" + element.data.requestData.name.replace(/[^a-zA-Z0-9_]/g, "_")] = {
-                    response: {
-                      body: responseHeader === "JSON" ? JSON.parse(resData.body) : resData.body,
-                      headers: response?.data?.headers
-                    },
-                    request: {
-                      headers: headersObject || {},
-                      body:reqBody,
-                      parameters:reqParam || {}
-                    }
-                  }
-                  requestChainResponse["$$" + element.data.blockName.replace(/[^a-zA-Z0-9_]/g, "_")] = {
-                    response: {
-                      body: responseHeader === "JSON" ? JSON.parse(resData.body) : resData.body,
-                      headers: response?.data?.headers
-                    },
-                    request: {
-                      headers: headersObject || {},
-                      body:reqBody,
-                      parameters:reqParam || {}
-                    }
-                  }
+                  reqBody = formDataObject || {};
+                } else {
+                  reqBody = decodeData[3];
+                }
+                requestChainResponse[
+                  "$$" +
+                    element.data.requestData.name.replace(/[^a-zA-Z0-9_]/g, "_")
+                ] = {
+                  response: {
+                    body:
+                      responseHeader === "JSON"
+                        ? JSON.parse(resData.body)
+                        : resData.body,
+                    headers: response?.data?.headers,
+                  },
+                  request: {
+                    headers: headersObject || {},
+                    body: reqBody,
+                    parameters: reqParam || {},
+                  },
+                };
+                requestChainResponse[
+                  "$$" + element.data.blockName.replace(/[^a-zA-Z0-9_]/g, "_")
+                ] = {
+                  response: {
+                    body:
+                      responseHeader === "JSON"
+                        ? JSON.parse(resData.body)
+                        : resData.body,
+                    headers: response?.data?.headers,
+                  },
+                  request: {
+                    headers: headersObject || {},
+                    body: reqBody,
+                    parameters: reqParam || {},
+                  },
+                };
               } else {
                 resData = {
                   body: response.message,
@@ -712,9 +727,8 @@ export class TestflowExplorerPageViewModel {
                 id: element.id,
                 response: resData,
                 request: adaptedRequest,
-
               });
-          
+
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
             }
             return testFlowDataMap;
@@ -744,29 +758,34 @@ export class TestflowExplorerPageViewModel {
                 request: adaptedRequest,
               });
 
-              requestChainResponse["$$" + element.data.requestData.name.replace(/[^a-zA-Z0-9_]/g, "_")] = {
+              requestChainResponse[
+                "$$" +
+                  element.data.requestData.name.replace(/[^a-zA-Z0-9_]/g, "_")
+              ] = {
                 response: {
                   body: {},
-                  headers:{}
+                  headers: {},
                 },
                 request: {
-                    headers:{},
-                    body:{},
-                    parameters:{}
-                }
-              }
+                  headers: {},
+                  body: {},
+                  parameters: {},
+                },
+              };
 
-              requestChainResponse["$$" + element.data.blockName.replace(/[^a-zA-Z0-9_]/g, "_")] = {
+              requestChainResponse[
+                "$$" + element.data.blockName.replace(/[^a-zA-Z0-9_]/g, "_")
+              ] = {
                 response: {
                   body: {},
-                  headers:{}
+                  headers: {},
                 },
                 request: {
-                    headers:{},
-                    body:{},
-                    parameters:{}
-                }
-              }
+                  headers: {},
+                  body: {},
+                  parameters: {},
+                },
+              };
 
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
             }
@@ -1154,7 +1173,7 @@ export class TestflowExplorerPageViewModel {
       request,
     );
     this.tabRepository.createTab(adaptedRequest);
-    moveNavigation("right");
+    scrollToTab("");
   };
 
   /**
@@ -1622,7 +1641,7 @@ export class TestflowExplorerPageViewModel {
         this._tab.getValue().path.workspaceId,
         environmentVariables.local.id,
         payload,
-        baseUrl
+        baseUrl,
       );
       if (response.isSuccessful) {
         // updates environment list

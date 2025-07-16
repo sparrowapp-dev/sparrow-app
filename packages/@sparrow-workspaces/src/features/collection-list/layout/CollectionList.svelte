@@ -457,6 +457,29 @@
       showAddItemMenu = false;
     }
   };
+
+  let virtualScrollEl: HTMLDivElement;
+
+  /**
+   * @description - triggers child function from parent component
+   */
+  $: scrollList = (position: "bottom") => scrollToBottom(position);
+
+  const scrollToBottom = () => {
+    requestAnimationFrame(() => {
+      if (virtualScrollEl) {
+        const scrollRoot = virtualScrollEl.querySelector(
+          ".virtual-scroll-root",
+        ) as HTMLElement;
+        if (scrollRoot) {
+          scrollRoot.scrollTo({
+            top: scrollRoot.scrollHeight,
+            behavior: "smooth",
+          });
+        }
+      }
+    });
+  };
 </script>
 
 <svelte:window
@@ -639,7 +662,7 @@
         ></div>
       {/if}
       {#if standardFlatItems?.length > 0 || mockFlatItems?.length > 0}
-        <div style="height: 100%;">
+        <div bind:this={virtualScrollEl} style="height: 100%;">
           <VirtualScroll
             data={[...standardFlatItems, ...mockFlatItems]}
             key="virtualId"

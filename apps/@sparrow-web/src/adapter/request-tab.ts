@@ -102,7 +102,10 @@ export class RequestTabAdapter {
         break;
       case HttpRequestAuthTypeBaseEnum.INHERIT_AUTH:
         requestAuthNavigation = HttpRequestAuthTypeBaseEnum.INHERIT_AUTH;
-      break;
+        break;
+      case HttpRequestAuthTypeBaseEnum.AUTH_PROFILES:
+        requestAuthNavigation = HttpRequestAuthTypeBaseEnum.AUTH_PROFILES;
+        break;
     }
     return requestAuthNavigation;
   };
@@ -125,7 +128,9 @@ export class RequestTabAdapter {
       case HttpRequestAuthTypeBaseEnum.INHERIT_AUTH:
         authType = HttpRequestAuthTypeBaseEnum.INHERIT_AUTH;
         break;
-          
+      case HttpRequestAuthTypeBaseEnum.AUTH_PROFILES:
+        authType = HttpRequestAuthTypeBaseEnum.AUTH_PROFILES;
+        break;
     }
     return authType;
   };
@@ -178,6 +183,15 @@ export class RequestTabAdapter {
       const AuthType = this.setAuthType(request.request?.selectedRequestAuthType);
       adaptedRequest.updateState({
         requestAuthNavigation: AuthType,
+      });
+    }
+
+    // parsing request auth profile id
+    const selectedRequestAuthProfileId = request.request?.selectedRequestAuthProfileId;
+    if (selectedRequestAuthProfileId) {
+      const authProfileId = request.request?.selectedRequestAuthProfileId;
+      adaptedRequest.updateState({
+        selectedRequestAuthProfileId: authProfileId,
       });
     }
 
@@ -273,6 +287,7 @@ export class RequestTabAdapter {
       selectedRequestAuthType: this.unsetAuthType(
         requestTab.property.request?.state?.requestAuthNavigation as HttpRequestAuthTypeBaseEnum,
       ),
+      selectedRequestAuthProfileId: requestTab.property.request?.state?.selectedRequestAuthProfileId,
     };
   }
 }

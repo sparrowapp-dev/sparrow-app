@@ -18,6 +18,7 @@ export enum HttpRequestAuthTypeBaseEnum {
   BEARER_TOKEN = "Bearer Token",
   BASIC_AUTH = "Basic Auth",
   INHERIT_AUTH = "Inherit Auth",
+  AUTH_PROFILES = "Authentication Profiles"
 }
 
 export interface HttpRequestBodyBaseInterface {
@@ -81,4 +82,5 @@ export interface HttpRequestBaseInterface {
   queryParams: HttpRequestKeyValueCheckedBaseInterface[];
   auth: HttpRequestAuthBaseInterface;
   headers: HttpRequestKeyValueCheckedBaseInterface[];
+  selectedRequestAuthProfileId?: string;
 }

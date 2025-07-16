@@ -11,7 +11,7 @@ import { GuideRepository } from "../../repositories/guide.repository";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { TabRepository } from "../../repositories/tab.repository";
 
-import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import { createDeepCopy, scrollToTab } from "@sparrow/common/utils";
 import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 import constants from "@app/constants/constants";
 
@@ -46,7 +46,7 @@ export class EnvironmentViewModel {
    * @returns
    */
   public refreshEnvironment = async (
-    workspaceId: string
+    workspaceId: string,
   ): Promise<{
     environmentTabsToBeDeleted?: string[];
   }> => {
@@ -60,7 +60,8 @@ export class EnvironmentViewModel {
     }
 
     const baseUrl = await this.constructBaseUrl(workspaceId);
-    const workspaceData = await this.workspaceRepository.readWorkspace(workspaceId);
+    const workspaceData =
+      await this.workspaceRepository.readWorkspace(workspaceId);
 
     let response;
     if (
@@ -70,12 +71,12 @@ export class EnvironmentViewModel {
     ) {
       response = await this.environmentService.fetchAllPublicEnvironments(
         workspaceId,
-        constants.API_URL
+        constants.API_URL,
       );
     } else {
       response = await this.environmentService.fetchAllEnvironments(
         workspaceId,
-        baseUrl
+        baseUrl,
       );
     }
 
@@ -104,12 +105,15 @@ export class EnvironmentViewModel {
     }
 
     await this.environmentRepository.refreshEnvironment(processedEnvironments);
-    await this.environmentRepository.deleteOrphanEnvironments(workspaceId, environmentIds);
+    await this.environmentRepository.deleteOrphanEnvironments(
+      workspaceId,
+      environmentIds,
+    );
 
     const environmentTabsToBeDeleted =
       await this.tabRepository.getIdOfTabsThatDoesntExistAtEnvironmentLevel(
         workspaceId,
-        environmentIds
+        environmentIds,
       );
 
     return { environmentTabsToBeDeleted };
@@ -204,7 +208,7 @@ export class EnvironmentViewModel {
       initEnvironmentTab.setName(newEnvironment.name);
       this.tabRepository.createTab(initEnvironmentTab.getValue());
       // scroll the top tab bar to right
-      moveNavigation("right");
+      scrollToTab("");
       notifications.success("New Environment created successfully.");
       return;
     }
@@ -236,7 +240,7 @@ export class EnvironmentViewModel {
         id: res._id,
       });
       // scroll the top tab bar to right
-      moveNavigation("right");
+      scrollToTab("");
       notifications.success("New Environment created successfully.");
       MixpanelEvent(Events.CREATE_LOCAL_ENVIRONMENT);
       return;

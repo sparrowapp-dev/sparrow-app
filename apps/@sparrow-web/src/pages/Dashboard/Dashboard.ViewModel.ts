@@ -11,7 +11,7 @@ import {
   InitEnvironmentTab,
   InitFolderTab,
   InitTestflowTab,
-  moveNavigation,
+  scrollToTab,
   Sleep,
   throttle,
 } from "@sparrow/common/utils";
@@ -93,6 +93,14 @@ export class DashboardViewModel {
   get environments() {
     return this.environmentRepository.getEnvironment();
   }
+
+     /**
+   * @description - get open team from local db
+   */
+  public get openTeam() {
+    return this.teamRepository.getOpenTeam();
+  }
+
 
   /**
    * @description - get recent visited public workspace list from local db
@@ -194,6 +202,7 @@ export class DashboardViewModel {
           updatedAt,
           updatedBy,
           isNewInvite,
+          billing
         } = elem;
         const updatedWorkspaces = workspaces?.map((workspace) => ({
           workspaceId: workspace.id,
@@ -222,6 +231,7 @@ export class DashboardViewModel {
           updatedBy,
           isNewInvite,
           isOpen: isOpenTeam,
+          billing
         };
         data.push(item);
       }
@@ -236,7 +246,6 @@ export class DashboardViewModel {
         this.teamRepository.setOpenTeam(data[0].teamId);
         return;
       }
-
     }
   };
 
@@ -709,7 +718,7 @@ export class DashboardViewModel {
         await this.tabRepository.createTab(adaptedRequest, workspaceId);
       }
     }
-    moveNavigation("right");
+    scrollToTab("");
   };
 
   public switchAndCreateCollectionTab = async (
@@ -724,7 +733,7 @@ export class DashboardViewModel {
     await this.tabRepository.createTab(collectionTab, workspaceId);
 
     // Update UI
-    moveNavigation("right");
+    scrollToTab("");
   };
 
   public switchAndCreateFolderTab = async (
@@ -745,7 +754,7 @@ export class DashboardViewModel {
     sampleFolder.updateIsSave(true);
 
     await this.tabRepository.createTab(sampleFolder.getValue(), workspaceId);
-    moveNavigation("right");
+    scrollToTab("");
   };
 
   public switchAndCreateWorkspaceTab = async (workspace: any) => {
@@ -756,7 +765,7 @@ export class DashboardViewModel {
 
     // Create tab and set active workspace
     await this.tabRepository.createTab(initWorkspaceTab, workspace._id);
-    moveNavigation("right");
+    scrollToTab("");
   };
 
   public switchAndCreateEnvironmentTab = async (environment: any) => {
@@ -772,7 +781,7 @@ export class DashboardViewModel {
       initEnvironmentTab.getValue(),
       environment.workspace,
     );
-    moveNavigation("right");
+    scrollToTab("");
   };
 
   public switchAndCreateTestflowTab = async (testflow: any) => {
@@ -787,7 +796,7 @@ export class DashboardViewModel {
 
     await new Sleep().setTime(100).exec();
     await this.tabRepository.createTab(testflowTab, testflow.workspaceId);
-    moveNavigation("right");
+    scrollToTab("");
   };
 
   public searchWorkspace = async (

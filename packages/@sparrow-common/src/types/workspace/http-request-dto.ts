@@ -92,4 +92,5 @@ export interface HttpRequestMetaDataDtoInterface {
   pathParams?: HttpRequestKeyValueDtoInterface[];
   headers?: HttpRequestKeyValueDtoInterface[];
   auth?: HttpRequestAuthDtoInterface;
+  selectedRequestAuthProfileId?: string;
 }

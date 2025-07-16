@@ -3,7 +3,7 @@
   "private": true,
   "author": "Sparrow",
   "description": "The Sparrow App is your next go to API development buddy which can help you test, debug, distribute better APIs while collaborating with your colleagues and making you a better programmer.",
-  "version": "2.27.0",
+  "version": "2.28.0",
   "type": "module",
   "workspaces": [
     "./apps/@sparrow-web",
@@ -89,6 +89,7 @@
     "btoa": "^1.2.1",
     "codemirror": "^6.0.1",
     "codemirror-json-schema": "^0.6.1",
+    "curlconverter": "^4.12.0",
     "editorjs-parser": "^1.5.3",
     "font-awesome": "^4.7.0",
     "graphql": "^16.9.0",
@@ -116,8 +117,8 @@
     "uuid": "^9.0.1",
     "yup": "^1.2.0",
     "svelte-virtual-list": "^3.0.1",
-    "@sveltejs/svelte-virtual-list":"^3.0.1",
-    "svelte-virtual-scroll-list":"^1.3.0"
+    "@sveltejs/svelte-virtual-list": "^3.0.1",
+    "svelte-virtual-scroll-list": "^1.3.0"
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",
@@ -177,19 +178,19 @@
           "assets": [
             {
               "path": "/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg",
-              "label": "Sparrow_2.27.0.dmg"
+              "label": "Sparrow_2.28.0.dmg"
             },
             {
               "path": "msi_files/*.exe",
-              "label": "Sparrow_2.27.0.exe"
+              "label": "Sparrow_2.28.0.exe"
             },
             {
               "path": "msi_files/*.msi",
-              "label": "Sparrow_2.27.0.msi"
+              "label": "Sparrow_2.28.0.msi"
             },
             {
               "path": "msi_files/*.zip",
-              "label": "Sparrow_2.27.0_x64_en-US.msi.zip"
+              "label": "Sparrow_2.28.0_x64_en-US.msi.zip"
             },
             {
               "path": "/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/Sparrow.app.tar.gz",
@@ -197,7 +198,7 @@
             },
             {
               "path": "deb_files/*.deb",
-              "label": "sparrow_2.27.0_amd64.deb"
+              "label": "sparrow_2.28.0_amd64.deb"
             }
           ]
         }
