@@ -85,7 +85,7 @@ jobs:
 
       - name: Build Snap from DEB
         run: |
-          snapcraft --use-multipass
+          sudo snapcraft --destructive-mode
 
       - name: Prepare Snapcraft credentials
         env:

@@ -1,6 +1,6 @@
 name: sparrow-app
 title: Sparrow App
-base: core20
+base: core24
 version: '${SPARROW_VERSION}'
 
 summary: An API management platform that streamlines software development.
@@ -13,18 +13,10 @@ apps:
   sparrow:
     command: usr/bin/sparrow
     desktop: usr/share/applications/sparrow.desktop
-    extensions: [gnome-3-38]
+    extensions: [gnome]
     plugs:
       - network
       - network-status
-      - home
-      - desktop
-      - desktop-legacy
-      - wayland
-      - x11
-      - opengl
-      - gsettings
-      - pulseaudio
       - single-instance-plug # add this if you're using the single-instance plugin
     slots:
       - single-instance # add this if you're using the single-instance plugin
@@ -61,6 +53,7 @@ parts:
       - dpkg
     stage-packages:
       - libwebkit2gtk-4.1-0
+      - libayatna-appindicator3-1
     override-build: |
       set -eu
       mkdir -p $SNAP_USER_COMMON/.cache
