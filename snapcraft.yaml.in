@@ -53,7 +53,7 @@ parts:
       - dpkg
     stage-packages:
       - libwebkit2gtk-4.1-0
-      - libayatna-appindicator3-1
+      - libayatana-appindicator3-1
     override-build: |
       set -eu
       mkdir -p $SNAP_USER_COMMON/.cache
