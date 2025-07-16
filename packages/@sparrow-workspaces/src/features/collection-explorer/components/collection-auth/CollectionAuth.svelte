@@ -70,8 +70,8 @@
     class="text-fs-12 fw-normal mb-4"
     style="color: var(--text-ds-neutral-400); max-width:500px;"
   >
-    This authorization will set for every requests in this collection and can be
-    modified within specified request.
+    This authorization will be set for every request in this collection and can
+    be modified within the specified request.
   </p>
   <section class="w-100" style="flex:1; overflow:auto;">
     {#if requestStateAuth === CollectionAuthTypeBaseEnum.NO_AUTH}

@@ -39,10 +39,8 @@
     "Name",
     "Description",
     "Auth Type",
-    "Created At (UTC)",
+    "Created At",
     "Default Key",
-    "",
-    "",
   ];
 
   function handleSortToggle(field) {
@@ -105,7 +103,7 @@
     selectedDefaultKey = authId;
     authProfile.defaultKey = true; // Mark the selected item as default
     // onUpdateRequestState({ selectedAuthType: authId });
-    onUpdateAuthProfile(authId, authProfile);
+    onUpdateAuthProfile(authId, authProfile, true);
   };
 
   const handleModalClose = (flag) => {
@@ -374,8 +372,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     height: 80%;
-    padding: 130px 35px 24px;
+    padding: 35px;
   }
   .not-found-text {
     color: var(--text-secondary-200);

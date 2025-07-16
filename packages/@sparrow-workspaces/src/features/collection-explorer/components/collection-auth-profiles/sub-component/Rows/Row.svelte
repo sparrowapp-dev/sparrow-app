@@ -50,18 +50,15 @@
   function formatDateToReadable(dateStr) {
     const date = new Date(dateStr);
 
-    const day = date.getUTCDate();
+    const day = date.getDate();
     const daySuffix = getDaySuffix(day);
-    const month = date.toLocaleString("en-US", {
-      month: "long",
-      timeZone: "UTC",
-    });
-    const year = date.getUTCFullYear();
+    const month = date.toLocaleString(undefined, { month: "long" }); // Uses system locale
+    const year = date.getFullYear();
 
-    let hours = date.getUTCHours();
-    const minutes = date.getUTCMinutes().toString().padStart(2, "0");
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, "0");
     const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12 || 12; // Convert to 12-hour format
+    hours = hours % 12 || 12;
 
     return `${day.toString().padStart(2, "0")}${daySuffix} ${month} ${year}, ${hours}:${minutes} ${ampm}`;
   }
@@ -132,15 +129,15 @@
       e.stopPropagation();
       //   onOpenCollection(list._id);
     }}
-    style="max-width: 15vw;"
+    style="max-width: 10vw;"
     class="tab-data text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium rounded-start py-2 overflow-hidden ellipsis"
   >
-    {list?.name}
-    {#if list?.defaultKey}
-      <div class="mt-1">
-        <Tag text={"Default Key"} type={"green"} endIcon={""} />
-      </div>
-    {/if}
+    <div class="d-flex gap-2 align-items-center">
+      {list?.name}
+      {#if list?.defaultKey}
+        <Tag text={"Default Key"} type={"green"} endIcon={""} size={"medium"} />
+      {/if}
+    </div>
   </td>
 
   <td
