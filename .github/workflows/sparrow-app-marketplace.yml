@@ -58,7 +58,7 @@ jobs:
         run: |
           sudo snap install snapcraft --classic
 
-      - name: Check Snapcraft Credentials
+       - name: Check Snapcraft Credentials
         run: |
           snapcraft whoami
 
@@ -85,10 +85,30 @@ jobs:
         run: |
           sudo snapcraft --destructive-mode
 
-      - name: Upload Snap to Snap Store
+      - name: Prepare Snapcraft credentials
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ vars.SNAPCRAFT_STORE_CREDENTIALS }}
         run: |
-          SNAP_FILE=$(ls *.snap | head -n 1)
-          echo "Uploading the $SNAP_FILE to $SNAP_CHANNEL"
+          # 1. Override XDG_CONFIG_HOME to a .config folder in the workspace
+          export XDG_CONFIG_HOME="$PWD/.config"
+
+          # 2. Create the snapcraft subfolder under that config
+          mkdir -p "$XDG_CONFIG_HOME/snapcraft"
+
+          # 3. Write the exported credentials JSON (your long token) to the file
+          echo "$SNAPCRAFT_STORE_CREDENTIALS" > "$XDG_CONFIG_HOME/snapcraft/credentials.json"
+          chmod 600 "$XDG_CONFIG_HOME/snapcraft/credentials.json"
+
+          echo "Stored Snapcraft creds in $XDG_CONFIG_HOME/snapcraft/credentials.json"
+
+      - name: Upload Snap to Snap Store
+        env:
+          SNAP_CHANNEL: ${{ vars.SNAP_RELEASE_CHANNEL || 'edge' }}
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ vars.SNAPCRAFT_STORE_CREDENTIALS }}
+          XDG_CONFIG_HOME: "$PWD/.config"
+        run: |
+          SNAP_FILE=$(ls *.snap | head -n1)
+          echo "Uploading $SNAP_FILE to $SNAP_CHANNEL"
           snapcraft upload "$SNAP_FILE" --release "$SNAP_CHANNEL"
 
       - name: Post Linux Snap Store Link to Teams
