@@ -191,14 +191,22 @@
 
     <!-- Variables list -->
     {#if conversation.variables && conversation.variables.length > 0}
-      <div class="d-flex align-items-center gap-2 mt-1 flex-wrap">
+      <div class="d-flex align-items-center gap-1 mt-1 flex-wrap">
         <CodeRegular size="16px" color="var(--text-ds-neutral-500)" />
-        <!-- Variable List -->
-          {#each conversation.variables as variable}
+
+        <!-- Show up to 2 variables -->
+        {#each conversation.variables.slice(0, 2) as variable}
           <span class="conversation-variables text-ds-font-weight-semi-bold">
             &#123;&#123;{variable.key}&#125;&#125;
           </span>
-          {/each}
+        {/each}
+
+        <!-- Show "+N" if more variables exist -->
+        {#if conversation.variables.length > 2}
+          <span class="conversation-variables text-ds-font-weight-semi-bold">
+            +{conversation.variables.length - 2}
+          </span>
+        {/if}
       </div>
     {/if}
   </div>
