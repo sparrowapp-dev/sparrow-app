@@ -4,3 +4,4 @@ export { AuthInputTheme } from "./auth-input-theme";
 export { TestFlowNameTheme } from "./test-flow-name-theme";
 export {MockUrlInputTheme} from "./mock-url-input-theme";
 export { PromptInputTheme } from "./prompt-input-theme"
+export {  TextEditorLikeTheme } from "./text-editor-theme"
