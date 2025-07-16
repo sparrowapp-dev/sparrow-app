@@ -182,7 +182,7 @@
       {#if conversation.authoredBy}
         <span
           class="updated-by text-truncate"
-          style="width: 40%; text-align: right; display: inline-blockhhh;"
+          style="width: 40%; text-align: right; display: inline-block;"
         >
           {`By ${conversation.authoredBy}`}
         </span>
