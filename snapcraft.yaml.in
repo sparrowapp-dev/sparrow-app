@@ -63,10 +63,6 @@ parts:
       set -eu
       mkdir -p $SNAP_USER_COMMON/.cache
 
-      # Download the latest .deb file
-      SPARROW_VERSION=2.25.0
-      DEB_URL="https://sparrow-assest.s3.us-east-1.amazonaws.com/linux/pool/stable/main/binary-amd64/sparrow.deb"
-
       # Extract the .deb file
       dpkg -x sparrow.deb ../install/
 
