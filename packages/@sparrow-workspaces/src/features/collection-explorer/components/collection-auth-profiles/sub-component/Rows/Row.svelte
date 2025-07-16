@@ -132,15 +132,15 @@
       e.stopPropagation();
       //   onOpenCollection(list._id);
     }}
-    style="max-width: 15vw;"
+    style="max-width: 6vw;"
     class="tab-data text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium rounded-start py-2 overflow-hidden ellipsis"
   >
-    {list?.name}
-    {#if list?.defaultKey}
-      <div class="mt-1">
-        <Tag text={"Default Key"} type={"green"} endIcon={""} />
-      </div>
-    {/if}
+    <div class="d-flex gap-2 align-items-center">
+      {list?.name}
+      {#if list?.defaultKey}
+        <Tag text={"Default Key"} type={"green"} endIcon={""} size={"medium"} />
+      {/if}
+    </div>
   </td>
 
   <td

@@ -41,8 +41,6 @@
     "Auth Type",
     "Created At (UTC)",
     "Default Key",
-    "",
-    "",
   ];
 
   function handleSortToggle(field) {
