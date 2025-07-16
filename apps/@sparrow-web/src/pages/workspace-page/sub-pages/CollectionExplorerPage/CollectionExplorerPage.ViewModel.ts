@@ -2032,34 +2032,130 @@ class CollectionExplorerPage {
         return { ...res, isSuccessful: true };
       } catch (error) {
         console.error("Error while updating guest auth profile:", error);
-        // notifications.error("Failed to update auth profile. Please try again.");
         return error;
       }
     }
 
-    const baseUrl = await this.constructBaseUrl(_collection.workspaceId);
-    const response = await this.collectionService.updateAuthProfile(
-      baseUrl,
-      _authProfileId,
-      updatedAuthProfileObj,
-    );
-    if (response.isSuccessful) {
-      const res = response.data.data;
+    // For non-guest users, implement optimistic update for auth profile updates
+    let previousAuthProfiles = null;
+    let previousDefaultAuthProfile = null;
+
+    try {
+      // Store previous state for potential rollback
+      const collectionData = await this.collectionRepository.readCollection(
+        _collection.id,
+      );
+      previousAuthProfiles = [...collectionData.authProfiles]; // Deep copy of current state
+
+      // Find the currently selected default auth profile
+      previousDefaultAuthProfile = previousAuthProfiles.find(
+        (profile) => profile.defaultKey === true,
+      );
+
+      // Apply optimistic update immediately (UI will reflect changes instantly)
       await this.collectionRepository.updateAuthProfile(
         _collection.id as string,
         _authProfileId,
-        res,
+        {
+          ..._updatedAuthProfilePayload,
+          updatedAt: new Date().toISOString(),
+        },
       );
 
-      // Don't show success notification if its a defaultkey is update request
-      if (!_isRequestForDefaultKey)
-        notifications.success("Auth profile updated successfully.");
-    } else {
-      console.error(response.message);
-      notifications.error("Failed to update authentication profile.");
-    }
+      // update auth profile in background
+      const baseUrl = await this.constructBaseUrl(_collection.workspaceId);
+      const response = await this.collectionService.updateAuthProfile(
+        baseUrl,
+        _authProfileId,
+        updatedAuthProfileObj,
+      );
 
-    return response;
+      if (response.isSuccessful) {
+        // update with server response to ensure consistency
+        const res = response.data.data;
+        await this.collectionRepository.updateAuthProfile(
+          _collection.id as string,
+          _authProfileId,
+          res,
+        );
+
+        // Don't show success notification if it's a defaultKey update request
+        if (!_isRequestForDefaultKey) {
+          notifications.success("Auth profile updated successfully.");
+        }
+      } else {
+        // update failed from server - revert to previous state
+        console.error(response.message);
+
+        if (previousAuthProfiles) {
+          // Revert the currently updated profile to its original state
+          const originalProfile = previousAuthProfiles.find(
+            (profile) => profile.authId === _authProfileId,
+          );
+          if (originalProfile) {
+            await this.collectionRepository.updateAuthProfile(
+              _collection.id as string,
+              _authProfileId,
+              originalProfile,
+            );
+          }
+
+          // If this was a defaultKey update, restore the previous default if there was one
+          if (
+            _isRequestForDefaultKey &&
+            previousDefaultAuthProfile &&
+            previousDefaultAuthProfile.authId !== _authProfileId
+          ) {
+            await this.collectionRepository.updateAuthProfile(
+              _collection.id as string,
+              previousDefaultAuthProfile.authId,
+              { ...previousDefaultAuthProfile, defaultKey: true },
+            );
+          }
+        }
+
+        notifications.error("Failed to update authentication profile.");
+      }
+
+      return response;
+    } catch (error) {
+      // Unexpected error - revert to previous state
+      console.error("Unexpected error during auth profile update:", error);
+
+      if (previousAuthProfiles) {
+        try {
+          // Revert the currently updated profile to its original state
+          const originalProfile = previousAuthProfiles.find(
+            (profile) => profile.authId === _authProfileId,
+          );
+          if (originalProfile) {
+            await this.collectionRepository.updateAuthProfile(
+              _collection.id as string,
+              _authProfileId,
+              originalProfile,
+            );
+          }
+
+          // If this was a defaultKey update, restore the previous default if there was one
+          if (
+            _isRequestForDefaultKey &&
+            previousDefaultAuthProfile &&
+            previousDefaultAuthProfile.authId !== _authProfileId
+          ) {
+            await this.collectionRepository.updateAuthProfile(
+              _collection.id as string,
+              previousDefaultAuthProfile.authId,
+              { ...previousDefaultAuthProfile, defaultKey: true },
+            );
+          }
+        } catch (revertError) {
+          console.error("Failed to revert auth profile state:", revertError);
+        }
+      }
+
+      notifications.error("Failed to update authentication profile.");
+      return { isSuccessful: false, message: error.message };
+    }
   };
 
   /**
