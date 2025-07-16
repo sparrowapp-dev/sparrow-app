@@ -179,8 +179,8 @@
     on:mouseover={handleMouseOver}
     on:mouseout={handleMouseOut}
     on:click={() => {
-      if($isDefaultTourGuideOpen === true){
-        isDefaultTourGuideOpen.set(false)
+      if ($isDefaultTourGuideOpen === true) {
+        isDefaultTourGuideOpen.set(false);
       }
       toggleExpandTestflow();
       handleTabUpdate("testflow");
@@ -250,7 +250,6 @@
 
   {#if $isExpandTestflow}
     <div
-      transition:slide={{ duration: 250 }}
       style="background-color: {ActiveTab === 'testflow'
         ? 'var(--bg-ds-surface-600)'
         : 'transparent'};"
