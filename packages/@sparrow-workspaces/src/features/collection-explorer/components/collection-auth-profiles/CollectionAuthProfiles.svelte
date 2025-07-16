@@ -39,7 +39,7 @@
     "Name",
     "Description",
     "Auth Type",
-    "Created At (UTC)",
+    "Created At",
     "Default Key",
   ];
 
