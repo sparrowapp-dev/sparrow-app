@@ -9,13 +9,13 @@ import {
   RequestMethodEnum,
   type HttpRequestCollectionLevelAuthTabInterface,
 } from "@sparrow/common/types/workspace";
-import { ReduceAuthHeader, ReduceAuthParameter} from ".";
+import { ReduceAuthHeader, ReduceAuthParameter } from ".";
 import { createDeepCopy } from "@sparrow/common/utils";
 import { SetDataStructure } from "@sparrow/common/utils";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 
 class DecodeRequest {
-  constructor() {}
+  constructor() { }
 
   /**
    * @description - Extracts the content type from the API response and sets it in the user's state.
@@ -108,11 +108,11 @@ class DecodeRequest {
       key: string;
       value: string;
     };
-    if(request.state.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.INHERIT_AUTH){
+    if ([HttpRequestAuthTypeBaseEnum.INHERIT_AUTH, HttpRequestAuthTypeBaseEnum.AUTH_PROFILES].includes(request.state.requestAuthNavigation)) {
       authHeader = new ReduceAuthParameter(_collectionAuth.collectionAuthNavigation, _collectionAuth.auth).getValue();
-    }else{
-     authHeader = new ReduceAuthParameter(request.state.requestAuthNavigation, request.auth).getValue();
-      
+    } else {
+      authHeader = new ReduceAuthParameter(request.state.requestAuthNavigation, request.auth).getValue();
+
     }
     url = url.trim();
     // Check if authentication header exists
@@ -156,12 +156,12 @@ class DecodeRequest {
   ): string => {
     let auth;
     // inject environment variable to basic auth before encryption
-    if(request.state.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.INHERIT_AUTH){
+    if ([HttpRequestAuthTypeBaseEnum.INHERIT_AUTH, HttpRequestAuthTypeBaseEnum.AUTH_PROFILES].includes(request.state.requestAuthNavigation)) {
       auth = createDeepCopy(_collectionAuth.auth)
-    }   
-    else{
-     auth = createDeepCopy(request.auth);
-      
+    }
+    else {
+      auth = createDeepCopy(request.auth);
+
     }
     auth.basicAuth.username = this.setEnvironmentVariables(
       auth.basicAuth.username,
@@ -176,13 +176,13 @@ class DecodeRequest {
       key: string;
       value: string;
     };
-    if(request.state.requestAuthNavigation === HttpRequestAuthTypeBaseEnum.INHERIT_AUTH){
+    if ([HttpRequestAuthTypeBaseEnum.INHERIT_AUTH, HttpRequestAuthTypeBaseEnum.AUTH_PROFILES].includes(request.state.requestAuthNavigation)) {
       authHeader = new ReduceAuthHeader(_collectionAuth.collectionAuthNavigation, auth).getValue();
-    }else{
-     authHeader = new ReduceAuthHeader(request.state.requestAuthNavigation, auth).getValue();
-      
+    } else {
+      authHeader = new ReduceAuthHeader(request.state.requestAuthNavigation, auth).getValue();
+
     }
-    
+
 
     // Combine headers from different sources
 
@@ -361,7 +361,7 @@ class DecodeRequest {
    * @param request - User Request
    * @param environmentVariables - Array of objects containing key-value pairs for environment variables.
    */
-  public init(request: Request, environmentVariables = [], _collectionAuth : Partial<HttpRequestCollectionLevelAuthTabInterface>): string[] {    
+  public init(request: Request, environmentVariables = [], _collectionAuth: Partial<HttpRequestCollectionLevelAuthTabInterface>): string[] {
     return [
       this.extractURL(
         this.setEnvironmentVariables(request.url, environmentVariables),

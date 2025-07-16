@@ -281,3 +281,7 @@ export { default as HourGlassRegular } from "./HourGlassRegular.svelte";
 export { default as MapRegular } from "./MapRegular.svelte";
 export { default as CodeRegular } from "./CodeRegular.svelte";
 export { default as DocumentPercentRegular} from "./DocumentPercentRegular.svelte";
+export { default as ApiKeyAuthTag } from "./ApiKeyAuthTagIcon.svelte";
+export { default as BasicAuthTag } from "./BasicAuthTagIcon.svelte";
+export { default as BearerTokenAuthTag } from "./BearerTokenAuthTagIcon.svelte";
+export { default as PersonKeyRegular } from "./PersonKeyRegular.svelte";

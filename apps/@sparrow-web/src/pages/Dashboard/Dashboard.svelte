@@ -1,5 +1,6 @@
 <script lang="ts">
   import {
+    HubPaymentFailed,
     LoginBanner,
     LoginSignupConfirmation,
     PlanUpgradeModal,
@@ -8,7 +9,7 @@
     UpgradePlanPopUp,
   } from "@sparrow/common/components";
   import { Sidebar } from "@sparrow/common/features";
-  import { Route, navigate } from "svelte-navigator";
+  import { Route, navigate, useLocation } from "svelte-navigator";
   import Navigate from "../../routing/Navigate.svelte";
   import { DashboardViewModel } from "./Dashboard.ViewModel";
   import { navigationState, user } from "@app/store/auth.store";
@@ -45,6 +46,7 @@
   import { planBannerisOpen, shouldRunThrottled } from "@sparrow/common/store";
 
   const _viewModel = new DashboardViewModel();
+  const location = useLocation();
   let userId: string;
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
@@ -99,6 +101,12 @@
     userLimits = data;
   };
 
+  const handlegetWorkspaceCount = async (teamId: string) => {
+    currentWorkspaceCount = await _viewModel.getWorkspaceCount(teamId);
+  };
+
+  const activeTeam: Observable<TeamDocument> = _viewModel.openTeam;
+
   let currentWorkspaceId = "";
   let currentWorkspaceName = "";
   let currentTeamName = "";
@@ -142,9 +150,13 @@
     },
   );
 
-  const handlegetWorkspaceCount = async (teamId: string) => {
-    currentWorkspaceCount = await _viewModel.getWorkspaceCount(teamId);
-  };
+  let openTeam;
+
+  const activeTeamSubscriber = activeTeam.subscribe((value) => {
+    if (value) {
+      openTeam = value?.toMutableJSON();
+    }
+  });
 
   let handlehideGlobalSearch = (val: boolean) => {
     hideGlobalSearch = val;
@@ -284,6 +296,7 @@
   onDestroy(() => {
     userUnsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
+    activeTeamSubscriber.unsubscribe();
   });
 
   let showProgressBar = false;
@@ -626,6 +639,16 @@
 
   {#if (userRole === TeamRole.TEAM_ADMIN && $planBannerisOpen) || (userRole === TeamRole.TEAM_OWNER && $planBannerisOpen)}
     <UpgradePlanBanner bind:isUpgradePlanModelOpen />
+  {/if}
+
+  {#if $location.pathname === "/app/home"}
+    {#if openTeam?.billing?.status === "payment_failed" || openTeam?.billing?.status === "action_required"}
+      <HubPaymentFailed
+        onFix={async () => {
+          await _viewModel.handleRedirectToAdminPanel(openTeam?.teamId);
+        }}
+      />
+    {/if}
   {/if}
 
   <!-- 

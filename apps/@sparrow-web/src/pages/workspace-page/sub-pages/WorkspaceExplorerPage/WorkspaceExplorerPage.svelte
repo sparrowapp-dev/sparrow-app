@@ -225,6 +225,7 @@
     currentWorkspaceDetails={currentWorkspace}
     users={currentTeam?.users}
     teamName={currentTeam?.name}
+    plan={currentTeam?.plan}
     onInviteUserToWorkspace={handleInviteWorkspace}
   />
 </Modal>

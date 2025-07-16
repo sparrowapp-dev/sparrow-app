@@ -37,6 +37,10 @@ export interface AiNavigationWrapper {
     aiNavigation: AiRequestSectionEnum;
 }
 
+export interface AiAuthProfileNavigationWrapper {
+    selectedRequestAuthProfileId: string;
+}
+
 export interface AiLeftSplitterWidthPercentageWrapper {
     aiLeftSplitterWidthPercentage: number;
 }
@@ -258,7 +262,8 @@ export interface State
     IsChatbotConversationLoading,
     IsConversationHistoryPanelOpen,
     IsConversationHistoryLoading,
-    IsChatbotPromptBoxActiveWrapper { }
+    IsChatbotPromptBoxActiveWrapper,
+    AiAuthProfileNavigationWrapper { }
 
 export interface StatePartial
     extends
@@ -276,4 +281,5 @@ export interface StatePartial
     Partial<IsChatbotConversationLoading>,
     Partial<IsConversationHistoryPanelOpen>,
     Partial<IsConversationHistoryLoading>,
-    Partial<IsChatbotPromptBoxActiveWrapper> { }
+    Partial<IsChatbotPromptBoxActiveWrapper>,
+    Partial<AiAuthProfileNavigationWrapper> { }

@@ -333,11 +333,11 @@ export default class WorkspaceExplorerViewModel {
       );
     } else {
       if (response?.message === "Plan limit reached") {
-        // notifications.error(
-        //   "You’ve reached the collaborator limit for your current plan. Upgrade to add more collaborators.",
-        // );
-      } else {
-        notifications.error(`Failed to send invite. Please try again.`);
+          // notifications.error("Failed to send invite. please upgrade your plan.");
+        } else {
+          notifications.error(
+            response?.message || "Failed to send invite. Please try again.",
+          );
       }
     }
     if (_data.role === WorkspaceRole.WORKSPACE_VIEWER) {

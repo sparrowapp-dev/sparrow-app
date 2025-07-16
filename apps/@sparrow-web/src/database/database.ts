@@ -314,6 +314,15 @@ export class RxDB {
           14: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          15: function (oldDoc: TabDocument) {
+            if (oldDoc?.property?.request) {
+              oldDoc.property.request.state.selectedRequestAuthProfileId = "";
+            }
+            if (oldDoc?.property?.aiRequest) {
+              oldDoc.property.aiRequest.state.selectedRequestAuthProfileId = "";
+            }
+            return oldDoc;
+          },
         },
       },
       collection: {
@@ -338,6 +347,9 @@ export class RxDB {
             return oldDoc;
           },
           7: function (oldDoc: CollectionDocument) {
+            return oldDoc;
+          },
+          8: function (oldDoc: CollectionDocument) {
             return oldDoc;
           },
         },

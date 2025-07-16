@@ -222,4 +222,7 @@
   onUpdateRunningState={_viewModel.handleMockCollectionState}
   {currentWorkspace}
   {isSharedWorkspace}
+  onCreateAuthProfile={_viewModel.handleCreateAuthProfile}
+  onUpdateAuthProfile={_viewModel.handleUpdateAuthProfile}
+  onDeleteAuthProfile={_viewModel.handleDeleteAuthProfile}
 />
