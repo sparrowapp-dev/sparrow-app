@@ -144,6 +144,7 @@
   export let selectiveRunModalOpen: boolean = false;
   export let selectiveRunTestflow: boolean = false;
   export let isGuestUser = false;
+  export let collectionListDocument: CollectionDocument[];
   let planContent: any;
   let planContentNonActive: any;
 
@@ -206,7 +207,6 @@
   let isEdgeDeletable = false;
   let blockName = `Block ${nodesValue}`;
   // List to store collection documents and filtered collections
-  let collectionListDocument: CollectionDocument[];
   let filteredCollections = writable<CollectionDto[]>([]);
 
   // Writable stores for nodes and edges
@@ -602,17 +602,11 @@
     return "";
   };
 
-  // Filter collections based on the current tab's workspace ID
-  const collectionsSubscriber = collectionList.subscribe((value) => {
-    if (value) {
-      collectionListDocument = value?.filter(
-        (value) => value.workspaceId === $tab?.path?.workspaceId,
-      );
-      filteredCollections.set(
-        collectionListDocument as unknown as CollectionDto[],
-      );
-    }
-  });
+  $: {
+    filteredCollections.set(
+      collectionListDocument as unknown as CollectionDto[],
+    );
+  }
 
   nodes.subscribe((nodes) => {
     if (nodes?.length > 0) {
@@ -1362,7 +1356,6 @@
    * functions for `nodesSubscriber` and `edgesSubscriber`.
    */
   onDestroy(() => {
-    collectionsSubscriber.unsubscribe();
     nodesSubscriber();
     edgesSubscriber();
   });
