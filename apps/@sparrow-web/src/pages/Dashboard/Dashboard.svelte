@@ -645,7 +645,7 @@
             await _viewModel.handleRedirectToAdminPanel(openTeam?.teamId);
           }}
         />
-      {:else if openTeam?.plan.name === "Community"}
+      {:else if openTeam?.plan?.name === "Community"}
         <UpgradePlanBanner bind:isUpgradePlanModelOpen />
       {/if}
     {/if}
