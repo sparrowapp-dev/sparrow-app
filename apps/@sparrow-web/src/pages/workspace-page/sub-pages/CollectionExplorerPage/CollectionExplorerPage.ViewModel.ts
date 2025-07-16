@@ -1983,6 +1983,7 @@ class CollectionExplorerPage {
     _collection: CollectionDto,
     _authProfileId: string,
     _updatedAuthProfilePayload: AuthProfileDto,
+    _isRequestForDefaultKey: boolean,
   ) => {
     let userSource = {};
     if (_collection?.activeSync) {
@@ -2024,7 +2025,7 @@ class CollectionExplorerPage {
         );
 
         // Don't show success notification if it's a defaultKey update request
-        if (!_updatedAuthProfilePayload.defaultKey) {
+        if (!_isRequestForDefaultKey) {
           notifications.success("Auth profile updated successfully.");
         }
 
@@ -2051,7 +2052,7 @@ class CollectionExplorerPage {
       );
 
       // Don't show success notification if its a defaultkey is update request
-      if (!_updatedAuthProfilePayload.defaultKey)
+      if (!_isRequestForDefaultKey)
         notifications.success("Auth profile updated successfully.");
     } else {
       console.error(response.message);

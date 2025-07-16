@@ -132,7 +132,7 @@
       e.stopPropagation();
       //   onOpenCollection(list._id);
     }}
-    style="max-width: 6vw;"
+    style="max-width: 10vw;"
     class="tab-data text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium rounded-start py-2 overflow-hidden ellipsis"
   >
     <div class="d-flex gap-2 align-items-center">

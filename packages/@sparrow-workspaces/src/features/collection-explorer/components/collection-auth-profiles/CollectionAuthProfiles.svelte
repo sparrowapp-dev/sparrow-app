@@ -103,7 +103,7 @@
     selectedDefaultKey = authId;
     authProfile.defaultKey = true; // Mark the selected item as default
     // onUpdateRequestState({ selectedAuthType: authId });
-    onUpdateAuthProfile(authId, authProfile);
+    onUpdateAuthProfile(authId, authProfile, true);
   };
 
   const handleModalClose = (flag) => {
