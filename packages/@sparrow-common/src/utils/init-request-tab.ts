@@ -122,6 +122,7 @@ class InitRequestTab {
             isChatbotGeneratingResponse: false,
             isDocGenerating: false,
             isDocAlreadyGenerated: false,
+            selectedRequestAuthProfileId: ""
           },
           auth: {
             bearerToken: "",

@@ -3,7 +3,7 @@ import {
   DecodeGraphql,
   ReduceAuthHeader,
 } from "@sparrow/workspaces/features/graphql-explorer/utils";
-import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import { createDeepCopy, scrollToTab } from "@sparrow/common/utils";
 import {
   startLoading,
   stopLoading,
@@ -2282,7 +2282,7 @@ class GraphqlExplorerViewModel {
             );
 
             this.tabRepository.createTab(initRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -2371,7 +2371,7 @@ class GraphqlExplorerViewModel {
             );
 
             this.tabRepository.createTab(initRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -2439,7 +2439,7 @@ class GraphqlExplorerViewModel {
               req.graphql?.headers as GraphqlRequestHeadersTabInterface[],
             );
             this.tabRepository.createTab(initRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -2526,7 +2526,7 @@ class GraphqlExplorerViewModel {
                 ?.headers as GraphqlRequestHeadersTabInterface[],
             );
             this.tabRepository.createTab(initRequestTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",

@@ -992,7 +992,7 @@
                 {#if true}
                   {#if $activeTab?.type === ItemType.REQUEST}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <RestExplorerPage
                           bind:isTourGuideOpen
                           tab={$activeTab}
@@ -1001,13 +1001,13 @@
                     </Motion>
                   {:else if $activeTab?.type === ItemType.AI_REQUEST}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <AiRequestExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === ItemType.COLLECTION}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <CollectionExplorerPage
                           tab={$activeTab}
                           onSyncCollection={handleSyncCollection}
@@ -1017,19 +1017,19 @@
                     </Motion>
                   {:else if $activeTab?.type === ItemType.FOLDER}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <FolderExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === ItemType.ENVIRONMENT}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <EnvironmentExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === ItemType.WORKSPACE}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <WorkspaceExplorerPage
                           {collectionList}
                           tab={$activeTab}
@@ -1039,13 +1039,13 @@
                     </Motion>
                   {:else if $activeTab?.type === ItemType.WEB_SOCKET}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <WebSocketExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === ItemType.TESTFLOW}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <TestFlowExplorerPage
                           tab={$activeTab}
                           {teamDetails}
@@ -1055,25 +1055,25 @@
                     </Motion>
                   {:else if $activeTab?.type === ItemType.SOCKET_IO}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <SocketIoExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.SAVED_REQUEST}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <RestExplorerSavedPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === ItemType.GRAPHQL}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <GraphqlExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.MOCK_REQUEST}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <RestExplorerMockPage
                           bind:isTourGuideOpen
                           tab={$activeTab}
@@ -1082,19 +1082,19 @@
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.MOCK_HISTORY}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <MockHistoryExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.HUB}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <HubExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if !$tabList?.length}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <WorkspaceDefault
                           {currentWorkspace}
                           {handleCreateEnvironment}
@@ -1392,7 +1392,6 @@
     workspaceId={$currentWorkspace._id}
     onClosePopup={() => (isImportCurlPopup = false)}
     onItemImported={_viewModel.handleImportItem}
-    onValidateCurl={_viewModel.handleValidateCurl}
   />
 </Modal>
 <!-- {/if} -->

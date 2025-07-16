@@ -970,7 +970,7 @@
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.WORKSPACE}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <WorkspaceExplorerPage
                           {collectionList}
                           tab={$activeTab}
@@ -1029,7 +1029,7 @@
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.HUB}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100" use:motion>
+                      <div class="h-100">
                         <HubExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
@@ -1270,8 +1270,10 @@
       }
       return response;
     }}
-    onImportPostmanCollection={async (currentWorkspaceId, postmanCollectionJson) => {
-      debugger
+    onImportPostmanCollection={async (
+      currentWorkspaceId,
+      postmanCollectionJson,
+    ) => {
       const response = await _viewModel.importPostmanCollection(
         currentWorkspaceId,
         postmanCollectionJson,
@@ -1323,7 +1325,6 @@
     workspaceId={$currentWorkspace._id}
     onClosePopup={() => (isImportCurlPopup = false)}
     onItemImported={_viewModel.handleImportItem}
-    onValidateCurl={_viewModel.handleValidateCurl}
   />
 </Modal>
 <!-- {/if} -->

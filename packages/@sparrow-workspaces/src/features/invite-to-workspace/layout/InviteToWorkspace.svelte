@@ -10,6 +10,7 @@
    * @param isInviteContainerOpened - Determines whether to show or hide the invite popup.
    */
   export let handleInvitePopup: (isInviteContainerOpened: boolean) => void;
+  export let plan;
 
   /**
    * The name of the team to which users are being invited.
@@ -172,6 +173,12 @@
     >{currentWorkspaceDetails.name}</span
   > workspace.
 </div>
+{#if plan?.name !== "Community"}
+  <p class="text-fs-12 mt-3" style="color: var(--text-ds-neutral-400)">
+    Note: Inviting a user reserves a license and may trigger a charge, unless an
+    unused license is available.
+  </p>
+{/if}
 <div class="d-flex align-items-center justify-content-between pt-3">
   <div class="description sparrow-fs-12 ellipsis">
     <p class="mb-0 text-secondary-200 ellipsis">

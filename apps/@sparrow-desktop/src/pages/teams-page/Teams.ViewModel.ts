@@ -9,7 +9,7 @@ import { WorkspaceRepository } from "../../repositories/workspace.repository";
 import { CollectionRepository } from "../../repositories/collection.repository";
 import { GithubRepoReposistory } from "../../repositories/github-repo.repository";
 import { GithubService } from "../../services/github.service";
-import { moveNavigation } from "@sparrow/common/utils";
+import { scrollToTab } from "@sparrow/common/utils";
 import { navigate } from "svelte-navigator";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import type { HttpClientResponseInterface } from "@app/types/http-client";
@@ -100,6 +100,7 @@ export class TeamsViewModel {
           updatedBy,
           isNewInvite,
           invites,
+          billing
         } = elem;
         const updatedWorkspaces = workspaces?.map((workspace) => ({
           workspaceId: workspace.id,
@@ -129,10 +130,11 @@ export class TeamsViewModel {
           isNewInvite,
           isOpen: isOpenTeam,
           invites,
+          billing
         };
         data.push(item);
       }
-  
+
       await this.teamRepository.bulkInsertData(data);
       await this.teamRepository.deleteOrphanTeams(
         data.map((_team) => {
@@ -143,7 +145,6 @@ export class TeamsViewModel {
         this.teamRepository.setOpenTeam(data[0].teamId);
         return;
       }
-
     }
   };
 
@@ -182,7 +183,7 @@ export class TeamsViewModel {
         planBannerisOpen.set(true);
       }
     } else {
-        notifications.error("Failed to create hub. Please try again.");
+      notifications.error("Failed to create hub. Please try again.");
     }
     MixpanelEvent(Events.CREATE_NEW_TEAM);
     return response;
@@ -232,7 +233,7 @@ export class TeamsViewModel {
   public handleApiClick = async (api: any): void => {
     await this.tabRepository.activeTab(api.id, api.path.workspaceId);
     await this.workspaceRepository.setActiveWorkspace(api.path.workspaceId);
-    moveNavigation("right");
+    scrollToTab("");
     navigate("collections");
   };
 
