@@ -55,6 +55,7 @@ import {
   InitRequestTab,
   InitWebSocketTab,
   InitAiRequestTab,
+  Sleep,
 } from "@sparrow/common/utils";
 import { InitCollectionTab } from "@sparrow/common/utils";
 import { InitFolderTab } from "@sparrow/common/utils";
@@ -719,7 +720,7 @@ export default class CollectionsViewModel {
   public handleActiveTab = async (id: string) => {
     const selectedTab = await this.tabRepository.activeTab(id);
     const selectedTabJSON = selectedTab?.toMutableJSON();
-
+    await new Sleep().setTime(1000).exec();
     if (selectedTabJSON?.path?.collectionId) {
       addCollectionItem(selectedTabJSON?.path?.collectionId, "collection");
     }
