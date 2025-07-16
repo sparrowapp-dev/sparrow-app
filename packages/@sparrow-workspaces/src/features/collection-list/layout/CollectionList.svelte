@@ -649,7 +649,6 @@
 
   {#if $isExpandCollection}
     <div
-      transition:slide={{ duration: 250 }}
       class="overflow-auto position-relative d-flex flex-column me-0"
       style={` background-color: ${ActiveTab === "collection" ? "var(--bg-ds-surface-600)" : "transparent"};`}
     >
