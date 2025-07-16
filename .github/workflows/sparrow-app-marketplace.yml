@@ -58,7 +58,7 @@ jobs:
         run: |
           sudo snap install snapcraft --classic
 
-       - name: Check Snapcraft Credentials
+      - name: Check Snapcraft Credentials
         run: |
           snapcraft whoami
 
