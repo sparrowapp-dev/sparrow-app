@@ -59,6 +59,8 @@ parts:
       - libssl-dev
       - librsvg2-dev
       - dpkg
+    stage-packages:
+      - libwebkit2gtk-4.1-0
     override-build: |
       set -eu
       mkdir -p $SNAP_USER_COMMON/.cache
