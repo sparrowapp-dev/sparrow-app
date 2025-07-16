@@ -59,6 +59,9 @@ jobs:
       - name: Install Snapcraft
         run: |
           sudo snap install snapcraft --classic
+          sudo snap install lxd
+          sudo lxd waitready
+          sudo lxd init --auto
 
       - name: Check Snapcraft Credentials
         run: |
@@ -85,7 +88,7 @@ jobs:
 
       - name: Build Snap from DEB
         run: |
-          sudo snapcraft --destructive-mode
+          snapcraft --use-lxd
 
       - name: Prepare Snapcraft credentials
         env:
