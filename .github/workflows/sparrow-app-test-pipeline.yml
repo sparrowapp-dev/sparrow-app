@@ -314,22 +314,6 @@ jobs:
         shell: powershell
 
       # --- STAGE 4: SIGN MSIX WITH DIGICERT ---
-      - name: Locate SignTool.exe
-        shell: pwsh
-        run: |
-          $signToolPath = Get-ChildItem -Path 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter signtool.exe -ErrorAction SilentlyContinue |
-                          Where-Object { $_.FullName -match '\\x64\\signtool\.exe$' } |
-                          Sort-Object LastWriteTime -Descending |
-                          Select-Object -First 1
-
-          if ($signToolPath) {
-            Write-Host "✅ Found SignTool.exe at: $($signToolPath.FullName)"
-            echo "SIGNTOOL_PATH=$($signToolPath.FullName)" >> $GITHUB_ENV
-          } else {
-            Write-Host "❌ SignTool.exe not found"
-            exit 1
-          }
-          
       - name: Sign MSIX
         run: |
           # Verify the MSIX file exists
@@ -340,7 +324,7 @@ jobs:
 
           Write-Host "Signing: msix-output/sparrow.msix"
 
-          & $env:SIGNTOOL_PATH sign `
+          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe" sign `
             /fd sha256 `
             /sha1 ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} `
             /tr http://timestamp.digicert.com `
