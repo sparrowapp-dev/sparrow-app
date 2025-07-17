@@ -238,48 +238,81 @@ jobs:
           & "$($makeAppx.FullName)" pack /d "app-root" /p $msixPath
         shell: powershell
 
+      # - name: Find and Sign MSIX files
+      #   shell: pwsh
+      #   run: |
+      #       # 1. Sync certificate into Windows store
+      #       smctl windows certsync --keypair-alias="$env:KEYPAIR_ALIAS"
+
+      #       # Robustly locate SignTool alongside MakeAppx
+      #       $makeAppx = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter makeappx.exe |
+      #                   Where-Object FullName -Match '\\x64\\makeappx\.exe$' |
+      #                   Sort-Object LastWriteTime -Descending |
+      #                   Select-Object -First 1
+      #       # Get the SDK folder, then join to Signtool.exe
+      #       $sdkFolder = Split-Path -Path $makeAppx.FullName -Parent
+      #       $signTool  = Join-Path -Path $sdkFolder -ChildPath 'Signtool.exe'
+      #       Write-Host "Using SignTool at: $signTool"
+
+      #       # 3. Sign all MSIX packages
+      #       $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
+      #       Get-ChildItem -Path "C:\a\sparrow-app\sparrow-app\msix-output" -Filter "*.msix" | ForEach-Object {
+      #         Write-Host "🔐 Signing: $($_.FullName)"
+      #         & "$signTool" sign /debug `
+      #           /sm /s My `
+      #           /sha1 $certThumb `
+      #           /fd sha256 `
+      #           /tr http://timestamp.digicert.com `
+      #           /td sha256 `
+      #           "$($_.FullName)"
+      #         if ($LASTEXITCODE -ne 0) {
+      #           Write-Host "🔍 Dumping last 5 AppxPackaging errors..."
+      #           Get-WinEvent -FilterHashtable @{
+      #               LogName = 'Microsoft-Windows-AppxPackaging/Operational';
+      #               Level   = 2  # Error level
+      #           } -MaxEvents 5 | ForEach-Object {
+      #               Write-Host "Event ID: $($_.Id) at $($_.TimeCreated)"
+      #               Write-Host $_.Message
+      #               Write-Host '―' * 40
+      #           }
+      #           Write-Host "❌ Failed to sign $($_.Name)"
+      #           exit 1
+      #         }
+      #         Write-Host "✅ Successfully signed $($_.Name)"
+      #       }
+
       - name: Find and Sign MSIX files
         shell: pwsh
         run: |
-            # 1. Sync certificate into Windows store
-            smctl windows certsync --keypair-alias="$env:KEYPAIR_ALIAS"
+          # 1. Sync certificate into Windows store
+          smctl windows certsync --keypair-alias="$env:KEYPAIR_ALIAS"
 
-            # Robustly locate SignTool alongside MakeAppx
-            $makeAppx = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter makeappx.exe |
-                        Where-Object FullName -Match '\\x64\\makeappx\.exe$' |
-                        Sort-Object LastWriteTime -Descending |
-                        Select-Object -First 1
-            # Get the SDK folder, then join to Signtool.exe
-            $sdkFolder = Split-Path -Path $makeAppx.FullName -Parent
-            $signTool  = Join-Path -Path $sdkFolder -ChildPath 'Signtool.exe'
-            Write-Host "Using SignTool at: $signTool"
+          # Find SignTool
+          $signTool = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter signtool.exe |
+                      Where-Object FullName -Match '\\x64\\signtool\.exe$' |
+                      Sort-Object LastWriteTime -Descending |
+                      Select-Object -First 1 -ExpandProperty FullName
+          Write-Host "Using SignTool at: $signTool"
 
-            # 3. Sign all MSIX packages
-            $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
-            Get-ChildItem -Path "C:\a\sparrow-app\sparrow-app\msix-output" -Filter "*.msix" | ForEach-Object {
-              Write-Host "🔐 Signing: $($_.FullName)"
-              & "$signTool" sign /debug `
-                /sm /s My `
-                /sha1 $certThumb `
-                /fd sha256 `
-                /tr http://timestamp.digicert.com `
-                /td sha256 `
-                "$($_.FullName)"
+          # 3. Sign all MSIX packages
+          $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
+          Get-ChildItem -Path "C:\a\sparrow-app\sparrow-app\msix-output" -Filter "*.msix" | ForEach-Object {
+            Write-Host "🔐 Signing: $($_.FullName)"
+            
+            # Try with minimal parameters first
+            & "$signTool" sign /debug /sm /sha1 $certThumb /fd sha256 "$($_.FullName)"
+            
+            if ($LASTEXITCODE -ne 0) {
+              # If simple signing fails, try with timestamp
+              & "$signTool" sign /debug /sm /sha1 $certThumb /fd sha256 /tr http://timestamp.sectigo.com "$($_.FullName)"
+              
               if ($LASTEXITCODE -ne 0) {
-                Write-Host "🔍 Dumping last 5 AppxPackaging errors..."
-                Get-WinEvent -FilterHashtable @{
-                    LogName = 'Microsoft-Windows-AppxPackaging/Operational';
-                    Level   = 2  # Error level
-                } -MaxEvents 5 | ForEach-Object {
-                    Write-Host "Event ID: $($_.Id) at $($_.TimeCreated)"
-                    Write-Host $_.Message
-                    Write-Host '―' * 40
-                }
                 Write-Host "❌ Failed to sign $($_.Name)"
                 exit 1
               }
-              Write-Host "✅ Successfully signed $($_.Name)"
             }
+            Write-Host "✅ Successfully signed $($_.Name)"
+          }
 
       - name: Verify MSIX Signature
         run: |
