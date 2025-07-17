@@ -266,6 +266,15 @@ jobs:
                 /td sha256 `
                 "$($_.FullName)"
               if ($LASTEXITCODE -ne 0) {
+              Write-Host "🔍 Dumping last 5 AppxPackaging errors..."
+              Get-WinEvent -FilterHashtable @{
+                  LogName = 'Microsoft-Windows-AppxPackaging/Operational';
+                  Level   = 2  # Error level
+              } -MaxEvents 5 | ForEach-Object {
+                  Write-Host "Event ID: $($_.Id) at $($_.TimeCreated)"
+                  Write-Host $_.Message
+                  Write-Host '―' * 40
+}
                 Write-Host "❌ Failed to sign $($_.Name)"
                 exit 1
               }
