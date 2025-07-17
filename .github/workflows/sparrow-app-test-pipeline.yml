@@ -359,7 +359,7 @@ jobs:
 
       - name: Notify Teams
         run: |
-          $msix = Get-ChildItem "msix-output/*.msix" | Select-Object -First 1
+          $msix = Get-ChildItem "C:\a\sparrow-app\sparrow-app\msix-output\*.msix" | Select-Object -First 1
           $url = "https://sparrow-release-assests-prod.s3.amazonaws.com/$($msix.Name)"
           
           $body = @{
