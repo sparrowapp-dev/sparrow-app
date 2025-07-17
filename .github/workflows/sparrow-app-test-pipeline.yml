@@ -111,7 +111,7 @@ jobs:
             exit 1
           }
           
-          Copy-Item $msi.FullName -Destination "apps/@sparrow-desktop/src-tauri/target/release/bundle/msi/Sparrow.msi"
+          Copy-Item $msi.FullName -Destination "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/Sparrow.msi"
           Write-Host "Copied $($msi.Name) to standard location"
         shell: powershell
 
