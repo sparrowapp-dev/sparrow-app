@@ -162,7 +162,7 @@ jobs:
               <DisplayName>Sparrow</DisplayName>
               <PublisherDisplayName>sparrowapp</PublisherDisplayName>
               <Description>Sparrow</Description>
-              <Logo>Assets\\StoreLogo.png</Logo>
+              <Logo>Assets\StoreLogo.png</Logo>
             </Properties>
             <Dependencies>
               <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.0.0" MaxVersionTested="10.0.19041.0" />
