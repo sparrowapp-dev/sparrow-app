@@ -165,6 +165,9 @@ jobs:
             <Resources>
               <Resource Language="en-us" />
             </Resources>
+            <Capabilities>
+              <Capability Name="runFullTrust" />
+            </Capabilities>
             <Applications>
               <Application Id="SparrowApp" Executable="Sparrow.exe" EntryPoint="Windows.FullTrustApplication">
                 <uap:VisualElements DisplayName="Sparrow" Description="Sparrow App" BackgroundColor="transparent" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png">
