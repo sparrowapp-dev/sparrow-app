@@ -45,7 +45,7 @@ env:
 
 jobs:
   build_and_sign_msix:
-    runs-on: windows-latest
+    runs-on: windows-2025
     environment: production
 
     steps:
@@ -144,26 +144,6 @@ jobs:
         shell: powershell
 
       # --- STAGE 3: CONVERT TO MSIX ---
-      - name: Install winget (Windows Package Manager)
-        run: |
-          # Download and install the App Installer package (contains winget)
-          $url = "https://aka.ms/getwinget"
-          $installerPath = "$env:TEMP\winget-installer.msixbundle"
-          
-          Invoke-WebRequest -Uri $url -OutFile $installerPath
-          Add-AppxPackage -Path $installerPath -ErrorAction Stop
-          
-          # Refresh PATH to make winget available
-          $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + 
-                      [System.Environment]::GetEnvironmentVariable("Path","User")
-          
-          # Verify installation
-          winget --version
-          if (-not $?) { throw "Winget installation failed" }
-          
-          Write-Host "Winget installed successfully"
-        shell: powershell
-
       - name: Inject version into MSIX template
         run: |
           # Get version from Tauri (assuming it's in src-tauri/Cargo.toml)
