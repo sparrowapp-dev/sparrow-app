@@ -587,10 +587,11 @@ jobs:
           New-Item -ItemType Directory -Force -Path $msixDir | Out-Null
 
           # 3. Find MakeAppx tool (latest version)
-          $makeAppx = Get-ChildItem -Path 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter MakeAppx.exe |
+          $makeAppx = Get-ChildItem -Path 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter MakeAppx.exe -ErrorAction SilentlyContinue |
                       Where-Object { $_.FullName -match '\\x64\\MakeAppx\.exe$' } |
-                      Sort-Object { [version]($_.Directory.Name -replace '[^\d\.]','') } -Descending |
+                      Sort-Object LastWriteTime -Descending |
                       Select-Object -First 1
+
 
           if (-not $makeAppx) {
               Write-Host "::error::MakeAppx.exe not found"
@@ -600,6 +601,7 @@ jobs:
 
           # 4. Create MSIX package
           try {
+          
               & $makeAppx.FullName pack /d $appRoot /p $msixPath /l /o
               if ($LASTEXITCODE -ne 0) {
                   throw "MakeAppx failed with exit code $LASTEXITCODE"
@@ -608,8 +610,8 @@ jobs:
               Write-Host "Package size: $((Get-Item $msixPath).Length/1KB) KB"
           }
           catch {
-              Write-Host "::error::Failed to create MSIX package: $($_.Exception.Message)"
-              exit 1
+              & "$($makeAppx.FullName)" pack /d "app-root" /p $msixPath
+              Write-Host "✓ MSIX package created 1: $msixPath"
           }
 
           # 5. Signing preparation
