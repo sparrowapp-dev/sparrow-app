@@ -314,6 +314,22 @@ jobs:
         shell: powershell
 
       # --- STAGE 4: SIGN MSIX WITH DIGICERT ---
+      - name: Locate SignTool.exe
+        shell: pwsh
+        run: |
+          $signToolPath = Get-ChildItem -Path 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter signtool.exe -ErrorAction SilentlyContinue |
+                          Where-Object { $_.FullName -match '\\x64\\signtool\.exe$' } |
+                          Sort-Object LastWriteTime -Descending |
+                          Select-Object -First 1
+
+          if ($signToolPath) {
+            Write-Host "✅ Found SignTool.exe at: $($signToolPath.FullName)"
+            echo "SIGNTOOL_PATH=$($signToolPath.FullName)" >> $GITHUB_ENV
+          } else {
+            Write-Host "❌ SignTool.exe not found"
+            exit 1
+          }
+          
       - name: Sign MSIX
         run: |
           # Verify the MSIX file exists
@@ -324,7 +340,7 @@ jobs:
 
           Write-Host "Signing: msix-output/sparrow.msix"
 
-          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe" sign `
+          & $env:SIGNTOOL_PATH sign `
             /fd sha256 `
             /sha1 ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} `
             /tr http://timestamp.digicert.com `
@@ -333,33 +349,31 @@ jobs:
             "msix-output/sparrow.msix"
 
           if ($LASTEXITCODE -ne 0) {
-              Write-Host "Failed to sign $msixPath"
+              Write-Host "Failed to sign msix-output/sparrow.msix"
               exit 1
           }
 
-          Write-Host "Successfully signed $msixPath"
+          Write-Host "Successfully signed msix-output/sparrow.msix"
         shell: powershell
 
       - name: Verify MSIX Signature
         run: |
-          $msixPath = "msix-output/sparrow.msix"
-
           # Verify the MSIX file exists
-          if (-Not (Test-Path $msixPath)) {
-              Write-Host "❌ MSIX file not found at $msixPath"
+          if (-Not (Test-Path msix-output/sparrow.msix)) {
+              Write-Host "MSIX file not found at msix-output/sparrow.msix"
               exit 1
           }
 
-          Write-Host "🔍 Verifying signature for: $msixPath"
+          Write-Host "Verifying signature for: msix-output/sparrow.msix"
 
           # Get the Authenticode signature
-          $sig = Get-AuthenticodeSignature -FilePath $msixPath
+          $sig = Get-AuthenticodeSignature -FilePath msix-output/sparrow.msix
 
           # Check the signature status
           if ($sig.Status -eq 'Valid') {
-              Write-Host "✅ Valid signature on $msixPath"
+              Write-Host "Valid signature on msix-output/sparrow.msix"
           } else {
-              Write-Host "❌ Invalid signature on $msixPath: $($sig.Status)"
+              Write-Host "Invalid signature on msix-output/sparrow.msix: $($sig.Status)"
               exit 1
           }
         shell: powershell
