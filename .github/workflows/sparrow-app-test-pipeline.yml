@@ -320,20 +320,69 @@ jobs:
 
       # --- STAGE 5: DEPLOY & NOTIFY ---
       - name: Upload to S3
+        shell: pwsh
         run: |
-          aws s3 cp C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix s3://sparrow-release-assests-prod/
+          # 1. Find the MSI file to get the naming pattern
+          $msiFile = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
+          $msiBaseName = [System.IO.Path]::GetFileNameWithoutExtension($msiFile.Name)
+          
+          # 2. Rename the MSIX file to match MSI pattern (just change extension)
+          $msixOriginal = "C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix"
+          $msixNewName = "$msiBaseName.msix"
+          $msixNewPath = Join-Path -Path (Split-Path -Path $msixOriginal -Parent) -ChildPath $msixNewName
+          Rename-Item -Path $msixOriginal -NewName $msixNewName
+          
+          # 3. Upload to S3
+          aws s3 cp $msixNewPath s3://sparrow-release-assests-prod/
+          
+          Write-Host "Uploaded $msixNewName to S3 bucket"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: Notify Teams
+        
+      - name: Post Windows Build Links to Teams
         run: |
-          $msix = Get-ChildItem "C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix" | Select-Object -First 1
-          $url = "https://sparrow-release-assests-prod.s3.amazonaws.com/$($msix.Name)"
-          
+          # Get the MSI file to determine the MSIX naming pattern
+          $msiFile = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
+          $msiBaseName = [System.IO.Path]::GetFileNameWithoutExtension($msiFile.Name)
+          $expectedMsixName = "$msiBaseName.msix"
+          $msixUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$expectedMsixName"
+
           $body = @{
-            text = "New MSIX build available: [$($msix.Name)]($url)"
-          } | ConvertTo-Json
+            "type" = "message"
+            "attachments" = @(
+              @{
+                "contentType" = "application/vnd.microsoft.card.adaptive"
+                "content" = @{
+                  "type" = "AdaptiveCard"
+                  "body" = @(
+                    @{
+                      "type" = "TextBlock"
+                      "text" = "🚀 New Windows Build Available"
+                      "weight" = "bolder"
+                      "size" = "large"
+                    }
+                    @{
+                      "type" = "TextBlock"
+                      "text" = "MSIX Download:"
+                      "wrap" = $true
+                      "weight" = "bolder"
+                    }
+                    @{
+                      "type" = "TextBlock"
+                      "text" = $msixUrl
+                      "color" = "accent"
+                      "wrap" = $true
+                    }
+                  )
+                  "$schema" = "http://adaptivecards.io/schemas/adaptive-card.json"
+                  "version" = "1.2"
+                }
+              }
+            )
+          }
           
-          Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $body -ContentType 'application/json'
-        shell: powershell
+          $jsonBody = $body | ConvertTo-Json -Depth 10
+
+          Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
+        shell: pwsh
