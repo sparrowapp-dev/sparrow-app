@@ -159,7 +159,7 @@ jobs:
         shell: powershell
 
       - name: Install MSIX Packaging Tool
-        run: winget install "MSIX Packaging Tool" --source msstore --silent
+        run: winget install "MSIX Packaging Tool" --source msstore --accept-package-agreements --accept-source-agreements --silent
         shell: powershell
 
       - name: Prepare MSIX Template
