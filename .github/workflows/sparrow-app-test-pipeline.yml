@@ -162,19 +162,18 @@ jobs:
         run: winget install "MSIX Packaging Tool" --source msstore --accept-package-agreements --accept-source-agreements --silent
         shell: powershell
 
-      - name: Prepare MSIX Template
-        run: |
-          $templatePath = ".github/workflows/msix_packaging/sparrow_template.xml"
-          $content = Get-Content $templatePath -Raw
-          $content -replace '\$\{\{msi_path\}\}', (Resolve-Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/*.msi") | 
-            Out-File $templatePath -Encoding UTF8
-        shell: powershell
-
       - name: Convert to MSIX
         run: |
+          # Create output directory
+          New-Item -ItemType Directory -Force -Path "msix-output"
+          
+          # Run conversion (output location is defined in the template)
           MsixPackagingTool.exe create-package `
-            --template .github/workflows/msix_packaging/sparrow_template.xml `
-            --output msix-output/
+            --template ".github/workflows/msix_packaging/sparrow_template.xml"
+          
+          # Move the generated MSIX to our output folder
+          $msixFile = Get-ChildItem -Path ".github/workflows/msix_packaging" -Filter "*.msix" -Recurse
+          Move-Item -Path $msixFile.FullName -Destination "msix-output/" -Force
         shell: powershell
 
       # --- STAGE 4: SIGN MSIX WITH DIGICERT ---
