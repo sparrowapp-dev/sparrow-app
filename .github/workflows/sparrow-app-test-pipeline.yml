@@ -579,7 +579,7 @@ jobs:
         run: |
           # 1. Configure paths
           $msixDir = "msix-output"
-          $msixPath = "$msixDir/sparrow.msix"
+          $msixPath   = Join-Path $PWD "$msixDir\sparrow.msix"
           $appRoot = "app-root"
           $backupPath = "$msixPath.backup"
 
@@ -650,7 +650,7 @@ jobs:
                           "/td", "sha256",
                           "/v",
                           "/debug",
-                          "`"$msixPath`""
+                          "$($msixPath.FullName)"
                       )
 
                       & $signTool $signArgs
