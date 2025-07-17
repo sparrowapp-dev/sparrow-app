@@ -576,6 +576,10 @@ jobs:
 
       - name: Create and Sign MSIX Package
         shell: pwsh
+        env:
+          # Environment variables to prevent crypto provider caching issues
+          COMPlus_EnableDiagnostics: 0
+          CRYPTNET_CRL_AUTODISCOVERY_OPT_IN: 0
         run: |
           # 1. Configure paths
           $msixDir = "msix-output"
@@ -626,13 +630,20 @@ jobs:
               # 6. Import certificate to Personal store
               $certPassword = ConvertTo-SecureString -String $env:SM_CLIENT_CERT_PASSWORD -AsPlainText -Force
               $cert = Import-PfxCertificate -FilePath $env:SM_CLIENT_CERT_FILE `
-                                          -CertStoreLocation Cert:\CurrentUser\My `
-                                          -Password $certPassword `
-                                          -Exportable
+                                     -CertStoreLocation Cert:\CurrentUser\My `
+                                     -Password $certPassword `
+                                     -Exportable `
+                                     -KeyStorageFlags @(
+                                        'UserKeySet',
+                                        'PersistKeySet',
+                                        'Exportable'
+                                     )
               if (-not $cert) {
                   throw "Failed to import certificate to store"
               }
               Write-Host "✓ Certificate imported (Thumbprint: $($cert.Thumbprint))"
+              Write-Host "Certificate Subject: $($cert.Subject)"
+              Write-Host "Has Private Key: $($cert.HasPrivateKey)"
 
               # 7. Execute signing with retries
               $maxRetries = 3
@@ -669,11 +680,24 @@ jobs:
                       Write-Host "✓ Successfully signed package"
                   }
                   catch {
-                      Write-Host "::warning::Attempt $retryCount failed: $($_.Exception.Message)"
-                      if ($retryCount -eq $maxRetries) {
-                          throw "All signing attempts failed"
-                      }
-                      Start-Sleep -Seconds (2 * $retryCount)
+                    Write-Host "::warning::Attempt $retryCount failed: $($_.Exception.Message)"
+                    
+                    # Additional diagnostics on last attempt
+                    if ($retryCount -eq $maxRetries) {
+                        Write-Host "=== Certificate Store Debug ==="
+                        Get-ChildItem Cert:\CurrentUser\My | Format-List Thumbprint,Subject,NotAfter,HasPrivateKey
+                        
+                        Write-Host "=== Private Key Access Test ==="
+                        try {
+                            $rsaKey = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($cert)
+                            Write-Host "Private key accessible: $($null -ne $rsaKey)"
+                        }
+                        catch {
+                            Write-Host "Private key access failed: $($_.Exception.Message)"
+                        }
+                    }
+                    
+                    Start-Sleep -Seconds (2 * $retryCount)
                   }
               }
 
@@ -689,16 +713,9 @@ jobs:
               Write-Host "::error::Signing failed: $($_.Exception.Message)"
               Write-Host "=== Debug Info ==="
               Write-Host "MSIX exists: $(Test-Path $msixPath)"
-              Write-Host "Cert exists: $(Test-Path $tempCertPath)"
               Write-Host "SignTool: $signTool"
               exit 1
           }
-          finally {
-              # Cleanup
-              if (Test-Path $tempCertPath) { Remove-Item $tempCertPath -Force }
-              if (Test-Path $backupPath) { Remove-Item $backupPath -Force }
-          }
-
       # - name: Sign MSIX with DigiCert SMCTLSign (using fingerprint)
       #   run: |
       #     if (-Not (Test-Path msix-output/sparrow.msix)) {
