@@ -179,22 +179,27 @@ jobs:
           $manifest | Set-Content -Encoding UTF8 -Path "app-root\AppxManifest.xml"
         shell: powershell
 
+      - name: Install Windows 10 SDK if MakeAppx is missing
+        run: choco install windows-sdk-10-version-1903-all -y
+        shell: powershell
+
       - name: Create MSIX Package using MakeAppx
         run: |
           New-Item -ItemType Directory -Force -Path "msix-output"
           $msixPath = "msix-output/sparrow.msix"
 
-          $makeappxPath = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -Filter "MakeAppx.exe" |
-                          Where-Object { $_.FullName -like "*\\x64\\MakeAppx.exe" } |
-                          Sort-Object FullName -Descending |
-                          Select-Object -First 1
+          $makeAppx = Get-ChildItem -Path 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter MakeAppx.exe -ErrorAction SilentlyContinue |
+                      Where-Object { $_.FullName -match '\\x64\\MakeAppx\.exe$' } |
+                      Sort-Object LastWriteTime -Descending |
+                      Select-Object -First 1
 
-          if (-not $makeappxPath) {
-            Write-Host "::error::MakeAppx.exe not found on system"
+          if (-not $makeAppx) {
+            Write-Host "::error::MakeAppx.exe not found. Please ensure Windows 10 SDK is available on this runner."
             exit 1
           }
 
-          & "$($makeappxPath.FullName)" pack /d "app-root" /p $msixPath
+          Write-Host "✅ Found MakeAppx.exe at: $($makeAppx.FullName)"
+          & "$($makeAppx.FullName)" pack /d "app-root" /p $msixPath
         shell: powershell
 
       # --- STAGE 4: SIGN MSIX WITH DIGICERT ---
