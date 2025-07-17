@@ -119,7 +119,6 @@ jobs:
 
       # --- STAGE 3: CONVERT TO MSIX ---
       - name: Inject version into MSIX template
-        shell: powershell
         run: |
           # Get version from Tauri (assuming it's in src-tauri/Cargo.toml)
           $version = (Select-String -Path "apps/@sparrow-desktop/src-tauri/Cargo.toml" -Pattern 'version = "(.*)"' | 
