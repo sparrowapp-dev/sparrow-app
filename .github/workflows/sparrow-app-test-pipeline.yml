@@ -133,9 +133,9 @@ jobs:
           echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> $env:GITHUB_ENV
         shell: bash
 
-      # - name: Install DigiCert Client tools
-      #   id: digicert-code-signing
-      #   uses: digicert/ssm-code-signing@v1.0.0
+      - name: Install DigiCert Client tools
+        id: digicert-code-signing
+        uses: digicert/ssm-code-signing@v1.0.0
 
       - name: Sign MSI
         run: |
