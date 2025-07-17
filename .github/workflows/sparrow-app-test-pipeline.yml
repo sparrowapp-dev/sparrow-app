@@ -387,26 +387,26 @@ jobs:
       #   shell: powershell
 
 
-      - name: Sign MSIX with DigiCert SMCTLSign (using fingerprint)
-        run: |
-          if (-Not (Test-Path msix-output/sparrow.msix)) {
-              Write-Host "MSIX file not found at msix-output/sparrow.msix"
-          }
+      # - name: Sign MSIX with DigiCert SMCTLSign (using fingerprint)
+      #   run: |
+      #     if (-Not (Test-Path msix-output/sparrow.msix)) {
+      #         Write-Host "MSIX file not found at msix-output/sparrow.msix"
+      #     }
 
-          Write-Host "Signing: msix-output/sparrow.msix with DigiCert SMCTLSign"
+      #     Write-Host "Signing: msix-output/sparrow.msix with DigiCert SMCTLSign"
           
-          $certFingerprint = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
-          Write-Host "Using certificate fingerprint: $certFingerprint"
+      #     $certFingerprint = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
+      #     Write-Host "Using certificate fingerprint: $certFingerprint"
           
-          # Use certificate fingerprint instead of keypair alias
-          smctl sign --certificate-fingerprint="$certFingerprint" --input="msix-output/sparrow.msix"
+      #     # Use certificate fingerprint instead of keypair alias
+      #     smctl sign --certificate-fingerprint="$certFingerprint" --input="msix-output/sparrow.msix"
           
-          if ($LASTEXITCODE -ne 0) {
-              Write-Host "Failed to sign msix-output/sparrow.msix with SMCTLSign"
-          }
+      #     if ($LASTEXITCODE -ne 0) {
+      #         Write-Host "Failed to sign msix-output/sparrow.msix with SMCTLSign"
+      #     }
 
-          Write-Host "Successfully signed msix-output/sparrow.msix"
-        shell: powershell
+      #     Write-Host "Successfully signed msix-output/sparrow.msix"
+      #   shell: powershell
 
       - name: Sign MSIX with DigiCert SMCTLSign
         run: |
@@ -418,8 +418,7 @@ jobs:
           Write-Host "Signing: msix-output/sparrow.msix with DigiCert SMCTLSign"
           
           # Use DigiCert's native signing tool
-          smctl sign --keypair-alias "$env:KEYPAIR_ALIAS" --input "msix-output/sparrow.msix" --verbose
-          
+          smctl sign --keypair-alias="$env:KEYPAIR_ALIAS" --input="msix-output/sparrow.msix" --verbose
           if ($LASTEXITCODE -ne 0) {
               Write-Host "Failed to sign msix-output/sparrow.msix with SMCTLSign"
               exit 1
