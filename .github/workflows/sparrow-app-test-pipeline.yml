@@ -45,7 +45,7 @@ env:
 
 jobs:
   build_and_sign_msix:
-    runs-on: windows-2025
+    runs-on: windows-latest
     environment: production
 
     steps:
@@ -53,53 +53,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Windows 10 SDK
-        run: choco install windows-sdk-10-version-2004-all -y
+      - name: Install Windows SDK
+        run: Invoke-WebRequest -Uri https://aka.ms/winsdk/10/latest/SdkSetup.exe -OutFile $env:TEMP\SdkSetup.exe
         shell: powershell
-
-      # - name: Setup Node.js
-      #   uses: actions/setup-node@v2
-      #   with:
-      #     node-version: "20.8"
-
-      # - name: Install Rust 1.82.0
-      #   run: |
-      #     Invoke-WebRequest -Uri https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -OutFile rustup-init.exe
-      #     .\rustup-init.exe -y
-      #     rustup install 1.82.0
-      #     rustup default 1.82.0
-
-      # - name: Update updater endpoint in tauri.conf.json file
-      #   run: |
-      #     $content = Get-Content apps/@sparrow-desktop/src-tauri/tauri.conf.json -Raw
-      #     $newContent = $content -replace '"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"', '"https://${{ secrets.UPDATER_ENDPOINT_PROD }}/updater/{{target}}/{{arch}}/{{current_version}}"'
-      #     Set-Content -Path apps/@sparrow-desktop/src-tauri/tauri.conf.json -Value $newContent
-      #   shell: pwsh
-
-      # - name: Increase Yarn network timeout
-      #   run: yarn config set network-timeout 600000
-
-      # - name: Sync version across all files
-      #   run: yarn sync-version
-
-      # - name: Build Tauri App
-      #   run: |
-      #     yarn cache clean
-      #     npm install -g pnpm
-      #     yarn install
-      #     yarn desktop-build
-      #   env:
-      #     TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-      #     TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-      #     GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
-
-      # - name: Upload MSI and EXE as Artifacts
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: tauri-build-artifacts
-      #     path: |
-      #       apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/*.msi
-      #       apps/@sparrow-desktop/src-tauri/target/debug/Sparrow.exe
 
       - name: Copy unsigned MSI and EXE from prebuilt
         run: |
@@ -127,127 +83,22 @@ jobs:
           Write-Host "Copied $($exe.Name) to standard location"
         shell: powershell
 
-      # --- STAGE 2: SIGN MSI WITH DIGICERT ---
-      - name: Setup and Verify DigiCert Certificate & Environment
+      # Set up DigiCert certificate for cloud signing
+      - name: Set up DigiCert certificate
         shell: pwsh
         run: |
-          # Enable strict error handling
-          $ErrorActionPreference = "Stop"
-          
-          Write-Host "=== Setting up DigiCert Certificate and Environment Variables ==="
-          
-          # 1. Environment Variables Setup
-          Write-Host "`n[1/3] Configuring Environment Variables..."
-          $requiredSecrets = @{
-            "SM_HOST" = "${{ secrets.SM_HOST }}"
-            "SM_API_KEY" = "${{ secrets.SM_API_KEY }}"
-            "SM_CLIENT_CERT_PASSWORD" = "${{ secrets.SM_CLIENT_CERT_PASSWORD }}"
-          }
-
-          # Verify secrets exist before proceeding
-          foreach ($key in $requiredSecrets.Keys) {
-            if ([string]::IsNullOrEmpty($requiredSecrets[$key])) {
-              Write-Host "::error::Missing required secret: $key"
-              exit 1
-            }
-          }
-
-          # Set environment variables using multiple methods for reliability
-          try {
-            # Method 1: GitHub Environment File
-            "SM_HOST=$($requiredSecrets.SM_HOST)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
-            "SM_API_KEY=$($requiredSecrets.SM_API_KEY)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
-            "SM_CLIENT_CERT_PASSWORD=$($requiredSecrets.SM_CLIENT_CERT_PASSWORD)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
-            
-            # Method 2: Immediate session variables
-            $env:SM_HOST = $requiredSecrets.SM_HOST
-            $env:SM_API_KEY = $requiredSecrets.SM_API_KEY
-            $env:SM_CLIENT_CERT_PASSWORD = $requiredSecrets.SM_CLIENT_CERT_PASSWORD
-            
-            Write-Host "✓ Environment variables set successfully"
-          }
-          catch {
-            Write-Host "::warning::Partial environment setup: $($_.Exception.Message)"
-          }
-
-          # 2. Certificate Decoding
-          Write-Host "`n[2/3] Processing Certificate..."
-          $certPath = "${{ github.workspace }}\Certificate_pkcs12.p12"
-          $certBase64 = "${{ secrets.SM_CLIENT_CERT_FILE_B64 }}".Trim()
-
-          # Validate certificate secret
-          if ([string]::IsNullOrWhiteSpace($certBase64)) {
-            Write-Host "::error::SM_CLIENT_CERT_FILE_B64 secret is empty or not set"
-            exit 1
-          }
-
-          # Clean and validate Base64
-          $cleanBase64 = $certBase64 -replace '\s',''
-          if ($cleanBase64.Length % 4 -ne 0) {
-            Write-Host "::warning::Base64 length not multiple of 4 (may need padding)"
-            $cleanBase64 = $cleanBase64.PadRight($cleanBase64.Length + (4 - $cleanBase64.Length % 4) % 4, '=')
-          }
-
-          try {
-            # Decode and save certificate
-            $certBytes = [Convert]::FromBase64String($cleanBase64)
-            [IO.File]::WriteAllBytes($certPath, $certBytes)
-            
-            # Set certificate path
-            "SM_CLIENT_CERT_FILE=$certPath" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
-            $env:SM_CLIENT_CERT_FILE = $certPath
-            
-            Write-Host "✓ Certificate saved to $certPath ($($certBytes.Length) bytes)"
-          }
-          catch {
-            Write-Host "::error::Certificate processing failed: $($_.Exception.Message)"
-            Write-Host "Debug info: Base64 length=$($certBase64.Length), Clean length=$($cleanBase64.Length)"
-            exit 1
-          }
-
-          # 3. Validation Phase
-          Write-Host "`n[3/3] Running Validations..."
-          
-          # Certificate Validation
-          try {
-            $cert = New-Object Security.Cryptography.X509Certificates.X509Certificate2(
-              $certPath,
-              $requiredSecrets.SM_CLIENT_CERT_PASSWORD,
-              [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable
-            )
-            
-            Write-Host "✓ Certificate Validated:"
-            Write-Host "   Subject: $($cert.Subject)"
-            Write-Host "   Thumbprint: $($cert.Thumbprint)"
-            Write-Host "   Expires: $($cert.NotAfter.ToString('yyyy-MM-dd'))"
-            $cert.Dispose()
-          }
-          catch {
-            Write-Host "::error::Certificate validation failed: $($_.Exception.Message)"
-            exit 1
-          }
-
-          # Environment Verification
-          $missingVars = @()
-          foreach ($var in @("SM_HOST", "SM_API_KEY", "SM_CLIENT_CERT_PASSWORD", "SM_CLIENT_CERT_FILE")) {
-            if (-not (Test-Path "env:$var")) {
-              $missingVars += $var
-            }
-          }
-
-          if ($missingVars.Count -gt 0) {
-            Write-Host "::warning::These variables didn't persist: $($missingVars -join ', ')"
-            Write-Host "Current environment:"
-            Get-ChildItem env: | Where-Object Name -like "SM_*" | Format-Table Name, @{
-              Label="Value";
-              Expression={ if ($_.Name -like "*KEY*" -or $_.Name -like "*PASSWORD*") { "*****" } else { $_.Value } }
-            }
-          }
-          else {
-            Write-Host "✓ All environment variables confirmed"
-          }
-
-          Write-Host "`n✅ Setup and Verification Completed Successfully"
+          Write-Host "Decoding DigiCert .p12 into D:\Certificate_pkcs12.p12"
+          $bytes = [Convert]::FromBase64String("${{ secrets.SM_CLIENT_CERT_FILE_B64 }}")
+          [IO.File]::WriteAllBytes("D:\Certificate_pkcs12.p12", $bytes)
+      
+      - name: Set variables
+        id: variables
+        run: |
+          echo "SM_HOST=${{ secrets.SM_HOST }}" >> "$GITHUB_ENV"
+          echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> "$GITHUB_ENV"
+          echo "SM_CLIENT_CERT_FILE=D:\\Certificate_pkcs12.p12" >> "$GITHUB_ENV"
+          echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV"
+        shell: bash
 
       # Setup Android SDK (required by DigiCert action for compatibility)
       - name: Setup Android SDK (for DigiCert action compatibility)
@@ -281,81 +132,18 @@ jobs:
         id: extract_alias
         shell: pwsh
         run: |
-          Write-Host "=== Getting keypair information ==="
-          
-          # Get keypair list and capture output
-          $keypairOutput = smctl keypair ls 2>&1
-          Write-Host "Keypair command output:"
-          Write-Host $keypairOutput
-          
-          # Parse the output more carefully
-          $lines = $keypairOutput -split "`n"
-          Write-Host "Total lines: $($lines.Count)"
-          
-          # Find the first data line (skip header lines)
-          $dataLine = $null
-          for ($i = 0; $i -lt $lines.Count; $i++) {
-              $line = $lines[$i].Trim()
-              Write-Host "Line $i`: $line"
-              
-              # Skip empty lines and header lines
-              if ($line -and $line -notmatch "^-+$" -and $line -notmatch "^ID\s+") {
-                  $dataLine = $line
-                  Write-Host "Found data line: $dataLine"
-                  break
-              }
-          }
-          
-          if (-not $dataLine) {
-              Write-Host "::error::No keypair data found"
-              exit 1
-          }
-          
-          # Extract alias (typically the third column)
-          $parts = $dataLine -split '\s{2,}'
-          Write-Host "Split parts: $($parts -join ' | ')"
-          
-          if ($parts.Count -lt 3) {
-              Write-Host "::error::Could not parse keypair line: $dataLine"
-              exit 1
-          }
-          
-          $alias = $parts[2].Trim()
-          Write-Host "✅ Extracted alias: '$alias'"
-          
-          if (-not $alias) {
-              Write-Host "::error::Alias is empty"
-              exit 1
-          }
-          
-          # Set environment variable for subsequent steps
-          Add-Content -Path $env:GITHUB_ENV -Value "KEYPAIR_ALIAS=$alias"
-          Write-Host "✅ Set KEYPAIR_ALIAS environment variable"
+          $line  = (smctl keypair ls | Select-Object -Skip 2 | Select-Object -First 1)
+          $alias = ($line -split '\s{2,}')[2]
+          Write-Host "✅ Using alias: $alias"
+          "KEYPAIR_ALIAS=$alias" | Out-File -FilePath $env:GITHUB_ENV -Encoding ascii
       
       - name: Sync Certificate into Windows Store
         shell: pwsh
         run: |
-          # Sync to both stores to be sure
-          smctl windows certsync --keypair-alias="$env:KEYPAIR_ALIAS"
-          smctl windows certsync --keypair-alias="$env:KEYPAIR_ALIAS" --store=system
-          
-          # Give it a moment to sync
-          Start-Sleep -Seconds 5
-          
-          # Verify the certificate is available
-          $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
-          $cert = Get-ChildItem -Path "Cert:\CurrentUser\My" | Where-Object { $_.Thumbprint -eq $certThumb }
-          if (-not $cert) {
-            $cert = Get-ChildItem -Path "Cert:\LocalMachine\My" | Where-Object { $_.Thumbprint -eq $certThumb }
-          }
-          
-          if (-not $cert) {
-            Write-Host "::error::Certificate still not found after sync"
-            exit 1
-          }
-          
-          Write-Host "✅ Certificate synced successfully"
-
+          Write-Host "🔄 Syncing cert for alias: $($env:KEYPAIR_ALIAS)"
+          smctl windows certsync `
+            --keypair-alias="$($env:KEYPAIR_ALIAS)" `
+            --store=system
 
       # --- STAGE 3: CONVERT TO MSIX USING MAKEAPPX ---
       - name: Prepare App Folder for MakeAppx
@@ -431,362 +219,66 @@ jobs:
           $manifest | Set-Content -Encoding UTF8 -Path "app-root\AppxManifest.xml"
         shell: powershell
 
-      # - name: Create MSIX Package using MakeAppx
-      #   run: |
-      #     New-Item -ItemType Directory -Force -Path "msix-output"
-      #     $msixPath = "msix-output/sparrow.msix"
-
-      #     $makeAppx = Get-ChildItem -Path 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter MakeAppx.exe -ErrorAction SilentlyContinue |
-      #                 Where-Object { $_.FullName -match '\\x64\\MakeAppx\.exe$' } |
-      #                 Sort-Object LastWriteTime -Descending |
-      #                 Select-Object -First 1
-
-      #     if (-not $makeAppx) {
-      #       Write-Host "::error::MakeAppx.exe not found. Please ensure Windows 10 SDK is available on this runner."
-      #       exit 1
-      #     }
-
-      #     Write-Host "✅ Found MakeAppx.exe at: $($makeAppx.FullName)"
-      #     & "$($makeAppx.FullName)" pack /d "app-root" /p $msixPath
-      #   shell: powershell
-
-      # # --- STAGE 4: SIGN MSIX WITH DIGICERT ---
-      # - name: Sign MSIX Package
-      #   shell: pwsh
-      #   run: |
-      #     # Enable strict error handling
-      #     $ErrorActionPreference = "Stop"
-          
-      #     # 1. Configure paths and parameters
-      #     $msixPath = "msix-output/sparrow.msix"
-      #     $timestampServer = "http://timestamp.digicert.com"
-      #     $signToolPath = "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe"
-          
-      #     # 2. Pre-signing validation
-      #     Write-Host "`n=== Pre-Signing Validation ==="
-          
-      #     # Verify MSIX exists
-      #     if (-not (Test-Path -Path $msixPath -PathType Leaf)) {
-      #       Write-Host "::error::MSIX file not found at $msixPath"
-      #       Get-ChildItem -Path "msix-output" | Format-Table Name, Length | Out-String | Write-Host
-      #       exit 1
-      #     }
-          
-      #     # Verify certificate is accessible
-      #     if (-not (Test-Path -Path $env:SM_CLIENT_CERT_FILE)) {
-      #       Write-Host "::error::Certificate file not found at $env:SM_CLIENT_CERT_FILE"
-      #       exit 1
-      #     }
-          
-      #     # Verify signtool exists
-      #     if (-not (Test-Path -Path $signToolPath)) {
-      #       Write-Host "::error::SignTool not found at $signToolPath"
-      #       Write-Host "Available Windows Kits versions:"
-      #       Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" | Format-Table Name | Out-String | Write-Host
-      #       exit 1
-      #     }
-          
-      #     # 3. Prepare signing command
-      #     $signArgs = @(
-      #       "sign",
-      #       "/fd", "sha256",
-      #       "/f", "`"$env:SM_CLIENT_CERT_FILE`"",
-      #       "/p", "`"$env:SM_CLIENT_CERT_PASSWORD`"",
-      #       "/tr", $timestampServer,
-      #       "/td", "sha256",
-      #       "/v",
-      #       "`"$msixPath`""
-      #     )
-          
-      #     Write-Host "`n=== Signing Command ==="
-      #     Write-Host "$signToolPath $($signArgs -join ' ')"
-          
-      #     # 4. Execute signing with retry logic
-      #     $maxRetries = 3
-      #     $retryCount = 0
-      #     $signed = $false
-          
-      #     while (-not $signed -and $retryCount -lt $maxRetries) {
-      #       try {
-      #         $retryCount++
-      #         Write-Host "`nAttempt $retryCount of $maxRetries..."
-              
-      #         # Clear any previous errors
-      #         $LASTEXITCODE = 0
-              
-      #         # Execute signing
-      #         & $signToolPath $signArgs
-              
-      #         if ($LASTEXITCODE -ne 0) {
-      #           throw "SignTool failed with exit code $LASTEXITCODE"
-      #         }
-              
-      #         $signed = $true
-      #         Write-Host "✓ Successfully signed $msixPath"
-      #       }
-      #       catch {
-      #         Write-Host "::warning::Signing attempt $retryCount failed: $($_.Exception.Message)"
-              
-      #         # Additional diagnostics on last attempt
-      #         if ($retryCount -eq $maxRetries) {
-      #           Write-Host "`n=== Final Attempt Diagnostics ==="
-                
-      #           # Verify certificate can be loaded
-      #           try {
-      #             $cert = New-Object Security.Cryptography.X509Certificates.X509Certificate2(
-      #               $env:SM_CLIENT_CERT_FILE,
-      #               $env:SM_CLIENT_CERT_PASSWORD,
-      #               [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable
-      #             )
-      #             Write-Host "✓ Certificate is valid:"
-      #             Write-Host "   Thumbprint: $($cert.Thumbprint)"
-      #             Write-Host "   Has Private Key: $($cert.HasPrivateKey)"
-      #             Write-Host "   Not After: $($cert.NotAfter)"
-      #             $cert.Dispose()
-      #           }
-      #           catch {
-      #             Write-Host "::error::Certificate validation failed: $($_.Exception.Message)"
-      #           }
-                
-      #           # Check file signatures
-      #           Write-Host "`nFile signatures:"
-      #           & $signToolPath verify /pa /v "`"$msixPath`""
-                
-      #           exit 1
-      #         }
-              
-      #         # Wait before retry
-      #         Start-Sleep -Seconds (5 * $retryCount)
-      #       }
-      #     }
-          
-      #     # 5. Post-signing verification
-      #     if ($signed) {
-      #       Write-Host "`n=== Signature Verification ==="
-      #       & $signToolPath verify /pa /v "`"$msixPath`""
-            
-      #       if ($LASTEXITCODE -ne 0) {
-      #         Write-Host "::error::Signature verification failed"
-      #         exit 1
-      #       }
-            
-      #       Write-Host "`n✅ Package signed and verified successfully"
-      #     }
-
-
-      - name: Create and Sign MSIX Package
-        shell: pwsh
-        env:
-          # Environment variables to prevent crypto provider caching issues
-          COMPlus_EnableDiagnostics: 0
-          CRYPTNET_CRL_AUTODISCOVERY_OPT_IN: 0
+      - name: Create MSIX Package using MakeAppx
         run: |
-          # 1. Configure paths
-          $msixDir = "msix-output"
-          $msixPath   = Join-Path $PWD "$msixDir\sparrow.msix"
-          $appRoot = "app-root"
-          $backupPath = "$msixPath.backup"
+          New-Item -ItemType Directory -Force -Path "msix-output"
+          $msixPath = "C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix"
 
-          # 2. Create output directory
-          New-Item -ItemType Directory -Force -Path $msixDir | Out-Null
-
-          # 3. Find MakeAppx tool (latest version)
           $makeAppx = Get-ChildItem -Path 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter MakeAppx.exe -ErrorAction SilentlyContinue |
                       Where-Object { $_.FullName -match '\\x64\\MakeAppx\.exe$' } |
                       Sort-Object LastWriteTime -Descending |
                       Select-Object -First 1
 
-
           if (-not $makeAppx) {
-              Write-Host "::error::MakeAppx.exe not found"
+            Write-Host "::error::MakeAppx.exe not found. Please ensure Windows 10 SDK is available on this runner."
+            exit 1
+          }
+
+          Write-Host "✅ Found MakeAppx.exe at: $($makeAppx.FullName)"
+          & "$($makeAppx.FullName)" pack /d "app-root" /p $msixPath
+        shell: powershell
+
+      - name: Find and Sign MSIX files
+        shell: pwsh
+        run: |
+          $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
+          $bundlePath = "C:\a\sparrow-app\sparrow-app\msix-output"
+          
+          # List all files in the bundle directory for debugging
+          Write-Host "🔍 Contents of bundle directory:"
+          Get-ChildItem -Path $bundlePath -Recurse | Format-Table Name, FullName
+
+          # Find all MSIX files
+          $msixFiles = Get-ChildItem -Path $bundlePath -Filter "*.msix"
+          
+          if ($msixFiles.Count -eq 0) {
+            Write-Host "❌ No MSIX files found in $bundlePath"
+            Write-Host "🔍 Checking parent directories..."
+            Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target" -Recurse -Filter "*.msix" | ForEach-Object {
+              Write-Host "Found MSIX: $($_.FullName)"
+            }
+            exit 1
+          }
+
+          # Sign each MSIX file found
+          foreach ($msixFile in $msixFiles) {
+            Write-Host "🔐 Signing: $($msixFile.FullName)"
+
+            & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe" sign `
+              /sm /s My `
+              /tr http://timestamp.digicert.com `
+              /td sha256 `
+              /fd sha256 `
+              /sha1 $certThumb `
+              "$($msixFile.FullName)"
+
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "❌ Failed to sign $($msixFile.Name)"
               exit 1
+            }
+
+            Write-Host "✅ Successfully signed $($msixFile.Name)"
           }
-          Write-Host "✓ Using MakeAppx: $($makeAppx.FullName)"
-
-          # 4. Create MSIX package
-          try {
-          
-              & $makeAppx.FullName pack /d $appRoot /p $msixPath /l /o
-              if ($LASTEXITCODE -ne 0) {
-                  throw "MakeAppx failed with exit code $LASTEXITCODE"
-              }
-              Write-Host "✓ MSIX package created: $msixPath"
-              Write-Host "Package size: $((Get-Item $msixPath).Length/1KB) KB"
-          }
-          catch {
-              & "$($makeAppx.FullName)" pack /d "app-root" /p $msixPath
-              Write-Host "✓ MSIX package created 1: $msixPath"
-          }
-
-          # 5. Signing preparation
-          $signTool = $makeAppx.Directory.FullName + "\signtool.exe"
-          
-          try {
-              # Verify signing tools exist
-              if (-not (Test-Path $signTool)) {
-                  throw "SignTool not found at $signTool"
-              }
-
-              # 6. Import certificate to Personal store
-              $certPassword = ConvertTo-SecureString -String $env:SM_CLIENT_CERT_PASSWORD -AsPlainText -Force
-              $cert = Import-PfxCertificate -FilePath $env:SM_CLIENT_CERT_FILE `
-                                     -CertStoreLocation Cert:\CurrentUser\My `
-                                     -Password $certPassword `
-                                     -Exportable `
-                                     -KeyStorageFlags @(
-                                        'UserKeySet',
-                                        'PersistKeySet',
-                                        'Exportable'
-                                     )
-              if (-not $cert) {
-                  throw "Failed to import certificate to store"
-              }
-              Write-Host "✓ Certificate imported (Thumbprint: $($cert.Thumbprint))"
-              Write-Host "Certificate Subject: $($cert.Subject)"
-              Write-Host "Has Private Key: $($cert.HasPrivateKey)"
-
-              # 7. Execute signing with retries
-              $maxRetries = 3
-              $retryCount = 0
-              $signed = $false
-
-              while (-not $signed -and $retryCount -lt $maxRetries) {
-                  $retryCount++
-                  try {
-                      Write-Host "`nSigning attempt $retryCount of $maxRetries..."
-
-                      # Create backup of MSIX
-                      Copy-Item -Path $msixPath -Destination $backupPath -Force
-
-                      # Sign using certificate store
-                      & $signTool sign `
-                          /sm `
-                          /s My `
-                          /sha1 $cert.Thumbprint `
-                          /tr http://timestamp.digicert.com `
-                          /td sha256 `
-                          /fd sha256 `
-                          /v `
-                          /debug `
-                          "`"$msixPath`""
-
-                      if ($LASTEXITCODE -ne 0) {
-                          # Restore backup if signing failed
-                          Copy-Item -Path $backupPath -Destination $msixPath -Force
-                          throw "SignTool failed with exit code $LASTEXITCODE"
-                      }
-
-                      $signed = $true
-                      Write-Host "✓ Successfully signed package"
-                  }
-                  catch {
-                    Write-Host "::warning::Attempt $retryCount failed: $($_.Exception.Message)"
-                    
-                    # Additional diagnostics on last attempt
-                    if ($retryCount -eq $maxRetries) {
-                        Write-Host "=== Certificate Store Debug ==="
-                        Get-ChildItem Cert:\CurrentUser\My | Format-List Thumbprint,Subject,NotAfter,HasPrivateKey
-                        
-                        Write-Host "=== Private Key Access Test ==="
-                        try {
-                            $rsaKey = [System.Security.Cryptography.X509Certificates.RSACertificateExtensions]::GetRSAPrivateKey($cert)
-                            Write-Host "Private key accessible: $($null -ne $rsaKey)"
-                        }
-                        catch {
-                            Write-Host "Private key access failed: $($_.Exception.Message)"
-                        }
-                    }
-                    
-                    Start-Sleep -Seconds (2 * $retryCount)
-                  }
-              }
-
-              # 7. Verify signature
-              & $signTool verify /pa /v "`"$msixPath`""
-              if ($LASTEXITCODE -ne 0) {
-                  throw "Signature verification failed"
-              }
-
-              Write-Host "✅ Package signed and verified successfully"
-          }
-          catch {
-              Write-Host "::error::Signing failed: $($_.Exception.Message)"
-              Write-Host "=== Debug Info ==="
-              Write-Host "MSIX exists: $(Test-Path $msixPath)"
-              Write-Host "SignTool: $signTool"
-              exit 1
-          }
-      # - name: Sign MSIX with DigiCert SMCTLSign (using fingerprint)
-      #   run: |
-      #     if (-Not (Test-Path msix-output/sparrow.msix)) {
-      #         Write-Host "MSIX file not found at msix-output/sparrow.msix"
-      #     }
-
-      #     Write-Host "Signing: msix-output/sparrow.msix with DigiCert SMCTLSign"
-          
-      #     $certFingerprint = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
-      #     Write-Host "Using certificate fingerprint: $certFingerprint"
-          
-      #     # Use certificate fingerprint instead of keypair alias
-      #     smctl sign --certificate-fingerprint="$certFingerprint" --input="msix-output/sparrow.msix"
-          
-      #     if ($LASTEXITCODE -ne 0) {
-      #         Write-Host "Failed to sign msix-output/sparrow.msix with SMCTLSign"
-      #     }
-
-      #     Write-Host "Successfully signed msix-output/sparrow.msix"
-      #   shell: powershell
-
-      # - name: Add SignTool to PATH
-      #   shell: pwsh
-      #   run: |
-      #     # Find the Windows SDK SignTool
-      #     $signTool = Get-ChildItem -Path 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter signtool.exe -ErrorAction SilentlyContinue |
-      #                 Where-Object { $_.FullName -match '\\x64\\signtool\.exe$' } |
-      #                 Sort-Object LastWriteTime -Descending |
-      #                 Select-Object -First 1
-
-      #     if (-not $signTool) {
-      #       Write-Host "::error::SignTool.exe not found"
-      #       exit 1
-      #     }
-
-      #     $signToolDir = $signTool.Directory.FullName
-      #     Write-Host "Found SignTool at: $($signTool.FullName)"
-      #     Write-Host "Adding to PATH: $signToolDir"
-          
-      #     # Add to PATH for this step and subsequent steps
-      #     $env:PATH = "$signToolDir;$env:PATH"
-      #     Add-Content -Path $env:GITHUB_ENV -Value "PATH=$signToolDir;$env:PATH"
-          
-      #     # Verify it's working
-      #     & signtool.exe /?
-      #     Write-Host "✅ SignTool added to PATH successfully"
-
-      # - name: Sign MSIX with DigiCert SMCTLSign
-      #   run: |
-      #     if (-Not (Test-Path msix-output/sparrow.msix)) {
-      #         Write-Host "MSIX file not found at msix-output/sparrow.msix"
-      #         exit 1
-      #     }
-
-      #     Write-Host "Signing: msix-output/sparrow.msix with DigiCert SMCTLSign"
-      #     Write-Host "Using keypair alias: $env:KEYPAIR_ALIAS"
-      #     Write-Host "SignTool path: $env:SIGNTOOL_PATH"
-          
-      #     # Set the SIGNTOOL_PATH environment variable for smctl
-      #     $env:SIGNTOOL_PATH = "$env:SIGNTOOL_PATH"
-          
-      #     # Use DigiCert's native signing tool
-      #     smctl sign --keypair-alias="$env:KEYPAIR_ALIAS" --input="msix-output/sparrow.msix" --verbose
-          
-      #     if ($LASTEXITCODE -ne 0) {
-      #         Write-Host "Failed to sign msix-output/sparrow.msix with SMCTLSign"
-      #         exit 1
-      #     }
-
-      #     Write-Host "Successfully signed msix-output/sparrow.msix"
-      #   shell: powershell
 
       - name: Verify MSIX Signature
         run: |
