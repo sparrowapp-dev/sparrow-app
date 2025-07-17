@@ -34,6 +34,7 @@
   let authProfileToDelete: AuthProfileDto | null = null;
   let authProfileDeleteLoader = false;
   let isDeleteAuthProfilePopupOpen = false;
+  let isDefaultKeyUpdateInProgress = false;
 
   const tableHeaderContent = [
     "Name",
@@ -99,11 +100,16 @@
   }
 
   // Handle default key change
-  const handleDefaultKeyChange = (authId, authProfile) => {
+  const handleDefaultKeyChange = async (
+    authId: string,
+    authProfile: AuthProfileDto,
+  ) => {
+    if (isDefaultKeyUpdateInProgress) return;
     selectedDefaultKey = authId;
-    authProfile.defaultKey = true; // Mark the selected item as default
-    // onUpdateRequestState({ selectedAuthType: authId });
-    onUpdateAuthProfile(authId, authProfile, true);
+    authProfile.defaultKey = true;
+    isDefaultKeyUpdateInProgress = true;
+    await onUpdateAuthProfile(authId, authProfile, true);
+    isDefaultKeyUpdateInProgress = false;
   };
 
   const handleModalClose = (flag) => {
@@ -157,6 +163,7 @@
             onDefaultKeyChange={handleDefaultKeyChange}
             onEditAuthProfile={handleOnClickEditProfile}
             onDeleteAuthProfile={handleOnClickDeleteProfile}
+            bind:isDefaultKeyUpdateInProgress
           />
         {/each}
       </tbody>
