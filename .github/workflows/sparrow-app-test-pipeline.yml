@@ -179,46 +179,32 @@ jobs:
           $line  = (smctl keypair ls | Select-Object -Skip 2 | Select-Object -First 1)
           $alias = ($line -split '\s{2,}')[2]
           Write-Host "✅ Using alias: $alias"
-          "KEYPAIR_ALIAS=$alias" | Out-File -FilePath $env:GITHUB_ENV -Encoding ascii
+          echo "KEYPAIR_ALIAS=$alias" >> $GITHUB_ENV
       
       - name: Sync Certificate into Windows Store
         shell: pwsh
         run: |
-          Write-Host "🔄 Syncing cert for alias: $($env:KEYPAIR_ALIAS)"
-          smctl windows certsync `
-            --keypair-alias="$($env:KEYPAIR_ALIAS)" `
-            --store=system
+          # Sync to both stores to be sure
+          smctl windows certsync --keypair-alias="$env:KEYPAIR_ALIAS"
+          smctl windows certsync --keypair-alias="$env:KEYPAIR_ALIAS" --store=system
+          
+          # Give it a moment to sync
+          Start-Sleep -Seconds 5
+          
+          # Verify the certificate is available
+          $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
+          $cert = Get-ChildItem -Path "Cert:\CurrentUser\My" | Where-Object { $_.Thumbprint -eq $certThumb }
+          if (-not $cert) {
+            $cert = Get-ChildItem -Path "Cert:\LocalMachine\My" | Where-Object { $_.Thumbprint -eq $certThumb }
+          }
+          
+          if (-not $cert) {
+            Write-Host "::error::Certificate still not found after sync"
+            exit 1
+          }
+          
+          Write-Host "✅ Certificate synced successfully"
 
-      # - name: Sign MSI
-      #   run: |
-      #     $msi = Get-ChildItem "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/*.msi" | Select-Object -First 1
-      #     smctl sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $msi.FullName
-      #   shell: powershell
-
-      # --- STAGE 3: CONVERT TO MSIX ---
-      # - name: Inject version into MSIX template
-      #   run: |
-      #     # Extract only the correct version line under [package]
-      #     $cargoFile = "apps/@sparrow-desktop/src-tauri/Cargo.toml"
-      #     $versionLine = Select-String -Path $cargoFile -Pattern '^\s*version\s*=\s*"(.*?)"' | Select-Object -First 1
-      #     $version = $versionLine.Matches.Groups[1].Value + ".0"
-
-      #     # Update MSIX template
-      #     $templatePath = ".github/workflows/msix_packaging/sparrow_template.xml"
-
-      #     (Get-Content $templatePath -Raw) -replace "{{PACKAGE_VERSION}}", $version | 
-      #       Set-Content $templatePath -Encoding UTF8
-
-      #     (Get-Content $templatePath -Raw) -replace "{{MSIX_PACKAGE_PATH}}", "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/Sparrow.msi" | 
-      #       Set-Content $templatePath -Encoding UTF8
-
-      #     # Print version
-      #     Write-Host "`n✅ MSIX version set to: $version"
-
-      #     # Print Msix Package Path
-      #     Write-Host "`n✅ MSIX package path set to: apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/Sparrow.msi"
-
-      #   shell: powershell
 
       # --- STAGE 3: CONVERT TO MSIX USING MAKEAPPX ---
       - name: Prepare App Folder for MakeAppx
@@ -326,6 +312,7 @@ jobs:
 
           Write-Host "Signing: msix-output/sparrow.msix"
 
+          # Try CurrentUser store first
           & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe" sign `
             /sm /s My `
             /tr http://timestamp.digicert.com `
@@ -333,6 +320,17 @@ jobs:
             /fd sha256 `
             /sha1 $certThumb `
             "msix-output/sparrow.msix"
+
+          if ($LASTEXITCODE -ne 0) {
+              Write-Host "Failed with CurrentUser store, trying LocalMachine..."
+              & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe" sign `
+                /sm /s "LocalMachine\My" `
+                /tr http://timestamp.digicert.com `
+                /td sha256 `
+                /fd sha256 `
+                /sha1 $certThumb `
+                "msix-output/sparrow.msix"
+          }
 
           if ($LASTEXITCODE -ne 0) {
               Write-Host "Failed to sign msix-output/sparrow.msix"
