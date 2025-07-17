@@ -244,12 +244,14 @@ jobs:
             # 1. Sync certificate into Windows store
             smctl windows certsync --keypair-alias="$env:KEYPAIR_ALIAS"
 
-            # 2. Discover SignTool from same SDK as MakeAppx
-            $makeAppx = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter MakeAppx.exe |
-                        Where-Object FullName -Match '\\x64\\MakeAppx\.exe$' |
+            # Robustly locate SignTool alongside MakeAppx
+            $makeAppx = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter makeappx.exe |
+                        Where-Object FullName -Match '\\x64\\makeappx\.exe$' |
                         Sort-Object LastWriteTime -Descending |
                         Select-Object -First 1
-            $signTool = $makeAppx.FullName.Replace('MakeAppx.exe','SignTool.exe')
+            # Get the SDK folder, then join to Signtool.exe
+            $sdkFolder = Split-Path -Path $makeAppx.FullName -Parent
+            $signTool  = Join-Path -Path $sdkFolder -ChildPath 'Signtool.exe'
             Write-Host "Using SignTool at: $signTool"
 
             # 3. Sign all MSIX packages
