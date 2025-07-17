@@ -408,6 +408,32 @@ jobs:
       #     Write-Host "Successfully signed msix-output/sparrow.msix"
       #   shell: powershell
 
+      - name: Add SignTool to PATH
+        shell: pwsh
+        run: |
+          # Find the Windows SDK SignTool
+          $signTool = Get-ChildItem -Path 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter signtool.exe -ErrorAction SilentlyContinue |
+                      Where-Object { $_.FullName -match '\\x64\\signtool\.exe$' } |
+                      Sort-Object LastWriteTime -Descending |
+                      Select-Object -First 1
+
+          if (-not $signTool) {
+            Write-Host "::error::SignTool.exe not found"
+            exit 1
+          }
+
+          $signToolDir = $signTool.Directory.FullName
+          Write-Host "Found SignTool at: $($signTool.FullName)"
+          Write-Host "Adding to PATH: $signToolDir"
+          
+          # Add to PATH for this step and subsequent steps
+          $env:PATH = "$signToolDir;$env:PATH"
+          Add-Content -Path $env:GITHUB_ENV -Value "PATH=$signToolDir;$env:PATH"
+          
+          # Verify it's working
+          & signtool.exe /?
+          Write-Host "✅ SignTool added to PATH successfully"
+
       - name: Sign MSIX with DigiCert SMCTLSign
         run: |
           if (-Not (Test-Path msix-output/sparrow.msix)) {
@@ -416,15 +442,22 @@ jobs:
           }
 
           Write-Host "Signing: msix-output/sparrow.msix with DigiCert SMCTLSign"
+          Write-Host "Using keypair alias: $env:KEYPAIR_ALIAS"
+          Write-Host "SignTool path: $env:SIGNTOOL_PATH"
+          
+          # Set the SIGNTOOL_PATH environment variable for smctl
+          $env:SIGNTOOL_PATH = "$env:SIGNTOOL_PATH"
           
           # Use DigiCert's native signing tool
           smctl sign --keypair-alias="$env:KEYPAIR_ALIAS" --input="msix-output/sparrow.msix" --verbose
+          
           if ($LASTEXITCODE -ne 0) {
               Write-Host "Failed to sign msix-output/sparrow.msix with SMCTLSign"
               exit 1
           }
 
           Write-Host "Successfully signed msix-output/sparrow.msix"
+        shell: powershell
 
       - name: Verify MSIX Signature
         run: |
