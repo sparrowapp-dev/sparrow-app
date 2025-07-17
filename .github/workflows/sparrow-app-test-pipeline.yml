@@ -8,7 +8,7 @@ on:
   push:
     # Trigger on push to the <branch_name> branch. Make sure to remove the branch name from the branches list below, once you are done testing.
     branches:
-      - <branch_name>
+      - fix/msix-build
   workflow_dispatch:
 
 env:
@@ -44,4 +44,124 @@ env:
   CI: false
 
 jobs:
-     
+  build_and_sign_msix:
+    runs-on: windows-latest
+    environment: production
+
+    steps:
+      # --- STAGE 1: BUILD TAURI APP (MSI ONLY) ---
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1
+
+      - name: Install Rust 1.82.0
+        run: |
+          Invoke-WebRequest -Uri https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -OutFile rustup-init.exe
+          .\rustup-init.exe -y
+          rustup install 1.82.0
+          rustup default 1.82.0
+
+      - name: Update updater endpoint in tauri.conf.json file
+        run: |
+          $content = Get-Content apps/@sparrow-desktop/src-tauri/tauri.conf.json -Raw
+          $newContent = $content -replace '"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"', '"https://${{ secrets.UPDATER_ENDPOINT_PROD }}/updater/{{target}}/{{arch}}/{{current_version}}"'
+          Set-Content -Path apps/@sparrow-desktop/src-tauri/tauri.conf.json -Value $newContent
+        shell: pwsh
+
+      - name: Increase Yarn network timeout
+        run: yarn config set network-timeout 600000
+
+      - name: Sync version across all files
+        run: yarn sync-version
+
+      - name: Build Tauri App
+        run: |
+          yarn cache clean
+          yarn install
+          yarn desktop-build --debug
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+
+      # --- STAGE 2: SIGN MSI WITH DIGICERT ---
+      - name: Set up DigiCert SM Client
+        run: |
+          echo "${{ secrets.SM_CLIENT_CERT_FILE_B64 }}" | base64 --decode > cert.p12
+          echo "SM_CLIENT_CERT_FILE=$env:GITHUB_WORKSPACE\cert.p12" >> $env:GITHUB_ENV
+          echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> $env:GITHUB_ENV
+        shell: bash
+
+      - name: Install DigiCert Client tools
+        id: digicert-code-signing
+        uses: digicert/ssm-code-signing@v1.0.0
+
+      - name: Sign MSI
+        run: |
+          $msi = Get-ChildItem "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/*.msi" | Select-Object -First 1
+          smctl sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $msi.FullName
+        shell: powershell
+
+      # --- STAGE 3: CONVERT TO MSIX ---
+      - name: Install MSIX Packaging Tool
+        run: winget install "MSIX Packaging Tool" --source msstore --silent
+        shell: powershell
+
+      - name: Prepare MSIX Template
+        run: |
+          $templatePath = ".github/workflows/msix_packaging/sparrow_template.xml"
+          $content = Get-Content $templatePath -Raw
+          $content -replace '\$\{\{msi_path\}\}', (Resolve-Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/*.msi") | 
+            Out-File $templatePath -Encoding UTF8
+        shell: pwsh
+
+      - name: Convert to MSIX
+        run: |
+          MsixPackagingTool.exe create-package `
+            --template .github/workflows/msix_packaging/sparrow_template.xml `
+            --output msix-output/
+        shell: powershell
+
+      # --- STAGE 4: SIGN MSIX WITH DIGICERT ---
+      - name: Sign MSIX
+        run: |
+          $msix = Get-ChildItem "msix-output/*.msix" | Select-Object -First 1
+          smctl sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $msix.FullName
+        shell: powershell
+
+      - name: Verify Signature
+        run: |
+          $msix = Get-ChildItem "msix-output/*.msix" | Select-Object -First 1
+          $result = smctl verify --input $msix.FullName
+          if (-not $result.Contains("Valid: True")) { 
+            throw "MSIX signature verification failed" 
+          }
+        shell: powershell
+
+      # --- STAGE 5: DEPLOY ---
+      - name: Upload to S3
+        run: |
+          aws s3 cp msix-output/*.msix s3://sparrow-release-assests-prod/
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Notify Teams
+        run: |
+          $msix = Get-ChildItem "msix-output/*.msix" | Select-Object -First 1
+          $url = "https://sparrow-release-assests-prod.s3.amazonaws.com/$($msix.Name)"
+          
+          $body = @{
+            text = "New MSIX build available: [$($msix.Name)]($url)"
+          } | ConvertTo-Json
+          
+          Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $body -ContentType 'application/json'
+        shell: pwsh
