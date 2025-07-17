@@ -93,6 +93,14 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
 
+      - name: Upload MSI and EXE as Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: tauri-build-artifacts
+          path: |
+            apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/*.msi
+            apps/@sparrow-desktop/src-tauri/target/debug/Sparrow.exe
+            
       # - name: Copy unsigned MSI from prebuilt
       #   run: |
       #     # Create target directory structure
@@ -227,8 +235,6 @@ jobs:
                                     BackgroundColor="transparent"
                                     Square150x150Logo="Assets\Square150x150Logo.png"
                                     Square44x44Logo="Assets\Square44x44Logo.png">
-                  <uap:DefaultTile Square150x150Logo="Assets\Square150x150Logo.png" />
-                  <uap:SplashScreen Image="Assets\SplashScreen.png" />
                 </uap:VisualElements>
               </Application>
             </Applications>
