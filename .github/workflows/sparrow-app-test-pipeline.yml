@@ -316,15 +316,13 @@ jobs:
       # --- STAGE 4: SIGN MSIX WITH DIGICERT ---
       - name: Sign MSIX
         run: |
-          $msixPath = "msix-output/sparrow.msix"
-
           # Verify the MSIX file exists
-          if (-Not (Test-Path $msixPath)) {
-              Write-Host "❌ MSIX file not found at $msixPath"
+          if (-Not (Test-Path msix-output/sparrow.msix)) {
+              Write-Host "MSIX file not found at msix-output/sparrow.msix"
               exit 1
           }
 
-          Write-Host "🔐 Signing: $msixPath"
+          Write-Host "Signing: msix-output/sparrow.msix"
 
           & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe" sign `
             /fd sha256 `
@@ -332,14 +330,14 @@ jobs:
             /tr http://timestamp.digicert.com `
             /td sha256 `
             /v `
-            "$msixPath"
+            "msix-output/sparrow.msix"
 
           if ($LASTEXITCODE -ne 0) {
-              Write-Host "❌ Failed to sign $msixPath"
+              Write-Host "Failed to sign $msixPath"
               exit 1
           }
 
-          Write-Host "✅ Successfully signed $msixPath"
+          Write-Host "Successfully signed $msixPath"
         shell: powershell
 
       - name: Verify MSIX Signature
