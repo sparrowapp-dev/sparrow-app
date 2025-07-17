@@ -616,7 +616,6 @@ jobs:
 
           # 5. Signing preparation
           $signTool = $makeAppx.Directory.FullName + "\signtool.exe"
-          $tempCertPath = "$env:RUNNER_TEMP\SigningCert.p12"
           
           try {
               # Verify signing tools exist
@@ -624,10 +623,18 @@ jobs:
                   throw "SignTool not found at $signTool"
               }
 
-              # Create certificate backup
-              Copy-Item -Path $env:SM_CLIENT_CERT_FILE -Destination $tempCertPath -Force
+              # 6. Import certificate to Personal store
+              $certPassword = ConvertTo-SecureString -String $env:SM_CLIENT_CERT_PASSWORD -AsPlainText -Force
+              $cert = Import-PfxCertificate -FilePath $env:SM_CLIENT_CERT_FILE `
+                                          -CertStoreLocation Cert:\CurrentUser\My `
+                                          -Password $certPassword `
+                                          -Exportable
+              if (-not $cert) {
+                  throw "Failed to import certificate to store"
+              }
+              Write-Host "✓ Certificate imported (Thumbprint: $($cert.Thumbprint))"
 
-              # 6. Execute signing with retries
+              # 7. Execute signing with retries
               $maxRetries = 3
               $retryCount = 0
               $signed = $false
@@ -640,20 +647,17 @@ jobs:
                       # Create backup of MSIX
                       Copy-Item -Path $msixPath -Destination $backupPath -Force
 
-                      # Sign command
-                      $signArgs = @(
-                          "sign",
-                          "/fd", "sha256",
-                          "/f", "`"$tempCertPath`"",
-                          "/p", "`"$env:SM_CLIENT_CERT_PASSWORD`"",
-                          "/tr", "http://timestamp.digicert.com",
-                          "/td", "sha256",
-                          "/v",
-                          "/debug",
-                          "$($msixPath.FullName)"
-                      )
-
-                      & $signTool $signArgs
+                      # Sign using certificate store
+                      & $signTool sign `
+                          /sm `
+                          /s My `
+                          /sha1 $cert.Thumbprint `
+                          /tr http://timestamp.digicert.com `
+                          /td sha256 `
+                          /fd sha256 `
+                          /v `
+                          /debug `
+                          "`"$msixPath`""
 
                       if ($LASTEXITCODE -ne 0) {
                           # Restore backup if signing failed
