@@ -53,56 +53,82 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20.x"
+      # - name: Setup Node.js
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: "20.x"
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 3.1
 
-      - name: Install Rust 1.82.0
-        run: |
-          Invoke-WebRequest -Uri https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -OutFile rustup-init.exe
-          .\rustup-init.exe -y
-          rustup install 1.82.0
-          rustup default 1.82.0
+      # - name: Install Rust 1.82.0
+      #   run: |
+      #     Invoke-WebRequest -Uri https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -OutFile rustup-init.exe
+      #     .\rustup-init.exe -y
+      #     rustup install 1.82.0
+      #     rustup default 1.82.0
 
-      - name: Update updater endpoint in tauri.conf.json file
+      # - name: Update updater endpoint in tauri.conf.json file
+      #   run: |
+      #     $content = Get-Content apps/@sparrow-desktop/src-tauri/tauri.conf.json -Raw
+      #     $newContent = $content -replace '"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"', '"https://${{ secrets.UPDATER_ENDPOINT_PROD }}/updater/{{target}}/{{arch}}/{{current_version}}"'
+      #     Set-Content -Path apps/@sparrow-desktop/src-tauri/tauri.conf.json -Value $newContent
+      #   shell: powershell
+
+      # - name: Increase Yarn network timeout
+      #   run: yarn config set network-timeout 600000
+
+      # - name: Sync version across all files
+      #   run: yarn sync-version
+
+      # - name: Build Tauri App
+      #   run: |
+      #     yarn cache clean
+      #     yarn install
+      #     yarn desktop-build
+      #   env:
+      #     TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+      #     TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+
+      # - name: Upload MSI as Artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: unsigned-build
+      #     path: apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/*.msi
+      #     retention-days: 1  # Optional: Adjust retention as needed
+
+      - name: Copy unsigned MSI from prebuilt
         run: |
-          $content = Get-Content apps/@sparrow-desktop/src-tauri/tauri.conf.json -Raw
-          $newContent = $content -replace '"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"', '"https://${{ secrets.UPDATER_ENDPOINT_PROD }}/updater/{{target}}/{{arch}}/{{current_version}}"'
-          Set-Content -Path apps/@sparrow-desktop/src-tauri/tauri.conf.json -Value $newContent
+          # Create target directory structure
+          New-Item -ItemType Directory -Force -Path "apps/@sparrow-desktop/src-tauri/target/release/bundle/msi"
+          
+          # Copy MSI to where the pipeline expects it
+          $msi = Get-ChildItem -Path "prebuilt/Sparrow_*_x64_en-US.msi" | Select-Object -First 1
+          if (-not $msi) {
+            Write-Host "::error::No MSI found in prebuilt folder"
+            exit 1
+          }
+          
+          Copy-Item $msi.FullName -Destination "apps/@sparrow-desktop/src-tauri/target/release/bundle/msi/Sparrow.msi"
+          Write-Host "Copied $($msi.Name) to standard location"
         shell: powershell
-
-      - name: Increase Yarn network timeout
-        run: yarn config set network-timeout 600000
-
-      - name: Sync version across all files
-        run: yarn sync-version
-
-      - name: Build Tauri App
-        run: |
-          yarn cache clean
-          yarn install
-          yarn desktop-build
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-
-      - name: Upload MSI as Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: unsigned-build
-          path: apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/*.msi
-          retention-days: 1  # Optional: Adjust retention as needed
 
       # --- STAGE 2: SIGN MSI WITH DIGICERT ---
       - name: Set up DigiCert SM Client
         run: |
           echo "${{ secrets.SM_CLIENT_CERT_FILE_B64 }}" | base64 --decode > cert.p12
+
+          # Verify file was created
+          if [ ! -f cert.p12 ]; then
+            echo "❌ Certificate file not created!"
+            exit 1
+          fi
+          
+          # Set environment variables (critical for auth)
+          echo "SM_HOST=${{ secrets.SM_HOST }}" >> $GITHUB_ENV
+          echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> $GITHUB_ENV
           echo "SM_CLIENT_CERT_FILE=$env:GITHUB_WORKSPACE\cert.p12" >> $env:GITHUB_ENV
           echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> $env:GITHUB_ENV
         shell: bash
@@ -110,6 +136,18 @@ jobs:
       - name: Install DigiCert Client tools
         id: digicert-code-signing
         uses: digicert/ssm-code-signing@v1.0.0
+
+      - name: Verify SM Client Auth
+        run: |
+          echo "=== SM Client Config ==="
+          echo "Host: $SM_HOST"
+          echo "API Key: ${SM_API_KEY:0:4}...${SM_API_KEY: -4}"
+          echo "Cert: $SM_CLIENT_CERT_FILE"
+          echo "Cert exists: $(test -f "$SM_CLIENT_CERT_FILE" && echo "Yes" || echo "No")"
+          
+          # Test authentication
+          smctl whoami || echo "⚠️ Auth check failed"
+        shell: bash
 
       - name: Sign MSI
         run: |
