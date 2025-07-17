@@ -185,44 +185,51 @@ jobs:
           $versionLine = Select-String -Path $cargoFile -Pattern '^[\s]*version\s*=\s*\"(.*?)\"' | Select-Object -First 1
           $version = $versionLine.Matches.Groups[1].Value
 
+          $thumb       = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
+          $cert        = Get-ChildItem Cert:\LocalMachine\My `
+                            | Where-Object Thumbprint -eq $thumb
+          $publisherDN = $cert.Subject
+          Write-Host "🔎 Using Publisher DN: $publisherDN"
+
+          # 3. Generate manifest with the exact Publisher string
           $manifest = @"
           <?xml version="1.0" encoding="utf-8"?>
           <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
-                  xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
-                  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
-                  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-                  IgnorableNamespaces="uap mp rescap">
+                    xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+                    xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+                    xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+                    IgnorableNamespaces="uap mp rescap">
             <Identity Name="Sparrow"
-                      Publisher="CN=Techdome Solutions, O=Techdome Solutions, C=IN"
+                      Publisher="$publisherDN"
                       Version="$version.0"
                       ProcessorArchitecture="x64" />
-            <Properties>
-              <DisplayName>Sparrow</DisplayName>
-              <PublisherDisplayName>sparrowapp</PublisherDisplayName>
-              <Description>Sparrow</Description>
-              <Logo>Assets\StoreLogo.png</Logo>
-            </Properties>
-            <Dependencies>
-              <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.0.0" MaxVersionTested="10.0.19041.0" />
-            </Dependencies>
-            <Resources>
-              <Resource Language="en-us" />
-            </Resources>
-            <Capabilities>
-              <rescap:Capability Name="runFullTrust" />
-            </Capabilities>
-            <Applications>
-              <Application Id="SparrowApp" Executable="Sparrow.exe" EntryPoint="Windows.FullTrustApplication">
-                <uap:VisualElements DisplayName="Sparrow"
-                                    Description="Sparrow App"
-                                    BackgroundColor="transparent"
-                                    Square150x150Logo="Assets\Square150x150Logo.png"
-                                    Square44x44Logo="Assets\Square44x44Logo.png">
-                </uap:VisualElements>
-              </Application>
-            </Applications>
-          </Package>
-          "@
+              <Properties>
+                <DisplayName>Sparrow</DisplayName>
+                <PublisherDisplayName>sparrowapp</PublisherDisplayName>
+                <Description>Sparrow</Description>
+                <Logo>Assets\StoreLogo.png</Logo>
+              </Properties>
+              <Dependencies>
+                <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.0.0" MaxVersionTested="10.0.19041.0" />
+              </Dependencies>
+              <Resources>
+                <Resource Language="en-us" />
+              </Resources>
+              <Capabilities>
+                <rescap:Capability Name="runFullTrust" />
+              </Capabilities>
+              <Applications>
+                <Application Id="SparrowApp" Executable="Sparrow.exe" EntryPoint="Windows.FullTrustApplication">
+                  <uap:VisualElements DisplayName="Sparrow"
+                                      Description="Sparrow App"
+                                      BackgroundColor="transparent"
+                                      Square150x150Logo="Assets\Square150x150Logo.png"
+                                      Square44x44Logo="Assets\Square44x44Logo.png">
+                  </uap:VisualElements>
+                </Application>
+              </Applications>
+            </Package>
+            "@
 
           $manifest | Set-Content -Encoding UTF8 -Path "app-root\AppxManifest.xml"
         shell: powershell
