@@ -75,7 +75,7 @@ jobs:
           $content = Get-Content apps/@sparrow-desktop/src-tauri/tauri.conf.json -Raw
           $newContent = $content -replace '"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"', '"https://${{ secrets.UPDATER_ENDPOINT_PROD }}/updater/{{target}}/{{arch}}/{{current_version}}"'
           Set-Content -Path apps/@sparrow-desktop/src-tauri/tauri.conf.json -Value $newContent
-        shell: pwsh
+        shell: powershell
 
       - name: Increase Yarn network timeout
         run: yarn config set network-timeout 600000
@@ -91,6 +91,13 @@ jobs:
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+
+      - name: Upload MSI as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-build
+          path: apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/*.msi
+          retention-days: 1  # Optional: Adjust retention as needed
 
       # --- STAGE 2: SIGN MSI WITH DIGICERT ---
       - name: Set up DigiCert SM Client
@@ -111,6 +118,21 @@ jobs:
         shell: powershell
 
       # --- STAGE 3: CONVERT TO MSIX ---
+      - name: Inject version into MSIX template
+        shell: powershell
+        run: |
+          # Get version from Tauri (assuming it's in src-tauri/Cargo.toml)
+          $version = (Select-String -Path "apps/@sparrow-desktop/src-tauri/Cargo.toml" -Pattern 'version = "(.*)"' | 
+                     ForEach-Object { $_.Matches.Groups[1].Value }) + ".0"
+          
+          # Update template
+          $templatePath = ".github/workflows/msix_packaging/sparrow_template.xml"
+          (Get-Content $templatePath -Raw) -replace "{{PACKAGE_VERSION}}", $version | 
+            Set-Content $templatePath -Encoding UTF8
+          
+          Write-Host "MSIX version set to: $version"
+        shell: powershell
+
       - name: Install MSIX Packaging Tool
         run: winget install "MSIX Packaging Tool" --source msstore --silent
         shell: powershell
@@ -121,7 +143,7 @@ jobs:
           $content = Get-Content $templatePath -Raw
           $content -replace '\$\{\{msi_path\}\}', (Resolve-Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/*.msi") | 
             Out-File $templatePath -Encoding UTF8
-        shell: pwsh
+        shell: powershell
 
       - name: Convert to MSIX
         run: |
@@ -164,4 +186,4 @@ jobs:
           } | ConvertTo-Json
           
           Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $body -ContentType 'application/json'
-        shell: pwsh
+        shell: powershell
