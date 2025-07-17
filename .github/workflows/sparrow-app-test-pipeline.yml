@@ -53,9 +53,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Windows 10 SDK
-        run: choco install windows-sdk-10-version-2004-all -y
-        shell: powershell
+      # - name: Install Windows 10 SDK
+      #   run: choco install windows-sdk-10-version-2004-all -y
+      #   shell: powershell
 
       # - name: Setup Node.js
       #   uses: actions/setup-node@v2
@@ -128,21 +128,19 @@ jobs:
         shell: powershell
 
       # --- STAGE 2: SIGN MSI WITH DIGICERT ---
-      - name: Set up DigiCert certificate
+      - name: Decode and Save DigiCert Certificate
         shell: pwsh
         run: |
-          $certPath = "$(Build.ArtifactStagingDirectory)\Certificate_pkcs12.p12"
-          Write-Host "Decoding DigiCert .p12 into $certPath"
-          $bytes = [Convert]::FromBase64String("${{ secrets.SM_CLIENT_CERT_FILE_B64 }}")
-          [IO.File]::WriteAllBytes($certPath, $bytes)
-          Write-Host "✅ Certificate saved to $certPath"
+          $certPath = "${{ github.workspace }}\Certificate_pkcs12.p12"
+          $certBase64 = "${{ secrets.SM_CLIENT_CERT_FILE_B64 }}"
+          [IO.File]::WriteAllBytes($certPath, [Convert]::FromBase64String($certBase64))
+          echo "SM_CLIENT_CERT_FILE=$certPath" >> $GITHUB_ENV
       
       - name: Set variables
         id: variables
         run: |
           echo "SM_HOST=${{ secrets.SM_HOST }}" >> "$GITHUB_ENV"
           echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> "$GITHUB_ENV"
-          echo "SM_CLIENT_CERT_FILE=$(Build.ArtifactStagingDirectory)\Certificate_pkcs12.p12" >> "$GITHUB_ENV"
           echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV"
         shell: bash
 
