@@ -304,7 +304,7 @@ jobs:
             
             if ($LASTEXITCODE -ne 0) {
               # If simple signing fails, try with timestamp
-              & "$signTool" sign /debug /sm /sha1 $certThumb /td SHA256 /fd sha256 /tr http://timestamp.sectigo.com "$($_.FullName)"
+              & "$signTool" sign /v /debug /sm /sha1 $certThumb /td SHA256 /fd sha256 /tr http://timestamp.digicert.com "$($_.FullName)"
               
               if ($LASTEXITCODE -ne 0) {
                 Write-Host "❌ Failed to sign $($_.Name)"
