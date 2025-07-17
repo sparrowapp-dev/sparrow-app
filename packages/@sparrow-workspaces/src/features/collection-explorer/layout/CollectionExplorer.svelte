@@ -370,11 +370,13 @@
   const handleOnUpdateAuthProfile = async (
     authId: string,
     updatedAuthProfileData: AuthProfileDto,
+    isRequestForDefaultKey: boolean,
   ) => {
     const response = await onUpdateAuthProfile(
       collection,
       authId,
       updatedAuthProfileData,
+      isRequestForDefaultKey,
     );
     return response;
   };
