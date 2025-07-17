@@ -180,8 +180,12 @@ jobs:
           }
 
            # Copy actual StoreLogo from known path
-          Copy-Item "apps/@sparrow-desktop/src-tauri/icons/StoreLogo.png" -Destination "app-root/Assets/StoreLogo.png"
-          Copy-Item "apps/@sparrow-desktop/src-tauri/icons/StoreLogo.png" -Destination "app-root/Assets/Square150x150Logo.png"
+          $logo = "apps/@sparrow-desktop/src-tauri/icons/StoreLogo.png"
+          Copy-Item $logo -Destination "app-root/Assets/StoreLogo.png"
+          Copy-Item $logo -Destination "app-root/Assets/Square150x150Logo.png"
+          Copy-Item $logo -Destination "app-root/Assets/Square44x44Logo.png"
+          Copy-Item $logo -Destination "app-root/Assets/Wide310x150Logo.png"
+          Copy-Item $logo -Destination "app-root/Assets/SplashScreen.png"
 
         shell: powershell
 
@@ -219,7 +223,15 @@ jobs:
             </Capabilities>
             <Applications>
               <Application Id="SparrowApp" Executable="Sparrow.exe" EntryPoint="Windows.FullTrustApplication">
-                <uap:VisualElements DisplayName="Sparrow" Description="Sparrow App" BackgroundColor="transparent" Square150x150Logo="Assets\Square150x150Logo.png" />
+                <uap:VisualElements DisplayName="Sparrow"
+                                    Description="Sparrow App"
+                                    BackgroundColor="transparent"
+                                    Square150x150Logo="Assets\Square150x150Logo.png"
+                                    Square44x44Logo="Assets\Square44x44Logo.png"
+                                    Wide310x150Logo="Assets\Wide310x150Logo.png">
+                  <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
+                  <uap:SplashScreen Image="Assets\SplashScreen.png" />
+                </uap:VisualElements>
               </Application>
             </Applications>
           </Package>
