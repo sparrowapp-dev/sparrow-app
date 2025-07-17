@@ -176,10 +176,56 @@ jobs:
         id: extract_alias
         shell: pwsh
         run: |
-          $line  = (smctl keypair ls | Select-Object -Skip 2 | Select-Object -First 1)
-          $alias = ($line -split '\s{2,}')[2]
-          Write-Host "✅ Using alias: $alias"
-          echo "KEYPAIR_ALIAS=$alias" >> $GITHUB_ENV
+          Write-Host "=== Getting keypair information ==="
+          
+          # Get keypair list and capture output
+          $keypairOutput = smctl keypair ls 2>&1
+          Write-Host "Keypair command output:"
+          Write-Host $keypairOutput
+          
+          # Parse the output more carefully
+          $lines = $keypairOutput -split "`n"
+          Write-Host "Total lines: $($lines.Count)"
+          
+          # Find the first data line (skip header lines)
+          $dataLine = $null
+          for ($i = 0; $i -lt $lines.Count; $i++) {
+              $line = $lines[$i].Trim()
+              Write-Host "Line $i`: $line"
+              
+              # Skip empty lines and header lines
+              if ($line -and $line -notmatch "^-+$" -and $line -notmatch "^ID\s+") {
+                  $dataLine = $line
+                  Write-Host "Found data line: $dataLine"
+                  break
+              }
+          }
+          
+          if (-not $dataLine) {
+              Write-Host "::error::No keypair data found"
+              exit 1
+          }
+          
+          # Extract alias (typically the third column)
+          $parts = $dataLine -split '\s{2,}'
+          Write-Host "Split parts: $($parts -join ' | ')"
+          
+          if ($parts.Count -lt 3) {
+              Write-Host "::error::Could not parse keypair line: $dataLine"
+              exit 1
+          }
+          
+          $alias = $parts[2].Trim()
+          Write-Host "✅ Extracted alias: '$alias'"
+          
+          if (-not $alias) {
+              Write-Host "::error::Alias is empty"
+              exit 1
+          }
+          
+          # Set environment variable for subsequent steps
+          Add-Content -Path $env:GITHUB_ENV -Value "KEYPAIR_ALIAS=$alias"
+          Write-Host "✅ Set KEYPAIR_ALIAS environment variable"
       
       - name: Sync Certificate into Windows Store
         shell: pwsh
@@ -339,6 +385,28 @@ jobs:
 
       #     Write-Host "Successfully signed msix-output/sparrow.msix"
       #   shell: powershell
+
+
+      - name: Sign MSIX with DigiCert SMCTLSign (using fingerprint)
+        run: |
+          if (-Not (Test-Path msix-output/sparrow.msix)) {
+              Write-Host "MSIX file not found at msix-output/sparrow.msix"
+          }
+
+          Write-Host "Signing: msix-output/sparrow.msix with DigiCert SMCTLSign"
+          
+          $certFingerprint = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
+          Write-Host "Using certificate fingerprint: $certFingerprint"
+          
+          # Use certificate fingerprint instead of keypair alias
+          smctl sign --certificate-fingerprint="$certFingerprint" --input="msix-output/sparrow.msix"
+          
+          if ($LASTEXITCODE -ne 0) {
+              Write-Host "Failed to sign msix-output/sparrow.msix with SMCTLSign"
+          }
+
+          Write-Host "Successfully signed msix-output/sparrow.msix"
+        shell: powershell
 
       - name: Sign MSIX with DigiCert SMCTLSign
         run: |
