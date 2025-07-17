@@ -153,11 +153,19 @@ jobs:
 
           # Update MSIX template
           $templatePath = ".github/workflows/msix_packaging/sparrow_template.xml"
+
           (Get-Content $templatePath -Raw) -replace "{{PACKAGE_VERSION}}", $version | 
+            Set-Content $templatePath -Encoding UTF8
+
+          (Get-Content $templatePath -Raw) -replace "{{MSIX_PACKAGE_PATH}}", "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/Sparrow.msi" | 
             Set-Content $templatePath -Encoding UTF8
 
           # Print version
           Write-Host "`n✅ MSIX version set to: $version"
+
+          # Print Msix Package Path
+          Write-Host "`n✅ MSIX package path set to: apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/Sparrow.msi"
+
         shell: powershell
 
       - name: Install MSIX Packaging Tool
