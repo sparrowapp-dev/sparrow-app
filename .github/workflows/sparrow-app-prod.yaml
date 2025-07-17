@@ -39,7 +39,7 @@ env:
   CI: false
 
 jobs:
-  build_and_sign_msix:
+  release_win:
     runs-on: windows-latest
     environment: production
 
