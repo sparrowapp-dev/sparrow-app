@@ -180,24 +180,27 @@ jobs:
         shell: powershell
 
       - name: Generate AppxManifest.xml with version injection
+        shell: pwsh
         run: |
-          $cargoFile = "apps/@sparrow-desktop/src-tauri/Cargo.toml"
-          $versionLine = Select-String -Path $cargoFile -Pattern '^[\s]*version\s*=\s*\"(.*?)\"' | Select-Object -First 1
-          $version = $versionLine.Matches.Groups[1].Value
+          # 1. Read version from Cargo.toml
+          $cargoFile   = "apps/@sparrow-desktop/src-tauri/Cargo.toml"
+          $versionLine = Select-String -Path $cargoFile -Pattern '^\s*version\s*=\s*"(.*?)"' | Select-Object -First 1
+          $version     = $versionLine.Matches.Groups[1].Value
 
-          $thumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
-          $cert = Get-ChildItem Cert:\LocalMachine\My `
-                           | Where-Object Thumbprint -eq $thumb
+          # 2. Lookup our synced cert by thumbprint and get full Subject DN
+          $thumb       = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
+          $cert        = Get-ChildItem Cert:\LocalMachine\My | Where-Object Thumbprint -eq $thumb
           $publisherDN = $cert.Subject
           Write-Host "🔎 Using Publisher DN: $publisherDN"
 
-           $manifest = @"
+          # 3. Build the AppxManifest.xml with the exact Publisher
+          $manifest = @"
           <?xml version="1.0" encoding="utf-8"?>
           <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
-                  xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
-                  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
-                  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-                  IgnorableNamespaces="uap mp rescap">
+                   xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+                   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+                   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+                   IgnorableNamespaces="uap mp rescap">
             <Identity Name="Sparrow"
                       Publisher="$publisherDN"
                       Version="$version.0"
@@ -228,10 +231,11 @@ jobs:
               </Application>
             </Applications>
           </Package>
-         "@
+          "@
 
+          # 4. Write out the manifest
           $manifest | Set-Content -Encoding UTF8 -Path "app-root\AppxManifest.xml"
-        shell: powershell
+
 
       - name: Create MSIX Package using MakeAppx
         run: |
