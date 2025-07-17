@@ -146,16 +146,18 @@ jobs:
       # --- STAGE 3: CONVERT TO MSIX ---
       - name: Inject version into MSIX template
         run: |
-          # Get version from Tauri (assuming it's in src-tauri/Cargo.toml)
-          $version = (Select-String -Path "apps/@sparrow-desktop/src-tauri/Cargo.toml" -Pattern 'version = "(.*)"' | 
-                     ForEach-Object { $_.Matches.Groups[1].Value }) + ".0"
-          
-          # Update template
+          # Extract only the correct version line under [package]
+          $cargoFile = "apps/@sparrow-desktop/src-tauri/Cargo.toml"
+          $versionLine = Select-String -Path $cargoFile -Pattern '^\s*version\s*=\s*"(.*?)"' | Select-Object -First 1
+          $version = $versionLine.Matches.Groups[1].Value
+
+          # Update MSIX template
           $templatePath = ".github/workflows/msix_packaging/sparrow_template.xml"
           (Get-Content $templatePath -Raw) -replace "{{PACKAGE_VERSION}}", $version | 
             Set-Content $templatePath -Encoding UTF8
-          
-          Write-Host "MSIX version set to: $version"
+
+          # Print version
+          Write-Host "`n✅ MSIX version set to: $version"
         shell: powershell
 
       - name: Install MSIX Packaging Tool

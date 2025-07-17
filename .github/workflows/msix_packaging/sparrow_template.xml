@@ -299,13 +299,5 @@
   <PrepareComputer DisableWindowsSearchService="false" />
   <SaveLocation PackagePath="${{github.workspace}}\.github\workflows\msix_packaging" />
   <Installer Path="${{github.workspace}}\.github\workflows\msix_packaging\Sparrow.msi" />
-<PackageInformation 
-  PackageName="Sparrow" 
-  PackageDisplayName="Sparrow" 
-  PublisherName="CN=Techdome Solutions, O=Techdome Solutions, C=IN" 
-  PublisherDisplayName="sparrowapp" 
-  Version="{{PACKAGE_VERSION}}" 
-  xmlns:p4="http://schemas.microsoft.com/msix/msixpackagingtool/template/1910">
-  <p4:PackageDescription>Sparrow</p4:PackageDescription>
-</PackageInformation>
+  <PackageInformation PackageName="Sparrow" PackageDisplayName="Sparrow" PublisherName="CN=Techdome Solutions, O=Techdome Solutions, C=IN" PublisherDisplayName="sparrowapp" Version="{{PACKAGE_VERSION}}" p4:PackageDescription="Sparrow" xmlns:p4="http://schemas.microsoft.com/msix/msixpackagingtool/template/1910" />
 </MsixPackagingToolTemplate>
