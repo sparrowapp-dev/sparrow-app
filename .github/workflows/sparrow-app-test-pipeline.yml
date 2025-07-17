@@ -144,6 +144,14 @@ jobs:
           smctl windows certsync `
             --keypair-alias="$($env:KEYPAIR_ALIAS)" `
             --store=system
+          # Define your SHA1 thumbprint (no spaces)
+          $thumb = '1D83CE02EE829B28C8C6F3B9DC1ADB5C437DD2D7'
+
+          # Look up in the LocalMachine\My store (or Cert:\CurrentUser\My if that’s where you synced)
+          $cert = Get-ChildItem Cert:\LocalMachine\My | Where-Object Thumbprint -eq $thumb
+
+          # Print the full subject DN
+          Write-Host "Certificate Subject:" $cert.Subject
 
       # --- STAGE 3: CONVERT TO MSIX USING MAKEAPPX ---
       - name: Prepare App Folder for MakeAppx
