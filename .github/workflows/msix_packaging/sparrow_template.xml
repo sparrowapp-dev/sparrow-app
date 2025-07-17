@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<MsixPackagingToolTemplate xmlns="http://schemas.microsoft.com/appx/msixpackagingtool/template/2018">
-  <Settings AllowTelemetry="true" ApplyAllPrepareComputerFixes="false" GenerateCommandLineFile="true" AllowPromptForPassword="false" p4:EnforceMicrosoftStoreRequirements="true" p5:ServerPortNumber="1599" p6:AddPackageIntegrity="true" p7:SupportedWindowsVersionForMsixCore="None" xmlns:p7="http://schemas.microsoft.com/msix/msixpackagingtool/template/2004" xmlns:p6="http://schemas.microsoft.com/msix/msixpackagingtool/template/2001" xmlns:p5="http://schemas.microsoft.com/msix/msixpackagingtool/template/1904" xmlns:p4="http://schemas.microsoft.com/msix/msixpackagingtool/template/2007">
-  </Settings>
-  <PrepareComputer DisableWindowsSearchService="false" />
-  <SaveLocation PackagePath="${{github.workspace}}\.github\workflows\msix_packaging" />
-  <Installer Path="{{MSIX_PACKAGE_PATH}}" />
-  <PackageInformation PackageName="Sparrow" PackageDisplayName="Sparrow" PublisherName="CN=Techdome Solutions, O=Techdome Solutions, C=IN" PublisherDisplayName="sparrowapp" Version="{{PACKAGE_VERSION}}" p4:PackageDescription="Sparrow" xmlns:p4="http://schemas.microsoft.com/msix/msixpackagingtool/template/1910" />
-</MsixPackagingToolTemplate>
