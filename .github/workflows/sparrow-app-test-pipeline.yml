@@ -131,16 +131,18 @@ jobs:
       - name: Set up DigiCert certificate
         shell: pwsh
         run: |
-          Write-Host "Decoding DigiCert .p12 into D:\Certificate_pkcs12.p12"
+          $certPath = "$(Build.ArtifactStagingDirectory)\Certificate_pkcs12.p12"
+          Write-Host "Decoding DigiCert .p12 into $certPath"
           $bytes = [Convert]::FromBase64String("${{ secrets.SM_CLIENT_CERT_FILE_B64 }}")
-          [IO.File]::WriteAllBytes("D:\Certificate_pkcs12.p12", $bytes)
+          [IO.File]::WriteAllBytes($certPath, $bytes)
+          Write-Host "✅ Certificate saved to $certPath"
       
       - name: Set variables
         id: variables
         run: |
           echo "SM_HOST=${{ secrets.SM_HOST }}" >> "$GITHUB_ENV"
           echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> "$GITHUB_ENV"
-          echo "SM_CLIENT_CERT_FILE=D:\\Certificate_pkcs12.p12" >> "$GITHUB_ENV"
+          echo "SM_CLIENT_CERT_FILE=$(Build.ArtifactStagingDirectory)\Certificate_pkcs12.p12" >> "$GITHUB_ENV"
           echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV"
         shell: bash
 
