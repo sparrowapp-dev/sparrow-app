@@ -53,6 +53,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Windows SDK
+        uses: microsoft/setup-msbuild@v1
+
       - name: Copy unsigned MSI from prebuilt
         run: |
           # Create target directory structure
@@ -181,7 +184,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path "msix-output"
           $msixPath = "msix-output/sparrow.msix"
           MakeAppx pack /d "app-root" /p $msixPath
-        shell: powershell
+        shell: cmd
 
       # --- STAGE 4: SIGN MSIX WITH DIGICERT ---
       - name: Sign MSIX
