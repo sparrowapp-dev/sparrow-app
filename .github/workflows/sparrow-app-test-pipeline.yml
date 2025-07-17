@@ -87,7 +87,7 @@ jobs:
         run: |
           yarn cache clean
           yarn install
-          yarn desktop-build --debug
+          yarn desktop-build
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
