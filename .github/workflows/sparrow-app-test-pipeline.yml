@@ -181,10 +181,12 @@ jobs:
 
       - name: Create MSIX Package using MakeAppx
         run: |
-          New-Item -ItemType Directory -Force -Path "msix-output"
-          $msixPath = "msix-output/sparrow.msix"
-          MakeAppx pack /d "app-root" /p $msixPath
-        shell: cmd
+          # Create output directory (PowerShell)
+          powershell -Command "New-Item -ItemType Directory -Force -Path 'msix-output'"
+          
+          # Pack MSIX (using cmd, which inherits SDK paths)
+          MakeAppx pack /d "app-root" /p "msix-output/sparrow.msix"
+        shell: cmd 
 
       # --- STAGE 4: SIGN MSIX WITH DIGICERT ---
       - name: Sign MSIX
