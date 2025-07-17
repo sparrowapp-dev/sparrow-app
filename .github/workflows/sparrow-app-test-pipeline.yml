@@ -300,45 +300,64 @@ jobs:
         shell: powershell
 
       # --- STAGE 4: SIGN MSIX WITH DIGICERT ---
-      - name: Sign MSIX
-        run: |
-          $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
+      # - name: Sign MSIX
+      #   run: |
+      #     $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
         
-          # Verify the MSIX file exists
+      #     # Verify the MSIX file exists
+      #     if (-Not (Test-Path msix-output/sparrow.msix)) {
+      #         Write-Host "MSIX file not found at msix-output/sparrow.msix"
+      #         exit 1
+      #     }
+
+      #     Write-Host "Signing: msix-output/sparrow.msix"
+
+      #     # Try CurrentUser store first
+      #     & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe" sign `
+      #       /sm /s My `
+      #       /tr http://timestamp.digicert.com `
+      #       /td sha256 `
+      #       /fd sha256 `
+      #       /sha1 $certThumb `
+      #       "msix-output/sparrow.msix"
+
+      #     if ($LASTEXITCODE -ne 0) {
+      #         Write-Host "Failed with CurrentUser store, trying LocalMachine..."
+      #         & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe" sign `
+      #           /sm /s "LocalMachine\My" `
+      #           /tr http://timestamp.digicert.com `
+      #           /td sha256 `
+      #           /fd sha256 `
+      #           /sha1 $certThumb `
+      #           "msix-output/sparrow.msix"
+      #     }
+
+      #     if ($LASTEXITCODE -ne 0) {
+      #         Write-Host "Failed to sign msix-output/sparrow.msix"
+      #         exit 1
+      #     }
+
+      #     Write-Host "Successfully signed msix-output/sparrow.msix"
+      #   shell: powershell
+
+      - name: Sign MSIX with DigiCert SMCTLSign
+        run: |
           if (-Not (Test-Path msix-output/sparrow.msix)) {
               Write-Host "MSIX file not found at msix-output/sparrow.msix"
               exit 1
           }
 
-          Write-Host "Signing: msix-output/sparrow.msix"
-
-          # Try CurrentUser store first
-          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe" sign `
-            /sm /s My `
-            /tr http://timestamp.digicert.com `
-            /td sha256 `
-            /fd sha256 `
-            /sha1 $certThumb `
-            "msix-output/sparrow.msix"
-
+          Write-Host "Signing: msix-output/sparrow.msix with DigiCert SMCTLSign"
+          
+          # Use DigiCert's native signing tool
+          smctl sign --keypair-alias="$env:KEYPAIR_ALIAS" --input="msix-output/sparrow.msix" --verbose
+          
           if ($LASTEXITCODE -ne 0) {
-              Write-Host "Failed with CurrentUser store, trying LocalMachine..."
-              & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe" sign `
-                /sm /s "LocalMachine\My" `
-                /tr http://timestamp.digicert.com `
-                /td sha256 `
-                /fd sha256 `
-                /sha1 $certThumb `
-                "msix-output/sparrow.msix"
-          }
-
-          if ($LASTEXITCODE -ne 0) {
-              Write-Host "Failed to sign msix-output/sparrow.msix"
+              Write-Host "Failed to sign msix-output/sparrow.msix with SMCTLSign"
               exit 1
           }
 
           Write-Host "Successfully signed msix-output/sparrow.msix"
-        shell: powershell
 
       - name: Verify MSIX Signature
         run: |
