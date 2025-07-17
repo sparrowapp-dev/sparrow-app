@@ -49,7 +49,7 @@ jobs:
     environment: production
 
     steps:
-      # --- STAGE 1: BUILD TAURI APP (MSI ONLY) ---
+      # --- STAGE 1: INITIAL SETUP AND PREREQUISITE INSTALLATIONS ---
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -57,31 +57,17 @@ jobs:
         run: Invoke-WebRequest -Uri https://aka.ms/winsdk/10/latest/SdkSetup.exe -OutFile $env:TEMP\SdkSetup.exe
         shell: powershell
 
-      - name: Copy unsigned MSI and EXE from prebuilt
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "20.8"
+
+      - name: Install Rust 1.82.0
         run: |
-          # Create target directory structure
-          New-Item -ItemType Directory -Force -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi"
-          
-          # Copy MSI to where the pipeline expects it
-          $msi = Get-ChildItem -Path "prebuilt/Sparrow_*_x64_en-US.msi" | Select-Object -First 1
-          if (-not $msi) {
-            Write-Host "::error::No MSI found in prebuilt folder"
-            exit 1
-          }
-
-          # Copy EXE to where the pipeline expects it
-          $exe = Get-ChildItem -Path "prebuilt/Sparrow.exe" | Select-Object -First 1
-          if (-not $exe) {
-            Write-Host "::error::No EXE found in prebuilt folder"
-            exit 1
-          } 
-          
-          Copy-Item $msi.FullName -Destination "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/Sparrow.msi"
-          Write-Host "Copied $($msi.Name) to standard location"
-
-          Copy-Item $exe.FullName -Destination "apps/@sparrow-desktop/src-tauri/target/debug/Sparrow.exe"
-          Write-Host "Copied $($exe.Name) to standard location"
-        shell: powershell
+          Invoke-WebRequest -Uri https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -OutFile rustup-init.exe
+          .\rustup-init.exe -y
+          rustup install 1.82.0
+          rustup default 1.82.0
 
       # Set up DigiCert certificate for cloud signing
       - name: Set up DigiCert certificate
@@ -90,7 +76,8 @@ jobs:
           Write-Host "Decoding DigiCert .p12 into D:\Certificate_pkcs12.p12"
           $bytes = [Convert]::FromBase64String("${{ secrets.SM_CLIENT_CERT_FILE_B64 }}")
           [IO.File]::WriteAllBytes("D:\Certificate_pkcs12.p12", $bytes)
-      
+
+      # Set environment variables for DigiCert
       - name: Set variables
         id: variables
         run: |
@@ -128,6 +115,32 @@ jobs:
       - name: Install DigiCert Signing Manager Tools
         uses: digicert/ssm-code-signing@v1.0.0
 
+      # --- STAGE 2: BUILD APP ---
+      - name: Update updater endpoint in tauri.conf.json file
+        run: |
+          $content = Get-Content apps/@sparrow-desktop/src-tauri/tauri.conf.json -Raw
+          $newContent = $content -replace '"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"', '"https://${{ secrets.UPDATER_ENDPOINT_PROD }}/updater/{{target}}/{{arch}}/{{current_version}}"'
+          Set-Content -Path apps/@sparrow-desktop/src-tauri/tauri.conf.json -Value $newContent
+        shell: pwsh
+
+      - name: Increase Yarn network timeout
+        run: yarn config set network-timeout 600000
+
+      - name: Sync version across all files
+        run: yarn sync-version
+
+      - name: Build Tauri App
+        run: |
+          yarn cache clean
+          npm install -g pnpm
+          yarn install
+          yarn desktop-build
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+
+      # --- STAGE 3: CONVERT TO MSIX USING MAKEAPPX ---
       - name: Extract first KeyPair alias
         id: extract_alias
         shell: pwsh
@@ -147,13 +160,12 @@ jobs:
           # Define your SHA1 thumbprint (no spaces)
           $thumb = '1D83CE02EE829B28C8C6F3B9DC1ADB5C437DD2D7'
 
-          # Look up in the LocalMachine\My store (or Cert:\CurrentUser\My if that’s where you synced)
+          # Look up in the LocalMachine\My store (or Cert:\CurrentUser\My if that's where you synced)
           $cert = Get-ChildItem Cert:\LocalMachine\My | Where-Object Thumbprint -eq $thumb
 
           # Print the full subject DN
           Write-Host "Certificate Subject:" $cert.Subject
 
-      # --- STAGE 3: CONVERT TO MSIX USING MAKEAPPX ---
       - name: Prepare App Folder for MakeAppx
         run: |
           New-Item -ItemType Directory -Force -Path "app-root/Assets"
@@ -256,49 +268,7 @@ jobs:
           & "$($makeAppx.FullName)" pack /d "app-root" /p $msixPath
         shell: powershell
 
-      # - name: Find and Sign MSIX files
-      #   shell: pwsh
-      #   run: |
-      #       # 1. Sync certificate into Windows store
-      #       smctl windows certsync --keypair-alias="$env:KEYPAIR_ALIAS"
-
-      #       # Robustly locate SignTool alongside MakeAppx
-      #       $makeAppx = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter makeappx.exe |
-      #                   Where-Object FullName -Match '\\x64\\makeappx\.exe$' |
-      #                   Sort-Object LastWriteTime -Descending |
-      #                   Select-Object -First 1
-      #       # Get the SDK folder, then join to Signtool.exe
-      #       $sdkFolder = Split-Path -Path $makeAppx.FullName -Parent
-      #       $signTool  = Join-Path -Path $sdkFolder -ChildPath 'Signtool.exe'
-      #       Write-Host "Using SignTool at: $signTool"
-
-      #       # 3. Sign all MSIX packages
-      #       $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
-      #       Get-ChildItem -Path "C:\a\sparrow-app\sparrow-app\msix-output" -Filter "*.msix" | ForEach-Object {
-      #         Write-Host "🔐 Signing: $($_.FullName)"
-      #         & "$signTool" sign /debug `
-      #           /sm /s My `
-      #           /sha1 $certThumb `
-      #           /fd sha256 `
-      #           /tr http://timestamp.digicert.com `
-      #           /td sha256 `
-      #           "$($_.FullName)"
-      #         if ($LASTEXITCODE -ne 0) {
-      #           Write-Host "🔍 Dumping last 5 AppxPackaging errors..."
-      #           Get-WinEvent -FilterHashtable @{
-      #               LogName = 'Microsoft-Windows-AppxPackaging/Operational';
-      #               Level   = 2  # Error level
-      #           } -MaxEvents 5 | ForEach-Object {
-      #               Write-Host "Event ID: $($_.Id) at $($_.TimeCreated)"
-      #               Write-Host $_.Message
-      #               Write-Host '―' * 40
-      #           }
-      #           Write-Host "❌ Failed to sign $($_.Name)"
-      #           exit 1
-      #         }
-      #         Write-Host "✅ Successfully signed $($_.Name)"
-      #       }
-
+      # --- STAGE 4: SIGN AND VERIFY MSIX ---
       - name: Find and Sign MSIX files
         shell: pwsh
         run: |
@@ -317,7 +287,6 @@ jobs:
           Get-ChildItem -Path "C:\a\sparrow-app\sparrow-app\msix-output" -Filter "*.msix" | ForEach-Object {
             Write-Host "🔐 Signing: $($_.FullName)"
             
-            # Try with minimal parameters first
             & "$signTool" sign /v /debug /sm /sha1 $certThumb /td SHA256 /fd sha256 /tr http://timestamp.digicert.com "$($_.FullName)"
             
             if ($LASTEXITCODE -ne 0) {
@@ -349,7 +318,7 @@ jobs:
           }
         shell: powershell
 
-      # --- STAGE 5: DEPLOY ---
+      # --- STAGE 5: DEPLOY & NOTIFY ---
       - name: Upload to S3
         run: |
           aws s3 cp C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix s3://sparrow-release-assests-prod/
