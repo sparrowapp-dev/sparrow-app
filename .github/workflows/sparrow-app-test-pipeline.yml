@@ -58,10 +58,10 @@ jobs:
       #   with:
       #     node-version: "20.x"
 
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 3.1
+      # - name: Set up .NET Core
+      #   uses: actions/setup-dotnet@v1
+      #   with:
+      #     dotnet-version: 3.1
 
       # - name: Install Rust 1.82.0
       #   run: |
@@ -102,7 +102,7 @@ jobs:
       - name: Copy unsigned MSI from prebuilt
         run: |
           # Create target directory structure
-          New-Item -ItemType Directory -Force -Path "apps/@sparrow-desktop/src-tauri/target/release/bundle/msi"
+          New-Item -ItemType Directory -Force -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi"
           
           # Copy MSI to where the pipeline expects it
           $msi = Get-ChildItem -Path "prebuilt/Sparrow_*_x64_en-US.msi" | Select-Object -First 1
@@ -136,18 +136,6 @@ jobs:
       - name: Install DigiCert Client tools
         id: digicert-code-signing
         uses: digicert/ssm-code-signing@v1.0.0
-
-      - name: Verify SM Client Auth
-        run: |
-          echo "=== SM Client Config ==="
-          echo "Host: $SM_HOST"
-          echo "API Key: ${SM_API_KEY:0:4}...${SM_API_KEY: -4}"
-          echo "Cert: $SM_CLIENT_CERT_FILE"
-          echo "Cert exists: $(test -f "$SM_CLIENT_CERT_FILE" && echo "Yes" || echo "No")"
-          
-          # Test authentication
-          smctl whoami || echo "⚠️ Auth check failed"
-        shell: bash
 
       - name: Sign MSI
         run: |
