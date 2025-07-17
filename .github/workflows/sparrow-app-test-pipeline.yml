@@ -431,146 +431,266 @@ jobs:
           $manifest | Set-Content -Encoding UTF8 -Path "app-root\AppxManifest.xml"
         shell: powershell
 
-      - name: Create MSIX Package using MakeAppx
-        run: |
-          New-Item -ItemType Directory -Force -Path "msix-output"
-          $msixPath = "msix-output/sparrow.msix"
+      # - name: Create MSIX Package using MakeAppx
+      #   run: |
+      #     New-Item -ItemType Directory -Force -Path "msix-output"
+      #     $msixPath = "msix-output/sparrow.msix"
 
-          $makeAppx = Get-ChildItem -Path 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter MakeAppx.exe -ErrorAction SilentlyContinue |
+      #     $makeAppx = Get-ChildItem -Path 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter MakeAppx.exe -ErrorAction SilentlyContinue |
+      #                 Where-Object { $_.FullName -match '\\x64\\MakeAppx\.exe$' } |
+      #                 Sort-Object LastWriteTime -Descending |
+      #                 Select-Object -First 1
+
+      #     if (-not $makeAppx) {
+      #       Write-Host "::error::MakeAppx.exe not found. Please ensure Windows 10 SDK is available on this runner."
+      #       exit 1
+      #     }
+
+      #     Write-Host "✅ Found MakeAppx.exe at: $($makeAppx.FullName)"
+      #     & "$($makeAppx.FullName)" pack /d "app-root" /p $msixPath
+      #   shell: powershell
+
+      # # --- STAGE 4: SIGN MSIX WITH DIGICERT ---
+      # - name: Sign MSIX Package
+      #   shell: pwsh
+      #   run: |
+      #     # Enable strict error handling
+      #     $ErrorActionPreference = "Stop"
+          
+      #     # 1. Configure paths and parameters
+      #     $msixPath = "msix-output/sparrow.msix"
+      #     $timestampServer = "http://timestamp.digicert.com"
+      #     $signToolPath = "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe"
+          
+      #     # 2. Pre-signing validation
+      #     Write-Host "`n=== Pre-Signing Validation ==="
+          
+      #     # Verify MSIX exists
+      #     if (-not (Test-Path -Path $msixPath -PathType Leaf)) {
+      #       Write-Host "::error::MSIX file not found at $msixPath"
+      #       Get-ChildItem -Path "msix-output" | Format-Table Name, Length | Out-String | Write-Host
+      #       exit 1
+      #     }
+          
+      #     # Verify certificate is accessible
+      #     if (-not (Test-Path -Path $env:SM_CLIENT_CERT_FILE)) {
+      #       Write-Host "::error::Certificate file not found at $env:SM_CLIENT_CERT_FILE"
+      #       exit 1
+      #     }
+          
+      #     # Verify signtool exists
+      #     if (-not (Test-Path -Path $signToolPath)) {
+      #       Write-Host "::error::SignTool not found at $signToolPath"
+      #       Write-Host "Available Windows Kits versions:"
+      #       Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" | Format-Table Name | Out-String | Write-Host
+      #       exit 1
+      #     }
+          
+      #     # 3. Prepare signing command
+      #     $signArgs = @(
+      #       "sign",
+      #       "/fd", "sha256",
+      #       "/f", "`"$env:SM_CLIENT_CERT_FILE`"",
+      #       "/p", "`"$env:SM_CLIENT_CERT_PASSWORD`"",
+      #       "/tr", $timestampServer,
+      #       "/td", "sha256",
+      #       "/v",
+      #       "`"$msixPath`""
+      #     )
+          
+      #     Write-Host "`n=== Signing Command ==="
+      #     Write-Host "$signToolPath $($signArgs -join ' ')"
+          
+      #     # 4. Execute signing with retry logic
+      #     $maxRetries = 3
+      #     $retryCount = 0
+      #     $signed = $false
+          
+      #     while (-not $signed -and $retryCount -lt $maxRetries) {
+      #       try {
+      #         $retryCount++
+      #         Write-Host "`nAttempt $retryCount of $maxRetries..."
+              
+      #         # Clear any previous errors
+      #         $LASTEXITCODE = 0
+              
+      #         # Execute signing
+      #         & $signToolPath $signArgs
+              
+      #         if ($LASTEXITCODE -ne 0) {
+      #           throw "SignTool failed with exit code $LASTEXITCODE"
+      #         }
+              
+      #         $signed = $true
+      #         Write-Host "✓ Successfully signed $msixPath"
+      #       }
+      #       catch {
+      #         Write-Host "::warning::Signing attempt $retryCount failed: $($_.Exception.Message)"
+              
+      #         # Additional diagnostics on last attempt
+      #         if ($retryCount -eq $maxRetries) {
+      #           Write-Host "`n=== Final Attempt Diagnostics ==="
+                
+      #           # Verify certificate can be loaded
+      #           try {
+      #             $cert = New-Object Security.Cryptography.X509Certificates.X509Certificate2(
+      #               $env:SM_CLIENT_CERT_FILE,
+      #               $env:SM_CLIENT_CERT_PASSWORD,
+      #               [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable
+      #             )
+      #             Write-Host "✓ Certificate is valid:"
+      #             Write-Host "   Thumbprint: $($cert.Thumbprint)"
+      #             Write-Host "   Has Private Key: $($cert.HasPrivateKey)"
+      #             Write-Host "   Not After: $($cert.NotAfter)"
+      #             $cert.Dispose()
+      #           }
+      #           catch {
+      #             Write-Host "::error::Certificate validation failed: $($_.Exception.Message)"
+      #           }
+                
+      #           # Check file signatures
+      #           Write-Host "`nFile signatures:"
+      #           & $signToolPath verify /pa /v "`"$msixPath`""
+                
+      #           exit 1
+      #         }
+              
+      #         # Wait before retry
+      #         Start-Sleep -Seconds (5 * $retryCount)
+      #       }
+      #     }
+          
+      #     # 5. Post-signing verification
+      #     if ($signed) {
+      #       Write-Host "`n=== Signature Verification ==="
+      #       & $signToolPath verify /pa /v "`"$msixPath`""
+            
+      #       if ($LASTEXITCODE -ne 0) {
+      #         Write-Host "::error::Signature verification failed"
+      #         exit 1
+      #       }
+            
+      #       Write-Host "`n✅ Package signed and verified successfully"
+      #     }
+
+
+      - name: Create and Sign MSIX Package
+        shell: pwsh
+        run: |
+          # 1. Configure paths
+          $msixDir = "msix-output"
+          $msixPath = "$msixDir/sparrow.msix"
+          $appRoot = "app-root"
+          $backupPath = "$msixPath.backup"
+
+          # 2. Create output directory
+          New-Item -ItemType Directory -Force -Path $msixDir | Out-Null
+
+          # 3. Find MakeAppx tool (latest version)
+          $makeAppx = Get-ChildItem -Path 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter MakeAppx.exe |
                       Where-Object { $_.FullName -match '\\x64\\MakeAppx\.exe$' } |
-                      Sort-Object LastWriteTime -Descending |
+                      Sort-Object { [version]($_.Directory.Name -replace '[^\d\.]','') } -Descending |
                       Select-Object -First 1
 
           if (-not $makeAppx) {
-            Write-Host "::error::MakeAppx.exe not found. Please ensure Windows 10 SDK is available on this runner."
-            exit 1
-          }
-
-          Write-Host "✅ Found MakeAppx.exe at: $($makeAppx.FullName)"
-          & "$($makeAppx.FullName)" pack /d "app-root" /p $msixPath
-        shell: powershell
-
-      # --- STAGE 4: SIGN MSIX WITH DIGICERT ---
-      - name: Sign MSIX Package
-        shell: pwsh
-        run: |
-          # Enable strict error handling
-          $ErrorActionPreference = "Stop"
-          
-          # 1. Configure paths and parameters
-          $msixPath = "msix-output/sparrow.msix"
-          $timestampServer = "http://timestamp.digicert.com"
-          $signToolPath = "C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\signtool.exe"
-          
-          # 2. Pre-signing validation
-          Write-Host "`n=== Pre-Signing Validation ==="
-          
-          # Verify MSIX exists
-          if (-not (Test-Path -Path $msixPath -PathType Leaf)) {
-            Write-Host "::error::MSIX file not found at $msixPath"
-            Get-ChildItem -Path "msix-output" | Format-Table Name, Length | Out-String | Write-Host
-            exit 1
-          }
-          
-          # Verify certificate is accessible
-          if (-not (Test-Path -Path $env:SM_CLIENT_CERT_FILE)) {
-            Write-Host "::error::Certificate file not found at $env:SM_CLIENT_CERT_FILE"
-            exit 1
-          }
-          
-          # Verify signtool exists
-          if (-not (Test-Path -Path $signToolPath)) {
-            Write-Host "::error::SignTool not found at $signToolPath"
-            Write-Host "Available Windows Kits versions:"
-            Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" | Format-Table Name | Out-String | Write-Host
-            exit 1
-          }
-          
-          # 3. Prepare signing command
-          $signArgs = @(
-            "sign",
-            "/fd", "sha256",
-            "/f", "`"$env:SM_CLIENT_CERT_FILE`"",
-            "/p", "`"$env:SM_CLIENT_CERT_PASSWORD`"",
-            "/tr", $timestampServer,
-            "/td", "sha256",
-            "/v",
-            "`"$msixPath`""
-          )
-          
-          Write-Host "`n=== Signing Command ==="
-          Write-Host "$signToolPath $($signArgs -join ' ')"
-          
-          # 4. Execute signing with retry logic
-          $maxRetries = 3
-          $retryCount = 0
-          $signed = $false
-          
-          while (-not $signed -and $retryCount -lt $maxRetries) {
-            try {
-              $retryCount++
-              Write-Host "`nAttempt $retryCount of $maxRetries..."
-              
-              # Clear any previous errors
-              $LASTEXITCODE = 0
-              
-              # Execute signing
-              & $signToolPath $signArgs
-              
-              if ($LASTEXITCODE -ne 0) {
-                throw "SignTool failed with exit code $LASTEXITCODE"
-              }
-              
-              $signed = $true
-              Write-Host "✓ Successfully signed $msixPath"
-            }
-            catch {
-              Write-Host "::warning::Signing attempt $retryCount failed: $($_.Exception.Message)"
-              
-              # Additional diagnostics on last attempt
-              if ($retryCount -eq $maxRetries) {
-                Write-Host "`n=== Final Attempt Diagnostics ==="
-                
-                # Verify certificate can be loaded
-                try {
-                  $cert = New-Object Security.Cryptography.X509Certificates.X509Certificate2(
-                    $env:SM_CLIENT_CERT_FILE,
-                    $env:SM_CLIENT_CERT_PASSWORD,
-                    [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable
-                  )
-                  Write-Host "✓ Certificate is valid:"
-                  Write-Host "   Thumbprint: $($cert.Thumbprint)"
-                  Write-Host "   Has Private Key: $($cert.HasPrivateKey)"
-                  Write-Host "   Not After: $($cert.NotAfter)"
-                  $cert.Dispose()
-                }
-                catch {
-                  Write-Host "::error::Certificate validation failed: $($_.Exception.Message)"
-                }
-                
-                # Check file signatures
-                Write-Host "`nFile signatures:"
-                & $signToolPath verify /pa /v "`"$msixPath`""
-                
-                exit 1
-              }
-              
-              # Wait before retry
-              Start-Sleep -Seconds (5 * $retryCount)
-            }
-          }
-          
-          # 5. Post-signing verification
-          if ($signed) {
-            Write-Host "`n=== Signature Verification ==="
-            & $signToolPath verify /pa /v "`"$msixPath`""
-            
-            if ($LASTEXITCODE -ne 0) {
-              Write-Host "::error::Signature verification failed"
+              Write-Host "::error::MakeAppx.exe not found"
               exit 1
-            }
-            
-            Write-Host "`n✅ Package signed and verified successfully"
+          }
+          Write-Host "✓ Using MakeAppx: $($makeAppx.FullName)"
+
+          # 4. Create MSIX package
+          try {
+              & $makeAppx.FullName pack /d $appRoot /p $msixPath /l /o
+              if ($LASTEXITCODE -ne 0) {
+                  throw "MakeAppx failed with exit code $LASTEXITCODE"
+              }
+              Write-Host "✓ MSIX package created: $msixPath"
+              Write-Host "Package size: $((Get-Item $msixPath).Length/1KB) KB"
+          }
+          catch {
+              Write-Host "::error::Failed to create MSIX package: $($_.Exception.Message)"
+              exit 1
+          }
+
+          # 5. Signing preparation
+          $signTool = $makeAppx.Directory.FullName + "\signtool.exe"
+          $tempCertPath = "$env:RUNNER_TEMP\SigningCert.p12"
+          
+          try {
+              # Verify signing tools exist
+              if (-not (Test-Path $signTool)) {
+                  throw "SignTool not found at $signTool"
+              }
+
+              # Create certificate backup
+              Copy-Item -Path $env:SM_CLIENT_CERT_FILE -Destination $tempCertPath -Force
+
+              # 6. Execute signing with retries
+              $maxRetries = 3
+              $retryCount = 0
+              $signed = $false
+
+              while (-not $signed -and $retryCount -lt $maxRetries) {
+                  $retryCount++
+                  try {
+                      Write-Host "`nSigning attempt $retryCount of $maxRetries..."
+
+                      # Create backup of MSIX
+                      Copy-Item -Path $msixPath -Destination $backupPath -Force
+
+                      # Sign command
+                      $signArgs = @(
+                          "sign",
+                          "/fd", "sha256",
+                          "/f", "`"$tempCertPath`"",
+                          "/p", "`"$env:SM_CLIENT_CERT_PASSWORD`"",
+                          "/tr", "http://timestamp.digicert.com",
+                          "/td", "sha256",
+                          "/v",
+                          "/debug",
+                          "`"$msixPath`""
+                      )
+
+                      & $signTool $signArgs
+
+                      if ($LASTEXITCODE -ne 0) {
+                          # Restore backup if signing failed
+                          Copy-Item -Path $backupPath -Destination $msixPath -Force
+                          throw "SignTool failed with exit code $LASTEXITCODE"
+                      }
+
+                      $signed = $true
+                      Write-Host "✓ Successfully signed package"
+                  }
+                  catch {
+                      Write-Host "::warning::Attempt $retryCount failed: $($_.Exception.Message)"
+                      if ($retryCount -eq $maxRetries) {
+                          throw "All signing attempts failed"
+                      }
+                      Start-Sleep -Seconds (2 * $retryCount)
+                  }
+              }
+
+              # 7. Verify signature
+              & $signTool verify /pa /v "`"$msixPath`""
+              if ($LASTEXITCODE -ne 0) {
+                  throw "Signature verification failed"
+              }
+
+              Write-Host "✅ Package signed and verified successfully"
+          }
+          catch {
+              Write-Host "::error::Signing failed: $($_.Exception.Message)"
+              Write-Host "=== Debug Info ==="
+              Write-Host "MSIX exists: $(Test-Path $msixPath)"
+              Write-Host "Cert exists: $(Test-Path $tempCertPath)"
+              Write-Host "SignTool: $signTool"
+              exit 1
+          }
+          finally {
+              # Cleanup
+              if (Test-Path $tempCertPath) { Remove-Item $tempCertPath -Force }
+              if (Test-Path $backupPath) { Remove-Item $backupPath -Force }
           }
 
       # - name: Sign MSIX with DigiCert SMCTLSign (using fingerprint)
