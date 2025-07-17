@@ -131,116 +131,123 @@ jobs:
       - name: Setup and Verify DigiCert Certificate & Environment
         shell: pwsh
         run: |
+          # Enable strict error handling
+          $ErrorActionPreference = "Stop"
+          
           Write-Host "=== Setting up DigiCert Certificate and Environment Variables ==="
           
-          # Set environment variables
-          Write-Host "Setting environment variables..."
-          Add-Content -Path $env:GITHUB_ENV -Value "SM_HOST=${{ secrets.SM_HOST }}"
-          Add-Content -Path $env:GITHUB_ENV -Value "SM_API_KEY=${{ secrets.SM_API_KEY }}"
-          Add-Content -Path $env:GITHUB_ENV -Value "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}"
-          
-          # Decode and save certificate
-          $certPath = "${{ github.workspace }}\Certificate_pkcs12.p12"
-          $certBase64 = "${{ secrets.SM_CLIENT_CERT_FILE_B64 }}"
-          
-          Write-Host "Decoding certificate to: $certPath"
-          
-          if (-not $certBase64) {
-              Write-Host "::error::SM_CLIENT_CERT_FILE_B64 secret is empty or not set"
-              exit 1
+          # 1. Environment Variables Setup
+          Write-Host "`n[1/3] Configuring Environment Variables..."
+          $requiredSecrets = @{
+            "SM_HOST" = "${{ secrets.SM_HOST }}"
+            "SM_API_KEY" = "${{ secrets.SM_API_KEY }}"
+            "SM_CLIENT_CERT_PASSWORD" = "${{ secrets.SM_CLIENT_CERT_PASSWORD }}"
           }
-          
-          Write-Host "Base64 certificate length: $($certBase64.Length) characters"
-          
+
+          # Verify secrets exist before proceeding
+          foreach ($key in $requiredSecrets.Keys) {
+            if ([string]::IsNullOrEmpty($requiredSecrets[$key])) {
+              Write-Host "::error::Missing required secret: $key"
+              exit 1
+            }
+          }
+
+          # Set environment variables using multiple methods for reliability
           try {
-              # Decode base64 and save to file
-              $certBytes = [Convert]::FromBase64String($certBase64)
-              [IO.File]::WriteAllBytes($certPath, $certBytes)
-              
-              Write-Host "✅ Certificate decoded successfully"
-              Write-Host "File size: $($certBytes.Length) bytes"
-              
-              # Set certificate path environment variable
-              Add-Content -Path $env:GITHUB_ENV -Value "SM_CLIENT_CERT_FILE=$certPath"
-              
+            # Method 1: GitHub Environment File
+            "SM_HOST=$($requiredSecrets.SM_HOST)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+            "SM_API_KEY=$($requiredSecrets.SM_API_KEY)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+            "SM_CLIENT_CERT_PASSWORD=$($requiredSecrets.SM_CLIENT_CERT_PASSWORD)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+            
+            # Method 2: Immediate session variables
+            $env:SM_HOST = $requiredSecrets.SM_HOST
+            $env:SM_API_KEY = $requiredSecrets.SM_API_KEY
+            $env:SM_CLIENT_CERT_PASSWORD = $requiredSecrets.SM_CLIENT_CERT_PASSWORD
+            
+            Write-Host "✓ Environment variables set successfully"
           }
           catch {
-              Write-Host "::error::Failed to decode certificate: $($_.Exception.Message)"
-              exit 1
+            Write-Host "::warning::Partial environment setup: $($_.Exception.Message)"
           }
-          
-          Write-Host "`n=== Certificate Verification ==="
-          
-          # Verify certificate file
-          if (Test-Path $certPath) {
-              Write-Host "✅ Certificate file exists"
-              
-              # Get file info
-              $fileInfo = Get-Item $certPath
-              Write-Host "File size: $($fileInfo.Length) bytes"
-              Write-Host "Created: $($fileInfo.CreationTime)"
-              
-              # Check if file is not empty
-              if ($fileInfo.Length -gt 0) {
-                  Write-Host "✅ Certificate file is not empty"
-                  
-                  # Try to read the certificate (validation)
-                  try {
-                      $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certPath, "${{ secrets.SM_CLIENT_CERT_PASSWORD }}")
-                      Write-Host "✅ Certificate is valid P12 format"
-                      Write-Host "Subject: $($cert.Subject)"
-                      Write-Host "Issuer: $($cert.Issuer)"
-                      Write-Host "Thumbprint: $($cert.Thumbprint)"
-                      Write-Host "Valid from: $($cert.NotBefore)"
-                      Write-Host "Valid to: $($cert.NotAfter)"
-                      Write-Host "Has private key: $($cert.HasPrivateKey)"
-                      $cert.Dispose()
-                  }
-                  catch {
-                      Write-Host "❌ Certificate validation failed: $($_.Exception.Message)"
-                      Write-Host "This might indicate:"
-                      Write-Host "  - Incorrect password"
-                      Write-Host "  - Corrupted base64 data"
-                      Write-Host "  - Invalid P12 format"
-                      exit 1
-                  }
-              } else {
-                  Write-Host "❌ Certificate file is empty"
-                  exit 1
-              }
-          } else {
-              Write-Host "❌ Certificate file does not exist"
-              exit 1
-          }
-          
-          Write-Host "`n=== Environment Variables Verification ==="
-          
-          # Verify environment variables are set (without exposing sensitive values)
-          $envVars = @("SM_HOST", "SM_API_KEY", "SM_CLIENT_CERT_PASSWORD", "SM_CLIENT_CERT_FILE")
-          
-          foreach ($envVar in $envVars) {
-              $value = [System.Environment]::GetEnvironmentVariable($envVar)
-              if ($value) {
-                  if ($envVar -eq "SM_CLIENT_CERT_FILE") {
-                      Write-Host "✅ $envVar is set to: $value"
-                  } else {
-                      Write-Host "✅ $envVar is set (length: $($value.Length))"
-                  }
-              } else {
-                  Write-Host "❌ $envVar is not set"
-              }
-          }
-          
-          # Basic base64 format check
-          if ($certBase64 -match '^[A-Za-z0-9+/]*={0,2}$') {
-              Write-Host "✅ Base64 format appears valid"
-          } else {
-              Write-Host "❌ Base64 format appears invalid"
-              exit 1
-          }
-          
-          Write-Host "`n✅ All DigiCert setup and verification completed successfully"
 
+          # 2. Certificate Decoding
+          Write-Host "`n[2/3] Processing Certificate..."
+          $certPath = "${{ github.workspace }}\Certificate_pkcs12.p12"
+          $certBase64 = "${{ secrets.SM_CLIENT_CERT_FILE_B64 }}".Trim()
+
+          # Validate certificate secret
+          if ([string]::IsNullOrWhiteSpace($certBase64)) {
+            Write-Host "::error::SM_CLIENT_CERT_FILE_B64 secret is empty or not set"
+            exit 1
+          }
+
+          # Clean and validate Base64
+          $cleanBase64 = $certBase64 -replace '\s',''
+          if ($cleanBase64.Length % 4 -ne 0) {
+            Write-Host "::warning::Base64 length not multiple of 4 (may need padding)"
+            $cleanBase64 = $cleanBase64.PadRight($cleanBase64.Length + (4 - $cleanBase64.Length % 4) % 4, '=')
+          }
+
+          try {
+            # Decode and save certificate
+            $certBytes = [Convert]::FromBase64String($cleanBase64)
+            [IO.File]::WriteAllBytes($certPath, $certBytes)
+            
+            # Set certificate path
+            "SM_CLIENT_CERT_FILE=$certPath" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+            $env:SM_CLIENT_CERT_FILE = $certPath
+            
+            Write-Host "✓ Certificate saved to $certPath ($($certBytes.Length) bytes)"
+          }
+          catch {
+            Write-Host "::error::Certificate processing failed: $($_.Exception.Message)"
+            Write-Host "Debug info: Base64 length=$($certBase64.Length), Clean length=$($cleanBase64.Length)"
+            exit 1
+          }
+
+          # 3. Validation Phase
+          Write-Host "`n[3/3] Running Validations..."
+          
+          # Certificate Validation
+          try {
+            $cert = New-Object Security.Cryptography.X509Certificates.X509Certificate2(
+              $certPath,
+              $requiredSecrets.SM_CLIENT_CERT_PASSWORD,
+              [Security.Cryptography.X509Certificates.X509KeyStorageFlags]::Exportable
+            )
+            
+            Write-Host "✓ Certificate Validated:"
+            Write-Host "   Subject: $($cert.Subject)"
+            Write-Host "   Thumbprint: $($cert.Thumbprint)"
+            Write-Host "   Expires: $($cert.NotAfter.ToString('yyyy-MM-dd'))"
+            $cert.Dispose()
+          }
+          catch {
+            Write-Host "::error::Certificate validation failed: $($_.Exception.Message)"
+            exit 1
+          }
+
+          # Environment Verification
+          $missingVars = @()
+          foreach ($var in @("SM_HOST", "SM_API_KEY", "SM_CLIENT_CERT_PASSWORD", "SM_CLIENT_CERT_FILE")) {
+            if (-not (Test-Path "env:$var")) {
+              $missingVars += $var
+            }
+          }
+
+          if ($missingVars.Count -gt 0) {
+            Write-Host "::warning::These variables didn't persist: $($missingVars -join ', ')"
+            Write-Host "Current environment:"
+            Get-ChildItem env: | Where-Object Name -like "SM_*" | Format-Table Name, @{
+              Label="Value";
+              Expression={ if ($_.Name -like "*KEY*" -or $_.Name -like "*PASSWORD*") { "*****" } else { $_.Value } }
+            }
+          }
+          else {
+            Write-Host "✓ All environment variables confirmed"
+          }
+
+          Write-Host "`n✅ Setup and Verification Completed Successfully"
 
       # Setup Android SDK (required by DigiCert action for compatibility)
       - name: Setup Android SDK (for DigiCert action compatibility)
