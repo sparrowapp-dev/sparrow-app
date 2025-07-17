@@ -57,93 +57,143 @@ jobs:
         run: choco install windows-sdk-10-version-2004-all -y
         shell: powershell
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "20.8"
+      # - name: Setup Node.js
+      #   uses: actions/setup-node@v2
+      #   with:
+      #     node-version: "20.8"
 
-      - name: Install Rust 1.82.0
-        run: |
-          Invoke-WebRequest -Uri https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -OutFile rustup-init.exe
-          .\rustup-init.exe -y
-          rustup install 1.82.0
-          rustup default 1.82.0
-
-      - name: Update updater endpoint in tauri.conf.json file
-        run: |
-          $content = Get-Content apps/@sparrow-desktop/src-tauri/tauri.conf.json -Raw
-          $newContent = $content -replace '"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"', '"https://${{ secrets.UPDATER_ENDPOINT_PROD }}/updater/{{target}}/{{arch}}/{{current_version}}"'
-          Set-Content -Path apps/@sparrow-desktop/src-tauri/tauri.conf.json -Value $newContent
-        shell: pwsh
-
-      - name: Increase Yarn network timeout
-        run: yarn config set network-timeout 600000
-
-      - name: Sync version across all files
-        run: yarn sync-version
-
-      - name: Build Tauri App
-        run: |
-          yarn cache clean
-          npm install -g pnpm
-          yarn install
-          yarn desktop-build
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
-
-      - name: Upload MSI and EXE as Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: tauri-build-artifacts
-          path: |
-            apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/*.msi
-            apps/@sparrow-desktop/src-tauri/target/debug/Sparrow.exe
-            
-      # - name: Copy unsigned MSI from prebuilt
+      # - name: Install Rust 1.82.0
       #   run: |
-      #     # Create target directory structure
-      #     New-Item -ItemType Directory -Force -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi"
+      #     Invoke-WebRequest -Uri https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -OutFile rustup-init.exe
+      #     .\rustup-init.exe -y
+      #     rustup install 1.82.0
+      #     rustup default 1.82.0
+
+      # - name: Update updater endpoint in tauri.conf.json file
+      #   run: |
+      #     $content = Get-Content apps/@sparrow-desktop/src-tauri/tauri.conf.json -Raw
+      #     $newContent = $content -replace '"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"', '"https://${{ secrets.UPDATER_ENDPOINT_PROD }}/updater/{{target}}/{{arch}}/{{current_version}}"'
+      #     Set-Content -Path apps/@sparrow-desktop/src-tauri/tauri.conf.json -Value $newContent
+      #   shell: pwsh
+
+      # - name: Increase Yarn network timeout
+      #   run: yarn config set network-timeout 600000
+
+      # - name: Sync version across all files
+      #   run: yarn sync-version
+
+      # - name: Build Tauri App
+      #   run: |
+      #     yarn cache clean
+      #     npm install -g pnpm
+      #     yarn install
+      #     yarn desktop-build
+      #   env:
+      #     TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+      #     TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+      #     GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+
+      # - name: Upload MSI and EXE as Artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: tauri-build-artifacts
+      #     path: |
+      #       apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/*.msi
+      #       apps/@sparrow-desktop/src-tauri/target/debug/Sparrow.exe
+
+      - name: Copy unsigned MSI and EXE from prebuilt
+        run: |
+          # Create target directory structure
+          New-Item -ItemType Directory -Force -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi"
           
-      #     # Copy MSI to where the pipeline expects it
-      #     $msi = Get-ChildItem -Path "prebuilt/Sparrow_*_x64_en-US.msi" | Select-Object -First 1
-      #     if (-not $msi) {
-      #       Write-Host "::error::No MSI found in prebuilt folder"
-      #       exit 1
-      #     }
+          # Copy MSI to where the pipeline expects it
+          $msi = Get-ChildItem -Path "prebuilt/Sparrow_*_x64_en-US.msi" | Select-Object -First 1
+          if (-not $msi) {
+            Write-Host "::error::No MSI found in prebuilt folder"
+            exit 1
+          }
+
+          # Copy EXE to where the pipeline expects it
+          $exe = Get-ChildItem -Path "prebuilt/Sparrow.exe" | Select-Object -First 1
+          if (-not $exe) {
+            Write-Host "::error::No EXE found in prebuilt folder"
+            exit 1
+          } 
           
-      #     Copy-Item $msi.FullName -Destination "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/Sparrow.msi"
-      #     Write-Host "Copied $($msi.Name) to standard location"
-      #   shell: powershell
+          Copy-Item $msi.FullName -Destination "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/Sparrow.msi"
+          Write-Host "Copied $($msi.Name) to standard location"
+
+          Copy-Item $exe.FullName -Destination "apps/@sparrow-desktop/src-tauri/target/debug/Sparrow.exe"
+          Write-Host "Copied $($exe.Name) to standard location"
+        shell: powershell
 
       # --- STAGE 2: SIGN MSI WITH DIGICERT ---
-      - name: Set up DigiCert SM Client
+      - name: Set up DigiCert certificate
+        shell: pwsh
         run: |
-          echo "${{ secrets.SM_CLIENT_CERT_FILE_B64 }}" | base64 --decode > cert.p12
-
-          # Verify file was created
-          if [ ! -f cert.p12 ]; then
-            echo "❌ Certificate file not created!"
-            exit 1
-          fi
-          
-          # Set environment variables (critical for auth)
-          echo "SM_HOST=${{ secrets.SM_HOST }}" >> $GITHUB_ENV
-          echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> $GITHUB_ENV
-          echo "SM_CLIENT_CERT_FILE=$env:GITHUB_WORKSPACE\cert.p12" >> $env:GITHUB_ENV
-          echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> $env:GITHUB_ENV
+          Write-Host "Decoding DigiCert .p12 into D:\Certificate_pkcs12.p12"
+          $bytes = [Convert]::FromBase64String("${{ secrets.SM_CLIENT_CERT_FILE_B64 }}")
+          [IO.File]::WriteAllBytes("D:\Certificate_pkcs12.p12", $bytes)
+      
+      - name: Set variables
+        id: variables
+        run: |
+          echo "SM_HOST=${{ secrets.SM_HOST }}" >> "$GITHUB_ENV"
+          echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> "$GITHUB_ENV"
+          echo "SM_CLIENT_CERT_FILE=D:\\Certificate_pkcs12.p12" >> "$GITHUB_ENV"
+          echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV"
         shell: bash
 
-      - name: Install DigiCert Client tools
-        id: digicert-code-signing
+      # Setup Android SDK (required by DigiCert action for compatibility)
+      - name: Setup Android SDK (for DigiCert action compatibility)
+        run: |
+          # Create minimal Android SDK structure to satisfy DigiCert action requirements
+          $androidSdkPath = "C:\Android\android-sdk"
+          $buildToolsPath = "$androidSdkPath\build-tools\30.0.2"
+          
+          Write-Host "Creating Android SDK directory structure..." -ForegroundColor Yellow
+          New-Item -ItemType Directory -Path $buildToolsPath -Force
+          
+          # Create dummy files that the DigiCert action expects to find
+          Write-Host "Creating required Android build tool files..." -ForegroundColor Yellow
+          New-Item -ItemType File -Path "$buildToolsPath\apksigner.bat" -Force
+          New-Item -ItemType File -Path "$buildToolsPath\zipalign.exe" -Force
+          New-Item -ItemType File -Path "$buildToolsPath\aapt.exe" -Force
+          New-Item -ItemType File -Path "$buildToolsPath\aapt2.exe" -Force
+          
+          # Set Android environment variables
+          echo "ANDROID_HOME=$androidSdkPath" >> $env:GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$androidSdkPath" >> $env:GITHUB_ENV
+          
+          Write-Host "Android SDK structure created successfully" -ForegroundColor Green
+        shell: powershell
+
+      # Install DigiCert Signing Manager Tools
+      - name: Install DigiCert Signing Manager Tools
         uses: digicert/ssm-code-signing@v1.0.0
 
-      - name: Sign MSI
+      - name: Extract first KeyPair alias
+        id: extract_alias
+        shell: pwsh
         run: |
-          $msi = Get-ChildItem "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/*.msi" | Select-Object -First 1
-          smctl sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $msi.FullName
-        shell: powershell
+          $line  = (smctl keypair ls | Select-Object -Skip 2 | Select-Object -First 1)
+          $alias = ($line -split '\s{2,}')[2]
+          Write-Host "✅ Using alias: $alias"
+          "KEYPAIR_ALIAS=$alias" | Out-File -FilePath $env:GITHUB_ENV -Encoding ascii
+      
+      - name: Sync Certificate into Windows Store
+        shell: pwsh
+        run: |
+          Write-Host "🔄 Syncing cert for alias: $($env:KEYPAIR_ALIAS)"
+          smctl windows certsync `
+            --keypair-alias="$($env:KEYPAIR_ALIAS)" `
+            --store=system
+
+      # - name: Sign MSI
+      #   run: |
+      #     $msi = Get-ChildItem "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/*.msi" | Select-Object -First 1
+      #     smctl sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $msi.FullName
+      #   shell: powershell
 
       # --- STAGE 3: CONVERT TO MSIX ---
       # - name: Inject version into MSIX template
@@ -266,16 +316,53 @@ jobs:
       # --- STAGE 4: SIGN MSIX WITH DIGICERT ---
       - name: Sign MSIX
         run: |
-          $msix = Get-ChildItem "msix-output/*.msix" | Select-Object -First 1
-          smctl sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $msix.FullName
+          $msixPath = "msix-output/sparrow.msix"
+
+          # Verify the MSIX file exists
+          if (-Not (Test-Path $msixPath)) {
+              Write-Host "❌ MSIX file not found at $msixPath"
+              exit 1
+          }
+
+          Write-Host "🔐 Signing: $msixPath"
+
+          & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe" sign `
+            /fd sha256 `
+            /sha1 ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} `
+            /tr http://timestamp.digicert.com `
+            /td sha256 `
+            /v `
+            "$msixPath"
+
+          if ($LASTEXITCODE -ne 0) {
+              Write-Host "❌ Failed to sign $msixPath"
+              exit 1
+          }
+
+          Write-Host "✅ Successfully signed $msixPath"
         shell: powershell
 
-      - name: Verify Signature
+      - name: Verify MSIX Signature
         run: |
-          $msix = Get-ChildItem "msix-output/*.msix" | Select-Object -First 1
-          $result = smctl verify --input $msix.FullName
-          if (-not $result.Contains("Valid: True")) { 
-            throw "MSIX signature verification failed" 
+          $msixPath = "msix-output/sparrow.msix"
+
+          # Verify the MSIX file exists
+          if (-Not (Test-Path $msixPath)) {
+              Write-Host "❌ MSIX file not found at $msixPath"
+              exit 1
+          }
+
+          Write-Host "🔍 Verifying signature for: $msixPath"
+
+          # Get the Authenticode signature
+          $sig = Get-AuthenticodeSignature -FilePath $msixPath
+
+          # Check the signature status
+          if ($sig.Status -eq 'Valid') {
+              Write-Host "✅ Valid signature on $msixPath"
+          } else {
+              Write-Host "❌ Invalid signature on $msixPath: $($sig.Status)"
+              exit 1
           }
         shell: powershell
 
