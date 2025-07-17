@@ -350,7 +350,7 @@ jobs:
           Write-Host "Signing: msix-output/sparrow.msix with DigiCert SMCTLSign"
           
           # Use DigiCert's native signing tool
-          smctl sign --keypair-alias="$env:KEYPAIR_ALIAS" --input="msix-output/sparrow.msix" --verbose
+          smctl sign --keypair-alias "$env:KEYPAIR_ALIAS" --input "msix-output/sparrow.msix" --verbose
           
           if ($LASTEXITCODE -ne 0) {
               Write-Host "Failed to sign msix-output/sparrow.msix with SMCTLSign"
