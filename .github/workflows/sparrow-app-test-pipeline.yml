@@ -181,12 +181,21 @@ jobs:
 
       - name: Create MSIX Package using MakeAppx
         run: |
-          # Create output directory (PowerShell)
-          powershell -Command "New-Item -ItemType Directory -Force -Path 'msix-output'"
-          
-          # Pack MSIX (using cmd, which inherits SDK paths)
-          MakeAppx pack /d "app-root" /p "msix-output/sparrow.msix"
-        shell: cmd 
+          New-Item -ItemType Directory -Force -Path "msix-output"
+          $msixPath = "msix-output/sparrow.msix"
+
+          $makeappxPath = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -Filter "MakeAppx.exe" |
+                          Where-Object { $_.FullName -like "*\\x64\\MakeAppx.exe" } |
+                          Sort-Object FullName -Descending |
+                          Select-Object -First 1
+
+          if (-not $makeappxPath) {
+            Write-Host "::error::MakeAppx.exe not found on system"
+            exit 1
+          }
+
+          & "$($makeappxPath.FullName)" pack /d "app-root" /p $msixPath
+        shell: powershell
 
       # --- STAGE 4: SIGN MSIX WITH DIGICERT ---
       - name: Sign MSIX
