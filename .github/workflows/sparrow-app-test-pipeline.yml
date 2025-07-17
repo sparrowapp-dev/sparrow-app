@@ -53,8 +53,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Windows SDK
-        uses: microsoft/setup-msbuild@v1
+      - name: Install Windows 10 SDK
+        run: choco install windows-sdk-10-version-2004-all -y
+        shell: powershell
 
       - name: Copy unsigned MSI from prebuilt
         run: |
@@ -128,14 +129,16 @@ jobs:
       # --- STAGE 3: CONVERT TO MSIX USING MAKEAPPX ---
       - name: Prepare App Folder for MakeAppx
         run: |
+          New-Item -ItemType Directory -Force -Path "app-root/Assets"
           $msiPath = "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/Sparrow.msi"
-          $destinationPath = "app-root"
+          $extractPath = "app-root"
+          Start-Process msiexec.exe -ArgumentList "/a `"$msiPath`" /qn TARGETDIR=`"$extractPath`"" -Wait -NoNewWindow
 
-          # Create destination directory if it doesn't exist
-          New-Item -ItemType Directory -Force -Path $destinationPath
+          # Ensure dummy executable exists (MakeAppx requires it)
+          Set-Content -Path "app-root/Sparrow.exe" -Value "placeholder"
 
-          # Extract MSI contents
-          Start-Process -Wait -FilePath "msiexec.exe" -ArgumentList "/a `"$msiPath`" /qn TARGETDIR=`"$(Resolve-Path $destinationPath)`""
+           # Copy actual StoreLogo from known path
+          Copy-Item "apps/@sparrow-desktop/src-tauri/icons/StoreLogo.png" -Destination "app-root/Assets/StoreLogo.png"
         shell: powershell
 
       - name: Generate AppxManifest.xml with version injection
@@ -150,7 +153,7 @@ jobs:
                   xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
                   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
                   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-                  IgnorableNamespaces="rescap">
+                  IgnorableNamespaces="uap mp rescap">
             <Identity Name="Sparrow"
                       Publisher="CN=Techdome Solutions, O=Techdome Solutions, C=IN"
                       Version="$version.0"
@@ -159,7 +162,7 @@ jobs:
               <DisplayName>Sparrow</DisplayName>
               <PublisherDisplayName>sparrowapp</PublisherDisplayName>
               <Description>Sparrow</Description>
-              <Logo>Assets\StoreLogo.png</Logo>
+              <Logo>Assets\\StoreLogo.png</Logo>
             </Properties>
             <Dependencies>
               <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.0.0" MaxVersionTested="10.0.19041.0" />
@@ -172,20 +175,13 @@ jobs:
             </Capabilities>
             <Applications>
               <Application Id="SparrowApp" Executable="Sparrow.exe" EntryPoint="Windows.FullTrustApplication">
-                <uap:VisualElements DisplayName="Sparrow" Description="Sparrow App" BackgroundColor="transparent" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png">
-                  <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
-                  <uap:SplashScreen Image="Assets\SplashScreen.png" />
-                </uap:VisualElements>
+                <uap:VisualElements DisplayName="Sparrow" Description="Sparrow App" BackgroundColor="transparent" />
               </Application>
             </Applications>
           </Package>
           "@
 
           $manifest | Set-Content -Encoding UTF8 -Path "app-root\AppxManifest.xml"
-        shell: powershell
-
-      - name: Install Windows 10 SDK if MakeAppx is missing
-        run: choco install windows-sdk-10-version-2004-all -y
         shell: powershell
 
       - name: Create MSIX Package using MakeAppx
