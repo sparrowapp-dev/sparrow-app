@@ -149,7 +149,7 @@ jobs:
           # Extract only the correct version line under [package]
           $cargoFile = "apps/@sparrow-desktop/src-tauri/Cargo.toml"
           $versionLine = Select-String -Path $cargoFile -Pattern '^\s*version\s*=\s*"(.*?)"' | Select-Object -First 1
-          $version = $versionLine.Matches.Groups[1].Value
+          $version = $versionLine.Matches.Groups[1].Value + ".0"
 
           # Update MSIX template
           $templatePath = ".github/workflows/msix_packaging/sparrow_template.xml"
