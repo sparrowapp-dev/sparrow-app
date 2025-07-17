@@ -241,44 +241,34 @@ jobs:
       - name: Find and Sign MSIX files
         shell: pwsh
         run: |
-          $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
-          $bundlePath = "C:\a\sparrow-app\sparrow-app\msix-output"
-          
-          # List all files in the bundle directory for debugging
-          Write-Host "🔍 Contents of bundle directory:"
-          Get-ChildItem -Path $bundlePath -Recurse | Format-Table Name, FullName
+            # 1. Sync certificate into Windows store
+            smctl windows certsync --keypair-alias="$env:KEYPAIR_ALIAS"
 
-          # Find all MSIX files
-          $msixFiles = Get-ChildItem -Path $bundlePath -Filter "*.msix"
-          
-          if ($msixFiles.Count -eq 0) {
-            Write-Host "❌ No MSIX files found in $bundlePath"
-            Write-Host "🔍 Checking parent directories..."
-            Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target" -Recurse -Filter "*.msix" | ForEach-Object {
-              Write-Host "Found MSIX: $($_.FullName)"
+            # 2. Discover SignTool from same SDK as MakeAppx
+            $makeAppx = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter MakeAppx.exe |
+                        Where-Object FullName -Match '\\x64\\MakeAppx\.exe$' |
+                        Sort-Object LastWriteTime -Descending |
+                        Select-Object -First 1
+            $signTool = $makeAppx.FullName.Replace('MakeAppx.exe','SignTool.exe')
+            Write-Host "Using SignTool at: $signTool"
+
+            # 3. Sign all MSIX packages
+            $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
+            Get-ChildItem -Path "C:\a\sparrow-app\sparrow-app\msix-output" -Filter "*.msix" | ForEach-Object {
+              Write-Host "🔐 Signing: $($_.FullName)"
+              & "$signTool" sign /debug `
+                /sm /s My `
+                /sha1 $certThumb `
+                /fd sha256 `
+                /tr http://timestamp.digicert.com `
+                /td sha256 `
+                "$($_.FullName)"
+              if ($LASTEXITCODE -ne 0) {
+                Write-Host "❌ Failed to sign $($_.Name)"
+                exit 1
+              }
+              Write-Host "✅ Successfully signed $($_.Name)"
             }
-            exit 1
-          }
-
-          # Sign each MSIX file found
-          foreach ($msixFile in $msixFiles) {
-            Write-Host "🔐 Signing: $($msixFile.FullName)"
-
-            & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe" sign `
-              /sm /s My `
-              /tr http://timestamp.digicert.com `
-              /td sha256 `
-              /fd sha256 `
-              /sha1 $certThumb `
-              "$($msixFile.FullName)"
-
-            if ($LASTEXITCODE -ne 0) {
-              Write-Host "❌ Failed to sign $($msixFile.Name)"
-              exit 1
-            }
-
-            Write-Host "✅ Successfully signed $($msixFile.Name)"
-          }
 
       - name: Verify MSIX Signature
         run: |
