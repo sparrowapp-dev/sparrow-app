@@ -27,7 +27,6 @@
     SidebarItemPositionBaseEnum,
     type SidebarItemBaseAllIconInterface,
   } from "../../../types/sidebar/sidebar-base";
-  import { planBannerisOpen } from "../../../store";
 
   export let sidebarItems: SidebarItemBaseInterface[] = [];
   const SidebarImageItem: SidebarItemBaseAllIconInterface[] = [];
@@ -42,6 +41,8 @@
   export let type = "desktop";
 
   let divHeight = 0;
+  let sidebarDiv: HTMLDivElement | null = null;
+  let resizeObserver: ResizeObserver;
 
   function logPositions(id) {
     const div = document.getElementById(`sidebar-item-${id}`);
@@ -107,6 +108,14 @@
   };
 
   onMount(() => {
+    // Attach ResizeObserver to sidebarDiv
+    resizeObserver = new ResizeObserver(() => {
+      handleResize();
+    });
+
+    if (sidebarDiv) {
+      resizeObserver.observe(sidebarDiv);
+    }
     window.addEventListener("resize", handleResize);
     return () => {
       window.removeEventListener("resize", handleResize);
@@ -128,13 +137,9 @@
       logPositions(id);
     }
   };
-
-  $: if ($planBannerisOpen) {
-    handleResize();
-  }
 </script>
 
-<div class={`sidebar ${componentClass}`}>
+<div bind:this={sidebarDiv} class={`sidebar ${componentClass}`}>
   <div class="active-indicator" style="top:{divHeight + 3}px"></div>
   <div class="primary-sidebar-items">
     {#each primarySidebarItems as item (item.route)}

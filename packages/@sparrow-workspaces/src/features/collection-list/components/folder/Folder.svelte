@@ -662,10 +662,7 @@
         {/if}
       </div>
       {#if expand}
-        <div
-          transition:slide={{ duration: 250 }}
-          style="padding-left: 0; overflow:auto;"
-        >
+        <div style="padding-left: 0; overflow:auto;">
           <div
             class="sub-files position-relative"
             style={` background-color: ${explorer.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"};`}

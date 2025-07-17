@@ -82,7 +82,7 @@
 
     let response;
     if (isEditMode && onUpdateProfile && profileForm.authId) {
-      response = await onUpdateProfile(profileForm.authId, profileData);
+      response = await onUpdateProfile(profileForm.authId, profileData, false);
     } else if (!isEditMode && onCreateProfile) {
       response = await onCreateProfile(profileData);
     }

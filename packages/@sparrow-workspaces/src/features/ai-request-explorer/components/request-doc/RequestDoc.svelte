@@ -2,7 +2,7 @@
   import { TextEditor } from "@sparrow/library/forms";
   import { BotSparkleFilled } from "@sparrow/library/icons";
   import { CodeMirrorInput } from "../../../../components";
-  import { TextEditorLikeTheme } from "../../../../utils/";
+  import { SystemPromptTheme } from "../../../../utils/";
 
   export let onUpdateAiSystemPrompt;
   export let requestDoc: string;
@@ -19,7 +19,7 @@
   };
   export let onUpdateEnvironment = () => {};
 
-  const theme = new TextEditorLikeTheme().build();
+  const theme = new SystemPromptTheme().build();
 </script>
 
 <div class="request-doc-wrapper {isEditable ? 'disabled' : ''}">

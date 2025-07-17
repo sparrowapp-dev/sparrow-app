@@ -22,6 +22,9 @@
     getFileRestrictions,
     isFileUploadSupported,
   } from "../../../../constants";
+  import CodeMirrorInput from "../../../../../../components/codemirror-input/CodeMirrorInput.svelte";
+  import { UserPromptTheme } from "../../../../../../utils";
+
 
   export let placeholder = "";
   export let sendPrompt;
@@ -36,6 +39,16 @@
   export let currentModel: AIModelVariant;
   export let filesToUpload: PromptFileAttachment[] = [];
   export let disabled: boolean = false;
+  const theme = new UserPromptTheme().build();
+  export let environmentVariables = {
+    filtered: [
+      { key: "API_KEY", value: "123456", type: "G", environment: "Global" },
+      { key: "BASE_URL", value: "https://api.example.com", type: "G", environment: "Global" },
+    ],
+    global: { name: "Global", type: "GLOBAL" },
+  };
+
+  export let onUpdateEnvironment = () => {};
 
   // Props
 
@@ -61,13 +74,28 @@
     textAreaInput.style.height = textAreaInput.scrollHeight + "px"; // Expand based on content
   }
 
+  function  setEnvironmentVariables (
+    text: string,
+    environmentVariables: any,
+  ){
+    let updatedText = text;
+    environmentVariables.forEach((element) => {
+      const regex = new RegExp(`{{(${element.key})}}`, "g");
+      updatedText = updatedText.replace(regex, element.value);
+    });
+
+    return updatedText;
+  };
+
   const hanldeStartGenerating = async () => {
     if (!prompt.trim()) return;
 
     try {
       const uploadedFiles = await handleUploadFiles(); // Upload files if any
       setTimeout(adjustTextareaHeight, 0); // waiting for the DOM to update.
-      await sendPrompt(prompt, uploadedFiles);
+      const debuggedprompt = setEnvironmentVariables(prompt, environmentVariables);
+      console.log("Debugged: ", debuggedprompt)
+      await sendPrompt(debuggedprompt, uploadedFiles);
       await onUpdateAiPrompt("");
       filesToUpload = [];
       MixpanelEvent(Events.AI_Initiate_Response);
@@ -255,7 +283,15 @@
     {/if}
 
     <!-- Textarea Input -->
-    <textarea
+      <CodeMirrorInput
+        value={prompt}
+        onUpdateInput={(val) => (onUpdateAiPrompt = val)}
+        placeholder="Write a prompt or generate one from generate prompt."
+        {theme}
+        {environmentVariables}
+        {onUpdateEnvironment}
+      />
+    <!-- <textarea
       bind:value={prompt}
       on:input={() => {
         isTyping = true;
@@ -294,7 +330,7 @@
         isPromptBoxFocused = false;
         isTyping = false;
       }}
-    />
+    /> -->
   </div>
 
   <!-- Action Btn Section -->

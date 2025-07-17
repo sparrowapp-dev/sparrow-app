@@ -517,58 +517,6 @@ jobs:
           yarn workspace @sparrow/desktop tauri build --bundles deb 
           # yarn workspace @sparrow/desktop tauri build --debug --bundles deb
 
-      - name: Generate DEB metadata
-        working-directory: apps/@sparrow-desktop/src-tauri/target/release/bundle
-        run: |
-          mkdir -p ../../../../../../publishDir/pool/stable/main/binary-amd64
-          cp deb/sparrow_*.deb ../../../../../../publishDir/pool/stable/main/binary-amd64/sparrow.deb
-          cd ../../../../../../publishDir
-          mkdir -p dists/stable/main/binary-amd64/
-          dpkg-scanpackages -m pool/stable/main/binary-amd64 /dev/null > dists/stable/main/binary-amd64/Packages
-          gzip -k dists/stable/main/binary-amd64/Packages
-
-      - name: Import GPG key
-        run: |
-          echo "${{ secrets.SPARROW_PRIVATE_KEY }}" | gpg --batch --import
-          echo "use-agent" >> ~/.gnupg/gpg.conf
-          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
-
-      - name: Prepare publish directory
-        run: |
-          cd publishDir
-          cat > apt-release.conf <<EOF
-          APT::FTPArchive::Release {
-            Origin "Sparrow";
-            Label "Sparrow";
-            Suite "stable";
-            Codename "stable";
-            Architectures "amd64";
-            Components "main";
-            Description "Sparrow Debian Repository";
-          };
-          EOF
-
-          cd dists/stable
-          apt-ftparchive -c ../../apt-release.conf release . > Release
-
-          gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.SPARROW_PASSPHRASE }}" \
-            --default-key "${{ vars.SPARROW_PUB_KEY }}" -abs -o Release.gpg Release
-
-          gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.SPARROW_PASSPHRASE }}" \
-            --default-key "${{ vars.SPARROW_PUB_KEY }}" --clearsign -o InRelease Release
-
-          cd ../../
-          gpg --armor --export ${{ vars.SPARROW_PUB_KEY }} > sparrow-repo-key.gpg
-
-          cd ..
-          mv publishDir gh-pages
-
-      - name: Upload gh-pages artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: gh-pages
-          path: gh-pages
-
       - name: Upload to S3 bucket
         uses: jakejarvis/s3-sync-action@master
         with:
@@ -578,17 +526,21 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.AWS_REGION }}
-          SOURCE_DIR: gh-pages
+          SOURCE_DIR: apps/@sparrow-desktop/src-tauri/target/release/bundle/deb
           DEST_DIR: linux 
 
-      - name: Post Linux Debian Repo Link to Teams
+      - name: Post Linux Build Link to Teams
         env:
           AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
           AWS_REGION: ${{ vars.AWS_REGION }}
           TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
         run: |
-          REPO_URL="https://${AWS_S3_BUCKET}.s3-website-${AWS_REGION}.amazonaws.com"
-          
+          # Find the latest .deb file in the local build output
+          DEB_SRC_DIR="apps/@sparrow-desktop/src-tauri/target/release/bundle/deb"
+          DEB_FILE=$(ls "$DEB_SRC_DIR"/*.deb | sort -V | tail -n 1)
+          DEB_BASENAME=$(basename "$DEB_FILE")
+          DEB_URL="https://sparrow-assest.s3.us-east-1.amazonaws.com/linux/$DEB_BASENAME"
+
           curl -H "Content-Type: application/json" -d "{
             \"type\": \"message\",
             \"attachments\": [
@@ -605,19 +557,20 @@ jobs:
                     },
                     {
                       \"type\": \"TextBlock\",
-                      \"text\": \"The latest Debian packages have been uploaded to the repository.\",
+                      \"text\": \"Branch: development\",
                       \"wrap\": true
                     },
                     {
                       \"type\": \"TextBlock\",
-                      \"text\": \"Repository URL:\",
+                      \"text\": \"Download Link:\",
                       \"wrap\": true
-                    },
+                    }
+                  ],
+                  \"actions\": [
                     {
-                      \"type\": \"TextBlock\",
-                      \"text\": \"$REPO_URL\",
-                      \"color\": \"accent\",
-                      \"wrap\": true
+                      \"type\": \"Action.OpenUrl\",
+                      \"title\": \"Download .deb\",
+                      \"url\": \"$DEB_URL\"
                     }
                   ],
                   \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",

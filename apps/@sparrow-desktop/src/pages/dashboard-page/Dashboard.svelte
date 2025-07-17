@@ -629,7 +629,7 @@
   };
 
   const handleRedirectToAdmin = async () => {
-    await _viewModel.handleRedirectToAdminPanel(currentTeamId);
+    await _viewModel.handleRedirectToAdminPanel(openTeam?.teamId);
     planBannerisOpen.set(false);
     isUpgradePlanModelOpen = false;
   };
@@ -715,17 +715,17 @@
     />
   {/if}
 
-  {#if (userRole === TeamRole.TEAM_ADMIN && $planBannerisOpen) || (userRole === TeamRole.TEAM_OWNER && $planBannerisOpen)}
-    <UpgradePlanBanner bind:isUpgradePlanModelOpen />
-  {/if}
-
   {#if $location.pathname === "/app/home"}
-    {#if openTeam?.billing?.status === "payment_failed" || openTeam?.billing?.status === "action_required"}
-      <HubPaymentFailed
-        onFix={async () => {
-          await _viewModel.handleRedirectToAdminPanel(openTeam?.teamId);
-        }}
-      />
+    {#if openTeam?.owner === userId || openTeam?.admins?.includes(userId)}
+      {#if openTeam?.billing?.status === "payment_failed" || openTeam?.billing?.status === "action_required"}
+        <HubPaymentFailed
+          onFix={async () => {
+            await _viewModel.handleRedirectToAdminPanel(openTeam?.teamId);
+          }}
+        />
+      {:else if openTeam?.plan?.name === "Community"}
+        <UpgradePlanBanner bind:isUpgradePlanModelOpen />
+      {/if}
     {/if}
   {/if}
 

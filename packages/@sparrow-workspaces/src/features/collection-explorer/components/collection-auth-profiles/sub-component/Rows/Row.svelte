@@ -1,18 +1,8 @@
 <script lang="ts">
-  import { starIcon, ThreeDotIcon } from "@sparrow/library/assets";
-  import { UserProfileList } from "@sparrow/teams/compopnents";
-  import { MenuView } from "@sparrow/common/components";
-  import {
-    TeamRole,
-    WorkspaceMemberRole,
-    WorkspaceType,
-  } from "@sparrow/common/enums";
   import { Button, Options, RadioButton, Tag } from "@sparrow/library/ui";
   import {
     DeleteRegular,
     EditRegular,
-    GlobeRegular,
-    LockClosedRegular,
     MoreVerticalRegular,
   } from "@sparrow/library/icons";
 
@@ -25,6 +15,7 @@
     date2: Date,
   ) => string;
   export let selectedDefaultKey: string = "";
+  export let isDefaultKeyUpdateInProgress: boolean = false;
   export let onEditAuthProfile: (workspace: any) => void;
   export let onDeleteAuthProfile: (workspace: any) => void;
   export let onDefaultKeyChange: (authId: string) => void;
@@ -50,18 +41,15 @@
   function formatDateToReadable(dateStr) {
     const date = new Date(dateStr);
 
-    const day = date.getUTCDate();
+    const day = date.getDate();
     const daySuffix = getDaySuffix(day);
-    const month = date.toLocaleString("en-US", {
-      month: "long",
-      timeZone: "UTC",
-    });
-    const year = date.getUTCFullYear();
+    const month = date.toLocaleString(undefined, { month: "long" }); // Uses system locale
+    const year = date.getFullYear();
 
-    let hours = date.getUTCHours();
-    const minutes = date.getUTCMinutes().toString().padStart(2, "0");
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, "0");
     const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12 || 12; // Convert to 12-hour format
+    hours = hours % 12 || 12;
 
     return `${day.toString().padStart(2, "0")}${daySuffix} ${month} ${year}, ${hours}:${minutes} ${ampm}`;
   }
@@ -82,6 +70,7 @@
 
   // Handle radio button change
   const handleRadioChange = () => {
+    if (isDefaultKeyUpdateInProgress) return;
     if (onDefaultKeyChange) {
       onDefaultKeyChange(list.authId, list);
     }
@@ -132,15 +121,24 @@
       e.stopPropagation();
       //   onOpenCollection(list._id);
     }}
-    style="max-width: 15vw;"
+    style="max-width: 10vw;"
     class="tab-data text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium rounded-start py-2 overflow-hidden ellipsis"
   >
-    {list?.name}
-    {#if list?.defaultKey}
-      <div class="mt-1">
-        <Tag text={"Default Key"} type={"green"} endIcon={""} />
+    <div class="d-flex gap-2 align-items-center">
+      <div class="ellipsis">
+        {list?.name}
       </div>
-    {/if}
+      {#if list?.defaultKey}
+        <div class="flex-1">
+          <Tag
+            text={"Default Key"}
+            type={"green"}
+            endIcon={""}
+            size={"medium"}
+          />
+        </div>
+      {/if}
+    </div>
   </td>
 
   <td
@@ -190,6 +188,7 @@
         handleChange={handleRadioChange}
         labelText=""
         buttonSize="medium"
+        disabled={isDefaultKeyUpdateInProgress}
       />
     </div>
   </td>
