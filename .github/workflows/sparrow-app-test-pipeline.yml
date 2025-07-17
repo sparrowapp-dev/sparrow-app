@@ -125,8 +125,14 @@ jobs:
       # --- STAGE 3: CONVERT TO MSIX USING MAKEAPPX ---
       - name: Prepare App Folder for MakeAppx
         run: |
-          New-Item -ItemType Directory -Force -Path "app-root"
-          Expand-MsiFile -MsiPath "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/Sparrow.msi" -DestinationPath "app-root"
+          $msiPath = "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi/Sparrow.msi"
+          $destinationPath = "app-root"
+
+          # Create destination directory if it doesn't exist
+          New-Item -ItemType Directory -Force -Path $destinationPath
+
+          # Extract MSI contents
+          Start-Process -Wait -FilePath "msiexec.exe" -ArgumentList "/a `"$msiPath`" /qn TARGETDIR=`"$(Resolve-Path $destinationPath)`""
         shell: powershell
 
       - name: Generate AppxManifest.xml with version injection
