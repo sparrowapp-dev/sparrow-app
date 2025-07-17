@@ -318,16 +318,11 @@ jobs:
             Write-Host "🔐 Signing: $($_.FullName)"
             
             # Try with minimal parameters first
-            & "$signTool" sign /debug /sm /sha1 $certThumb /fd sha256 "$($_.FullName)"
+            & "$signTool" sign /v /debug /sm /sha1 $certThumb /td SHA256 /fd sha256 /tr http://timestamp.digicert.com "$($_.FullName)"
             
             if ($LASTEXITCODE -ne 0) {
-              # If simple signing fails, try with timestamp
-              & "$signTool" sign /v /debug /sm /sha1 $certThumb /td SHA256 /fd sha256 /tr http://timestamp.digicert.com "$($_.FullName)"
-              
-              if ($LASTEXITCODE -ne 0) {
-                Write-Host "❌ Failed to sign $($_.Name)"
-                exit 1
-              }
+              Write-Host "❌ Failed to sign $($_.Name)"
+              exit 1
             }
             Write-Host "✅ Successfully signed $($_.Name)"
           }
