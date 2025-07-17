@@ -330,21 +330,21 @@ jobs:
       - name: Verify MSIX Signature
         run: |
           # Verify the MSIX file exists
-          if (-Not (Test-Path msix-output/sparrow.msix)) {
+          if (-Not (Test-Path C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix)) {
               Write-Host "MSIX file not found at msix-output/sparrow.msix"
               exit 1
           }
 
-          Write-Host "Verifying signature for: msix-output/sparrow.msix"
+          Write-Host "Verifying signature for: C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix"
 
           # Get the Authenticode signature
-          $sig = Get-AuthenticodeSignature -FilePath msix-output/sparrow.msix
+          $sig = Get-AuthenticodeSignature -FilePath C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix
 
           # Check the signature status
           if ($sig.Status -eq 'Valid') {
-              Write-Host "Valid signature on msix-output/sparrow.msix"
+              Write-Host "Valid signature on C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix"
           } else {
-              Write-Host "Invalid signature on msix-output/sparrow.msix: $($sig.Status)"
+              Write-Host "Invalid signature on C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix: $($sig.Status)"
               exit 1
           }
         shell: powershell
