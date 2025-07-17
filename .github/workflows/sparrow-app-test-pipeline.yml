@@ -191,7 +191,7 @@ jobs:
           $publisherDN = $cert.Subject
           Write-Host "🔎 Using Publisher DN: $publisherDN"
 
-          $manifest = @"
+           $manifest = @"
           <?xml version="1.0" encoding="utf-8"?>
           <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
                   xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
@@ -228,7 +228,7 @@ jobs:
               </Application>
             </Applications>
           </Package>
-          "@
+         "@
 
           $manifest | Set-Content -Encoding UTF8 -Path "app-root\AppxManifest.xml"
         shell: powershell
