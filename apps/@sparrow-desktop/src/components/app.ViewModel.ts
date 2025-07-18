@@ -1,11 +1,8 @@
-import { throttle } from "@sparrow/common/utils";
-
-import { handleLoginV2 } from "@app/pages/auth-page/sub-pages/login-page/login-page";
+import { Sleep, throttle } from "@sparrow/common/utils";
 import { listen } from "@tauri-apps/api/event";
 import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { userValidationStore } from "@app/store/deviceSync.store";
-import { getAuthJwt, jwtDecode } from "../utils/jwt";
+import { getAuthJwt, getClientUser, jwtDecode, setAuthJwt } from "../utils/jwt";
 import constants from "@app/constants/constants";
 import { EnvironmentRepository } from "../repositories/environment.repository";
 import { WorkspaceRepository } from "../repositories/workspace.repository";
@@ -14,7 +11,7 @@ import { TabRepository } from "../repositories/tab.repository";
 import { navigate } from "svelte-navigator";
 import { platform } from "@tauri-apps/plugin-os";
 import { v4 as uuidv4 } from "uuid";
-import { isGuestUserActive } from "@app/store/auth.store";
+import { isGuestUserActive, setUser } from "@app/store/auth.store";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@sparrow/common/enums";
 import { TeamRepository } from "@app/repositories/team.repository";
@@ -22,6 +19,13 @@ import { GuideRepository } from "@app/repositories/guide.repository";
 import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
 import * as Sentry from "@sentry/svelte";
 import {policyConfig} from "@sparrow/common/store"
+import { TeamService } from "@app/services/team.service";
+import { WorkspaceService } from "@app/services/workspace.service";
+import { identifyUser } from "@app/utils/posthog/posthogConfig";
+import { notifications } from "@sparrow/library/ui";
+import { isUserFirstSignUp } from "@app/store/user.store";
+import { isFirstTimeInTestFlow } from "@sparrow/workspaces/stores";
+import mixpanel from "mixpanel-browser";
 
 interface DeepLinkHandlerWindowsPayload {
   payload: {
@@ -36,6 +40,158 @@ export class AppViewModel {
   private teamRepository = new TeamRepository();
   private environmentRepository = new EnvironmentRepository();
   private guideRepository = new GuideRepository();
+  private teamService = new TeamService();
+  private workspaceService = new WorkspaceService();
+  
+  
+  /**
+   * sync workspace data with backend server
+   * @param userId User id
+   */
+  public refreshWorkspaces = async (userId: string): Promise<void> => {
+    if (!userId) return;
+    const response = await this.workspaceService.fetchWorkspaces(userId);
+    let isAnyWorkspaceActive: undefined | string = undefined;
+    const data = [];
+    const isSuccessful = response?.isSuccessful;
+    const res = response?.data?.data;
+    if (isSuccessful && res) {
+      for (const elem of res) {
+        const {
+          _id,
+          name,
+          hubUrl,
+          description,
+          workspaceType,
+          users,
+          admins,
+          team,
+          createdAt,
+          createdBy,
+          collection,
+          updatedAt,
+          updatedBy,
+          isNewInvite,
+        } = elem;
+        const isActiveWorkspace =
+          await this.workspaceRepository.checkActiveWorkspace(_id);
+        if (isActiveWorkspace) isAnyWorkspaceActive = _id;
+        const item = {
+          _id,
+          name,
+          hubUrl,
+          description,
+          workspaceType,
+          users,
+          collections: collection ? collection : [],
+          admins: admins,
+          team: {
+            teamId: team.id,
+            teamName: team.name,
+            hubUrl: team?.hubUrl || "",
+          },
+          environmentId: "",
+          isActiveWorkspace: isActiveWorkspace,
+          createdAt,
+          createdBy,
+          updatedAt,
+          updatedBy,
+          isNewInvite,
+        };
+        data.push(item);
+      }
+      await this.workspaceRepository.bulkInsertData(data);
+      await this.workspaceRepository.deleteOrphanWorkspaces(
+        data.map((_workspace) => {
+          return _workspace._id;
+        }),
+      );
+      if (!isAnyWorkspaceActive) {
+        this.workspaceRepository.setActiveWorkspace(data[0]._id);
+        return;
+      }
+      return;
+    }
+  };
+
+   /**
+   * sync teams data with backend server
+   * @param userId User id
+   */
+  public refreshTeams = async (userId: string): Promise<void> => {
+    if (!userId) return;
+    const response = await this.teamService.fetchTeams(userId);
+    let isAnyTeamsOpen: undefined | string = undefined;
+    const userPlans = [];
+    if (response?.isSuccessful && response?.data?.data) {
+      const data = [];
+      for (const elem of response.data.data) {
+        userPlans.push(elem?.plan?.id.toString());
+        const {
+          _id,
+          name,
+          hubUrl,
+          xUrl,
+          githubUrl,
+          linkedinUrl,
+          users,
+          description,
+          logo,
+          workspaces,
+          owner,
+          admins,
+          plan,
+          createdAt,
+          createdBy,
+          updatedAt,
+          updatedBy,
+          isNewInvite,
+          billing
+        } = elem;
+        const updatedWorkspaces = workspaces?.map((workspace) => ({
+          workspaceId: workspace.id,
+          name: workspace.name,
+        }));
+        const isOpenTeam = await this.teamRepository.checkIsTeamOpen(_id);
+        if (isOpenTeam) isAnyTeamsOpen = _id;
+        const item = {
+          teamId: _id,
+          name,
+          hubUrl,
+          xUrl,
+          githubUrl,
+          linkedinUrl,
+          users,
+          description,
+          logo,
+          workspaces: updatedWorkspaces,
+          owner,
+          admins,
+          plan,
+          isActiveTeam: false,
+          createdAt,
+          createdBy,
+          updatedAt,
+          updatedBy,
+          isNewInvite,
+          isOpen: isOpenTeam,
+          billing
+        };
+        data.push(item);
+      }
+
+      await this.teamRepository.bulkInsertData(data);
+      await this.teamRepository.deleteOrphanTeams(
+        data.map((_team) => {
+          return _team.teamId;
+        }),
+      );
+      if (!isAnyTeamsOpen) {
+        this.teamRepository.setOpenTeam(data[0].teamId);
+        return;
+      }
+    }
+  };
 
   private workspaceSwitcher = async (id: string) => {
     if (!id) return;
@@ -49,8 +205,10 @@ export class AppViewModel {
     await this.workspaceRepository.setActiveWorkspace(id);
     navigate("collections");
   };
-
-  constructor() {}
+  private triggerAccessDeniedModal;
+  constructor(_triggerAccessDeniedModal) {
+    this.triggerAccessDeniedModal = _triggerAccessDeniedModal;
+  }
 
   /**
    * add guest user in local db
@@ -64,23 +222,10 @@ export class AppViewModel {
     });
   };
 
-  /**
-   * Get the guest user state
-   */
-  private getGuestUserState = async () => {
-    const response = await this.guestUserRepository.findOne({
-      name: "guestUser",
-    });
-    return response?.getLatest().toMutableJSON().isGuestUser;
-  };
-
   // Private method to validate user access
   private async validateUserAccess(
     webUserAccessToken: string | null,
   ): Promise<boolean> {
-    const isGuestUser = await this.getGuestUserState();
-    if (isGuestUser) return false;
-    // different user
     const desktopUserAccessToken = localStorage.getItem(constants.AUTH_TOKEN);
 
     // Validate existing user
@@ -95,27 +240,56 @@ export class AppViewModel {
     return true;
   }
 
-  // Private method to handle login and workspace switch
-  private async handleLoginAndWorkspaceSwitch(
-    url: string,
-    workspaceId: string | null,
-  ): Promise<void> {
-    const tokens = getAuthJwt();
-    if (!tokens[0] || !tokens[1]) {
-      // client desktop is currently not logged in.
-      await handleLoginV2(url);
-    }
 
-    if (workspaceId) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      await this.workspaceSwitcher(workspaceId);
+  private sendUserDataToMixpanel = (userDetails) => {
+    if (constants.ENABLE_MIX_PANEL === "true") {
+      mixpanel.identify(userDetails._id);
+      mixpanel.people.set({ $email: userDetails.email });
+    }
+  };
+
+
+
+  private handleAccountLogin = async(url: string) => {
+    const params = new URLSearchParams(url.split("?")[1]);
+    const accessToken = params.get("accessToken");
+    const refreshToken = params.get("refreshToken");
+    const event = params.get("event");
+    const method = params.get("method");
+
+    if (accessToken && refreshToken) {
+      const userDetails = jwtDecode(accessToken);
+      
+      identifyUser(userDetails.email);
+      setAuthJwt(constants.AUTH_TOKEN, accessToken);
+      setAuthJwt(constants.REF_TOKEN, refreshToken);
+      setUser(jwtDecode(accessToken));
+      this.sendUserDataToMixpanel(userDetails);
+
+      notifications.success("You're logged in successfully.");
+      if (event === "register") {
+        navigate("/app/collections?first=true");
+        isUserFirstSignUp.set(true);
+        MixpanelEvent(Events.USER_SIGNUP, {
+          method: method,
+          Success: true,
+        });
+        await this.guideRepository.insert({ isActive: true, id: "environment-guide" });
+        await this.guideRepository.insert({ isActive: true, id: "collection-guide" });
+        isFirstTimeInTestFlow.set(true);
+      } else {
+        navigate("/app/collections?first=false");
+        MixpanelEvent(Events.USER_LOGIN, {
+          method: method,
+          Success: true,
+        });
+        await this.guideRepository.insert({ isActive: false, id: "environment-guide" });
+        await  this.guideRepository.insert({ isActive: false, id: "collection-guide" });
+      }
+    } else {
+      console.error("acces token and refresh token not found!");
     }
   }
-
-  private handleLoginAndWorkspaceSwitchThrottler = throttle(
-    this.handleLoginAndWorkspaceSwitch,
-    5000,
-  );
 
   /**
    *
@@ -127,158 +301,83 @@ export class AppViewModel {
     return res;
   };
 
-  /**
-   * create dummy team and workspace for guest user
-   */
-  private createGuestUserTeamWorkspace = async () => {
-    const response = await this.findUser({ name: "guestUser" });
-    const user = response?.getLatest().toMutableJSON();
-    const teamId = uuidv4();
-    const workspaceId = uuidv4();
-    const dummyTeam = {
-      teamId: teamId,
-      name: "Hub",
-      workspaces: [{ name: "My Workspace", workspaceId: workspaceId }],
-      users: [{ id: user.id, name: user.name, email: "", role: "owner" }],
-      owner: user.id,
-      admins: [],
-      isActiveTeam: true,
-      isOpen: true,
-      isNewInvite: false,
-      createdAt: new Date().toISOString(),
-      createdBy: user.id,
-      updatedAt: new Date().toISOString(),
-      updatedBy: user.id,
-    };
-    await this.teamRepository.createTeam(dummyTeam);
-    const dummyWorkspace = {
-      _id: workspaceId,
-      name: "My Workspace",
-      team: {
-        teamId: teamId,
-        teamName: "Hub",
-      },
-      admins: [{ id: user.id, name: user.name }],
-      users: [{ id: user.id, name: user.name, email: "", role: "admin" }],
-      createdAt: new Date().toISOString(),
-      createdBy: user.id,
-      isActiveWorkspace: true,
-      isNewInvite: false,
-      environmentId: "",
-      collections: [],
-    };
-    await this.workspaceRepository.addWorkspace(dummyWorkspace);
-    const environmentId = uuidv4();
-    const newEnvironment = {
-      id: environmentId,
-      name: "Global Variables",
-      variable: [
-        {
-          key: "",
-          value: "",
-          checked: true,
-        },
-      ],
-      isActive: false,
-      type: "GLOBAL",
-      workspaceId: workspaceId,
-      createdAt: new Date().toISOString(),
-      createdBy: "username",
-      updatedBy: "username",
-      updatedAt: "2024-07-16T11:12:55.920Z",
-    };
-
-    this.environmentRepository.addEnvironment(newEnvironment);
-
-    this.guideRepository.insert({ isActive: true, id: "environment-guide" });
-    this.guideRepository.insert({ isActive: true, id: "collection-guide" });
-  };
-
-  private skipLoginHandler = async () => {
-    // Save Guest User in local DB
-    const response = await this.getGuestUserState();
-    if (response) {
-      await this.createGuestUserTeamWorkspace();
-      isGuestUserActive.set(true);
-      navigate("/guest/collections");
-      MixpanelEvent(Events.CONTINUE_WITHOUT_SIGNUP, {
-        source: "Sparrow Auth",
-      });
-    }
-  };
-
 
   private async processDeepLink(url: string): Promise<void> {
     try {
       await getCurrentWindow().setFocus();
       const params = new URLSearchParams(url.split("?")[1]);
       const currentUserAccessToken = params.get("accessToken");
-      const existingAccessToken = localStorage.getItem("AUTH_TOKEN");
       const workspaceId = params.get("workspaceID");
       const isSparrowEdge = params.get("isSparrowEdge");
+      const tokens = getAuthJwt();
 
-      // If running in Sparrow Edge mode and a valid access token already exists,
-      // skip further login logic to avoid overriding the existing user session.
-      if (isSparrowEdge === "true" && existingAccessToken) {
+       const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+      const isGuestUser = guestUser?.getLatest()?.toMutableJSON()?.isGuestUser;
+      if (isGuestUser) {
+        // 1. desktop app status guest
+        if(isSparrowEdge){
+          // desktop and web both on guest user
+          // show access denied (can't open web guest account to desktop)
+            this.triggerAccessDeniedModal(true);
+              return;
+        }else if(currentUserAccessToken){
+          // desktop is guest and web app is loogedIn
+          // show access denied (logout desktop first to proceed)
+            this.triggerAccessDeniedModal(true);
+              return;
+        }
         return;
-      }
-
-      // Get current policy settings
-      let policySettings: any;
-      policyConfig.subscribe(value => {
-        policySettings = value;
-      })();
-
-      if (!policySettings?.enableLogin) {
-        console.error({
-          title: "Access Denied",
-          content: "Sign-in has been disabled by organization policy"
-        });
-        return;
-      }
-
-      // Handle Sparrow Edge case
-      if (isSparrowEdge === "true" && !existingAccessToken) {
-        // Check if sign-in is disabled by policy
+      }else if(tokens[0]){
+        // 2. desktop is currently  logged in.
+        if(isSparrowEdge){
+          // desktop is loggedIn and web is guest
+          // show access denied (cant open web guest account to desktop)
+            this.triggerAccessDeniedModal(true);
+              return;
+        }else if(currentUserAccessToken){
+            const isValidUser = await this.validateUserAccess(currentUserAccessToken);
+            if (!isValidUser) {
+              // different account logged in on desktop and web
+              // show access denied (logout desktop first to proceed)
+              this.triggerAccessDeniedModal(true);
+              return;
+            }else{
+              // same account logged in on desktop and web
+               if (workspaceId) {
+                  const userId = getClientUser().id;
+                  if(userId){
+                    await Promise.all([
+                          this.refreshTeams(userId),
+                          this.refreshWorkspaces(userId),
+                        ]);
+                  }
+                  await this.workspaceSwitcher(workspaceId as string);
+                }
+                return;
+            }
+        }
         
-        await this.addGuestUser();
-        setTimeout(async () => {
-          await this.skipLoginHandler();
-        }, 1000);
-        return;
-      }
+      }else{
+        // desktop app status identity
+        if(isSparrowEdge){
+          // desktop is identity and web is guest account
+          // show access denied (cant open web guest account to desktop)
 
-      // Validate user access
-      const isValidUser = await this.validateUserAccess(currentUserAccessToken);
-      if (!isValidUser) {
-        console.error({
-          title: "Access Denied",
-          content: "Please log out the current user before switching accounts"
-        });
-        userValidationStore.set({ isValid: false });
-        return;
+            
+              return;
+        }else if(currentUserAccessToken){
+           // login successful
+           await this.handleAccountLogin(url);
+            if (workspaceId) {
+              await new Sleep().setTime(4000).exec();
+              await this.workspaceSwitcher(workspaceId as string);
+            }
+            return;
+        }
       }
-
-      // Check if sign-in is disabled when trying to log in
-      if (currentUserAccessToken && !policySettings.enableLogin) {
-        console.error({
-          title: "Access Denied",
-          content: "Sign-in has been disabled by organization policy"
-        });
-        return;
-      }
-
-      // Check if workspace switching is disabled when trying to switch workspaces
-      if (workspaceId && policySettings?.hubCreationAllowed) {
-        console.error({
-          title: "Access Denied",
-          content: "Workspace access has been disabled by organization policy"
-        });
-        return;
-      }
-
-      // If all policy checks pass, proceed with login and workspace switching
-      await this.handleLoginAndWorkspaceSwitchThrottler(url, workspaceId);
+  
     } catch (error) {
       Sentry.captureException(error);
       console.error(error);
