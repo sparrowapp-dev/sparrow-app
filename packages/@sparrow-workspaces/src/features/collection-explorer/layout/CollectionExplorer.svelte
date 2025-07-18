@@ -370,11 +370,13 @@
   const handleOnUpdateAuthProfile = async (
     authId: string,
     updatedAuthProfileData: AuthProfileDto,
+    isRequestForDefaultKey: boolean,
   ) => {
     const response = await onUpdateAuthProfile(
       collection,
       authId,
       updatedAuthProfileData,
+      isRequestForDefaultKey,
     );
     return response;
   };
@@ -425,7 +427,7 @@
     </div>
   </Modal> -->
   <div
-    class="my-collection d-flex flex-column w-100 z-1 p-3 h-100"
+    class="my-collection d-flex flex-column w-100 p-3 h-100"
     style=" min-width: 450px"
   >
     <div class="d-flex gap-2 pb-4">

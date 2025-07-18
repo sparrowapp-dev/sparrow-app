@@ -34,15 +34,14 @@
   let authProfileToDelete: AuthProfileDto | null = null;
   let authProfileDeleteLoader = false;
   let isDeleteAuthProfilePopupOpen = false;
+  let isDefaultKeyUpdateInProgress = false;
 
   const tableHeaderContent = [
     "Name",
     "Description",
     "Auth Type",
-    "Created At (UTC)",
+    "Created At",
     "Default Key",
-    "",
-    "",
   ];
 
   function handleSortToggle(field) {
@@ -101,11 +100,16 @@
   }
 
   // Handle default key change
-  const handleDefaultKeyChange = (authId, authProfile) => {
+  const handleDefaultKeyChange = async (
+    authId: string,
+    authProfile: AuthProfileDto,
+  ) => {
+    if (isDefaultKeyUpdateInProgress) return;
     selectedDefaultKey = authId;
-    authProfile.defaultKey = true; // Mark the selected item as default
-    // onUpdateRequestState({ selectedAuthType: authId });
-    onUpdateAuthProfile(authId, authProfile);
+    authProfile.defaultKey = true;
+    isDefaultKeyUpdateInProgress = true;
+    await onUpdateAuthProfile(authId, authProfile, true);
+    isDefaultKeyUpdateInProgress = false;
   };
 
   const handleModalClose = (flag) => {
@@ -159,6 +163,7 @@
             onDefaultKeyChange={handleDefaultKeyChange}
             onEditAuthProfile={handleOnClickEditProfile}
             onDeleteAuthProfile={handleOnClickDeleteProfile}
+            bind:isDefaultKeyUpdateInProgress
           />
         {/each}
       </tbody>
@@ -297,7 +302,7 @@
     : "Add Authentication Profile"}
   type={"dark"}
   width={"35%"}
-  zIndex={1000}
+  zIndex={10000}
   isOpen={isCreateProfileModalOpen}
   handleModalState={handleModalClose}
 >
@@ -374,8 +379,9 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     height: 80%;
-    padding: 130px 35px 24px;
+    padding: 35px;
   }
   .not-found-text {
     color: var(--text-secondary-200);
