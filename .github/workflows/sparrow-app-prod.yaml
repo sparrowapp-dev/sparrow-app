@@ -388,7 +388,7 @@ jobs:
                   "body" = @(
                     @{
                       "type" = "TextBlock"
-                      "text" = "🚀 (DO NOT TEST THIS) New Windows Build Available"
+                      "text" = "🚀 New Windows Build Available"
                       "weight" = "bolder"
                       "size" = "large"
                     }
