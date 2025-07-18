@@ -7,7 +7,7 @@
   import { Modal } from "@sparrow/library/ui";
   import { LeaveTeam } from "@sparrow/teams/features";
   import { DeleteWorkspace } from "@sparrow/common/features";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { InviteToWorkspace } from "@sparrow/workspaces/features";
   import { copyToClipBoard } from "@sparrow/common/utils";
   import constants from "@app/constants/constants";
@@ -34,7 +34,7 @@
 
   const OnleaveTeam = _viewModel.leaveTeam;
   let userId = "";
-  user.subscribe(async (value) => {
+  const userSubscriber = user.subscribe(async (value) => {
     if (value) {
       userId = value._id;
     }
@@ -43,18 +43,21 @@
   let currentTeam = {
     name: "",
     users: [],
+    plan: {},
   };
 
-  activeTeam.subscribe((value) => {
+  const activeTeamSubscriber = activeTeam.subscribe((value) => {
     if (value) {
       currentTeam.name = value.name;
       currentTeam.users = value.users;
+      currentTeam.plan = value.plan;
       usersInvitePlanCount = value?._data?.users?.length || 5;
     }
   });
 
   let isTeamInviteModalOpen = false;
   let isLeaveTeamModelOpen = false;
+  let invitedCount = 0;
   let isGuestUser;
 
   const handleDeleteWorkspace = (workspace: WorkspaceDocument) => {
@@ -89,6 +92,7 @@
     inviteBody: InviteBody,
     userId: string,
   ) => {
+    invitedCount = inviteBody?.users.length;
     const response = await _viewModel.handleTeamInvite(
       teamId,
       teamName,
@@ -128,6 +132,7 @@
     data: addUsersInWorkspacePayload,
     invitedUserCount: number,
   ) => {
+    invitedCount = invitedUserCount;
     const response = await _viewModel.inviteUserToWorkspace(
       workspaceId,
       workspaceName,
@@ -140,6 +145,11 @@
     }
     return response;
   };
+
+  onDestroy(() => {
+    userSubscriber();
+    activeTeamSubscriber.unsubscribe();
+  });
 </script>
 
 <TeamExplorer
@@ -149,6 +159,7 @@
   bind:isLeaveTeamModelOpen
   bind:upgradePlanModalInvite
   bind:upgradePlanModal
+  bind:invitedCount
   onAddMember={handleWorkspaceDetails}
   openTeam={$activeTeam}
   workspaces={$workspaces}
@@ -194,6 +205,7 @@
     teamName={$activeTeam?.name}
     users={$activeTeam?.users}
     teamId={$activeTeam?.teamId}
+    plan={$activeTeam?.plan}
     workspaces={$workspaces.filter((elem) => {
       return elem?.team?.teamId === $activeTeam?.teamId;
     })}
@@ -266,6 +278,7 @@
     currentWorkspaceDetails={workspaceDetails}
     users={currentTeam?.users}
     teamName={currentTeam?.name}
+    plan={currentTeam?.plan}
     onInviteUserToWorkspace={handleAddWorkspace}
   />
 </Modal>

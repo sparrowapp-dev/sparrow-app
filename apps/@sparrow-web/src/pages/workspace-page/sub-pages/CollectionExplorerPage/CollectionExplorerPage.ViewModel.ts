@@ -22,7 +22,7 @@ import {
   InitFolderTab,
   InitMockRequestTab,
   InitWebSocketTab,
-  moveNavigation,
+  scrollToTab,
 } from "@sparrow/common/utils";
 import {
   ItemType,
@@ -43,6 +43,7 @@ import {
   type CollectionArgsBaseInterface,
   type CollectionBaseInterface as CollectionDto,
   type CollectionItemBaseInterface as CollectionItemsDto,
+  type CollectionAuthProifleBaseInterface as AuthProfileDto,
 } from "@sparrow/common/types/workspace/collection-base";
 import {
   TabPersistenceTypeEnum,
@@ -132,6 +133,7 @@ class CollectionExplorerPage {
       progressiveTab.id,
       collection,
     );
+
     if (!collection) result = false;
     // description
     else if (collectionTab.description !== progressiveTab.description) {
@@ -949,7 +951,7 @@ class CollectionExplorerPage {
       });
       initRequestTab.updateIsSave(true);
       this.tabRepository.createTab(initRequestTab.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     } else {
       const baseUrl = await this.constructBaseUrl(collection.workspaceId);
@@ -987,7 +989,7 @@ class CollectionExplorerPage {
         //   request,
         // );
         this.tabRepository.createTab(initRequestTab.getValue());
-        moveNavigation("right");
+        scrollToTab("");
         return;
       } else {
         notifications.error(response.message);
@@ -1099,7 +1101,7 @@ class CollectionExplorerPage {
       });
       request.updateIsSave(true);
       await this.tabRepository.createTab(request.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     }
     const baseUrl = await this.constructBaseUrl(workspaceId);
@@ -1123,7 +1125,7 @@ class CollectionExplorerPage {
       });
       request.updateIsSave(true);
       this.tabRepository.createTab(request.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     } else {
       this.collectionRepository.deleteRequestOrFolderInCollection(
@@ -1207,7 +1209,7 @@ class CollectionExplorerPage {
       });
       request.updateIsSave(true);
       await this.tabRepository.createTab(request.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     }
     const baseUrl = await this.constructBaseUrl(workspaceId);
@@ -1230,9 +1232,12 @@ class CollectionExplorerPage {
         folderId: "",
       });
       request.updateIsSave(true);
+      if ((collection.collectionType = CollectionTypeBaseEnum.MOCK)) {
+        request.updateLabel(CollectionTypeBaseEnum.MOCK);
+      }
       // request.updateUrl(collection?.mockCollectionUrl);
       this.tabRepository.createTab(request.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     } else {
       this.collectionRepository.deleteRequestOrFolderInCollection(
@@ -1318,7 +1323,7 @@ class CollectionExplorerPage {
       });
       aiRequest.updateIsSave(true);
       await this.tabRepository.createTab(aiRequest.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     }
     const baseUrl = await this.constructBaseUrl(workspaceId);
@@ -1342,7 +1347,7 @@ class CollectionExplorerPage {
       });
       aiRequest.updateIsSave(true);
       this.tabRepository.createTab(aiRequest.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     } else {
       this.collectionRepository.deleteRequestOrFolderInCollection(
@@ -1418,7 +1423,7 @@ class CollectionExplorerPage {
       sampleFolder.updateIsSave(true);
 
       this.tabRepository.createTab(sampleFolder.getValue());
-      moveNavigation("right");
+      scrollToTab("");
 
       // Update the locally added folder with server response
       const folderObj = data;
@@ -1460,9 +1465,12 @@ class CollectionExplorerPage {
       sampleFolder.updateName(response.data.data.name);
       sampleFolder.updatePath(path);
       sampleFolder.updateIsSave(true);
+      if (collection?.collectionType === CollectionTypeBaseEnum.MOCK) {
+        sampleFolder.updateLabel(CollectionTypeBaseEnum.MOCK);
+      }
 
       this.tabRepository.createTab(sampleFolder.getValue());
-      moveNavigation("right");
+      scrollToTab("");
 
       // Update the locally added folder with server response
       const folderObj = response.data.data;
@@ -1550,7 +1558,7 @@ class CollectionExplorerPage {
       });
       websocket.updateIsSave(true);
       await this.tabRepository.createTab(websocket.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     }
     const baseUrl = await this.constructBaseUrl(workspaceId);
@@ -1576,7 +1584,7 @@ class CollectionExplorerPage {
       websocket.updateIsSave(true);
 
       this.tabRepository.createTab(websocket.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     } else {
       this.collectionRepository.deleteRequestOrFolderInCollection(
@@ -1633,7 +1641,7 @@ class CollectionExplorerPage {
       });
       socketIoTab.updateIsSave(true);
       await this.tabRepository.createTab(socketIoTab.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     }
 
@@ -1661,7 +1669,7 @@ class CollectionExplorerPage {
       socketIoTab.updateIsSave(true);
 
       this.tabRepository.createTab(socketIoTab.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     } else {
       this.collectionRepository.deleteRequestOrFolderInCollection(
@@ -1718,7 +1726,7 @@ class CollectionExplorerPage {
       });
       graphqlTab.updateIsSave(true);
       await this.tabRepository.createTab(graphqlTab.getValue());
-      moveNavigation("right");
+      scrollToTab("");
       return;
     }
 
@@ -1746,7 +1754,7 @@ class CollectionExplorerPage {
       graphqlTab.updateIsSave(true);
 
       this.tabRepository.createTab(graphqlTab.getValue());
-      moveNavigation("right");
+      scrollToTab("");
 
       return;
     } else {
@@ -1767,7 +1775,7 @@ class CollectionExplorerPage {
       collection.id,
     );
     this.tabRepository.createTab(mockHistroyTab);
-    moveNavigation("right");
+    scrollToTab("");
   };
 
   /**
@@ -1866,6 +1874,351 @@ class CollectionExplorerPage {
     } else {
       notifications.error("Failed to update running state. Please try again.");
     }
+  };
+
+  /**
+   * Handle creating a new auth profile in a collection
+   * @param collection :CollectionDocument - the collection in which new request is going to be created
+   * @param authProfilePayload :AuthProfilePayload Object
+   * @returns :void
+   */
+  public handleCreateAuthProfile = async (
+    _collection: CollectionDto,
+    _authProfilePayload: AuthProfileDto,
+  ) => {
+    _authProfilePayload.authId = UntrackedItems.UNTRACKED + uuidv4();
+    let userSource = {};
+    if (_collection?.activeSync) {
+      userSource = {
+        currentBranch: _collection?.currentBranch
+          ? _collection?.currentBranch
+          : _collection?.primaryBranch,
+        source: "USER",
+      };
+    }
+
+    if (!_collection?.authProfiles.length) {
+      _authProfilePayload.defaultKey = true;
+    }
+
+    const authProfileObj = {
+      collectionId: _collection.id,
+      workspaceId: _collection.workspaceId,
+      ...userSource,
+      authProfiles: [
+        {
+          ..._authProfilePayload,
+        },
+      ],
+    };
+
+    await this.collectionRepository.addAuthProfile(_collection.id as string, {
+      ...authProfileObj.authProfiles[0],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser) {
+      try {
+        const res =
+          await this.collectionRepository.readAuthProfilesInCollection(
+            authProfileObj.collectionId as string,
+            _authProfilePayload.authId,
+          );
+
+        if (res) res.authId = uuidv4();
+
+        await this.collectionRepository.updateAuthProfile(
+          _collection.id as string,
+          res.authId,
+          res,
+        );
+
+        notifications.success("Auth profile created successfully.");
+        return { ...res, isSuccessful: true };
+      } catch (error) {
+        console.error("Error while handling guest auth profile:", error);
+        return error;
+      }
+    }
+
+    const baseUrl = await this.constructBaseUrl(_collection.workspaceId);
+    const response = await this.collectionService.addAuthProfile(
+      baseUrl,
+      authProfileObj,
+    );
+    if (response.isSuccessful && response.data.data) {
+      const res = response.data.data;
+      await this.collectionRepository.updateAuthProfile(
+        _collection.id as string,
+        _authProfilePayload.authId,
+        res,
+      );
+      notifications.success("Auth profile created successfully.");
+    } else {
+      await this.collectionRepository.deleteAuthProfile(
+        _collection.id,
+        _authProfilePayload.authId,
+      );
+      console.error(response.message);
+      notifications.error("Failed to create authentication profile.");
+    }
+
+    return response;
+  };
+
+  /**
+   * Handle updating existing auth profile in a collection
+   * @param collection :CollectionDocument - the collection in which new request is going to be created
+   * @param authId :authId for which update has to be done
+   * @param authProfilePayload :AuthProfilePayload Object
+   * @returns :void
+   */
+  public handleUpdateAuthProfile = async (
+    _collection: CollectionDto,
+    _authProfileId: string,
+    _updatedAuthProfilePayload: AuthProfileDto,
+    _isRequestForDefaultKey: boolean,
+  ) => {
+    let userSource = {};
+    if (_collection?.activeSync) {
+      userSource = {
+        currentBranch: _collection?.currentBranch
+          ? _collection?.currentBranch
+          : _collection?.primaryBranch,
+        source: "USER",
+      };
+    }
+
+    const updatedAuthProfileObj = {
+      collectionId: _collection.id,
+      workspaceId: _collection.workspaceId,
+      ...userSource,
+      ..._updatedAuthProfilePayload,
+    };
+
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser) {
+      try {
+        const res =
+          await this.collectionRepository.readAuthProfilesInCollection(
+            updatedAuthProfileObj.collectionId as string,
+            updatedAuthProfileObj.authId,
+          );
+
+        await this.collectionRepository.updateAuthProfile(
+          _collection.id as string,
+          _authProfileId,
+          {
+            ..._updatedAuthProfilePayload,
+            updatedAt: new Date().toISOString(),
+          },
+        );
+
+        // Don't show success notification if it's a defaultKey update request
+        if (!_isRequestForDefaultKey) {
+          notifications.success("Auth profile updated successfully.");
+        }
+
+        return { ...res, isSuccessful: true };
+      } catch (error) {
+        console.error("Error while updating guest auth profile:", error);
+        return error;
+      }
+    }
+
+    // For non-guest users, implement optimistic update for auth profile updates
+    let previousAuthProfiles = null;
+    let previousDefaultAuthProfile = null;
+
+    try {
+      // Store previous state for potential rollback
+      const collectionData = await this.collectionRepository.readCollection(
+        _collection.id,
+      );
+      previousAuthProfiles = [...collectionData.authProfiles]; // Deep copy of current state
+
+      // Find the currently selected default auth profile
+      previousDefaultAuthProfile = previousAuthProfiles.find(
+        (profile) => profile.defaultKey === true,
+      );
+
+      // Apply optimistic update immediately (UI will reflect changes instantly)
+      await this.collectionRepository.updateAuthProfile(
+        _collection.id as string,
+        _authProfileId,
+        {
+          ..._updatedAuthProfilePayload,
+          updatedAt: new Date().toISOString(),
+        },
+      );
+
+      // update auth profile in background
+      const baseUrl = await this.constructBaseUrl(_collection.workspaceId);
+      const response = await this.collectionService.updateAuthProfile(
+        baseUrl,
+        _authProfileId,
+        updatedAuthProfileObj,
+      );
+
+      if (response.isSuccessful) {
+        // update with server response to ensure consistency
+        const res = response.data.data;
+        await this.collectionRepository.updateAuthProfile(
+          _collection.id as string,
+          _authProfileId,
+          res,
+        );
+
+        // Don't show success notification if it's a defaultKey update request
+        if (!_isRequestForDefaultKey) {
+          notifications.success("Auth profile updated successfully.");
+        }
+      } else {
+        // update failed from server - revert to previous state
+        console.error(response.message);
+
+        if (previousAuthProfiles) {
+          // Revert the currently updated profile to its original state
+          const originalProfile = previousAuthProfiles.find(
+            (profile) => profile.authId === _authProfileId,
+          );
+          if (originalProfile) {
+            await this.collectionRepository.updateAuthProfile(
+              _collection.id as string,
+              _authProfileId,
+              originalProfile,
+            );
+          }
+
+          // If this was a defaultKey update, restore the previous default if there was one
+          if (
+            _isRequestForDefaultKey &&
+            previousDefaultAuthProfile &&
+            previousDefaultAuthProfile.authId !== _authProfileId
+          ) {
+            await this.collectionRepository.updateAuthProfile(
+              _collection.id as string,
+              previousDefaultAuthProfile.authId,
+              { ...previousDefaultAuthProfile, defaultKey: true },
+            );
+          }
+        }
+
+        notifications.error("Failed to update authentication profile.");
+      }
+
+      return response;
+    } catch (error) {
+      // Unexpected error - revert to previous state
+      console.error("Unexpected error during auth profile update:", error);
+
+      if (previousAuthProfiles) {
+        try {
+          // Revert the currently updated profile to its original state
+          const originalProfile = previousAuthProfiles.find(
+            (profile) => profile.authId === _authProfileId,
+          );
+          if (originalProfile) {
+            await this.collectionRepository.updateAuthProfile(
+              _collection.id as string,
+              _authProfileId,
+              originalProfile,
+            );
+          }
+
+          // If this was a defaultKey update, restore the previous default if there was one
+          if (
+            _isRequestForDefaultKey &&
+            previousDefaultAuthProfile &&
+            previousDefaultAuthProfile.authId !== _authProfileId
+          ) {
+            await this.collectionRepository.updateAuthProfile(
+              _collection.id as string,
+              previousDefaultAuthProfile.authId,
+              { ...previousDefaultAuthProfile, defaultKey: true },
+            );
+          }
+        } catch (revertError) {
+          console.error("Failed to revert auth profile state:", revertError);
+        }
+      }
+
+      notifications.error("Failed to update authentication profile.");
+      return { isSuccessful: false, message: error.message };
+    }
+  };
+
+  /**
+   * Handle deleting auth profile in a collection
+   * @param collection :CollectionDocument - the collection in which new request is going to be created
+   * @param authId :authId of auth profile which needs to be deleted
+   * @param authProfilePayload :AuthProfilePayload Object
+   * @returns :void
+   */
+  public handleDeleteAuthProfile = async (
+    collection: CollectionDto,
+    authId: string,
+  ) => {
+    let userSource = {};
+    if (collection.activeSync) {
+      userSource = {
+        currentBranch: collection.currentBranch,
+      };
+    }
+
+    const authProfileObj = {
+      collectionId: collection.id,
+      workspaceId: collection.workspaceId,
+      ...userSource,
+      authId: authId,
+    };
+
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    if (isGuestUser) {
+      try {
+        await this.collectionRepository.deleteAuthProfile(
+          collection.id,
+          authId,
+        );
+
+        notifications.success("Authentication profile deleted successfully.");
+        return;
+      } catch (error) {
+        console.error("Error while deleting guest auth profile:", error);
+        // notifications.error("Failed to delete auth profile. Please try again.");
+        return;
+      }
+    }
+
+    const baseUrl = await this.constructBaseUrl(collection.workspaceId);
+    const response = await this.collectionService.deleteAuthProfile(
+      baseUrl,
+      authId,
+      authProfileObj,
+    );
+
+    if (response.isSuccessful) {
+      await this.collectionRepository.deleteAuthProfile(collection.id, authId);
+      notifications.success("Authentication profile deleted successfully.");
+    } else {
+      console.error(response.message);
+      notifications.error("Failed to delete authentication profile.");
+    }
+    return response;
   };
 }
 

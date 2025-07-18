@@ -93,6 +93,13 @@
   import { ChatBot } from "../../chat-bot";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
+  import { Motion } from "svelte-motion";
+  import {
+    chatbotOpenAnimation,
+    chatbotClosedAnimation,
+    chatbotCloseTransition,
+    chatbotOpenTransition,
+  } from "../utils";
 
   import { policyConfig } from "@sparrow/common/store";
   export let tab: Observable<Tab>;
@@ -522,93 +529,99 @@
   }
 </script>
 
-{#if $tab.tabId}
-  <div class="d-flex rest-explorer-layout h-100">
-    <div class="w-100 d-flex flex-column h-100 p-3">
-      <!-- Request Name Header -->
-      <!-- 
+<!-- {#if $tab.tabId} -->
+<div class="d-flex rest-explorer-layout h-100">
+  <div class="w-100 d-flex flex-column h-100 p-3">
+    <!-- Request Name Header -->
+    <!-- 
         --
         -- Rest name header is set to display none 
         --
       -->
-      <div class="d-flex justify-content-between w-100 p-3 d-none">
-        <RequestName name={$tab.name} {onUpdateRequestName} />
+    <div class="d-flex justify-content-between w-100 p-3 d-none">
+      <RequestName name={$tab.name} {onUpdateRequestName} />
 
-        <div class="d-flex justify-content-between">
-          <Button
-            title="Save Request"
-            type={"secondary"}
-            loader={false}
-            buttonClassProp="ms-2"
-            buttonStartIcon={floppyDisk}
-            onClick={async () => {
-              const x = await onSaveRequest();
-              if (
-                x.status === "error" &&
-                x.message ===
-                  "request is not a part of any workspace or collection"
-              ) {
-                isExposeSaveAsRequest = true;
-              } else if (x.status === "success") {
-                notifications.success("API request saved successfully.");
-              }
-            }}
-          /> <span class="position-relative" style="width:35px;"> </span>
-          <Button
-            title="Share"
-            type={"secondary"}
-            buttonClassProp="ms-2"
-            onClick={() => {}}
-          />
-        </div>
+      <div class="d-flex justify-content-between">
+        <Button
+          title="Save Request"
+          type={"secondary"}
+          loader={false}
+          buttonClassProp="ms-2"
+          buttonStartIcon={floppyDisk}
+          onClick={async () => {
+            const x = await onSaveRequest();
+            if (
+              x.status === "error" &&
+              x.message ===
+                "request is not a part of any workspace or collection"
+            ) {
+              isExposeSaveAsRequest = true;
+            } else if (x.status === "success") {
+              notifications.success("API request saved successfully.");
+            }
+          }}
+        /> <span class="position-relative" style="width:35px;"> </span>
+        <Button
+          title="Share"
+          type={"secondary"}
+          buttonClassProp="ms-2"
+          onClick={() => {}}
+        />
       </div>
+    </div>
 
-      <!-- HTTP URL Section -->
-      <HttpUrlSection
-        class=""
-        isSaveLoad={$loading}
-        isSave={$tab.isSaved}
-        bind:userRole
-        requestUrl={$tab.property.request?.url}
-        httpMethod={$tab.property.request?.method}
-        isSendRequestInProgress={storeData?.isSendRequestInProgress}
-        onSendButtonClicked={onSendRequest}
-        onCancelButtonClicked={onCancelRequest}
-        {onUpdateEnvironment}
-        {environmentVariables}
-        {onUpdateRequestUrl}
-        {onUpdateRequestMethod}
-        {toggleSaveRequest}
-        {onSaveRequest}
-        {isGuestUser}
-      />
+    <!-- HTTP URL Section -->
+    <HttpUrlSection
+      class=""
+      isSaveLoad={$loading}
+      isSave={$tab.isSaved}
+      bind:userRole
+      requestUrl={$tab.property?.request?.url}
+      httpMethod={$tab.property?.request?.method}
+      isSendRequestInProgress={storeData?.isSendRequestInProgress}
+      onSendButtonClicked={onSendRequest}
+      onCancelButtonClicked={onCancelRequest}
+      {onUpdateEnvironment}
+      {environmentVariables}
+      {onUpdateRequestUrl}
+      {onUpdateRequestMethod}
+      {toggleSaveRequest}
+      {onSaveRequest}
+      {isGuestUser}
+    />
 
-      {#if isPopoverContainer}
-        <div class="pt-2"></div>
-        <Popover
-          onClose={closeCollectionHelpText}
-          heading={`Welcome to Sparrow`}
-        >
-          <p class="mb-0 text-fs-12">
-            Your one-stop solution for API testing and management. Start
-            organizing your API requests into collections, utilize environment
-            variables, and streamline your development process. Get started now
-            by creating your first collection or exploring our features
-            <span
-              on:click={() => {
-                isGuidePopup = true;
-              }}
-              class="link p-0 border-0"
-              style="font-size: 12px;"
-              >See how it works.
-            </span>
-          </p>
-        </Popover>
-        <div class="pt-2"></div>
-      {/if}
-      <div
-        bind:this={splitpaneContainer}
-        style="flex:1; overflow:auto; margin-top: 12px;"
+    {#if isPopoverContainer}
+      <div class="pt-2"></div>
+      <Popover onClose={closeCollectionHelpText} heading={`Welcome to Sparrow`}>
+        <p class="mb-0 text-fs-12">
+          Your one-stop solution for API testing and management. Start
+          organizing your API requests into collections, utilize environment
+          variables, and streamline your development process. Get started now by
+          creating your first collection or exploring our features
+          <span
+            on:click={() => {
+              isGuidePopup = true;
+            }}
+            class="link p-0 border-0"
+            style="font-size: 12px;"
+            >See how it works.
+          </span>
+        </p>
+      </Popover>
+      <div class="pt-2"></div>
+    {/if}
+    <div
+      bind:this={splitpaneContainer}
+      style="flex:1; overflow:auto; margin-top: 12px;"
+    >
+      <Motion
+        animate={$tab?.property?.request?.state?.isChatbotActive
+          ? chatbotOpenAnimation
+          : chatbotClosedAnimation}
+        transition={$tab?.property?.request?.state?.isChatbotActive
+          ? chatbotOpenTransition
+          : chatbotCloseTransition}
+        let:motion
       >
         <Splitpanes class="explorer-chatbot-splitter">
           <Pane class="position-relative bg-transparent">
@@ -633,7 +646,7 @@
               >
                 <Pane
                   minSize={30}
-                  size={$tab.property.request?.state
+                  size={$tab.property?.request?.state
                     ?.requestLeftSplitterWidthPercentage}
                   class="position-relative bg-transparent"
                 >
@@ -645,7 +658,7 @@
                       : 'pe-2'}"
                   >
                     <RequestNavigator
-                      requestStateSection={$tab.property.request?.state
+                      requestStateSection={$tab.property?.request?.state
                         ?.requestNavigation}
                       {onUpdateRequestState}
                       authParameterLength={$requestAuthParameter.value ? 1 : 0}
@@ -658,12 +671,12 @@
                         ?.autoGeneratedHeaders?.length || 0}
                     />
                     <div style="flex:1; overflow:auto;" class="p-0">
-                      {#if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.PARAMETERS}
+                      {#if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.PARAMETERS}
                         <RequestParameters
                           isBulkEditActive={$tab?.property?.request.state
                             ?.isParameterBulkEditActive}
                           {onUpdateRequestState}
-                          params={$tab.property.request.queryParams}
+                          params={$tab.property?.request.queryParams}
                           {onUpdateRequestParams}
                           authParameter={$requestAuthParameter}
                           {onUpdateEnvironment}
@@ -672,11 +685,11 @@
                           bind:isMergeViewLoading
                           bind:newModifiedContent
                         />
-                      {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.REQUEST_BODY}
+                      {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.REQUEST_BODY}
                         <RequestBody
-                          body={$tab.property.request.body}
-                          method={$tab.property.request.method}
-                          requestState={$tab.property.request.state}
+                          body={$tab.property?.request.body}
+                          method={$tab.property?.request.method}
+                          requestState={$tab.property?.request.state}
                           {onUpdateRequestBody}
                           {onUpdateRequestState}
                           {onUpdateEnvironment}
@@ -687,15 +700,15 @@
                           bind:newModifiedContent
                           {mergeViewRequestDatasetType}
                         />
-                      {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.HEADERS}
+                      {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.HEADERS}
                         <RequestHeaders
                           isBulkEditActive={$tab?.property?.request.state
                             ?.isHeaderBulkEditActive}
                           {onUpdateRequestState}
                           {environmentVariables}
                           {onUpdateEnvironment}
-                          headers={$tab.property.request.headers}
-                          autoGeneratedHeaders={$tab.property.request
+                          headers={$tab.property?.request.headers}
+                          autoGeneratedHeaders={$tab.property?.request
                             .autoGeneratedHeaders}
                           authHeader={$requestAuthHeader}
                           onHeadersChange={onUpdateHeaders}
@@ -705,12 +718,14 @@
                           bind:isMergeViewLoading
                           bind:newModifiedContent
                         />
-                      {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.AUTHORIZATION}
+                      {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.AUTHORIZATION}
                         <RequestAuth
-                          requestStateAuth={$tab.property.request.state
+                          requestStateAuth={$tab.property?.request.state
                             .requestAuthNavigation}
+                          requestStateAuthProfile={$tab.property.request.state
+                            .selectedRequestAuthProfileId}
                           {onUpdateRequestState}
-                          auth={$tab.property.request.auth}
+                          auth={$tab.property?.request.auth}
                           collectionAuth={$collectionAuth}
                           {onUpdateRequestAuth}
                           {onUpdateEnvironment}
@@ -718,11 +733,11 @@
                           {collection}
                           {onOpenCollection}
                         />
-                      {:else if $tab.property.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
+                      {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
                         <RequestDoc
-                          isDocGenerating={$tab.property.request?.state
+                          isDocGenerating={$tab.property?.request?.state
                             ?.isDocGenerating}
-                          isDocAlreadyGenerated={$tab.property.request?.state
+                          isDocAlreadyGenerated={$tab.property?.request?.state
                             ?.isDocAlreadyGenerated}
                           {onGenerateDocumentation}
                           {onUpdateRequestDescription}
@@ -736,7 +751,7 @@
                 </Pane>
                 <Pane
                   minSize={30}
-                  size={$tab.property.request?.state
+                  size={$tab.property?.request?.state
                     ?.requestRightSplitterWidthPercentage}
                   class="bg-transparent position-relative"
                 >
@@ -862,77 +877,82 @@
               size={defaultSizePct}
               maxSize={maxSizePct}
             >
-              <ChatBot
-                {tab}
-                {onUpdateAiPrompt}
-                {onUpdateAiConversation}
-                {onUpdateAiModel}
-                {onUpdateRequestState}
-                {onGenerateAiResponse}
-                {onStopGeneratingAIResponse}
-                {onToggleLike}
-                {handleApplyChangeOnAISuggestion}
-              />
+              <div use:motion class="h-100">
+                {#if $tab?.property?.request?.state?.isChatbotActive}
+                  <ChatBot
+                    {tab}
+                    {onUpdateAiPrompt}
+                    {onUpdateAiConversation}
+                    {onUpdateAiModel}
+                    {onUpdateRequestState}
+                    {onGenerateAiResponse}
+                    {onStopGeneratingAIResponse}
+                    {onToggleLike}
+                    {handleApplyChangeOnAISuggestion}
+                  />
+                {/if}
+              </div>
             </Pane>
           {/if}
         </Splitpanes>
-      </div>
+      </Motion>
     </div>
-    <!--
+  </div>
+  <!--
       --
        -- Rest extension panel is set to display none 
       --
     -->
-    <div class="d-none">
-      <RestExtensionPanel
-        state={$tab.property.request?.state}
-        requestMethod={$tab.property.request?.method}
-        requestUrl={$tab.property.request?.url}
-        requestName={$tab.name}
-        requestDescription={$tab.description}
-        requestPath={$tab.path}
-        collections={$collections}
-        {onSaveRequest}
-        {readCollection}
-        {readWorkspace}
-        {onSaveAsRequest}
-        {onCreateFolder}
-        {onCreateCollection}
-        {onUpdateRequestState}
-        {onUpdateRequestDescription}
-        {readRequestOrFolderInCollection}
-      />
-    </div>
-  </div>
-  <Modal
-    title={"Save Request"}
-    type={"dark"}
-    width={"55%"}
-    zIndex={10000}
-    isOpen={isExposeSaveAsRequest}
-    handleModalState={(flag = false) => {
-      isExposeSaveAsRequest = flag;
-    }}
-  >
-    <SaveAsCollectionItem
-      onClick={(flag = false) => {
-        isExposeSaveAsRequest = flag;
-      }}
-      requestMethod={$tab.property.request?.method}
-      requestUrl={$tab.property.request?.url}
+  <div class="d-none">
+    <!-- <RestExtensionPanel
+      state={$tab.property?.request?.state}
+      requestMethod={$tab.property?.request?.method}
+      requestUrl={$tab.property?.request?.url}
       requestName={$tab.name}
       requestDescription={$tab.description}
       requestPath={$tab.path}
       collections={$collections}
+      {onSaveRequest}
+      {readCollection}
       {readWorkspace}
-      onSave={onSaveAsRequest}
+      {onSaveAsRequest}
       {onCreateFolder}
       {onCreateCollection}
-      {onRenameCollection}
-      {onRenameFolder}
-    />
-  </Modal>
-{/if}
+      {onUpdateRequestState}
+      {onUpdateRequestDescription}
+      {readRequestOrFolderInCollection}
+    /> -->
+  </div>
+</div>
+<Modal
+  title={"Save Request"}
+  type={"dark"}
+  width={"55%"}
+  zIndex={10000}
+  isOpen={isExposeSaveAsRequest}
+  handleModalState={(flag = false) => {
+    isExposeSaveAsRequest = flag;
+  }}
+>
+  <SaveAsCollectionItem
+    onClick={(flag = false) => {
+      isExposeSaveAsRequest = flag;
+    }}
+    requestMethod={$tab.property?.request?.method}
+    requestUrl={$tab.property?.request?.url}
+    requestName={$tab.name}
+    requestDescription={$tab.description}
+    requestPath={$tab.path}
+    collections={$collections}
+    {readWorkspace}
+    onSave={onSaveAsRequest}
+    {onCreateFolder}
+    {onCreateCollection}
+    {onRenameCollection}
+    {onRenameFolder}
+  />
+</Modal>
+<!-- {/if} -->
 
 <Modal
   title={""}

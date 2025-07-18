@@ -11,9 +11,10 @@ import { GuideRepository } from "../../repositories/guide.repository";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { TabRepository } from "../../repositories/tab.repository";
 
-import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import { createDeepCopy, scrollToTab } from "@sparrow/common/utils";
 import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 import constants from "src/constants/constants";
+import { tick } from "svelte";
 
 export class EnvironmentViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -53,13 +54,16 @@ export class EnvironmentViewModel {
     const guestUser = await this.guestUserRepository.findOne({
       name: "guestUser",
     });
+
     const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
     if (isGuestUser) {
       return {};
     }
+
     const baseUrl = await this.constructBaseUrl(workspaceId);
     const workspaceData =
       await this.workspaceRepository.readWorkspace(workspaceId);
+
     let response;
     if (
       workspaceData &&
@@ -77,35 +81,43 @@ export class EnvironmentViewModel {
       );
     }
 
-    if (response?.isSuccessful && response?.data?.data) {
-      const environments = response.data.data;
-      await this.environmentRepository.refreshEnvironment(
-        environments?.map((_environment: any) => {
-          const environment = createDeepCopy(_environment);
-          environment["id"] = environment._id;
-          environment["workspaceId"] = workspaceId;
-          delete environment._id;
-          return environment;
-        }),
-      );
-      await this.environmentRepository.deleteOrphanEnvironments(
-        workspaceId,
-        environments?.map((_environment: any) => {
-          return _environment._id;
-        }),
-      );
-      const environmentTabsToBeDeleted =
-        await this.tabRepository.getIdOfTabsThatDoesntExistAtEnvironmentLevel(
-          workspaceId,
-          environments?.map((_environment: any) => {
-            return _environment._id;
-          }),
-        );
-      return {
-        environmentTabsToBeDeleted,
-      };
+    if (!response?.isSuccessful || !response?.data?.data) {
+      return {};
     }
-    return {};
+
+    const environments = response.data.data;
+    const processedEnvironments: any[] = [];
+    const environmentIds: string[] = [];
+
+    const chunkSize = 100;
+
+    for (let i = 0; i < environments.length; i += chunkSize) {
+      const chunk = environments.slice(i, i + chunkSize);
+      for (const env of chunk) {
+        const environment = createDeepCopy(env);
+        environment.id = env._id;
+        environment.workspaceId = workspaceId;
+        delete environment._id;
+
+        processedEnvironments.push(environment);
+        environmentIds.push(env._id);
+      }
+      await new Promise((res) => setTimeout(res)); // Yield to browser
+    }
+
+    await this.environmentRepository.refreshEnvironment(processedEnvironments);
+    await this.environmentRepository.deleteOrphanEnvironments(
+      workspaceId,
+      environmentIds,
+    );
+
+    const environmentTabsToBeDeleted =
+      await this.tabRepository.getIdOfTabsThatDoesntExistAtEnvironmentLevel(
+        workspaceId,
+        environmentIds,
+      );
+
+    return { environmentTabsToBeDeleted };
   };
 
   /**
@@ -197,7 +209,7 @@ export class EnvironmentViewModel {
       initEnvironmentTab.setName(newEnvironment.name);
       this.tabRepository.createTab(initEnvironmentTab.getValue());
       // scroll the top tab bar to right
-      moveNavigation("right");
+      scrollToTab("");
       notifications.success("New Environment created successfully.");
       return;
     }
@@ -228,7 +240,7 @@ export class EnvironmentViewModel {
         id: res._id,
       });
       // scroll the top tab bar to right
-      moveNavigation("right");
+      scrollToTab("");
       notifications.success("New Environment created successfully.");
       MixpanelEvent(Events.CREATE_LOCAL_ENVIRONMENT);
       return;

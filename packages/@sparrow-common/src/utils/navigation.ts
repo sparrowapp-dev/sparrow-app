@@ -11,17 +11,13 @@ export const moveNavigation = (direction: string) => {
   if (direction === "left") {
     sideScroll(navigation, "left", 25, 100, 50);
   } else {
-    let count = 0;
-    let scroll = setInterval(() => {
-      count++;
-      if (count === 5) {
-        clearInterval(scroll);
-      }
+    // Add a small delay to ensure DOM is updated
+    setTimeout(() => {
       navigation?.scrollTo({
         left: navigation.scrollWidth,
         behavior: "smooth",
       });
-    }, 50);
+    }, 500);
   }
 };
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -61,5 +57,7 @@ export const scrollToTab = (requestId: string) => {
       inline: "nearest",
       block: "nearest",
     });
+  } else {
+    moveNavigation("right");
   }
 };

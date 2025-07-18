@@ -1,5 +1,6 @@
 <script lang="ts">
   import {
+    HubPaymentFailed,
     LoginBanner,
     LoginSignupConfirmation,
     PlanUpgradeModal,
@@ -8,7 +9,7 @@
     UpgradePlanPopUp,
   } from "@sparrow/common/components";
   import { Sidebar } from "@sparrow/common/features";
-  import { Route, navigate } from "svelte-navigator";
+  import { Route, navigate, useLocation } from "svelte-navigator";
   import Navigate from "../../routing/Navigate.svelte";
   import CollectionsPage from "../workspace-page/CollectionsPage.svelte";
   import { DashboardViewModel } from "./Dashboard.ViewModel";
@@ -48,18 +49,23 @@
   import MarketplacePage from "../marketplace-page/MarketplacePage.svelte";
   import { ResponseMessage, TeamRole } from "@sparrow/common/enums";
   import { planInfoByRole } from "@sparrow/common/utils";
-  import { planBannerisOpen } from "@sparrow/common/store";
+  import { planBannerisOpen, shouldRunThrottled } from "@sparrow/common/store";
 
   const _viewModel = new DashboardViewModel();
   const osDetector = new OSDetector();
-
-  let userId;
+  const location = useLocation();
+  let userId: string;
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
-      // await _viewModel.refreshTeams(value._id);
-      // await _viewModel.refreshWorkspaces(value._id);
       userId = value?._id;
-      await _viewModel.refreshTeamsWorkspaces(value._id);
+      if (userId && shouldRunThrottled(userId)) {
+        await Promise.all([
+          _viewModel.refreshTeams(userId),
+          _viewModel.refreshWorkspaces(userId),
+        ]);
+      } else {
+        console.error(`Throttled for ${userId}`);
+      }
     }
   });
   const environments = _viewModel.environments;
@@ -114,6 +120,12 @@
     userLimits = data;
   };
 
+  const handlegetWorkspaceCount = async (teamId: string) => {
+    currentWorkspaceCount = await _viewModel.getWorkspaceCount(teamId);
+  };
+
+  const activeTeam: Observable<TeamDocument> = _viewModel.openTeam;
+
   let currentWorkspaceId = "";
   let currentWorkspaceName = "";
   let currentTeamName = "";
@@ -158,9 +170,13 @@
     },
   );
 
-  const handlegetWorkspaceCount = async (teamId: string) => {
-    currentWorkspaceCount = await _viewModel.getWorkspaceCount(teamId);
-  };
+  let openTeam;
+
+  const activeTeamSubscriber = activeTeam.subscribe((value) => {
+    if (value) {
+      openTeam = value?.toMutableJSON();
+    }
+  });
 
   const onModalStateChanged = (flag: boolean) => {
     isPopupOpen = flag;
@@ -282,6 +298,7 @@
   onDestroy(() => {
     userUnsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
+    activeTeamSubscriber.unsubscribe();
   });
 
   let updaterVisible = true;
@@ -310,7 +327,7 @@
     try {
       updater = await check();
       if (updater?.available) {
-        notifications.warning("Update Available");
+        // notifications.warning("Update Available");
         newAppVersion = updater.version;
         updateAvailable = true;
       }
@@ -612,7 +629,7 @@
   };
 
   const handleRedirectToAdmin = async () => {
-    await _viewModel.handleRedirectToAdminPanel(currentTeamId);
+    await _viewModel.handleRedirectToAdminPanel(openTeam?.teamId);
     planBannerisOpen.set(false);
     isUpgradePlanModelOpen = false;
   };
@@ -698,8 +715,18 @@
     />
   {/if}
 
-  {#if (userRole === TeamRole.TEAM_ADMIN && $planBannerisOpen) || (userRole === TeamRole.TEAM_OWNER && $planBannerisOpen)}
-    <UpgradePlanBanner bind:isUpgradePlanModelOpen />
+  {#if $location.pathname === "/app/home"}
+    {#if openTeam?.owner === userId || openTeam?.admins?.includes(userId)}
+      {#if openTeam?.billing?.status === "payment_failed" || openTeam?.billing?.status === "action_required"}
+        <HubPaymentFailed
+          onFix={async () => {
+            await _viewModel.handleRedirectToAdminPanel(openTeam?.teamId);
+          }}
+        />
+      {:else if openTeam?.plan?.name === "Community"}
+        <UpgradePlanBanner bind:isUpgradePlanModelOpen />
+      {/if}
+    {/if}
   {/if}
 
   <!-- 

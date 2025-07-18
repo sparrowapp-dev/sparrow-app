@@ -81,7 +81,7 @@
       <div class="expression-textarea-editor">
         <Editor
           lang={"JavaScript"}
-          placeholder={"Select API data, functions, or variables from the panel."}
+          placeholder={"Select API or function from the panel."}
           bind:value={expression}
           on:change={handleCodeMirrorChange}
           isEditable={true}
@@ -156,7 +156,8 @@
         class="text-fs-12 mb-0 ellipsis-5"
         style="color: var(--text-ds-danger-300)"
       >
-        No preview available. Please check your expression and try again.
+        No preview available. Make sure you’ve run the test flow and that your
+        expression is valid before trying again.
       </p>
     {/if}
   </div>

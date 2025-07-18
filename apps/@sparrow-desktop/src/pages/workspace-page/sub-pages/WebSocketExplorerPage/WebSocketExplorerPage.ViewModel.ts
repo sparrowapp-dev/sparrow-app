@@ -4,7 +4,7 @@ import {
   ReduceQueryParams,
   DecodeWebsocket,
 } from "@sparrow/workspaces/features/socket-explorer/utils";
-import { createDeepCopy, moveNavigation } from "@sparrow/common/utils";
+import { createDeepCopy, scrollToTab } from "@sparrow/common/utils";
 import {
   startLoading,
   stopLoading,
@@ -923,7 +923,7 @@ class RestExplorerViewModel {
             initWebSocketTab.updateHeaders(req.websocket.headers);
 
             this.tabRepository.createTab(initWebSocketTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -996,7 +996,7 @@ class RestExplorerViewModel {
             initSocketTab.updateHeaders(res.data.data.websocket.headers);
 
             this.tabRepository.createTab(initSocketTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1060,7 +1060,7 @@ class RestExplorerViewModel {
             initSocketTab.updateQueryParams(req.websocket.queryParams);
             initSocketTab.updateHeaders(req.websocket.headers);
             this.tabRepository.createTab(initSocketTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",
@@ -1130,7 +1130,7 @@ class RestExplorerViewModel {
             );
             initSocketTab.updateHeaders(res.data.data.websocket.headers);
             this.tabRepository.createTab(initSocketTab.getValue());
-            moveNavigation("right");
+            scrollToTab("");
           }
           return {
             status: "success",

@@ -45,3 +45,7 @@ vite.config.ts.timestamp*
 
 #pnpm lock
 pnpm-lock.yaml
+
+# Github Local Action Files
+.secrets
+.vars

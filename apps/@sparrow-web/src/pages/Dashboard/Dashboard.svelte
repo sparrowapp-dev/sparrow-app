@@ -1,5 +1,6 @@
 <script lang="ts">
   import {
+    HubPaymentFailed,
     LoginBanner,
     LoginSignupConfirmation,
     PlanUpgradeModal,
@@ -8,7 +9,7 @@
     UpgradePlanPopUp,
   } from "@sparrow/common/components";
   import { Sidebar } from "@sparrow/common/features";
-  import { Route, navigate } from "svelte-navigator";
+  import { Route, navigate, useLocation } from "svelte-navigator";
   import Navigate from "../../routing/Navigate.svelte";
   import { DashboardViewModel } from "./Dashboard.ViewModel";
   import { navigationState, user } from "@app/store/auth.store";
@@ -42,16 +43,22 @@
   import { GlobalSearch } from "@sparrow/common/features";
   import MarketplacePage from "../marketplace-page/MarketplacePage.svelte";
   import { ResponseMessage, TeamRole } from "@sparrow/common/enums";
-  import { planBannerisOpen } from "@sparrow/common/store";
+  import { planBannerisOpen, shouldRunThrottled } from "@sparrow/common/store";
 
   const _viewModel = new DashboardViewModel();
-  let userId;
+  const location = useLocation();
+  let userId: string;
   const userUnsubscribe = user.subscribe(async (value) => {
     if (value) {
-      // await _viewModel.refreshTeams(value._id);
-      // await _viewModel.refreshWorkspaces(value._id);
       userId = value?._id;
-      await _viewModel.refreshTeamsWorkspaces(value._id);
+      if (userId && shouldRunThrottled(userId)) {
+        await Promise.all([
+          _viewModel.refreshTeams(userId),
+          _viewModel.refreshWorkspaces(userId),
+        ]);
+      } else {
+        console.error(`Throttled for ${userId}`);
+      }
     }
   });
 
@@ -94,6 +101,12 @@
     userLimits = data;
   };
 
+  const handlegetWorkspaceCount = async (teamId: string) => {
+    currentWorkspaceCount = await _viewModel.getWorkspaceCount(teamId);
+  };
+
+  const activeTeam: Observable<TeamDocument> = _viewModel.openTeam;
+
   let currentWorkspaceId = "";
   let currentWorkspaceName = "";
   let currentTeamName = "";
@@ -120,7 +133,6 @@
           teamName: OwnerDetails?.name,
           teamEmail: OwnerDetails?.email,
         };
-        planBannerisOpen.set(false);
         handlegetWorkspaceCount(currentTeamId);
         handleLimits(currentTeamId);
         const envIdInitiatedToWorkspace =
@@ -138,9 +150,13 @@
     },
   );
 
-  const handlegetWorkspaceCount = async (teamId: string) => {
-    currentWorkspaceCount = await _viewModel.getWorkspaceCount(teamId);
-  };
+  let openTeam;
+
+  const activeTeamSubscriber = activeTeam.subscribe((value) => {
+    if (value) {
+      openTeam = value?.toMutableJSON();
+    }
+  });
 
   let handlehideGlobalSearch = (val: boolean) => {
     hideGlobalSearch = val;
@@ -280,6 +296,7 @@
   onDestroy(() => {
     userUnsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
+    activeTeamSubscriber.unsubscribe();
   });
 
   let showProgressBar = false;
@@ -534,11 +551,10 @@
   const handleRedirectToAdminPanel = async () => {
     await _viewModel.handleRedirectToAdminPanel(currentTeamId);
     upgradePlanModalWorkspace = true;
-    planBannerisOpen.set(false);
   };
 
   const handleRedirectToAdmin = async () => {
-    await _viewModel.handleRedirectToAdminPanel(currentTeamId);
+    await _viewModel.handleRedirectToAdminPanel(openTeam?.teamId);
     planBannerisOpen.set(false);
     isUpgradePlanModelOpen = false;
   };
@@ -621,8 +637,18 @@
     recentVisitedWorkspaces={$recentVisitedWorkspaces}
   />
 
-  {#if (userRole === TeamRole.TEAM_ADMIN && $planBannerisOpen) || (userRole === TeamRole.TEAM_OWNER && $planBannerisOpen)}
-    <UpgradePlanBanner bind:isUpgradePlanModelOpen />
+  {#if $location.pathname === "/app/home"}
+    {#if openTeam?.owner === userId || openTeam?.admins?.includes(userId)}
+      {#if openTeam?.billing?.status === "payment_failed" || openTeam?.billing?.status === "action_required"}
+        <HubPaymentFailed
+          onFix={async () => {
+            await _viewModel.handleRedirectToAdminPanel(openTeam?.teamId);
+          }}
+        />
+      {:else if openTeam?.plan?.name === "Community"}
+        <UpgradePlanBanner bind:isUpgradePlanModelOpen />
+      {/if}
+    {/if}
   {/if}
 
   <!-- 

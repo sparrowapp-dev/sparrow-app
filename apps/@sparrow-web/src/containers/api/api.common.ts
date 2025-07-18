@@ -1305,7 +1305,7 @@ const makeGraphQLRequest = async (
         data: {
           url: _url,
           method: "POST",
-          headers: "[]",
+          headers: _headers || "[]",
           body: JSON.stringify({
             query: _query,
             variables: _variables || {},
@@ -1322,9 +1322,26 @@ const makeGraphQLRequest = async (
         status: axiosResponse.data.status,
       });
     } else {
+      let jsonHeader;
+        try {
+          jsonHeader = JSON.parse(_headers);
+        } catch (error) {
+          jsonHeader = [];
+        }
+        const headersObject = jsonHeader.reduce(
+          (
+            acc: Record<string, string>,
+            header: { key: string; value: string },
+          ) => {
+            acc[header.key] = header.value;
+            return acc;
+          },
+          {},
+        );
       const axiosResponse = await axios({
         method: "POST",
         url: _url,
+        headers: {...headersObject},
         data: { query: _query, variables: _variables || {} } || {},
       });
 

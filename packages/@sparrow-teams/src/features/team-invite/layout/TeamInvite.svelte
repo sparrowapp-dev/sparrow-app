@@ -17,6 +17,7 @@
   export let teamLogo;
   export let userId;
   export let users;
+  export let plan;
   /**
    * Validates the user email.
    */
@@ -359,6 +360,12 @@
       all workspaces, please click on select all.
     </p>
   {/if}
+{/if}
+{#if plan?.name !== "Community"}
+  <p class="text-fs-12 mt-3" style="color: var(--text-ds-neutral-400)">
+    Note: Inviting a user reserves a license and may trigger a charge, unless an
+    unused license is available.
+  </p>
 {/if}
 <div class="mt-3">
   <div class="d-flex align-items-center ellipsis gap-1 text-ds-font-size-12">
