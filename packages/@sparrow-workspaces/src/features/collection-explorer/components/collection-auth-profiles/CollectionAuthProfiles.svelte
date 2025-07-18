@@ -302,7 +302,7 @@
     : "Add Authentication Profile"}
   type={"dark"}
   width={"35%"}
-  zIndex={1000}
+  zIndex={10000}
   isOpen={isCreateProfileModalOpen}
   handleModalState={handleModalClose}
 >
