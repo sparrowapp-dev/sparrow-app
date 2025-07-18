@@ -65,8 +65,8 @@ jobs:
       - name: Set up Sparrow APT Repo
         run: |
           sudo mkdir -p /etc/apt/keyrings
-          curl -fsSL https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/sparrow-repo-key.gpg | sudo tee /etc/apt/keyrings/sparrow.asc > /dev/null
-          echo "deb [signed-by=/etc/apt/keyrings/sparrow.asc] https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/linux stable main" | sudo tee /etc/apt/sources.list.d/sparrow.list
+          curl -fsSL https://sparrow-assest.s3.us-east-1.amazonaws.com/linux/sparrow-repo-key.gpg | sudo tee /etc/apt/keyrings/sparrow.asc > /dev/null
+          echo "deb [signed-by=/etc/apt/keyrings/sparrow.asc] https://sparrow-assest.s3.us-east-1.amazonaws.com/linux stable main" | sudo tee /etc/apt/sources.list.d/sparrow.list
           sudo apt-get update
 
       - name: Download Latest Sparrow DEB
