@@ -28,7 +28,7 @@
     <div id="editor2" class="editor-wrapper">
       <CodeMirrorInput
         value={requestDoc}
-        onUpdateInput={(val) => (onUpdateAiSystemPrompt = val)}
+        onUpdateInput={(val) => onUpdateAiSystemPrompt(val)}
         placeholder="Give the model context to understand the task and provide tailored responses."
         {theme}
         {environmentVariables}

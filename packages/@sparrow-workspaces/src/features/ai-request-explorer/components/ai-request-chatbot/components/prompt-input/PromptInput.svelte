@@ -38,6 +38,7 @@
   export let currentModel: AIModelVariant;
   export let filesToUpload: PromptFileAttachment[] = [];
   export let disabled: boolean = false;
+  export let onSetEnviromentVariables;
   const theme = new UserPromptTheme().build();
   export let environmentVariables = {
     filtered: [
@@ -78,31 +79,34 @@
     textAreaInput.style.height = textAreaInput.scrollHeight + "px"; // Expand based on content
   }
 
-  function setEnvironmentVariables(text: string, environmentVariables) {
-  let updatedText = text;
+  // function setEnvironmentVariables(text: string, environmentVariables) {
+  //   let updatedText = text;
 
-  if (!Array.isArray(environmentVariables)) {
-    console.warn("Invalid environmentVariables:", environmentVariables);
-    return text; // return original text if not valid
-  }
+  //   if (!Array.isArray(environmentVariables)) {
+  //     console.warn("Invalid environmentVariables:", environmentVariables);
+  //     return text; // return original text if not valid
+  //   }
 
-  environmentVariables.forEach((element) => {
-    const regex = new RegExp(`{{${element.key}}}`, "g");
-    updatedText = updatedText.replace(regex, element.value);
-  });
+  //   environmentVariables.forEach((element) => {
+  //     const regex = new RegExp(`{{${element.key}}}`, "g");
+  //     updatedText = updatedText.replace(regex, element.value);
+  //   });
 
-  return updatedText;
-}
-
+  //   return updatedText;
+  // }
 
   const hanldeStartGenerating = async () => {
-    debugger;
     if (!prompt.trim()) return;
 
     try {
       const uploadedFiles = await handleUploadFiles(); // Upload files if any
       setTimeout(adjustTextareaHeight, 0); // waiting for the DOM to update.
-      const debuggedprompt = setEnvironmentVariables(prompt, environmentVariables.filtered || []);
+      const debuggedprompt = await onSetEnviromentVariables(
+        prompt,
+        environmentVariables.filtered || [],
+      );
+      console.log("Debugger Prompt: ", debuggedprompt);
+      debugger;
       await sendPrompt(debuggedprompt, uploadedFiles);
       await onUpdateAiPrompt("");
       filesToUpload = [];
@@ -398,12 +402,11 @@
           disable={isUploadingFiles}
           loader={isUploadingFiles}
           onClick={() => {
-            debugger;
             if (isResponseGenerating) {
               onStopGeneratingAIResponse();
               return;
             }
-            console.log("prompt: ", prompt)
+            console.log("prompt: ", prompt);
             if (!isResponseGenerating && prompt.trim()) {
               hanldeStartGenerating();
               return;
