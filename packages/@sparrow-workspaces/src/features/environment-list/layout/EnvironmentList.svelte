@@ -265,7 +265,6 @@
 
   {#if $isExpandEnvironment}
     <div
-      transition:slide={{ duration: 250 }}
       style="background-color: {ActiveTab === 'enviroment'
         ? 'var(--bg-ds-surface-600)'
         : 'transparent'};"

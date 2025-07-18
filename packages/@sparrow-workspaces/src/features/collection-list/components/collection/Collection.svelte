@@ -1030,11 +1030,7 @@
     <!-- {#if !collection?.activeSync || isBranchSynced} -->
 
     {#if visibility}
-      <div
-        transition:slide={{ duration: 250 }}
-        class="z-1"
-        style=" padding-left: 0; padding-right:0;"
-      >
+      <div class="z-1" style=" padding-left: 0; padding-right:0;">
         <div
           class=" ps-0 position-relative"
           style={`background-color: ${collection.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"}; margin-bottom: ${collection.id === activeTabId ? "0px" : "0px"};`}
@@ -1043,8 +1039,8 @@
             <div
               class="box-line"
               style="background-color: {verticalCollectionLine
-                ? 'var(--bg-ds-neutral-500)'
-                : 'var(--bg-ds-surface-100)'}"
+                ? 'var(--bg-ds-neutral-700)'
+                : 'var(--bg-ds-surface-700)'}"
             ></div>
             <div
               style="height:32px; padding-left:68px; color: var(--text-ds-neutral-500)"

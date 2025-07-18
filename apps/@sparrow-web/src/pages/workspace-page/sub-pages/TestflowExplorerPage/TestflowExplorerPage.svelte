@@ -51,6 +51,9 @@
     isGuestUser = value;
   });
 
+  let collectionListDocument = [];
+  let collectionsSubscriber;
+
   /**
    * @description - refreshes the environment everytime workspace changes
    */
@@ -181,6 +184,14 @@
 
           render = true;
 
+          collectionsSubscriber = collectionList.subscribe(async (value) => {
+            if (value) {
+              collectionListDocument = value?.filter(
+                (value) => value.workspaceId === tab?.path?.workspaceId,
+              );
+            }
+          });
+
           activeWorkspaceSubscriber = activeWorkspace.subscribe(
             (_workspace) => {
               const workspaceDoc = _workspace?.toMutableJSON();
@@ -264,6 +275,7 @@
 
   onMount(() => {
     handleBlockLimitTestflow();
+    collectionsSubscriber.unsubscribe();
   });
 </script>
 
@@ -275,7 +287,7 @@
     {testflowStore}
     onUpdateNodes={_viewModel.updateNodes}
     onUpdateEdges={_viewModel.updateEdges}
-    {collectionList}
+    {collectionListDocument}
     onClickRun={_viewModel.handleTestFlowRun}
     onRunSampleApi={_viewModel.handleSampleTestFlowRun}
     toggleHistoryDetails={_viewModel.toggleHistoryDetails}
