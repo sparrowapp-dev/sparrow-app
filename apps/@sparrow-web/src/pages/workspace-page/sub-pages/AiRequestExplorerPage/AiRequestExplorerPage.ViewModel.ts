@@ -2405,6 +2405,8 @@ class AiRequestExplorerViewModel {
   ) => {
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
+        console.log("Componenet Data: ", componentData)
+
     const tabId = componentData.tabId;
 
     // **IMPROTANT** ToDo: Create a utility class to decode the AI request similar to rest requests.

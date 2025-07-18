@@ -25,7 +25,6 @@
   import CodeMirrorInput from "../../../../../../components/codemirror-input/CodeMirrorInput.svelte";
   import { UserPromptTheme } from "../../../../../../utils";
 
-
   export let placeholder = "";
   export let sendPrompt;
   export let prompt: string = "";
@@ -43,7 +42,12 @@
   export let environmentVariables = {
     filtered: [
       { key: "API_KEY", value: "123456", type: "G", environment: "Global" },
-      { key: "BASE_URL", value: "https://api.example.com", type: "G", environment: "Global" },
+      {
+        key: "BASE_URL",
+        value: "https://api.example.com",
+        type: "G",
+        environment: "Global",
+      },
     ],
     global: { name: "Global", type: "GLOBAL" },
   };
@@ -74,27 +78,31 @@
     textAreaInput.style.height = textAreaInput.scrollHeight + "px"; // Expand based on content
   }
 
-  function  setEnvironmentVariables (
-    text: string,
-    environmentVariables: any,
-  ){
-    let updatedText = text;
-    environmentVariables.forEach((element) => {
-      const regex = new RegExp(`{{(${element.key})}}`, "g");
-      updatedText = updatedText.replace(regex, element.value);
-    });
+  function setEnvironmentVariables(text: string, environmentVariables) {
+  let updatedText = text;
 
-    return updatedText;
-  };
+  if (!Array.isArray(environmentVariables)) {
+    console.warn("Invalid environmentVariables:", environmentVariables);
+    return text; // return original text if not valid
+  }
+
+  environmentVariables.forEach((element) => {
+    const regex = new RegExp(`{{${element.key}}}`, "g");
+    updatedText = updatedText.replace(regex, element.value);
+  });
+
+  return updatedText;
+}
+
 
   const hanldeStartGenerating = async () => {
+    debugger;
     if (!prompt.trim()) return;
 
     try {
       const uploadedFiles = await handleUploadFiles(); // Upload files if any
       setTimeout(adjustTextareaHeight, 0); // waiting for the DOM to update.
-      const debuggedprompt = setEnvironmentVariables(prompt, environmentVariables);
-      console.log("Debugged: ", debuggedprompt)
+      const debuggedprompt = setEnvironmentVariables(prompt, environmentVariables.filtered || []);
       await sendPrompt(debuggedprompt, uploadedFiles);
       await onUpdateAiPrompt("");
       filesToUpload = [];
@@ -283,14 +291,15 @@
     {/if}
 
     <!-- Textarea Input -->
-      <CodeMirrorInput
-        value={prompt}
-        onUpdateInput={(val) => (onUpdateAiPrompt = val)}
-        placeholder="Write a prompt or generate one from generate prompt."
-        {theme}
-        {environmentVariables}
-        {onUpdateEnvironment}
-      />
+    <CodeMirrorInput
+      value={prompt}
+      onUpdateInput={(val) => (prompt = val)}
+      placeholder="Write a prompt or generate one from generate prompt."
+      {theme}
+      {environmentVariables}
+      {onUpdateEnvironment}
+      disabled={isResponseGenerating ? true : false}
+    />
     <!-- <textarea
       bind:value={prompt}
       on:input={() => {
@@ -389,10 +398,12 @@
           disable={isUploadingFiles}
           loader={isUploadingFiles}
           onClick={() => {
+            debugger;
             if (isResponseGenerating) {
               onStopGeneratingAIResponse();
               return;
             }
+            console.log("prompt: ", prompt)
             if (!isResponseGenerating && prompt.trim()) {
               hanldeStartGenerating();
               return;

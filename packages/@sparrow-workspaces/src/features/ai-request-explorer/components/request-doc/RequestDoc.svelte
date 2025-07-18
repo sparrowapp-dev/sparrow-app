@@ -1,6 +1,7 @@
 <script lang="ts">
   import { TextEditor } from "@sparrow/library/forms";
   import { BotSparkleFilled } from "@sparrow/library/icons";
+  import { Tooltip } from "@sparrow/library/ui";
   import { CodeMirrorInput } from "../../../../components";
   import { SystemPromptTheme } from "../../../../utils/";
 
@@ -32,7 +33,7 @@
         {theme}
         {environmentVariables}
         {onUpdateEnvironment}
-        isReadOnly={isAutoPromptGenerationInProgress}
+        isReadOnly={isAutoPromptGenerationInProgress ? true : false}
       />
 
       {#if isEditable && !isAutoPromptGenerationInProgress}
