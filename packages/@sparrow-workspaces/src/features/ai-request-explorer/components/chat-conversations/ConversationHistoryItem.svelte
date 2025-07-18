@@ -7,6 +7,7 @@
     DeleteRegular,
     EditRegular,
     MoreHorizontalRegular,
+    CodeRegular,
   } from "@sparrow/library/icons";
   import { Button, Modal, notifications, Options } from "@sparrow/library/ui";
 
@@ -187,6 +188,27 @@
         </span>
       {/if}
     </div>
+
+    <!-- Variables list -->
+    {#if conversation.variables && conversation.variables.length > 0}
+      <div class="d-flex align-items-center gap-1 mt-1 flex-wrap">
+        <CodeRegular size="16px" color="var(--text-ds-neutral-500)" />
+
+        <!-- Show up to 2 variables -->
+        {#each conversation.variables.slice(0, 2) as variable}
+          <span class="conversation-variables text-ds-font-weight-semi-bold">
+            &#123;&#123;{variable.key}&#125;&#125;
+          </span>
+        {/each}
+
+        <!-- Show "+N" if more variables exist -->
+        {#if conversation.variables.length > 2}
+          <span class="conversation-variables text-ds-font-weight-semi-bold">
+            +{conversation.variables.length - 2}
+          </span>
+        {/if}
+      </div>
+    {/if}
   </div>
 
   <div
@@ -375,6 +397,13 @@
     font-family: Inter, sans-serif;
     font-size: 10px;
     color: var(--text-ds-neutral-300);
+    font-weight: 600;
+  }
+
+  .conversation-variables {
+    font-family: Inter, sans-serif;
+    font-size: 12px;
+    color: var(--text-ds-primary-300);
     line-height: 1;
     font-weight: 500;
   }
