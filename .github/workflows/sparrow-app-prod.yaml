@@ -152,11 +152,8 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
 
-      - name: msi sig
-        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.sig
-
-      - name: nsis sig
-        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.sig     
+      - name: msi zip sig
+        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.zip.sig
 
       # --- STAGE 3: SIGN MSIX and NSIS FILES ---
       - name: Find and Sign MSI files
@@ -200,6 +197,7 @@ jobs:
             
             Write-Host "✅ Successfully signed $($msiFile.Name)"
           }
+      
       - name: Find and Sign EXE files  
         shell: pwsh
         run: |
@@ -233,6 +231,7 @@ jobs:
             
             Write-Host "✅ Successfully signed $($exeFile.Name)"
           }
+      
       - name: Verify All Signatures
         shell: pwsh
         run: |
@@ -346,7 +345,6 @@ jobs:
 
           # 4. Write out the manifest
           $manifest | Set-Content -Encoding UTF8 -Path "app-root\AppxManifest.xml"
-
 
       - name: Create MSIX Package using MakeAppx
         run: |
