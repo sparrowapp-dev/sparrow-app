@@ -3,7 +3,7 @@ title: Sparrow App
 base: core24
 version: '${SPARROW_VERSION}'
 
-summary: An API management platform that streamlines the software development lifecycle. # 79 char long summary
+summary: An API management platform that streamlines software development.
 description: |
   Sparrow is a modern API management platform designed to simplify and accelerate the software development lifecycle. It enables teams to manage APIs more efficiently through features like request handling, environment configuration, collection management, and access control across workspaces. Ideal for developers, QA engineers, and cross-functional teams, Sparrow fosters collaboration by allowing multiple teams to work together seamlessly. It addresses common pain points such as scattered API documentation, inefficient testing workflows, and limited team coordination by providing a centralized, user-friendly platform for all API-related tasks.
 grade: stable
@@ -57,14 +57,6 @@ parts:
     override-build: |
       set -eu
       mkdir -p $SNAP_USER_COMMON/.cache
-
-      # Download the latest .deb file
-      SPARROW_VERSION=2.25.0
-      DEB_URL="https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/pool/stable/main/binary-amd64/sparrow.deb"
-
-      # curl -L -o sparrow.deb "$DEB_URL"
-      # wget --timeout=30 --tries=3 -O sparrow.deb "$DEB_URL"
-      # cp $CRAFT_PROJECT_DIR/sparrow.deb sparrow.deb
 
       # Extract the .deb file
       dpkg -x sparrow.deb ../install/
