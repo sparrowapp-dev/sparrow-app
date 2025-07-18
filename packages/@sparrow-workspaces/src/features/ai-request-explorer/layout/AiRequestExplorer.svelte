@@ -59,6 +59,7 @@
   export let onRenameFolder;
   export let onClearConversation;
   export let onUploadFiles;
+  export let onSetEnviromentVariables;
 
   let isGeneratePromptModalOpen = false;
   let isConversationHistoryLoading = false;
@@ -276,7 +277,7 @@
                       .aiAuthNavigation}
                     auth={$tab.property?.aiRequest.auth}
                     requestStateAuthProfile={$tab.property.aiRequest.state
-                        .selectedRequestAuthProfileId}
+                      .selectedRequestAuthProfileId}
                     selectedModelProvider={$tab.property?.aiRequest
                       ?.aiModelProvider}
                     collectionAuth={$collectionAuth}
@@ -370,6 +371,7 @@
             {onDeleteConversation}
             {onClearConversation}
             {onUploadFiles}
+            {onSetEnviromentVariables}
             bind:isConversationHistoryPanelOpen
             bind:isConversationHistoryLoading
           />

@@ -2414,12 +2414,29 @@ class AiRequestExplorerViewModel {
       ? currConfigurations[modelProvider].jsonResponseFormat || false
       : false;
 
-    let finalSP = null;
-    if (systemPrompt.length) {
-      const SPDatas = JSON.parse(systemPrompt);
-      if (SPDatas.length)
-        finalSP = SPDatas.map((obj) => obj.data.text).join("");
-    }
+    // const variables = componentData.property.aiRequest.variables;
+    
+    let environmentVariables = {
+      filtered: [
+        { key: "API_KEY", value: "123456", type: "G", environment: "Global" },
+        {
+          key: "BASE_URL",
+          value: "https://api.example.com",
+          type: "G",
+          environment: "Global",
+        },
+      ],
+      global: { name: "Global", type: "GLOBAL" },
+    };
+
+    const finalSP = this.aiAssistentWebSocketService.setEnvironmentVariables(systemPrompt, environmentVariables.filtered)
+
+    // let finalSP = null;
+    // if (systemPrompt.length) {
+    //   const SPDatas = JSON.parse(systemPrompt);
+    //   if (SPDatas.length)
+    //     finalSP = SPDatas.map((obj) => obj.data.text).join("");
+    // }
 
     if (isJsonFormatEnabed) prompt = `${prompt} (Give Response In JSON Format)`;
 

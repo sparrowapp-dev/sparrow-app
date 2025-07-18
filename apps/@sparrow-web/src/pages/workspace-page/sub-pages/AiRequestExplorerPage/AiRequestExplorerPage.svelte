@@ -238,4 +238,5 @@
   onGenerateAiPrompt={_viewModel.generateAiPrompt}
   onHandleInsertPrompt={_viewModel.handleInsertAiPrompt}
   onUploadFiles={_viewModel.handleUploadFilesToCloud}
+  onSetEnviromentVariables={_viewModel.setEnvironmentVariables}
 />

@@ -65,6 +65,7 @@
   export let currentProvider;
   export let currentModel;
   export let isPromptBoxActive = false;
+  export let onSetEnviromentVariables;
 
   let isRenaming = false;
   let newRequestName: string = "";
@@ -622,6 +623,7 @@
           {currentProvider}
           {currentModel}
           disabled={!isPromptBoxActive}
+          {onSetEnviromentVariables}
         />
       </div>
     </div>
