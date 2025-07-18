@@ -648,7 +648,7 @@ jobs:
                     },
                     {
                       \"type\": \"TextBlock\",
-                      \"text\": \"Branch: development\",
+                      \"text\": \"Branch: production\",
                       \"wrap\": true
                     },
                     {
