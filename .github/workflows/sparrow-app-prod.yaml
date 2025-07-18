@@ -44,22 +44,18 @@ jobs:
     environment: production
 
     steps:
+      # --- STAGE 1: INITIAL SETUP AND PREREQUISITE INSTALLATIONS ---
       - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "20.8"
+        uses: actions/checkout@v4
 
       - name: Install Windows SDK
         run: Invoke-WebRequest -Uri https://aka.ms/winsdk/10/latest/SdkSetup.exe -OutFile $env:TEMP\SdkSetup.exe
         shell: powershell
 
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v1
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
         with:
-          dotnet-version: 3.1
+          node-version: "20.8"
 
       - name: Install Rust 1.82.0
         run: |
@@ -68,6 +64,53 @@ jobs:
           rustup install 1.82.0
           rustup default 1.82.0
 
+      # Set up DigiCert certificate for cloud signing
+      - name: Set up DigiCert certificate
+        shell: pwsh
+        run: |
+          Write-Host "Decoding DigiCert .p12 into D:\Certificate_pkcs12.p12"
+          $bytes = [Convert]::FromBase64String("${{ secrets.SM_CLIENT_CERT_FILE_B64 }}")
+          [IO.File]::WriteAllBytes("D:\Certificate_pkcs12.p12", $bytes)
+
+      # Set environment variables for DigiCert
+      - name: Set variables
+        id: variables
+        run: |
+          echo "SM_HOST=${{ secrets.SM_HOST }}" >> "$GITHUB_ENV"
+          echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> "$GITHUB_ENV"
+          echo "SM_CLIENT_CERT_FILE=D:\\Certificate_pkcs12.p12" >> "$GITHUB_ENV"
+          echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV"
+        shell: bash
+
+      # Setup Android SDK (required by DigiCert action for compatibility)
+      - name: Setup Android SDK (for DigiCert action compatibility)
+        run: |
+          # Create minimal Android SDK structure to satisfy DigiCert action requirements
+          $androidSdkPath = "C:\Android\android-sdk"
+          $buildToolsPath = "$androidSdkPath\build-tools\30.0.2"
+          
+          Write-Host "Creating Android SDK directory structure..." -ForegroundColor Yellow
+          New-Item -ItemType Directory -Path $buildToolsPath -Force
+          
+          # Create dummy files that the DigiCert action expects to find
+          Write-Host "Creating required Android build tool files..." -ForegroundColor Yellow
+          New-Item -ItemType File -Path "$buildToolsPath\apksigner.bat" -Force
+          New-Item -ItemType File -Path "$buildToolsPath\zipalign.exe" -Force
+          New-Item -ItemType File -Path "$buildToolsPath\aapt.exe" -Force
+          New-Item -ItemType File -Path "$buildToolsPath\aapt2.exe" -Force
+          
+          # Set Android environment variables
+          echo "ANDROID_HOME=$androidSdkPath" >> $env:GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$androidSdkPath" >> $env:GITHUB_ENV
+          
+          Write-Host "Android SDK structure created successfully" -ForegroundColor Green
+        shell: powershell
+
+      # Install DigiCert Signing Manager Tools
+      - name: Install DigiCert Signing Manager Tools
+        uses: digicert/ssm-code-signing@v1.0.0
+
+      # --- STAGE 2: BUILD APP ---
       - name: Update updater endpoint in tauri.conf.json file
         run: |
           $content = Get-Content apps/@sparrow-desktop/src-tauri/tauri.conf.json -Raw
@@ -87,60 +130,33 @@ jobs:
           npm install -g pnpm
           yarn install
           yarn desktop-build
-          # yarn tauri build --debug
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
 
-      - name: msi sig
-        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.sig
-
-      - name: nsis sig
-        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.sig
-
-      - name: Set up certificate
-        run: |
-          echo "${{ secrets.SM_CLIENT_CERT_FILE_B64 }}" | base64 --decode > /d/Certificate_pkcs12.p12
-        shell: bash
-
-      - name: Set variables
-        id: variables
-        run: |
-          echo "SM_HOST=${{ secrets.SM_HOST }}" >> "$GITHUB_ENV"
-          echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> "$GITHUB_ENV"
-          echo "SM_CLIENT_CERT_FILE=D:\\Certificate_pkcs12.p12" >> "$GITHUB_ENV"
-          echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV"
-        shell: bash
-
-      - name: Install DigiCert Client tools
-        id: digicert-code-signing
-        uses: digicert/ssm-code-signing@v1.0.0
-
-      - name: Sign MSI files
+      # --- STAGE 3: SIGN MSIX and NSIS FILES ---
+      - name: Sign and Verify MSI files
         run: |
           Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | ForEach-Object {
             Write-Host "Signing MSI: $($_.Name)"
             smctl sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $_.FullName
           }
-        shell: powershell
-
-      - name: Sign EXE files
-        run: |
-          Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.exe" | ForEach-Object {
-            Write-Host "Signing EXE: $($_.Name)"
-            smctl sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $_.FullName
-          }
-        shell: powershell
-
-      - name: Verify Signatures
-        run: |
+          
           # Verify MSI signatures
           Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | ForEach-Object {
             Write-Host "Verifying signature for: $($_.Name)"
             Get-AuthenticodeSignature $_.FullName | Format-List
           }
-          
+        shell: powershell
+
+      - name: Sign and Verify EXE files
+        run: |
+          Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.exe" | ForEach-Object {
+            Write-Host "Signing EXE: $($_.Name)"
+            smctl sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $_.FullName
+          }
+
           # Verify EXE signatures
           Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.exe" | ForEach-Object {
             Write-Host "Verifying signature for: $($_.Name)"
@@ -148,27 +164,216 @@ jobs:
           }
         shell: powershell
 
-      - name: Install AWS CLI
-        uses: chrislennon/action-aws-cli@v1.1
-        with:
-          version: latest
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
-      - name: Upload files to S3
+      # --- STAGE 4: CONVERT TO MSIX USING MAKEAPPX ---
+      - name: Extract first KeyPair alias
+        id: extract_alias
+        shell: pwsh
         run: |
+          $line  = (smctl keypair ls | Select-Object -Skip 2 | Select-Object -First 1)
+          $alias = ($line -split '\s{2,}')[2]
+          Write-Host "✅ Using alias: $alias"
+          "KEYPAIR_ALIAS=$alias" | Out-File -FilePath $env:GITHUB_ENV -Encoding ascii
+      
+      - name: Sync Certificate into Windows Store
+        shell: pwsh
+        run: |
+          Write-Host "🔄 Syncing cert for alias: $($env:KEYPAIR_ALIAS)"
+          smctl windows certsync `
+            --keypair-alias="$($env:KEYPAIR_ALIAS)" `
+            --store=system
+
+      - name: Prepare App Folder for MakeAppx
+        run: |
+          New-Item -ItemType Directory -Force -Path "app-root/Assets"
+          $msiPath = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
+          $extractPath = "app-root"
+          Start-Process msiexec.exe -ArgumentList "/a `"$msiPath`" /qn TARGETDIR=`"$extractPath`"" -Wait -NoNewWindow
+
+          #Copy app executable (MakeAppx requires it)
+          $exeSource = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug" -Filter "Sparrow.exe" -Recurse | Select-Object -First 1
+          if ($exeSource) {
+            Copy-Item $exeSource.FullName -Destination "app-root/Sparrow.exe"
+          } else {
+            Write-Host "::warning::Real Sparrow.exe not found. Inserting dummy executable."
+            Set-Content -Path "app-root/Sparrow.exe" -Value "placeholder"
+          }
+
+           # Copy actual StoreLogo from known path
+          $logo = "apps/@sparrow-desktop/src-tauri/icons/StoreLogo.png"
+          Copy-Item $logo -Destination "app-root/Assets/StoreLogo.png"
+          Copy-Item $logo -Destination "app-root/Assets/Square150x150Logo.png"
+          Copy-Item $logo -Destination "app-root/Assets/Square44x44Logo.png"
+          Copy-Item $logo -Destination "app-root/Assets/SplashScreen.png"
+
+        shell: powershell
+
+      - name: Generate AppxManifest.xml with version injection
+        shell: pwsh
+        run: |
+          # 1. Read version from Cargo.toml
+          $cargoFile   = "apps/@sparrow-desktop/src-tauri/Cargo.toml"
+          $versionLine = Select-String -Path $cargoFile -Pattern '^\s*version\s*=\s*"(.*?)"' | Select-Object -First 1
+          $version     = $versionLine.Matches.Groups[1].Value
+
+          # 2. Lookup our synced cert by thumbprint and get full Subject DN
+          $thumb       = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
+          $cert        = Get-ChildItem Cert:\LocalMachine\My | Where-Object Thumbprint -eq $thumb
+          $publisherDN = $cert.Subject
+          Write-Host "🔎 Using Publisher DN: $publisherDN"
+
+          # 3. Build the AppxManifest.xml with the exact Publisher
+          $manifest = @"
+          <?xml version="1.0" encoding="utf-8"?>
+          <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+                   xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+                   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+                   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+                   IgnorableNamespaces="uap mp rescap">
+            <Identity Name="Sparrow"
+                      Publisher="$publisherDN"
+                      Version="$version.0"
+                      ProcessorArchitecture="x64" />
+            <Properties>
+              <DisplayName>Sparrow</DisplayName>
+              <PublisherDisplayName>sparrowapp</PublisherDisplayName>
+              <Description>Sparrow</Description>
+              <Logo>Assets\StoreLogo.png</Logo>
+            </Properties>
+            <Dependencies>
+              <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.0.0" MaxVersionTested="10.0.19041.0" />
+            </Dependencies>
+            <Resources>
+              <Resource Language="en-us" />
+            </Resources>
+            <Capabilities>
+              <rescap:Capability Name="runFullTrust" />
+            </Capabilities>
+            <Applications>
+              <Application Id="SparrowApp" Executable="Sparrow.exe" EntryPoint="Windows.FullTrustApplication">
+                <uap:VisualElements DisplayName="Sparrow"
+                                    Description="Sparrow App"
+                                    BackgroundColor="transparent"
+                                    Square150x150Logo="Assets\Square150x150Logo.png"
+                                    Square44x44Logo="Assets\Square44x44Logo.png">
+                </uap:VisualElements>
+              </Application>
+            </Applications>
+          </Package>
+          "@
+
+          # 4. Write out the manifest
+          $manifest | Set-Content -Encoding UTF8 -Path "app-root\AppxManifest.xml"
+
+
+      - name: Create MSIX Package using MakeAppx
+        run: |
+          New-Item -ItemType Directory -Force -Path "msix-output"
+          $msixPath = "C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix"
+
+          $makeAppx = Get-ChildItem -Path 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter MakeAppx.exe -ErrorAction SilentlyContinue |
+                      Where-Object { $_.FullName -match '\\x64\\MakeAppx\.exe$' } |
+                      Sort-Object LastWriteTime -Descending |
+                      Select-Object -First 1
+
+          if (-not $makeAppx) {
+            Write-Host "::error::MakeAppx.exe not found. Please ensure Windows 10 SDK is available on this runner."
+            exit 1
+          }
+
+          Write-Host "✅ Found MakeAppx.exe at: $($makeAppx.FullName)"
+          & "$($makeAppx.FullName)" pack /d "app-root" /p $msixPath
+        shell: powershell
+
+      # --- STAGE 5: SIGN AND VERIFY MSIX ---
+      - name: Find and Sign MSIX files
+        shell: pwsh
+        run: |
+          # 1. Sync certificate into Windows store
+          smctl windows certsync --keypair-alias="$env:KEYPAIR_ALIAS"
+
+          # Find SignTool
+          $signTool = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter signtool.exe |
+                      Where-Object FullName -Match '\\x64\\signtool\.exe$' |
+                      Sort-Object LastWriteTime -Descending |
+                      Select-Object -First 1 -ExpandProperty FullName
+          Write-Host "Using SignTool at: $signTool"
+
+          # 3. Sign all MSIX packages
+          $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
+          Get-ChildItem -Path "C:\a\sparrow-app\sparrow-app\msix-output" -Filter "*.msix" | ForEach-Object {
+            Write-Host "🔐 Signing: $($_.FullName)"
+            
+            & "$signTool" sign /v /debug /sm /sha1 $certThumb /td SHA256 /fd sha256 /tr http://timestamp.digicert.com "$($_.FullName)"
+            
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "❌ Failed to sign $($_.Name)"
+              exit 1
+            }
+            Write-Host "✅ Successfully signed $($_.Name)"
+          }
+
+      - name: Verify MSIX Signature
+        run: |
+          # Verify the MSIX file exists
+          if (-Not (Test-Path C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix)) {
+              Write-Host "MSIX file not found at msix-output/sparrow.msix"
+              exit 1
+          }
+
+          Write-Host "Verifying signature for: C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix"
+
+          # Get the Authenticode signature
+          $sig = Get-AuthenticodeSignature -FilePath C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix
+
+          # Check the signature status
+          if ($sig.Status -eq 'Valid') {
+              Write-Host "Valid signature on C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix"
+          } else {
+              Write-Host "Invalid signature on C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix: $($sig.Status)"
+              exit 1
+          }
+        shell: powershell
+
+      # --- STAGE 6: DEPLOY & NOTIFY ---
+      - name: Upload to S3
+        shell: pwsh
+        run: |
+
+          # 1. Upload MSI and NSIS files
           aws s3 sync D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-prod --exclude "*" --include "*.zip" --include "*.msi"
           aws s3 sync D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis s3://sparrow-release-assests-prod --exclude "*" --include "*.exe"
+
+          Write-Host "Uploaded MSI and NSIS files to S3 bucket"
+
+          # 2. Find the MSI file to get the naming pattern
+          $msiFile = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
+          $msiBaseName = [System.IO.Path]::GetFileNameWithoutExtension($msiFile.Name)
+          
+          # 3. Rename the MSIX file to match MSI pattern (just change extension)
+          $msixOriginal = "C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix"
+          $msixNewName = "$msiBaseName.msix"
+          $msixNewPath = Join-Path -Path (Split-Path -Path $msixOriginal -Parent) -ChildPath $msixNewName
+          Rename-Item -Path $msixOriginal -NewName $msixNewName
+          
+          # 4. Upload to S3
+          aws s3 cp $msixNewPath s3://sparrow-release-assests-prod/
+          
+          Write-Host "Uploaded $msixNewName to S3 bucket"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      
+        
       - name: Post Windows Build Links to Teams
         run: |
-          $msiFile = Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | Select-Object -First 1
-          $msiFileName = $msiFile.Name
-          $msiUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$msiFileName"
+          # Get the MSI file to determine the naming pattern
+          $msiFile = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
+          $msiBaseName = [System.IO.Path]::GetFileNameWithoutExtension($msiFile.Name)
           
+          # Construct URLs for all file types
+          $msixUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$msiBaseName.msix"
+          $msiUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$msiBaseName.msi"
+          $exeUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$msiBaseName.exe"
+
           $body = @{
             "type" = "message"
             "attachments" = @(
@@ -185,19 +390,60 @@ jobs:
                     }
                     @{
                       "type" = "TextBlock"
-                      "text" = "Branch: main"
-                      "wrap" = $true
+                      "text" = "Download Links:"
+                      "weight" = "bolder"
+                      "spacing" = "medium"
                     }
                     @{
-                      "type" = "TextBlock"
-                      "text" = "Download Link:"
-                      "wrap" = $true
+                      "type" = "ColumnSet"
+                      "columns" = @(
+                        @{
+                          "type" = "Column"
+                          "width" = "stretch"
+                          "items" = @(
+                            @{
+                              "type" = "TextBlock"
+                              "text" = "[MSIX Installer]($msixUrl)"
+                              "color" = "accent"
+                              "wrap" = $true
+                            }
+                          )
+                        }
+                      )
                     }
                     @{
-                      "type" = "TextBlock"
-                      "text" = $msiUrl
-                      "color" = "accent"
-                      "wrap" = $true
+                      "type" = "ColumnSet"
+                      "columns" = @(
+                        @{
+                          "type" = "Column"
+                          "width" = "stretch"
+                          "items" = @(
+                            @{
+                              "type" = "TextBlock"
+                              "text" = "[MSI Installer]($msiUrl)"
+                              "color" = "accent"
+                              "wrap" = $true
+                            }
+                          )
+                        }
+                      )
+                    }
+                    @{
+                      "type" = "ColumnSet"
+                      "columns" = @(
+                        @{
+                          "type" = "Column"
+                          "width" = "stretch"
+                          "items" = @(
+                            @{
+                              "type" = "TextBlock"
+                              "text" = "[EXE Installer]($exeUrl)"
+                              "color" = "accent"
+                              "wrap" = $true
+                            }
+                          )
+                        }
+                      )
                     }
                   )
                   "$schema" = "http://adaptivecards.io/schemas/adaptive-card.json"
