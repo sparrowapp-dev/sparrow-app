@@ -1,3 +1,11 @@
+## [2.28.1](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.28.0...v2.28.1) (2025-07-18)
+
+
+### Bug Fixes
+
+* windows build pipeline ([986d8f5](https://github.com/sparrowapp-dev/sparrow-app/commit/986d8f5a7afe602fa4c33f1b625b0bb478986f71))
+* windows build pipeline ([b01c478](https://github.com/sparrowapp-dev/sparrow-app/commit/b01c47871f597198c1c440949d4b31e0c2d0b484))
+
 # [2.28.0](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.27.1...v2.28.0) (2025-07-18)
 
 
