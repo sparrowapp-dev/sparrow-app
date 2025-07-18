@@ -532,6 +532,46 @@ jobs:
           yarn workspace @sparrow/desktop tauri build --bundles deb 
           # yarn workspace @sparrow/desktop tauri build --debug --bundles deb
 
+      - name: Generate DEB metadata
+        working-directory: apps/@sparrow-desktop/src-tauri/target/release/bundle
+        run: |
+          mkdir -p ../../../../../../publishDir/pool/stable/main/binary-amd64
+          cp deb/sparrow_*.deb ../../../../../../publishDir/pool/stable/main/binary-amd64/sparrow.deb
+          cd ../../../../../../publishDir
+          mkdir -p dists/stable/main/binary-amd64/
+          dpkg-scanpackages -m pool/stable/main/binary-amd64 /dev/null > dists/stable/main/binary-amd64/Packages
+          gzip -k dists/stable/main/binary-amd64/Packages
+      - name: Import GPG key
+        run: |
+          echo "${{ secrets.SPARROW_PRIVATE_KEY }}" | gpg --batch --import
+          echo "use-agent" >> ~/.gnupg/gpg.conf
+          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+      - name: Prepare publish directory
+        run: |
+          cd publishDir
+          cat > apt-release.conf <<EOF
+          APT::FTPArchive::Release {
+            Origin "Sparrow";
+            Label "Sparrow";
+            Suite "stable";
+            Codename "stable";
+            Architectures "amd64";
+            Components "main";
+            Description "Sparrow Debian Repository";
+          };
+          EOF
+          cd dists/stable
+          apt-ftparchive -c ../../apt-release.conf release . > Release
+          gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.SPARROW_PASSPHRASE }}" \
+            --default-key "${{ vars.SPARROW_PUB_KEY }}" -abs -o Release.gpg Release
+          gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.SPARROW_PASSPHRASE }}" \
+            --default-key "${{ vars.SPARROW_PUB_KEY }}" --clearsign -o InRelease Release
+          cd ../../
+          gpg --armor --export ${{ vars.SPARROW_PUB_KEY }} > sparrow-repo-key.gpg
+          cd ..
+          mv publishDir deb-build
+
+
       - name: Upload to S3 bucket
         uses: jakejarvis/s3-sync-action@master
         with:
@@ -571,7 +611,7 @@ jobs:
                     },
                     {
                       \"type\": \"TextBlock\",
-                      \"text\": \"Branch: development\",
+                      \"text\": \"Branch: production\",
                       \"wrap\": true
                     },
                     {
@@ -595,7 +635,7 @@ jobs:
           }" "$TEAMS_WEBHOOK_URL"
         shell: bash
 
-        
+
   release_macos:
     runs-on: macos-latest
     environment: production
