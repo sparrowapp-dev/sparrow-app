@@ -162,7 +162,71 @@ jobs:
             Write-Host "Verifying signature for: $($_.Name)"
             Get-AuthenticodeSignature $_.FullName | Format-List
           }
-        shell: powershell
+
+      - name: Find and Sign EXE files  
+        shell: pwsh
+        run: |
+          $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
+          $bundlePath = "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis"
+          
+          # Find all EXE files in NSIS bundle
+          $exeFiles = Get-ChildItem -Path $bundlePath -Filter "*.exe"
+          
+          if ($exeFiles.Count -eq 0) {
+            Write-Host "❌ No EXE files found in $bundlePath"
+            exit 1
+          }
+          
+          # Sign each EXE file found
+          foreach ($exeFile in $exeFiles) {
+            Write-Host "🔐 Signing: $($exeFile.FullName)"
+            
+            & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe" sign `
+              /sm /s My `
+              /tr http://timestamp.digicert.com `
+              /td sha256 `
+              /fd sha256 `
+              /sha1 $certThumb `
+              "$($exeFile.FullName)"
+            
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "❌ Failed to sign $($exeFile.Name)"
+              exit 1
+            }
+            
+            Write-Host "✅ Successfully signed $($exeFile.Name)"
+          }
+
+      - name: Verify All Signatures
+        shell: pwsh
+        run: |
+          $bundlePaths = @(
+            "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi",
+            "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis"
+          )
+          
+          $allValid = $true
+          
+          foreach ($path in $bundlePaths) {
+            $files = Get-ChildItem -Path $path -Include "*.msi", "*.exe" -Recurse
+            
+            foreach ($file in $files) {
+              $sig = Get-AuthenticodeSignature $file.FullName
+              
+              if ($sig.Status -ne 'Valid') {
+                Write-Host "❌ Invalid signature on $($file.Name): $($sig.Status)"
+                $allValid = $false
+              } else {
+                Write-Host "✅ Valid signature on $($file.Name)"
+              }
+            }
+          }
+          
+          if (-not $allValid) {
+            throw "One or more files have invalid signatures"
+          }
+          
+          Write-Host "🎉 All files successfully signed and verified"
 
       # --- STAGE 4: CONVERT TO MSIX USING MAKEAPPX ---
       - name: Extract first KeyPair alias

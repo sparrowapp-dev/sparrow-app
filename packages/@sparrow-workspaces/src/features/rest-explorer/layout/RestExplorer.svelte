@@ -1,7 +1,7 @@
 <script lang="ts">
   // ---- Assets
   import { floppyDiskIcon as floppyDisk } from "@sparrow/library/assets";
-
+ 
   // ---- Components
   import {
     HttpUrlSection,
@@ -24,7 +24,7 @@
   import { notifications } from "@sparrow/library/ui";
   import { Splitpanes, Pane } from "svelte-splitpanes";
   import { Button } from "@sparrow/library/ui";
-
+ 
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import type { CollectionDocument } from "@app/database/database";
   import {
@@ -76,7 +76,7 @@
     SendingApiRequest,
   } from "@sparrow/workspaces/constants";
   import { ResponseStatusCode } from "@sparrow/common/enums";
-
+ 
   import type { CancelRequestType } from "@workspaces/common/type/actions";
   import type { restExplorerData } from "../store/rest-explorer";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
@@ -85,7 +85,7 @@
     ErrorCircleFilled,
     CaretDownFilled,
   } from "@sparrow/library/icons";
-
+ 
   import { SparrowSecondaryIcon, SparkleFilled } from "@sparrow/common/icons";
   import { loadingState } from "../../../../../@sparrow-common/src/store";
   import { writable } from "svelte/store";
@@ -100,7 +100,7 @@
     chatbotCloseTransition,
     chatbotOpenTransition,
   } from "../utils";
-
+ 
   import { policyConfig } from "@sparrow/common/store";
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -131,10 +131,10 @@
   export let environmentVariables;
   export let isGuestUser = false;
   export let onOpenCollection;
-
+ 
   export let onGenerateAiResponse;
   export let onToggleLike;
-
+ 
   // export let isLoginBannerActive = false;
   export let isPopoverContainer = true;
   export let onFetchCollectionGuide: (query) => void;
@@ -144,7 +144,7 @@
   export let onUpdateAiModel;
   export let onGenerateDocumentation;
   export let onStopGeneratingAIResponse;
-
+ 
   /**
    * Role of user in active workspace
    */
@@ -157,7 +157,7 @@
   export let collectionAuth;
   export let collection;
   const loading = writable<boolean>(false);
-
+ 
   // Props for showing merge/diff view in RequestBody, Headers and Params
   let isAIDebugBtnEnable = false;
   let isMergeViewEnableForRequestBody = false;
@@ -166,21 +166,21 @@
   let isMergeViewLoading = false;
   let newModifiedContent: string | KeyValuePair[];
   let mergeViewRequestDatasetType: RequestDatasetEnum;
-
+ 
   // Reference to the splitpane container element
   let splitpaneContainer;
   let splitpaneContainerWidth = 0;
-
+ 
   // Chatbot pane size constraints in pixels (based on Figma design)
   const minPx = 343;
   const maxPx = 525;
   const defaultPx = 452;
-
+ 
   // Chatbot pane size constraints in percentage (calculated at runtime)
   let minSizePct = 0;
   let maxSizePct = 0;
   let defaultSizePct = 0;
-
+ 
   /**
    * Converts the pixel-based min, max, and default sizes
    * of the chatbot pane into percentages relative to the
@@ -190,19 +190,19 @@
    */
   function updateSplitpaneContSizes() {
     if (!splitpaneContainer) return;
-
+ 
     splitpaneContainerWidth = splitpaneContainer.clientWidth;
-
+ 
     minSizePct = (minPx / splitpaneContainerWidth) * 100;
     maxSizePct = (maxPx / splitpaneContainerWidth) * 100;
     defaultSizePct = (defaultPx / splitpaneContainerWidth) * 100;
   }
-
+ 
   const closeCollectionHelpText = () => {
     onUpdateCollectionGuide({ id: "collection-guide" }, false);
     isPopoverContainer = !isPopoverContainer;
   };
-
+ 
   onMount(async () => {
     const event = await onFetchCollectionGuide({
       id: "collection-guide",
@@ -214,7 +214,7 @@
         isPopoverContainer = true;
       }
     });
-
+ 
     // Delay to ensure DOM is ready before measuring container width
     setTimeout(() => {
       updateSplitpaneContSizes();
@@ -226,14 +226,14 @@
       return () => resizeObserver.disconnect(); // Cleanup on component unmount
     }, 0);
   });
-
+ 
   export let onRenameCollection;
   export let onRenameFolder;
-
+ 
   let isExposeSaveAsRequest = false;
   let isLoading = true;
   let isErrorMsgOpen = false;
-
+ 
   $: {
     if ($tab?.property?.request?.url?.length > 0) {
       isLoading = false;
@@ -247,14 +247,14 @@
   const toggleSaveRequest = (flag: boolean): void => {
     isExposeSaveAsRequest = flag;
   };
-
+ 
   $: {
     loadingState.subscribe((tab) => {
       loading.set(tab.get($tab.tabId));
     });
   }
   let isGuidePopup = false;
-
+ 
   // Here we are closing the chatbot when user switches to vertical layout view.
   // This can be handled with a better approach, as its not user friendly way
   // that we are closing the Chatbot interface with respect to vertical layout switching
@@ -272,7 +272,7 @@
   onDestroy(() => {
     isChatbotOpenInCurrTab.set(false);
   });
-
+ 
   /**
    * Enables the diff/merge view while having suggested changes by AI
    * @param newContent The new changes suggested
@@ -290,12 +290,12 @@
     });
     onUpdateRequestState({ requestBodyNavigation: requestDatasetType });
     onUpdateRequestState({ requestBodyLanguage: contentType });
-
+ 
     if (isMergeViewEnableForRequestBody) {
       notifications.info("Please accept the current suggested changes first.");
       return;
     }
-
+ 
     if (requestDatasetType === RequestDatasetEnum.RAW) {
       newModifiedContent = newContent;
     } else if (requestDatasetType === RequestDatasetEnum.URLENCODED) {
@@ -304,19 +304,19 @@
       newModifiedContent = convertJsonToKeyValPairs(JSON.parse(newContent));
     } else if (requestDatasetType === RequestDatasetEnum.BINARY) return;
     else return;
-
+ 
     mergeViewRequestDatasetType = requestDatasetType;
     isMergeViewEnableForRequestBody = true;
     // isMergeViewLoading = true;
   };
-
+ 
   const handleEventOnInsertSuggestion = (suggestion_type: string) => {
     captureEvent("copilot_suggestion_applied", {
       component: "RestExplorer",
       suggestion_type: suggestion_type,
     });
   };
-
+ 
   /**
    * Embeds the changes suggested by AI in request data
    * @param target Where to insert the changes (Request Body or Headers or Parameters)
@@ -348,7 +348,7 @@
           // For testing, remove while raising PR
           // requestBodyType = "URL Encoded" as RequestDatasetEnum;
           // requestBodyType = "Form Data" as RequestDatasetEnum;
-
+ 
           enabledMergeViewForReqBody(
             modifiedContent,
             requestBodyType,
@@ -359,7 +359,7 @@
         case RequestSectionEnum.HEADERS:
         case RequestSectionEnum.PARAMETERS: {
           const newData = convertJsonToKeyValPairs(JSON.parse(modifiedContent));
-
+ 
           // Auto navigating to request navigator tab
           onUpdateRequestState({
             requestNavigation:
@@ -367,14 +367,14 @@
                 ? RequestSectionEnum.HEADERS
                 : RequestSectionEnum.PARAMETERS,
           });
-
+ 
           if (isMergeViewEnableForHeaders || isMergeViewEnableForParams) {
             notifications.error(
               "Please accept the current suggested changes first.",
             );
             return;
           }
-
+ 
           await sleep(500);
           newModifiedContent = newData;
           // isMergeViewLoading = true;
@@ -390,7 +390,7 @@
       console.log("Error which inserting AI suggestions: ", err);
     }
   };
-
+ 
   /**
    * Converts an object (data A) to an array of KeyValuePair objects (data B)
    * @param {Record<string, any>} dataA - The input object to convert
@@ -404,13 +404,13 @@
     if (!dataA || typeof dataA !== "object" || Array.isArray(dataA)) {
       throw new Error("Input must be a valid object");
     }
-
+ 
     const defaultChecked = true; // fallback value
-
+ 
     // Get checked value from input if it exists
     const checkedValue =
       typeof dataA.checked === "boolean" ? dataA.checked : defaultChecked;
-
+ 
     // Convert object to array of KeyValuePair objects
     const dataB: KeyValuePair[] = Object.entries(dataA)
       .filter(([key]) => key !== "checked") // Skip the checked property itself
@@ -420,22 +420,22 @@
           Array.isArray(value) || (typeof value === "object" && value !== null)
             ? JSON.stringify(value)
             : String(value);
-
+ 
         return {
           key,
           value: stringValue,
           checked: checkedValue,
         };
       });
-
+ 
     return dataB;
   };
-
+ 
   // Utility function to create a delay
   const sleep = (ms: number): Promise<void> => {
     return new Promise((resolve) => setTimeout(resolve, ms));
   };
-
+ 
   const handleEventOnClickAI = (
     responseStatus: string | undefined,
     requestMethod: string | undefined,
@@ -447,7 +447,7 @@
       http_method: requestMethod,
     });
   };
-
+ 
   const handleOnClickAIDebug = async () => {
     const statusCode = storeData?.response?.status || "Unknown Error";
     const statusNumber = parseInt(statusCode.split(" ")[0]);
@@ -455,19 +455,19 @@
       statusNumber >= 500
         ? "DEBUG_5XX_ERROR_REQUEST"
         : "DEBUG_4XX_ERROR_REQUEST";
-
+ 
     handleEventOnClickAI(statusCode, tab.property?.request?.method);
     isAIDebugBtnEnable = false;
-
+ 
     // adjusting the panel layout
     if ($tabsSplitterDirection != "horizontal") {
       tabsSplitterDirection.set("horizontal");
       isChatbotOpenInCurrTab.set(true);
     }
-
+ 
     const isResponseGenerating =
       $tab?.property?.request?.state?.isChatbotGeneratingResponse;
-
+ 
     if (!isResponseGenerating) {
       onUpdateAiConversation([
         ...$tab?.property?.request?.ai?.conversations,
@@ -480,38 +480,38 @@
           status: true,
         },
       ]);
-
+ 
       // The prompt in the below format is required to trigger the 4xx error debugging instructions for AI model
       const debugPrompt = `[${tag}]
-      I am getting the below mentioned error when I send request. 
+      I am getting the below mentioned error when I send request.
       Can you help me debug this error and tell me what changes I need to make in my request to solve this issue.
       Error Response (${statusCode}): ${JSON.stringify(storeData?.response)}
       Please analyze this error and provide suggestions to fix it following your strict error debugging protocol.
       - If it's a 4xx error: I need **precise, formatted suggestions** that I can directly apply to my request configuration.
       - If it's a 5xx error: I need **server-side troubleshooting insights** and any client-side checks I can perform.
       [/${tag}]`;
-
+ 
       // ToDo: Enable scroller
       // Scroller for user prompt
       // setTimeout(() => {
       //   if (scrollList) scrollList("bottom", -1, "smooth");
       // }, 10);
-
+ 
       await onGenerateAiResponse(debugPrompt);
-
+ 
       // ToDo: Enable scroller
       // Scroller for AI response
       // setTimeout(() => {
       //   if (scrollList) scrollList("bottom", -1, "smooth");
       // }, 10);
-
+ 
       onUpdateRequestState({ isChatbotActive: true });
     }
-
+ 
     // ToDo: Register mixpanel event for "Help me debug" action
     // MixpanelEvent(Events.AI_Ext_Gen_Curl_Prompt);
   };
-
+ 
   /**
    * Checks whether the response status code indicates a client or server error (HTTP 4xx or 5xx).
    * @returns {boolean} - Returns true if the status code is between 400 and 599, otherwise false.
@@ -521,26 +521,26 @@
     const code = parseInt(status?.split(" ")[0]);
     return code >= 400 && code < 600;
   };
-
+ 
   $: {
     if (storeData) {
       isAIDebugBtnEnable = isErrorStatus();
     }
   }
 </script>
-
+ 
 <!-- {#if $tab.tabId} -->
 <div class="d-flex rest-explorer-layout h-100">
   <div class="w-100 d-flex flex-column h-100 p-3">
     <!-- Request Name Header -->
-    <!-- 
+    <!--
         --
-        -- Rest name header is set to display none 
+        -- Rest name header is set to display none
         --
       -->
     <div class="d-flex justify-content-between w-100 p-3 d-none">
       <RequestName name={$tab.name} {onUpdateRequestName} />
-
+ 
       <div class="d-flex justify-content-between">
         <Button
           title="Save Request"
@@ -569,7 +569,7 @@
         />
       </div>
     </div>
-
+ 
     <!-- HTTP URL Section -->
     <HttpUrlSection
       class=""
@@ -589,7 +589,7 @@
       {onSaveRequest}
       {isGuestUser}
     />
-
+ 
     {#if isPopoverContainer}
       <div class="pt-2"></div>
       <Popover onClose={closeCollectionHelpText} heading={`Welcome to Sparrow`}>
@@ -626,7 +626,7 @@
         <Splitpanes class="explorer-chatbot-splitter">
           <Pane class="position-relative bg-transparent">
             <!--Disabling the Quick Help feature, will be taken up in next release-->
-
+ 
             {#if !isLoading}
               <Splitpanes
                 class="rest-splitter w-100 h-100"
@@ -795,7 +795,7 @@
                                 responseHeadersLength={storeData?.response
                                   .headers?.length || 0}
                               />
-
+ 
                               <div class="d-flex">
                                 {#if !isGuestUser && $policyConfig.enableAIAssistance}
                                   <!-- AI debugging trigger button -->
@@ -819,7 +819,7 @@
                                     ></Button>
                                   </div>
                                 {/if}
-
+ 
                                 <ResponseStatus response={storeData.response} />
                               </div>
                             </div>
@@ -900,7 +900,7 @@
   </div>
   <!--
       --
-       -- Rest extension panel is set to display none 
+       -- Rest extension panel is set to display none
       --
     -->
   <div class="d-none">
@@ -953,7 +953,7 @@
   />
 </Modal>
 <!-- {/if} -->
-
+ 
 <Modal
   title={""}
   type={"dark"}
@@ -996,7 +996,7 @@
     />
   </div>
 </Modal>
-
+ 
 <!-- ChatBot Toggler -->
 {#if !isGuestUser && $policyConfig.enableAIAssistance}
   <div
@@ -1016,7 +1016,7 @@
         onUpdateRequestState({
           isChatbotActive: !$tab?.property?.request?.state?.isChatbotActive,
         });
-
+ 
         MixpanelEvent(Events.AI_Chat_Initiation);
       }}
     >
@@ -1032,7 +1032,7 @@
     </div>
   </div>
 {/if}
-
+ 
 <style>
   .chatten-box {
     background-color: var(--bg-ds-primary-400);
@@ -1053,11 +1053,11 @@
     border: 2px solid var(--border-ds-primary-300);
     outline: none;
   }
-
+ 
   .rest-explorer-layout {
     background-color: var(--bg-ds-surface-900);
   }
-
+ 
   :global(.rest-splitter.splitpanes--vertical > .splitpanes__splitter) {
     width: 11px !important;
     height: 100% !important;
@@ -1082,7 +1082,7 @@
   ) {
     background-color: var(--bg-ds-primary-400) !important;
   }
-
+ 
   /* Disabling the splitter for explorer and chatbot interface - only split dragger is allowed on hover */
   :global(
     .explorer-chatbot-splitter.splitpanes--vertical > .splitpanes__splitter
@@ -1091,7 +1091,7 @@
     border: none !important;
     background: transparent !important;
   }
-
+ 
   :global(
     .explorer-chatbot-splitter.splitpanes--vertical
       > .splitpanes__splitter:hover,
@@ -1102,15 +1102,17 @@
     border-right: 2px solid var(--border-ds-primary-300) !important;
     background: transparent !important;
   }
-
+ 
   .link {
     color: var(--text-primary-300);
     text-decoration: underline;
     cursor: pointer;
   }
-
+ 
   .ai-chip-button.enabled:hover {
     border-color: var(--border-ds-primary-400) !important;
     box-shadow: 0 0 4px 1px rgba(17, 173, 240, 0.4) !important;
   }
 </style>
+ 
+ 
