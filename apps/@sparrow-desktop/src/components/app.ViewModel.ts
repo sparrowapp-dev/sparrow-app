@@ -1,4 +1,4 @@
-import { Sleep, throttle } from "@sparrow/common/utils";
+import { Sleep } from "@sparrow/common/utils";
 import { listen } from "@tauri-apps/api/event";
 import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
 import { getCurrentWindow } from "@tauri-apps/api/window";
@@ -206,9 +206,22 @@ export class AppViewModel {
     navigate("collections");
   };
   private triggerAccessDeniedModal;
+
+
   constructor(_triggerAccessDeniedModal) {
     this.triggerAccessDeniedModal = _triggerAccessDeniedModal;
   }
+
+  private teamSwitcher = async (id: string) => {
+    if (!id) return;
+    const res = await this.teamRepository.getTeam(id);
+    if (!res) {
+      console.error("team doesn't exist to switch!");
+      return;
+    }
+    this.teamRepository.setActiveTeam(id);
+    navigate("home");
+  };
 
   /**
    * add guest user in local db
@@ -384,21 +397,19 @@ export class AppViewModel {
     }
   }
 
-  private processDeepLinkThrottler = throttle(this.processDeepLink, 5000);
-
   // Private platform-specific handlers
   private deepLinkHandlerWindows = async (
     deepLinkUrl: DeepLinkHandlerWindowsPayload,
   ): Promise<void> => {
     const url = deepLinkUrl.payload.url;
     if (url) {
-      await this.processDeepLinkThrottler(url);
+      await this.processDeepLink(url);
     }
   };
 
   private deepLinkHandlerMacOs = async (deepLinkUrl: string): Promise<void> => {
     if (deepLinkUrl) {
-      await this.processDeepLinkThrottler(deepLinkUrl[0]);
+      await this.processDeepLink(deepLinkUrl[0]);
     }
   };
 
