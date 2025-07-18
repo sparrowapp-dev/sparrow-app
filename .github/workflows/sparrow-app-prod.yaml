@@ -368,11 +368,15 @@ jobs:
           # Get the MSI file to determine the naming pattern
           $msiFile = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
           $msiBaseName = [System.IO.Path]::GetFileNameWithoutExtension($msiFile.Name)
-          
+
+          $exeFile = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/nsis" -Filter "Sparrow_*_x64-setup.exe" | Select-Object -First 1
+          $exeBaseName = [System.IO.Path]::GetFileNameWithoutExtension($exeFile.Name)
+          $exeUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$exeBaseName.exe"
+
           # Construct URLs for all file types
           $msixUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$msiBaseName.msix"
           $msiUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$msiBaseName.msi"
-          $exeUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$msiBaseName.exe"
+          $exeUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$exeBaseName.exe"
 
           $body = @{
             "type" = "message"
@@ -384,7 +388,7 @@ jobs:
                   "body" = @(
                     @{
                       "type" = "TextBlock"
-                      "text" = "🚀 New Windows Build Available"
+                      "text" = "🚀 (DO NOT TEST THIS) New Windows Build Available"
                       "weight" = "bolder"
                       "size" = "large"
                     }
