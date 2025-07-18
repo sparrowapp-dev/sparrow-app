@@ -135,7 +135,36 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
 
-      # --- STAGE 3: CONVERT TO MSIX USING MAKEAPPX ---
+      # --- STAGE 3: SIGN MSIX and NSIS FILES ---
+      - name: Sign and Verify MSI files
+        run: |
+          Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | ForEach-Object {
+            Write-Host "Signing MSI: $($_.Name)"
+            smctl sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $_.FullName
+          }
+          
+          # Verify MSI signatures
+          Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi" | ForEach-Object {
+            Write-Host "Verifying signature for: $($_.Name)"
+            Get-AuthenticodeSignature $_.FullName | Format-List
+          }
+        shell: powershell
+
+      - name: Sign and Verify EXE files
+        run: |
+          Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.exe" | ForEach-Object {
+            Write-Host "Signing EXE: $($_.Name)"
+            smctl sign --fingerprint ${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }} --input $_.FullName
+          }
+
+          # Verify EXE signatures
+          Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.exe" | ForEach-Object {
+            Write-Host "Verifying signature for: $($_.Name)"
+            Get-AuthenticodeSignature $_.FullName | Format-List
+          }
+        shell: powershell
+
+      # --- STAGE 4: CONVERT TO MSIX USING MAKEAPPX ---
       - name: Extract first KeyPair alias
         id: extract_alias
         shell: pwsh
@@ -255,7 +284,7 @@ jobs:
           & "$($makeAppx.FullName)" pack /d "app-root" /p $msixPath
         shell: powershell
 
-      # --- STAGE 4: SIGN AND VERIFY MSIX ---
+      # --- STAGE 5: SIGN AND VERIFY MSIX ---
       - name: Find and Sign MSIX files
         shell: pwsh
         run: |
@@ -305,21 +334,28 @@ jobs:
           }
         shell: powershell
 
-      # --- STAGE 5: DEPLOY & NOTIFY ---
+      # --- STAGE 6: DEPLOY & NOTIFY ---
       - name: Upload to S3
         shell: pwsh
         run: |
-          # 1. Find the MSI file to get the naming pattern
+
+          # 1. Upload MSI and NSIS files
+          aws s3 sync D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi s3://sparrow-release-assests-prod --exclude "*" --include "*.zip" --include "*.msi"
+          aws s3 sync D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis s3://sparrow-release-assests-prod --exclude "*" --include "*.exe"
+
+          Write-Host "Uploaded MSI and NSIS files to S3 bucket"
+
+          # 2. Find the MSI file to get the naming pattern
           $msiFile = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
           $msiBaseName = [System.IO.Path]::GetFileNameWithoutExtension($msiFile.Name)
           
-          # 2. Rename the MSIX file to match MSI pattern (just change extension)
+          # 3. Rename the MSIX file to match MSI pattern (just change extension)
           $msixOriginal = "C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix"
           $msixNewName = "$msiBaseName.msix"
           $msixNewPath = Join-Path -Path (Split-Path -Path $msixOriginal -Parent) -ChildPath $msixNewName
           Rename-Item -Path $msixOriginal -NewName $msixNewName
           
-          # 3. Upload to S3
+          # 4. Upload to S3
           aws s3 cp $msixNewPath s3://sparrow-release-assests-prod/
           
           Write-Host "Uploaded $msixNewName to S3 bucket"
@@ -329,11 +365,14 @@ jobs:
         
       - name: Post Windows Build Links to Teams
         run: |
-          # Get the MSI file to determine the MSIX naming pattern
+          # Get the MSI file to determine the naming pattern
           $msiFile = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
           $msiBaseName = [System.IO.Path]::GetFileNameWithoutExtension($msiFile.Name)
-          $expectedMsixName = "$msiBaseName.msix"
-          $msixUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$expectedMsixName"
+          
+          # Construct URLs for all file types
+          $msixUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$msiBaseName.msix"
+          $msiUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$msiBaseName.msi"
+          $exeUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$msiBaseName.exe"
 
           $body = @{
             "type" = "message"
@@ -351,15 +390,60 @@ jobs:
                     }
                     @{
                       "type" = "TextBlock"
-                      "text" = "MSIX Download:"
-                      "wrap" = $true
+                      "text" = "Download Links:"
                       "weight" = "bolder"
+                      "spacing" = "medium"
                     }
                     @{
-                      "type" = "TextBlock"
-                      "text" = $msixUrl
-                      "color" = "accent"
-                      "wrap" = $true
+                      "type" = "ColumnSet"
+                      "columns" = @(
+                        @{
+                          "type" = "Column"
+                          "width" = "stretch"
+                          "items" = @(
+                            @{
+                              "type" = "TextBlock"
+                              "text" = "[MSIX Installer]($msixUrl)"
+                              "color" = "accent"
+                              "wrap" = $true
+                            }
+                          )
+                        }
+                      )
+                    }
+                    @{
+                      "type" = "ColumnSet"
+                      "columns" = @(
+                        @{
+                          "type" = "Column"
+                          "width" = "stretch"
+                          "items" = @(
+                            @{
+                              "type" = "TextBlock"
+                              "text" = "[MSI Installer]($msiUrl)"
+                              "color" = "accent"
+                              "wrap" = $true
+                            }
+                          )
+                        }
+                      )
+                    }
+                    @{
+                      "type" = "ColumnSet"
+                      "columns" = @(
+                        @{
+                          "type" = "Column"
+                          "width" = "stretch"
+                          "items" = @(
+                            @{
+                              "type" = "TextBlock"
+                              "text" = "[EXE Installer]($exeUrl)"
+                              "color" = "accent"
+                              "wrap" = $true
+                            }
+                          )
+                        }
+                      )
                     }
                   )
                   "$schema" = "http://adaptivecards.io/schemas/adaptive-card.json"
