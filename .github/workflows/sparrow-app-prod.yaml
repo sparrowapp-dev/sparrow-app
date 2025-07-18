@@ -135,6 +135,12 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
 
+      - name: msi sig
+        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.sig
+
+      - name: nsis sig
+        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis\*.sig     
+
       # --- STAGE 3: SIGN MSIX and NSIS FILES ---
       - name: Sign and Verify MSI files
         run: |
@@ -526,52 +532,6 @@ jobs:
           yarn workspace @sparrow/desktop tauri build --bundles deb 
           # yarn workspace @sparrow/desktop tauri build --debug --bundles deb
 
-      - name: Generate DEB metadata
-        working-directory: apps/@sparrow-desktop/src-tauri/target/release/bundle
-        run: |
-          mkdir -p ../../../../../../publishDir/pool/stable/main/binary-amd64
-          cp deb/sparrow_*.deb ../../../../../../publishDir/pool/stable/main/binary-amd64/sparrow.deb
-          cd ../../../../../../publishDir
-          mkdir -p dists/stable/main/binary-amd64/
-          dpkg-scanpackages -m pool/stable/main/binary-amd64 /dev/null > dists/stable/main/binary-amd64/Packages
-          gzip -k dists/stable/main/binary-amd64/Packages
-
-      - name: Import GPG key
-        run: |
-          echo "${{ secrets.SPARROW_PRIVATE_KEY }}" | gpg --batch --import
-          echo "use-agent" >> ~/.gnupg/gpg.conf
-          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
-
-      - name: Prepare publish directory
-        run: |
-          cd publishDir
-          cat > apt-release.conf <<EOF
-          APT::FTPArchive::Release {
-            Origin "Sparrow";
-            Label "Sparrow";
-            Suite "stable";
-            Codename "stable";
-            Architectures "amd64";
-            Components "main";
-            Description "Sparrow Debian Repository";
-          };
-          EOF
-
-          cd dists/stable
-          apt-ftparchive -c ../../apt-release.conf release . > Release
-
-          gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.SPARROW_PASSPHRASE }}" \
-            --default-key "${{ vars.SPARROW_PUB_KEY }}" -abs -o Release.gpg Release
-
-          gpg --batch --yes --pinentry-mode loopback --passphrase "${{ secrets.SPARROW_PASSPHRASE }}" \
-            --default-key "${{ vars.SPARROW_PUB_KEY }}" --clearsign -o InRelease Release
-
-          cd ../../
-          gpg --armor --export ${{ vars.SPARROW_PUB_KEY }} > sparrow-repo-key.gpg
-
-          cd ..
-          mv publishDir deb-build
-
       - name: Upload to S3 bucket
         uses: jakejarvis/s3-sync-action@master
         with:
@@ -581,16 +541,61 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-west-1
-          SOURCE_DIR: deb-build
-
-      - name: Notify Teams Channel
+          SOURCE_DIR: apps/@sparrow-desktop/src-tauri/target/release/bundle/deb
+          DEST_DIR: linux
+      - name: Post Linux Build Link to Teams
+        env:
+          AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+          AWS_REGION: us-west-1
+          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
         run: |
-          curl -H 'Content-Type: application/json' \
-            -d '{
-              "text": "**Sparrow Debian Repo Updated**\n\nThe latest Debian packages have been uploaded to the S3 repository.\n\nAccess it here:\nhttps://${{ vars.AWS_S3_BUCKET }}.s3-website-${{ vars.AWS_REGION }}.amazonaws.com"
-            }' \
-            ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}      
+          # Find the latest .deb file in the local build output
+          DEB_SRC_DIR="apps/@sparrow-desktop/src-tauri/target/release/bundle/deb"
+          DEB_FILE=$(ls "$DEB_SRC_DIR"/*.deb | sort -V | tail -n 1)
+          DEB_BASENAME=$(basename "$DEB_FILE")
+          DEB_URL="https://sparrow-release-assests-prod.s3.amazonaws.com/linux/$DEB_BASENAME"
 
+          curl -H "Content-Type: application/json" -d "{
+            \"type\": \"message\",
+            \"attachments\": [
+              {
+                \"contentType\": \"application/vnd.microsoft.card.adaptive\",
+                \"content\": {
+                  \"type\": \"AdaptiveCard\",
+                  \"body\": [
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"🐧 New Debian Build Available\",
+                      \"weight\": \"bolder\",
+                      \"size\": \"large\"
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"Branch: development\",
+                      \"wrap\": true
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"Download Link:\",
+                      \"wrap\": true
+                    }
+                  ],
+                  \"actions\": [
+                    {
+                      \"type\": \"Action.OpenUrl\",
+                      \"title\": \"Download .deb\",
+                      \"url\": \"$DEB_URL\"
+                    }
+                  ],
+                  \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
+                  \"version\": \"1.2\"
+                }
+              }
+            ]
+          }" "$TEAMS_WEBHOOK_URL"
+        shell: bash
+
+        
   release_macos:
     runs-on: macos-latest
     environment: production
