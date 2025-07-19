@@ -114,13 +114,13 @@ jobs:
           yarn cache clean
           npm install -g pnpm
           yarn install
-          yarn workspace @sparrow/desktop tauri build --debug --bundles deb
+          yarn workspace @sparrow/desktop tauri build --bundles deb
 
       - name: Upload DEB artifact
         uses: actions/upload-artifact@v4
         with:
           name: sparrow-deb-package
-          path: apps/@sparrow-desktop/src-tauri/target/debug/bundle/deb/*.deb
+          path: apps/@sparrow-desktop/src-tauri/target/release/bundle/deb/*.deb
           retention-days: 1
           
       # - name: Copy from prebuilt directory
@@ -135,7 +135,7 @@ jobs:
       - name: Create repo structure
         run: |
           mkdir -p apt-repo/{pool/main,dists/stable/main/binary-amd64}
-          cp apps/@sparrow-desktop/src-tauri/target/debug/bundle/deb/*.deb apt-repo/pool/main/
+          cp apps/@sparrow-desktop/src-tauri/target/release/bundle/deb/*.deb apt-repo/pool/main/
 
       - name: Generate Packages.gz
         run: |
