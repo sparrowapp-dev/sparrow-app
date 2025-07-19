@@ -97,12 +97,6 @@ jobs:
           yarn install
           yarn workspace @sparrow/desktop tauri build --bundles deb 
             
-        - name: Copy from prebuilt directory
-          run: |
-            mkdir -p apps/@sparrow-desktop/src-tauri/target/release/bundle/deb/
-            # Copy the prebuilt DEB file to the expected location
-            cp prebuilt/sparrow_2.28.0_amd64.deb apps/@sparrow-desktop/src-tauri/target/release/bundle/deb/
-
       # --- Prepare APT Repository ---
       - name: Setup APT tools
         run: sudo apt-get install -y dpkg-dev gnupg2
@@ -164,7 +158,6 @@ jobs:
 
           echo "APT metadata signed successfully."
 
-      # --- Upload to S3 ---
       - name: Upload to S3
         uses: jakejarvis/s3-sync-action@master
         with:
