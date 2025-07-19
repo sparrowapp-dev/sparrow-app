@@ -54,8 +54,16 @@ jobs:
       CI: false
 
     steps:
-      - name: Checkout repo
+      - name: Checkout Repo
         uses: actions/checkout@v3
+
+      - name: Install Snapcraft
+        run: |
+          sudo snap install snapcraft --classic
+          
+      - name: Check Snapcraft Credentials
+        run: |
+          snapcraft whoami
 
       - name: Setup Rust 1.82.0
         uses: actions-rs/toolchain@v1
@@ -106,64 +114,119 @@ jobs:
           npm install -g pnpm
           yarn install
           yarn workspace @sparrow/desktop tauri build --debug --bundles deb
-      
-      - name: Upload Built app to artifacts
+
+      - name: Upload DEB artifact
         uses: actions/upload-artifact@v4
         with:
-          name: sparrow-linux-artifacts
+          name: sparrow-deb-package
           path: apps/@sparrow-desktop/src-tauri/target/debug/bundle/deb/*.deb
+          retention-days: 1
+          
+      # - name: Copy from prebuilt directory
+      #   run: |
+      #     # Copy the prebuilt DEB file to the expected location
+      #     cp prebuilt/sparrow_2.28.0_amd64.deb apps/@sparrow-desktop/src-tauri/target/debug/bundle/deb/
 
-      - name: Prepare DEB Repository Structure
+      # --- Prepare APT Repository ---
+      - name: Setup APT tools
+        run: sudo apt-get install -y dpkg-dev gnupg2
+
+      - name: Create repo structure
         run: |
-          mkdir -p linux-repo/pool/main
-          mkdir -p linux-repo/dists/stable/main/binary-amd64
-          cp apps/@sparrow-desktop/src-tauri/target/debug/bundle/deb/*.deb linux-repo/pool/main/
-          
-          # Generate proper metadata
-          cd linux-repo
-          dpkg-scanpackages --arch amd64 pool/ /dev/null > dists/stable/main/binary-amd64/Packages
-          gzip -k dists/stable/main/binary-amd64/Packages
-          
-          # Create Release file (critical missing piece)
-          apt-ftparchive release dists/stable/ > dists/stable/Release
-          
-          # Sign the Release file to create InRelease (fixes "not signed" error)
-          gpg --yes --clearsign -o dists/stable/InRelease dists/stable/Release
-          gpg --yes -abs -o dists/stable/Release.gpg dists/stable/Release
-          cd ..
+          mkdir -p apt-repo/{pool/main,dists/stable/main/binary-amd64}
+          cp apps/@sparrow-desktop/src-tauri/target/debug/bundle/deb/*.deb apt-repo/pool/main/
 
-      - name: Upload to S3 bucket
+      - name: Generate Packages.gz
+        run: |
+          cd apt-repo
+          dpkg-scanpackages --arch amd64 pool/ > dists/stable/main/binary-amd64/Packages
+          gzip -k dists/stable/main/binary-amd64/Packages
+
+      - name: Generate Release file
+        run: |
+          cd apt-repo
+          apt-ftparchive release dists/stable/ > dists/stable/Release
+
+      - name: Sign metadata
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          echo "$GPG_PASSPHRASE" | gpg --batch --passphrase-fd 0 --pinentry-mode loopback
+          cd apt-repo
+          gpg --batch --yes --clearsign -o dists/stable/InRelease dists/stable/Release
+          gpg --batch --yes -abs -o dists/stable/Release.gpg dists/stable/Release
+
+      # --- Upload to S3 ---
+      - name: Upload to S3
         uses: jakejarvis/s3-sync-action@master
         with:
           args: --acl public-read --delete
         env:
-          AWS_S3_BUCKET: sparrow-release-assests-prod
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: us-west-1
-          SOURCE_DIR: linux-repo
+          SOURCE_DIR: apt-repo
           DEST_DIR: linux
 
-      - name: Setup APT dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gnupg2  # Ensure GPG is available
+      # - name: Post Linux Build Link to Teams
+      #   env:
+      #     AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+      #     AWS_REGION: us-west-1
+      #     TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
+      #   run: |
+      #     # Find the latest .deb file in the local build output
+      #     DEB_SRC_DIR="apps/@sparrow-desktop/src-tauri/target/debug/bundle/deb"
+      #     DEB_FILE=$(ls "$DEB_SRC_DIR"/*.deb | sort -V | tail -n 1)
+      #     DEB_BASENAME=$(basename "$DEB_FILE")
+      #     DEB_URL="https://sparrow-release-assests-prod.s3.amazonaws.com/linux/pool/main/$DEB_BASENAME"
+      #     REPO_URL="https://sparrow-release-assests-prod.s3.amazonaws.com/linux"
 
-      - name: Import signing key (updated method)
-        run: |
-          sudo mkdir -p /etc/apt/keyrings
-          curl -fsSL https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/linux/sparrow-repo-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/sparrow.gpg
-          echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/sparrow.gpg] https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/linux stable main" | sudo tee /etc/apt/sources.list.d/sparrow.list
-
-      - name: Verify repository access
-        run: |
-          curl -v https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/linux/dists/stable/InRelease
-          curl -v https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/linux/dists/stable/Release
-
-      - name: Update and download
-        run: |
-          sudo apt-get update -o Acquire::AllowInsecureRepositories=true
-          sudo apt-get update
-          apt download sparrow
-          deb_file=$(ls sparrow_*.deb | head -n 1)
-          mv "$deb_file" sparrow.deb
+      #     curl -H "Content-Type: application/json" -d "{
+      #       \"type\": \"message\",
+      #       \"attachments\": [
+      #         {
+      #           \"contentType\": \"application/vnd.microsoft.card.adaptive\",
+      #           \"content\": {
+      #             \"type\": \"AdaptiveCard\",
+      #             \"body\": [
+      #               {
+      #                 \"type\": \"TextBlock\",
+      #                 \"text\": \"🐧 New Debian Build Available\",
+      #                 \"weight\": \"bolder\",
+      #                 \"size\": \"large\"
+      #               },
+      #               {
+      #                 \"type\": \"TextBlock\",
+      #                 \"text\": \"Branch: production\",
+      #                 \"wrap\": true
+      #               },
+      #               {
+      #                 \"type\": \"TextBlock\",
+      #                 \"text\": \"Direct Download:\",
+      #                 \"wrap\": true
+      #               },
+      #               {
+      #                 \"type\": \"TextBlock\",
+      #                 \"text\": \"APT Repository Setup:\",
+      #                 \"wrap\": true
+      #               }
+      #             ],
+      #             \"actions\": [
+      #               {
+      #                 \"type\": \"Action.OpenUrl\",
+      #                 \"title\": \"Download .deb\",
+      #                 \"url\": \"$DEB_URL\"
+      #               },
+      #               {
+      #                 \"type\": \"Action.OpenUrl\",
+      #                 \"title\": \"View Repository\",
+      #                 \"url\": \"$REPO_URL\"
+      #               }
+      #             ],
+      #             \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
+      #             \"version\": \"1.2\"
+      #           }
+      #         }
+      #       ]
+      #     }" "$TEAMS_WEBHOOK_URL"
