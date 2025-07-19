@@ -156,38 +156,40 @@ jobs:
         run: |
           set -euo pipefail
 
-          # 1. Import key (only if not already present)
+          # 1. Import your private key
           echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --import
 
-          # 2. Get key ID (first secret key)
-          KEY_ID="$(gpg --list-secret-keys --with-colons | awk -F: '/^sec:/ {print $5; exit}')"
+          # 2. Extract the full fingerprint (from the first fpr: line)
+          FPR="$(gpg --list-secret-keys --with-colons \
+            | awk -F: '/^fpr:/ { print $10; exit }')"
 
-          if [ -z "$KEY_ID" ]; then
-            echo "::error::Failed to extract GPG key ID"
+          if [ -z "$FPR" ]; then
+            echo "::error::Could not find GPG fingerprint"
             exit 1
           fi
-          echo "Using GPG key: $KEY_ID"
+          echo "Using GPG fingerprint: $FPR"
 
-          # 3. (Optional) Mark key ultimately trusted to silence some warnings
-          # Create a minimal ownertrust file and import it.
-          printf '%s:6:\n' "$KEY_ID" | gpg --batch --import-ownertrust
+          # (Optional) Trust it ultimately so you don’t get trust warnings
+          printf '%s:6:\n' "$FPR" | gpg --batch --import-ownertrust
 
           cd apt-repo
 
-          # 4. Sign Release -> InRelease (clearsigned) and detached Release.gpg
+          # 3. Clear-sign the Release file into InRelease
           gpg --batch --yes \
               --pinentry-mode loopback \
               --passphrase "$GPG_PASSPHRASE" \
-              --default-key "$KEY_ID" \
+              --default-key "$FPR" \
               --clearsign -o dists/stable/InRelease dists/stable/Release
 
+          # 4. Create the detached signature
           gpg --batch --yes \
               --pinentry-mode loopback \
               --passphrase "$GPG_PASSPHRASE" \
-              --default-key "$KEY_ID" \
+              --default-key "$FPR" \
               -abs -o dists/stable/Release.gpg dists/stable/Release
 
-          echo "Signing complete."
+          echo "APT metadata signed successfully."
+
 
       # --- Upload to S3 ---
       - name: Upload to S3
