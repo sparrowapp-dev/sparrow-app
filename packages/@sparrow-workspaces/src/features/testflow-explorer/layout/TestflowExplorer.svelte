@@ -1466,10 +1466,6 @@
 
   $: {
     if (selectedBlock) {
-      console.log(
-        "-----------this is the selected block ------->",
-        selectedBlock,
-      );
       if (selectAuthHeader === undefined || selectAuthHeader !== "") {
         selectAuthHeader =
           selectedBlock?.data?.requestData?.state?.requestAuthNavigation;
