@@ -42,6 +42,7 @@ env:
   VITE_SPARROW_ADMIN_URL: ${{ vars.VITE_SPARROW_ADMIN_URL }}
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
   CI: false
+  SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
 
 jobs:
   release_linux:
@@ -59,15 +60,12 @@ jobs:
         run: |
             sudo snap install snapcraft --classic
 
-      - name: Login to Snapcraft
+      - name: Check Snapcraft Credentials
         run: |
-          echo "$SNAPCRAFT_STORE_CREDENTIALS" > snapcraft_credentials
-          snapcraft login --with snapcraft_credentials
-          rm snapcraft_credentials
-          snapcraft whoami  # Verify login
+            snapcraft whoami
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
-
+          
       - name: Checkout Repo
         uses: actions/checkout@v3
 
