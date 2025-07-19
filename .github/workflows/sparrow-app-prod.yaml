@@ -562,16 +562,6 @@ jobs:
           toolchain: 1.82.0
           override: true
 
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y \
-            pkg-config libssl-dev libcairo2-dev \
-            libwebkit2gtk-4.1-dev build-essential \
-            curl wget file libxdo-dev \
-            libayatana-appindicator3-dev librsvg2-dev \
-            gnupg software-properties-common tree
-
       - name: Setup Node.js 22
         run: |
           curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
@@ -584,7 +574,6 @@ jobs:
           echo "deb [signed-by=/etc/apt/keyrings/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
           sudo apt update
           sudo apt install -y yarn
-
 
       - name: Install project dependencies
         run: yarn
@@ -605,19 +594,82 @@ jobs:
           npm install -g pnpm
           yarn install
           yarn workspace @sparrow/desktop tauri build --bundles deb 
-          # yarn workspace @sparrow/desktop tauri build --debug --bundles deb
 
-      - name: Upload to S3 bucket
+      # --- Prepare APT Repository ---
+      - name: Setup APT tools
+        run: sudo apt-get install -y dpkg-dev gnupg2
+
+      - name: Create repo structure
+        run: |
+          mkdir -p apt-repo/{pool/main,dists/stable/main/binary-amd64}
+          cp apps/@sparrow-desktop/src-tauri/target/release/bundle/deb/*.deb apt-repo/pool/main/
+
+      - name: Generate Packages.gz
+        run: |
+          cd apt-repo
+          dpkg-scanpackages --arch amd64 pool/ > dists/stable/main/binary-amd64/Packages
+          gzip -k dists/stable/main/binary-amd64/Packages
+
+      - name: Generate Release file
+        run: |
+          cd apt-repo
+          apt-ftparchive release dists/stable/ > dists/stable/Release
+
+      - name: Sign APT metadata
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+
+          # 1. Import your private key
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --import
+
+          # 2. Extract the full fingerprint (from the first fpr: line)
+          FPR="$(gpg --list-secret-keys --with-colons \
+            | awk -F: '/^fpr:/ { print $10; exit }')"
+
+          if [ -z "$FPR" ]; then
+            echo "::error::Could not find GPG fingerprint"
+            exit 1
+          fi
+          echo "Using GPG fingerprint: $FPR"
+
+          # (Optional) Trust it ultimately so you don’t get trust warnings
+          printf '%s:6:\n' "$FPR" | gpg --batch --import-ownertrust
+
+          cd apt-repo
+
+          # 3. Clear-sign the Release file into InRelease
+          gpg --batch --yes \
+              --pinentry-mode loopback \
+              --passphrase "$GPG_PASSPHRASE" \
+              --default-key "$FPR" \
+              --clearsign -o dists/stable/InRelease dists/stable/Release
+
+          # 4. Create the detached signature
+          gpg --batch --yes \
+              --pinentry-mode loopback \
+              --passphrase "$GPG_PASSPHRASE" \
+              --default-key "$FPR" \
+              -abs -o dists/stable/Release.gpg dists/stable/Release
+
+          echo "APT metadata signed successfully."
+
+
+      # --- Upload to S3 ---
+      - name: Upload to S3
         uses: jakejarvis/s3-sync-action@master
         with:
-          args: --delete
+          args: --acl public-read --delete --exclude "sparrow-repo-key.gpg"
         env:
           AWS_S3_BUCKET: sparrow-release-assests-prod
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-west-1
-          SOURCE_DIR: apps/@sparrow-desktop/src-tauri/target/release/bundle/deb
+          SOURCE_DIR: apt-repo
           DEST_DIR: linux
+
       - name: Post Linux Build Link to Teams
         env:
           AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
@@ -669,7 +721,6 @@ jobs:
             ]
           }" "$TEAMS_WEBHOOK_URL"
         shell: bash
-
         
   release_macos:
     runs-on: macos-latest
@@ -758,7 +809,7 @@ jobs:
           mkdir msi_files
           mkdir deb_files
           aws s3 cp s3://sparrow-release-assests-prod/ msi_files/ --recursive --exclude "*" --include "*.msi" --include "*.exe" --include "*.zip"
-          aws s3 cp s3://sparrow-release-assests-prod/pool/stable/main/binary-amd64/ deb_files/ --recursive --exclude "*" --include "*.deb"
+          aws s3 cp s3://sparrow-release-assests-prod/linux/pool/main/ deb_files/ --recursive --exclude "*" --include "*.deb"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
