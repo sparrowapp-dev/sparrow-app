@@ -197,13 +197,73 @@ jobs:
         with:
           args: --acl public-read --delete
         env:
-          AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
+          AWS_S3_BUCKET: sparrow-release-assests-prod
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-west-1
           SOURCE_DIR: apt-repo
           DEST_DIR: linux
 
+
+
+
+     - name: Install Snapcraft
+        run: |
+          sudo snap install snapcraft --classic
+
+      - name: Check Snapcraft Credentials
+        run: |
+          snapcraft whoami
+
+      - name: Set up Sparrow APT Repo
+        run: |
+          sudo mkdir -p /etc/apt/keyrings
+          curl -fsSL https://sparrow-assest.s3.us-east-1.amazonaws.com/linux/sparrow-repo-key.gpg | sudo tee /etc/apt/keyrings/sparrow.asc > /dev/null
+          echo "deb [signed-by=/etc/apt/keyrings/sparrow.asc] https://sparrow-assest.s3.us-east-1.amazonaws.com/linux stable main" | sudo tee /etc/apt/sources.list.d/sparrow.list
+          sudo apt-get update
+
+      - name: Download Latest Sparrow DEB
+        run: |
+          apt download sparrow
+          deb_file=$(ls sparrow_*.deb | head -n 1)
+          mv "$deb_file" sparrow.deb
+
+      - name: Set Version and Generate snapcraft.yaml
+        run: |
+          export SPARROW_VERSION=$(dpkg-deb -f sparrow.deb Version)
+          echo "Using Sparrow version: $SPARROW_VERSION"
+          envsubst < snapcraft.yaml.in > snapcraft.yaml
+
+      - name: Build Snap from DEB
+        run: |
+          sudo snapcraft --destructive-mode
+
+      - name: Prepare Snapcraft credentials
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ vars.SNAPCRAFT_STORE_CREDENTIALS }}
+        run: |
+          # 1. Override XDG_CONFIG_HOME to a .config folder in the workspace
+          export XDG_CONFIG_HOME="$PWD/.config"
+
+          # 2. Create the snapcraft subfolder under that config
+          mkdir -p "$XDG_CONFIG_HOME/snapcraft"
+
+          # 3. Write the exported credentials JSON (your long token) to the file
+          echo "$SNAPCRAFT_STORE_CREDENTIALS" > "$XDG_CONFIG_HOME/snapcraft/credentials.json"
+          chmod 600 "$XDG_CONFIG_HOME/snapcraft/credentials.json"
+
+          echo "Stored Snapcraft creds in $XDG_CONFIG_HOME/snapcraft/credentials.json"
+
+      - name: Upload Snap to Snap Store
+        env:
+          SNAP_CHANNEL: ${{ vars.SNAP_RELEASE_CHANNEL || 'edge' }}
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ vars.SNAPCRAFT_STORE_CREDENTIALS }}
+          XDG_CONFIG_HOME: "$PWD/.config"
+        run: |
+          SNAP_FILE=$(ls *.snap | head -n1)
+          echo "Uploading $SNAP_FILE to $SNAP_CHANNEL"
+          snapcraft upload "$SNAP_FILE" --release "$SNAP_CHANNEL"
+          
       # - name: Post Linux Build Link to Teams
       #   env:
       #     AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
