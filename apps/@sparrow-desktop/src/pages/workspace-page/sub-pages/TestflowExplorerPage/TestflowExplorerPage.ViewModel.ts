@@ -62,6 +62,8 @@ import { open } from "@tauri-apps/plugin-shell";
 import { TeamRepository } from "@app/repositories/team.repository";
 import { PlanRepository } from "@app/repositories/plan.repository";
 import { TeamService } from "@app/services/team.service";
+import { ReduceAuthHeader } from "@sparrow/workspaces/features/rest-explorer/utils";
+import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -1770,5 +1772,18 @@ export class TestflowExplorerPageViewModel {
 
   public handleContactSales = async () => {
     await open(`${constants.MARKETING_URL}/pricing/`);
+  };
+
+  /**
+   * @description - This function will convert the data of auth into key value Format.
+   */
+  public parseAuthHeader = (
+    selectAuthHeader?: HttpRequestAuthTypeBaseEnum,
+    authContent: any,
+  ): { key: string; value: string } | undefined => {
+    if (selectAuthHeader) {
+      const response = new ReduceAuthHeader(selectAuthHeader, authContent);
+      return response.getValue();
+    }
   };
 }
