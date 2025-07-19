@@ -125,6 +125,7 @@ jobs:
           
       - name: Copy from prebuilt directory
         run: |
+          mkdir -p apps/@sparrow-desktop/src-tauri/target/release/bundle/deb/
           # Copy the prebuilt DEB file to the expected location
           cp prebuilt/sparrow_2.28.0_amd64.deb apps/@sparrow-desktop/src-tauri/target/release/bundle/deb/
 
@@ -148,20 +149,45 @@ jobs:
           cd apt-repo
           apt-ftparchive release dists/stable/ > dists/stable/Release
 
-      - name: Sign metadata
+      - name: Sign APT metadata
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_SIGNING_KEY }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         run: |
-          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
-          echo "$GPG_PASSPHRASE" | gpg --batch --passphrase-fd 0 --pinentry-mode loopback
+          set -euo pipefail
 
-          KEY_ID=$(gpg --list-secret-keys --with-colons | awk -F: '/^sec:/ {print $5}' | head -n1)
-          
-          # Sign files
+          # 1. Import key (only if not already present)
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --import
+
+          # 2. Get key ID (first secret key)
+          KEY_ID="$(gpg --list-secret-keys --with-colons | awk -F: '/^sec:/ {print $5; exit}')"
+
+          if [ -z "$KEY_ID" ]; then
+            echo "::error::Failed to extract GPG key ID"
+            exit 1
+          fi
+          echo "Using GPG key: $KEY_ID"
+
+          # 3. (Optional) Mark key ultimately trusted to silence some warnings
+          # Create a minimal ownertrust file and import it.
+          printf '%s:6:\n' "$KEY_ID" | gpg --batch --import-ownertrust
+
           cd apt-repo
-          gpg --batch --yes --default-key "$KEY_ID" --clearsign -o dists/stable/InRelease dists/stable/Release
-          gpg --batch --yes --default-key "$KEY_ID" -abs -o dists/stable/Release.gpg dists/stable/Release
+
+          # 4. Sign Release -> InRelease (clearsigned) and detached Release.gpg
+          gpg --batch --yes \
+              --pinentry-mode loopback \
+              --passphrase "$GPG_PASSPHRASE" \
+              --default-key "$KEY_ID" \
+              --clearsign -o dists/stable/InRelease dists/stable/Release
+
+          gpg --batch --yes \
+              --pinentry-mode loopback \
+              --passphrase "$GPG_PASSPHRASE" \
+              --default-key "$KEY_ID" \
+              -abs -o dists/stable/Release.gpg dists/stable/Release
+
+          echo "Signing complete."
 
       # --- Upload to S3 ---
       - name: Upload to S3
