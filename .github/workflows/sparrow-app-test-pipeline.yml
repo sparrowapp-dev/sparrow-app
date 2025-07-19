@@ -155,9 +155,13 @@ jobs:
         run: |
           echo "$GPG_PRIVATE_KEY" | gpg --batch --import
           echo "$GPG_PASSPHRASE" | gpg --batch --passphrase-fd 0 --pinentry-mode loopback
+
+          KEY_ID=$(gpg --list-secret-keys --with-colons | awk -F: '/^sec:/ {print $5}' | head -n1)
+          
+          # Sign files
           cd apt-repo
-          gpg --batch --yes --clearsign -o dists/stable/InRelease dists/stable/Release
-          gpg --batch --yes -abs -o dists/stable/Release.gpg dists/stable/Release
+          gpg --batch --yes --default-key "$KEY_ID" --clearsign -o dists/stable/InRelease dists/stable/Release
+          gpg --batch --yes --default-key "$KEY_ID" -abs -o dists/stable/Release.gpg dists/stable/Release
 
       # --- Upload to S3 ---
       - name: Upload to S3
