@@ -322,5 +322,6 @@
     {handleRequestOwner}
     {selectiveRunTestflow}
     handleContactSales={_viewModel.handleContactSales}
+    onChangeSeletedAuthValue={_viewModel.parseAuthHeader}
   />
 {/if}

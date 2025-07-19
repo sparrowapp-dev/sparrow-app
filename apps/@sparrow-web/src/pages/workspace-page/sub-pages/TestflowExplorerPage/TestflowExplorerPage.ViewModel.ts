@@ -42,7 +42,7 @@ import type {
 } from "@sparrow/common/types/workspace/testflow";
 import { CompareArray, Debounce, ParseTime } from "@sparrow/common/utils";
 import { notifications } from "@sparrow/library/ui";
-import { DecodeRequest } from "@sparrow/workspaces/features/rest-explorer/utils";
+import { ReduceAuthHeader } from "@sparrow/workspaces/features/rest-explorer/utils";
 import { testFlowDataStore } from "@sparrow/workspaces/features/testflow-explorer/store";
 import { BehaviorSubject, Observable } from "rxjs";
 import type { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
@@ -64,6 +64,7 @@ import * as Sentry from "@sentry/svelte";
 import { TeamRepository } from "@app/repositories/team.repository";
 import { PlanRepository } from "@app/repositories/plan.repository";
 import { TeamService } from "src/services/team.service";
+import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -1787,5 +1788,18 @@ export class TestflowExplorerPageViewModel {
 
   public handleContactSales = async () => {
     window.open(`${constants.MARKETING_URL}/pricing/`);
+  };
+
+  /**
+   * @description - This function will convert the data of auth into key value Format.
+   */
+  public parseAuthHeader = (
+    selectAuthHeader?: HttpRequestAuthTypeBaseEnum,
+    authContent: any,
+  ): { key: string; value: string } | undefined => {
+    if (selectAuthHeader) {
+      const response = new ReduceAuthHeader(selectAuthHeader, authContent);
+      return response.getValue();
+    }
   };
 }

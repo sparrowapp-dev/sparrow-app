@@ -143,10 +143,12 @@
   export let runHistoryPlanModalOpen: boolean = false;
   export let selectiveRunModalOpen: boolean = false;
   export let selectiveRunTestflow: boolean = false;
+  export let onChangeSeletedAuthValue: () => any;
   export let isGuestUser = false;
   export let collectionListDocument: CollectionDocument[];
   let planContent: any;
   let planContentNonActive: any;
+  let selectedAuthHeader: any;
 
   const checkRequestExistInNode = (_id: string) => {
     let result = false;
@@ -201,6 +203,7 @@
   let updateNodeUrl: string;
   let updateNodeFolderId: any;
   let dynamicExpressionDeleteWarning: boolean = false;
+  let selectAuthHeader: string;
   // Flag to control whether nodes are draggable
   let isNodesDraggable = true;
   let isNodeDeletable = false;
@@ -1460,6 +1463,19 @@
       planContentNonActive = planContentDisable();
     }
   }
+
+  $: {
+    if (selectedBlock) {
+      if (selectAuthHeader === undefined || selectAuthHeader !== "") {
+        selectAuthHeader =
+          selectedBlock?.data?.requestData?.state?.requestAuthNavigation;
+      }
+      selectedAuthHeader = onChangeSeletedAuthValue(
+        selectAuthHeader,
+        selectedBlock?.data?.requestData?.auth ?? {},
+      );
+    }
+  }
 </script>
 
 <div
@@ -1695,6 +1711,8 @@
         {onUpdateEnvironment}
         {runSingleNode}
         {testflowStore}
+        {selectedAuthHeader}
+        bind:selectAuthHeader
         {handleOpenCurrentDynamicExpression}
       />
     </div>
