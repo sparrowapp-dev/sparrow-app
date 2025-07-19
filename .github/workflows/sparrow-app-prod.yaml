@@ -562,6 +562,16 @@ jobs:
           toolchain: 1.82.0
           override: true
 
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            pkg-config libssl-dev libcairo2-dev \
+            libwebkit2gtk-4.1-dev build-essential \
+            curl wget file libxdo-dev \
+            libayatana-appindicator3-dev librsvg2-dev \
+            gnupg software-properties-common tree
+            
       - name: Setup Node.js 22
         run: |
           curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
@@ -656,8 +666,6 @@ jobs:
 
           echo "APT metadata signed successfully."
 
-
-      # --- Upload to S3 ---
       - name: Upload to S3
         uses: jakejarvis/s3-sync-action@master
         with:
