@@ -56,7 +56,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-          uses: actions/checkout@v3
+        uses: actions/checkout@v3
 
       - name: Setup Rust 1.82.0
         uses: actions-rs/toolchain@v1
@@ -163,7 +163,6 @@ jobs:
               -abs -o dists/stable/Release.gpg dists/stable/Release
 
           echo "APT metadata signed successfully."
-
 
       # --- Upload to S3 ---
       - name: Upload to S3
