@@ -42,17 +42,16 @@ env:
   VITE_SPARROW_ADMIN_URL: ${{ vars.VITE_SPARROW_ADMIN_URL }}
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
   CI: false
-  SNAPCRAFT_STORE_CREDENTIALS: ${{ vars.SNAPCRAFT_STORE_CREDENTIALS }}
 
 jobs:
   release_linux:
     runs-on: ubuntu-latest
     environment: production
-
     env:
       TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
       TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
       CI: false
+      SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
 
     steps:
       - name: Checkout Repo
@@ -236,8 +235,6 @@ jobs:
           sudo snapcraft --destructive-mode
 
       - name: Prepare Snapcraft credentials
-        env:
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ vars.SNAPCRAFT_STORE_CREDENTIALS }}
         run: |
           # 1. Override XDG_CONFIG_HOME to a .config folder in the workspace
           export XDG_CONFIG_HOME="$PWD/.config"
@@ -254,7 +251,6 @@ jobs:
       - name: Upload Snap to Snap Store
         env:
           SNAP_CHANNEL: ${{ vars.SNAP_RELEASE_CHANNEL || 'edge' }}
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ vars.SNAPCRAFT_STORE_CREDENTIALS }}
           XDG_CONFIG_HOME: "$PWD/.config"
         run: |
           SNAP_FILE=$(ls *.snap | head -n1)
