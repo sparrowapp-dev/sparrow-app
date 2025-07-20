@@ -1518,6 +1518,9 @@ export const tabSchemaLiteral = {
                 selectedRequestAuthProfileId: {
                   type: "string",
                 },
+                isAiRequestVariablesBulkEditActive: {
+                  type: "boolean",
+                },
               },
             },
             auth: {
