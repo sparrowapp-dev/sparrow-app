@@ -1,43 +1,56 @@
-name: Sync GitHub issues to JIRA and vice versa
+name: Create JIRA Issue on GitHub Issue Creation
 
 on:
   issues:
     types: [opened]
 
 jobs:
-  create_jira_issue:
-    if: contains(join(github.event.issue.labels.*.name, ','), 'bug') || contains(join(github.event.issue.labels.*.name, ','), 'feature')
+  create-jira-issue:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Map GitHub Label to Jira Issue Type
-        id: map_type
+      - name: Check if label is 'bug' or 'feature'
+        id: check_label
         run: |
-          ISSUE_TYPE="Task"
-          for label in "${{ join(github.event.issue.labels.*.name, ' ') }}"; do
+          labels=$(echo "${{ toJson(github.event.issue.labels) }}" | jq -r '.[].name')
+          echo "Labels: $labels"
+          type="skip"
+          for label in $labels; do
             if [[ "$label" == "bug" ]]; then
-              ISSUE_TYPE="Bug"
+              type="Bug"
             elif [[ "$label" == "feature" ]]; then
-              ISSUE_TYPE="Story"
+              type="Story"
             fi
           done
-          echo "JIRA_ISSUE_TYPE=$ISSUE_TYPE" >> $GITHUB_ENV
+          echo "jira_type=$type" >> $GITHUB_OUTPUT
 
-      - name: Create Jira Issue
-        id: create_jira
-        uses: atlassian/gajira-create@v3
-        with:
-          project: ${{ secrets.JIRA_PROJECT_KEY }}
-          issuetype: ${{ env.JIRA_ISSUE_TYPE }}
-          summary: "GitHub Issue: ${{ github.event.issue.title }}"
-          description: |
-            **GitHub Issue:** [View Issue](${{ github.event.issue.html_url }})
-            **Description:**  
-            ${{ github.event.issue.body }}
-            **GitHub Labels:** ${{ join(github.event.issue.labels.*.name, ', ') }}
-          labels: "GitHub-Issue"
+      - name: Exit if label is not bug or feature
+        if: steps.check_label.outputs.jira_type == 'skip'
+        run: echo "No relevant label found. Skipping JIRA creation."
+
+      - name: Create JIRA issue
+        if: steps.check_label.outputs.jira_type != 'skip'
         env:
-          JIRA_SITE: ${{ secrets.JIRA_URL }}
           JIRA_BASE_URL: ${{ secrets.JIRA_URL }}
-          JIRA_USER_EMAIL: ${{ secrets.JIRA_EMAIL }}
-          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_AUTH_HEADER: ${{ secrets.JIRA_AUTH_HEADER }}
+          JIRA_PROJECT_KEY: ${{ secrets.JIRA_PROJECT_KEY }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          JIRA_ISSUE_TYPE: ${{ steps.check_label.outputs.jira_type }}
+        run: |
+          curl -X POST \
+            -H "Authorization: $JIRA_AUTH_HEADER" \
+            -H "Content-Type: application/json" \
+            --data '{
+              "fields": {
+                "project": {
+                  "key": "'"$JIRA_PROJECT_KEY"'"
+                },
+                "summary": "'"${ISSUE_TITLE//\"/\\\"}"'",
+                "description": "'"${ISSUE_BODY//\"/\\\"}"'",
+                "issuetype": {
+                  "name": "'"$JIRA_ISSUE_TYPE"'"
+                }
+              }
+            }' \
+            $JIRA_BASE_URL/rest/api/2/issue/
