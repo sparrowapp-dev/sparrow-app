@@ -9,6 +9,7 @@
     AiConfigs,
     GetCode,
     GeneratePromptModal,
+    RequestVariables,
   } from "../components";
   import { Splitpanes, Pane } from "svelte-splitpanes";
   import type {
@@ -28,7 +29,11 @@
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import { onDestroy, onMount } from "svelte";
   import { writable } from "svelte/store";
-  import { SettingsRegular, BotSparkleRegular } from "@sparrow/library/icons";
+  import {
+    SettingsRegular,
+    BotSparkleRegular,
+    PersonKeyRegular,
+  } from "@sparrow/library/icons";
   import { SaveAsCollectionItem } from "../../save-as-request";
   import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
   import { Modal } from "@sparrow/library/ui";
@@ -39,6 +44,7 @@
   export let onUpdateRequestAuth;
   export let onUpdateRequestState;
   export let onUpdateAiSystemPrompt;
+  export let onUpdateAiRequestVariables;
   export let onSaveAiRequest;
   export let onOpenCollection;
   export let onUpdateEnvironment;
@@ -276,7 +282,7 @@
                       .aiAuthNavigation}
                     auth={$tab.property?.aiRequest.auth}
                     requestStateAuthProfile={$tab.property.aiRequest.state
-                        .selectedRequestAuthProfileId}
+                      .selectedRequestAuthProfileId}
                     selectedModelProvider={$tab.property?.aiRequest
                       ?.aiModelProvider}
                     collectionAuth={$collectionAuth}
@@ -336,6 +342,37 @@
                     >
                       No model selected. Please choose a model to configure its
                       settings.
+                    </p>
+                  </div>
+                {/if}
+              {:else if $tab.property?.aiRequest?.state?.aiNavigation === AiRequestSectionEnum.VARIABLES}
+                {#if $tab.property?.aiRequest?.aiModelProvider}
+                  <RequestVariables
+                    isBulkEditActive={$tab?.property?.aiRequest.state
+                      ?.isAiRequestVariablesBulkEditActive}
+                    {onUpdateRequestState}
+                    params={$tab.property?.aiRequest.variables}
+                    {onUpdateAiRequestVariables}
+                    {onUpdateEnvironment}
+                    {environmentVariables}
+                  />
+                {:else}
+                  <div
+                    style="font-family: Inter, sans-serif;"
+                    class="d-flex flex-column align-items-center justify-content-center h-100 text-center text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium"
+                  >
+                    <div class="mb-3">
+                      <PersonKeyRegular
+                        size={"48px"}
+                        color={"var(--icon-ds-neutral-500)"}
+                      />
+                    </div>
+                    <p
+                      class="text-muted mb-0 px-3"
+                      style="font-family: Inter, sans-serif; color=var(--icon-ds-neutral-500)"
+                    >
+                      No model selected. Please choose a model to enable
+                      variables in your request.
                     </p>
                   </div>
                 {/if}

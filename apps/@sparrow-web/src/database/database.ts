@@ -323,6 +323,18 @@ export class RxDB {
             }
             return oldDoc;
           },
+          16: function (oldDoc: TabDocument) {
+            if (oldDoc?.property?.aiRequest) {
+              oldDoc.property.aiRequest.variables = [
+                {
+                  key: "",
+                  value: "",
+                  checked: false,
+                },
+              ];
+            }
+            return oldDoc;
+          },
         },
       },
       collection: {
