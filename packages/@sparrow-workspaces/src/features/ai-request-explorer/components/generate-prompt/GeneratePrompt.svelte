@@ -41,7 +41,7 @@
   let isSparrowAiLimitReached = false;
   let isErrorWhileGeneratePrompt = false;
   let errorMsgForGeneratePrompt = "";
-  let templatePlaceholders: string[] = ["api_name", "api_category", "api_description"];
+  let templatePlaceholders: string[] = [];
 
   // Computed properties
   $: isUserPromptEmpty = !userPromptExpectation.trim().length;
@@ -68,6 +68,19 @@
     dispatch("close");
   };
 
+  const setEnvironmentVariables = (
+      text: string,
+      environmentVariables,
+    ): string => {
+      let updatedText = text;
+      environmentVariables.forEach((element) => {
+        const regex = new RegExp(`{{(${element.key})}}`, "g");
+        updatedText = updatedText.replace(regex, element.value);
+      });
+
+      return updatedText;
+  };
+
   const handleGenerateResponse = async (): Promise<void> => {
     if (isUserPromptEmpty) return;
 
@@ -76,9 +89,10 @@
     errorMsgForGeneratePrompt = "";
 
     try {
+      const userprompt = setEnvironmentVariables(userPromptExpectation, environmentVariables.filtered)
       const response = await onGenerateAiPrompt(
         generatePromptTarget,
-        userPromptExpectation,
+        userprompt,
       );
 
       if (response.successStatus) {

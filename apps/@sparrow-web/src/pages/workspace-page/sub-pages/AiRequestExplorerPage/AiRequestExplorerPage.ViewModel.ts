@@ -2877,10 +2877,10 @@ class AiRequestExplorerViewModel {
       await this.updateUserPrompt(response);
     } else if (target === "SystemPrompt") {
       await this.updateRequestState({ isSaveDescriptionInProgress: true });
-      const formatter = new MarkdownFormatter();
-      const formattedData = await formatter.FormatData(response);
-      const stringifyData = JSON.stringify(formattedData.blocks);
-      await this.updateAiSystemPrompt(stringifyData);
+      // const formatter = new MarkdownFormatter();
+      // const formattedData = await formatter.FormatData(response);
+      // const stringifyData = JSON.stringify(formattedData.blocks);
+      await this.updateAiSystemPrompt(response);
       await this.updateRequestState({ isSaveDescriptionInProgress: false });
     }
     return response;
