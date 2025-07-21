@@ -25,6 +25,8 @@ import { PlanRepository } from "@app/repositories/plan.repository";
 import { PlanService } from "@app/services/plan.service";
 import constants from "@app/constants/constants";
 import { planBannerisOpen } from "@sparrow/common/store";
+import { getClientUser } from "@app/utils/jwt";
+import { open } from "@tauri-apps/plugin-shell";
 
 export class TeamsViewModel {
   constructor() {}
@@ -100,7 +102,7 @@ export class TeamsViewModel {
           updatedBy,
           isNewInvite,
           invites,
-          billing
+          billing,
         } = elem;
         const updatedWorkspaces = workspaces?.map((workspace) => ({
           workspaceId: workspace.id,
@@ -130,7 +132,7 @@ export class TeamsViewModel {
           isNewInvite,
           isOpen: isOpenTeam,
           invites,
-          billing
+          billing,
         };
         data.push(item);
       }
@@ -402,5 +404,26 @@ export class TeamsViewModel {
       return;
     }
   };
-  //
+
+  public getUserTrialExhaustedStatus = async (): Promise<boolean> => {
+    try {
+      const email = getClientUser().email;
+      const response =
+        await this.userService.getUserTrialExhaustedStatus(email);
+      return response?.data?.data?.isUserTrialExhausted ?? false;
+    } catch (error) {
+      console.error("Error fetching trial exhausted status:", error);
+      return false;
+    }
+  };
+
+  public handleStartTrial = () => {
+    const email = getClientUser().email;
+    const accessToken = localStorage.getItem("AUTH_TOKEN");
+    const refreshToken = localStorage.getItem("REF_TOKEN");
+    const url =
+      constants.ADMIN_URL +
+      `?accessToken=${accessToken}&refreshToken=${refreshToken}&email=${email}&source=desktop&trial=login_trial`;
+    open(url);
+  };
 }

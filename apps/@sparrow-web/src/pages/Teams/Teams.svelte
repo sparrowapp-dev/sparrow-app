@@ -54,6 +54,7 @@
     ChevronDoubleRightRegular,
     DoubleArrowIcon,
     GithubIcon,
+    SparkleRegular,
   } from "@sparrow/library/icons";
   import { ListTeamNavigation } from "@sparrow/teams/features";
   import { TeamTabsEnum } from "@sparrow/teams/constants/TeamTabs.constants";
@@ -76,6 +77,7 @@
       userId = value._id;
     }
   });
+  let isTrialExhausted = false;
 
   onMount(async () => {
     if (userId && shouldRunThrottled(userId)) {
@@ -95,7 +97,12 @@
     githubRepo = await _viewModel.getGithubRepo();
     githubRepoData = githubRepo?.getLatest().toMutableJSON();
     isGuestUser = await _viewModel.getGuestUser();
+    isTrialExhausted = await _viewModel.getUserTrialExhaustedStatus();
   });
+
+  const startTrial = async () => {
+    await _viewModel.handleStartTrial();
+  };
 
   let splitter: HTMLElement | null;
 
@@ -242,6 +249,35 @@
 
             <!-- github repo section -->
             <section>
+              {#if isTrialExhausted == false}
+                <div class="d-flex flex-column" style="gap: 12px">
+                  <div class="d-flex align-items-start">
+                    <div>
+                      <SparkleRegular />
+                    </div>
+                    <div class="d-flex flex-column text-ds-font-size-12">
+                      <div style="color: var(--text-ds-neutral-50);">
+                        Unlock trial Access
+                      </div>
+                      <div style="color: var(--text-ds-neutral-200);">
+                        Unlock advanced features for 14 days, no charges until
+                        trial ends.
+                      </div>
+                    </div>
+                  </div>
+                  <Button
+                    title="Start Free Trial"
+                    size="medium"
+                    type="outline-primary"
+                    onClick={startTrial}
+                    disable={false}
+                    loader={false}
+                  />
+                </div>
+                <div
+                  style="border-bottom: 1px solid var(--bg-ds-surface-100); margin: 8px 0 0 0;"
+                ></div>
+              {/if}
               <div
                 class="p-2 d-flex align-items-center justify-content-between"
                 style="z-index: 4;"
