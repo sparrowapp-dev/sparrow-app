@@ -1,4 +1,4 @@
-import { Sleep } from "@sparrow/common/utils";
+import { Sleep, throttle as Throttle } from "@sparrow/common/utils";
 import { listen } from "@tauri-apps/api/event";
 import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
 import { getCurrentWindow } from "@tauri-apps/api/window";
@@ -195,12 +195,20 @@ export class AppViewModel {
 
   private workspaceSwitcher = async (id: string) => {
     if (!id) return;
-    const res = await this.workspaceRepository.readWorkspace(id);
+    let res = await this.workspaceRepository.readWorkspace(id);
     if (!res) {
-      console.error("workspace doesn't exist to switch!");
-      return;
+      const userId = getClientUser().id;
+      if(userId){
+        await Promise.all([
+              this.refreshTeams(userId),
+              this.refreshWorkspaces(userId),
+            ]);
+      }
+      await new Sleep().setTime(1000).exec();
+      res = await this.workspaceRepository.readWorkspace(id);
     }
     const initWorkspaceTab = new WorkspaceTabAdapter().adapt(id, res);
+    await new Sleep().setTime(1000).exec();
     await this.tabRepository.createTab(initWorkspaceTab, id);
     await this.workspaceRepository.setActiveWorkspace(id);
     navigate("collections");
@@ -314,6 +322,20 @@ export class AppViewModel {
     return res;
   };
 
+  private queue: Promise<void> = Promise.resolve();
+
+  private enqueue = (url: string, handler: (url: string) => Promise<void>) => {
+    // Chain the promises sequentially
+      this.queue = this.queue.then(() => handler(url)).catch((e) => {
+        console.error('Error processing deep link:', e);
+      });
+
+      return this.queue;
+  }
+
+  private  handleIncomingDeepLink = (url: string)  => {
+    this.enqueue(url, (link) => this.processDeepLink(link));
+  }
 
   private async processDeepLink(url: string): Promise<void> {
     try {
@@ -359,13 +381,6 @@ export class AppViewModel {
             }else{
               // same account logged in on desktop and web
                if (workspaceId) {
-                  const userId = getClientUser().id;
-                  if(userId){
-                    await Promise.all([
-                          this.refreshTeams(userId),
-                          this.refreshWorkspaces(userId),
-                        ]);
-                  }
                   await this.workspaceSwitcher(workspaceId as string);
                 }
                 return;
@@ -397,19 +412,21 @@ export class AppViewModel {
     }
   }
 
+  private throttleHandleIncomingDeepLink = new Throttle(this.handleIncomingDeepLink as any, 1000);
+
   // Private platform-specific handlers
   private deepLinkHandlerWindows = async (
     deepLinkUrl: DeepLinkHandlerWindowsPayload,
   ): Promise<void> => {
     const url = deepLinkUrl.payload.url;
     if (url) {
-      await this.processDeepLink(url);
+      await this.throttleHandleIncomingDeepLink(url);
     }
   };
 
   private deepLinkHandlerMacOs = async (deepLinkUrl: string): Promise<void> => {
     if (deepLinkUrl) {
-      await this.processDeepLink(deepLinkUrl[0]);
+      await this.throttleHandleIncomingDeepLink(deepLinkUrl[0]);
     }
   };
 
