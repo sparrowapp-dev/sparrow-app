@@ -347,8 +347,14 @@ export class AppViewModel {
       const tokens = getAuthJwt();
 
        const guestUser = await this.guestUserRepository.findOne({
-      name: "guestUser",
-    });
+          name: "guestUser",
+        });
+          // Get current policy settings
+      let policySettings: any;
+      policyConfig.subscribe(value => {
+        policySettings = value;
+      })();
+
       const isGuestUser = guestUser?.getLatest()?.toMutableJSON()?.isGuestUser;
       if (isGuestUser) {
         // 1. desktop app status guest
@@ -397,10 +403,15 @@ export class AppViewModel {
               return;
         }else if(currentUserAccessToken){
            // login successful
-           await this.handleAccountLogin(url);
-            if (workspaceId) {
-              await new Sleep().setTime(4000).exec();
-              await this.workspaceSwitcher(workspaceId as string);
+            if (policySettings.enableLogin) {
+              await this.handleAccountLogin(url);
+               if (workspaceId) {
+                   await new Sleep().setTime(4000).exec();
+                   await this.workspaceSwitcher(workspaceId as string);
+               }
+            }
+            else{
+                console.error("Sign-in has been disabled by organization policy");
             }
             return;
         }
