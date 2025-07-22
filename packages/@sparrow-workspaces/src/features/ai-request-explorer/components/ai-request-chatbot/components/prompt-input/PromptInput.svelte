@@ -68,22 +68,6 @@
     textAreaInput.style.height = textAreaInput.scrollHeight + "px"; // Expand based on content
   }
 
-  // function setEnvironmentVariables(text: string, environmentVariables) {
-  //   let updatedText = text;
-
-  //   if (!Array.isArray(environmentVariables)) {
-  //     console.warn("Invalid environmentVariables:", environmentVariables);
-  //     return text; // return original text if not valid
-  //   }
-
-  //   environmentVariables.forEach((element) => {
-  //     const regex = new RegExp(`{{${element.key}}}`, "g");
-  //     updatedText = updatedText.replace(regex, element.value);
-  //   });
-
-  //   return updatedText;
-  // }
-
   const hanldeStartGenerating = async () => {
     if (!prompt.trim()) return;
 
@@ -389,7 +373,6 @@
               onStopGeneratingAIResponse();
               return;
             }
-            console.log("prompt: ", prompt);
             if (!isResponseGenerating && prompt.trim()) {
               hanldeStartGenerating();
               return;

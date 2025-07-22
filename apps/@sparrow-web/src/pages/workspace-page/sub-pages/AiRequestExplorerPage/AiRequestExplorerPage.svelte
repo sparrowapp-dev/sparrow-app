@@ -204,7 +204,7 @@
   bind:collectionAuth={_viewModel.collectionAuth}
   bind:userRole
   {collection}
-  environmentVariables={[]}
+  {environmentVariables}
   {isGuestUser}
   isWebApp={true}
   storeData={AiRequestExplorerData}
@@ -238,5 +238,4 @@
   onGenerateAiPrompt={_viewModel.generateAiPrompt}
   onHandleInsertPrompt={_viewModel.handleInsertAiPrompt}
   onUploadFiles={_viewModel.handleUploadFilesToCloud}
-  onSetEnviromentVariables={_viewModel.setEnvironmentVariables}
 />

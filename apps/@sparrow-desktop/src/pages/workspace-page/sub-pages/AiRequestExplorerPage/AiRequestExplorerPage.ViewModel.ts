@@ -2417,7 +2417,6 @@ class AiRequestExplorerViewModel {
       ? currConfigurations[modelProvider].jsonResponseFormat || false
       : false;
 
-    // const variables = componentData.property.aiRequest.variables;
     let prompt = this.setEnvironmentVariables(_prompt, environments.filtered);
     
     let finalSP = null;

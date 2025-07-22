@@ -79,11 +79,6 @@
       if (response.successStatus) {
         aiPromptQueryResponse = response.aiGeneratedPrompt;
         isSparrowAiLimitReached = false;
-        const matches =
-          response.aiGeneratedPrompt.match(/\{\{\s*(.*?)\s*\}\}/g) || [];
-        templatePlaceholders = matches.map((p) =>
-          p.replace(/[{}]/g, "").trim(),
-        );
       } else if (response.isLimitReached) {
         isSparrowAiLimitReached = true;
       } else {
