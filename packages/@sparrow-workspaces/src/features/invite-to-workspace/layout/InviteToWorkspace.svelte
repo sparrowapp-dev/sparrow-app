@@ -154,6 +154,7 @@
       return true;
     })}
     id={"input-select2"}
+    currentWorkspaceUsers={currentWorkspaceDetails.users}
     onChange={(items) => {
       emailstoBeSentArr = items;
       clearErrors();
