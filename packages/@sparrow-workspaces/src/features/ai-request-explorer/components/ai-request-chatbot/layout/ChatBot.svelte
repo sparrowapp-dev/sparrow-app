@@ -37,6 +37,7 @@
   export let activateGeneratePromptModal;
   export let isGuestUser: boolean;
   export let onUploadFiles;
+  export let onSetEnviromentVariables;
 
   let scrollList: ScrollList;
 
@@ -145,6 +146,7 @@
       bind:isConversationHistoryLoading
       {activateGeneratePromptModal}
       {onUploadFiles}
+      {onSetEnviromentVariables}
     />
   </div>
 {/if}

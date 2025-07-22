@@ -385,6 +385,19 @@ export class AiAssistantWebSocketService {
     }
   };
 
+  public setEnvironmentVariables = (
+    text: string,
+    environmentVariables,
+  ): string => {
+    let updatedText = text;
+    environmentVariables.forEach((element) => {
+      const regex = new RegExp(`{{(${element.key})}}`, "g");
+      updatedText = updatedText.replace(regex, element.value);
+    });
+
+    return updatedText;
+  };
+
   public prepareConversation = (
     modelProvider: AiModelProviderEnum,
     userPrompt: string,

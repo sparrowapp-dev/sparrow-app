@@ -2405,6 +2405,7 @@ class AiRequestExplorerViewModel {
   ) => {
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
+
     const tabId = componentData.tabId;
 
     // **IMPROTANT** ToDo: Create a utility class to decode the AI request similar to rest requests.
@@ -2423,13 +2424,30 @@ class AiRequestExplorerViewModel {
     const isJsonFormatEnabed = isJsonFormatConfigAvailable
       ? currConfigurations[modelProvider].jsonResponseFormat || false
       : false;
+    
+    // const variables = componentData.property.aiRequest.variables;
+    
+    let environmentVariables = {
+      filtered: [
+        { key: "API_KEY", value: "123456", type: "G", environment: "Global" },
+        {
+          key: "BASE_URL",
+          value: "https://api.example.com",
+          type: "G",
+          environment: "Global",
+        },
+      ],
+      global: { name: "Global", type: "GLOBAL" },
+    };
 
-    let finalSP = null;
-    if (systemPrompt.length) {
-      const SPDatas = JSON.parse(systemPrompt);
-      if (SPDatas.length)
-        finalSP = SPDatas.map((obj) => obj.data.text).join("");
-    }
+    const finalSP = this.aiAssistentWebSocketService.setEnvironmentVariables(systemPrompt, environmentVariables.filtered)
+
+    // let finalSP = null;
+    // if (systemPrompt.length) {
+    //   const SPDatas = JSON.parse(systemPrompt);
+    //   if (SPDatas.length)
+    //     finalSP = SPDatas.map((obj) => obj.data.text).join("");
+    // }
 
     if (isJsonFormatEnabed) prompt = `${prompt} (Give Response In JSON Format)`;
 
@@ -2859,10 +2877,10 @@ class AiRequestExplorerViewModel {
       await this.updateUserPrompt(response);
     } else if (target === "SystemPrompt") {
       await this.updateRequestState({ isSaveDescriptionInProgress: true });
-      const formatter = new MarkdownFormatter();
-      const formattedData = await formatter.FormatData(response);
-      const stringifyData = JSON.stringify(formattedData.blocks);
-      await this.updateAiSystemPrompt(stringifyData);
+      // const formatter = new MarkdownFormatter();
+      // const formattedData = await formatter.FormatData(response);
+      // const stringifyData = JSON.stringify(formattedData.blocks);
+      await this.updateAiSystemPrompt(response);
       await this.updateRequestState({ isSaveDescriptionInProgress: false });
     }
     return response;
