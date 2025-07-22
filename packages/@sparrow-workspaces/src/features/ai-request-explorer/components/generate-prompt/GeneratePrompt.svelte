@@ -17,13 +17,7 @@
     response: string,
   ) => Promise<void>;
   const theme = new PromptInputTheme().build();
-  export let environmentVariables = {
-    filtered: [
-      { key: "API_KEY", value: "123456", type: "G", environment: "Global" },
-      { key: "BASE_URL", value: "https://api.example.com", type: "G", environment: "Global" },
-    ],
-    global: { name: "Global", type: "GLOBAL" },
-  };
+  export let environmentVariables;
 
   export let onUpdateEnvironment = () => {};
 
@@ -68,19 +62,6 @@
     dispatch("close");
   };
 
-  const setEnvironmentVariables = (
-      text: string,
-      environmentVariables,
-    ): string => {
-      let updatedText = text;
-      environmentVariables.forEach((element) => {
-        const regex = new RegExp(`{{(${element.key})}}`, "g");
-        updatedText = updatedText.replace(regex, element.value);
-      });
-
-      return updatedText;
-  };
-
   const handleGenerateResponse = async (): Promise<void> => {
     if (isUserPromptEmpty) return;
 
@@ -89,7 +70,7 @@
     errorMsgForGeneratePrompt = "";
 
     try {
-      const userprompt = setEnvironmentVariables(userPromptExpectation, environmentVariables.filtered)
+      const userprompt = userPromptExpectation;
       const response = await onGenerateAiPrompt(
         generatePromptTarget,
         userprompt,

@@ -249,6 +249,8 @@
                     isAutoPromptGenerationInProgress={$tab.property?.aiRequest
                       .state.isSaveDescriptionInProgress}
                     {isGuestUser}
+                    {environmentVariables}
+                    {onUpdateEnvironment}
                   />
                 {:else}
                   <div
@@ -359,6 +361,8 @@
             {onUpdateAiPrompt}
             {onUpdateAiConversation}
             {onUpdateRequestState}
+            {environmentVariables}
+            {onUpdateEnvironment}
             {onGenerateAiResponse}
             {onStopGeneratingAIResponse}
             {activateGeneratePromptModal}
@@ -446,6 +450,8 @@
       isGeneratePromptModalOpen = false;
       generatePromptTarget = "None";
     }}
+    {environmentVariables}
+    {onUpdateEnvironment}
     on:insert={(event) => {}}
   />
 </Modal>

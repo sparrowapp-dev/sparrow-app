@@ -11,13 +11,7 @@
   export let activateGeneratePromptModal;
   export let isAutoPromptGenerationInProgress = true;
   export let isGuestUser: boolean;
-  export let environmentVariables = {
-    filtered: [
-      { key: "API_KEY", value: "123456", type: "G", environment: "Global" },
-      { key: "BASE_URL", value: "https://api.example.com", type: "G", environment: "Global" },
-    ],
-    global: { name: "Global", type: "GLOBAL" },
-  };
+  export let environmentVariables;
   export let onUpdateEnvironment = () => {};
 
   const theme = new SystemPromptTheme().build();

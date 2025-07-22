@@ -38,22 +38,11 @@
   export let currentModel: AIModelVariant;
   export let filesToUpload: PromptFileAttachment[] = [];
   export let disabled: boolean = false;
-  export let onSetEnviromentVariables;
-  const theme = new UserPromptTheme().build();
-  export let environmentVariables = {
-    filtered: [
-      { key: "API_KEY", value: "123456", type: "G", environment: "Global" },
-      {
-        key: "BASE_URL",
-        value: "https://api.example.com",
-        type: "G",
-        environment: "Global",
-      },
-    ],
-    global: { name: "Global", type: "GLOBAL" },
-  };
 
-  export let onUpdateEnvironment = () => {};
+  const theme = new UserPromptTheme().build();
+  export let environmentVariables;
+
+  export let onUpdateEnvironment;
 
   // Props
 
@@ -101,13 +90,7 @@
     try {
       const uploadedFiles = await handleUploadFiles(); // Upload files if any
       setTimeout(adjustTextareaHeight, 0); // waiting for the DOM to update.
-      const debuggedprompt = await onSetEnviromentVariables(
-        prompt,
-        environmentVariables.filtered || [],
-      );
-      console.log("Debugger Prompt: ", debuggedprompt);
-      debugger;
-      await sendPrompt(debuggedprompt, uploadedFiles);
+      await sendPrompt(prompt, uploadedFiles);
       await onUpdateAiPrompt("");
       filesToUpload = [];
       MixpanelEvent(Events.AI_Initiate_Response);
