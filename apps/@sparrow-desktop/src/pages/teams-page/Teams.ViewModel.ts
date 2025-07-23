@@ -406,6 +406,11 @@ export class TeamsViewModel {
   };
 
   public getUserTrialExhaustedStatus = async (): Promise<boolean> => {
+    const response = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = response?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) return false;
     try {
       const email = getClientUser().email;
       const response =
