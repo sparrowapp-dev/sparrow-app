@@ -173,6 +173,7 @@
   storeData={restExplorerData}
   {environmentVariables}
   {isGuestUser}
+  isWebApp={true}
   {isLoginBannerActive}
   onSendRequest={_viewModel.sendRequest}
   onCancelRequest={_viewModel.cancelRequest}
