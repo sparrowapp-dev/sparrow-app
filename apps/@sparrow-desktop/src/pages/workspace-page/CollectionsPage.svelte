@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Route } from "svelte-navigator";
   import { Pane, Splitpanes } from "svelte-splitpanes";
-  import { userValidationStore } from "@app/store/deviceSync.store";
 
   // ---- Store
   import {
@@ -523,7 +522,6 @@
   let count = 0;
   let autoRefreshEnable: boolean = true;
   let refreshLoad: boolean = false;
-  let isAccessDeniedModalOpen = false;
   let isSyncReplaceModalOpen = false;
   let isSyncModalOpen = false;
   let isCollectionSyncing = false;
@@ -614,15 +612,6 @@
 
   let isInitialDataLoading = true;
 
-  const userValidationStoreSubscriber = userValidationStore.subscribe(
-    (validation) => {
-      if (!validation.isValid) {
-        isAccessDeniedModalOpen = true;
-        isWelcomePopupOpen = false;
-      }
-    },
-  );
-
   const currentWorkspaceSubscriber = currentWorkspace.subscribe(
     async (value) => {
       if (value) {
@@ -667,11 +656,6 @@
     },
   );
 
-  const handleAccessDeniedClose = () => {
-    isAccessDeniedModalOpen = false;
-    // Optionally reset the validation state
-    userValidationStore.set({ isValid: true, checked: false });
-  };
   $: {
     if (splitter && $leftPanelCollapse === true) {
       splitter.style.display = "none";
@@ -829,7 +813,6 @@
     userSubscriber();
     collectionListSubscriber.unsubscribe();
     isUserFirstSignUpSubscriber();
-    userValidationStoreSubscriber();
     environmentsSubscriber.unsubscribe();
   });
 </script>
@@ -1191,23 +1174,6 @@
   />
 </Modal>
 <WorkspaceTourGuide />
-{#if isAccessDeniedModalOpen}
-  <Modal
-    title="Access Denied"
-    type="dark"
-    width="50%"
-    zIndex={1000}
-    isOpen={isAccessDeniedModalOpen}
-    handleModalState={handleAccessDeniedClose}
-  >
-    <div class="py-4">
-      <p class=" mb-4">
-        You don't seem to have access to this resource. Please check if you are
-        using the right account.
-      </p>
-    </div>
-  </Modal>
-{/if}
 
 <svelte:window on:keydown={handleKeyPress} />
 

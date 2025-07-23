@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Route } from "svelte-navigator";
   import { Pane, Splitpanes } from "svelte-splitpanes";
-  import { userValidationStore } from "@app/store/deviceSync.store";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
   // ---- Store
   import {
@@ -544,7 +543,6 @@
   let autoRefreshEnable: boolean = true;
   let refreshLoad: boolean = false;
 
-  let isAccessDeniedModalOpen = false;
   let isSyncReplaceModalOpen = false;
   let isSyncModalOpen = false;
   let isCollectionSyncing = false;
@@ -602,15 +600,6 @@
 
   let isInitialDataLoading = true;
 
-  const userValidationStoreSubscriber = userValidationStore.subscribe(
-    (validation) => {
-      if (!validation.isValid) {
-        isAccessDeniedModalOpen = true;
-        isWelcomePopupOpen = false;
-      }
-    },
-  );
-
   const cw = currentWorkspace.subscribe(async (value) => {
     if (value) {
       if (prevWorkspaceId !== value._id) {
@@ -653,11 +642,6 @@
     }
   });
 
-  const handleAccessDeniedClose = () => {
-    isAccessDeniedModalOpen = false;
-    // Optionally reset the validation state
-    userValidationStore.set({ isValid: true, checked: false });
-  };
   $: {
     if (splitter && $leftPanelCollapse === true) {
       splitter.style.display = "none";
@@ -681,7 +665,6 @@
 
   onDestroy(() => {
     cw.unsubscribe();
-    userValidationStoreSubscriber();
     environmentSubscriber.unsubscribe();
     currentWorkspaceSubscriber.unsubscribe();
     isGuestUserSubscriber();
@@ -1256,23 +1239,6 @@
   />
 </Modal>
 <WorkspaceTourGuide />
-{#if isAccessDeniedModalOpen}
-  <Modal
-    title="Access Denied"
-    type="dark"
-    width="50%"
-    zIndex={1000}
-    isOpen={isAccessDeniedModalOpen}
-    handleModalState={handleAccessDeniedClose}
-  >
-    <div class="py-4">
-      <p class=" mb-4">
-        You don't seem to have access to this resource. Please check if you are
-        using the right account.
-      </p>
-    </div>
-  </Modal>
-{/if}
 
 <svelte:window on:keydown={handleKeyPress} />
 
@@ -1335,7 +1301,6 @@
       }
       return response;
     }}
-    
     onImportPostmanCollection={async (
       currentWorkspaceId,
       postmanCollectionJson,
@@ -1351,7 +1316,6 @@
       }
       return response;
     }}
-
     onImportCollectionURL={async (
       currentWorkspaceId,
       requestBody,

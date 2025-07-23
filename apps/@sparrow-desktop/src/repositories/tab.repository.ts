@@ -45,7 +45,8 @@ export class TabRepository {
       workspaceId = activeWorkspace.toMutableJSON()._id;
     }
 
-    const _tab = await this.rxdb
+    const _tab = await RxDB.getInstance()
+        .rxdb.tab
       ?.findOne({
         selector: {
           "path.workspaceId": workspaceId,
@@ -58,7 +59,8 @@ export class TabRepository {
       return;
     }
 
-    const activeTab = await this.rxdb
+    const activeTab = await RxDB.getInstance()
+        .rxdb.tab
       ?.findOne({
         selector: {
           "path.workspaceId": workspaceId,
@@ -70,7 +72,8 @@ export class TabRepository {
       await activeTab.incrementalUpdate({ $set: { isActive: false } });
     }
     const lastIndex = (
-      await this.rxdb
+      await RxDB.getInstance()
+        .rxdb.tab
         ?.find({
           selector: {
             "path.workspaceId": workspaceId,
@@ -80,7 +83,8 @@ export class TabRepository {
     )?.length;
     tab.index = lastIndex;
     if (tab.persistence === TabPersistenceTypeEnum.TEMPORARY) {
-      const tempTab = await this.rxdb
+      const tempTab = await RxDB.getInstance()
+        .rxdb.tab
         ?.findOne({
           selector: {
             "path.workspaceId": workspaceId,
@@ -95,7 +99,8 @@ export class TabRepository {
         tab.index = tempTabIndex; // Assign the same index to the new tab
       }
     }
-    await this.rxdb?.insert(tab);
+    await RxDB.getInstance()
+        .rxdb.tab?.insert(tab);
   };
 
   /**
@@ -219,7 +224,8 @@ export class TabRepository {
     updatedDocs.push({ ...deselectedTab.toMutableJSON(), isActive: false });
   }
 
-  await this.rxdb.bulkUpsert(updatedDocs);
+  await RxDB.getInstance()
+      .rxdb.tab.bulkUpsert(updatedDocs);
   return selectedTab;
 };
 

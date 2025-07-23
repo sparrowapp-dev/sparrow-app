@@ -31,13 +31,10 @@
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import { leftIconIcon } from "@sparrow/library/assets";
   import { jwtDecode } from "@app/utils/jwt";
-  import { handleLoginV2 } from "./sub-pages/login-page/login-page";
   import * as Sentry from "@sentry/svelte";
   import { identifyUser } from "@app/utils/posthog/posthogConfig";
   import { policyConfig } from "@sparrow/common/store";
 
-  let isEntry = false;
-  let isHover = false;
   let externalSparrowLink =
     `${constants.SPARROW_AUTH_URL}` + "/init?source=desktop";
   let externalHelpLink = `${constants.SPARROW_AUTH_URL}` + "/support";
@@ -46,9 +43,7 @@
   const openDefaultBrowser = async () => {
     await open(externalSparrowLink);
   };
-  const handleRedirect = (value: boolean) => {
-    isEntry = value;
-  };
+
   let os = "";
   onMount(async () => {
     os = await platform();
@@ -57,7 +52,7 @@
       navigationPath = value;
     });
     if (navigationPath === "guestUser") {
-      isEntry = true;
+      isTokenFormEnabled = true;
       navigationState.set("");
     }
   });
@@ -137,7 +132,6 @@
               ? 'shadow-pressed'
               : 'shadow-none'}"
             on:click={() => {
-              handleRedirect(true);
               openDefaultBrowser();
               isTokenFormEnabled = true;
             }}
@@ -240,7 +234,7 @@
                 },
               });
               isTokenErrorMessage = false;
-              handleLoginV2(token);
+              _viewModel.handleAccountLogin(token);
             } catch (e) {
               isTokenErrorMessage = true;
             } finally {
