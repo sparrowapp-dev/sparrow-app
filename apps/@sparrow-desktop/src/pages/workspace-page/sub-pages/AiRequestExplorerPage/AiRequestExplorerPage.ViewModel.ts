@@ -19,6 +19,7 @@ import type {
   TabDocument,
   WorkspaceDocument,
   CollectionDocument,
+  EnvironmentDocument,
 } from "../../../../database/database";
 import type { CreateDirectoryPostBody } from "@sparrow/common/dto";
 
@@ -84,7 +85,7 @@ import {
   startLoading,
   stopLoading,
 } from "../../../../../../../packages/@sparrow-common/src/store";
-import { Events, ItemType } from "@sparrow/common/enums";
+import { environmentType, Events, ItemType } from "@sparrow/common/enums";
 import { CollectionService } from "../../../../services/collection.service";
 import { CompareArray, Debounce } from "@sparrow/common/utils";
 import {
@@ -107,6 +108,7 @@ import type {
   AiRequestCollectionLevelAuthProfileTabInterface,
   AiRequestCollectionLevelAuthTabInterface,
 } from "@sparrow/common/types/workspace/ai-request-base";
+import type { ENVDocumentType, ENVExtractVariableType } from "@sparrow/common/types/workspace/environment";
 
 class AiRequestExplorerViewModel {
   // Repository
@@ -2392,11 +2394,12 @@ class AiRequestExplorerViewModel {
    * @param Prompt - Prompt from the user
    */
   public generateAIResponseWS = async (
-    prompt = "",
+    _prompt = "",
     fileAttachments: PromptFileAttachment[],
   ) => {
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
+    const environments = await this.getActiveEnvironments(componentData?.path?.workspaceId);
     const tabId = componentData.tabId;
     const modelProvider = componentData.property.aiRequest.aiModelProvider;
     const modelVariant = componentData.property.aiRequest.aiModelVariant;
@@ -2414,9 +2417,12 @@ class AiRequestExplorerViewModel {
       ? currConfigurations[modelProvider].jsonResponseFormat || false
       : false;
 
+    let prompt = this.setEnvironmentVariables(_prompt, environments.filtered);
+    
     let finalSP = null;
     if (systemPrompt.length) {
-      const SPDatas = JSON.parse(systemPrompt);
+      const systemPromptWithVariables = this.setEnvironmentVariables(systemPrompt, environments.filtered)
+      const SPDatas = JSON.parse(systemPromptWithVariables);
       if (SPDatas.length)
         finalSP = SPDatas.map((obj) => obj.data.text).join("");
     }
@@ -2779,9 +2785,86 @@ class AiRequestExplorerViewModel {
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
 
+    private getActiveEnvironments = async (currentWorkspaceId: string) => {
+      let environmentId: string;
+      const activeWorkspace =
+        await this.workspaceRepository.getActiveWorkspaceDoc();
+  
+      if (activeWorkspace) {
+        currentWorkspaceId = activeWorkspace.get("_id");
+        environmentId = activeWorkspace.get("environmentId");
+      }
+  
+      const environments = await this.environmentRepository.getEnvironment();
+      let environmentDocuments: EnvironmentDocument[] = [];
+  
+      environments.subscribe((value) => {
+        if (value) {
+          environmentDocuments = value;
+        }
+      });
+  
+      let environmentVariables: {
+        filtered: ENVExtractVariableType[];
+      } = {
+        filtered: [],
+      };
+  
+      if (environmentDocuments && currentWorkspaceId) {
+        if (environmentDocuments?.length > 0) {
+          const filteredEnv = environmentDocuments
+            .filter((elem) => {
+              return elem.workspaceId === currentWorkspaceId;
+            })
+            .filter((elem) => {
+              if (
+                elem.type === environmentType.GLOBAL ||
+                elem.id === environmentId
+              ) {
+                return true;
+              }
+            });
+          if (filteredEnv?.length > 0) {
+            const envs: ENVExtractVariableType[] = [];
+            filteredEnv.forEach((elem) => {
+              environmentVariables = {
+                filtered: [],
+              };
+  
+              const temp = elem.toMutableJSON() as ENVDocumentType;
+              temp.variable.forEach((variable) => {
+                if (variable.key && variable.checked) {
+                  envs.unshift({
+                    key: variable.key,
+                    value: variable.value,
+                    type: temp.type === environmentType.GLOBAL ? "G" : "E",
+                    environment: temp.name,
+                  });
+                }
+              });
+              environmentVariables.filtered = envs;
+            });
+          }
+        }
+      }
+      return environmentVariables;
+    };
+
+  private setEnvironmentVariables = (
+    text: string,
+    environmentVariables,
+  ): string => {
+    let updatedText = text;
+    environmentVariables.forEach((element) => {
+      const regex = new RegExp(`{{(${element.key})}}`, "g");
+      updatedText = updatedText.replace(regex, element.value);
+    });
+    return updatedText;
+  };
+
   public generateAiPrompt = async (
     target: "UserPrompt" | "SystemPrompt",
-    prompt = "",
+    _prompt = "",
   ): Promise<{
     successStatus: boolean;
     message: string;
@@ -2791,8 +2874,11 @@ class AiRequestExplorerViewModel {
   }> => {
     const componentData = this._tab.getValue();
     let workspaceId = componentData.path.workspaceId;
+    const environments = await this.getActiveEnvironments(workspaceId)
+    const prompt = this.setEnvironmentVariables(_prompt, environments.filtered);
     let workspaceVal = await this.readWorkspace(workspaceId);
     let teamId = workspaceVal.team?.teamId;
+
     const response = await this.aiAssistentService.generateUserOrSystemPrompts({
       userInput: prompt,
       emailId: getClientUser().email,

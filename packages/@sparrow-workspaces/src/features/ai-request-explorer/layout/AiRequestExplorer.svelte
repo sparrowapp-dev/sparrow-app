@@ -248,6 +248,8 @@
                     isAutoPromptGenerationInProgress={$tab.property?.aiRequest
                       .state.isSaveDescriptionInProgress}
                     {isGuestUser}
+                    {environmentVariables}
+                    {onUpdateEnvironment}
                   />
                 {:else}
                   <div
@@ -276,7 +278,7 @@
                       .aiAuthNavigation}
                     auth={$tab.property?.aiRequest.auth}
                     requestStateAuthProfile={$tab.property.aiRequest.state
-                        .selectedRequestAuthProfileId}
+                      .selectedRequestAuthProfileId}
                     selectedModelProvider={$tab.property?.aiRequest
                       ?.aiModelProvider}
                     collectionAuth={$collectionAuth}
@@ -358,6 +360,8 @@
             {onUpdateAiPrompt}
             {onUpdateAiConversation}
             {onUpdateRequestState}
+            {environmentVariables}
+            {onUpdateEnvironment}
             {onGenerateAiResponse}
             {onStopGeneratingAIResponse}
             {activateGeneratePromptModal}
@@ -444,6 +448,8 @@
       isGeneratePromptModalOpen = false;
       generatePromptTarget = "None";
     }}
+    {environmentVariables}
+    {onUpdateEnvironment}
     on:insert={(event) => {}}
   />
 </Modal>

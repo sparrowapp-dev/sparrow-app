@@ -2,6 +2,8 @@
   import { Alert, Button, notifications } from "@sparrow/library/ui";
   import { Textarea } from "@sparrow/library/forms";
   import { createEventDispatcher } from "svelte";
+  import { PromptInputTheme } from "../../../../utils/";
+  import { CodeMirrorInput } from "../../../../components";
 
   // Props
   export let generatePromptTarget: "UserPrompt" | "SystemPrompt" | "None" =
@@ -14,6 +16,10 @@
     target: string,
     response: string,
   ) => Promise<void>;
+  const theme = new PromptInputTheme().build();
+  export let environmentVariables;
+
+  export let onUpdateEnvironment = () => {};
 
   // Event dispatcher for parent communication
   const dispatch = createEventDispatcher<{
@@ -29,6 +35,7 @@
   let isSparrowAiLimitReached = false;
   let isErrorWhileGeneratePrompt = false;
   let errorMsgForGeneratePrompt = "";
+  let templatePlaceholders: string[] = [];
 
   // Computed properties
   $: isUserPromptEmpty = !userPromptExpectation.trim().length;
@@ -47,6 +54,7 @@
     isSparrowAiLimitReached = false;
     isErrorWhileGeneratePrompt = false;
     errorMsgForGeneratePrompt = "";
+    let templatePlaceholders: string[] = [];
   };
 
   const handleCancel = (): void => {
@@ -62,9 +70,10 @@
     errorMsgForGeneratePrompt = "";
 
     try {
+      const userprompt = userPromptExpectation;
       const response = await onGenerateAiPrompt(
         generatePromptTarget,
-        userPromptExpectation,
+        userprompt,
       );
 
       if (response.successStatus) {
@@ -151,7 +160,16 @@
       >
         Your Message
       </label>
-      <Textarea
+      <CodeMirrorInput
+        value={userPromptExpectation}
+        onUpdateInput={(val) => (userPromptExpectation = val)}
+        placeholder="Describe your task..."
+        {theme}
+        {environmentVariables}
+        {onUpdateEnvironment}
+        isFocusedOnMount={false}
+      />
+      <!-- <Textarea
         id="user-prompt-textarea"
         bind:value={userPromptExpectation}
         placeholder="Describe your task..."
@@ -164,7 +182,7 @@
         disabled={isAnyActionInProgress}
         maxlength={1000}
         placeholderColor="var(--text-secondary-200)"
-      />
+      /> -->
     </div>
   </div>
 
@@ -178,7 +196,16 @@
       >
         Generated Response
       </label>
-      <Textarea
+      <CodeMirrorInput
+        value={aiPromptQueryResponse}
+        onUpdateInput={(val) => (aiPromptQueryResponse = val)}
+        placeholder="Your response will be generated here"
+        {theme}
+        {environmentVariables}
+        {onUpdateEnvironment}
+        disabled={isAnyActionInProgress}
+      />
+      <!-- <Textarea
         id="ai-response-textarea"
         bind:value={aiPromptQueryResponse}
         placeholder="Your response will be generated here"
@@ -191,7 +218,7 @@
         disabled={isAnyActionInProgress}
         maxlength={1000}
         placeholderColor="var(--text-secondary-200)"
-      />
+      /> -->
     </div>
   </div>
 </div>
@@ -208,6 +235,55 @@
       closeIconRequired={false}
       onClickClose={() => {}}
     />
+  </div>
+{/if}
+
+<!--If Variables are present -->
+{#if templatePlaceholders.length > 0}
+  <div class="mb-4">
+    <label
+      class="form-label mb-2 text-ds-font-size-12 text-ds-font-weight-semi-bold"
+      style="color: var(--text-ds-neutral-200);"
+      for="ai-response-textarea"
+    >
+      Variables
+    </label>
+
+    <div>
+      <p
+        class="form-label mb-2 text-ds-font-size-12 text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-surface-50);"
+      >
+        Variables are placeholder values that make your prompt flexible and
+        reusable. Variables in Workbench are enclosed in double brackets like
+        so: &#123;&#123;VARIABLE_NAME&#125;&#125;. The prompt above has the
+        following variables:
+      </p>
+
+      <!-- Render variables in styled boxes -->
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        {#each templatePlaceholders as variable}
+          <div
+            style="
+              height: 20px;
+              max-width: 188px;
+              border-radius: 2px;
+              border: 1px solid var(--Cyan-700, hsla(197, 48%, 25%, 1));
+              background-color: var(--Cyan-900, hsla(191, 41%, 10%, 1));
+              color: var(--Cyan-300, hsla(197, 80%, 65%, 1));
+              padding: 0 5px;
+              font-size: 12px;
+              line-height: 20px;
+              display: flex;
+              align-items: center;
+              white-space: nowrap;
+            "
+          >
+            {variable}
+          </div>
+        {/each}
+      </div>
+    </div>
   </div>
 {/if}
 

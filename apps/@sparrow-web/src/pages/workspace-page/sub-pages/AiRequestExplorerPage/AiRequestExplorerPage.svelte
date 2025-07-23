@@ -204,7 +204,7 @@
   bind:collectionAuth={_viewModel.collectionAuth}
   bind:userRole
   {collection}
-  environmentVariables={[]}
+  {environmentVariables}
   {isGuestUser}
   isWebApp={true}
   storeData={AiRequestExplorerData}
