@@ -406,7 +406,7 @@
     handleInvitePopup={(flag = false) => {
       isWorkspaceInviteModalOpen = flag;
     }}
-    currentWorkspaceDetails={currentWorkspace}
+    currentWorkspaceDetails={workspaceDetails}
     users={currentTeam?.users}
     teamName={currentTeam?.name}
     plan={currentTeam?.plan}

@@ -51,38 +51,76 @@
   const defaultRole: string = "select";
   let loader: boolean = false;
   let emailstoBeSentArr: string[] = [];
-  let showErrors: boolean = false;
   let selectedRole: string = defaultRole;
   let invalidEmails: string[] = [];
+  let errors = {
+    emailsEmpty: false,
+    roleInvalid: false,
+    userConflict: "",
+  };
+
+  const clearErrors = () => {
+    errors = {
+      emailsEmpty: false,
+      roleInvalid: false,
+      userConflict: "",
+    };
+  };
 
   /**
    * Handles the invite action. Sends the invite to the specified emails with the selected role.
    */
   const handleInvite = async () => {
     loader = true;
-    showErrors = true;
+    clearErrors();
+    if (emailstoBeSentArr.length === 0) {
+      errors.emailsEmpty = true;
+      loader = false;
+      return;
+    }
+    const isValid = filterWorkspaceInviteEmails(emailstoBeSentArr);
+    if (!isValid) {
+      loader = false;
+      return;
+    }
+    if (selectedRole === defaultRole) {
+      errors.roleInvalid = true;
+      loader = false;
+      return;
+    }
     const data: addUsersInWorkspacePayload = {
       users: emailstoBeSentArr,
       role: selectedRole,
     };
-    if (
-      emailstoBeSentArr &&
-      emailstoBeSentArr.length > 0 &&
-      !invalidEmails.length &&
-      selectedRole &&
-      selectedRole != defaultRole
-    ) {
-      const response = await onInviteUserToWorkspace(
-        currentWorkspaceDetails.id,
-        currentWorkspaceDetails.name,
-        data,
-        emailstoBeSentArr?.length,
-      );
-      if (response.isSuccessful) {
-        handleInvitePopup(false);
-      }
+    const response = await onInviteUserToWorkspace(
+      currentWorkspaceDetails.id,
+      currentWorkspaceDetails.name,
+      data,
+      emailstoBeSentArr.length,
+    );
+    if (response.isSuccessful) {
+      handleInvitePopup(false);
     }
     loader = false;
+  };
+
+  const filterWorkspaceInviteEmails = (sentEmails: string[]) => {
+    const existingUserEmails = users.map((u: any) => u.email);
+    const matchingEmails = sentEmails.filter((email) =>
+      existingUserEmails.includes(email),
+    );
+    if (matchingEmails.length !== sentEmails.length) {
+      errors.userConflict = "Please check and enter correct email address.";
+      return false;
+    }
+    const alreadyInWorkspace = currentWorkspaceDetails.users.some((user) =>
+      matchingEmails.includes(user.email),
+    );
+    if (alreadyInWorkspace) {
+      errors.userConflict = "User already exists in workspace.";
+      return false;
+    }
+    return true;
   };
 
   /**
@@ -91,6 +129,7 @@
    */
   const handleDropdown = (role: string) => {
     selectedRole = role as WorkspaceRole;
+    if (role !== defaultRole) errors.roleInvalid = false;
   };
 </script>
 
@@ -115,13 +154,18 @@
       return true;
     })}
     id={"input-select2"}
+    currentWorkspaceUsers={currentWorkspaceDetails.users}
     onChange={(items) => {
       emailstoBeSentArr = items;
+      clearErrors();
+      filterWorkspaceInviteEmails(emailstoBeSentArr);
     }}
-    isError={showErrors && emailstoBeSentArr.length === 0}
+    isError={errors.emailsEmpty || !!errors.userConflict}
   />
-  {#if showErrors && emailstoBeSentArr.length === 0}
+  {#if errors.emailsEmpty}
     <p class="error-text mb-0 sparrow-fs-12">Email ID cannot be empty.</p>
+  {:else if errors.userConflict}
+    <p class="error-text mb-0 sparrow-fs-12">{errors.userConflict}</p>
   {/if}
 </div>
 <div class="mt-4">
@@ -159,11 +203,11 @@
     borderRounded={"4px"}
     headerFontWeight={400}
     headerFontSize={"12px"}
-    isError={showErrors && selectedRole === defaultRole}
+    isError={errors.roleInvalid}
     minHeaderWidth={"100%"}
     size={"medium"}
   />
-  {#if showErrors && selectedRole === defaultRole}
+  {#if errors.roleInvalid}
     <p class="error-text sparrow-fs-12">Role cannot be empty.</p>
   {/if}
 </div>
