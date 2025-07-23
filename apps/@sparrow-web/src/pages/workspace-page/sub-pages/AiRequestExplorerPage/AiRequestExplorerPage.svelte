@@ -213,6 +213,7 @@
   onUpdateRequestAuth={_viewModel.updateRequestAuth}
   onUpdateRequestState={_viewModel.updateRequestState}
   onUpdateAiSystemPrompt={_viewModel.updateAiSystemPrompt}
+  onUpdateAiRequestVariables={_viewModel.updateAiRequestVariables}
   onUpdateEnvironment={_viewModel.updateEnvironment}
   onUpdateAiPrompt={_viewModel.updateRequestAIPrompt}
   onUpdateAiConversation={_viewModel.updateRequestAIConversation}

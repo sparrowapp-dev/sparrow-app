@@ -35,6 +35,11 @@ export enum AiRequestAddToDtoEnum {
   QUERY = "QUERY",
 }
 
+export interface AiRequestVariablesDtoInterface {
+  key: string;
+  value: string;
+}
+
 export interface AiRequestMetaDataDtoInterface {
   aiModelProvider?: AiModelProviderEnum;
   aiModelVariant?: AIModelVariant;
