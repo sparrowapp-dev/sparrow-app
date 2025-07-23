@@ -51,6 +51,7 @@ import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
 import { RecentWorkspaceRepository } from "@app/repositories/recent-workspace.repository";
 import { PlanRepository } from "@app/repositories/plan.repository";
 import { PlanService } from "@app/services/plan.service";
+import { clearThrottleStore } from "@sparrow/common/store";
 
 export class DashboardViewModel {
   constructor() {}
@@ -359,10 +360,9 @@ export class DashboardViewModel {
   public clearLocalDB = async (): Promise<void> => {
     setUser(null);
     isGuestUserActive.set(false);
-    await this.tabRepository.clearTabs();
-    await this.guestUserRepository.clearTabs();
     await RxDB.getInstance().destroyDb();
     await RxDB.getInstance().getDb();
+    clearThrottleStore();
     clearAuthJwt();
   };
 
@@ -379,9 +379,9 @@ export class DashboardViewModel {
 
   public clientLogout = async (): Promise<void> => {
     setUser(null);
-    await this.tabRepository.clearTabs();
     await RxDB.getInstance().destroyDb();
     await RxDB.getInstance().getDb();
+    clearThrottleStore();
     clearAuthJwt();
   };
 

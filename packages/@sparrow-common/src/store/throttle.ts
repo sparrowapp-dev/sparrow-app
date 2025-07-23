@@ -22,3 +22,11 @@ export function shouldRunThrottled(id: string, throttleMs = 10000): boolean {
 
   return false;
 }
+
+/**
+ * Clears all throttled entries from the store.
+ */
+export function clearThrottleStore() {
+  throttleMap.clear();
+  throttleStore.set(new Map());
+}
