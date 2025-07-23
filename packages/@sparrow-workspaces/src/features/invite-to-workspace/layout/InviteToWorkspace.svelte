@@ -212,11 +212,10 @@
   {/if}
 </div>
 <div class="text-secondary-200 mt-2 sparrow-fs-12">
-  Note: You can invite only hub members to this workspace. Invited users will
-  have access only to <span style="color:white"
+  You can invite hub members or external collaborators to this workspace.
+  Invited people will have access to only the <span style="color:white"
     >{currentWorkspaceDetails.name}</span
-  >
-  workspace.
+  > workspace.
 </div>
 {#if plan?.name !== "Community"}
   <p class="text-fs-12 mt-3" style="color: var(--text-ds-neutral-400)">
