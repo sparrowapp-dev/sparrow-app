@@ -28,19 +28,24 @@
     onChange(event);
   };
 
+  const handleDivClick = (event: MouseEvent) => {
+    // Prevent multiple clicks if clicking on label elements
+    if ((event.target as HTMLElement).tagName === "LABEL") {
+      return;
+    }
+    document.getElementById(inputId)?.click();
+  };
+
   let isInfoTooltipHovered = false;
 </script>
 
 <div class="sparrow-text-input-container mb-2">
   <div class="d-flex">
-    <!-- {#if value.length == 0 || value.size === 0} -->
     <div
-      style="width:{width} !important; height:{height} !important;  border: 1px dashed var(--border-ds-surface-100)'; border-width: 1px; cursor: pointer;"
+      style="width:{width} !important; height:{height} !important; border: 1px dashed var(--border-ds-surface-100); border-width: 1px; cursor: pointer;"
       class="sparrow-file-input w-100 px-auto bg-tertiary-300 {isDragOver &&
         'opacity-75'}"
-      on:click={() => {
-        document.getElementById(inputId)?.click();
-      }}
+      on:click={handleDivClick}
       on:dragover={(e) => {
         e.preventDefault();
         isDragOver = true;
@@ -58,7 +63,12 @@
         class="uploader"
         style="display: flex;justify-content:center;align-items:center; position:relative;top:12px; cursor:pointer;"
       >
-        <label for={inputId} class="d-flex" style="cursor: pointer;">
+        <label
+          for={inputId}
+          class="d-flex"
+          style="cursor: pointer;"
+          on:click={(e) => e.stopPropagation()}
+        >
           <CloudArrowUpRegular
             size={"28px"}
             color={"var(--bg-ds-neutral-400)"}
@@ -76,7 +86,7 @@
           for={inputId}
           class="sparrow-choose-file-label ps-1"
           style="color: var(--text-ds-primary-300); cursor: pointer;"
-          >Upload File</label
+          on:click={(e) => e.stopPropagation()}>Upload File</label
         ><span style="padding-left: 4px; color:var(--text-ds-neutral-200)"
           >here</span
         >
@@ -84,7 +94,6 @@
           class="sparrow-choose-file-input visually-hidden"
           type="file"
           multiple
-          value=""
           id={inputId}
           placeholder={inputPlaceholder}
           on:change={(e) => {
@@ -146,7 +155,7 @@
         ></div>
 
         <div style="display: flex; align-items: center;">
-          <ImageRegular size="16px" color={"var(--bg-ds-neutral-400"} />
+          <ImageRegular size="16px" color={"var(--bg-ds-neutral-400)"} />
           <p
             style="color: var(--text-ds-neutral-400); margin-bottom: 0; padding-left: 4px;"
             class="text-ds-font-weight-medium text-ds-line-height-130 text-ds-font-size-12"
@@ -161,7 +170,7 @@
         ></div>
 
         <div style="display: flex; align-items: center;">
-          <ImageRegular size="16px" color={"var(--bg-ds-neutral-400"} />
+          <ImageRegular size="16px" color={"var(--bg-ds-neutral-400)"} />
           <p
             style="color: var(--text-ds-neutral-400); margin-bottom: 0; padding-left: 4px;"
             class="text-ds-font-weight-medium text-ds-line-height-130 text-ds-font-size-12"
@@ -171,7 +180,6 @@
         </div>
       </div>
     </div>
-    <!-- {/if} -->
   </div>
 </div>
 
