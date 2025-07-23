@@ -2421,20 +2421,24 @@ class AiRequestExplorerViewModel {
     
     let finalSP = null;
     if (systemPrompt.length) {
-      const systemPromptWithVariables = this.setEnvironmentVariables(systemPrompt, environments.filtered)
-      const SPDatas = JSON.parse(systemPromptWithVariables);
-      if (SPDatas.length)
-        finalSP = SPDatas.map((obj) => obj.data.text).join("");
+       finalSP = this.setEnvironmentVariables(systemPrompt, environments.filtered);
+      // const SPDatas = JSON.parse(systemPromptWithVariables);
+      // if (SPDatas.length)
+      //   finalSP = SPDatas.map((obj) => obj.data.text).join("");
     }
 
-    if (isJsonFormatEnabed) prompt = `${prompt} (Give Response In JSON Format)`;
+    let stringifiedConversation = JSON.stringify(componentData?.property?.aiRequest?.ai?.conversations || []);
+    let decryptedConversationString = this.setEnvironmentVariables(stringifiedConversation, environments.filtered);
+    let decryptedConversationObject = JSON.parse(decryptedConversationString);
+    let decryptedAuth =  this.setEnvironmentVariables(authKey.authValue || "", environments.filtered);
 
+    if (isJsonFormatEnabed) prompt = `${prompt} (Give Response In JSON Format)`;
     const userInputConvo = this.aiAssistentWebSocketService.prepareConversation(
       modelProvider,
       prompt,
       finalSP || "Answer my queries.",
       !isChatAutoClearActive,
-      componentData?.property?.aiRequest?.ai?.conversations || [],
+      decryptedConversationObject || [],
       isJsonFormatEnabed,
       fileAttachments,
     );
@@ -2453,7 +2457,7 @@ class AiRequestExplorerViewModel {
           modelVariant === OpenAIModelEnum.GPT_o1_Mini)
           ? prompt
           : userInputConvo,
-      authKey: authKey.authValue,
+      authKey: decryptedAuth,
       configs: modelSpecificConfig,
       model: modelProvider || "openai",
       modelVersion: modelVariant || "gpt-3.5-turbo",
@@ -2935,11 +2939,12 @@ class AiRequestExplorerViewModel {
     if (target === "UserPrompt") {
       await this.updateUserPrompt(response);
     } else if (target === "SystemPrompt") {
-      await this.updateRequestState({ isSaveDescriptionInProgress: true });
-      const formatter = new MarkdownFormatter();
-      const formattedData = await formatter.FormatData(response);
-      const stringifyData = JSON.stringify(formattedData.blocks);
-      await this.updateAiSystemPrompt(stringifyData);
+      // await this.updateRequestState({ isSaveDescriptionInProgress: true });
+      // const formatter = new MarkdownFormatter();
+      // const formattedData = await formatter.FormatData(response);
+      // const stringifyData = JSON.stringify(formattedData.blocks);
+      // await this.updateAiSystemPrompt(stringifyData);
+      await this.updateAiSystemPrompt(response);
       await this.updateRequestState({ isSaveDescriptionInProgress: false });
     }
     return response;
