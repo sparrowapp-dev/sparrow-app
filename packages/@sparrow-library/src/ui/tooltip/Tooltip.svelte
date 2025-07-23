@@ -195,7 +195,7 @@
       ? `tooltip-text-hover ${'tooltip-text-hover-' + placement.toString()}`
       : ''} tooltip-text invisible m-auto text-center position-fixed justify-content-center align-items-center opacity-0
  {placement.toString()} tooltip-animate-text {show ? 'tooltip-animate' : ''} "
-    style="top: {top}; left: {left}; right: {right}; bottom: {bottom}; transition: {transitionTime} ; padding:{spacing}; font-size:12px; z-index : {zIndex} ; 
+    style="top: {top}; left: {left}; right: {right}; bottom: {bottom}; padding:{spacing}; font-size:12px; z-index : {zIndex} ; 
            border-radius: {styles.borderRadius}; 
            box-shadow: {styles.boxShadow}; {styleProp}
            max-width: {styles.maxWidth}; white-space: normal; word-wrap: break-word; background-color:var(--bg-ds-surface-100)"
@@ -396,8 +396,8 @@
   .tooltip-animate-text {
     opacity: 0;
     transition:
-      opacity 120ms ease-out 120ms,
-      transform 120ms ease-out 120ms;
+      opacity 250ms cubic-bezier(0.25, 0.1, 0.25, 1),
+      transform 250ms cubic-bezier(0.25, 0.1, 0.25, 1);
     pointer-events: none;
     visibility: hidden;
   }
@@ -407,7 +407,7 @@
     pointer-events: auto;
     visibility: visible;
     transition:
-      opacity 120ms ease-out 120ms,
-      transform 120ms ease-out 120ms;
+      opacity 250ms cubic-bezier(0.25, 0.1, 0.25, 1),
+      transform 250ms cubic-bezier(0.25, 0.1, 0.25, 1);
   }
 </style>
