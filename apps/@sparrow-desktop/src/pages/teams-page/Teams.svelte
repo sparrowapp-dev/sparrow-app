@@ -29,6 +29,7 @@
     ChevronDoubleRightRegular,
     DoubleArrowIcon,
     GithubIcon,
+    SparkleRegular,
   } from "@sparrow/library/icons";
   import constants from "../../constants/constants";
   import { TeamTabsEnum } from "@sparrow/teams/constants/TeamTabs.constants";
@@ -56,6 +57,8 @@
 
   let workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
   const openTeam: Observable<TeamDocument> = _viewModel.openTeam;
+
+  let isTrialExhausted: boolean | undefined = undefined;
 
   let githubRepoData: GithubRepoDocType;
   let isGuestUser = false;
@@ -88,9 +91,13 @@
     githubRepo = await _viewModel.getGithubRepo();
     githubRepoData = githubRepo?.getLatest().toMutableJSON();
     isGuestUser = await _viewModel.getGuestUser();
+    isTrialExhausted = await _viewModel.getUserTrialExhaustedStatus();
   });
-
   let splitter: HTMLElement | null;
+
+  const startTrial = async () => {
+    await _viewModel.handleStartTrial();
+  };
 
   const handleCollapseCollectionList = () => {
     leftPanelCollapse.set(!$leftPanelCollapse);
@@ -201,7 +208,36 @@
             </div>
 
             <!-- github repo section -->
-            <section>
+            <section class="d-flex p-2 flex-column">
+              {#if !isGuestUser && isTrialExhausted == false}
+                <div class="d-flex flex-column" style="gap: 12px">
+                  <div class="d-flex align-items-start">
+                    <div>
+                      <SparkleRegular />
+                    </div>
+                    <div class="d-flex flex-column text-ds-font-size-12">
+                      <div style="color: var(--text-ds-neutral-50)">
+                        Unlock trial Access
+                      </div>
+                      <div style="color: var(--text-ds-neutral-200);">
+                        Unlock advanced features for 14 days, no charges until
+                        trial ends.
+                      </div>
+                    </div>
+                  </div>
+                  <Button
+                    title="Start Free Trial"
+                    size="medium"
+                    type="outline-primary"
+                    onClick={startTrial}
+                    disable={false}
+                    loader={false}
+                  />
+                </div>
+                <div
+                  style="border-bottom: 1px solid var(--bg-ds-surface-100); margin: 8px 0 0 0;"
+                ></div>
+              {/if}
               <div
                 class="p-2 d-flex align-items-center justify-content-between"
                 style="z-index: 4;"
