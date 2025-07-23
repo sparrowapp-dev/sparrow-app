@@ -264,7 +264,9 @@
     <!-- Textarea Input -->
     <CodeMirrorInput
       value={prompt}
-      onUpdateInput={(val) => (prompt = val)}
+      onUpdateInput={(val) => {
+        onUpdateAiPrompt(val);
+      }}
       placeholder="Write a prompt or generate one from generate prompt."
       {theme}
       {environmentVariables}
