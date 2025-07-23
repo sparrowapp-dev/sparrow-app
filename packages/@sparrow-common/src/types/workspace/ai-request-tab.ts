@@ -1,9 +1,9 @@
 import {
-    AiRequestAuthTypeBaseEnum,
-    AiModelProviderEnum,
-    type AIModelVariant,
-    type AiConfigurations,
-    type PromptFileAttachment
+  AiRequestAuthTypeBaseEnum,
+  AiModelProviderEnum,
+  type AIModelVariant,
+  type AiConfigurations,
+  type PromptFileAttachment,
 } from "./ai-request-base";
 import { CollectionRequestAddToBaseEnum } from "./collection-base";
 
@@ -11,244 +11,270 @@ import { CollectionRequestAddToBaseEnum } from "./collection-base";
 //                   AI Request Interface
 ///////////////////////////////////////////////////////////////////
 export enum AiRequestSectionEnum {
-    SYSTEM_PROMPT = "System Prompt",
-    AUTHORIZATION = "Authorization",
-    AI_MODAL_CONFIGURATIONS = "Configurations",
+  SYSTEM_PROMPT = "System Prompt",
+  AUTHORIZATION = "Authorization",
+  AI_MODAL_CONFIGURATIONS = "Configurations",
+  VARIABLES = "Variables",
 }
 
 export enum MessageTypeEnum {
-    SENDER = "Sender",
-    RECEIVER = "Receiver",
+  SENDER = "Sender",
+  RECEIVER = "Receiver",
 }
 
-
 export enum UntrackedItemsEnum {
-    UNTRACKED = "UNTRACKED-",
+  UNTRACKED = "UNTRACKED-",
 }
 
 ////////////////////////////////////////////////////////////////
 //            Managing AI Request Tab State
 ////////////////////////////////////////////////////////////////
 export interface AiAuthNavigationWrapper {
-    aiAuthNavigation: AiRequestAuthTypeBaseEnum;
+  aiAuthNavigation: AiRequestAuthTypeBaseEnum;
 }
 
 export interface AiNavigationWrapper {
-    aiNavigation: AiRequestSectionEnum;
+  aiNavigation: AiRequestSectionEnum;
 }
 
 export interface AiAuthProfileNavigationWrapper {
-    selectedRequestAuthProfileId: string;
+  selectedRequestAuthProfileId: string;
 }
 
 export interface AiLeftSplitterWidthPercentageWrapper {
-    aiLeftSplitterWidthPercentage: number;
+  aiLeftSplitterWidthPercentage: number;
 }
 
 export interface AiRightSplitterWidthPercentageWrapper {
-    aiRightSplitterWidthPercentage: number;
+  aiRightSplitterWidthPercentage: number;
 }
 
 export interface IsAiSendRequestInProgressWrapper {
-    isAiSendRequestInProgress: boolean;
+  isAiSendRequestInProgress: boolean;
 }
 
 export interface IsSaveDescriptionInProgressWrapper {
-    isSaveDescriptionInProgress: boolean;
+  isSaveDescriptionInProgress: boolean;
 }
 
 export interface IsSaveRequestInProgressWrapper {
-    isSaveRequestInProgress: boolean;
+  isSaveRequestInProgress: boolean;
 }
 
 export interface IsChatbotActive {
-    isChatbotActive: boolean;
+  isChatbotActive: boolean;
 }
 
 export interface IsChatbotPromptBoxActiveWrapper {
-    isChatbotPromptBoxActive: boolean;
+  isChatbotPromptBoxActive: boolean;
 }
 
 export interface IsChatAutoClearActive {
-    isChatAutoClearActive: boolean;
+  isChatAutoClearActive: boolean;
 }
 
 export interface IsChatbotConversationLoading {
-    isChatbotConversationLoading: boolean;
+  isChatbotConversationLoading: boolean;
 }
 export interface IsConversationHistoryPanelOpen {
-    isConversationHistoryPanelOpen: boolean;
+  isConversationHistoryPanelOpen: boolean;
 }
 
 export interface IsConversationHistoryLoading {
-    isConversationHistoryLoading: boolean;
+  isConversationHistoryLoading: boolean;
 }
 
 export interface IsChatbotSuggestionsActive {
-    isChatbotSuggestionsActive: boolean;
+  isChatbotSuggestionsActive: boolean;
 }
 
 export interface IsChatbotGeneratingResponse {
-    isChatbotGeneratingResponse: boolean;
+  isChatbotGeneratingResponse: boolean;
+}
+
+export interface IsAiRequestVariablesBulkEditActiveWrapper {
+  isAiRequestVariablesBulkEditActive: boolean;
 }
 
 export interface UsernameWrapper {
-    username: string;
+  username: string;
 }
 export interface PasswordWrapper {
-    password: string;
+  password: string;
 }
 export interface AuthKeyWrapper {
-    authKey: string;
+  authKey: string;
 }
 export interface AuthValueWrapper {
-    authValue: string;
+  authValue: string;
 }
 export interface AddtoWrapper {
-    addTo: CollectionRequestAddToBaseEnum;
+  addTo: CollectionRequestAddToBaseEnum;
 }
 export interface BearerTokenWrapper {
-    bearerToken: string;
+  bearerToken: string;
 }
 
 export interface AiModelProviderWrapper {
-    aiModelProvider: AiModelProviderEnum;
+  aiModelProvider: AiModelProviderEnum;
 }
 
 export interface AiModelVariantWrapper {
-    aiModelVariant: AIModelVariant;
+  aiModelVariant: AIModelVariant;
 }
 
 export interface AiSystemPromptWrapper {
-    systemPrompt: string;
+  systemPrompt: string;
 }
 
 export interface AiConfigurationsWrapper {
-    configurations: AiConfigurations;
+  configurations: AiConfigurations;
+}
+
+export interface KeyWrapper {
+  key: string;
+}
+export interface ValueWrapper {
+  value: string;
+}
+export interface CheckedWrapper {
+  checked: boolean;
+}
+export interface KeyValue extends KeyWrapper, ValueWrapper {}
+export interface KeyValueChecked
+  extends KeyWrapper,
+    ValueWrapper,
+    CheckedWrapper {}
+
+export interface AiRequestVariables extends KeyValueChecked {}
+export interface AiRequestVariablesWrapper {
+  variables: KeyValueChecked[];
 }
 
 export interface ResponseStatusWrapper {
-    status: string;
+  status: string;
 }
 export interface ResponseTimeWrapper {
-    time: number;
+  time: number;
 }
 export interface ResponseSizeWrapper {
-    size: number;
+  size: number;
 }
 export interface ResponseTokenCountWrapper {
-    tokenCount: number;
+  tokenCount: number;
 }
 
-export interface AiResponseInfo extends
-    ResponseStatusWrapper, ResponseTimeWrapper, ResponseSizeWrapper, ResponseTokenCountWrapper, AiModelVariantWrapper { }
-
+export interface AiResponseInfo
+  extends ResponseStatusWrapper,
+    ResponseTimeWrapper,
+    ResponseSizeWrapper,
+    ResponseTokenCountWrapper,
+    AiModelVariantWrapper {}
 
 export interface StateWrapper {
-    state: State;
+  state: State;
 }
 
 export interface PromptWrapper {
-    prompt: string;
+  prompt: string;
 }
 
 export interface TypeWrapper {
-    type: MessageTypeEnum;
+  type: MessageTypeEnum;
 }
 export interface MessageIdWrapper {
-    messageId: string;
+  messageId: string;
 }
 export interface MessageWrapper {
-    message: string;
+  message: string;
 }
 export interface IsLikedWrapper {
-    isLiked: boolean;
+  isLiked: boolean;
 }
 export interface IsDislikedWrapper {
-    isDisliked: boolean;
+  isDisliked: boolean;
 }
 export interface StatusWrapper {
-    status: boolean;
+  status: boolean;
 }
 
 export interface FileAttachmentsWrapper {
-    fileAttachments: PromptFileAttachment[]
+  fileAttachments: PromptFileAttachment[];
 }
 
 export interface Conversation
-    extends TypeWrapper,
+  extends TypeWrapper,
     MessageIdWrapper,
     MessageWrapper,
     IsLikedWrapper,
     IsDislikedWrapper,
-    StatusWrapper, FileAttachmentsWrapper { }
+    StatusWrapper,
+    FileAttachmentsWrapper {}
 
 export interface ConversationsWrapper {
-    conversations: Conversation[];
+  conversations: Conversation[];
 }
 export interface LastActiveConversationBackupWrapper {
-    lastActiveChatBackup: Conversation[];
+  lastActiveChatBackup: Conversation[];
 }
 export interface ConversationIdWrapper {
-    conversationId: string;
+  conversationId: string;
 }
 
 export interface ConversationTitleWrapper {
-    conversationTitle: string;
+  conversationTitle: string;
 }
 
 export interface IsoldChatPreviewActiveWrapper {
-    isoldChatPreviewActive: boolean
+  isoldChatPreviewActive: boolean;
 }
 
 export interface Ai
-    extends PromptWrapper,
+  extends PromptWrapper,
     ConversationsWrapper,
     ConversationIdWrapper,
     LastActiveConversationBackupWrapper,
     IsoldChatPreviewActiveWrapper,
-    ConversationTitleWrapper { }
+    ConversationTitleWrapper {}
 export interface AiWrapper {
-    ai: Ai;
+  ai: Ai;
 }
 
-export interface BasicAuth extends UsernameWrapper, PasswordWrapper { }
+export interface BasicAuth extends UsernameWrapper, PasswordWrapper {}
 export interface BasicAuthWrapper {
-    basicAuth: BasicAuth;
+  basicAuth: BasicAuth;
 }
 export interface ApiKey
-    extends AuthKeyWrapper,
+  extends AuthKeyWrapper,
     AuthValueWrapper,
-    AddtoWrapper { }
+    AddtoWrapper {}
 export interface ApiKeyWrapper {
-    apiKey: ApiKey;
+  apiKey: ApiKey;
 }
 export interface Auth
-    extends BearerTokenWrapper,
+  extends BearerTokenWrapper,
     BasicAuthWrapper,
-    ApiKeyWrapper { }
+    ApiKeyWrapper {}
 export interface AuthWrapper {
-    auth: Auth;
+  auth: Auth;
 }
 
 export interface AiRequestWrapper {
-    aiRequest: AiRequestType;
+  aiRequest: AiRequestType;
 }
 
 export interface AiRequestType
-    extends
-    AiModelProviderWrapper,
+  extends AiModelProviderWrapper,
     AiModelVariantWrapper,
     AiSystemPromptWrapper,
     AiConfigurationsWrapper,
+    AiRequestVariablesWrapper,
     StateWrapper,
     AuthWrapper,
-    AiWrapper { }
-
+    AiWrapper {}
 
 export interface State
-    extends
-    AiAuthNavigationWrapper,
+  extends AiAuthNavigationWrapper,
     AiNavigationWrapper,
     AiLeftSplitterWidthPercentageWrapper,
     AiRightSplitterWidthPercentageWrapper,
@@ -263,11 +289,11 @@ export interface State
     IsConversationHistoryPanelOpen,
     IsConversationHistoryLoading,
     IsChatbotPromptBoxActiveWrapper,
-    AiAuthProfileNavigationWrapper { }
+    AiAuthProfileNavigationWrapper,
+    IsAiRequestVariablesBulkEditActiveWrapper {}
 
 export interface StatePartial
-    extends
-    Partial<AiAuthNavigationWrapper>,
+  extends Partial<AiAuthNavigationWrapper>,
     Partial<AiNavigationWrapper>,
     Partial<AiLeftSplitterWidthPercentageWrapper>,
     Partial<AiRightSplitterWidthPercentageWrapper>,
@@ -282,4 +308,5 @@ export interface StatePartial
     Partial<IsConversationHistoryPanelOpen>,
     Partial<IsConversationHistoryLoading>,
     Partial<IsChatbotPromptBoxActiveWrapper>,
-    Partial<AiAuthProfileNavigationWrapper> { }
+    Partial<AiAuthProfileNavigationWrapper>,
+    Partial<IsAiRequestVariablesBulkEditActiveWrapper> {}

@@ -94,6 +94,7 @@ export class AiRequestTabAdapter {
     adaptedAiRequest.updateAIModelVariant(request.aiRequest?.aiModelVariant);
     adaptedAiRequest.updateAISystemPrompt(request.aiRequest?.systemPrompt);
     // adaptedAiRequest.updateAIConfigurations(request.aiRequest?.configurations);
+    adaptedAiRequest.updateAiRequestVariables(request.aiRequest?.variables);
     adaptedAiRequest.updateAuth(request.aiRequest?.auth);
     adaptedAiRequest.updatePath(path);
     adaptedAiRequest.updateTabType(TabPersistenceTypeEnum.PERMANENT);
@@ -126,6 +127,7 @@ export class AiRequestTabAdapter {
       aiModelProvider: requestTab.property.aiRequest?.aiModelProvider,
       aiModelVariant: requestTab.property.aiRequest?.aiModelVariant,
       systemPrompt: requestTab.property.aiRequest?.systemPrompt,
+      variables: requestTab.property.aiRequest?.variables,
       auth: requestTab.property.aiRequest?.auth,
       selectedAuthType: this.unsetAuthType(
         requestTab.property.aiRequest?.state

@@ -39,6 +39,11 @@
         id: AiRequestSectionEnum.AI_MODAL_CONFIGURATIONS,
         count: 0,
       },
+      {
+        name: "Variables",
+        id: AiRequestSectionEnum.VARIABLES,
+        count: 0,
+      },
     ];
   };
 

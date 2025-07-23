@@ -5,7 +5,7 @@ import {
   MarkdownFormatter,
   moveNavigation,
   Sleep,
-  scrollToTab
+  scrollToTab,
 } from "@sparrow/common/utils";
 import {
   DecodeRequest,
@@ -53,6 +53,7 @@ import {
   MessageTypeEnum,
   type HttpRequestCollectionLevelAuthTabInterface,
   type HttpRequestCollectionLevelAuthProfileTabInterface,
+  type KeyValueChecked,
 } from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
 import { GuestUserRepository } from "../../../../repositories/guest-user.repository";
@@ -439,6 +440,13 @@ class AiRequestExplorerViewModel {
     else if (
       requestServer.aiRequest.auth.bearerToken !==
       progressiveTab.property.aiRequest.auth.bearerToken
+    ) {
+      result = false;
+    } else if (
+      !this.compareArray.init(
+        requestServer.aiRequest.variables,
+        progressiveTab.property.aiRequest.variables,
+      )
     ) {
       result = false;
     }
@@ -2158,6 +2166,25 @@ class AiRequestExplorerViewModel {
         "Failed to update the documentation. Please try again",
       );
     }
+    this.compareRequestWithServer();
+  };
+
+  /**
+   *
+   * @param _params - request query parameters
+   * @param _effectURL - lag that effect request url
+   */
+  public updateAiRequestVariables = async (_variables: KeyValueChecked[]) => {
+    const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
+    if (
+      JSON.stringify(_variables) ===
+      JSON.stringify(progressiveTab.property.aiRequest.variables)
+    ) {
+      return;
+    }
+    progressiveTab.property.aiRequest.variables = _variables;
+    this.tab = progressiveTab;
+    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
   };
 
