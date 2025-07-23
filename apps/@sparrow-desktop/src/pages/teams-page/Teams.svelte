@@ -209,7 +209,7 @@
 
             <!-- github repo section -->
             <section class="d-flex p-2 flex-column">
-              {#if isTrialExhausted == false}
+              {#if !isGuestUser && isTrialExhausted == false}
                 <div class="d-flex flex-column" style="gap: 12px">
                   <div class="d-flex align-items-start">
                     <div>
