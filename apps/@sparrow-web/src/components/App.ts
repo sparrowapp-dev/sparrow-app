@@ -1,6 +1,12 @@
 import constants from "../constants/constants";
 import { navigate } from "svelte-navigator";
-import { jwtDecode, setAuthJwt, getAuthJwt, getClientUser } from "../utils/jwt";
+import {
+  jwtDecode,
+  setAuthJwt,
+  getAuthJwt,
+  getClientUser,
+  clearAuthJwt,
+} from "../utils/jwt";
 import { isGuestUserActive, setUser } from "../store/auth.store";
 import mixpanel from "mixpanel-browser";
 import MixpanelEvent from "../utils/mixpanel/MixpanelEvent";
@@ -21,6 +27,7 @@ import { TestflowRepository } from "src/repositories/testflow.repository";
 import { TestflowService } from "src/services/testflow.service";
 import { TabRepository } from "src/repositories/tab.repository";
 import { identifyUser } from "src/utils/posthog/posthogConfig";
+import { RxDB } from "src/database/database";
 const _guideRepository = new GuideRepository();
 const guestUserRepository = new GuestUserRepository();
 const teamRepository = new TeamRepository();
@@ -409,6 +416,20 @@ const refreshTestflow = async (
   return {};
 };
 
+/**
+ * clear local DB and clear guest user details from store
+ */
+const clearLocalDB = async (): Promise<void> => {
+  setUser(null);
+  isGuestUserActive.set(false);
+  await tabRepository.clearTabs();
+  await guestUserRepository.clearTabs();
+  await RxDB.getInstance().destroyDb();
+  await RxDB.getInstance().getDb();
+  // clearThrottleStore();
+  clearAuthJwt();
+};
+
 export async function handleLogin(url: string) {
   const tokens = getAuthJwt();
   const urlParams = new URLSearchParams(url.split("?")[1]);
@@ -475,6 +496,10 @@ export async function handleLogin(url: string) {
   }
   // handles case if token exist in url
   const userDetails = jwtDecode(accessToken);
+  const existingGuestUser = await getGuestUserState();
+  if (existingGuestUser?.isGuestUser) {
+    await clearLocalDB();
+  }
   identifyUser(userDetails.email);
   setAuthJwt(constants.AUTH_TOKEN, accessToken);
   setAuthJwt(constants.REF_TOKEN, refreshToken);
