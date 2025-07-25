@@ -211,7 +211,7 @@
             <section class="d-flex p-2 flex-column">
               {#if !isGuestUser && isTrialExhausted == false}
                 <div class="d-flex flex-column" style="gap: 12px">
-                  <div class="d-flex align-items-start">
+                  <div class="d-flex align-items-start" style="gap: 4px">
                     <div>
                       <SparkleRegular />
                     </div>
