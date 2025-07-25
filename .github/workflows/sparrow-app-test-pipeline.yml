@@ -140,7 +140,7 @@ jobs:
         run: |
           cd apt-repo
           apt-ftparchive -c apt-release.conf release dists/stable/ > dists/stable/Release
-          
+
       - name: Sign APT metadata
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_SIGNING_KEY }}
@@ -248,7 +248,7 @@ jobs:
   build-snap:
     runs-on: ubuntu-latest
     environment: production
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    needs: release_linux
 
     env:
       SNAP_CHANNEL: ${{ vars.SNAP_RELEASE_CHANNEL || 'edge' }}
