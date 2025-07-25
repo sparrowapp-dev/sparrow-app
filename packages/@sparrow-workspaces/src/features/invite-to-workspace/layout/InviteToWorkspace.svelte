@@ -105,31 +105,26 @@
   };
 
   const filterWorkspaceInviteEmails = (sentEmails: string[]) => {
-    const existingUserEmails = users.map((u: any) => u.email);
+    const hubUserEmails = users.map((u: any) => u.email);
+    const workspaceUserEmails = currentWorkspaceDetails.users.map(
+      (u: any) => u.email,
+    );
     for (const email of sentEmails) {
       if (!isValidEmail(email)) {
-        errors.userConflict = "Please check and enter correct email address.";
+        errors.userConflict = "Please check and enter a correct email address.";
         return false;
       }
-    }
-    const matchingEmails = sentEmails.filter((email) =>
-      existingUserEmails.includes(email),
-    );
-    if (matchingEmails.length !== sentEmails.length) {
-      errors.userConflict = "Only Hub members can be invited.";
-      return false;
-    }
-    const alreadyInWorkspace = currentWorkspaceDetails.users.some((user) =>
-      matchingEmails.includes(user.email),
-    );
-    if (alreadyInWorkspace) {
-      errors.userConflict = "User already exists in workspace.";
-      return false;
+      const isHubMember = hubUserEmails.includes(email);
+      const isInWorkspace = workspaceUserEmails.includes(email);
+      if (isHubMember && isInWorkspace) {
+        errors.userConflict = "User already exists in workspace.";
+        return false;
+      }
     }
     return true;
   };
 
-  export function isValidEmail(email: string): boolean {
+  function isValidEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email.trim());
   }
@@ -223,7 +218,7 @@
   {/if}
 </div>
 <div class="text-secondary-200 mt-2 sparrow-fs-12">
-  You can invite hub members to this workspace.
+  You can invite hub members or external collaborators to this workspace.
   Invited people will have access to only the <span style="color:white"
     >{currentWorkspaceDetails.name}</span
   > workspace.

@@ -43,14 +43,23 @@
    * Validates if an email is valid (exists in list and not already in workspace)
    */
   const validateEmail = (email: string): boolean => {
-    const existingUserEmails = list.map((u) => u.email);
-    const isInUserList = existingUserEmails.includes(email);
-    const isAlreadyInWorkspace = currentWorkspaceUsers.some(
-      (user) => user.email === email,
+    const trimmedEmail = email.trim();
+    if (!isValidEmail(trimmedEmail)) {
+      return false;
+    }
+    const isInWorkspace = currentWorkspaceUsers.some(
+      (user) => user.email === trimmedEmail,
     );
-
-    return isInUserList && !isAlreadyInWorkspace;
+    if (isInWorkspace) {
+      return false;
+    }
+    return true;
   };
+
+  function isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email.trim());
+  }
 
   /**
    * Updates the invalid emails set and triggers parent onChange
