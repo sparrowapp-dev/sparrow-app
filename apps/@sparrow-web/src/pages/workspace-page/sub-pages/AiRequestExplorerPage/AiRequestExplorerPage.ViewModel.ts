@@ -595,6 +595,8 @@ class AiRequestExplorerViewModel {
         date: this.getLocalDate(),
         time: this.getFormattedTime(),
         conversation: conversations,
+        configurations:  configurations ,
+        systemPrompt: systemPrompt,
         authoredBy: isGuestUser ? "Guest User" : user.name,
         updatedBy: isGuestUser
           ? "Guest User"
@@ -659,8 +661,6 @@ class AiRequestExplorerViewModel {
           data: {
             ...commonFields,
             conversation: limitedConversations,
-            configurations:  configurations ,
-            systemPrompt: systemPrompt,
             inputTokens: limitedInputTokens,
             outputTokens: limitedOutputTokens,
           },
