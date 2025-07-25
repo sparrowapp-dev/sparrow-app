@@ -3,9 +3,8 @@ import {
   createDeepCopy,
   InitAiRequestTab,
   MarkdownFormatter,
-  moveNavigation,
+  scrollToTab,
   Sleep,
-  scrollToTab
 } from "@sparrow/common/utils";
 import {
   DecodeRequest,
@@ -24,14 +23,6 @@ import type {
 } from "../../../../database/database";
 import type { CreateDirectoryPostBody } from "@sparrow/common/dto";
 
-// ---- Repo
-import { TabRepository } from "../../../../repositories/tab.repository";
-import { CollectionRepository } from "../../../../repositories/collection.repository";
-import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
-import { EnvironmentRepository } from "../../../../repositories/environment.repository";
-import { BehaviorSubject, Observable } from "rxjs";
-import { EnvironmentService } from "../../../../services/environment.service";
-
 // ---- Service
 import {
   insertCollection,
@@ -39,7 +30,14 @@ import {
   insertCollectionRequest,
   updateCollectionRequest,
 } from "../../../../services/collection";
-import { AiRequestService } from "src/services/ai-request.service";
+
+// ---- Repo
+import { TabRepository } from "../../../../repositories/tab.repository";
+import { CollectionRepository } from "../../../../repositories/collection.repository";
+import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
+import { EnvironmentRepository } from "../../../../repositories/environment.repository";
+import { BehaviorSubject, Observable } from "rxjs";
+import { EnvironmentService } from "../../../../services/environment.service";
 
 // ---- Events
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
@@ -68,14 +66,14 @@ import {
   TabPersistenceTypeEnum,
   type Tab,
 } from "@sparrow/common/types/workspace/tab";
-import { getClientUser } from "src/utils/jwt";
-import constants from "src/constants/constants";
+import { getClientUser } from "@app/utils/jwt";
+import constants from "@app/constants/constants";
 import * as Sentry from "@sentry/svelte";
 import {
   AiModelProviderEnum,
-  type modelsConfigType,
-  type AIModelVariant,
   OpenAIModelEnum,
+  type modelsConfigType,
+ 
   type PromptFileAttachment,
   AiRequestAuthTypeBaseEnum,
 } from "@sparrow/common/types/workspace/ai-request-base";
@@ -88,27 +86,24 @@ import {
   stopLoading,
 } from "../../../../../../../packages/@sparrow-common/src/store";
 import { environmentType, Events, ItemType } from "@sparrow/common/enums";
-import { AiRequestTabAdapter, CollectionTabAdapter } from "src/adapter";
 import { CollectionService } from "../../../../services/collection.service";
 import { CompareArray, Debounce } from "@sparrow/common/utils";
 import {
-  CollectionAuthTypeBaseEnum,
   CollectionItemTypeBaseEnum,
+  type CollectionItemBaseInterface,
   CollectionRequestAddToBaseEnum,
+  CollectionAuthTypeBaseEnum,
   type CollectionAuthBaseInterface,
   type CollectionAuthProifleBaseInterface,
-  type CollectionItemBaseInterface,
 } from "@sparrow/common/types/workspace/collection-base";
 import type {
   AiRequestCreateUpdateInCollectionPayloadDtoInterface,
   AiRequestCreateUpdateInFolderPayloadDtoInterface,
 } from "@sparrow/common/types/workspace/ai-request-dto";
-
-import { AiRequestRepository } from "src/repositories/ai-request.repository";
-import {
-  type AiRequestType,
-  type StatePartial as AiStateParital,
-} from "@sparrow/common/types/workspace/ai-request-tab";
+import { AiRequestTabAdapter, CollectionTabAdapter } from "@app/adapter";
+import { AiRequestRepository } from "../../../../repositories/ai-request.repository";
+import { type StatePartial as AiStateParital } from "@sparrow/common/types/workspace/ai-request-tab";
+import { AiRequestService } from "../../../../services/ai-request.service";
 import type {
   AiRequestCollectionLevelAuthProfileTabInterface,
   AiRequestCollectionLevelAuthTabInterface,
@@ -475,10 +470,10 @@ class AiRequestExplorerViewModel {
 
     const componentData = this._tab.getValue();
     const provider = componentData.property.aiRequest.aiModelProvider;
-    const providerAuthKey = this.decodeAiRequestAuth(
+    const providerAuthKey = (await this.decodeAiRequestAuth(
       componentData.property.aiRequest,
       this._collectionAuthProfile.getValue(),
-    ).apiKey.authValue;
+    ))?.apiKey.authValue;
 
     if (!providerAuthKey || !provider) {
       console.error(
@@ -514,13 +509,13 @@ class AiRequestExplorerViewModel {
    * Get list of conversations based on specific apikey
    * @returns :Observable<CollectionDocument[]> - the list of collection from current active workspace
    */
-  public getConversationsList = () => {
+  public getConversationsList = async() => {
     const componentData = this._tab.getValue();
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
-    const providerAuthKey = this.decodeAiRequestAuth(
+    const providerAuthKey = (await this.decodeAiRequestAuth(
       componentData.property.aiRequest,
       this._collectionAuthProfile.getValue(),
-    ).apiKey.authValue;
+    ))?.apiKey.authValue;
 
     if (!provider || !providerAuthKey) {
       console.error(
@@ -563,14 +558,18 @@ class AiRequestExplorerViewModel {
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const conversations =
       componentData?.property?.aiRequest?.ai?.conversations || [];
+    const configurations =
+    componentData?.property?.aiRequest?.configurations || {};
+    const systemPrompt =
+    componentData?.property?.aiRequest?.systemPrompt || "";
     const conversationId =
       componentData?.property?.aiRequest?.ai?.conversationId;
     const conversationTitle =
       componentData?.property?.aiRequest?.ai?.conversationTitle;
-    const providerAuthKey = this.decodeAiRequestAuth(
+    const providerAuthKey = (await this.decodeAiRequestAuth(
       componentData.property.aiRequest,
       this._collectionAuthProfile.getValue(),
-    ).apiKey.authValue;
+    ))?.apiKey.authValue;
 
     // if (!conversations.length || !provider || !providerAuthKey) {
     if (!provider || !providerAuthKey) {
@@ -660,6 +659,8 @@ class AiRequestExplorerViewModel {
           data: {
             ...commonFields,
             conversation: limitedConversations,
+            configurations:  configurations ,
+            systemPrompt: systemPrompt,
             inputTokens: limitedInputTokens,
             outputTokens: limitedOutputTokens,
           },
@@ -736,10 +737,10 @@ class AiRequestExplorerViewModel {
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const currTabConversationId =
       componentData?.property?.aiRequest?.ai?.conversationId;
-    const providerAuthKey = this.decodeAiRequestAuth(
+    const providerAuthKey = (await this.decodeAiRequestAuth(
       componentData.property.aiRequest,
       this._collectionAuthProfile.getValue(),
-    ).apiKey.authValue;
+    ))?.apiKey.authValue;
 
     if (!provider || !providerAuthKey) {
       console.error("Missing provider, conversations, or authKey.");
@@ -798,10 +799,10 @@ class AiRequestExplorerViewModel {
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const currTabConversationId =
       componentData?.property?.aiRequest?.ai?.conversationId;
-    const providerAuthKey = this.decodeAiRequestAuth(
+    const providerAuthKey = (await this.decodeAiRequestAuth(
       componentData.property.aiRequest,
       this._collectionAuthProfile.getValue(),
-    ).apiKey.authValue;
+    ))?.apiKey.authValue;
 
     if (!conversationId || !provider || !providerAuthKey) {
       console.error("Missing provider or authKey.");
@@ -821,7 +822,7 @@ class AiRequestExplorerViewModel {
         }
         await this.fetchConversations(); // Fetch to udpate the states in local db
         notifications.success(
-          `Conversation “${conversationTitle}” deleted successfully.`,
+          `Conversation  “${conversationTitle}” deleted successfully.`,
         );
       } else {
         notifications.error(
@@ -845,10 +846,10 @@ class AiRequestExplorerViewModel {
     const componentData = this._tab.getValue();
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const providerModel = componentData?.property?.aiRequest?.aiModelVariant;
-    const providerAuthKey = this.decodeAiRequestAuth(
+    const providerAuthKey = (await this.decodeAiRequestAuth(
       componentData.property.aiRequest,
       this._collectionAuthProfile.getValue(),
-    ).apiKey.authValue;
+    ))?.apiKey.authValue;
 
     // Don't allow file uploads when auth key is not present.
     if (!provider || !providerAuthKey) {
@@ -1970,71 +1971,12 @@ class AiRequestExplorerViewModel {
     }
   };
 
- private getActiveEnvironments = async (currentWorkspaceId: string) => {
-      let environmentId: string;
-      const activeWorkspace =
-        await this.workspaceRepository.getActiveWorkspaceDoc();
-  
-      if (activeWorkspace) {
-        currentWorkspaceId = activeWorkspace.get("_id");
-        environmentId = activeWorkspace.get("environmentId");
-      }
-  
-      const environments = await this.environmentRepository.getEnvironment();
-      let environmentDocuments: EnvironmentDocument[] = [];
-  
-      environments.subscribe((value) => {
-        if (value) {
-          environmentDocuments = value;
-        }
-      });
-  
-      let environmentVariables: {
-        filtered: ENVExtractVariableType[];
-      } = {
-        filtered: [],
-      };
-  
-      if (environmentDocuments && currentWorkspaceId) {
-        if (environmentDocuments?.length > 0) {
-          const filteredEnv = environmentDocuments
-            .filter((elem) => {
-              return elem.workspaceId === currentWorkspaceId;
-            })
-            .filter((elem) => {
-              if (
-                elem.type === environmentType.GLOBAL ||
-                elem.id === environmentId
-              ) {
-                return true;
-              }
-            });
-          if (filteredEnv?.length > 0) {
-            const envs: ENVExtractVariableType[] = [];
-            filteredEnv.forEach((elem) => {
-              environmentVariables = {
-                filtered: [],
-              };
-  
-              const temp = elem.toMutableJSON() as ENVDocumentType;
-              temp.variable.forEach((variable) => {
-                if (variable.key && variable.checked) {
-                  envs.unshift({
-                    key: variable.key,
-                    value: variable.value,
-                    type: temp.type === environmentType.GLOBAL ? "G" : "E",
-                    environment: temp.name,
-                  });
-                }
-              });
-              environmentVariables.filtered = envs;
-            });
-          }
-        }
-      }
-      return environmentVariables;
-    };
-
+  /**
+   * Sets environment variables in a given text by replacing placeholders with corresponding values.
+   * @param {string} text - The text containing placeholders for environment variables.
+   * @param environmentVariables - Array of objects containing key-value pairs for environment variables.
+   * @returns {string} The text with placeholders replaced by environment variable values.
+   */
   private setEnvironmentVariables = (
     text: string,
     environmentVariables,
@@ -2044,8 +1986,10 @@ class AiRequestExplorerViewModel {
       const regex = new RegExp(`{{(${element.key})}}`, "g");
       updatedText = updatedText.replace(regex, element.value);
     });
+
     return updatedText;
   };
+
   //////////////////////////////////////////////////////////////////////////////
   //                 AI Request Tab Data Update Methods
   //////////////////////////////////////////////////////////////////////////////
@@ -2143,24 +2087,6 @@ class AiRequestExplorerViewModel {
     this.compareRequestWithServer();
   };
 
-  public updateAiConfigurations = async (
-    model: AiModelProviderEnum,
-    _configUpdates: modelsConfigType,
-  ) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.aiRequest.configurations[model] = _configUpdates;
-    this.tab = progressiveTab;
-    try {
-      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    } catch (error) {
-      Sentry.captureException(error);
-      notifications.error(
-        "Failed to update the documentation. Please try again",
-      );
-    }
-    this.compareRequestWithServer();
-  };
-
   /**
    * Updates the AI prompt in the request property of the current tab.
    *
@@ -2233,26 +2159,31 @@ class AiRequestExplorerViewModel {
     await new Sleep().setTime(2000).exec();
     this.updateRequestState({ isChatbotConversationLoading: false });
     this.updateRequestState({ isChatbotPromptBoxActive: true });
-    // notifications.success("Created new conversation.");
   };
 
   public switchConversation = async (
     _conversationId: string,
     _conversationTitle: string,
     _conversations: Conversation[],
+    _configurations = null,
+    _systemPrompt = null
   ) => {
     this.updateRequestState({ isChatbotConversationLoading: true });
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.aiRequest.ai.conversationId = _conversationId;
     progressiveTab.property.aiRequest.ai.conversationTitle = _conversationTitle;
     progressiveTab.property.aiRequest.ai.conversations = _conversations;
+    if(_configurations){
+      progressiveTab.property.aiRequest.configurations = _configurations;
+    }
+    if(_systemPrompt !== null){
+      progressiveTab.property.aiRequest.systemPrompt = _systemPrompt;   
+    }
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     await new Sleep().setTime(2000).exec();
     this.updateRequestState({ isChatbotConversationLoading: false });
     this.updateRequestState({ isChatbotPromptBoxActive: true });
-
-    // notifications.success(!_conversationId ? `Created new conversation session.` : `Switched to "${_conversationTitle}" conversation!`);
   };
 
   /**
@@ -2413,7 +2344,25 @@ class AiRequestExplorerViewModel {
     } else console.error("chunk not found!");
   }
 
-  private decodeAiRequestAuth = (
+  public updateAiConfigurations = async (
+    model: AiModelProviderEnum,
+    _configUpdates: modelsConfigType,
+  ) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.aiRequest.configurations[model] = _configUpdates;
+    this.tab = progressiveTab;
+    try {
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    } catch (error) {
+      Sentry.captureException(error);
+      notifications.error(
+        "Failed to update the documentation. Please try again",
+      );
+    }
+    // this.compareRequestWithServer();
+  };
+
+  private decodeAiRequestAuth = async(
     aiRequest: AiRequestType,
     _collectionLevelAuth: Partial<AiRequestCollectionLevelAuthProfileTabInterface>,
   ): Auth | CollectionAuthBaseInterface => {
@@ -2449,7 +2398,12 @@ class AiRequestExplorerViewModel {
         }
       }
     } else {
+      const componentData = this._tab.getValue();
+      const environments =  await this.getActiveEnvironments(componentData?.path?.workspaceId);
+      const token = aiRequest.auth.apiKey.authValue;
+      const decryptToken = this.setEnvironmentVariables(token, environments.filtered)
       auth = createDeepCopy(aiRequest.auth);
+      auth.apiKey.authValue = decryptToken;
     }
     return auth;
   };
@@ -2466,14 +2420,12 @@ class AiRequestExplorerViewModel {
     const componentData = this._tab.getValue();
     const environments = await this.getActiveEnvironments(componentData?.path?.workspaceId);
     const tabId = componentData.tabId;
-
-    // **IMPROTANT** ToDo: Create a utility class to decode the AI request similar to rest requests.
     const modelProvider = componentData.property.aiRequest.aiModelProvider;
     const modelVariant = componentData.property.aiRequest.aiModelVariant;
-    const authKey = this.decodeAiRequestAuth(
+    const authKey = (await this.decodeAiRequestAuth(
       componentData.property.aiRequest,
       this._collectionAuthProfile.getValue(),
-    ).apiKey;
+    ))?.apiKey;
     const systemPrompt = componentData.property.aiRequest.systemPrompt;
     const currConfigurations = componentData.property.aiRequest.configurations;
     const isChatAutoClearActive =
@@ -2485,23 +2437,21 @@ class AiRequestExplorerViewModel {
       : false;
 
     let prompt = this.setEnvironmentVariables(_prompt, environments.filtered);
-
+    
     let finalSP = null;
     if (systemPrompt.length) {
-      finalSP = this.setEnvironmentVariables(systemPrompt, environments.filtered)
+       finalSP = this.setEnvironmentVariables(systemPrompt, environments.filtered);
       // const SPDatas = JSON.parse(systemPromptWithVariables);
       // if (SPDatas.length)
       //   finalSP = SPDatas.map((obj) => obj.data.text).join("");
     }
 
-     let stringifiedConversation = JSON.stringify(componentData?.property?.aiRequest?.ai?.conversations || []);
+    let stringifiedConversation = JSON.stringify(componentData?.property?.aiRequest?.ai?.conversations || []);
     let decryptedConversationString = this.setEnvironmentVariables(stringifiedConversation, environments.filtered);
     let decryptedConversationObject = JSON.parse(decryptedConversationString);
     let decryptedAuth =  this.setEnvironmentVariables(authKey.authValue || "", environments.filtered);
 
-
     if (isJsonFormatEnabed) prompt = `${prompt} (Give Response In JSON Format)`;
-
     const userInputConvo = this.aiAssistentWebSocketService.prepareConversation(
       modelProvider,
       prompt,
@@ -2654,6 +2604,7 @@ class AiRequestExplorerViewModel {
                 map.set(tabId, newData);
                 return new Map(map); // Return a new Map to trigger reactivity
               });
+
               return;
             }
 
@@ -2857,6 +2808,71 @@ class AiRequestExplorerViewModel {
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
 
+    private getActiveEnvironments = async (currentWorkspaceId: string) => {
+      let environmentId: string;
+      const activeWorkspace =
+        await this.workspaceRepository.getActiveWorkspaceDoc();
+  
+      if (activeWorkspace) {
+        currentWorkspaceId = activeWorkspace.get("_id");
+        environmentId = activeWorkspace.get("environmentId");
+      }
+  
+      const environments = await this.environmentRepository.getEnvironment();
+      let environmentDocuments: EnvironmentDocument[] = [];
+  
+      environments.subscribe((value) => {
+        if (value) {
+          environmentDocuments = value;
+        }
+      });
+  
+      let environmentVariables: {
+        filtered: ENVExtractVariableType[];
+      } = {
+        filtered: [],
+      };
+  
+      if (environmentDocuments && currentWorkspaceId) {
+        if (environmentDocuments?.length > 0) {
+          const filteredEnv = environmentDocuments
+            .filter((elem) => {
+              return elem.workspaceId === currentWorkspaceId;
+            })
+            .filter((elem) => {
+              if (
+                elem.type === environmentType.GLOBAL ||
+                elem.id === environmentId
+              ) {
+                return true;
+              }
+            });
+          if (filteredEnv?.length > 0) {
+            const envs: ENVExtractVariableType[] = [];
+            filteredEnv.forEach((elem) => {
+              environmentVariables = {
+                filtered: [],
+              };
+  
+              const temp = elem.toMutableJSON() as ENVDocumentType;
+              temp.variable.forEach((variable) => {
+                if (variable.key && variable.checked) {
+                  envs.unshift({
+                    key: variable.key,
+                    value: variable.value,
+                    type: temp.type === environmentType.GLOBAL ? "G" : "E",
+                    environment: temp.name,
+                  });
+                }
+              });
+              environmentVariables.filtered = envs;
+            });
+          }
+        }
+      }
+      return environmentVariables;
+    };
+
   public generateAiPrompt = async (
     target: "UserPrompt" | "SystemPrompt",
     _prompt = "",
@@ -2873,6 +2889,7 @@ class AiRequestExplorerViewModel {
     const prompt = this.setEnvironmentVariables(_prompt, environments.filtered);
     let workspaceVal = await this.readWorkspace(workspaceId);
     let teamId = workspaceVal.team?.teamId;
+
     const response = await this.aiAssistentService.generateUserOrSystemPrompts({
       userInput: prompt,
       emailId: getClientUser().email,
@@ -2933,6 +2950,7 @@ class AiRequestExplorerViewModel {
       // const formatter = new MarkdownFormatter();
       // const formattedData = await formatter.FormatData(response);
       // const stringifyData = JSON.stringify(formattedData.blocks);
+      // await this.updateAiSystemPrompt(stringifyData);
       await this.updateAiSystemPrompt(response);
       await this.updateRequestState({ isSaveDescriptionInProgress: false });
     }

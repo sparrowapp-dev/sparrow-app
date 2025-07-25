@@ -13,8 +13,13 @@
   export let onUpdateAiConfigurations: (updates: Record<string, any>) => void;
   export let config: modelsConfigType;
 
-  $: currentModelConfig =
-    configFormat[currSelectedModel]?.[currSelectedModelVariant] || {}; // Get current model configuration metadata
+  let currentModelConfig;
+  $: {
+    if (config) {
+      currentModelConfig =
+        configFormat[currSelectedModel]?.[currSelectedModelVariant] || {}; // Get current model configuration metadata
+    }
+  }
   $: configEntries = Object.entries(currentModelConfig); // Get configuration entries for the current model
 
   // Event handler for config changes
