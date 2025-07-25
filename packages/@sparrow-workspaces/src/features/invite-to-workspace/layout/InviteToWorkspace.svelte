@@ -106,11 +106,17 @@
 
   const filterWorkspaceInviteEmails = (sentEmails: string[]) => {
     const existingUserEmails = users.map((u: any) => u.email);
+    for (const email of sentEmails) {
+      if (!isValidEmail(email)) {
+        errors.userConflict = "Please check and enter correct email address.";
+        return false;
+      }
+    }
     const matchingEmails = sentEmails.filter((email) =>
       existingUserEmails.includes(email),
     );
     if (matchingEmails.length !== sentEmails.length) {
-      errors.userConflict = "Please check and enter correct email address.";
+      errors.userConflict = "Only Hub members can be invited.";
       return false;
     }
     const alreadyInWorkspace = currentWorkspaceDetails.users.some((user) =>
@@ -122,6 +128,11 @@
     }
     return true;
   };
+
+  export function isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email.trim());
+  }
 
   /**
    * Handles the role selection from the dropdown.
