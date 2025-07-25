@@ -139,8 +139,8 @@ jobs:
       - name: Generate Release file
         run: |
           cd apt-repo
-          apt-ftparchive release dists/stable/ > dists/stable/Release
-
+          apt-ftparchive -c apt-release.conf release dists/stable/ > dists/stable/Release
+          
       - name: Sign APT metadata
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_SIGNING_KEY }}
