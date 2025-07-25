@@ -79,8 +79,10 @@
 
   onMount(async () => {
     if (userId && shouldRunThrottled(userId)) {
-      await _viewModel.refreshTeams(userId);
-      await _viewModel.refreshWorkspaces(userId);
+      await Promise.all([
+        _viewModel.refreshTeams(userId),
+        _viewModel.refreshWorkspaces(userId),
+      ]);
     } else {
       console.error(`Throttled for ${userId}`);
     }
