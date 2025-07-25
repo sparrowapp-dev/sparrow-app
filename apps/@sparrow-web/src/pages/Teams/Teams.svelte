@@ -78,13 +78,13 @@
   });
 
   onMount(async () => {
-    if (userId && shouldRunThrottled(userId)) {
-      await Promise.all([
-        _viewModel.refreshTeams(userId),
-        _viewModel.refreshWorkspaces(userId),
-      ]);
-    } else {
-      console.error(`Throttled for ${userId}`);
+    if (userId) {
+      await _viewModel.refreshTeams(userId);
+      if (shouldRunThrottled(userId)) {
+        await _viewModel.refreshWorkspaces(userId);
+      } else {
+        console.error(`Throttled for ${userId}`);
+      }
     }
 
     let githubRepo = await _viewModel.getGithubRepo();
