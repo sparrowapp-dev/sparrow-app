@@ -77,7 +77,7 @@
       userId = value._id;
     }
   });
-  let isTrialExhausted = false;
+  let isTrialExhausted: boolean | undefined = undefined;
 
   onMount(async () => {
     if (userId && shouldRunThrottled(userId)) {
@@ -248,7 +248,7 @@
             </div>
 
             <!-- github repo section -->
-            <section>
+            <section class="d-flex p-2 flex-column">
               {#if !isGuestUser && isTrialExhausted == false}
                 <div class="d-flex flex-column" style="gap: 12px">
                   <div class="d-flex align-items-start">
