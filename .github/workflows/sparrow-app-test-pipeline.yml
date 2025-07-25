@@ -105,7 +105,7 @@ jobs:
           yarn cache clean
           npm install -g pnpm
           yarn install
-          yarn workspace @sparrow/desktop tauri build --bundles deb --debug
+          yarn workspace @sparrow/desktop tauri build --bundles deb
 
       # --- Prepare APT Repository ---
       - name: Setup APT tools
@@ -114,7 +114,7 @@ jobs:
       - name: Create repo structure
         run: |
           mkdir -p apt-repo/{pool/main,dists/stable/main/binary-amd64}
-          cp apps/@sparrow-desktop/src-tauri/target/debug/bundle/deb/*.deb apt-repo/pool/main/
+          cp apps/@sparrow-desktop/src-tauri/target/release/bundle/deb/*.deb apt-repo/pool/main/
 
       - name: Generate Packages.gz
         run: |
