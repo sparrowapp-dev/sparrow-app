@@ -223,7 +223,7 @@
   {/if}
 </div>
 <div class="text-secondary-200 mt-2 sparrow-fs-12">
-  You can invite hub members or external collaborators to this workspace.
+  You can invite hub members to this workspace.
   Invited people will have access to only the <span style="color:white"
     >{currentWorkspaceDetails.name}</span
   > workspace.
