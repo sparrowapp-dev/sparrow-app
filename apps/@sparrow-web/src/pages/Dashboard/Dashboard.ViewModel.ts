@@ -95,7 +95,7 @@ export class DashboardViewModel {
     return this.environmentRepository.getEnvironment();
   }
 
-     /**
+  /**
    * @description - get open team from local db
    */
   public get openTeam() {
@@ -202,8 +202,9 @@ export class DashboardViewModel {
           createdBy,
           updatedAt,
           updatedBy,
+          invites,
           isNewInvite,
-          billing
+          billing,
         } = elem;
         const updatedWorkspaces = workspaces?.map((workspace) => ({
           workspaceId: workspace.id,
@@ -230,6 +231,7 @@ export class DashboardViewModel {
           createdBy,
           updatedAt,
           updatedBy,
+          invites,
           isNewInvite,
           isOpen: isOpenTeam,
           billing
