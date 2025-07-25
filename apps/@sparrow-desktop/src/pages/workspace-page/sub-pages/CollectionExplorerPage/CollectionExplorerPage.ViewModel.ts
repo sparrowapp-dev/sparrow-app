@@ -10,6 +10,7 @@ import type {
   CollectionDocument,
   TabDocument,
 } from "../../../../database/database";
+import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
 
 // Notification
 import { notifications } from "@sparrow/library/ui";
@@ -2219,6 +2220,163 @@ class CollectionExplorerPage {
       console.error(response.message);
       notifications.error("Failed to delete authentication profile.");
     }
+    return response;
+  };
+
+  /**
+   * Handle create generative variables for a collection.
+   * @param collectionId :CollectionId - the collection in which new request is going to be created
+   * @param workspaceId : WorkspaceId of collection generative variables creating.
+   * @returns :void
+   */
+  public handleGenerativeVariableCreation = async (
+    collectionId: string,
+    workspaceId: string,
+  ): Promise<{ [key: string]: any }> => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const reseponse = [
+          {
+            key: "name",
+            value: "world",
+            checked: false,
+          },
+          {
+            key: "sample",
+            value: "test",
+            checked: false,
+          },
+          {
+            key: "sample-1",
+            value: "test-1",
+            checked: false,
+          },
+          {
+            key: "sample-2",
+            value: "test-2",
+            checked: false,
+          },
+          {
+            key: "",
+            value: "",
+            checked: false,
+          },
+        ];
+        resolve(reseponse);
+      }, 4000); // 4 seconds delay
+    });
+  };
+
+  /**
+   * Handle updated environment variables for a workspace.
+   * @param environmentId :environmentId in which we want to update it.
+   * @param targetEnvironments : environment at which I want to updated the variables in a workspace.
+   * @param keyPairObjects:new generated variables we need to add into environment.
+   * @returns :reponse
+   */
+  public updateEnvironmentById = async (
+    environmentId: string,
+    targetEnvironments: any[],
+    keyPairObjects: { key: string; value: string }[],
+  ) => {
+    const response = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = response?.getLatest().toMutableJSON().isGuestUser;
+    const targetEnvironment = targetEnvironments.find(
+      (env) => env.id === environmentId,
+    );
+    if (!targetEnvironment) {
+      notifications.error("Environment not found.");
+      return { isSuccessful: false };
+    }
+    const existingVariables = Array.isArray(targetEnvironment.variable)
+      ? [...targetEnvironment.variable]
+      : [];
+
+    const newVariables = keyPairObjects.map(({ key, value }) => ({
+      key,
+      value,
+      checked: true,
+    }));
+
+    const updatedVariables = [...existingVariables, ...newVariables].filter(
+      (variable) =>
+        variable.key.trim().length > 0 && variable.value.trim().length > 0,
+    );
+    updatedVariables.push({
+      key: "",
+      value: "",
+      checked: false,
+    });
+
+    const payload = {
+      name: targetEnvironment.name,
+      variable: updatedVariables,
+    };
+
+    if (isGuestUser) {
+      this.environmentRepository.updateEnvironment(environmentId, payload);
+      const currentTab = await this.tabRepository.getTabById(environmentId);
+      if (currentTab) {
+        const currentTabId = currentTab.tabId;
+        const envTab = createDeepCopy(currentTab);
+        envTab.property.environment.variable = updatedVariables;
+        envTab.isSaved = true;
+        await this.tabRepository.updateTab(currentTabId as string, {
+          property: envTab.property,
+          isSaved: envTab.isSaved,
+        });
+      }
+      notifications.success("Environment variables added successfully.");
+      return { isSuccessful: true };
+    }
+    const baseUrl = await this.constructBaseUrl(
+      this._tab.getValue().path?.workspaceId as string,
+    );
+    const apiResponse = await this.environmentService.updateEnvironment(
+      this._tab.getValue().path?.workspaceId as string,
+      environmentId,
+      payload,
+      baseUrl,
+    );
+    if (apiResponse.isSuccessful) {
+      this.environmentRepository.updateEnvironment(
+        apiResponse.data.data._id,
+        apiResponse.data.data,
+      );
+      const currentTab = await this.tabRepository.getTabById(
+        apiResponse.data.data._id,
+      );
+      if (currentTab) {
+        const currentTabId = currentTab.tabId;
+        const envTab = createDeepCopy(currentTab);
+        envTab.property.environment.variable = apiResponse.data.data.variable;
+        envTab.isSaved = true;
+        await this.tabRepository.updateTab(currentTabId as string, {
+          property: envTab.property,
+          isSaved: envTab.isSaved,
+        });
+      }
+      notifications.success("Environment variables added successfully.");
+    } else {
+      notifications.error(
+        "Failed to add environment variables. Please try again.",
+      );
+    }
+    return apiResponse;
+  };
+
+  public handleInsertGenerateVariable = async (
+    generateVariables: KeyValuePair[],
+    selectedEnvironmentId: string,
+    env: any,
+  ) => {
+    const response = await this.updateEnvironmentById(
+      selectedEnvironmentId,
+      env,
+      generateVariables,
+    );
     return response;
   };
 }
