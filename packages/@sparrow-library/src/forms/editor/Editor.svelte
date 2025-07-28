@@ -310,6 +310,7 @@
       CreatePlaceHolder(placeholder),
     ];
 
+    // Removing window style space(\r\n) to find correct cursor position
     let sanitizedValue = value?.includes("\r\n")
       ? value.replace(/\r\n/g, "\n")
       : value;
