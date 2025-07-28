@@ -40,6 +40,9 @@
   export let removeDynamicExpression: (id: string) => void | undefined;
   export let dynamicExpressionItems: any | undefined;
 
+  export let isNewLineOnEnter;
+  export let isNewLineOnShiftEnter;
+
   const environmentHelper = new EnvironmentHeper();
   let trackParanthesis: unknown[] = [];
   let trackCursor: number | undefined;
@@ -124,6 +127,8 @@
   {id}
   {componentClass}
   {isFocusedOnMount}
+  {isNewLineOnEnter}
+  {isNewLineOnShiftEnter}
   {handleOpenDE}
   {removeDynamicExpression}
   {dynamicExpressionItems}
