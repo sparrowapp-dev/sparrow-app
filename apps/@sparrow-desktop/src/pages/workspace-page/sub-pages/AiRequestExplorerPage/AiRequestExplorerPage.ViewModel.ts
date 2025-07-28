@@ -2467,9 +2467,10 @@ class AiRequestExplorerViewModel {
     Object.keys(allowedConfigs).forEach((key) => {
       modelSpecificConfig[key] = currConfigurations[modelProvider][key];
     });
-
+    const userEmail = getClientUser()?.email || "";
     const aiRequestData = {
       feature: "llm-evaluation",
+      emailId: userEmail,
       userInput:
         modelProvider === AiModelProviderEnum.Google ||
         (modelProvider === AiModelProviderEnum.OpenAI &&
