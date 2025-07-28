@@ -272,6 +272,14 @@
       {environmentVariables}
       {onUpdateEnvironment}
       disabled={isResponseGenerating ? true : false}
+      onkeydown={(event) => {
+        if (event === "Enter") {
+          if (!isResponseGenerating && prompt.trim()) {
+            hanldeStartGenerating();
+            return;
+          }
+        }
+      }}
     />
     <!-- <textarea
       bind:value={prompt}

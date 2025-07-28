@@ -766,6 +766,16 @@
     _direction = "add-block-after",
   ) => {
     if (!_id) return;
+    // handles run from from start button click
+    if (_id === "0") {
+      await onClickRun();
+      const startingNode = handleSelectFirstNode();
+      if (startingNode) {
+        selectNode(startingNode);
+      }
+      MixpanelEvent(Events.Run_TestFlows);
+      return;
+    }
     if ($nodes.length >= planLimitTestFlowBlocks + 1 && !isGuestUser) {
       testflowBlocksPlanModalOpen = true;
       // notifications.error(
@@ -780,17 +790,6 @@
         _requestData?.requestId,
         _requestData?.folderId,
       );
-    }
-
-    // handles run from from start button click
-    if (_id === "0") {
-      await onClickRun();
-      const startingNode = handleSelectFirstNode();
-      if (startingNode) {
-        selectNode(startingNode);
-      }
-      MixpanelEvent(Events.Run_TestFlows);
-      return;
     }
 
     // if (checkIfEdgesExist(_id)) {

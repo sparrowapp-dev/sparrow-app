@@ -102,6 +102,7 @@
           >
           <div class="d-flex" style="width: calc(100% - 55px);">
             <div
+              class="ellipsis"
               style="width: calc(100% - 20px); font-weight: 400; font-size: 12px; line-height: 18px; color:var(--text-ds-neutral-50); max-width:105px;whitespace:nowrap; overflow:hidden; text-overflow:ellipsis;"
             >
               {reviewEnv?.value}
