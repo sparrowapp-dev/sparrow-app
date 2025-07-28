@@ -43,6 +43,7 @@ env:
   VITE_SPARROW_ADMIN_URL: ${{ vars.VITE_SPARROW_ADMIN_URL }}
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
   CI: false
+  SNAPCRAFT_STORE_CREDENTIALS: ${{ vars.SNAPCRAFT_STORE_CREDENTIALS }}
 
 jobs:
   release_linux:
@@ -105,7 +106,7 @@ jobs:
           yarn cache clean
           npm install -g pnpm
           yarn install
-          yarn workspace @sparrow/desktop tauri build --bundles deb
+          yarn workspace @sparrow/desktop tauri build --bundles deb --debug
 
       # --- Prepare APT Repository ---
       - name: Setup APT tools
@@ -114,7 +115,7 @@ jobs:
       - name: Create repo structure
         run: |
           mkdir -p apt-repo/{pool/main,dists/stable/main/binary-amd64}
-          cp apps/@sparrow-desktop/src-tauri/target/release/bundle/deb/*.deb apt-repo/pool/main/
+          cp apps/@sparrow-desktop/src-tauri/target/debug/bundle/deb/*.deb apt-repo/pool/main/
 
       - name: Generate Packages.gz
         run: |
@@ -194,56 +195,56 @@ jobs:
           SOURCE_DIR: apt-repo
           DEST_DIR: linux
 
-      - name: Post Linux Build Link to Teams
-        env:
-          AWS_S3_BUCKET: sparrow-release-assests-prod
-          AWS_REGION: us-west-1
-          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
-        run: |
-          # Find the latest .deb file in the local build output
-          DEB_SRC_DIR="apps/@sparrow-desktop/src-tauri/target/release/bundle/deb"
-          DEB_FILE=$(ls "$DEB_SRC_DIR"/*.deb | sort -V | tail -n 1)
-          DEB_BASENAME=$(basename "$DEB_FILE")
-          DEB_URL="https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/linux/pool/main/$DEB_BASENAME"
+      # - name: Post Linux Build Link to Teams
+      #   env:
+      #     AWS_S3_BUCKET: sparrow-release-assests-prod
+      #     AWS_REGION: us-west-1
+      #     TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
+      #   run: |
+      #     # Find the latest .deb file in the local build output
+      #     DEB_SRC_DIR="apps/@sparrow-desktop/src-tauri/target/release/bundle/deb"
+      #     DEB_FILE=$(ls "$DEB_SRC_DIR"/*.deb | sort -V | tail -n 1)
+      #     DEB_BASENAME=$(basename "$DEB_FILE")
+      #     DEB_URL="https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/linux/pool/main/$DEB_BASENAME"
 
-          curl -H "Content-Type: application/json" -d "{
-            \"type\": \"message\",
-            \"attachments\": [
-              {
-                \"contentType\": \"application/vnd.microsoft.card.adaptive\",
-                \"content\": {
-                  \"type\": \"AdaptiveCard\",
-                  \"body\": [
-                    {
-                      \"type\": \"TextBlock\",
-                      \"text\": \"🐧 New Debian Build Available\",
-                      \"weight\": \"bolder\",
-                      \"size\": \"large\"
-                    },
-                    {
-                      \"type\": \"TextBlock\",
-                      \"text\": \"Branch: production\",
-                      \"wrap\": true
-                    },
-                    {
-                      \"type\": \"TextBlock\",
-                      \"text\": \"Direct Download:\",
-                      \"wrap\": true
-                    }
-                  ],
-                  \"actions\": [
-                    {
-                      \"type\": \"Action.OpenUrl\",
-                      \"title\": \"Download .deb\",
-                      \"url\": \"$DEB_URL\"
-                    }
-                  ],
-                  \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
-                  \"version\": \"1.2\"
-                }
-              }
-            ]
-          }" "$TEAMS_WEBHOOK_URL"   
+      #     curl -H "Content-Type: application/json" -d "{
+      #       \"type\": \"message\",
+      #       \"attachments\": [
+      #         {
+      #           \"contentType\": \"application/vnd.microsoft.card.adaptive\",
+      #           \"content\": {
+      #             \"type\": \"AdaptiveCard\",
+      #             \"body\": [
+      #               {
+      #                 \"type\": \"TextBlock\",
+      #                 \"text\": \"🐧 New Debian Build Available\",
+      #                 \"weight\": \"bolder\",
+      #                 \"size\": \"large\"
+      #               },
+      #               {
+      #                 \"type\": \"TextBlock\",
+      #                 \"text\": \"Branch: production\",
+      #                 \"wrap\": true
+      #               },
+      #               {
+      #                 \"type\": \"TextBlock\",
+      #                 \"text\": \"Direct Download:\",
+      #                 \"wrap\": true
+      #               }
+      #             ],
+      #             \"actions\": [
+      #               {
+      #                 \"type\": \"Action.OpenUrl\",
+      #                 \"title\": \"Download .deb\",
+      #                 \"url\": \"$DEB_URL\"
+      #               }
+      #             ],
+      #             \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
+      #             \"version\": \"1.2\"
+      #           }
+      #         }
+      #       ]
+      #     }" "$TEAMS_WEBHOOK_URL"   
   
   build-snap:
     runs-on: ubuntu-latest
@@ -314,56 +315,56 @@ jobs:
           echo "Uploading $SNAP_FILE to $SNAP_CHANNEL"
           snapcraft upload "$SNAP_FILE" --release "$SNAP_CHANNEL"
 
-      - name: Post Linux Snap Store Link to Teams
-        env:
-          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
-          SNAP_STORE_URL: ${{ secrets.SNAP_STORE_URL }}
-        run: |
-          curl -H "Content-Type: application/json" -d "{
-            \"type\": \"message\",
-            \"attachments\": [
-              {
-                \"contentType\": \"application/vnd.microsoft.card.adaptive\",
-                \"content\": {
-                  \"type\": \"AdaptiveCard\",
-                  \"body\": [
-                    {
-                      \"type\": \"TextBlock\",
-                      \"text\": \"📦 New Linux Snap Store Build Available\",
-                      \"weight\": \"bolder\",
-                      \"size\": \"large\",
-                      \"color\": \"good\"
-                    },
-                    {
-                      \"type\": \"TextBlock\",
-                      \"text\": \"A new Linux snap package has been uploaded to the Snap Store:\",
-                      \"wrap\": true
-                    },
-                    {
-                      \"type\": \"TextBlock\",
-                      \"text\": \"Channel: $SNAP_CHANNEL\",
-                      \"wrap\": true
-                    },
-                    {
-                      \"type\": \"TextBlock\",
-                      \"text\": \"Snap Store URL:\",
-                      \"wrap\": true
-                    },
-                    {
-                      \"type\": \"TextBlock\",
-                      \"text\": \"$SNAP_STORE_URL\",
-                      \"color\": \"accent\",
-                      \"wrap\": true
-                    }
-                  ],
-                  \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
-                  \"version\": \"1.2\",
-                  \"msteams\": {
-                    \"width\": \"Full\"
-                  }
-                }
-              }
-            ]
-          }" "$TEAMS_WEBHOOK_URL"
-        shell: bash
+      # - name: Post Linux Snap Store Link to Teams
+      #   env:
+      #     TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
+      #     SNAP_STORE_URL: ${{ secrets.SNAP_STORE_URL }}
+      #   run: |
+      #     curl -H "Content-Type: application/json" -d "{
+      #       \"type\": \"message\",
+      #       \"attachments\": [
+      #         {
+      #           \"contentType\": \"application/vnd.microsoft.card.adaptive\",
+      #           \"content\": {
+      #             \"type\": \"AdaptiveCard\",
+      #             \"body\": [
+      #               {
+      #                 \"type\": \"TextBlock\",
+      #                 \"text\": \"📦 New Linux Snap Store Build Available\",
+      #                 \"weight\": \"bolder\",
+      #                 \"size\": \"large\",
+      #                 \"color\": \"good\"
+      #               },
+      #               {
+      #                 \"type\": \"TextBlock\",
+      #                 \"text\": \"A new Linux snap package has been uploaded to the Snap Store:\",
+      #                 \"wrap\": true
+      #               },
+      #               {
+      #                 \"type\": \"TextBlock\",
+      #                 \"text\": \"Channel: $SNAP_CHANNEL\",
+      #                 \"wrap\": true
+      #               },
+      #               {
+      #                 \"type\": \"TextBlock\",
+      #                 \"text\": \"Snap Store URL:\",
+      #                 \"wrap\": true
+      #               },
+      #               {
+      #                 \"type\": \"TextBlock\",
+      #                 \"text\": \"$SNAP_STORE_URL\",
+      #                 \"color\": \"accent\",
+      #                 \"wrap\": true
+      #               }
+      #             ],
+      #             \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
+      #             \"version\": \"1.2\",
+      #             \"msteams\": {
+      #               \"width\": \"Full\"
+      #             }
+      #           }
+      #         }
+      #       ]
+      #     }" "$TEAMS_WEBHOOK_URL"
+      #   shell: bash
 
