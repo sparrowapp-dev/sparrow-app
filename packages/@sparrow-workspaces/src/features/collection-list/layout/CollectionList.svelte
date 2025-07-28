@@ -207,9 +207,6 @@
       currentWorkspaceId = value._data._id;
       activeWorkspace = value;
       isSharedWorkspace = value?.isShared || false;
-      collectionListDocument = collectionListDocument?.filter(
-        (value) => value.workspaceId === activeWorkspace?._id,
-      );
     }
   });
 
@@ -295,9 +292,11 @@
     }
   }
 
-  const collectionListSubscriber = collectionList.subscribe(async (value) => {
-    if (value) {
-      collectionListDocument = value
+  let rawCollection = [];
+
+  $: {
+    if (activeWorkspace?._id) {
+      collectionListDocument = rawCollection
         .map((value) => {
           return value.toMutableJSON();
         })
@@ -306,6 +305,12 @@
             value.workspaceId === activeWorkspace?._id &&
             !(value?.activeSync && activeWorkspace?.isShared),
         );
+    }
+  }
+
+  const collectionListSubscriber = collectionList.subscribe(async (value) => {
+    if (value) {
+      rawCollection = value;
     }
   });
 
