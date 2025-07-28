@@ -28,6 +28,8 @@
         {environmentVariables}
         {onUpdateEnvironment}
         isReadOnly={isAutoPromptGenerationInProgress ? true : false}
+        isNewLineOnEnter={true}
+        isNewLineOnShiftEnter={true}
       />
 
       {#if isEditable && !isAutoPromptGenerationInProgress}

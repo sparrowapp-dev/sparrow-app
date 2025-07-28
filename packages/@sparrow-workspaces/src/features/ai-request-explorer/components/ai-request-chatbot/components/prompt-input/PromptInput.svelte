@@ -272,6 +272,7 @@
       {environmentVariables}
       {onUpdateEnvironment}
       disabled={isResponseGenerating ? true : false}
+      isNewLineOnShiftEnter={true}
       onkeydown={(event) => {
         if (event === "Enter") {
           if (!isResponseGenerating && prompt.trim()) {

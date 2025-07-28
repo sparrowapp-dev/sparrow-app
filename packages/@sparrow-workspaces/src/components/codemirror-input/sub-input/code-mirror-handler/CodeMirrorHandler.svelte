@@ -74,6 +74,9 @@
   export let dispatcher;
   export let onkeydown = () => {};
 
+  export let isNewLineOnEnter = false;
+  export let isNewLineOnShiftEnter = false;
+
   let inputWrapper: HTMLElement;
   let localEnvKey = "";
   let codeMirrorEditorDiv: HTMLDivElement;
@@ -327,13 +330,17 @@
       key: "Enter",
       run: (view) => {
         onkeydown("Enter");
-        return true;
+        if (!isNewLineOnEnter) {
+          return true;
+        }
       },
     },
     {
       key: "Shift-Enter",
       run: (view) => {
-        return true;
+        if (!isNewLineOnShiftEnter) {
+          return true;
+        }
       },
     },
     {
