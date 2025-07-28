@@ -72,6 +72,7 @@
   export let isFocusedOnMount = false;
   export let handleOpenDE;
   export let dispatcher;
+  export let onkeydown = () => {};
 
   let inputWrapper: HTMLElement;
   let localEnvKey = "";
@@ -325,6 +326,7 @@
     {
       key: "Enter",
       run: (view) => {
+        onkeydown("Enter");
         return true;
       },
     },
