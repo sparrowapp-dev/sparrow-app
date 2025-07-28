@@ -293,6 +293,11 @@
       highlightActiveLine,
       highlightActiveLineGutter,
     };
+    console.log(
+      "Initializing CodeMirror editor with value:",
+      value,
+      value.length,
+    );
 
     let extensions: Extension[];
     extensions = [
@@ -310,11 +315,16 @@
       CreatePlaceHolder(placeholder),
     ];
 
+    let sanitizedValue = value?.includes("\r\n")
+      ? value.replace(/\r\n/g, "\n")
+      : value;
+    console.log("Trimmed value length:", sanitizedValue.length);
+
     let state = EditorState.create({
       doc: value,
       extensions: extensions,
       selection: autofocus
-        ? { anchor: value.length, head: value.length }
+        ? { anchor: sanitizedValue.length, head: sanitizedValue.length }
         : { anchor: 0, head: 0 },
     });
 
@@ -368,6 +378,10 @@
   afterUpdate(() => {
     // Handling the mergeview state while component state changes
     if (!isMergeViewEnabled && value !== codeMirrorView.state.doc.toString()) {
+      let sanitizedValue = value.includes("\r\n")
+        ? value.replace(/\r\n/g, "\n")
+        : value;
+
       codeMirrorView.dispatch({
         changes: {
           from: 0,
@@ -375,7 +389,7 @@
           insert: value,
         },
         selection: autofocus
-          ? { anchor: value.length, head: value.length }
+          ? { anchor: sanitizedValue.length, head: sanitizedValue.length }
           : { anchor: 0, head: 0 },
         annotations: [{ autoChange: true }],
       });
