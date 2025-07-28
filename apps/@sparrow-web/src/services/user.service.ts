@@ -53,4 +53,20 @@ export class UserService {
     );
     return response;
   };
+  /**
+   * Gets the trial exhausted status for a user by email.
+   *
+   * @param email - The email address of the user.
+   * @returns A promise that resolves to the server's response.
+   */
+  public getUserTrialExhaustedStatus = async (email: string) => {
+    const response: HttpClientResponseInterface = await makeRequest(
+      "GET",
+      `${apiUrl}/api/user/trial-exhausted/${email}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }

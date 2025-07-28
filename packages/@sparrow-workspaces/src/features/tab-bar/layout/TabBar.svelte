@@ -346,7 +346,9 @@
     height: 100%;
     background-color: var(--sparrow-black);
   }
-
+  .tab-scroller {
+    overflow-y: hidden;
+  }
   .tab-scroller::-webkit-scrollbar {
     display: none;
   }

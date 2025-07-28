@@ -27,11 +27,53 @@
    */
   export let isError: boolean = false;
 
+  /**
+   * List of current workspace users to check for duplicates
+   */
+  export let currentWorkspaceUsers: { email: string }[] = [];
+
   // State variables
   let isOpen = false;
   let data = list;
   let emailstoBeSentArr: string[] = [];
   let currentEmailEntered = "";
+  let invalidEmails: Set<string> = new Set();
+
+  /**
+   * Validates if an email is valid (exists in list and not already in workspace)
+   */
+  const validateEmail = (email: string): boolean => {
+    const trimmedEmail = email.trim();
+    if (!isValidEmail(trimmedEmail)) {
+      return false;
+    }
+    const isInWorkspace = currentWorkspaceUsers.some(
+      (user) => user.email === trimmedEmail,
+    );
+    if (isInWorkspace) {
+      return false;
+    }
+    return true;
+  };
+
+  function isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email.trim());
+  }
+
+  /**
+   * Updates the invalid emails set and triggers parent onChange
+   */
+  const updateInvalidEmails = () => {
+    invalidEmails.clear();
+    emailstoBeSentArr.forEach((email) => {
+      if (!validateEmail(email)) {
+        invalidEmails.add(email);
+      }
+    });
+    invalidEmails = invalidEmails;
+    onChange(emailstoBeSentArr);
+  };
 
   /**
    * Handles click events outside the dropdown to close it.
@@ -95,8 +137,16 @@
   const handleEmailOnAdd = (email: string) => {
     email = email.replace(",", "");
     email = email.trim();
+    // Check if email already exists in the array
+    if (emailstoBeSentArr.includes(email)) {
+      return;
+    }
     emailstoBeSentArr = [...emailstoBeSentArr, email];
-    onChange(emailstoBeSentArr);
+    const isValid = validateEmail(email);
+    if (!isValid) {
+      invalidEmails.add(email);
+      invalidEmails = invalidEmails;
+    }
 
     const emailDiv: HTMLElement = createDynamicComponents(
       "div",
@@ -122,6 +172,10 @@
     closeIconBtn.id = email;
     closeIconBtn.src = closeIcon;
     emailContentSpan.innerHTML = email;
+    // Add red color for invalid emails
+    if (!isValid) {
+      emailContentSpan.style.color = "var(--text-ds-danger-300)";
+    }
     emailDiv.appendChild(emailContentSpan);
     emailDiv.appendChild(closeIconBtn);
     const emailContainer: HTMLElement = document.getElementById(
@@ -129,6 +183,7 @@
     ) as HTMLElement;
     emailContainer.appendChild(emailDiv);
     currentEmailEntered = "";
+    updateInvalidEmails();
   };
 
   /**
@@ -143,8 +198,25 @@
     ) as HTMLElement;
     emailContainer.removeChild(removeElement);
     emailstoBeSentArr = emailstoBeSentArr?.filter((e) => e != email);
-    onChange(emailstoBeSentArr);
+    // Remove from invalid emails set
+    invalidEmails.delete(email);
+    invalidEmails = invalidEmails;
+    updateInvalidEmails();
     filterUser();
+  };
+
+  /**
+   * Handle keyboard events for adding emails
+   */
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "Enter" || event.key === ",") {
+      event.preventDefault();
+      if (currentEmailEntered.trim()) {
+        handleEmailOnAdd(currentEmailEntered);
+        isOpen = false;
+        filterUser();
+      }
+    }
   };
 </script>
 
@@ -179,6 +251,7 @@
           on:focus={() => {
             isOpen = true;
           }}
+          on:keydown={handleKeyDown}
           class="input-container mt-1 sparrow-fs-12 my-1"
         />
       </div>
@@ -205,13 +278,13 @@
                   <Avatar
                     type="letter"
                     size="large"
-                    letter={user.name[0]}
+                    letter={user.name ? user.name[0] : user.email[0]}
                     bgColor="var(--text-tertiary-500)"
                   />
                 </div>
                 <div class="name pl-1 ellipsis" style="width: 90%;">
                   <span class="sparrow-fs-12 text-whiteColor w-100 ellipsis"
-                    >{user.name || ""}</span
+                    >{user.name || user.email}</span
                   ><br />
                   <span class="sparrow-fs-12 text-secondary-200 w-100 ellipsis"
                     >{user.email}</span

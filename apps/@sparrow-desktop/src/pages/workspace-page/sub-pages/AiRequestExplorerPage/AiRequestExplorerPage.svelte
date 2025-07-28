@@ -109,7 +109,7 @@
           }
 
           getConversationList = async () => {
-            conversationsHistory = _viewModel.getConversationsList();
+            conversationsHistory = await _viewModel.getConversationsList();
           };
 
           findUserRole();
@@ -204,7 +204,7 @@
   bind:collectionAuth={_viewModel.collectionAuth}
   bind:userRole
   {collection}
-  environmentVariables={[]}
+  {environmentVariables}
   {isGuestUser}
   storeData={AiRequestExplorerData}
   onUpdateAIModel={_viewModel.onUpdateAIModel}

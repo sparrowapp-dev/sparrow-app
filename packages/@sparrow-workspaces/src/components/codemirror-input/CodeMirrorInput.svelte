@@ -24,6 +24,8 @@
   export let disabled = false;
 
   export let enableEnvironmentHighlighting = true;
+
+  export let onkeydown;
   /**
    * unique id used to focus codemirror input
    */
@@ -126,6 +128,7 @@
   {removeDynamicExpression}
   {dynamicExpressionItems}
   {enableEnvironmentHighlighting}
+  {onkeydown}
   bind:dispatcher
 />
 

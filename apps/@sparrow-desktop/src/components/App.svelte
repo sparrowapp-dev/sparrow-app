@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Router, Route } from "svelte-navigator";
   import "font-awesome/css/font-awesome.css";
-  import { Toast } from "@sparrow/library/ui";
+  import { Modal, Toast } from "@sparrow/library/ui";
   import Authguard from "../routing/Authguard.svelte";
   import Navigate from "../routing/Navigate.svelte";
   import Dashboard from "@app/pages/dashboard-page/Dashboard.svelte";
@@ -26,7 +26,11 @@
   import { open } from "@tauri-apps/plugin-shell";
   import { Platform } from "@sparrow/common/enums";
 
-  const _viewModel = new AppViewModel();
+  let isAccessDeniedModalOpen = false;
+  const handleAccessDeniedClose = (flag = false) => {
+    isAccessDeniedModalOpen = flag;
+  };
+  const _viewModel = new AppViewModel(handleAccessDeniedClose);
 
   export let url = "/";
   let isActiveInternet: boolean = true;
@@ -140,6 +144,23 @@
 </script>
 
 <AppUpdater updateDoc={openUpdateDocs} />
+
+<Modal
+  title="Access Denied"
+  type="dark"
+  width="45%"
+  zIndex={1000}
+  isOpen={isAccessDeniedModalOpen}
+  handleModalState={handleAccessDeniedClose}
+>
+  <div class="py-0">
+    <p class="text-fs-14">
+      You don't seem to have access to this resource. Please check if you are
+      using the right account.
+    </p>
+  </div>
+</Modal>
+
 <Router {url}>
   <Authguard>
     <section slot="loggedIn">
