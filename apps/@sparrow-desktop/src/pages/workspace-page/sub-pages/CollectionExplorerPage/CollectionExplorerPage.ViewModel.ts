@@ -77,6 +77,7 @@ class CollectionExplorerPage {
   private environmentRepository = new EnvironmentRepository();
   private environmentService = new EnvironmentService();
   private guestUserRepository = new GuestUserRepository();
+  private initTab = new InitTab();
 
   // Private Services
   private collectionService = new CollectionService();
@@ -2271,13 +2272,13 @@ class CollectionExplorerPage {
    * Handle updated environment variables for a workspace.
    * @param environmentId :environmentId in which we want to update it.
    * @param targetEnvironments : environment at which I want to updated the variables in a workspace.
-   * @param keyPairObjects:new generated variables we need to add into environment.
+   * @param newKeyValuePairs:new generated variables we need to add into environment.
    * @returns :reponse
    */
   public updateEnvironmentById = async (
     environmentId: string,
     targetEnvironments: any[],
-    keyPairObjects: { key: string; value: string }[],
+    newKeyValuePairs: { key: string; value: string }[],
   ) => {
     const response = await this.guestUserRepository.findOne({
       name: "guestUser",
@@ -2294,7 +2295,7 @@ class CollectionExplorerPage {
       ? [...targetEnvironment.variable]
       : [];
 
-    const newVariables = keyPairObjects.map(({ key, value }) => ({
+    const newVariables = newKeyValuePairs.map(({ key, value }) => ({
       key,
       value,
       checked: true,
@@ -2358,6 +2359,16 @@ class CollectionExplorerPage {
           isSaved: envTab.isSaved,
         });
       }
+      const updatedEnv = apiResponse?.data?.data;
+      const initEnvironmentTab = this.initTab.environment(
+        environmentId,
+        updatedEnv?.workspaceId,
+      );
+      initEnvironmentTab
+        .setName(updatedEnv?.name)
+        .setVariable(updatedEnv?.variable);
+      initEnvironmentTab.setTabType(TabPersistenceTypeEnum.TEMPORARY);
+      this.tabRepository.createTab(initEnvironmentTab.getValue());
       notifications.success("Environment variables added successfully.");
     } else {
       notifications.error(
@@ -2377,7 +2388,9 @@ class CollectionExplorerPage {
       env,
       generateVariables,
     );
-    return response;
+    if (response?.isSuccessful) {
+      return response;
+    }
   };
 }
 
