@@ -139,6 +139,7 @@
   let environmentId: string;
   let currentWorkspaceId = "";
   let currentWorkspace;
+  let workspaceEnvironments;
 
   let activeWorkspaceSubscribe;
 
@@ -187,8 +188,21 @@
     }
   };
 
+  const handleworkspaceEnvironments = () => {
+    if ($environments && currentWorkspaceId) {
+      workspaceEnvironments = $environments
+        .filter((env: any) => {
+          return env._data.workspaceId === currentWorkspaceId;
+        })
+        .map(
+          (env: any) => env.toMutableJSON() as EnvironmentDocumentBaseInterface,
+        );
+    }
+  };
+
   $: {
     if (environmentId || $environments || currentWorkspaceId) {
+      handleworkspaceEnvironments();
       refreshEnvironment();
     }
   }
@@ -207,6 +221,7 @@
   tab={_viewModel.tab}
   bind:collection
   {environmentVariables}
+  workspaceEnvs={workspaceEnvironments}
   {onSyncCollection}
   onUpdateDescription={_viewModel.handleUpdateDescription}
   onCreateAPIRequest={_viewModel.handleCreateRequest}
@@ -225,4 +240,6 @@
   onCreateAuthProfile={_viewModel.handleCreateAuthProfile}
   onUpdateAuthProfile={_viewModel.handleUpdateAuthProfile}
   onDeleteAuthProfile={_viewModel.handleDeleteAuthProfile}
+  onCreateGenerativeVariable={_viewModel.handleGenerativeVariableCreation}
+  onInsertGenerativeVariables={_viewModel.handleInsertGenerateVariable}
 />

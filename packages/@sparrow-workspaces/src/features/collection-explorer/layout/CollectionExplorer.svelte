@@ -81,6 +81,7 @@
   import {
     Button,
     Dropdown,
+    Modal,
     notifications,
     Options,
     Tag,
@@ -117,7 +118,15 @@
     type CollectionAuthProifleBaseInterface,
   } from "@sparrow/common/types/workspace/collection-base";
   import { getMethodStyle } from "@sparrow/common/utils";
-  import { WorkspaceRole, WorkspaceType } from "@sparrow/common/enums";
+  import {
+    WorkspaceRole,
+    WorkspaceType,
+    environmentType,
+  } from "@sparrow/common/enums";
+  import { SparkleFilled } from "@sparrow/common/icons";
+  import GenerateVariableLoading from "../components/generate-variable-loading/GenerateVariableLoading.svelte";
+  import GenerateVariable from "../components/generate-variable/GenerateVariable.svelte";
+  import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
 
   /**
    * Role of user in active workspace
@@ -131,6 +140,9 @@
   export let onCreateAuthProfile;
   export let onUpdateAuthProfile;
   export let onDeleteAuthProfile;
+  export let onCreateGenerativeVariable;
+  export let workspaceEnvs;
+  export let onInsertGenerativeVariables;
 
   /**
    * Local variables
@@ -154,6 +166,11 @@
   let isCollectionSyncing = false;
   let authProfilesList: CollectionAuthProifleBaseInterface[] = [];
   $: authProfilesList = collection?.authProfiles || [];
+  let totalAPIsCount: number = 0;
+  let generateVariableLoading: boolean = false;
+  let gerenatrVariableModal: boolean = false;
+  let generateVariables: KeyValuePair[] = [];
+  let workspaceEnvironments: any = [];
 
   /**
    * Function to update isSynced, totalRequests and totalFolders, and lastUpdated
@@ -384,6 +401,44 @@
     const response = await onDeleteAuthProfile(collection, authId);
     return response;
   };
+
+  const handleCloseModal = () => {
+    gerenatrVariableModal = false;
+  };
+
+  const handleGenerateVariables = async (
+    collectionId: string,
+    workspaceId: string,
+  ) => {
+    generateVariableLoading = true;
+    const data = await onCreateGenerativeVariable(collectionId, workspaceId);
+    if (data) {
+      generateVariableLoading = false;
+      gerenatrVariableModal = true;
+      generateVariables = data;
+    }
+  };
+
+  const handleWorkspaceEnvironment = () => {
+    workspaceEnvs.forEach((env) => {
+      workspaceEnvironments.push({
+        id: env.id,
+        type: env.type === environmentType.GLOBAL ? "G" : "E",
+        name: env.name,
+      });
+    });
+  };
+
+  $: {
+    totalAPIsCount =
+      totalGraphQl + totalRequests + totalSocketIo + totalWebSocket;
+  }
+
+  $: {
+    if (workspaceEnvs) {
+      handleWorkspaceEnvironment();
+    }
+  }
 </script>
 
 <div class="main-container d-flex h-100">
@@ -602,6 +657,52 @@
             </div>
           {/if}
 
+          <!-- Show save button only for overview tab, not for collection auth -->
+          <div style="margin-right: 8px;">
+            {#if $tab?.property?.collection?.state?.collectionNavigation !== CollectionNavigationTabEnum.AUTH_PROFILES}
+              <Button
+                disable={$tab?.isSaved || !isCollectionEditable
+                  ? true
+                  : false || isSharedWorkspace}
+                startIcon={SaveRegular}
+                type={"secondary"}
+                size="medium"
+                onClick={() => {
+                  onSaveCollection();
+                  handlecollection_collection_saved({
+                    name: "Collection Saved",
+                  });
+                }}
+              />
+            {/if}
+          </div>
+
+          <div style="margin-right: 8px;">
+            <Tooltip
+              title={"Generate Variables"}
+              subtext={`Use AI to quickly generate env variables by analyzing every API request in your collection.` +
+                (totalAPIsCount > 0
+                  ? ``
+                  : `You will need at least 1 API in your collection to perform this action.`)}
+              placement={"bottom-center"}
+              size="medium"
+            >
+              <Button
+                disable={false}
+                startIcon={SparkleFilled}
+                title={"Generate Variables"}
+                size="medium"
+                type={"secondary"}
+                onClick={() => {
+                  handleGenerateVariables(
+                    collection?.id,
+                    collection?.workspaceId,
+                  );
+                }}
+              />
+            </Tooltip>
+          </div>
+
           <div
             class="d-flex me-2 flex-column justify-content-center"
             bind:this={collectionTabButtonWrapper}
@@ -633,21 +734,6 @@
               />
             </Dropdown>
           </div>
-
-          <!-- Show save button only for overview tab, not for collection auth -->
-          {#if $tab?.property?.collection?.state?.collectionNavigation !== CollectionNavigationTabEnum.AUTH_PROFILES}
-            <Button
-              disable={$tab?.isSaved || !isCollectionEditable
-                ? true
-                : false || isSharedWorkspace}
-              startIcon={SaveRegular}
-              type={"secondary"}
-              onClick={() => {
-                onSaveCollection();
-                handlecollection_collection_saved({ name: "Collection Saved" });
-              }}
-            />
-          {/if}
         </div>
       {/if}
     </div>
@@ -1057,6 +1143,26 @@ margin-right: 8px;
     </div>
   </div> -->
 </div>
+
+{#if generateVariableLoading}
+  <GenerateVariableLoading />
+{/if}
+
+<Modal
+  title={"Generate Variables with AI"}
+  width={"40%"}
+  zIndex={1000}
+  isOpen={gerenatrVariableModal}
+  handleModalState={() => (gerenatrVariableModal = false)}
+>
+  <GenerateVariable
+    bind:generateVariables
+    {handleCloseModal}
+    {workspaceEnvironments}
+    {workspaceEnvs}
+    {onInsertGenerativeVariables}
+  />
+</Modal>
 
 <style>
   .input-outline {
