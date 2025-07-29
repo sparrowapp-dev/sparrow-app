@@ -14,6 +14,7 @@
   export let requestStateAuth: any = {};
   export let onUpdateRequestAuth;
   export let onUpdateEnvironment;
+  export let selectAuthHeader: string = HttpRequestAuthTypeBaseEnum.NO_AUTH;
 
   const onUpdateAuthType = (id = "") => {
     requestStateAuth = {
@@ -21,7 +22,7 @@
       requestAuthNavigation: id,
     };
     onUpdateRequestAuth("requestAuthNavigation", id);
-
+    selectAuthHeader = id;
     if (id === HttpRequestAuthTypeBaseEnum.NO_AUTH) {
       onUpdateRequestAuth("auth", defaultAuthValue);
     }

@@ -139,7 +139,7 @@
     // fetchConversations(); // fetch the updated state from DB
     // await new Sleep().setTime(1500).exec(); // wait for UI to load
     await fetchConversations();
-    const result = getConversationsList();
+    const result = await getConversationsList();
     maxPx += 230;
     defaultPx += 220;
     minPx += 300;
@@ -159,7 +159,7 @@
     if (!isGuestUser && isConversationHistoryPanelOpen) {
       isConversationHistoryLoading = true;
       const res = await fetchConversations();
-      const result = getConversationsList();
+      const result = await getConversationsList();
       isConversationHistoryLoading = false;
     }
     onUpdateRequestAuth();
@@ -248,6 +248,8 @@
                     isAutoPromptGenerationInProgress={$tab.property?.aiRequest
                       .state.isSaveDescriptionInProgress}
                     {isGuestUser}
+                    {environmentVariables}
+                    {onUpdateEnvironment}
                   />
                 {:else}
                   <div
@@ -276,7 +278,7 @@
                       .aiAuthNavigation}
                     auth={$tab.property?.aiRequest.auth}
                     requestStateAuthProfile={$tab.property.aiRequest.state
-                        .selectedRequestAuthProfileId}
+                      .selectedRequestAuthProfileId}
                     selectedModelProvider={$tab.property?.aiRequest
                       ?.aiModelProvider}
                     collectionAuth={$collectionAuth}
@@ -358,6 +360,8 @@
             {onUpdateAiPrompt}
             {onUpdateAiConversation}
             {onUpdateRequestState}
+            {environmentVariables}
+            {onUpdateEnvironment}
             {onGenerateAiResponse}
             {onStopGeneratingAIResponse}
             {activateGeneratePromptModal}
@@ -444,6 +448,8 @@
       isGeneratePromptModalOpen = false;
       generatePromptTarget = "None";
     }}
+    {environmentVariables}
+    {onUpdateEnvironment}
     on:insert={(event) => {}}
   />
 </Modal>

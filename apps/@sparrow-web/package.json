@@ -1,6 +1,6 @@
 {
   "name": "@sparrow/web",
-  "version": "2.28.0",
+  "version": "2.28.1",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 1422",
     "build": "vite build",
@@ -44,7 +44,7 @@
     "path": "^0.12.7",
     "svelte-navigator": "^3.2.2",
     "svelte-toasts": "^1.1.2",
-    "@sveltejs/svelte-virtual-list":"^3.0.1",
+    "@sveltejs/svelte-virtual-list": "^3.0.1",
     "uuid": "^9.0.1",
     "yup": "^1.2.0",
     "posthog-js": "1.236.7",

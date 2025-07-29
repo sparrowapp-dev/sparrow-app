@@ -28,6 +28,7 @@ import { TestflowService } from "src/services/testflow.service";
 import { TabRepository } from "src/repositories/tab.repository";
 import { identifyUser } from "src/utils/posthog/posthogConfig";
 import { RxDB } from "src/database/database";
+import { clearThrottleStore } from "@sparrow/common/store";
 const _guideRepository = new GuideRepository();
 const guestUserRepository = new GuestUserRepository();
 const teamRepository = new TeamRepository();
@@ -422,11 +423,9 @@ const refreshTestflow = async (
 const clearLocalDB = async (): Promise<void> => {
   setUser(null);
   isGuestUserActive.set(false);
-  await tabRepository.clearTabs();
-  await guestUserRepository.clearTabs();
   await RxDB.getInstance().destroyDb();
   await RxDB.getInstance().getDb();
-  // clearThrottleStore();
+  clearThrottleStore();
   clearAuthJwt();
 };
 

@@ -51,39 +51,83 @@
   const defaultRole: string = "select";
   let loader: boolean = false;
   let emailstoBeSentArr: string[] = [];
-  let showErrors: boolean = false;
   let selectedRole: string = defaultRole;
   let invalidEmails: string[] = [];
+  let errors = {
+    emailsEmpty: false,
+    roleInvalid: false,
+    userConflict: "",
+  };
+
+  const clearErrors = () => {
+    errors = {
+      emailsEmpty: false,
+      roleInvalid: false,
+      userConflict: "",
+    };
+  };
 
   /**
    * Handles the invite action. Sends the invite to the specified emails with the selected role.
    */
   const handleInvite = async () => {
     loader = true;
-    showErrors = true;
+    clearErrors();
+    if (emailstoBeSentArr.length === 0) {
+      errors.emailsEmpty = true;
+      loader = false;
+      return;
+    }
+    const isValid = filterWorkspaceInviteEmails(emailstoBeSentArr);
+    if (!isValid) {
+      loader = false;
+      return;
+    }
+    if (selectedRole === defaultRole) {
+      errors.roleInvalid = true;
+      loader = false;
+      return;
+    }
     const data: addUsersInWorkspacePayload = {
       users: emailstoBeSentArr,
       role: selectedRole,
     };
-    if (
-      emailstoBeSentArr &&
-      emailstoBeSentArr.length > 0 &&
-      !invalidEmails.length &&
-      selectedRole &&
-      selectedRole != defaultRole
-    ) {
-      const response = await onInviteUserToWorkspace(
-        currentWorkspaceDetails.id,
-        currentWorkspaceDetails.name,
-        data,
-        emailstoBeSentArr?.length,
-      );
-      if (response.isSuccessful) {
-        handleInvitePopup(false);
-      }
+    const response = await onInviteUserToWorkspace(
+      currentWorkspaceDetails.id,
+      currentWorkspaceDetails.name,
+      data,
+      emailstoBeSentArr.length,
+    );
+    if (response.isSuccessful) {
+      handleInvitePopup(false);
     }
     loader = false;
   };
+
+  const filterWorkspaceInviteEmails = (sentEmails: string[]) => {
+    const hubUserEmails = users.map((u: any) => u.email);
+    const workspaceUserEmails = currentWorkspaceDetails.users.map(
+      (u: any) => u.email,
+    );
+    for (const email of sentEmails) {
+      if (!isValidEmail(email)) {
+        errors.userConflict = "Please check and enter a correct email address.";
+        return false;
+      }
+      const isHubMember = hubUserEmails.includes(email);
+      const isInWorkspace = workspaceUserEmails.includes(email);
+      if (isHubMember && isInWorkspace) {
+        errors.userConflict = "User already exists in workspace.";
+        return false;
+      }
+    }
+    return true;
+  };
+
+  function isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email.trim());
+  }
 
   /**
    * Handles the role selection from the dropdown.
@@ -91,6 +135,7 @@
    */
   const handleDropdown = (role: string) => {
     selectedRole = role as WorkspaceRole;
+    if (role !== defaultRole) errors.roleInvalid = false;
   };
 </script>
 
@@ -115,13 +160,18 @@
       return true;
     })}
     id={"input-select2"}
+    currentWorkspaceUsers={currentWorkspaceDetails.users}
     onChange={(items) => {
       emailstoBeSentArr = items;
+      clearErrors();
+      filterWorkspaceInviteEmails(emailstoBeSentArr);
     }}
-    isError={showErrors && emailstoBeSentArr.length === 0}
+    isError={errors.emailsEmpty || !!errors.userConflict}
   />
-  {#if showErrors && emailstoBeSentArr.length === 0}
+  {#if errors.emailsEmpty}
     <p class="error-text mb-0 sparrow-fs-12">Email ID cannot be empty.</p>
+  {:else if errors.userConflict}
+    <p class="error-text mb-0 sparrow-fs-12">{errors.userConflict}</p>
   {/if}
 </div>
 <div class="mt-4">
@@ -159,11 +209,11 @@
     borderRounded={"4px"}
     headerFontWeight={400}
     headerFontSize={"12px"}
-    isError={showErrors && selectedRole === defaultRole}
+    isError={errors.roleInvalid}
     minHeaderWidth={"100%"}
     size={"medium"}
   />
-  {#if showErrors && selectedRole === defaultRole}
+  {#if errors.roleInvalid}
     <p class="error-text sparrow-fs-12">Role cannot be empty.</p>
   {/if}
 </div>

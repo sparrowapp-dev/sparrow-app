@@ -50,6 +50,7 @@ import { SocketTabAdapter } from "@app/adapter/socket-tab";
 import { RecentWorkspaceRepository } from "src/repositories/recent-workspace.repository";
 import { PlanRepository } from "src/repositories/plan.repository";
 import { PlanService } from "src/services/plan.service";
+import { clearThrottleStore } from "@sparrow/common/store";
 
 export class DashboardViewModel {
   constructor() {}
@@ -94,7 +95,7 @@ export class DashboardViewModel {
     return this.environmentRepository.getEnvironment();
   }
 
-     /**
+  /**
    * @description - get open team from local db
    */
   public get openTeam() {
@@ -201,8 +202,9 @@ export class DashboardViewModel {
           createdBy,
           updatedAt,
           updatedBy,
+          invites,
           isNewInvite,
-          billing
+          billing,
         } = elem;
         const updatedWorkspaces = workspaces?.map((workspace) => ({
           workspaceId: workspace.id,
@@ -229,6 +231,7 @@ export class DashboardViewModel {
           createdBy,
           updatedAt,
           updatedBy,
+          invites,
           isNewInvite,
           isOpen: isOpenTeam,
           billing
@@ -358,10 +361,9 @@ export class DashboardViewModel {
   public clearLocalDB = async (): Promise<void> => {
     setUser(null);
     isGuestUserActive.set(false);
-    await this.tabRepository.clearTabs();
-    await this.guestUserRepository.clearTabs();
     await RxDB.getInstance().destroyDb();
     await RxDB.getInstance().getDb();
+    clearThrottleStore();
     clearAuthJwt();
   };
 
@@ -378,9 +380,9 @@ export class DashboardViewModel {
 
   public clientLogout = async (): Promise<void> => {
     setUser(null);
-    await this.tabRepository.clearTabs();
     await RxDB.getInstance().destroyDb();
     await RxDB.getInstance().getDb();
+    clearThrottleStore();
     clearAuthJwt();
     window.location.href = constants.SPARROW_AUTH_URL + "/init?source=web";
   };

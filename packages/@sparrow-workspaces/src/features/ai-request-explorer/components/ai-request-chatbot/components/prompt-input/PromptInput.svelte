@@ -22,6 +22,8 @@
     getFileRestrictions,
     isFileUploadSupported,
   } from "../../../../constants";
+  import CodeMirrorInput from "../../../../../../components/codemirror-input/CodeMirrorInput.svelte";
+  import { UserPromptTheme } from "../../../../../../utils";
 
   export let placeholder = "";
   export let sendPrompt;
@@ -36,6 +38,11 @@
   export let currentModel: AIModelVariant;
   export let filesToUpload: PromptFileAttachment[] = [];
   export let disabled: boolean = false;
+
+  const theme = new UserPromptTheme().build();
+  export let environmentVariables;
+
+  export let onUpdateEnvironment;
 
   // Props
 
@@ -255,7 +262,27 @@
     {/if}
 
     <!-- Textarea Input -->
-    <textarea
+    <CodeMirrorInput
+      value={prompt}
+      onUpdateInput={(val) => {
+        onUpdateAiPrompt(val);
+      }}
+      placeholder="Write a prompt or generate one from generate prompt."
+      {theme}
+      {environmentVariables}
+      {onUpdateEnvironment}
+      disabled={isResponseGenerating ? true : false}
+      isNewLineOnShiftEnter={true}
+      onkeydown={(event) => {
+        if (event === "Enter") {
+          if (!isResponseGenerating && prompt.trim()) {
+            hanldeStartGenerating();
+            return;
+          }
+        }
+      }}
+    />
+    <!-- <textarea
       bind:value={prompt}
       on:input={() => {
         isTyping = true;
@@ -294,7 +321,7 @@
         isPromptBoxFocused = false;
         isTyping = false;
       }}
-    />
+    /> -->
   </div>
 
   <!-- Action Btn Section -->

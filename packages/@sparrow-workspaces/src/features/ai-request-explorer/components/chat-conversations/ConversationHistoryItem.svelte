@@ -4,6 +4,7 @@
     Conversation,
   } from "@sparrow/common/types/workspace/ai-request-tab";
   import {
+    CodeRegular,
     DeleteRegular,
     EditRegular,
     MoreHorizontalRegular,
@@ -39,6 +40,8 @@
       conversation.id,
       conversation.title,
       conversation.conversation,
+      conversation.configurations,
+      conversation.systemPrompt,
     );
   };
   export let currOpenedConversationId: string;
@@ -100,6 +103,22 @@
       inputField.blur();
     }
   };
+
+  let conversationTags = "";
+
+  function extractVariables(str, unique = true) {
+    const matches = [...str.matchAll(/{{\s*([^{}]+?)\s*}}/g)].map(
+      (match) => `{{${match[1]}}}`,
+    );
+
+    return unique ? [...new Set(matches)].join(" ") : matches.join(" ");
+  }
+
+  $: {
+    conversationTags = extractVariables(
+      JSON.stringify(conversation?.conversation || {}),
+    );
+  }
 </script>
 
 <svelte:window
@@ -117,7 +136,7 @@
   role="button"
   tabindex="0"
 >
-  <div class="conversation-content flex-fill">
+  <div class="conversation-content" style="    width: -webkit-fill-available;">
     <!-- Title -->
     {#if isRenaming}
       <input
@@ -162,7 +181,7 @@
     </div>
 
     <!-- Bottom row with timestamp and updated by -->
-    <div class="d-flex align-items-center justify-content-between mt-1">
+    <div class="d-flex mb-1 align-items-center justify-content-between mt-1">
       <div class="d-flex align-items-center gap-2">
         <!-- Timestamp -->
         <span class="conversation-timestamp">
@@ -187,6 +206,21 @@
         </span>
       {/if}
     </div>
+    {#if conversationTags}
+      <div class="ellipsis">
+        <div class="d-flex ellipsis">
+          <span class="mr-2">
+            <CodeRegular size={"16px"} color={"var(--icon-ds-neutral-500)"} />
+          </span>
+          <p
+            class="text-fs-12 mb-0 ellipsis w-100"
+            style="color:var(--text-ds-primary-300)"
+          >
+            {conversationTags}
+          </p>
+        </div>
+      </div>
+    {/if}
   </div>
 
   <div

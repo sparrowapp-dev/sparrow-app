@@ -265,8 +265,33 @@ class HelpPageViewModel {
             currentCategory.toLowerCase(),
         )
       : result;
+    if (search !== "") {
+      return this.searchFilter(filteredResult, search);
+    }
     return filteredResult;
   };
+
+  /**
+   * Simple search function to filter objects based on title and details
+   * @param {Array} data - Array of objects to search through
+   * @param {string} searchQuery - Search query string
+   * @returns {Array} - Array of matching objects
+   */
+  public searchFilter(data: any, searchQuery: string) {
+    if (!searchQuery || searchQuery.trim() === "") {
+      return data;
+    }
+    const query = searchQuery.toLowerCase().trim();
+    const searchTerms = query.split(/\s+/).filter((term) => term.length > 0);
+    return data.filter((item: any) => {
+      const title = (item?.title || "").toLowerCase();
+      const details = (item?.details || "").toLowerCase();
+      // Combine both fields for searching
+      const searchableText = `${title} ${details}`;
+      // Check if any search term is found in the searchable text
+      return searchTerms.some((term) => searchableText.includes(term));
+    });
+  }
 
   /**
    * Creates a post on the feedback board retrieved from Canny service with the given title and description.

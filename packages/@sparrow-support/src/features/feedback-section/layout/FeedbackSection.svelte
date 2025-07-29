@@ -503,7 +503,7 @@
               isPostFetching = false;
               MixpanelEvent(Events.Feedback_SortBy_Filter);
             }}
-            class="sort-buttons d-flex align-items-center justify-content-between w-100"
+            class="sort-buttons d-flex align-items-center justify-content-between"
             class:active={currentSort === "trending"}
           >
             <div>
@@ -541,7 +541,7 @@
               isPostFetching = false;
               MixpanelEvent(Events.Feedback_SortBy_Filter);
             }}
-            class="sort-buttons d-flex align-items-center justify-content-between w-100 mt-1"
+            class="sort-buttons d-flex align-items-center justify-content-between mt-1"
             class:active={currentSort === "newest"}
           >
             <span
@@ -577,7 +577,7 @@
               isPostFetching = false;
               MixpanelEvent(Events.Feedback_SortBy_Filter);
             }}
-            class="sort-buttons d-flex align-items-center justify-content-between w-100 mt-2"
+            class="sort-buttons d-flex align-items-center justify-content-between mt-2"
             class:active={currentSort === "score"}
           >
             <span
@@ -772,6 +772,7 @@
     outline: none !important;
     border: none !important;
     font-weight: 500;
+    width: 108px !important;
   }
 
   .sort-buttons:hover {

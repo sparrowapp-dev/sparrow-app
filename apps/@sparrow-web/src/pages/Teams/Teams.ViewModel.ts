@@ -25,6 +25,7 @@ import { PlanRepository } from "src/repositories/plan.repository";
 import { PlanService } from "src/services/plan.service";
 import constants from "src/constants/constants";
 import { planBannerisOpen } from "@sparrow/common/store";
+import { getClientUser } from "src/utils/jwt";
 
 export class TeamsViewModel {
   constructor() {}
@@ -123,7 +124,7 @@ export class TeamsViewModel {
           updatedBy,
           isNewInvite,
           invites,
-          billing
+          billing,
         } = elem;
         const updatedWorkspaces = workspaces?.map((workspace) => ({
           workspaceId: workspace.id,
@@ -153,7 +154,7 @@ export class TeamsViewModel {
           isNewInvite,
           isOpen: isOpenTeam,
           invites,
-          billing
+          billing,
         };
         data.push(item);
       }
@@ -466,5 +467,33 @@ export class TeamsViewModel {
     const isSparrowEdge = isGuestUser ? "&isSparrowEdge=true" : "";
     const sparrowRedirect = `sparrow://?accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email${isSparrowEdge}`;
     window.location.href = sparrowRedirect;
+  };
+
+  public getUserTrialExhaustedStatus = async (): Promise<boolean> => {
+    const response = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = response?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) return false;
+    try {
+      const email = getClientUser().email;
+      const response =
+        await this.userService.getUserTrialExhaustedStatus(email);
+      return response?.data?.data?.isUserTrialExhausted ?? false;
+    } catch (error) {
+      console.error("Error fetching trial exhausted status:", error);
+      return false;
+    }
+  };
+
+  public handleStartTrial = () => {
+    debugger;
+    const email = getClientUser().email;
+    const accessToken = localStorage.getItem("AUTH_TOKEN");
+    const refreshToken = localStorage.getItem("REF_TOKEN");
+    const url =
+      constants.ADMIN_URL +
+      `?accessToken=${accessToken}&refreshToken=${refreshToken}&email=${email}&source=web&trial=login_trial`;
+    window.open(url, "_blank");
   };
 }
