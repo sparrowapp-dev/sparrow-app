@@ -71,7 +71,10 @@
   };
 
   const handleEnvironmentPopUpSuccess = async () => {
-    const response = await onDeleteEnvironment(env);
+    const response = await onDeleteEnvironment(
+      env,
+      currentWorkspace?.environmentId,
+    );
     if (response.isSuccessful) {
       handleEnvironmentPopUpCancel(false);
     }

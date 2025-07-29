@@ -275,7 +275,7 @@ export class EnvironmentViewModel {
    * @param env - environment needs to be deleted
    * @returns
    */
-  public onDeleteEnvironment = async (env) => {
+  public onDeleteEnvironment = async (env, activeEnvironmentId: string) => {
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
       env.workspaceId,
     );
@@ -284,10 +284,11 @@ export class EnvironmentViewModel {
       name: "guestUser",
     });
     const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    const updatedEnvironmentId = activeEnvironmentId || "none";
     if (isGuestUser) {
       this.environmentRepository.removeEnvironment(env.id);
       this.workspaceRepository.updateWorkspace(currentWorkspace._id, {
-        environmentId: "none",
+        environmentId: updatedEnvironmentId,
       });
       this.deleteEnvironmentTab(env.id);
       notifications.success(
@@ -306,7 +307,7 @@ export class EnvironmentViewModel {
     if (response.isSuccessful) {
       this.environmentRepository.removeEnvironment(env.id);
       this.workspaceRepository.updateWorkspace(currentWorkspace._id, {
-        environmentId: "none",
+        environmentId: updatedEnvironmentId,
       });
       this.deleteEnvironmentTab(env.id);
       notifications.success(
