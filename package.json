@@ -3,7 +3,7 @@
   "private": true,
   "author": "Sparrow",
   "description": "The Sparrow App is your next go to API development buddy which can help you test, debug, distribute better APIs while collaborating with your colleagues and making you a better programmer.",
-  "version": "2.29.0",
+  "version": "2.26.0",
   "type": "module",
   "workspaces": [
     "./apps/@sparrow-web",
@@ -178,19 +178,19 @@
           "assets": [
             {
               "path": "/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg",
-              "label": "Sparrow_2.29.0.dmg"
+              "label": "Sparrow_2.26.0.dmg"
             },
             {
               "path": "msi_files/*.exe",
-              "label": "Sparrow_2.29.0.exe"
+              "label": "Sparrow_2.26.0.exe"
             },
             {
               "path": "msi_files/*.msi",
-              "label": "Sparrow_2.29.0.msi"
+              "label": "Sparrow_2.26.0.msi"
             },
             {
               "path": "msi_files/*.zip",
-              "label": "Sparrow_2.29.0_x64_en-US.msi.zip"
+              "label": "Sparrow_2.26.0_x64_en-US.msi.zip"
             },
             {
               "path": "/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/Sparrow.app.tar.gz",
@@ -198,7 +198,7 @@
             },
             {
               "path": "deb_files/*.deb",
-              "label": "sparrow_2.29.0_amd64.deb"
+              "label": "sparrow_2.26.0_amd64.deb"
             }
           ]
         }

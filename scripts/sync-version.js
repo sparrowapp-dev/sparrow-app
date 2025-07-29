@@ -57,7 +57,7 @@ filesToUpdate.forEach(filePath => {
         if (githubPlugin && githubPlugin[1] && githubPlugin[1].assets) {
           githubPlugin[1].assets.forEach(asset => {
             if (asset.label) {
-              // Update labels that contain version patterns like "Sparrow_2.29.0.dmg"
+              // Update labels that contain version patterns like "Sparrow_2.26.0.dmg"
               const updatedLabel = asset.label.replace(/\d+\.\d+\.\d+/g, version);
               if (asset.label !== updatedLabel) {
                 asset.label = updatedLabel;
