@@ -232,6 +232,8 @@
           user.role === WorkspaceRole.WORKSPACE_VIEWER)
       )}
       borderRounded={"4px"}
+      minBodyWidth={"95px"}
+      minHeaderWidth={"95px"}
     />
   </div>
 </div>

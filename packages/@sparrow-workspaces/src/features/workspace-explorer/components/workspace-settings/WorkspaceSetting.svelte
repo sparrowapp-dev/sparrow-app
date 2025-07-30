@@ -54,6 +54,7 @@
         bind:value={search}
         on:input={() => {}}
         customWidth={"300px"}
+        placeholder={"Search by name,email or role"}
       />
     </div>
     <Member user={activeUser} isActiveUser={true} />
