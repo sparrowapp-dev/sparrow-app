@@ -105,23 +105,29 @@
   };
 
   const filterWorkspaceInviteEmails = (sentEmails: string[]) => {
-    const existingUserEmails = users.map((u: any) => u.email);
-    const matchingEmails = sentEmails.filter((email) =>
-      existingUserEmails.includes(email),
+    const hubUserEmails = users.map((u: any) => u.email);
+    const workspaceUserEmails = currentWorkspaceDetails.users.map(
+      (u: any) => u.email,
     );
-    if (matchingEmails.length !== sentEmails.length) {
-      errors.userConflict = "Please check and enter correct email address.";
-      return false;
-    }
-    const alreadyInWorkspace = currentWorkspaceDetails.users.some((user) =>
-      matchingEmails.includes(user.email),
-    );
-    if (alreadyInWorkspace) {
-      errors.userConflict = "User already exists in workspace.";
-      return false;
+    for (const email of sentEmails) {
+      if (!isValidEmail(email)) {
+        errors.userConflict = "Please check and enter a correct email address.";
+        return false;
+      }
+      const isHubMember = hubUserEmails.includes(email);
+      const isInWorkspace = workspaceUserEmails.includes(email);
+      if (isHubMember && isInWorkspace) {
+        errors.userConflict = "User already exists in workspace.";
+        return false;
+      }
     }
     return true;
   };
+
+  function isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email.trim());
+  }
 
   /**
    * Handles the role selection from the dropdown.

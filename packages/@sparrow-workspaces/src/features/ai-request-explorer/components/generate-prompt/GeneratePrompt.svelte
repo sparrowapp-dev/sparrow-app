@@ -168,6 +168,8 @@
         {environmentVariables}
         {onUpdateEnvironment}
         isFocusedOnMount={false}
+        isNewLineOnEnter={true}
+        isNewLineOnShiftEnter={true}
       />
       <!-- <Textarea
         id="user-prompt-textarea"
@@ -204,6 +206,8 @@
         {environmentVariables}
         {onUpdateEnvironment}
         disabled={isAnyActionInProgress}
+        isNewLineOnEnter={true}
+        isNewLineOnShiftEnter={true}
       />
       <!-- <Textarea
         id="ai-response-textarea"

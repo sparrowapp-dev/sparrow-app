@@ -475,7 +475,7 @@
       will be removed.
     </p>
   </div>
-  <div class="d-flex gap-3">
+  <div class="d-flex flex-wrap gap-3">
     <div class="d-flex gap-1 text-ds-font-size-12">
       <span class="text-plusButton">{folderCount}</span>
       <p>Folder</p>

@@ -24,6 +24,8 @@
   export let disabled = false;
 
   export let enableEnvironmentHighlighting = true;
+
+  export let onkeydown;
   /**
    * unique id used to focus codemirror input
    */
@@ -37,6 +39,9 @@
   export let handleOpenDE;
   export let removeDynamicExpression: (id: string) => void | undefined;
   export let dynamicExpressionItems: any | undefined;
+
+  export let isNewLineOnEnter;
+  export let isNewLineOnShiftEnter;
 
   const environmentHelper = new EnvironmentHeper();
   let trackParanthesis: unknown[] = [];
@@ -122,10 +127,13 @@
   {id}
   {componentClass}
   {isFocusedOnMount}
+  {isNewLineOnEnter}
+  {isNewLineOnShiftEnter}
   {handleOpenDE}
   {removeDynamicExpression}
   {dynamicExpressionItems}
   {enableEnvironmentHighlighting}
+  {onkeydown}
   bind:dispatcher
 />
 

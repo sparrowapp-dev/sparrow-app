@@ -72,6 +72,10 @@
   export let isFocusedOnMount = false;
   export let handleOpenDE;
   export let dispatcher;
+  export let onkeydown = () => {};
+
+  export let isNewLineOnEnter = false;
+  export let isNewLineOnShiftEnter = false;
 
   let inputWrapper: HTMLElement;
   let localEnvKey = "";
@@ -325,13 +329,18 @@
     {
       key: "Enter",
       run: (view) => {
-        return true;
+        onkeydown("Enter");
+        if (!isNewLineOnEnter) {
+          return true;
+        }
       },
     },
     {
       key: "Shift-Enter",
       run: (view) => {
-        return true;
+        if (!isNewLineOnShiftEnter) {
+          return true;
+        }
       },
     },
     {

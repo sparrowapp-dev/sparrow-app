@@ -933,7 +933,6 @@
     opacity: 0;
     transform: translateY(6px);
     will-change: opacity, transform;
-    overflow: hidden;
   }
   .select-data.visible {
     opacity: 1;

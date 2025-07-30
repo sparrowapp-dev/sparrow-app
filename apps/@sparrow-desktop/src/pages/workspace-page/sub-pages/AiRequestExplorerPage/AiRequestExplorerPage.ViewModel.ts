@@ -470,10 +470,10 @@ class AiRequestExplorerViewModel {
 
     const componentData = this._tab.getValue();
     const provider = componentData.property.aiRequest.aiModelProvider;
-    const providerAuthKey = this.decodeAiRequestAuth(
+    const providerAuthKey = (await this.decodeAiRequestAuth(
       componentData.property.aiRequest,
       this._collectionAuthProfile.getValue(),
-    ).apiKey.authValue;
+    ))?.apiKey.authValue;
 
     if (!providerAuthKey || !provider) {
       console.error(
@@ -509,13 +509,13 @@ class AiRequestExplorerViewModel {
    * Get list of conversations based on specific apikey
    * @returns :Observable<CollectionDocument[]> - the list of collection from current active workspace
    */
-  public getConversationsList = () => {
+  public getConversationsList = async() => {
     const componentData = this._tab.getValue();
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
-    const providerAuthKey = this.decodeAiRequestAuth(
+    const providerAuthKey = (await this.decodeAiRequestAuth(
       componentData.property.aiRequest,
       this._collectionAuthProfile.getValue(),
-    ).apiKey.authValue;
+    ))?.apiKey.authValue;
 
     if (!provider || !providerAuthKey) {
       console.error(
@@ -558,14 +558,18 @@ class AiRequestExplorerViewModel {
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const conversations =
       componentData?.property?.aiRequest?.ai?.conversations || [];
+    const configurations =
+    componentData?.property?.aiRequest?.configurations || {};
+    const systemPrompt =
+    componentData?.property?.aiRequest?.systemPrompt || "";
     const conversationId =
       componentData?.property?.aiRequest?.ai?.conversationId;
     const conversationTitle =
       componentData?.property?.aiRequest?.ai?.conversationTitle;
-    const providerAuthKey = this.decodeAiRequestAuth(
+    const providerAuthKey = (await this.decodeAiRequestAuth(
       componentData.property.aiRequest,
       this._collectionAuthProfile.getValue(),
-    ).apiKey.authValue;
+    ))?.apiKey.authValue;
 
     // if (!conversations.length || !provider || !providerAuthKey) {
     if (!provider || !providerAuthKey) {
@@ -591,6 +595,8 @@ class AiRequestExplorerViewModel {
         date: this.getLocalDate(),
         time: this.getFormattedTime(),
         conversation: conversations,
+        configurations:  configurations ,
+        systemPrompt: systemPrompt,
         authoredBy: isGuestUser ? "Guest User" : user.name,
         updatedBy: isGuestUser
           ? "Guest User"
@@ -606,7 +612,7 @@ class AiRequestExplorerViewModel {
           provider,
           apiKey: providerAuthKey,
           data: {
-            ...commonFields,
+            ...commonFields,        
             createdBy: isGuestUser
               ? "Guest User"
               : {
@@ -731,10 +737,10 @@ class AiRequestExplorerViewModel {
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const currTabConversationId =
       componentData?.property?.aiRequest?.ai?.conversationId;
-    const providerAuthKey = this.decodeAiRequestAuth(
+    const providerAuthKey = (await this.decodeAiRequestAuth(
       componentData.property.aiRequest,
       this._collectionAuthProfile.getValue(),
-    ).apiKey.authValue;
+    ))?.apiKey.authValue;
 
     if (!provider || !providerAuthKey) {
       console.error("Missing provider, conversations, or authKey.");
@@ -793,10 +799,10 @@ class AiRequestExplorerViewModel {
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const currTabConversationId =
       componentData?.property?.aiRequest?.ai?.conversationId;
-    const providerAuthKey = this.decodeAiRequestAuth(
+    const providerAuthKey = (await this.decodeAiRequestAuth(
       componentData.property.aiRequest,
       this._collectionAuthProfile.getValue(),
-    ).apiKey.authValue;
+    ))?.apiKey.authValue;
 
     if (!conversationId || !provider || !providerAuthKey) {
       console.error("Missing provider or authKey.");
@@ -840,10 +846,10 @@ class AiRequestExplorerViewModel {
     const componentData = this._tab.getValue();
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const providerModel = componentData?.property?.aiRequest?.aiModelVariant;
-    const providerAuthKey = this.decodeAiRequestAuth(
+    const providerAuthKey = (await this.decodeAiRequestAuth(
       componentData.property.aiRequest,
       this._collectionAuthProfile.getValue(),
-    ).apiKey.authValue;
+    ))?.apiKey.authValue;
 
     // Don't allow file uploads when auth key is not present.
     if (!provider || !providerAuthKey) {
@@ -2159,12 +2165,20 @@ class AiRequestExplorerViewModel {
     _conversationId: string,
     _conversationTitle: string,
     _conversations: Conversation[],
+    _configurations = null,
+    _systemPrompt = null
   ) => {
     this.updateRequestState({ isChatbotConversationLoading: true });
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.aiRequest.ai.conversationId = _conversationId;
     progressiveTab.property.aiRequest.ai.conversationTitle = _conversationTitle;
     progressiveTab.property.aiRequest.ai.conversations = _conversations;
+    if(_configurations){
+      progressiveTab.property.aiRequest.configurations = _configurations;
+    }
+    if(_systemPrompt !== null){
+      progressiveTab.property.aiRequest.systemPrompt = _systemPrompt;   
+    }
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     await new Sleep().setTime(2000).exec();
@@ -2348,7 +2362,7 @@ class AiRequestExplorerViewModel {
     // this.compareRequestWithServer();
   };
 
-  private decodeAiRequestAuth = (
+  private decodeAiRequestAuth = async(
     aiRequest: AiRequestType,
     _collectionLevelAuth: Partial<AiRequestCollectionLevelAuthProfileTabInterface>,
   ): Auth | CollectionAuthBaseInterface => {
@@ -2384,7 +2398,12 @@ class AiRequestExplorerViewModel {
         }
       }
     } else {
+      const componentData = this._tab.getValue();
+      const environments =  await this.getActiveEnvironments(componentData?.path?.workspaceId);
+      const token = aiRequest.auth.apiKey.authValue;
+      const decryptToken = this.setEnvironmentVariables(token, environments.filtered)
       auth = createDeepCopy(aiRequest.auth);
+      auth.apiKey.authValue = decryptToken;
     }
     return auth;
   };
@@ -2403,10 +2422,10 @@ class AiRequestExplorerViewModel {
     const tabId = componentData.tabId;
     const modelProvider = componentData.property.aiRequest.aiModelProvider;
     const modelVariant = componentData.property.aiRequest.aiModelVariant;
-    const authKey = this.decodeAiRequestAuth(
+    const authKey = (await this.decodeAiRequestAuth(
       componentData.property.aiRequest,
       this._collectionAuthProfile.getValue(),
-    ).apiKey;
+    ))?.apiKey;
     const systemPrompt = componentData.property.aiRequest.systemPrompt;
     const currConfigurations = componentData.property.aiRequest.configurations;
     const isChatAutoClearActive =
@@ -2448,9 +2467,10 @@ class AiRequestExplorerViewModel {
     Object.keys(allowedConfigs).forEach((key) => {
       modelSpecificConfig[key] = currConfigurations[modelProvider][key];
     });
-
+    const userEmail = getClientUser()?.email || "";
     const aiRequestData = {
       feature: "llm-evaluation",
+      emailId: userEmail,
       userInput:
         modelProvider === AiModelProviderEnum.Google ||
         (modelProvider === AiModelProviderEnum.OpenAI &&
@@ -2853,18 +2873,6 @@ class AiRequestExplorerViewModel {
       }
       return environmentVariables;
     };
-
-  private setEnvironmentVariables = (
-    text: string,
-    environmentVariables,
-  ): string => {
-    let updatedText = text;
-    environmentVariables.forEach((element) => {
-      const regex = new RegExp(`{{(${element.key})}}`, "g");
-      updatedText = updatedText.replace(regex, element.value);
-    });
-    return updatedText;
-  };
 
   public generateAiPrompt = async (
     target: "UserPrompt" | "SystemPrompt",

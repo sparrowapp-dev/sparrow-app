@@ -69,4 +69,4 @@ parts:
       fi
      
       # 3. Then carry on with the dump plugin’s default behavior
-      craftctl build
+      snapcraftctl build

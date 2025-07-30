@@ -109,7 +109,7 @@
           }
 
           getConversationList = async () => {
-            conversationsHistory = _viewModel.getConversationsList();
+            conversationsHistory = await _viewModel.getConversationsList();
           };
 
           findUserRole();
