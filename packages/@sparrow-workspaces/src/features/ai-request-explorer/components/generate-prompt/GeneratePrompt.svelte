@@ -292,7 +292,7 @@
 {/if}
 
 <!-- Action Buttons -->
-<div class="d-flex justify-content-between gap-2 mt-2 w-100">
+<div class="d-flex flex-wrap justify-content-between gap-2 mt-2 w-100">
   <Button
     title={generateButtonTitle}
     size="medium"
