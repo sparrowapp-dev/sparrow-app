@@ -23,7 +23,6 @@
   export let updateOperationSearch;
   export let isSchemaFetching = false;
   export let onRefreshSchema: () => void = () => {};
-  let reactiveCounter = 0;
 
   interface QuerySchema {
     name: string;
@@ -442,8 +441,8 @@
         }
       }
     }
-
     saveSchemaToDatabase(!_isCheckedNode);
+    queryBuilder = queryBuilder;
   };
 
   /**
@@ -539,13 +538,6 @@
       _id,
       convertStringToDataType(_e.detail, _datatype),
     );
-
-  $: {
-    if (queryBuilder) {
-      // Force a re-render by updating a dummy variable
-      reactiveCounter = (reactiveCounter || 0) + 1;
-    }
-  }
 </script>
 
 <div class="d-flex flex-column h-100">
@@ -611,134 +603,131 @@
             />
           </div>
           <div style="flex: 1; overflow: auto;">
-            {#key reactiveCounter}
-              {#if queryBuilder.length > 0}
-                {#each queryBuilder[0] as item}
-                  <div>
+            {#if queryBuilder.length > 0}
+              {#each queryBuilder[0] as item}
+                <div>
+                  <div
+                    class="d-flex align-items-center attribute-row border-radius-2 py-1 px-2 justify-content-between mb-1"
+                    style={item.isExpanded && !item?.isLeafNode
+                      ? "background-color: var(--bg-ds-surface-700) !important;"
+                      : ""}
+                    on:click={(e) => {
+                      e.preventDefault();
+                      handleQBuilderCheckboxExpandOrCollapse(
+                        item.id,
+                        0,
+                        item.isExpanded,
+                        item.isLeafNode,
+                        item.isSelected,
+                      );
+                    }}
+                  >
                     <div
-                      class="d-flex align-items-center attribute-row border-radius-2 py-1 px-2 justify-content-between mb-1"
-                      style={item.isExpanded && !item?.isLeafNode
-                        ? "background-color: var(--bg-ds-surface-700) !important;"
-                        : ""}
+                      style="width: 24px;"
+                      class="me-2"
                       on:click={(e) => {
                         e.preventDefault();
-                        handleQBuilderCheckboxExpandOrCollapse(
+                        e.stopPropagation();
+                        handleQBuilderCheckboxCheckedOrUnchecked(
                           item.id,
                           0,
-                          item.isExpanded,
-                          item.isLeafNode,
                           item.isSelected,
+                          item.isLeafNode,
                         );
                       }}
                     >
-                      <div
-                        style="width: 24px;"
-                        class="me-2"
-                        on:click={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleQBuilderCheckboxCheckedOrUnchecked(
-                            item.id,
-                            0,
-                            item.isSelected,
-                            item.isLeafNode,
-                          );
+                      <Checkbox checked={item.isSelected} />
+                    </div>
+
+                    <p
+                      class="d-flex align-items-center mb-0 ellipsis flex-grow-1"
+                      style="width: calc(100% - 40px);"
+                    >
+                      <span
+                        class="ellipsis node-valu-text"
+                        style="color: var(--text-ds-neutral-200);"
+                      >
+                        {item.name}
+                      </span>
+                      {#if item.isLeafNode && item.isInputField}
+                        <span class="input-arg-text text-fs-12 ms-2">ARG</span>
+                      {/if}
+                    </p>
+
+                    {#if !item.isLeafNode}
+                      <span
+                        class="d-flex align-items-center justify-content-center ms-auto"
+                      >
+                        <Button
+                          startIcon={ChevronRightRegular}
+                          size="extra-small"
+                          type="teritiary-regular"
+                          iconSize={12}
+                        />
+                      </span>
+                    {/if}
+                  </div>
+                  {#if item.isLeafNode && item.isInputField && item.isSelected}
+                    <div
+                      class="input-parent pe-2 mb-2 position-relative"
+                      style="padding-left: 35px;"
+                    >
+                      <input
+                        type="text"
+                        style="border:1px solid grey; outline:none;"
+                        class="arg-input w-100 bg-transparent border-radius-2 px-2 pe-3 py-1 text-fs-12"
+                        placeholder="Enter value"
+                        value={item.value || ""}
+                        on:input={(e) => {
+                          handleQBuilderInputboxChange(e, item.id, item.type);
                         }}
-                      >
-                        <Checkbox checked={item.isSelected} />
-                      </div>
-
-                      <p
-                        class="d-flex align-items-center mb-0 ellipsis flex-grow-1"
-                        style="width: calc(100% - 40px);"
-                      >
+                        on:focus={() => {
+                          isQueryInputFocused = true;
+                        }}
+                        on:blur={() => {
+                          setTimeout(() => {
+                            isQueryInputFocused = false;
+                          }, 400);
+                        }}
+                      />
+                      {#if item?.value && isQueryInputFocused}
                         <span
-                          class="ellipsis node-valu-text"
-                          style="color: var(--text-ds-neutral-200);"
+                          role="button"
+                          class="trash-container position-absolute"
+                          style="top:0px; right: 22px"
+                          on:click={() => {
+                            updateAttributeInputData(item?.id, "");
+                          }}
                         >
-                          {item.name}
-                        </span>
-                        {#if item.isLeafNode && item.isInputField}
-                          <span class="input-arg-text text-fs-12 ms-2">ARG</span
-                          >
-                        {/if}
-                      </p>
-
-                      {#if !item.isLeafNode}
-                        <span
-                          class="d-flex align-items-center justify-content-center ms-auto"
-                        >
-                          <Button
-                            startIcon={ChevronRightRegular}
-                            size="extra-small"
-                            type="teritiary-regular"
-                            iconSize={12}
+                          <img
+                            src={trashIcon}
+                            style="height: 100%; width: 100%;"
+                            class="trashicon"
                           />
                         </span>
                       {/if}
                     </div>
-                    {#if item.isLeafNode && item.isInputField && item.isSelected}
-                      <div
-                        class="input-parent pe-2 mb-2 position-relative"
-                        style="padding-left: 35px;"
-                      >
-                        <input
-                          type="text"
-                          style="border:1px solid grey; outline:none;"
-                          class="arg-input w-100 bg-transparent border-radius-2 px-2 pe-3 py-1 text-fs-12"
-                          placeholder="Enter value"
-                          value={item.value || ""}
-                          on:input={(e) => {
-                            handleQBuilderInputboxChange(e, item.id, item.type);
-                          }}
-                          on:focus={() => {
-                            isQueryInputFocused = true;
-                          }}
-                          on:blur={() => {
-                            setTimeout(() => {
-                              isQueryInputFocused = false;
-                            }, 400);
-                          }}
-                        />
-                        {#if item?.value && isQueryInputFocused}
-                          <span
-                            role="button"
-                            class="trash-container position-absolute"
-                            style="top:0px; right: 22px"
-                            on:click={() => {
-                              updateAttributeInputData(item?.id, "");
-                            }}
-                          >
-                            <img
-                              src={trashIcon}
-                              style="height: 100%; width: 100%;"
-                              class="trashicon"
-                            />
-                          </span>
-                        {/if}
-                      </div>
-                    {/if}
-                  </div>
-                {/each}
-              {/if}
-              {#if operationSearch && !queryBuilder?.length}
-                <div
-                  class="fields-column h-100 ellipsis"
-                  style="min-width: 260px; max-width: 260px; overflow: auto; border-right: 1px solid var(--border-secondary-500);"
-                >
-                  <div
-                    class="h-100 d-flex align-items-center justify-content-center"
-                  >
-                    <p
-                      class="text-fs-12 text-secondary-200"
-                      style="text-align: center;"
-                    >
-                      No result found.
-                    </p>
-                  </div>
+                  {/if}
                 </div>
-              {/if}
-            {/key}
+              {/each}
+            {/if}
+            {#if operationSearch && !queryBuilder?.length}
+              <div
+                class="fields-column h-100 ellipsis"
+                style="min-width: 260px; max-width: 260px; overflow: auto; border-right: 1px solid var(--border-secondary-500);"
+              >
+                <div
+                  class="h-100 d-flex align-items-center justify-content-center"
+                >
+                  <p
+                    class="text-fs-12 text-secondary-200"
+                    style="text-align: center;"
+                  >
+                    No result found.
+                  </p>
+                </div>
+              </div>
+            {/if}
           </div>
         </div>
       </div>
