@@ -4,6 +4,11 @@
   import { Button } from "@sparrow/library/ui";
   import { Avatar } from "@sparrow/library/ui";
   export let tab;
+  function addHttps(url) {
+    if (!url) return "";
+    if (/^https?:\/\//i.test(url)) return url;
+    return `https://${url}`;
+  }
 </script>
 
 <div
@@ -67,7 +72,7 @@
       <div class="d-flex flex-row align-items-center">
         <GithubIcon color="white" />
         <a
-          href={tab.property?.hub?.githubUrl || ""}
+          href={addHttps(tab.property?.hub?.githubUrl) || ""}
           target="_blank"
           style="text-decoration: none;"
         >
@@ -84,7 +89,7 @@
       <div class="d-flex flex-row align-items-center">
         <LinkedinOrgIcon />
         <a
-          href={tab.property?.hub?.linkedinUrl || ""}
+          href={addHttps(tab.property?.hub?.linkedinUrl) || ""}
           target="_blank"
           style="text-decoration: none;"
         >
@@ -101,7 +106,7 @@
       <div class="d-flex flex-row align-items-center">
         <XIcon />
         <a
-          href={tab.property?.hub?.xUrl || ""}
+          href={addHttps(tab.property?.hub?.xUrl) || ""}
           target="_blank"
           style="text-decoration: none;"
         >
