@@ -3,7 +3,7 @@
   import { Input } from "@sparrow/library/forms";
   import { CopyRegular } from "@sparrow/library/icons";
   import { Button, notifications } from "@sparrow/library/ui";
-  import {policyConfig} from "@sparrow/common/store"
+  import { policyConfig } from "@sparrow/common/store";
 
   /**
    * The description of the workspace.
@@ -100,7 +100,7 @@
       </div>
     </div>
 
-    {#if workspaceType === WorkspaceType.PRIVATE && !$policyConfig.restrictPublicWorkspaceCreation}
+    {#if workspaceType === WorkspaceType.PRIVATE && userRole === WorkspaceRole.WORKSPACE_ADMIN && !$policyConfig.restrictPublicWorkspaceCreation}
       <div class="flex flex-column" style="gap:8px;">
         <span class="textarea-header">Make your Workspace public</span>
         <div
