@@ -91,6 +91,10 @@
   const ENV_HIGHLIGHT_FOUND = "env-found" + id + " env-found";
   const ENV_HIGHLIGHT_NOT_FOUND = "env-not-found" + id + " env-not-found";
   const languageConf = new Compartment();
+
+  // Create a compartment for the readOnly state
+  const readOnlyConf = new Compartment();
+
   let codeMirrorView: EditorView;
   let prevValue = "";
 
@@ -566,7 +570,8 @@
         history(), // Add history extension
         keymap.of([...historyKeymap, ...defaultKeymap]),
         languageConf.of(javascriptLanguage),
-        EditorState.readOnly.of(disabled ? true : false),
+        //Use the compartment for readOnly state
+        readOnlyConf.of(EditorState.readOnly.of(disabled ? true : false)),
         handleEventsRegister,
         CreatePlaceHolder(placeholder),
       ],
@@ -610,10 +615,20 @@
           annotations: [{ autoChange: true }],
         });
       }
+      //Handle both language configuration and readOnly state updates
       codeMirrorView.dispatch({
-        effects: languageConf.reconfigure([
-          environmentHighlightStyle(filterData, enableEnvironmentHighlighting),
-        ]),
+        effects: [
+          languageConf.reconfigure([
+            environmentHighlightStyle(
+              filterData,
+              enableEnvironmentHighlighting,
+            ),
+          ]),
+          //Reconfigure the readOnly state when disabled prop changes
+          readOnlyConf.reconfigure(
+            EditorState.readOnly.of(disabled ? true : false),
+          ),
+        ],
       });
     }
   });
@@ -629,7 +644,10 @@
 </script>
 
 <div class="w-100 basic-code-mirror-input" bind:this={inputWrapper}>
-  <div class={componentClass} bind:this={codeMirrorEditorDiv} />
+  <div
+    class={`${componentClass} ${disabled ? "codemirror-disabled" : ""}`}
+    bind:this={codeMirrorEditorDiv}
+  />
 </div>
 <svelte:window on:keydown={handleKeyPress} />
 
@@ -686,5 +704,32 @@
   :global(.cm-expression-block-close-span) {
     align-content: center;
     margin: 0px;
+  }
+  .codemirror-disabled {
+    pointer-events: none !important;
+    cursor:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23eb5651' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='5' y1='5' x2='19' y2='19'/%3E%3C/svg%3E")
+        8 8,
+      not-allowed !important;
+    opacity: 0.6;
+  }
+
+  .codemirror-disabled :global(.cm-editor),
+  .codemirror-disabled :global(.cm-content),
+  .codemirror-disabled :global(*) {
+    pointer-events: none !important;
+    cursor:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23eb5651' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='5' y1='5' x2='19' y2='19'/%3E%3C/svg%3E")
+        8 8,
+      not-allowed !important;
+  }
+  .codemirror-disabled :global(.cm-focused) {
+    outline: none !important;
+  }
+  .basic-code-mirror-input:has(.codemirror-disabled) {
+    cursor:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23eb5651' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='5' y1='5' x2='19' y2='19'/%3E%3C/svg%3E")
+        8 8,
+      not-allowed !important;
   }
 </style>
