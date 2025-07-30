@@ -199,7 +199,11 @@
             {
               "path": "deb_files/*.deb",
               "label": "sparrow_2.28.1_amd64.deb"
-            }
+            },
+            {
+              "path": "msi_files/*.msix",
+              "label": "Sparrow_2.28.1.msix"
+            },
           ]
         }
       ]
