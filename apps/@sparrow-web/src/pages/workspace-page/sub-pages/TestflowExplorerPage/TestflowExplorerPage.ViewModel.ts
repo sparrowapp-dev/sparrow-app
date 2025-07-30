@@ -558,7 +558,7 @@ export class TestflowExplorerPageViewModel {
         // Read the API request data from the tab
         const requestData = await this.collectionRepository.readRequestInTab(
           progressiveTab.tabId,
-          element.data.requestId,
+          element.id,
         );
 
         const request = transformRequestData(requestData);
@@ -946,7 +946,7 @@ export class TestflowExplorerPageViewModel {
     testFlowDataStore.update((testFlowDataMap) => {
       let wsData = testFlowDataMap.get(tab.tabId);
       if (wsData) {
-        wsData.nodes = [];
+        // wsData.nodes = [];
         wsData.isTestFlowRunning = false;
       } else {
         wsData = {
@@ -964,7 +964,7 @@ export class TestflowExplorerPageViewModel {
     // Read the API request data
     const requestData = await this.collectionRepository.readRequestInTab(
       tab.tabId,
-      node.data.requestId,
+      node.id,
     );
 
     const request = transformRequestData(requestData);
@@ -1036,17 +1036,25 @@ export class TestflowExplorerPageViewModel {
       };
     }
 
-    // Update testFlowDataStore with this single result
     testFlowDataStore.update((testFlowDataMap) => {
       const wsData = testFlowDataMap.get(tab.tabId);
       if (wsData) {
-        const updatedNodes = wsData.nodes.filter((n) => n.id !== node.id);
-        updatedNodes.push({
+        const nodeIndex = wsData.nodes.findIndex((n) => n.id === node.id);
+
+        const newNode = {
           id: node.id,
           response: resData,
           request: adaptedRequest,
-        });
-        wsData.nodes = updatedNodes;
+        };
+
+        if (nodeIndex !== -1) {
+          // Update existing node
+          wsData.nodes[nodeIndex] = newNode;
+        } else {
+          // Add new node
+          wsData.nodes.push(newNode);
+        }
+
         testFlowDataMap.set(tab.tabId, wsData);
       }
       return testFlowDataMap;

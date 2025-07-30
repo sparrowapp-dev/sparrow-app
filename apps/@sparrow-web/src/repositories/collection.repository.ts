@@ -1034,7 +1034,7 @@ export class CollectionRepository {
    * @description
    * Read an API request within a tab.
    */
-  public readRequestInTab = async (tabId: string, requestId: string) => {
+  public readRequestInTab = async (tabId: string, _nodeId: string) => {
     const tabData = await RxDB.getInstance()
       .rxdb.tab.findOne({ selector: { tabId: tabId } })
       .exec();
@@ -1044,7 +1044,7 @@ export class CollectionRepository {
     return tabData
       .toJSON()
       ?.property?.testflow?.nodes?.find(
-        (element) => element.data.requestId === requestId,
+        (element) => element.id === _nodeId,
       );
   };
 
