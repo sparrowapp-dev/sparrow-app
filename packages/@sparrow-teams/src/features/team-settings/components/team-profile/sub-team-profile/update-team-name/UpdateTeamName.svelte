@@ -46,6 +46,9 @@
 </div>
 
 <style>
+  :global(#input-team-name::placeholder) {
+    font-size: 12px;
+  }
   .settings-team-name {
     background-color: transparent !important;
   }
