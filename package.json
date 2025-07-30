@@ -203,7 +203,7 @@
             {
               "path": "msi_files/*.msix",
               "label": "Sparrow_2.28.1.msix"
-            },
+            }
           ]
         }
       ]
