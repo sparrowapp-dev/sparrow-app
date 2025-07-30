@@ -422,11 +422,12 @@
     try {
       const isActiveWorkspace =
         await _viewModel.checkActiveWorkspace(workspaceId);
+      const workspaceData = await _viewModel.getWorkspaceById(workspaceId);
       if (!isActiveWorkspace) {
         handlehideGlobalSearch(true);
-        const workspaceData = await _viewModel.getWorkspaceById(workspaceId);
         handleSwitchWorkspaceModal(workspaceData.name, "Request", workspaceId);
       }
+      await _viewModel.setOpenTeam(workspaceData?._data?.team?.teamId);
       await _viewModel.switchAndCreateRequestTab(
         workspaceId,
         collectionId,
@@ -452,16 +453,16 @@
     try {
       const isActiveWorkspace =
         await _viewModel.checkActiveWorkspace(workspaceId);
-
+      const workspaceData = await _viewModel.getWorkspaceById(workspaceId);
       if (!isActiveWorkspace) {
         handlehideGlobalSearch(true);
-        const workspaceData = await _viewModel.getWorkspaceById(workspaceId);
         handleSwitchWorkspaceModal(
           workspaceData.name,
           "Collection",
           workspaceId,
         );
       }
+      await _viewModel.setOpenTeam(workspaceData?._data?.team?.teamId);
       await _viewModel.switchAndCreateCollectionTab(workspaceId, collection);
       if (isActiveWorkspace) {
         navigate("collections");
@@ -484,11 +485,12 @@
     try {
       const isActiveWorkspace =
         await _viewModel.checkActiveWorkspace(workspaceId);
+      const workspaceData = await _viewModel.getWorkspaceById(workspaceId);
       if (!isActiveWorkspace) {
         handlehideGlobalSearch(true);
-        const workspaceData = await _viewModel.getWorkspaceById(workspaceId);
         handleSwitchWorkspaceModal(workspaceData.name, "Folder", workspaceId);
       }
+      await _viewModel.setOpenTeam(workspaceData?._data?.team?.teamId);
       await _viewModel.switchAndCreateFolderTab(
         workspaceId,
         collectionId,
@@ -512,14 +514,14 @@
       const isActiveWorkspace = await _viewModel.checkActiveWorkspace(
         workspace._id,
       );
-
       if (!isActiveWorkspace) {
         await _viewModel.activateWorkspace(workspace._id);
         closeGlobalSearch();
         handlehideGlobalSearch(false);
       }
-
       _viewModel.switchAndCreateWorkspaceTab(workspace);
+      const workspaceData = await _viewModel.getWorkspaceById(workspace?._id);
+      await _viewModel.setOpenTeam(workspaceData?._data?.team?.teamId);
       navigate("collections");
       // Additional workspace opening logic here if needed
       closeGlobalSearch();
@@ -537,18 +539,18 @@
       const isActiveWorkspace = await _viewModel.checkActiveWorkspace(
         environment.workspace,
       );
-
+      const workspaceData = await _viewModel.getWorkspaceById(
+        environment.workspace,
+      );
       if (!isActiveWorkspace) {
         handlehideGlobalSearch(true);
-        const workspaceData = await _viewModel.getWorkspaceById(
-          environment.workspace,
-        );
         handleSwitchWorkspaceModal(
           workspaceData.name,
           "Environment",
           environment.workspace,
         );
       }
+      await _viewModel.setOpenTeam(workspaceData?._data?.team?.teamId);
       await _viewModel.switchAndCreateEnvironmentTab(environment);
       if (isActiveWorkspace) {
         navigate("collections");
@@ -568,18 +570,18 @@
       const isActiveWorkspace = await _viewModel.checkActiveWorkspace(
         testflow.workspaceId,
       );
-
+      const workspaceData = await _viewModel.getWorkspaceById(
+        testflow.workspaceId,
+      );
       if (!isActiveWorkspace) {
         handlehideGlobalSearch(true);
-        const workspaceData = await _viewModel.getWorkspaceById(
-          testflow.workspaceId,
-        );
         handleSwitchWorkspaceModal(
           workspaceData.name,
           "Testflow",
           testflow.workspaceId,
         );
       }
+      await _viewModel.setOpenTeam(workspaceData?._data?.team?.teamId);
       await _viewModel.switchAndCreateTestflowTab(testflow);
       if (isActiveWorkspace) {
         navigate("collections");
