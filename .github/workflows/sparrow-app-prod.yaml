@@ -620,6 +620,20 @@ jobs:
           dpkg-scanpackages --arch amd64 pool/ > dists/stable/main/binary-amd64/Packages
           gzip -k dists/stable/main/binary-amd64/Packages
 
+      - name: Create apt-release.conf
+        run: |
+          cat > apt-repo/apt-release.conf <<EOF
+          APT::FTPArchive::Release {
+            Origin "Sparrow";
+            Label "Sparrow";
+            Suite "stable";
+            Codename "stable";
+            Architectures "amd64";
+            Components "main";
+            Description "Sparrow Debian Repository";
+          };
+          EOF
+
       - name: Generate Release file
         run: |
           cd apt-repo
