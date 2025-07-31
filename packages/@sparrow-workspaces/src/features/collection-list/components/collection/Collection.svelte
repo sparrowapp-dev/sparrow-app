@@ -1058,7 +1058,7 @@
               activeTabId
                 ? 'active-history-tab'
                 : ''}"
-              style="height: 32px; padding-left: 3px; margin-bottom: 2px;"
+              style="height: 32px; padding-left: 3px;"
             >
               <button
                 tabindex="-1"
