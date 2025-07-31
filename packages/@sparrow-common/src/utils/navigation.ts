@@ -50,7 +50,7 @@ const sideScroll = (
  */
 export const scrollToTab = (requestId: string) => {
   const navigation = document.getElementById("tab-scroller");
-  const tabElement = document.getElementById(requestId);
+  const tabElement = document.getElementById("tab-" + requestId);
   if (navigation && tabElement) {
     tabElement.scrollIntoView({
       behavior: "smooth",
