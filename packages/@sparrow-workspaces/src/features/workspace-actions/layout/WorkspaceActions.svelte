@@ -733,13 +733,16 @@
           }
         }}
       >
-        <div class="d-flex flex-row align-items-center flex-grow-1">
+        <div
+          class="d-flex flex-row align-items-center flex-grow-1"
+          style="max-width:100%;"
+        >
           <span style="display: flex; margin-left:5px;">
             <WorkspaceRegular size="16px" color="var(--text-ds-neutral-50)" />
           </span>
           <span
             class="ms-2 text-ds-font-size-12 text-ds-font-weight-semi-bold text-truncate"
-            style="max-width: 75%;"
+            style="max-width:75%;"
           >
             {currentWorkspaceName}
           </span>
