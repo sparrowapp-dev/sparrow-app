@@ -27,6 +27,7 @@
   } from "@sparrow/library/icons";
   import { Select } from "@sparrow/library/forms";
   import { WorkspaceRole } from "@sparrow/common/enums";
+  import { onMount, tick } from "svelte";
 
   export let response;
   export let apiState;
@@ -37,7 +38,10 @@
   export let onSaveResponse;
   export let path;
   export let userRole;
-
+  onMount(async () => {
+    await tick(); // wait for DOM to render
+    sliderStyle = getSliderStyle(apiState.bodyFormatter); // set initial slider position
+  });
   let fileExtension: string;
   let formatedBody: string;
   let fileNameWithExtension: string;

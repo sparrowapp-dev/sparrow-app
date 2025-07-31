@@ -13,7 +13,6 @@
 
   export let onChangeUserRoleAtWorkspace;
   export let onRemoveUserFromWorkspace;
-
   let search: string = "";
   let activeUser;
   let filteredUser;
@@ -54,6 +53,7 @@
         bind:value={search}
         on:input={() => {}}
         customWidth={"300px"}
+        placeholder={`Search people in ${currentWorkspace?.name}`}
       />
     </div>
     <Member user={activeUser} isActiveUser={true} />
