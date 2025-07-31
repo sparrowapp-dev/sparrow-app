@@ -13,7 +13,6 @@
 
   export let onChangeUserRoleAtWorkspace;
   export let onRemoveUserFromWorkspace;
-  $: console.log(currentWorkspace);
   let search: string = "";
   let activeUser;
   let filteredUser;
