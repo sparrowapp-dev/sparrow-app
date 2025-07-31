@@ -427,7 +427,7 @@
         handlehideGlobalSearch(true);
         handleSwitchWorkspaceModal(workspaceData.name, "Request", workspaceId);
       }
-      await _viewModel.setOpenTeam(workspaceData?._data?.team?.teamId);
+      await _viewModel.setOpenTeam(workspaceData.toMutableJSON().team?.teamId);
       await _viewModel.switchAndCreateRequestTab(
         workspaceId,
         collectionId,
@@ -462,7 +462,7 @@
           workspaceId,
         );
       }
-      await _viewModel.setOpenTeam(workspaceData?._data?.team?.teamId);
+      await _viewModel.setOpenTeam(workspaceData.toMutableJSON().team?.teamId);
       await _viewModel.switchAndCreateCollectionTab(workspaceId, collection);
       if (isActiveWorkspace) {
         navigate("collections");
@@ -490,7 +490,7 @@
         handlehideGlobalSearch(true);
         handleSwitchWorkspaceModal(workspaceData.name, "Folder", workspaceId);
       }
-      await _viewModel.setOpenTeam(workspaceData?._data?.team?.teamId);
+      await _viewModel.setOpenTeam(workspaceData.toMutableJSON().team?.teamId);
       await _viewModel.switchAndCreateFolderTab(
         workspaceId,
         collectionId,
@@ -521,7 +521,7 @@
       }
       _viewModel.switchAndCreateWorkspaceTab(workspace);
       const workspaceData = await _viewModel.getWorkspaceById(workspace?._id);
-      await _viewModel.setOpenTeam(workspaceData?._data?.team?.teamId);
+      await _viewModel.setOpenTeam(workspaceData.toMutableJSON().team?.teamId);
       navigate("collections");
       // Additional workspace opening logic here if needed
       closeGlobalSearch();
@@ -550,7 +550,7 @@
           environment.workspace,
         );
       }
-      await _viewModel.setOpenTeam(workspaceData?._data?.team?.teamId);
+      await _viewModel.setOpenTeam(workspaceData.toMutableJSON().team?.teamId);
       await _viewModel.switchAndCreateEnvironmentTab(environment);
       if (isActiveWorkspace) {
         navigate("collections");
@@ -581,7 +581,7 @@
           testflow.workspaceId,
         );
       }
-      await _viewModel.setOpenTeam(workspaceData?._data?.team?.teamId);
+      await _viewModel.setOpenTeam(workspaceData.toMutableJSON().team?.teamId);
       await _viewModel.switchAndCreateTestflowTab(testflow);
       if (isActiveWorkspace) {
         navigate("collections");
