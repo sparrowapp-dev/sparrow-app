@@ -29,22 +29,7 @@
     GithubStarRedirect,
     LaunchDesktop,
   } from "@sparrow/common/components";
-
-  const _viewModel = new TeamsViewModel();
-  const teamList: Observable<TeamDocument[]> = _viewModel.teams;
-  const tabList: Observable<TabDocument[]> = _viewModel.tabs;
-  const setOpenTeam = _viewModel.setOpenTeam;
-  const disableNewInviteTag = _viewModel.disableNewInviteTag;
-  const modifyTeam = _viewModel.modifyTeam;
-
-  let isCreateTeamModalOpen: boolean = false;
-  const collectionList = _viewModel.collection;
-  const onApiClick = _viewModel.handleApiClick;
-  const OnWorkspaceSwitch = _viewModel.handleSwitchWorkspace;
-  let workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
-  const openTeam: Observable<TeamDocument> = _viewModel.openTeam;
-  const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, tick } from "svelte";
   import { Motion } from "svelte-motion";
   import { isUserFirstSignUp } from "src/store/user.store";
   import { user } from "src/store/auth.store";
@@ -66,12 +51,28 @@
   import { DownloadApp } from "@sparrow/common/features";
   import { shouldRunThrottled } from "@sparrow/common/store";
 
+  const _viewModel = new TeamsViewModel();
+  const teamList: Observable<TeamDocument[]> = _viewModel.teams;
+  const tabList: Observable<TabDocument[]> = _viewModel.tabs;
+  const setOpenTeam = _viewModel.setOpenTeam;
+  const disableNewInviteTag = _viewModel.disableNewInviteTag;
+  const modifyTeam = _viewModel.modifyTeam;
+
+  let isCreateTeamModalOpen: boolean = false;
+  const collectionList = _viewModel.collection;
+  const onApiClick = _viewModel.handleApiClick;
+  const OnWorkspaceSwitch = _viewModel.handleSwitchWorkspace;
+  let workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
+  const openTeam: Observable<TeamDocument> = _viewModel.openTeam;
+  const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
+
   let githubRepoData: GithubRepoDocType;
   let isGuestUser = false;
 
   const externalSparrowGithub = constants.SPARROW_GITHUB;
 
   let userId = "";
+  let dataInitialized = false;
   const userSubscriber = user.subscribe(async (value) => {
     if (value) {
       userId = value._id;
@@ -79,7 +80,8 @@
   });
   let isTrialExhausted: boolean | undefined = undefined;
 
-  onMount(async () => {
+  const initializeData = async () => {
+    if (dataInitialized) return;
     if (userId && shouldRunThrottled(userId)) {
       await Promise.all([
         _viewModel.refreshTeams(userId),
@@ -89,16 +91,25 @@
       console.error(`Throttled for ${userId}`);
     }
 
-    let githubRepo = await _viewModel.getGithubRepo();
-    githubRepoData = githubRepo?.getLatest().toMutableJSON();
+    await tick();
     splitter = document.querySelector(".team-splitter .splitpanes__splitter");
 
     await _viewModel.fetchGithubRepo();
-    githubRepo = await _viewModel.getGithubRepo();
+    const githubRepo = await _viewModel.getGithubRepo();
     githubRepoData = githubRepo?.getLatest().toMutableJSON();
     isGuestUser = await _viewModel.getGuestUser();
     isTrialExhausted = await _viewModel.getUserTrialExhaustedStatus();
+
+    dataInitialized = true;
+  };
+
+  onMount(async () => {
+    await initializeData();
   });
+
+  $: if (userId && !dataInitialized) {
+    initializeData();
+  }
 
   const startTrial = async () => {
     await _viewModel.handleStartTrial();
@@ -163,6 +174,7 @@
   });
 
   onDestroy(() => {
+    dataInitialized = false;
     openTeamSubscriber.unsubscribe();
     userSubscriber();
     isUserFirstSignUpSubscriber();
@@ -248,7 +260,7 @@
             </div>
 
             <!-- github repo section -->
-            <section class="d-flex p-2 flex-column">
+            <section class="d-flex flex-column">
               {#if !isGuestUser && isTrialExhausted == false}
                 <div class="d-flex flex-column" style="gap: 12px">
                   <div class="d-flex align-items-start" style="gap: 4px">
