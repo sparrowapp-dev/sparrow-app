@@ -706,7 +706,6 @@
     margin: 0px;
   }
   .codemirror-disabled {
-    pointer-events: none !important;
     cursor:
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23eb5651' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='5' y1='5' x2='19' y2='19'/%3E%3C/svg%3E")
         8 8,
@@ -717,7 +716,6 @@
   .codemirror-disabled :global(.cm-editor),
   .codemirror-disabled :global(.cm-content),
   .codemirror-disabled :global(*) {
-    pointer-events: none !important;
     cursor:
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23eb5651' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='5' y1='5' x2='19' y2='19'/%3E%3C/svg%3E")
         8 8,
