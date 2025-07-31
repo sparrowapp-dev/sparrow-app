@@ -20,7 +20,7 @@
   import { pagesMotion } from "../../constants";
   import { version } from "../../../src-tauri/tauri.conf.json";
 
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy, onMount, tick } from "svelte";
   import { Motion } from "svelte-motion";
   import { user } from "../../store/auth.store";
   import { WithButton } from "@sparrow/workspaces/hoc";
@@ -63,6 +63,7 @@
   let githubRepoData: GithubRepoDocType;
   let isGuestUser = false;
   let userId = "";
+  let dataInitialized = false;
   const userSubscriber = user.subscribe(async (value) => {
     if (value) {
       userId = value._id;
@@ -73,7 +74,7 @@
 
   const sparrowAdminUrl = constants.ADMIN_URL;
 
-  onMount(async () => {
+  const initializeData = async () => {
     if (userId && shouldRunThrottled(userId)) {
       await Promise.all([
         _viewModel.refreshTeams(userId),
@@ -83,16 +84,25 @@
       console.error(`Throttled for ${userId}`);
     }
 
-    let githubRepo = await _viewModel.getGithubRepo();
-    githubRepoData = githubRepo?.getLatest().toMutableJSON();
+    await tick();
     splitter = document.querySelector(".team-splitter .splitpanes__splitter");
 
     await _viewModel.fetchGithubRepo();
-    githubRepo = await _viewModel.getGithubRepo();
+    const githubRepo = await _viewModel.getGithubRepo();
     githubRepoData = githubRepo?.getLatest().toMutableJSON();
     isGuestUser = await _viewModel.getGuestUser();
     isTrialExhausted = await _viewModel.getUserTrialExhaustedStatus();
+    dataInitialized = true;
+  };
+
+  onMount(async () => {
+    await initializeData();
   });
+
+  $: if (userId && !dataInitialized) {
+    initializeData();
+  }
+
   let splitter: HTMLElement | null;
 
   const startTrial = async () => {
@@ -126,6 +136,7 @@
   };
 
   onDestroy(() => {
+    dataInitialized = false;
     userSubscriber();
   });
 </script>
@@ -207,8 +218,7 @@
               {/if}
             </div>
 
-            <!-- github repo section -->
-            <section class="d-flex p-2 flex-column">
+            <div class="p-2">
               {#if !isGuestUser && isTrialExhausted == false}
                 <div class="d-flex flex-column" style="gap: 12px">
                   <div class="d-flex align-items-start" style="gap: 4px">
@@ -238,6 +248,10 @@
                   style="border-bottom: 1px solid var(--bg-ds-surface-100); margin: 8px 0 0 0;"
                 ></div>
               {/if}
+            </div>
+
+            <!-- github repo section -->
+            <section class="d-flex flex-column">
               <div
                 class="p-2 d-flex align-items-center justify-content-between"
                 style="z-index: 4;"
