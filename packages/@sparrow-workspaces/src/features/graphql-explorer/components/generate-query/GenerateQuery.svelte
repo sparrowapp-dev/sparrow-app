@@ -441,8 +441,8 @@
         }
       }
     }
-
     saveSchemaToDatabase(!_isCheckedNode);
+    queryBuilder = queryBuilder;
   };
 
   /**
