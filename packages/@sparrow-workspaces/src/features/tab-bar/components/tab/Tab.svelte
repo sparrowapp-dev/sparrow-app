@@ -133,7 +133,7 @@
   }}
   tabindex="0"
   class="badge-container tab-container h-100 d-inline-block p-0 position-relative pt-1 individual-tab"
-  id={tab.id}
+  id={"tab-" + tab.id}
   style="width: {tabWidth}px;  margin-left:{index === 0 ? '4px' : ''}"
   on:mousedown={handleMouseDown}
   on:dblclick={() => handleDoubleClick(tab)}

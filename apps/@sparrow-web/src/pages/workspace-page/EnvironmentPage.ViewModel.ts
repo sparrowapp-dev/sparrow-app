@@ -268,6 +268,7 @@ export class EnvironmentViewModel {
       .setVariable(environment?.variable);
     initEnvironmentTab.setTabType(TabPersistenceTypeEnum.TEMPORARY);
     this.tabRepository.createTab(initEnvironmentTab.getValue());
+    scrollToTab(initEnvironmentTab.getValue().id);
   };
 
   /**
@@ -396,6 +397,7 @@ export class EnvironmentViewModel {
     initEnvironmentTab.setTabType(TabPersistenceTypeEnum.TEMPORARY);
 
     this.tabRepository.createTab(initEnvironmentTab.getValue());
+    scrollToTab(initEnvironmentTab.getValue().id);
   };
 
   /**
