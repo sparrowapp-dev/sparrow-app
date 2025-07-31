@@ -32,6 +32,7 @@
    * Role of user in active workspace
    */
   export let userRole;
+  let isConnected;
 
   const theme = new UrlInputTheme().build();
   /**
@@ -50,6 +51,8 @@
       );
     }
   };
+
+  $: isConnected = webSocket?.status === "connected";
 </script>
 
 <div class={` ${componentClass}`} style="display: flex; gap: 6px;">
@@ -63,6 +66,7 @@
         {onUpdateEnvironment}
         {environmentVariables}
         codeId={"url"}
+        disabled={isConnected}
         class={"input-url"}
         {userRole}
       />
