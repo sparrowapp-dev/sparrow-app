@@ -63,6 +63,7 @@
   let githubRepoData: GithubRepoDocType;
   let isGuestUser = false;
   let userId = "";
+  let dataInitialized = false;
   const userSubscriber = user.subscribe(async (value) => {
     if (value) {
       userId = value._id;
@@ -91,11 +92,16 @@
     githubRepoData = githubRepo?.getLatest().toMutableJSON();
     isGuestUser = await _viewModel.getGuestUser();
     isTrialExhausted = await _viewModel.getUserTrialExhaustedStatus();
+    dataInitialized = true;
   };
 
   onMount(async () => {
     await initializeData();
   });
+
+  $: if (userId && !dataInitialized) {
+    initializeData();
+  }
 
   let splitter: HTMLElement | null;
 
@@ -130,6 +136,7 @@
   };
 
   onDestroy(() => {
+    dataInitialized = false;
     userSubscriber();
   });
 </script>

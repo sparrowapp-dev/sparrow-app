@@ -72,6 +72,7 @@
   const externalSparrowGithub = constants.SPARROW_GITHUB;
 
   let userId = "";
+  let dataInitialized = false;
   const userSubscriber = user.subscribe(async (value) => {
     if (value) {
       userId = value._id;
@@ -98,11 +99,17 @@
     githubRepoData = githubRepo?.getLatest().toMutableJSON();
     isGuestUser = await _viewModel.getGuestUser();
     isTrialExhausted = await _viewModel.getUserTrialExhaustedStatus();
+
+    dataInitialized = true;
   };
 
   onMount(async () => {
     await initializeData();
   });
+
+  $: if (userId && !dataInitialized) {
+    initializeData();
+  }
 
   const startTrial = async () => {
     await _viewModel.handleStartTrial();
@@ -167,6 +174,7 @@
   });
 
   onDestroy(() => {
+    dataInitialized = false;
     openTeamSubscriber.unsubscribe();
     userSubscriber();
     isUserFirstSignUpSubscriber();
