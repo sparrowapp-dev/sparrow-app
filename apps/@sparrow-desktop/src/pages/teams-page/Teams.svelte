@@ -63,7 +63,6 @@
   let githubRepoData: GithubRepoDocType;
   let isGuestUser = false;
   let userId = "";
-  let dataInitialized = false; // Added flag to prevent duplicate initialization
   const userSubscriber = user.subscribe(async (value) => {
     if (value) {
       userId = value._id;
@@ -75,7 +74,6 @@
   const sparrowAdminUrl = constants.ADMIN_URL;
 
   const initializeData = async () => {
-    if (dataInitialized) return;
     if (userId && shouldRunThrottled(userId)) {
       await Promise.all([
         _viewModel.refreshTeams(userId),
@@ -93,8 +91,6 @@
     githubRepoData = githubRepo?.getLatest().toMutableJSON();
     isGuestUser = await _viewModel.getGuestUser();
     isTrialExhausted = await _viewModel.getUserTrialExhaustedStatus();
-
-    dataInitialized = true;
   };
 
   onMount(async () => {
@@ -134,7 +130,6 @@
   };
 
   onDestroy(() => {
-    dataInitialized = false; // Reset flag on destroy
     userSubscriber();
   });
 </script>
