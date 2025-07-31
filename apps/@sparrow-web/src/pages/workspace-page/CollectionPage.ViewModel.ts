@@ -3099,6 +3099,7 @@ export default class CollectionsViewModel {
       sampleFolder.updateName(response.data.data.name);
       sampleFolder.updatePath(path);
       sampleFolder.updateIsSave(true);
+      sampleFolder.updateTabType(TabPersistenceTypeEnum.PERMANENT);
       if (collection?.collectionType === CollectionTypeBaseEnum.MOCK) {
         sampleFolder.updateLabel(CollectionTypeBaseEnum.MOCK);
       }

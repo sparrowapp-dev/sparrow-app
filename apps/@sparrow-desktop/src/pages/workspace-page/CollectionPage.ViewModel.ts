@@ -3033,6 +3033,7 @@ export default class CollectionsViewModel {
       sampleFolder.updateName(data.name);
       sampleFolder.updatePath(path);
       sampleFolder.updateIsSave(true);
+      sampleFolder.updateTabType(TabPersistenceTypeEnum.PERMANENT);
 
       this.handleCreateTab(sampleFolder.getValue());
       scrollToTab("");
