@@ -742,7 +742,7 @@
           </span>
           <span
             class="ms-2 text-ds-font-size-12 text-ds-font-weight-semi-bold text-truncate"
-            style="max-width: 75%;"
+            style="max-width:75%;"
           >
             {currentWorkspaceName}
           </span>
