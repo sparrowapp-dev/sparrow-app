@@ -7,7 +7,7 @@ export class PromptInputTheme {
     this.theme = EditorView.theme({
       // Root container of the editor
       "&": {
-        height: "150px",
+        height: "200px",
         width: "100%",
         flex: "1",
         borderRadius: "4px",
@@ -25,7 +25,9 @@ export class PromptInputTheme {
         fontWeight: "500",
         color: "inherit",
         minHeight: "100%",
-        maxHeight: "164px",
+        width: "100%",
+        height: "100% !important",
+        maxHeight: "100%",
         borderRadius: "4px",
         overflowY: "auto",
         overflowX: "hidden",
@@ -85,14 +87,14 @@ export class PromptInputTheme {
         borderRadius: "4px",
         outline: "none",
         resize: "none",
-        minHeight: "36px",
-        maxHeight: "164px",
+        minHeight: "100%",
+        maxHeight: "100%",
 
         "&:hover": {
-          outline: "1px solid var(--border-ds-neutral-300)", // hoveredBorderColor
+          // outline: "1px solid var(--border-ds-neutral-300)", // hoveredBorderColor
         },
         "&.cm-focused": {
-          outline: "1px solid var(--border-ds-primary-300)", // focusedBorderColor
+          // outline: "1px solid var(--border-ds-primary-300)", // focusedBorderColor
         },
       },
 
@@ -102,23 +104,23 @@ export class PromptInputTheme {
         wordBreak: "break-word !important",
         overflowX: "hidden !important",
         overflowY: "auto !important",
-        maxHeight: "164px !important",
+        maxHeight: "100% !important",
         width: "100% !important",
       },
 
       "&.cm-focused .cm-content": {
-        whiteSpace: "pre-wrap !important",
-        wordBreak: "break-word !important",
-        maxHeight: "164px !important",
-        width: "100% !important",
+        // whiteSpace: "pre-wrap !important",
+        // wordBreak: "break-word !important",
+        // maxHeight: "100% !important",
+        // width: "100% !important",
       },
 
       "&.cm-focused .cm-line": {
-        width: "100% !important",
-        maxWidth: "100% !important",
-        display: "block !important",
-        boxSizing: "border-box !important",
-        paddingRight: "10px !important",
+        // width: "100% !important",
+        // maxWidth: "100% !important",
+        // display: "block !important",
+        // boxSizing: "border-box !important",
+        // paddingRight: "10px !important",
       },
     });
   }

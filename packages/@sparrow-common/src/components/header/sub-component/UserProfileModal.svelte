@@ -187,6 +187,7 @@
     backdrop-filter: blur(75px);
     border-radius: 5px;
     background-color: var(--bg-ds-surface-600);
+    box-shadow: 0 16px 32px 0 rgba(0, 0, 0, 0.3);
   }
 
   .sign-out-button:hover {

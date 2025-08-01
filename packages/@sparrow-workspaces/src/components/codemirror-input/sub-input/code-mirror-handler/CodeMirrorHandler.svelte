@@ -118,7 +118,7 @@
     }
     handleHighlightClass();
     if (inputWrapper) {
-      const dialogboxWidth = 400;
+      const dialogboxWidth = 300;
       const dialogboxHeight = 170;
       const rightDistance = inputWrapper.getBoundingClientRect().right;
       const leftDistance = inputWrapper.getBoundingClientRect().left;

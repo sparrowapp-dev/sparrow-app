@@ -84,123 +84,129 @@
       return elem.type === "E";
     }).length > 0}
       <div class="variable-heading mb-2">ENVIRONMENT VARIABLES</div>
-    {/if}
-    {#each filterData as mock, index}
-      {#if mock.type === "E"}
-        <div
-          role="button"
-          class="env-item border-radius-1"
-          on:click={() => {
-            const preUrl = inputText?.substring(0, trackParanthesis[0]);
-            const postUrl = inputText?.substring(trackCursor, inputText.length);
-            updateText(preUrl + "{{" + mock.key + "}}" + postUrl);
-            handleInputValue();
-          }}
-        >
-          <div
-            class="d-flex align-items-center border-radius-2"
-            style="padding:4px 6px 4px 8px;"
-          >
+      <div class="mb-3">
+        {#each filterData as mock, index}
+          {#if mock.type === "E"}
             <div
-              class=" d-flex align-items-center justify-content-center"
-              style="height:28px; width:30px;"
+              role="button"
+              class="env-item border-radius-1"
+              on:click={() => {
+                const preUrl = inputText?.substring(0, trackParanthesis[0]);
+                const postUrl = inputText?.substring(
+                  trackCursor,
+                  inputText.length,
+                );
+                updateText(preUrl + "{{" + mock.key + "}}" + postUrl);
+                handleInputValue();
+              }}
             >
               <div
-                class="h-100 w-100 d-flex align-items-center border-radius-2 justify-content-center local-environment"
+                class="d-flex align-items-center border-radius-2"
+                style="padding:4px 6px 4px 8px;"
               >
-                <span class={"icon-text"}>{mock.type}</span>
+                <div
+                  class=" d-flex align-items-center justify-content-center"
+                  style="height:28px; width:30px;"
+                >
+                  <div
+                    class="h-100 w-100 d-flex align-items-center border-radius-2 justify-content-center local-environment"
+                  >
+                    <span class={"icon-text"}>{mock.type}</span>
+                  </div>
+                </div>
+                <div
+                  style="height: 33px;"
+                  class="p-0 d-flex flex-column justify-content-center w-100 ps-2"
+                >
+                  <p
+                    class="mock-key m-0 p-0 env-value word-break"
+                    style="margin-bottom:2px; "
+                  >
+                    {mock.key}
+                  </p>
+                  {#if mock.value}
+                    <p class="mock-value m-0 p-0 env-value word-break">
+                      {mock.value}
+                    </p>
+                  {/if}
+                </div>
               </div>
             </div>
-            <div
-              style="height: 33px;"
-              class="p-0 d-flex flex-column justify-content-center w-100 ps-2"
-            >
-              <p
-                class="mock-key m-0 p-0 env-value word-break"
-                style="margin-bottom:2px; "
-              >
-                {mock.key}
-              </p>
-              {#if mock.value}
-                <p class="mock-value m-0 p-0 env-value word-break">
-                  {mock.value}
-                </p>
-              {/if}
-            </div>
-          </div>
-        </div>
-      {/if}
-    {/each}
+          {/if}
+        {/each}
+      </div>
+    {/if}
     {#if filterData.filter((elem) => {
       return elem.type === "G";
     }).length > 0}
-      <div class="variable-heading mb-2" style="margin-top:12px;">
+      <div class="variable-heading mb-2" style="margin-top:0px;">
         GLOBAL VARIABLES
       </div>
-    {/if}
-
-    {#each filterData.filter((elem) => {
-      return elem.type === "G";
-    }) as mock, index}
-      <div
-        role="button"
-        class="env-item border-radius-2"
-        on:click={() => {
-          const preUrl = inputText?.substring(0, trackParanthesis[0]);
-          const postUrl = inputText?.substring(trackCursor, inputText.length);
-          updateText(preUrl + "{{" + mock.key + "}}" + postUrl);
-          handleInputValue();
-        }}
-      >
-        <div
-          class="d-flex align-items-center border-radius-2"
-          style="padding:4px 6px 4px 8px;"
-        >
+      <div class="mb-3">
+        {#each filterData.filter((elem) => {
+          return elem.type === "G";
+        }) as mock, index}
           <div
-            class="d-flex align-items-center justify-content-center"
-            style="height:28px; width:31px;"
+            role="button"
+            class="env-item border-radius-2"
+            on:click={() => {
+              const preUrl = inputText?.substring(0, trackParanthesis[0]);
+              const postUrl = inputText?.substring(
+                trackCursor,
+                inputText.length,
+              );
+              updateText(preUrl + "{{" + mock.key + "}}" + postUrl);
+              handleInputValue();
+            }}
           >
             <div
-              class="d-flex align-items-center border-radius-2 justify-content-center global-environment"
+              class="d-flex align-items-center border-radius-2"
+              style="padding:4px 6px 4px 8px;"
             >
-              <span class={"icon-text"}>{mock.type}</span>
+              <div
+                class="d-flex align-items-center justify-content-center"
+                style="height:28px; width:31px;"
+              >
+                <div
+                  class="d-flex align-items-center border-radius-2 justify-content-center global-environment"
+                >
+                  <span class={"icon-text"}>{mock.type}</span>
+                </div>
+              </div>
+              <div
+                style="height: 33px;"
+                class="p-0 d-flex flex-column justify-content-center w-100 ps-2"
+              >
+                <p class="mock-key m-0 p-0 env-value word-break">
+                  {mock.key}
+                </p>
+                {#if mock.value}
+                  <p class="mock-value m-0 p-0 env-value word-break">
+                    {mock.value}
+                  </p>
+                {/if}
+              </div>
             </div>
           </div>
-          <div
-            style="height: 33px;"
-            class="p-0 d-flex flex-column justify-content-center w-100 ps-2"
-          >
-            <p class="mock-key m-0 p-0 env-value word-break">
-              {mock.key}
-            </p>
-            {#if mock.value}
-              <p class="mock-value m-0 p-0 env-value word-break">
-                {mock.value}
-              </p>
-            {/if}
-          </div>
-        </div>
+        {/each}
       </div>
-    {/each}
+    {/if}
   </div>
 </div>
 <svelte:window on:keydown={handleKeyPress} />
 
 <style>
   .select-environment-popup {
-    width: 252px;
-    height: fit-content;
-    max-height: 348px;
+    width: 300px;
+    height: 170px;
     position: fixed;
     z-index: 900;
     flex-wrap: wrap;
     background-color: var(--bg-ds-surface-600);
-    padding: 12px;
+    padding: 12px 12px 0px 12px;
     border-radius: 4px;
-  }
-  .select-environment-popup .left-panel {
-    max-height: 324px;
-    overflow-y: auto;
+    box-shadow: 0 16px 32px 0 rgba(0, 0, 0, 0.3);
+    overflow: auto;
   }
   .global-environment {
     background-color: var(--bg-ds-primary-500);

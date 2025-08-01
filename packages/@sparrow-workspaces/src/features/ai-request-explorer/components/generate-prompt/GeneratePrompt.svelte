@@ -160,17 +160,19 @@
       >
         Your Message
       </label>
-      <CodeMirrorInput
-        value={userPromptExpectation}
-        onUpdateInput={(val) => (userPromptExpectation = val)}
-        placeholder="Describe your task..."
-        {theme}
-        {environmentVariables}
-        {onUpdateEnvironment}
-        isFocusedOnMount={false}
-        isNewLineOnEnter={true}
-        isNewLineOnShiftEnter={true}
-      />
+      <div>
+        <CodeMirrorInput
+          value={userPromptExpectation}
+          onUpdateInput={(val) => (userPromptExpectation = val)}
+          placeholder="Describe your task..."
+          {theme}
+          {environmentVariables}
+          {onUpdateEnvironment}
+          isFocusedOnMount={false}
+          isNewLineOnEnter={true}
+          isNewLineOnShiftEnter={true}
+        />
+      </div>
       <!-- <Textarea
         id="user-prompt-textarea"
         bind:value={userPromptExpectation}

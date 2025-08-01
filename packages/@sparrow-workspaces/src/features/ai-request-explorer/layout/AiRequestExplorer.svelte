@@ -191,6 +191,10 @@
     }, 0);
   });
   onDestroy(() => {});
+
+  $: {
+    console.log($tab.property?.aiRequest?.aiModelProvider, "TEST");
+  }
 </script>
 
 <div class="d-flex ai-request-explorer-layout h-100">

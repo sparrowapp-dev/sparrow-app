@@ -111,7 +111,8 @@
         </div>
 
         <div
-          class="prevent-default text-fs-12 text-center border-radius-2 p-2 bg-primary-300"
+          class="prevent-default text-fs-12 text-center border-radius-2 p-2 add-btn"
+          style="cursor: pointer;"
           on:click={async (e) => {
             const response = await onUpdateEnvironment(
               isGlobalVariable,
@@ -167,8 +168,8 @@
     background-color: var(--bg-ds-surface-600);
   }
   .select-environment-popup {
-    width: 222px;
-    height: auto;
+    width: 300px;
+    height: 170px;
     position: fixed;
     z-index: 900;
     flex-wrap: wrap;
@@ -176,18 +177,22 @@
     background-color: var(--bg-ds-surface-600);
     border-radius: 4px;
     padding: 12px;
+    box-shadow: 0 16px 32px 0 rgba(0, 0, 0, 0.3);
   }
   .variable-highlight {
     color: white;
   }
+  input {
+    height: 27px;
+  }
+
   .add-btn {
     background-color: var(--bg-ds-primary-400);
   }
-
   .add-btn:hover {
-    background: var(--button-active);
+    background-color: var(--bg-ds-primary-300);
   }
   .add-btn:active {
-    background: var(--bg-primary-300);
+    background-color: var(--bg-ds-primary-600);
   }
 </style>

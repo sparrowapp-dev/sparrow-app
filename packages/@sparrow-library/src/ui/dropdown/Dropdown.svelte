@@ -85,7 +85,7 @@
   });
 </script>
 
-<div class="position-relative" style="font-size: 12px;">
+<div class="position-relative" style="font-size: 12px; ">
   <!--
     the button to open the menu container
   -->
@@ -163,10 +163,8 @@
 
 <style>
   .dropdown-container {
-    /* -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
-    -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
-    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5); */
     background-color: var(--bg-ds-surface-600);
+    box-shadow: 0 16px 32px 0 rgba(0, 0, 0, 0.3);
   }
   .option-button {
     background-color: var(--bg-ds-surface-600);
