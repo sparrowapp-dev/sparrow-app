@@ -534,11 +534,13 @@
     _e: any,
     _id: string,
     _datatype: string,
-  ) =>
+  ) => {
     updateAttributeInputData(
       _id,
       convertStringToDataType(_e.detail, _datatype),
     );
+    queryBuilder = queryBuilder;
+  };
 </script>
 
 <div class="d-flex flex-column h-100">

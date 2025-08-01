@@ -355,6 +355,40 @@ class GraphqlExplorerViewModel {
     1000,
   );
 
+  public cleanGraphQLQuery(query: any) {
+    // Remove comments and normalize whitespace
+    let cleaned = query.replace(/\s+/g, " ").trim();
+    let previousLength;
+    do {
+      previousLength = cleaned.length;
+      // This handles cases like { { suite } }, { { suite { name } } }, { { suite { name { address } } } }
+      cleaned = cleaned.replace(
+        /\{\s*\{[^}]*(?:\{[^}]*\}[^}]*)*\}\s*\}/g,
+        "{ }",
+      );
+      // More aggressive pattern for deeply nested invalid structures
+      // This catches patterns where we have { { ... any nested content ... } }
+      let newCleaned = cleaned;
+      do {
+        cleaned = newCleaned;
+        newCleaned = cleaned.replace(
+          /\{\s*\{(?:[^{}]|\{[^{}]*\})*\}\s*\}/g,
+          "{ }",
+        );
+      } while (newCleaned !== cleaned);
+      // Remove completely empty objects: {}
+      cleaned = cleaned.replace(/\{\s*\}/g, "");
+      // Remove fields that only had empty objects: "fieldName {}"
+      cleaned = cleaned.replace(/\w+\s*\{\s*\}/g, "");
+      // Remove trailing commas and extra spaces
+      cleaned = cleaned.replace(/,\s*([})])/g, "$1");
+      cleaned = cleaned.replace(/\s+/g, " ");
+      cleaned = cleaned.trim();
+    } while (cleaned.length !== previousLength);
+
+    return cleaned;
+  }
+
   public updateSchemaAsPerQuery = async () => {
     try {
       const progressiveTab = createDeepCopy(this._tab.getValue());
@@ -367,14 +401,14 @@ class GraphqlExplorerViewModel {
       } else {
         query = progressiveTab.property.graphql.query;
       }
+      let cleanQuery = this.cleanGraphQLQuery(query);
       try {
-        // Check if the query is valid by attempting to parse it
-        parse(query);
+        parse(cleanQuery);
       } catch (error) {
         console.error("not a valid query");
         return;
       }
-      const reverseJson = await this.reverseGraphQLToJSON(query);
+      const reverseJson = await this.reverseGraphQLToJSON(cleanQuery);
       const parsedSchema = JSON.parse(progressiveTab.property.graphql.schema);
       let updatedJSON;
       if (
