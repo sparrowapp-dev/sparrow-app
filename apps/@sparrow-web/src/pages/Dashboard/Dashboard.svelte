@@ -44,6 +44,12 @@
   import MarketplacePage from "../marketplace-page/MarketplacePage.svelte";
   import { ResponseMessage, TeamRole } from "@sparrow/common/enums";
   import { planBannerisOpen, shouldRunThrottled } from "@sparrow/common/store";
+  import {
+    addCollectionItem,
+    isExpandCollection,
+    isExpandEnvironment,
+    isExpandTestflow,
+  } from "../../../../../packages/@sparrow-workspaces/src/stores/recent-left-panel";
 
   const _viewModel = new DashboardViewModel();
   const location = useLocation();
@@ -375,6 +381,9 @@
         folderId,
         tree,
       );
+      isExpandCollection.set(true);
+      addCollectionItem(collectionId, "collection");
+      addCollectionItem(folderId, "folder");
       if (isActiveWorkspace) {
         navigate("collections");
       }
@@ -404,6 +413,8 @@
       }
       await _viewModel.setOpenTeam(workspaceData.toMutableJSON().team?.teamId);
       await _viewModel.switchAndCreateCollectionTab(workspaceId, collection);
+      isExpandCollection.set(true);
+      addCollectionItem(collection.id, "collection");
       if (isActiveWorkspace) {
         navigate("collections");
       }
@@ -435,6 +446,9 @@
         collectionId,
         folder,
       );
+      isExpandCollection.set(true);
+      addCollectionItem(collectionId, "collection");
+      addCollectionItem(folder.id, "folder");
       if (isActiveWorkspace) {
         navigate("collections");
       }
@@ -489,6 +503,7 @@
       }
       await _viewModel.setOpenTeam(workspaceData.toMutableJSON().team?.teamId);
       await _viewModel.switchAndCreateEnvironmentTab(environment);
+      isExpandEnvironment.set(true);
       if (isActiveWorkspace) {
         navigate("collections");
       }
@@ -519,6 +534,7 @@
       }
       await _viewModel.setOpenTeam(workspaceData.toMutableJSON().team?.teamId);
       await _viewModel.switchAndCreateTestflowTab(testflow);
+      isExpandTestflow.set(true);
       if (isActiveWorkspace) {
         navigate("collections");
       }
