@@ -305,7 +305,7 @@
         </Tooltip>
         <!-- Download button -->
         {#if !isWebApp}
-          <Tooltip title={"Export"} placement={"bottom-center"}>
+          <Tooltip title={"Export"} placement={"bottom-right"}>
             <WithButtonV6
               icon={ArrowDownloadRegular}
               onClick={handleDownloaded}
@@ -314,7 +314,7 @@
             />
           </Tooltip>
         {:else}
-          <Tooltip title={"Export"} placement={"bottom-center"}>
+          <Tooltip title={"Export"} placement={"bottom-right"}>
             <WithButtonV6
               icon={ArrowDownloadRegular}
               onClick={() =>
