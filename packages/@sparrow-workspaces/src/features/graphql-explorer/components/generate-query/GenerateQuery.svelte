@@ -354,6 +354,7 @@
       );
     }
     saveSchemaToDatabase(isCheckBoxChecked);
+    queryBuilder = queryBuilder;
   };
 
   /**
