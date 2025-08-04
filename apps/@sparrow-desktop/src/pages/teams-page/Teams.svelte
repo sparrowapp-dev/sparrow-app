@@ -207,8 +207,7 @@
               {/if}
             </div>
 
-            <!-- github repo section -->
-            <section class="d-flex flex-column">
+            <div class="p-2">
               {#if !isGuestUser && isTrialExhausted == false}
                 <div
                   class="d-flex flex-column"
@@ -241,6 +240,10 @@
                   style="border-bottom: 1px solid var(--bg-ds-surface-100); margin: 8px 0 0 8px;"
                 ></div>
               {/if}
+            </div>
+
+            <!-- github repo section -->
+            <section class="d-flex flex-column">
               <div
                 class="p-2 d-flex align-items-center justify-content-between"
                 style="z-index: 4;"
