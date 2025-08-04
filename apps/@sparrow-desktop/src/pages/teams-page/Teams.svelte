@@ -74,6 +74,11 @@
   const sparrowAdminUrl = constants.ADMIN_URL;
 
   onMount(async () => {
+    let githubRepo = await _viewModel.getGithubRepo();
+    githubRepoData = githubRepo?.getLatest().toMutableJSON();
+    splitter = document.querySelector(".team-splitter .splitpanes__splitter");
+    isGuestUser = await _viewModel.getGuestUser();
+
     if (userId && shouldRunThrottled(userId)) {
       await Promise.all([
         _viewModel.refreshTeams(userId),
@@ -83,14 +88,9 @@
       console.error(`Throttled for ${userId}`);
     }
 
-    let githubRepo = await _viewModel.getGithubRepo();
-    githubRepoData = githubRepo?.getLatest().toMutableJSON();
-    splitter = document.querySelector(".team-splitter .splitpanes__splitter");
-
     await _viewModel.fetchGithubRepo();
     githubRepo = await _viewModel.getGithubRepo();
     githubRepoData = githubRepo?.getLatest().toMutableJSON();
-    isGuestUser = await _viewModel.getGuestUser();
     isTrialExhausted = await _viewModel.getUserTrialExhaustedStatus();
   });
   let splitter: HTMLElement | null;
@@ -208,9 +208,12 @@
             </div>
 
             <!-- github repo section -->
-            <section class="d-flex p-2 flex-column">
+            <section class="d-flex flex-column">
               {#if !isGuestUser && isTrialExhausted == false}
-                <div class="d-flex flex-column" style="gap: 12px">
+                <div
+                  class="d-flex flex-column"
+                  style="gap: 12px; padding-left: 8px;"
+                >
                   <div class="d-flex align-items-start" style="gap: 4px">
                     <div>
                       <SparkleRegular />
@@ -235,7 +238,7 @@
                   />
                 </div>
                 <div
-                  style="border-bottom: 1px solid var(--bg-ds-surface-100); margin: 8px 0 0 0;"
+                  style="border-bottom: 1px solid var(--bg-ds-surface-100); margin: 8px 0 0 8px;"
                 ></div>
               {/if}
               <div
