@@ -303,7 +303,7 @@
       <Tooltip
         placement="bottom-center"
         title="More"
-        distance={17}
+        distance={0}
         show={!showMenu}
       >
         <span class="threedot-icon-container d-flex">
