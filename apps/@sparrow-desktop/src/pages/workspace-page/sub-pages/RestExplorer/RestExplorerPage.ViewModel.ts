@@ -2624,6 +2624,7 @@ class RestExplorerViewModel {
     componentData: RequestTab,
     errorMessage: string,
   ) {
+    Sentry.captureException(errorMessage || "Socket Connection Break");
     await this.updateRequestAIConversation([
       ...(componentData?.property?.request?.ai?.conversations || []),
       {
@@ -2723,6 +2724,7 @@ class RestExplorerViewModel {
       );
 
       if (!socketResponse) {
+        Sentry.captureException("Socket Connection Break");
         throw new Error("Something went wrong. Please try again");
       }
 
