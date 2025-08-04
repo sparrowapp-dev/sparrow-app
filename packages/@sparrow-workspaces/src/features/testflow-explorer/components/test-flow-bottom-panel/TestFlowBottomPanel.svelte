@@ -406,7 +406,10 @@
                     responseHeadersLength={selectedNodeResponse?.response
                       ?.headers?.length || 0}
                   />
-                  <ResponseStatus response={selectedNodeResponse?.response} />
+                  <ResponseStatus
+                    response={selectedNodeResponse?.response}
+                    {isWebApp}
+                  />
                 </div>
 
                 {#if responseNavigation === "Response"}
