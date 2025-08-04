@@ -372,14 +372,17 @@ class GraphqlExplorerViewModel {
       } while (newCleaned !== cleaned);
       // Remove completely empty objects: {}
       cleaned = cleaned.replace(/\{\s*\}/g, "");
-      // Remove fields that only had empty objects: "fieldName {}"
-      cleaned = cleaned.replace(/\w+\s*\{\s*\}/g, "");
+      // Handle the specific case: remove empty braces after field names
+      // This will turn "fieldName {}" into "fieldName" and remove the braces
+      cleaned = cleaned.replace(/(\w+)\s*\{\s*\}/g, "$1");
+      // Clean up any remaining empty nested structures
+      // For cases like "address{ { anycontent}}" -> "address"
+      cleaned = cleaned.replace(/(\w+)\s*\{\s*\{\s*[^}]*\}\s*\}/g, "$1");
       // Remove trailing commas and extra spaces
       cleaned = cleaned.replace(/,\s*([})])/g, "$1");
       cleaned = cleaned.replace(/\s+/g, " ");
       cleaned = cleaned.trim();
     } while (cleaned.length !== previousLength);
-
     return cleaned;
   }
 
@@ -1044,9 +1047,8 @@ class GraphqlExplorerViewModel {
       }
 
       for (const firstItem of firstItems) {
-        const secondItem = secondMap.get(
-          firstItem.itemType + ":" + firstItem.name,
-        );
+        const compositeKey = `${firstItem.itemType}:${firstItem.name}`;
+        const secondItem = secondMap.get(compositeKey);
 
         // If `isSelected` is true in the first item but it doesn't exist in the second JSON, set `isSelected` to false
         if (firstItem.isSelected && !secondItem) {
@@ -1059,11 +1061,19 @@ class GraphqlExplorerViewModel {
           firstItem.isSelected = secondItem.isSelected;
 
           // Recursively process nested items
-          if (
-            Array.isArray(firstItem.items) &&
-            Array.isArray(secondItem.items)
-          ) {
-            processItems(firstItem.items, secondItem.items);
+          if (Array.isArray(firstItem.items)) {
+            if (Array.isArray(secondItem.items)) {
+              // Both have nested items - process recursively
+              processItems(firstItem.items, secondItem.items);
+            } else {
+              // First has nested items but second doesn't - set all nested items to isSelected: false
+              processItems(firstItem.items, []);
+            }
+          }
+        } else {
+          // Item doesn't exist in second JSON - recursively set all nested items to false as well
+          if (Array.isArray(firstItem.items)) {
+            processItems(firstItem.items, []);
           }
         }
       }
