@@ -52,7 +52,7 @@
   {#if workspaces.length === 0}
     <div class="text-center py-3">No recent workspaces</div>
   {:else}
-    <List height={"100%"} overflowY={"auto"} classProps={"px-1 py-0"}>
+    <List height={"100%"} overflowY={"auto"} classProps={"ps-2 py-0"}>
       {#each topFiveWorkspaces as list, index}
         {#if index < 5}
           <div

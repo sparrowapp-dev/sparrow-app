@@ -42,7 +42,7 @@
     {/if}
   </div>
   <div class="sidebar-teams-list" style="flex:1; overflow:auto;">
-    <div style="height: 100%;">
+    <div class="ps-2" style="height: 100%;">
       <VirtualScroll data={teamList.reverse()} key="teamId" let:data>
         <TeamRow
           team={data}
@@ -73,4 +73,7 @@
   .teams-heading {
     outline: none;
   }
+  /* .virtual-scroll-wrapper {
+    padding: 0 0 0 4px;
+  } */
 </style>
