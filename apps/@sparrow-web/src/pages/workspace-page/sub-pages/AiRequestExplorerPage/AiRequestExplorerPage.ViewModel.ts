@@ -2297,6 +2297,7 @@ class AiRequestExplorerViewModel {
     componentData: RequestTab,
     errorMessage: string,
   ) {
+    Sentry.captureException(errorMessage || "Socket Connection Break");
     await this.updateRequestAIConversation([
       ...(componentData?.property?.aiRequest?.ai?.conversations || []),
       {
@@ -2499,6 +2500,7 @@ class AiRequestExplorerViewModel {
         await this.aiAssistentWebSocketService.sendAiRequest(aiRequestData);
 
       if (!socketResponse) {
+        Sentry.captureException("Socket Connection Break");
         throw new Error("Something went wrong. Please try again");
       }
 
@@ -2527,6 +2529,7 @@ class AiRequestExplorerViewModel {
             events.forEach((event) =>
               this.aiAssistentWebSocketService.removeListener(event),
             );
+            Sentry.captureException("Socket Connection Break");
             await this.handleAIResponseError(
               componentData,
               "Something went wrong. Please try again",
