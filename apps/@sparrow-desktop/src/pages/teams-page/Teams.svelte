@@ -209,16 +209,13 @@
 
             <div class="p-2">
               {#if !isGuestUser && isTrialExhausted == false}
-                <div
-                  class="d-flex flex-column"
-                  style="gap: 12px; padding-left: 8px;"
-                >
+                <div class="d-flex flex-column" style="gap: 12px">
                   <div class="d-flex align-items-start" style="gap: 4px">
                     <div>
                       <SparkleRegular />
                     </div>
                     <div class="d-flex flex-column text-ds-font-size-12">
-                      <div style="color: var(--text-ds-neutral-50)">
+                      <div style="color: var(--text-ds-neutral-50);">
                         Unlock trial Access
                       </div>
                       <div style="color: var(--text-ds-neutral-200);">
@@ -237,7 +234,7 @@
                   />
                 </div>
                 <div
-                  style="border-bottom: 1px solid var(--bg-ds-surface-100); margin: 8px 0 0 8px;"
+                  style="border-bottom: 1px solid var(--bg-ds-surface-100); margin: 8px 0 0 0;"
                 ></div>
               {/if}
             </div>
