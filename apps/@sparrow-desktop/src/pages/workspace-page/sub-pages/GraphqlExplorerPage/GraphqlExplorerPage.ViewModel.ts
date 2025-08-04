@@ -1041,8 +1041,26 @@ class GraphqlExplorerViewModel {
 
   // This function will compare and update the main JSON with the new generated JSON.
   private compareAndUpdateFirstJSON = (firstJSON, secondJSONItems) => {
-    // Create a helper function to recursively process nested items
-    function processItems(firstItems, secondItems) {
+    const selectedPaths = new Set<string>();
+
+    //Collect selected paths from secondJSON
+    function collectSelectedPaths(items, path = "") {
+      for (const item of items) {
+        if (item.isSelected) {
+          const exactKey = `${path}${item.itemType}:${item.name}`;
+          const looseKey = `${path}${item.name}`;
+          selectedPaths.add(exactKey);
+          selectedPaths.add(looseKey);
+
+          if (Array.isArray(item.items)) {
+            collectSelectedPaths(item.items, exactKey + " > ");
+          }
+        }
+      }
+    }
+
+    //Modified processItems to use selectedPaths
+    function processItems(firstItems, secondItems, path = "") {
       // Create a map of secondItems for quick lookup by name
       const secondMap = new Map();
       for (const secondItem of secondItems) {
@@ -1052,41 +1070,40 @@ class GraphqlExplorerViewModel {
 
       for (const firstItem of firstItems) {
         const compositeKey = `${firstItem.itemType}:${firstItem.name}`;
+        const exactKey = `${path}${firstItem.itemType}:${firstItem.name}`;
+        const looseKey = `${path}${firstItem.name}`;
         const secondItem = secondMap.get(compositeKey);
 
-        // If `isSelected` is true in the first item but it doesn't exist in the second JSON, set `isSelected` to false
-        if (firstItem.isSelected && !secondItem) {
-          firstItem.isSelected = false;
-        }
+        // Set isSelected based on selectedPaths instead of only comparing presence in secondMap
+        firstItem.isSelected =
+          selectedPaths.has(exactKey) || selectedPaths.has(looseKey);
 
-        // If the object exists in both, update its value
         if (secondItem) {
           firstItem.value = secondItem.value;
-          firstItem.isSelected = secondItem.isSelected;
 
           // Recursively process nested items
           if (Array.isArray(firstItem.items)) {
             if (Array.isArray(secondItem.items)) {
               // Both have nested items - process recursively
-              processItems(firstItem.items, secondItem.items);
+              processItems(firstItem.items, secondItem.items, exactKey + " > ");
             } else {
               // First has nested items but second doesn't - set all nested items to isSelected: false
-              processItems(firstItem.items, []);
+              processItems(firstItem.items, [], exactKey + " > ");
             }
           }
         } else {
           // Item doesn't exist in second JSON - recursively set all nested items to false as well
           if (Array.isArray(firstItem.items)) {
-            processItems(firstItem.items, []);
+            processItems(firstItem.items, [], exactKey + " > ");
           }
         }
       }
     }
 
-    // Start processing with the top-level items
+    collectSelectedPaths(secondJSONItems);
     processItems(firstJSON.items, secondJSONItems);
 
-    return firstJSON; // Return the updated first JSON
+    return firstJSON;
   };
 
   private compareAndUpdateFetchedJson = async (previous, current) => {
