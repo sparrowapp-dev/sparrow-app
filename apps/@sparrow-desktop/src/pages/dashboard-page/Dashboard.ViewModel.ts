@@ -1236,7 +1236,10 @@ export class DashboardViewModel {
    * @description - This function will redirect you to billing section.
    */
   public handleRedirectToAdminPanel = async (teamId: string) => {
-    await open(`${constants.ADMIN_URL}/billing/billingOverview/${teamId}`);
+    const accessToken = localStorage.getItem("AUTH_TOKEN");
+    await open(
+      `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?token=${accessToken}`,
+    );
   };
 
   public handleContactSales = async () => {

@@ -963,7 +963,7 @@ export class TeamExplorerPageViewModel {
       );
     }
     else{
-        if (response?.message === "Plan limit reached") {
+      if (response?.message === "Plan limit reached") {
         // notifications.error("Failed to send invite. please upgrade your plan.");
       } else {
         notifications.error(
@@ -1086,8 +1086,9 @@ export class TeamExplorerPageViewModel {
   };
 
   public handleRedirectToAdminPanel = async (teamId: string) => {
+    const accessToken = localStorage.getItem("AUTH_TOKEN");
     window.open(
-      constants.ADMIN_URL + `/billing/billingOverview/${teamId}`,
+      constants.ADMIN_URL + `/hubs/workspace/${teamId}?token=${accessToken}`,
       "_blank",
     );
     return;

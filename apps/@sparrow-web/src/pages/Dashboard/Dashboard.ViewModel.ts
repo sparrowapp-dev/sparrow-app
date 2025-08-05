@@ -1302,8 +1302,10 @@ export class DashboardViewModel {
   };
 
   public handleRedirectToAdminPanel = async (teamId: string) => {
+    const accessToken = localStorage.getItem("AUTH_TOKEN");
     window.open(
-      constants.ADMIN_URL + `/billing/billingOverview/${teamId}`,
+      constants.ADMIN_URL +
+        `/billing/billingOverview/${teamId}?token=${accessToken}`,
       "_blank",
     );
     return;
