@@ -71,18 +71,19 @@
     <div
       style="margin-bottom: 12px;"
       class={reviewEnv?.type === "G"
-        ? "global-base text-fs-10"
-        : "local-base text-fs-10"}
+        ? "global-base text-fs-10 ellipsis"
+        : "local-base text-fs-10 ellipsis"}
     >
       <DotIcon
         color={reviewEnv?.type === "G" ? "#3670f7" : "#69d696"}
         height={"6px"}
         width={"6px"}
-      /> baseURL
+      />
+      {reviewEnv?.key || ""}
     </div>
 
     <div class="d-flex justify-content-between">
-      <div>
+      <div style="width: calc(100% - 55px);">
         <div class="d-flex">
           <span
             class="text-secondary-200 text-fs-11"
@@ -103,7 +104,7 @@
           <div class="d-flex" style="width: calc(100% - 55px);">
             <div
               class="env-value"
-              style="width: calc(100% - 20px); font-weight: 400; font-size: 12px; line-height: 18px; color:var(--text-ds-neutral-50); "
+              style=" font-weight: 400; font-size: 12px; line-height: 18px; color:var(--text-ds-neutral-50); "
             >
               {reviewEnv?.value}
             </div>
