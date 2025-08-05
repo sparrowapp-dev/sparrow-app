@@ -809,7 +809,6 @@ class GraphqlExplorerViewModel {
 
   // This function will reverse the GraphQL query to JSON object.
   private reverseGraphQLToJSON = (query) => {
-    // Helper to process arguments
 
     // Helper to process object fields
     const processObjectFields = (fields) => {
@@ -1380,13 +1379,12 @@ class GraphqlExplorerViewModel {
    *
    * @param _headers - request headers
    */
-  public updateSchema = async (_schema: string) => {
-    const isCheckBoxChecked = JSON.parse(_schema)?.isCheckBoxChecked;
+  public updateSchema = async (_schema: string, _isQueryUpdateRequired: boolean) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.graphql.schema = _schema;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    await this.updateQueryAsPerSchema(isCheckBoxChecked);
+    await this.updateQueryAsPerSchema(_isQueryUpdateRequired);
     this.compareRequestWithServer();
   };
 
