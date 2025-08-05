@@ -198,7 +198,7 @@
           <Button
             type={"link-primary"}
             onClick={() => {
-              onOpenCollection();
+              onOpenCollection(true);
             }}
             title={collection?.name?.length > 25
               ? collection?.name?.slice(0, 25) + "..."
