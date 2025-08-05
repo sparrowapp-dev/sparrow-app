@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Input, Search } from "@sparrow/library/forms";
-  import { Shimmer } from "../../images";
+  import { SparrowBirdLogo } from "../../images";
   import { user } from "@app/store/auth.store";
   import { Member } from "./sub-workspace-settings";
 
@@ -13,7 +13,6 @@
 
   export let onChangeUserRoleAtWorkspace;
   export let onRemoveUserFromWorkspace;
-
   let search: string = "";
   let activeUser;
   let filteredUser;
@@ -54,6 +53,7 @@
         bind:value={search}
         on:input={() => {}}
         customWidth={"300px"}
+        placeholder={`Search people in ${currentWorkspace?.name}`}
       />
     </div>
     <Member user={activeUser} isActiveUser={true} />
@@ -77,15 +77,11 @@
       {/each}
     {:else if !filteredUser?.length}
       <div class="skeleton-parent">
-        <p class="skeleton-text">
-          Once you invite people to this workspace, you will see them listed
-          here. Add people and manage their access by clicking to invite.
-        </p>
         <img
-          src={Shimmer}
-          alt="shimmer effect"
-          width="100%"
-          height="100%"
+          src={SparrowBirdLogo}
+          alt="Sparrow Logo"
+          width="50%"
+          height="50%"
           style="margin-top:8px;"
         />
       </div>
@@ -95,7 +91,10 @@
 
 <style>
   .skeleton-parent {
-    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
   }
   .skeleton-text {
     position: absolute;

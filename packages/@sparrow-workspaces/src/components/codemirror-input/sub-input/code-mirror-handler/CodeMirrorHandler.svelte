@@ -118,7 +118,7 @@
     }
     handleHighlightClass();
     if (inputWrapper) {
-      const dialogboxWidth = 400;
+      const dialogboxWidth = 300;
       const dialogboxHeight = 170;
       const rightDistance = inputWrapper.getBoundingClientRect().right;
       const leftDistance = inputWrapper.getBoundingClientRect().left;
@@ -711,30 +711,5 @@
   :global(.cm-expression-block-close-span) {
     align-content: center;
     margin: 0px;
-  }
-  .codemirror-disabled {
-    cursor:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23eb5651' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='5' y1='5' x2='19' y2='19'/%3E%3C/svg%3E")
-        8 8,
-      not-allowed !important;
-    opacity: 0.6;
-  }
-
-  .codemirror-disabled :global(.cm-editor),
-  .codemirror-disabled :global(.cm-content),
-  .codemirror-disabled :global(*) {
-    cursor:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23eb5651' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='5' y1='5' x2='19' y2='19'/%3E%3C/svg%3E")
-        8 8,
-      not-allowed !important;
-  }
-  .codemirror-disabled :global(.cm-focused) {
-    outline: none !important;
-  }
-  .basic-code-mirror-input:has(.codemirror-disabled) {
-    cursor:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23eb5651' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='5' y1='5' x2='19' y2='19'/%3E%3C/svg%3E")
-        8 8,
-      not-allowed !important;
   }
 </style>

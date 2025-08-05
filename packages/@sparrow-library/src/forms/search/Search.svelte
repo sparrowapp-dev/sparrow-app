@@ -197,7 +197,7 @@
         var(--bg-ds-surface-400),
         var(--bg-ds-surface-400)
       ),
-      linear-gradient(90deg, #11adf0, #316cf6, #6147ff); 
+      linear-gradient(90deg, #11adf0, #316cf6, #6147ff);
     background-origin: border-box;
     background-clip: padding-box, border-box;
     caret-color: var(--border-ds-primary-300);
@@ -227,7 +227,7 @@
 
   .custom-surface900 {
     background-color: var(--bg-ds-surface-600);
-    border: none;
+    border: 1px solid transparent;
     caret-color: var(--border-ds-primary-300);
   }
 

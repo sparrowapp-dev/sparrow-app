@@ -20,13 +20,11 @@ export class SystemPromptTheme {
       },
 
       "&:hover": {
-        border: "1px solid white",
-        backgroundColor: "var(--bg-secondary-450)",
+        border: "1px solid var(--border-ds-primary-300)",
       },
 
       "&.cm-focused": {
         border: "1px solid var(--border-ds-primary-300)",
-        backgroundColor: "var(--bg-ds-surface-600)",
         outline: "none",
       },
 

@@ -56,11 +56,16 @@
 
   let noOfColumns = 180;
 
-  const rightClickContextMenu = () => {
-    setTimeout(() => {
-      showMenu = !showMenu;
-    }, 100);
-  };
+  function rightClickContextMenu() {
+    if (
+      loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER &&
+      !currentWorkspace?.isShared
+    ) {
+      setTimeout(() => {
+        showMenu = !showMenu;
+      }, 100);
+    }
+  }
 
   const handleSelectClick = (event: MouseEvent) => {
     const selectElement = document.getElementById(

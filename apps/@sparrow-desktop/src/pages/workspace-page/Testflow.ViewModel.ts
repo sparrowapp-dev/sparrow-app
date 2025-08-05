@@ -312,6 +312,7 @@ export class TestflowViewModel {
       _testflow.toMutableJSON(),
     );
     this.tabRepository.createTab(testflowTab);
+    scrollToTab(testflowTab.id);
   };
 
   private constructBaseUrl = async (_id: string) => {

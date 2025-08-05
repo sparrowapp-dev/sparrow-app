@@ -152,7 +152,7 @@
         if (animatedWrapper) {
           animatedWrapper.style.height = "auto";
         }
-      }, 250);
+      }, 50);
 
       previousHeight = newHeight;
     }
