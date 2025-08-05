@@ -810,67 +810,29 @@ class GraphqlExplorerViewModel {
   // This function will reverse the GraphQL query to JSON object.
   private reverseGraphQLToJSON = (query) => {
     // Helper to process arguments
-    const processArguments = (args) => {
-      return args.map((arg) => {
-        let items = [];
-
-        // Handle different kinds of argument values
-        switch (arg.value.kind) {
-          case "StringValue":
-            // For StringValue, set value directly
-            return {
-              name: arg.name.value,
-              itemType: "argument",
-              isSelected: true,
-              value: arg.value.value, // Set value for StringValue
-              items: [], // No nested items
-            };
-          case "IntValue":
-            // For IntValue, set value directly
-            return {
-              name: arg.name.value,
-              itemType: "argument",
-              isSelected: true,
-              value: arg.value.value,
-              items: [], // No nested items
-            };
-          case "ObjectValue":
-            // For ObjectValue, process nested fields and place them in items
-            items = processObjectFields(arg.value.fields);
-            return {
-              name: arg.name.value,
-              itemType: "argument",
-              isSelected: true,
-              value: null, // Set value to null for ObjectValue
-              items: items, // Place nested fields in items
-            };
-          default:
-            // Handle other types if needed
-            return {
-              name: arg.name.value,
-              itemType: "argument",
-              isSelected: true,
-              value: null,
-              items: [],
-            };
-        }
-      });
-    };
 
     // Helper to process object fields
     const processObjectFields = (fields) => {
       return fields.map((field) => {
         let items = [];
-
         // Handle different kinds of field values
         switch (field.value.kind) {
           case "StringValue":
             // For StringValue, set value directly
             return {
               name: field.name.value,
-              itemType: "field",
+              itemType: "argument",
               isSelected: true,
               value: field.value.value, // Set value for StringValue
+              items: [], // No nested items
+            };
+          case "IntValue":
+          // For IntValue, set value directly
+            return {
+              name: field.name.value,
+              itemType: "argument",
+              isSelected: true,
+              value: field.value.value,
               items: [], // No nested items
             };
           case "ObjectValue":
@@ -887,7 +849,7 @@ class GraphqlExplorerViewModel {
             // Handle other types if needed
             return {
               name: field.name.value,
-              itemType: "field",
+              itemType: "argument",
               isSelected: true,
               value: null,
               items: [],
@@ -899,7 +861,7 @@ class GraphqlExplorerViewModel {
     // Helper to process fields
     const processFields = (fields) => {
       return fields.map((field) => {
-        const args = field.arguments ? processArguments(field.arguments) : [];
+        const args = field.arguments ? processObjectFields(field.arguments) : [];
         const nestedFields =
           field.selectionSet && field.selectionSet.selections
             ? processFields(field.selectionSet.selections)
@@ -1012,14 +974,13 @@ class GraphqlExplorerViewModel {
       // Create a map of secondItems for quick lookup by name
       const secondMap = new Map();
       for (const secondItem of secondItems) {
-        const compositeKey = `${secondItem.itemType}:${secondItem.name}`;
+        const compositeKey = `${secondItem.name}`;
         secondMap.set(compositeKey, secondItem);
       }
 
       for (const firstItem of firstItems) {
-        const secondItem = secondMap.get(
-          firstItem.itemType + ":" + firstItem.name,
-        );
+        const compositeKey = `${firstItem.name}`;
+        const secondItem = secondMap.get(compositeKey);
 
         // If `isSelected` is true in the first item but it doesn't exist in the second JSON, set `isSelected` to false
         if (firstItem.isSelected && !secondItem) {
