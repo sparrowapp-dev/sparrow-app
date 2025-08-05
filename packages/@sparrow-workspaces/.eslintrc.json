@@ -38,6 +38,7 @@
       "error",
       { "allow": ["warn", "error", "table", "info", "debug"] }
     ], // Restricts use of console.log()
-    "no-debugger": "error" // Restricts use of debugger
+    "no-debugger": "error", // Restricts use of debugger
+    "prefer-const": "off"
   }
 }
