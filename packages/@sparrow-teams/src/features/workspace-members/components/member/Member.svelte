@@ -155,7 +155,7 @@
 <Modal
   title={"Remove user?"}
   type={"danger"}
-  width={"35%"}
+  width={"40%"}
   zIndex={10000}
   isOpen={memberPopObj.isMemberRemovePopup}
   handleModalState={(flag) => {
@@ -163,7 +163,7 @@
   }}
 >
   <div style="font-size: 14px;" class="isMemberRemovePopuptext-lightGray mb-1">
-    <p style="font-size:12px;" class="text-textColor">
+    <p style="font-size:14px;" class="text-textColor">
       Are you sure you want to remove <span class="text-whiteColor"
         >"{user.name}"</span
       >

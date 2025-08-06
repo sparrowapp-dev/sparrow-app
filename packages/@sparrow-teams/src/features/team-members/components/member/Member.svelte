@@ -230,7 +230,7 @@
 <Modal
   title={"Remove user?"}
   type={"danger"}
-  width={"35%"}
+  width={"40%"}
   zIndex={10000}
   isOpen={memberPopObj.isMemberRemovePopup}
   handleModalState={(flag) => {
@@ -239,14 +239,14 @@
 >
   <div class="text-lightGray text-ds-font-size-14 mb-1">
     <p
-      class="text-textColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
+      class="text-textColor text-ds-line-height-130 text-ds-font-weight-regular"
     >
       Are you sure you want to remove <span class="text-whiteColor"
         >"{truncateText(user.name, 20)}"</span
       >
       ? They will lose access to the
       <span
-        class="text-whiteColor text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-regular"
+        class="text-whiteColor text-ds-line-height-130 text-ds-font-weight-regular"
         >"{openTeam?.name}"</span
       > hub.
     </p>
