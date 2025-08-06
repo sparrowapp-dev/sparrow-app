@@ -50,12 +50,12 @@
   export let isWorkspaceCreationInProgress = false;
   export let onCopyLink;
   export let selectedFilter;
-
   let workspacePerPage = 5;
   let filterText = "";
   let currPage = 1;
   let prevPage = -1;
   let filteredWorkspaces: any[] = [];
+  let prevSelectedFilter = selectedFilter;
 
   // filters the workspaces based on the search query
   $: {
@@ -66,12 +66,14 @@
     );
 
     currPage =
-      searchQuery && filteredResults.length > 0
+      selectedFilter !== prevSelectedFilter
         ? 1
-        : prevPage !== -1
-          ? prevPage
-          : currPage;
-
+        : searchQuery && filteredResults.length > 0
+          ? 1
+          : prevPage !== -1
+            ? prevPage
+            : currPage;
+    prevSelectedFilter = selectedFilter;
     filteredWorkspaces = filteredResults.sort(
       (a, b) =>
         new Date(b._data.updatedAt).getTime() -
