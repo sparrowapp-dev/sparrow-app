@@ -157,11 +157,14 @@
     await handleQueryErrorStatus();
   };
 
-  const handleUpdateSchema = async (data: any) => {
+  const handleUpdateSchema = async (
+    data: any,
+    _isQueryUpdateRequired: boolean,
+  ) => {
     isQueryInvalid = false;
     errorStartIndex = 0;
     errorEndIndex = 0;
-    await updateSchema(data);
+    await updateSchema(data, _isQueryUpdateRequired);
     await handleQueryErrorStatus();
   };
 
