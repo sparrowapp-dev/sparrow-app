@@ -82,6 +82,9 @@ use tokio::sync::mpsc::{self, UnboundedSender};
 use tokio::sync::Mutex;
 use tokio_tungstenite::connect_async;
 use tokio_tungstenite::tungstenite::protocol::Message;
+// --- Connect WebSocket with invalid certs allowed ---
+use tokio_tungstenite::tungstenite::client::IntoClientRequest;
+use tokio_tungstenite::Connector as WsConnector;
 
 // Socket.IO imports
 use futures_util::FutureExt;
@@ -401,9 +404,9 @@ async fn make_request_v2(
 ) -> Result<String, std::io::Error> {
     // Create a client
     let client = reqwest::Client::builder()
-    .danger_accept_invalid_certs(true)
-    .build()
-    .unwrap();
+        .danger_accept_invalid_certs(true)
+        .build()
+        .unwrap();
 
     // Convert method string to reqwest::Method
     let reqwest_method = match method {
@@ -665,44 +668,37 @@ async fn connect_websocket(
         headers_key_value_map.insert(kv.key, kv.value);
     }
 
-    // Create an HTTPS connector and client
-    let https = HttpsConnector::new();
-    let client: OtherClient<_, hyper::Body> = OtherClient::builder().build::<_, hyper::Body>(https);
+    // --- Custom HTTPS connector that accepts invalid certs ---
 
-    // Build the HTTP request to upgrade to WebSocket
-    let mut req_builder = Request::builder()
-        .uri(&httpurl)
-        .header(UPGRADE, "websocket")
-        .header(CONNECTION, "Upgrade");
+    // Build the WebSocket request with headers
+    let mut ws_request = url
+        .clone()
+        .into_client_request()
+        .map_err(|e| format!("Invalid WS URL: {}", e))?;
 
-    // Add custom headers to the request
+    // Add custom headers
     for (key, value) in headers_key_value_map.iter() {
-        req_builder = req_builder.header(
-            key,
-            HeaderValue::from_str(value).map_err(|e| format!("Invalid header value: {}", e))?,
+        ws_request.headers_mut().insert(
+            http::header::HeaderName::from_bytes(key.as_bytes())
+                .map_err(|e| format!("Invalid header name: {}", e))?,
+            http::header::HeaderValue::from_str(value)
+                .map_err(|e| format!("Invalid header value: {}", e))?,
         );
     }
 
-    // Unwrap the body
-    let req = req_builder
-        .body(hyper::Body::empty())
-        .map_err(|e| format!("Failed to build request: {}", e))?;
+    // Build a TLS connector that accepts invalid certs for tokio-tungstenite
+    let mut ws_tls = native_tls::TlsConnector::builder();
+    ws_tls.danger_accept_invalid_certs(true);
+    let ws_tls_connector = ws_tls
+        .build()
+        .map_err(|e| format!("TLS build error: {}", e))?;
+    let ws_connector = WsConnector::NativeTls(ws_tls_connector.into());
 
-    // Send the HTTP request and await the response to check if upgrade to websocket is possible or not.
-    let response = client
-        .request(req)
-        .await
-        .map_err(|e| format!("Failed to request: {}", e))?;
-
-    // Check if the upgrade to WebSocket was successful
-    if response.status() != 101 {
-        return Err(format!("Failed to upgrade: {:?}", response.status()));
-    }
-
-    // Establish the WebSocket connection and convert the response into a WebSocket stream
-    let (ws_stream, response) = connect_async(url)
-        .await
-        .map_err(|e| format!("Failed to connect: {}", e))?;
+    // Connect with custom request and connector
+    let (ws_stream, response) =
+        tokio_tungstenite::connect_async_tls_with_config(ws_request, None, Some(ws_connector))
+            .await
+            .map_err(|e| format!("Failed to connect: {}", e))?;
 
     // Extract headers from the response
     let mut response_headers = HashMap::new();
@@ -1194,9 +1190,9 @@ async fn send_graphql_request(
 ) -> Result<String, String> {
     // Initialize an HTTP client for making requests.
     let client = reqwest::Client::builder()
-    .danger_accept_invalid_certs(true)
-    .build()
-    .unwrap();
+        .danger_accept_invalid_certs(true)
+        .build()
+        .unwrap();
 
     // Deserialize the JSON string `headers` into a Vec of key-value pairs.
     // Each key-value pair is represented by the KeyValue struct.

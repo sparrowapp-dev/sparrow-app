@@ -4276,6 +4276,7 @@ dependencies = [
  "tauri-plugin-single-instance",
  "tauri-plugin-updater",
  "tokio",
+ "tokio-native-tls",
  "tokio-tungstenite 0.16.1",
  "tokio-util 0.6.10",
  "tungstenite 0.20.1",
