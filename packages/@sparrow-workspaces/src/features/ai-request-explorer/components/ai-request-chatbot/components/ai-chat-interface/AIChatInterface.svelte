@@ -323,11 +323,7 @@
       ? 'with-history'
       : 'full-width'}"
   >
-    <div
-      class="d-flex flex-column h-100 chat-box"
-      in:fly={{ y: 50, duration: 300, easing: cubicOut }}
-      out:fly={{ y: 50, duration: 300, easing: cubicOut }}
-    >
+    <div class="d-flex flex-column h-100 chat-box">
       <div style="flex:1; overflow:auto;">
         <div class="d-flex h-100 flex-column">
           <div class="chatbox-heading">
