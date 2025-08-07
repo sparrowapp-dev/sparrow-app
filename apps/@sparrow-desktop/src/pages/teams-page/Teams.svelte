@@ -41,6 +41,7 @@
     UpgradePlanPopUp,
   } from "@sparrow/common/components";
   import { shouldRunThrottled } from "@sparrow/common/store";
+  import { type TeamDocType } from "@app/models/team.model";
 
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
@@ -63,6 +64,7 @@
   let githubRepoData: GithubRepoDocType;
   let isGuestUser = false;
   let userId = "";
+  let lastKnownTimestamp: string | null = null;
   const userSubscriber = user.subscribe(async (value) => {
     if (value) {
       userId = value._id;
@@ -72,6 +74,16 @@
   const externalSparrowGithub = constants.SPARROW_GITHUB;
 
   const sparrowAdminUrl = constants.ADMIN_URL;
+
+  const handleCheckTeamUpdates = async (teamId: string) => {
+    const response = await _viewModel.teamLatestTimestamps(teamId);
+    if (response?.updatedAt && response?.updatedBy) {
+      if (lastKnownTimestamp !== response.updatedAt) {
+        await _viewModel.refreshTeams(userId);
+        lastKnownTimestamp = response.updatedAt;
+      }
+    }
+  };
 
   onMount(async () => {
     let githubRepo = await _viewModel.getGithubRepo();
@@ -124,6 +136,58 @@
       return version;
     }
   };
+
+  let openTeamData: TeamDocType;
+  const openTeamSubscriber = openTeam.subscribe((_team) => {
+    if (_team) {
+      const teamJSON = _team?.toMutableJSON();
+      setTimeout(() => {
+        openTeamData = teamJSON;
+      }, 0);
+    }
+  });
+
+  const getIntervalDelay = (minutes: number): number => {
+    if (minutes < 10) return 10000; // every 10s
+    if (minutes < 20) return 30000; // every 30s
+    if (minutes < 30) return 60000; // every 60s
+    if (minutes < 60) return 120000; // every 2 mins
+    return 300000; // every 5 mins after 1 hour
+  };
+
+  onMount(() => {
+    let pollingInterval: NodeJS.Timeout;
+    let increaseTimer: NodeJS.Timeout;
+    let activeMinutes = 0;
+
+    const setDynamicInterval = (delay: number) => {
+      if (pollingInterval) clearInterval(pollingInterval);
+      pollingInterval = setInterval(() => {
+        if (openTeamData?.teamId) {
+          handleCheckTeamUpdates(openTeamData.teamId);
+        }
+      }, delay);
+    };
+
+    // Start initial polling
+    let currentDelay = getIntervalDelay(activeMinutes);
+    setDynamicInterval(currentDelay);
+
+    // Every minute, update interval if needed
+    increaseTimer = setInterval(() => {
+      activeMinutes += 1;
+      const newDelay = getIntervalDelay(activeMinutes);
+      if (newDelay !== currentDelay) {
+        currentDelay = newDelay;
+        setDynamicInterval(currentDelay);
+      }
+    }, 60000);
+
+    return () => {
+      clearInterval(pollingInterval);
+      clearInterval(increaseTimer);
+    };
+  });
 
   onDestroy(() => {
     userSubscriber();

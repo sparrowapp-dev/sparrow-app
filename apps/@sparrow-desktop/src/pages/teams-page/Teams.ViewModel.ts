@@ -405,6 +405,17 @@ export class TeamsViewModel {
     }
   };
 
+  public constructBaseUrl = async (_teamId: string) => {
+    const teamData = await this.teamRepository.getTeamDoc(_teamId);
+    const hubUrl = teamData?.hubUrl;
+
+    if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
+      const envSuffix = constants.APP_ENVIRONMENT_PATH;
+      return `${hubUrl}/${envSuffix}`;
+    }
+    return constants.API_URL;
+  };
+
   public getUserTrialExhaustedStatus = async (): Promise<boolean> => {
     const response = await this.guestUserRepository.findOne({
       name: "guestUser",
@@ -430,5 +441,13 @@ export class TeamsViewModel {
       constants.ADMIN_URL +
       `?accessToken=${accessToken}&refreshToken=${refreshToken}&email=${email}&source=desktop&trial=login_trial`;
     open(url);
+  };
+
+  public teamLatestTimestamps = async (teamId: string) => {
+    const baseUrl = await this.constructBaseUrl(teamId);
+    const response = await this.teamService.teamTimestamps(teamId, baseUrl);
+    if (response.isSuccessful) {
+      return response.data;
+    }
   };
 }
