@@ -14,7 +14,7 @@
   // Call the onFileSelect function when files are selected
   const handleFileChange = (event: Event) => {
     const input = event.target as HTMLInputElement;
-    onFileSelect(input.files);
+    onFileSelect(event);
   };
 </script>
 
@@ -33,7 +33,9 @@
   type="file"
   id={inputId}
   accept={acceptedFileTypes}
-  on:change={handleFileChange}
+  on:change={(e) => {
+    handleFileChange(e);
+  }}
   multiple
 />
 
