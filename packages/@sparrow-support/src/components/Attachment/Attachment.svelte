@@ -4,7 +4,7 @@
   // Props: inputId and onFileSelect handler are passed in from the parent component
   export let inputId: string; // Parent will pass a unique id
   export let onFileSelect: (files: FileList | null) => void; // Parent will pass a function to handle file selection
-  export let acceptedFileTypes: string = "image/png,image/jpeg"; // Optional prop for accepted file types
+  export let acceptedFileTypes: string = "image/png,image/jpeg,video/mp4"; // Optional prop for accepted file types
 
   // Function to trigger file input click
   const triggerFileSelect = () => {
