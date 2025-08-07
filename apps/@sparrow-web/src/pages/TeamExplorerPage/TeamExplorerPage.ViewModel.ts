@@ -491,6 +491,11 @@ export class TeamExplorerPageViewModel {
     _userId: string,
   ) => {
     const baseUrl = await this.constructBaseUrl(_teamId);
+    const hasWorksapces = await this.hasTeamWorkspaces(_teamId);
+    if (!hasWorksapces) {
+      notifications.warning("Please add a workspace before inviting.");
+      return;
+    }
     const response = await this.teamService.inviteMembersAtTeam(
       _teamId,
       _inviteBody,
@@ -963,7 +968,7 @@ export class TeamExplorerPageViewModel {
       );
     }
     else{
-        if (response?.message === "Plan limit reached") {
+      if (response?.message === "Plan limit reached") {
         // notifications.error("Failed to send invite. please upgrade your plan.");
       } else {
         notifications.error(
@@ -1095,5 +1100,10 @@ export class TeamExplorerPageViewModel {
 
   public handleContactSales = async () => {
     window.open(`${constants.MARKETING_URL}/pricing/`);
+  };
+
+  public hasTeamWorkspaces = async (teamId: string): Promise<boolean> => {
+    const team = await this.teamRepository.getTeamDoc(teamId);
+    return Array.isArray(team?.workspaces) && team.workspaces.length > 0;
   };
 }
