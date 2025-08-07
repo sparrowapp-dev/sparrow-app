@@ -203,6 +203,12 @@
     await _viewModel.handleRedirectToAdminPanel($activeTeam?.teamId);
   };
 
+  const handleRedirectToAdminPanelWorkspace = async () => {
+    await _viewModel.handleRedirectToAdminPanel($activeTeam?.teamId, {
+      toWorkspace: true,
+    });
+  };
+
   const handleCreateWorkspace = async (teamId: string) => {
     const response = await _viewModel.handleCreateWorkspace(teamId);
     if (response?.data?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
@@ -314,6 +320,7 @@
     planLimits={handleUserLimits}
     contactOwner={handleRequestPlan}
     {handleRedirectAdminPanel}
+    {handleRedirectToAdminPanelWorkspace}
     handleContactSales={_viewModel.handleContactSales}
   />
 {/if}
