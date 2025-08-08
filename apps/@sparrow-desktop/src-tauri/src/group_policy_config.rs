@@ -1,5 +1,5 @@
 #[tauri::command]
-pub fn get_policy_config(app_handle: tauri::AppHandle) -> Result<PolicyConfig, String> {
+pub fn get_policy_config(_app_handle: tauri::AppHandle) -> Result<PolicyConfig, String> {
     // For Windows
     #[cfg(target_os = "windows")]
     {

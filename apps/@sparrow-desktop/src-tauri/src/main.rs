@@ -48,7 +48,7 @@ mod urlencoded_handler;
 mod utils;
 
 // External Imports
-use base64;
+use base64::{engine::general_purpose, Engine as _};
 use formdata_handler::make_formdata_request;
 use group_policy_config::get_policy_config;
 use json_handler::make_json_request;
@@ -488,7 +488,7 @@ async fn make_request_v2(
 
             println!("{}", svg_string);
 
-            base64_string = base64::encode(svg_string);
+            base64_string = general_purpose::STANDARD.encode(svg_string.as_bytes());
         } else {
             //extract bytes from respose body for further conversion
             let bytes = response_value
@@ -496,7 +496,7 @@ async fn make_request_v2(
                 .await
                 .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
 
-            base64_string = base64::encode(bytes); // convert bytes to base64 string effiecient for transmission / no data willl not get currupted.
+            base64_string = general_purpose::STANDARD.encode(bytes); // convert bytes to base64 string effiecient for transmission / no data willl not get currupted.
         }
 
         //create src from content type and base64 string
@@ -972,7 +972,8 @@ async fn connect_socket_io(
 
         async move {
             // Create a message JSON object
-            let message_json = match payload {
+            #[allow(deprecated)]
+            let message_json: Value = match payload {
                 SocketIoPayload::String(str) => {
                     json!({
                         "event": event.as_str(),
@@ -1036,6 +1037,7 @@ async fn connect_socket_io(
 
             // If socket_io server is not connected, that means it was a abrupt socket.io server disconnection and we need to emit the disconnect event
             if !connected {
+                #[allow(deprecated)]
                 let error_message = match err {
                     SocketIoPayload::Binary(_) => "Binary data error".to_string(),
                     SocketIoPayload::Text(values) => values
