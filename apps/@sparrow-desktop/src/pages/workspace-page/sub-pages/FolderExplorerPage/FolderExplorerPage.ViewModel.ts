@@ -38,6 +38,7 @@ import { BehaviorSubject, type Observable } from "rxjs";
 import { FolderTabAdapter } from "@app/adapter";
 import {
   CollectionItemTypeBaseEnum,
+  CollectionTypeBaseEnum,
   type CollectionBaseInterface,
   type CollectionItemBaseInterface,
 } from "@sparrow/common/types/workspace/collection-base";
@@ -476,6 +477,7 @@ class FolderExplorerPage {
     collection: CollectionBaseInterface,
     explorer: CollectionItemBaseInterface,
   ) => {
+    debugger;
     const sampleRequest = new InitMockRequestTab(
       UntrackedItems.UNTRACKED + uuidv4(),
       workspaceId,
@@ -545,6 +547,7 @@ class FolderExplorerPage {
         folderId: explorer.id,
       });
       sampleRequest.updateIsSave(true);
+      sampleRequest.updateLabel(CollectionTypeBaseEnum.MOCK);
       this.tabRepository.createTab(sampleRequest.getValue());
 
       scrollToTab("");
@@ -575,6 +578,7 @@ class FolderExplorerPage {
         folderId: explorer.id,
       });
       sampleRequest.updateIsSave(true);
+      sampleRequest.updateLabel(CollectionTypeBaseEnum.MOCK);
       // sampleRequest.updateUrl(collection?.mockCollectionUrl);
       this.tabRepository.createTab(sampleRequest.getValue());
 
