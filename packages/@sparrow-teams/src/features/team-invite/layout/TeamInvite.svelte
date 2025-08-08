@@ -172,7 +172,7 @@
               }),
           };
           const response = await onInviteClick(teamId, teamName, data, userId);
-          if (response.isSuccessful) {
+          if (response?.isSuccessful) {
             handleModalState(false);
           } else {
             loader = false;
@@ -186,7 +186,7 @@
           teamId: teamId,
         };
         const response = await onInviteClick(teamId, teamName, data, userId);
-        if (response.isSuccessful) {
+        if (response?.isSuccessful) {
           handleModalState(false);
         } else {
           loader = false;
