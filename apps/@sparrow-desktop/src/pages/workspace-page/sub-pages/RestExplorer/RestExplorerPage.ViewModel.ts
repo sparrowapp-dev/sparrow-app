@@ -67,6 +67,7 @@ import {
   ResponseFormatterEnum,
   type HttpRequestCollectionLevelAuthTabInterface,
   type HttpRequestCollectionLevelAuthProfileTabInterface,
+  RequestDatasetEnum,
 } from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
 import { RequestTabAdapter } from "../../../../adapter/request-tab";
@@ -90,6 +91,7 @@ import {
   CollectionRequestAddToBaseEnum,
   type CollectionAuthBaseInterface,
   type CollectionAuthProifleBaseInterface as AuthProfileDto,
+  type TransformedRequest,
 } from "@sparrow/common/types/workspace/collection-base";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 
@@ -683,6 +685,86 @@ class RestExplorerViewModel {
         status_code: responseCode,
       });
       scrollToTab("");
+    }
+  };
+
+  /**
+   * Handles importing cURL data directly into the current tab
+   * @param parsedCurlData The parsed cURL command data
+   */
+  public handleImportCurl = async (parsedCurlData: TransformedRequest) => {
+    if (!parsedCurlData) return false;
+
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+
+    try {
+      // Update URL Name
+      if (parsedCurlData.request.url && !progressiveTab.path.collectionId) {
+        await this.updateRequestName(parsedCurlData.request.url);
+      }
+      // Update URL
+      if (parsedCurlData.request.url) {
+        await this.updateRequestUrl(parsedCurlData.request.url, false);
+      }
+
+      // Update method
+      if (parsedCurlData.request.method) {
+        await this.updateRequestMethod(
+          parsedCurlData.request.method.toUpperCase(),
+        );
+      }
+
+      // Update headers
+      if (
+        parsedCurlData.request.headers &&
+        parsedCurlData.request.headers.length > 0
+      ) {
+        await this.updateHeaders(parsedCurlData.request.headers);
+      }
+
+      // Update query parameters if they exist in the parsed data
+      if (
+        parsedCurlData.request.queryParams &&
+        parsedCurlData.request.queryParams.length > 0
+      ) {
+        await this.updateParams(parsedCurlData.request.queryParams, false);
+      }
+
+      // Update body
+      if (parsedCurlData.request.body) {
+        await this.updateRequestBody({
+          raw: parsedCurlData.request.body,
+          urlencoded:
+            parsedCurlData.request.body.urlencoded ||
+            progressiveTab.property.request.body.urlencoded,
+          formdata:
+            parsedCurlData.request.body.formdata ||
+            progressiveTab.property.request.body.formdata,
+        });
+      }
+
+      // Update auth if present
+      if (
+        parsedCurlData.request.auth &&
+        Object.keys(parsedCurlData.request.auth).length > 0
+      ) {
+        await this.updateRequestAuth(parsedCurlData.request.auth);
+      }
+      await this.updateRequestState({
+        requestBodyNavigation: RequestDatasetEnum.RAW,
+      });
+
+      // Track the event
+      MixpanelEvent(Events.IMPORT_API_VIA_CURL, {
+        source: "URL input",
+      });
+
+      notifications.success("cURL imported successfully!");
+      return true;
+    } catch (error) {
+      console.error("Error importing cURL:", error);
+      notifications.error("Failed to import cURL. Please try again.");
+      return false;
     }
   };
 
