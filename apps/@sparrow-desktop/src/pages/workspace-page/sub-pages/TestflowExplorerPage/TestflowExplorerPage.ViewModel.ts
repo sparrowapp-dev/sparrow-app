@@ -64,6 +64,7 @@ import { PlanRepository } from "@app/repositories/plan.repository";
 import { TeamService } from "@app/services/team.service";
 import { ReduceAuthHeader } from "@sparrow/workspaces/features/rest-explorer/utils";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
+import { getAuthJwt } from "@app/utils/jwt";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -1774,7 +1775,10 @@ export class TestflowExplorerPageViewModel {
    * @description - This function will redirect you to billing section.
    */
   public handleRedirectToAdminPanel = async (teamId: string) => {
-    await open(`${constants.ADMIN_URL}/billing/billingOverview/${teamId}`);
+    const [authToken] = getAuthJwt();
+    await open(
+      `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+    );
   };
 
   public handleContactSales = async () => {

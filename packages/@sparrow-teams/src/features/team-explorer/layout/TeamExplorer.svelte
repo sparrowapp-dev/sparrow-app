@@ -132,6 +132,7 @@
   export let planLimits;
   export let contactOwner;
   export let handleRedirectAdminPanel;
+  export let handleRedirectToAdminPanelWorkspace;
   export let handleContactSales;
   export let invitedCount;
 
@@ -317,10 +318,6 @@
     upgradePlanModalInvite = false;
   };
 
-  const handleRedirectToAdmin = async () => {
-    await handleRedirectAdminPanel();
-  };
-
   const handleRequestOwner = async () => {
     await contactOwner();
     upgradePlanModal = false;
@@ -364,7 +361,7 @@
               {#if openTeam?.toMutableJSON()?.plan?.name}
                 <div
                   class="ms-2 d-flex align-items-center gap-1 text-primary-400 cursor-pointer"
-                  on:click={handleRedirectToAdmin}
+                  on:click={handleRedirectToAdminPanelWorkspace}
                 >
                   <p class="text-fs-12 mb-0 pb-0">Launch Admin Panel</p>
                   <OpenRegular />

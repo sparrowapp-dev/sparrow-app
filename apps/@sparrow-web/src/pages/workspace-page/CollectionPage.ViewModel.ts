@@ -160,6 +160,7 @@ import { TeamRepository } from "src/repositories/team.repository";
 import { TeamService } from "src/services/team.service";
 import { PlanRepository } from "src/repositories/plan.repository";
 import { tick } from "svelte";
+import { getAuthJwt } from "src/utils/jwt";
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
   private workspaceRepository = new WorkspaceRepository();
@@ -8255,8 +8256,10 @@ export default class CollectionsViewModel {
   };
 
   public handleRedirectToAdminPanel = async (teamId: string) => {
+    const [authToken] = getAuthJwt();
     window.open(
-      constants.ADMIN_URL + `/billing/billingOverview/${teamId}`,
+      constants.ADMIN_URL +
+        `/billing/billingOverview/${teamId}?redirect=changePlan&xid=${authToken}`,
       "_blank",
     );
   };

@@ -25,7 +25,7 @@ import { notifications } from "@sparrow/library/ui";
 import { BehaviorSubject, Observable } from "rxjs";
 import { navigate } from "svelte-navigator";
 import { v4 as uuidv4 } from "uuid";
-import { getClientUser } from "../../../../utils/jwt";
+import { getAuthJwt, getClientUser } from "../../../../utils/jwt";
 import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
 import constants from "@app/constants/constants";
 import { RecentWorkspaceRepository } from "@app/repositories/recent-workspace.repository";
@@ -465,7 +465,9 @@ export class TeamExplorerPageViewModel {
       if (response?.message === "Plan limit reached") {
         // notifications.error("Failed to send invite. please upgrade your plan.");
       } else {
-        notifications.error(response?.message || "Failed to send invite. Please try again.");
+        notifications.error(
+          response?.message || "Failed to send invite. Please try again.",
+        );
       }
     }
     return response;
@@ -938,9 +940,8 @@ export class TeamExplorerPageViewModel {
           _invitedUserCount === 1 ? "person" : "people"
         } for ${_workspaceName}.`,
       );
-    }
-    else{
-        if (response?.message === "Plan limit reached") {
+    } else {
+      if (response?.message === "Plan limit reached") {
         // notifications.error("Failed to send invite. please upgrade your plan.");
       } else {
         notifications.error(
@@ -1055,8 +1056,20 @@ export class TeamExplorerPageViewModel {
     }
   };
 
-  public handleRedirectToAdminPanel = async (teamId: string) => {
-    await open(`${constants.ADMIN_URL}/billing/billingOverview/${teamId}`);
+  public handleRedirectToAdminPanel = async (
+    teamId: string,
+    options?: { toWorkspace?: boolean },
+  ) => {
+    const [authToken] = getAuthJwt();
+    if (options?.toWorkspace) {
+      await open(
+        `${constants.ADMIN_URL}/hubs/workspace/${teamId}?xid=${authToken}`,
+      );
+    } else {
+      await open(
+        `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+      );
+    }
   };
 
   public handleContactSales = async () => {

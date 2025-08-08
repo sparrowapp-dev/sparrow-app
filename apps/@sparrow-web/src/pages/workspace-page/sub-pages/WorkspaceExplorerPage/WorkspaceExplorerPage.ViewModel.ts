@@ -35,6 +35,7 @@ import constants from "src/constants/constants";
 import { InitHubTab } from "@sparrow/common/utils";
 import { PlanRepository } from "src/repositories/plan.repository";
 import { TeamService } from "src/services/team.service";
+import { getAuthJwt } from "src/utils/jwt";
 
 export default class WorkspaceExplorerViewModel {
   // Private Repositories
@@ -337,9 +338,9 @@ export default class WorkspaceExplorerViewModel {
         } for ${_workspaceName}.`,
       );
     } else {
-        if (response?.message === "Plan limit reached") {
-            // notifications.error("Failed to send invite. please upgrade your plan.");
-          } else {
+      if (response?.message === "Plan limit reached") {
+        // notifications.error("Failed to send invite. please upgrade your plan.");
+      } else {
         notifications.error(
           response?.message || "Failed to send invite. Please try again.",
         );
@@ -648,7 +649,10 @@ export default class WorkspaceExplorerViewModel {
    * @description - This function will redirect you to billing section.
    */
   public handleRedirectToAdminPanel = async (teamId: string) => {
-    window.open(`${constants.ADMIN_URL}/billing/billingOverview/${teamId}`);
+    const [authToken] = getAuthJwt();
+    window.open(
+      `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+    );
   };
 
   public handleContactSales = async () => {

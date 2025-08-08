@@ -23,7 +23,7 @@ import { notifications } from "@sparrow/library/ui";
 import { BehaviorSubject, Observable } from "rxjs";
 import { navigate } from "svelte-navigator";
 import { v4 as uuidv4 } from "uuid";
-import { getClientUser } from "../../utils/jwt";
+import { getAuthJwt, getClientUser } from "../../utils/jwt";
 import { WorkspaceTabAdapter } from "src/adapter";
 import constants from "src/constants/constants";
 import { Sleep } from "@sparrow/common/utils";
@@ -961,9 +961,8 @@ export class TeamExplorerPageViewModel {
           _invitedUserCount === 1 ? "person" : "people"
         } for ${_workspaceName}.`,
       );
-    }
-    else{
-        if (response?.message === "Plan limit reached") {
+    } else {
+      if (response?.message === "Plan limit reached") {
         // notifications.error("Failed to send invite. please upgrade your plan.");
       } else {
         notifications.error(
@@ -1085,12 +1084,22 @@ export class TeamExplorerPageViewModel {
     }
   };
 
-  public handleRedirectToAdminPanel = async (teamId: string) => {
-    window.open(
-      constants.ADMIN_URL + `/billing/billingOverview/${teamId}`,
-      "_blank",
-    );
-    return;
+  public handleRedirectToAdminPanel = async (
+    teamId: string,
+    options?: { toWorkspace?: boolean },
+  ) => {
+    const [authToken] = getAuthJwt();
+    if (options?.toWorkspace) {
+      window.open(
+        `${constants.ADMIN_URL}/hubs/workspace/${teamId}?xid=${authToken}`,
+        "_blank",
+      );
+    } else {
+      window.open(
+        `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+        "_blank",
+      );
+    }
   };
 
   public handleContactSales = async () => {
