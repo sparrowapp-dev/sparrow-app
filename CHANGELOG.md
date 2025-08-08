@@ -1,3 +1,57 @@
+# [2.29.0](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.28.1...v2.29.0) (2025-08-08)
+
+
+### Bug Fixes
+
+* add admin role check for public workspace text [SPRW-1143] ([3eab995](https://github.com/sparrowapp-dev/sparrow-app/commit/3eab995c85b552238eca2e42f9b783205cd4e56e))
+* added for guest user as well ([bf23674](https://github.com/sparrowapp-dev/sparrow-app/commit/bf236743dfb8e306124d2efb8326e6c2a931538a))
+* api caching for testflow response [SPRW-1634] ([959b294](https://github.com/sparrowapp-dev/sparrow-app/commit/959b2942b3c9e5bbe75422aaf9308742fda56a97))
+* debian apt warning for codename stable ([dddaf01](https://github.com/sparrowapp-dev/sparrow-app/commit/dddaf01a5362f3bf689b8fadd287b30266754e91))
+* fixed the license content [] ([808cdf4](https://github.com/sparrowapp-dev/sparrow-app/commit/808cdf4e4a47548b5a9496d632b3f4980cbd7aa2))
+* fixed the placeholder size [SPRW-614] ([8587f15](https://github.com/sparrowapp-dev/sparrow-app/commit/8587f15621a6030dcc6860901c4f86988be0e784))
+* folder issue updated in collection ([acaf657](https://github.com/sparrowapp-dev/sparrow-app/commit/acaf6575467be073b36b53e9e193ec496bc5bc12))
+* graphql query sync issue ([0380cf8](https://github.com/sparrowapp-dev/sparrow-app/commit/0380cf890ddfea5f8ac1ad931094485f9a95f051))
+* I have resolved issue of folder count in delete popup ([55ded31](https://github.com/sparrowapp-dev/sparrow-app/commit/55ded3176f96c8994761c2e661bf60d41701c363))
+* I have updated the global search left panel not opening issue ([798689a](https://github.com/sparrowapp-dev/sparrow-app/commit/798689a023c0f2aecaf27ca53f75c17612ee7ab0))
+* merge branch development into graphql [SPRW-192] ([e7e58e9](https://github.com/sparrowapp-dev/sparrow-app/commit/e7e58e976a8eda2663b51350ab54c94e9209acdb))
+* merge branch development into graphql [SPRW-192] ([f5a1a0b](https://github.com/sparrowapp-dev/sparrow-app/commit/f5a1a0b9eaf45065fc4992bb0c82cd9fa942ca05))
+* overflow issues ([e678ed5](https://github.com/sparrowapp-dev/sparrow-app/commit/e678ed5e0054411b48578ceb11a022b570714e04))
+* overflow issues ([76fe60b](https://github.com/sparrowapp-dev/sparrow-app/commit/76fe60beefd15c86eb6210ff7bb1c116d7625b28))
+* overflow issues ([aad273c](https://github.com/sparrowapp-dev/sparrow-app/commit/aad273c9b9d837f49d26ef572718a50995c8a8fe))
+* removed the auto generated headers in web socket [SPRW-1711] ([f1da4b5](https://github.com/sparrowapp-dev/sparrow-app/commit/f1da4b5bf5ea61edc3f143d01e59447d444c2c7a))
+* replaced the upgrade logic of sparrow to inbuild crate [SPRW-1711] ([a0aeb0c](https://github.com/sparrowapp-dev/sparrow-app/commit/a0aeb0c10ee303f7b37118a75bbd01e1796636be))
+* resolved comment of deselecting ([b8dfe78](https://github.com/sparrowapp-dev/sparrow-app/commit/b8dfe78619f92a61321033f62969d482f960d988))
+* resolved deselecting issue while deleting a environment ([c4822f1](https://github.com/sparrowapp-dev/sparrow-app/commit/c4822f182bccbe24ef60a0e6361a5480e6d431cd))
+* resolved issue of hub not chaging in global search ([35a4750](https://github.com/sparrowapp-dev/sparrow-app/commit/35a475072be460d7396e234054af2be1ef111ef7))
+* resolved scroller issue for saved response in preview ([5faade2](https://github.com/sparrowapp-dev/sparrow-app/commit/5faade2849735aebcad3b179b54d1a7c191258ee))
+* resolved the issue with graphql response sync with editor ([9a7b390](https://github.com/sparrowapp-dev/sparrow-app/commit/9a7b3906d562645259e2960fd53c662d13d09233))
+* resolved websocket connected input issue ([2537208](https://github.com/sparrowapp-dev/sparrow-app/commit/25372087d523bc4a72e3c4145f4a0fd3cd70b093))
+* sync editor to graphql explorer [SPRW-192] ([38ec2fd](https://github.com/sparrowapp-dev/sparrow-app/commit/38ec2fdcd35c41ed2a371f8c48788b38c9001723))
+* sync editor to graphql explorer [SPRW-192] ([d64d2f4](https://github.com/sparrowapp-dev/sparrow-app/commit/d64d2f4f7d2df1636e690d361dbfb31e3bce8a6d))
+* updated code mirror input to copy the value ([0502b57](https://github.com/sparrowapp-dev/sparrow-app/commit/0502b57b711f122f3770c0caad027690711a9d1c))
+* updated position of trial plan ([c49e615](https://github.com/sparrowapp-dev/sparrow-app/commit/c49e615a37d63527e1265b836f85d00b07382f2f))
+* updated position of trial plan ([b5ed816](https://github.com/sparrowapp-dev/sparrow-app/commit/b5ed816e8aab6a263ee3c878c02e49661a5aecad))
+* updated socketIo input during its connection ([0eaca82](https://github.com/sparrowapp-dev/sparrow-app/commit/0eaca820628f68fbecdb176c48ac821ab58b32b6))
+* updated the placeholder ([11f7759](https://github.com/sparrowapp-dev/sparrow-app/commit/11f77591e8df54b1db418fb6b16576dfeedecf1b))
+* updated the placeholder ([f267201](https://github.com/sparrowapp-dev/sparrow-app/commit/f26720135679f7dcc524b65176676a2328b5f948))
+* updated the Tooltip location to support mac ([bede5a0](https://github.com/sparrowapp-dev/sparrow-app/commit/bede5a095f2a7d8af102053d4805d73e6c16564f))
+* workspace settings background image updated accordingly to the figma ([e38b780](https://github.com/sparrowapp-dev/sparrow-app/commit/e38b780b8a1b96c8e613f53b79d5e484648ef3ab))
+
+
+### Features
+
+* add ai request issues [SPRW-1628] ([11c2d5a](https://github.com/sparrowapp-dev/sparrow-app/commit/11c2d5a30758931d9a90639bb7b594ee440058ed))
+* add ai request issues [SPRW-1628] ([040927a](https://github.com/sparrowapp-dev/sparrow-app/commit/040927a1ee18279a06ffafe253bcdf5bf95f251f))
+* add ai request issues [SPRW-1628] ([01eb753](https://github.com/sparrowapp-dev/sparrow-app/commit/01eb75321175b636a0f23ebd87425d2a794ac268))
+* add ai request issues [SPRW-1628] ([a885b57](https://github.com/sparrowapp-dev/sparrow-app/commit/a885b5764abdd02993c3762c250dae8580c6091e))
+* remove packages on pre commit ([80d3bdd](https://github.com/sparrowapp-dev/sparrow-app/commit/80d3bdd2ff4b946b241c320e874e885f70406f52))
+* remove packages on pre commit ([0f71654](https://github.com/sparrowapp-dev/sparrow-app/commit/0f71654ab4722db8b2db4b7d537d50b594c4cc5c))
+* remove packages on pre commit ([3ad8da1](https://github.com/sparrowapp-dev/sparrow-app/commit/3ad8da139c2406bba2063bd0fa5c4a4e85204980))
+* remove packages on pre commit ([e796392](https://github.com/sparrowapp-dev/sparrow-app/commit/e7963921e244457c734b4c87075495b6417fd11e))
+* remove packages on pre commit ([2691c6b](https://github.com/sparrowapp-dev/sparrow-app/commit/2691c6b6bb4cad9137e033f4366dcde2458e7b4d))
+* remove stop propogation to context menu [SPRW-435] ([da49712](https://github.com/sparrowapp-dev/sparrow-app/commit/da497126599d51ffd59f5f3191c5e1f00d7ed048))
+* upgrade app version to 2-28-2 ([fc93a5e](https://github.com/sparrowapp-dev/sparrow-app/commit/fc93a5eba8876fe59e275a90a2d6300ca94bebf8))
+
 # [2.23.0](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.22.0...v2.23.0) (2025-04-28)
 
 
