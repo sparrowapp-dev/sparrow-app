@@ -207,4 +207,15 @@ export class TeamService {
     );
     return response;
   };
+
+  public teamTimestamps = async (teamId: string, baseUrl: string) => {
+    const response = await makeRequest(
+      "GET",
+      `${baseUrl}/api/team/${teamId}/updates`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }
