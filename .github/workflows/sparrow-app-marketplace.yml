@@ -188,8 +188,8 @@ jobs:
       - name: Install project dependencies
         run: yarn
 
-      - name: Sync version across all files
-        run: yarn sync-version
+      # - name: Sync version across all files
+      #   run: yarn sync-version
 
       - name: Increase Yarn network timeout
         run: yarn config set network-timeout 600000
