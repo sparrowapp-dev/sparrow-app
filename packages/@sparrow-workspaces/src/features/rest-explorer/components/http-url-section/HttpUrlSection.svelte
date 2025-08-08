@@ -235,6 +235,7 @@
       } catch (err) {
         console.error("Failed to parse cURL command:", err);
         notifications.error("Failed to parse cURL command.");
+        onUpdateRequestUrl(value);
       }
     } else {
       onUpdateRequestUrl(value);
