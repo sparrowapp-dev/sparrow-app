@@ -5,6 +5,6 @@
 # yarn sync-version
 
 # Add updated files to git
-git add package.json apps/*/package.json packages/*/package.json apps/@sparrow-desktop/src-tauri/tauri.conf.json
+# git add package.json apps/*/package.json packages/*/package.json apps/@sparrow-desktop/src-tauri/tauri.conf.json
 
 pnpm npx lint-staged
