@@ -288,4 +288,42 @@ export class EnvironmentExplorerViewModel {
   public getWorkspace = async () => {
     return await this.workspaceRepository.getActiveWorkspaceDoc();
   };
+
+  /**
+   * Handle create generative variables for a collection.
+   * @param collectionId :CollectionId - the collection in which new request is going to be created
+   * @returns :void
+   */
+  public getGenerateVariables = async (
+    collectionId: string,
+  ): Promise<{ [key: string]: any }> => {
+    console.log("this is the collection id we are getting---->", collectionId);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const reseponse = [
+          {
+            key: "name",
+            value: "world",
+            checked: false,
+          },
+          {
+            key: "sample",
+            value: "test",
+            checked: false,
+          },
+          {
+            key: "sample-1",
+            value: "test-1",
+            checked: false,
+          },
+          {
+            key: "sample-2",
+            value: "test-2",
+            checked: false,
+          },
+        ];
+        resolve(reseponse);
+      }, 4000);
+    });
+  };
 }

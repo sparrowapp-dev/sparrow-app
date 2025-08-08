@@ -13,6 +13,8 @@
   import { DeleteRegular, ReOrderDotsRegular } from "@sparrow/library/icons";
   import { CodeMirrorInput } from "..";
   import { TabularInputTheme } from "../../utils";
+  import { DismissRegular } from "@sparrow/library/icons";
+  import { CheckMarkIcon } from "@sparrow/library/icons";
 
   /**
    * tabular pair entries
@@ -31,6 +33,7 @@
    * disabled flag to disable the input, delete, and checkbox
    */
   export let disabled = false;
+  export let isGeneratedVariable = false;
   let pairs: KeyValueChecked[] = keyValue;
   let controller: boolean = false;
   const theme = new TabularInputTheme().build();
@@ -144,20 +147,24 @@
     style="height: 28px; background-color:var(--bg-ds-surface-400); gap:11px;"
   >
     <div style="width:24px; margin-left: 4px;">
-      <Checkbox
-        disabled={pairs.length === 1 || disabled}
-        checked={controller}
-        on:input={handleCheckAll}
-      />
+      {#if !isGeneratedVariable}
+        <Checkbox
+          disabled={pairs.length === 1 || disabled}
+          checked={controller}
+          on:input={handleCheckAll}
+        />
+      {/if}
     </div>
     <div
       class="d-flex pair-title align-items-center w-100"
       style="font-size: 12px; font-weight: 500;"
     >
-      <p class="mb-0 w-50 header-text p-1">Variable</p>
+      <p class="mb-0 w-50 header-text p-1">Key</p>
       <p
         class="mb-0 w-50 header-text"
-        style="padding-left: 17px; padding-right:4px"
+        style="padding-left: {isGeneratedVariable
+          ? '5px'
+          : '17px'}; padding-right:4px"
       >
         Value
       </p>
@@ -220,7 +227,7 @@
                   />
                 </div> -->
                 <div style="width:24px;">
-                  {#if pairs.length - 1 != index}
+                  {#if pairs.length - 1 != index && !isGeneratedVariable}
                     <Checkbox
                       checked={element.checked}
                       on:input={() => {
@@ -232,39 +239,47 @@
                 </div>
               </div>
 
-              
-                <div class="w-50">
-                  <div class="position-absolute top-0" style="width: calc(50% - 32px);">
-                    <CodeMirrorInput
-                      bind:value={element.key}
-                      onUpdateInput={() => {
-                        updatePairs(index);
-                      }}
-                      disabled={disabled}
-                      placeholder={"Add Variable"}
-                      {theme}
-                      enableEnvironmentHighlighting={false}
-                    />
-                  </div>
+              <div class="w-50">
+                <div
+                  class="position-absolute top-0"
+                  style="width: calc(50% - {isGeneratedVariable
+                    ? '45px'
+                    : '33px'} );"
+                >
+                  <CodeMirrorInput
+                    bind:value={element.key}
+                    onUpdateInput={() => {
+                      updatePairs(index);
+                    }}
+                    {disabled}
+                    placeholder={"Add Variable"}
+                    {theme}
+                    enableEnvironmentHighlighting={false}
+                  />
                 </div>
+              </div>
 
-                <div class="w-50 ">
-                  <div class="position-absolute top-0" style="width: calc(50% - 33px);">
-                    <CodeMirrorInput
-                      bind:value={element.value}
-                      onUpdateInput={() => {
-                        updatePairs(index);
-                      }}
-                      disabled={disabled}
-                      placeholder={"Add Value"}
-                      {theme}
-                      enableEnvironmentHighlighting={false}
-                    />
-                  </div>
+              <div class="w-50">
+                <div
+                  class="position-absolute top-0"
+                  style="width: calc(50% - {isGeneratedVariable
+                    ? '45px'
+                    : '33px'});"
+                >
+                  <CodeMirrorInput
+                    bind:value={element.value}
+                    onUpdateInput={() => {
+                      updatePairs(index);
+                    }}
+                    {disabled}
+                    placeholder={"Add Value"}
+                    {theme}
+                    enableEnvironmentHighlighting={false}
+                  />
                 </div>
-              
+              </div>
 
-              {#if pairs.length - 1 != index && !disabled}
+              {#if pairs.length - 1 != index && !disabled && !isGeneratedVariable}
                 <Tooltip
                   title={"Delete"}
                   placement={"bottom-right"}
@@ -282,6 +297,31 @@
                     />
                   </div>
                 </Tooltip>
+              {:else if isGeneratedVariable}
+                <div class="d-flex gap-1">
+                  <button
+                    class="generate-action-button reject"
+                    on:click|stopPropagation={() => {
+                      console.log("accept it------>");
+                    }}
+                  >
+                    <CheckMarkIcon
+                      size="12"
+                      color={"var(--icon-ds-success-300)"}
+                    />
+                  </button>
+                  <button
+                    class="generate-action-button reject"
+                    on:click|stopPropagation={() => {
+                      deletePairs(index);
+                    }}
+                  >
+                    <DismissRegular
+                      size="12"
+                      color={"var(--icon-ds-danger-300)"}
+                    />
+                  </button>
+                </div>
               {:else}
                 <div class="h-75 pe-1">
                   <button
@@ -306,7 +346,9 @@
   return false;
 }).length === 0 && search !== ""}
   <p class="text-fs-12 mt-3 ps-2 no-data-found">
-    The variable <span style="color:var(--text-ds-neutral-100)">'{search}'</span> is not found in this environment. Add the variable or try searching in a different environment.
+    The variable <span style="color:var(--text-ds-neutral-100)">'{search}'</span
+    > is not found in this environment. Add the variable or try searching in a different
+    environment.
   </p>
 {/if}
 
@@ -347,5 +389,29 @@
     text-align: center;
     color: var(--text-ds-neutral-400);
     line-height: 18px;
+  }
+  .generate-action-button {
+    width: 24px;
+    height: 24px;
+    background-color: transparent;
+    color: var(--text-ds-neutral-100);
+    background-color: transparent;
+    border: 0px;
+    border-radius: 4px;
+  }
+  .generate-action-button:hover {
+    color: var(--text-ds-neutral-50);
+    background-color: var(--bg-ds-surface-300);
+    border: 0px;
+  }
+  .generate-action-button:focus-visible {
+    border: 2px solid var(--border-ds-primary-300);
+    color: var(--text-ds-neutral-100);
+    outline: none;
+  }
+  .generate-action-button:active {
+    color: var(--text-ds-primary-300);
+    background-color: var(--bg-ds-surface-400);
+    border: 0px;
   }
 </style>

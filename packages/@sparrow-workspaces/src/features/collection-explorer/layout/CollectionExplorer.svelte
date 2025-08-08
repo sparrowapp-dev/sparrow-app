@@ -118,6 +118,7 @@
   } from "@sparrow/common/types/workspace/collection-base";
   import { getMethodStyle } from "@sparrow/common/utils";
   import { WorkspaceRole, WorkspaceType } from "@sparrow/common/enums";
+  import { SparkleFilled } from "@sparrow/common/icons";
 
   /**
    * Role of user in active workspace
@@ -131,6 +132,8 @@
   export let onCreateAuthProfile;
   export let onUpdateAuthProfile;
   export let onDeleteAuthProfile;
+  export let onGenerateVariables;
+  export let globalEnvironment;
 
   /**
    * Local variables
@@ -602,6 +605,54 @@
             </div>
           {/if}
 
+          <!-- Show save button only for overview tab, not for collection auth -->
+          <div style="margin-right: 8px;">
+            {#if $tab?.property?.collection?.state?.collectionNavigation !== CollectionNavigationTabEnum.AUTH_PROFILES}
+              <Button
+                disable={$tab?.isSaved || !isCollectionEditable
+                  ? true
+                  : false || isSharedWorkspace}
+                startIcon={SaveRegular}
+                type={"secondary"}
+                size="medium"
+                onClick={() => {
+                  onSaveCollection();
+                  handlecollection_collection_saved({
+                    name: "Collection Saved",
+                  });
+                }}
+              />
+            {/if}
+          </div>
+
+          <div style="margin-right: 8px;">
+            <Tooltip
+              title={"Generate Variables"}
+              subtext={"Use AI to quickly generate env variables by analyzing every API request in your collection."}
+              placement={"bottom-center"}
+              size="medium"
+            >
+              <div
+                style="border: 2px solid var(--border-ds-primary-400); border-radius:8.5px;"
+              >
+                <Button
+                  disable={false}
+                  startIcon={SparkleFilled}
+                  title={"Generate Variables"}
+                  size="medium"
+                  type={"secondary"}
+                  onClick={async () => {
+                    onGenerateVariables(
+                      collection?.id,
+                      globalEnvironment,
+                      collection?.name,
+                    );
+                  }}
+                />
+              </div>
+            </Tooltip>
+          </div>
+
           <div
             class="d-flex me-2 flex-column justify-content-center"
             bind:this={collectionTabButtonWrapper}
@@ -633,21 +684,6 @@
               />
             </Dropdown>
           </div>
-
-          <!-- Show save button only for overview tab, not for collection auth -->
-          {#if $tab?.property?.collection?.state?.collectionNavigation !== CollectionNavigationTabEnum.AUTH_PROFILES}
-            <Button
-              disable={$tab?.isSaved || !isCollectionEditable
-                ? true
-                : false || isSharedWorkspace}
-              startIcon={SaveRegular}
-              type={"secondary"}
-              onClick={() => {
-                onSaveCollection();
-                handlecollection_collection_saved({ name: "Collection Saved" });
-              }}
-            />
-          {/if}
         </div>
       {/if}
     </div>
@@ -710,36 +746,32 @@
               API.
             </p>
           </div>
-          {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
-            <div class="d-flex gap-2 align-items-center">
-              <div class="d-flex justify-content-center">
-                <Tag
-                  size="medium"
-                  type={collection?.isMockCollectionRunning ? "green" : "grey"}
-                  text={collection?.isMockCollectionRunning
-                    ? "Running"
-                    : "Inactive"}
-                />
-              </div>
-              <Button
-                size="small"
-                type={collection?.isMockCollectionRunning
-                  ? "danger"
-                  : "primary"}
-                title={collection?.isMockCollectionRunning
-                  ? "Stop Mock"
-                  : "Run Mock"}
-                onClick={() => {
-                  mockRunningStatus();
-                }}
-                startIcon={collection?.isMockCollectionRunning
-                  ? RecordStopRegular
-                  : PlayCircleRegular}
-                disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
-                  isSharedWorkspace}
+          <div class="d-flex gap-2 align-items-center">
+            <div class="d-flex justify-content-center">
+              <Tag
+                size="medium"
+                type={collection?.isMockCollectionRunning ? "green" : "grey"}
+                text={collection?.isMockCollectionRunning
+                  ? "Running"
+                  : "Inactive"}
               />
             </div>
-          {/if}
+            <Button
+              size="small"
+              type={collection?.isMockCollectionRunning ? "danger" : "primary"}
+              title={collection?.isMockCollectionRunning
+                ? "Stop Mock"
+                : "Run Mock"}
+              onClick={() => {
+                mockRunningStatus();
+              }}
+              startIcon={collection?.isMockCollectionRunning
+                ? RecordStopRegular
+                : PlayCircleRegular}
+              disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+                isSharedWorkspace}
+            />
+          </div>
         </div>
         <div class="d-flex">
           <div
