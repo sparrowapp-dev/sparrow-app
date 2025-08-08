@@ -24,7 +24,7 @@
   export let onToggleLike;
   export let handleApplyChangeOnAISuggestion;
   export let responseData: AiRequestExplorerData;
-  export let disabled = true;
+  export let disabled;
   export let conversationsHistory;
   export let onOpenConversationHistoryPanel;
   export let onCloseConversationHistoryPanel;
@@ -133,8 +133,8 @@
       currentModel={$tab?.property?.aiRequest?.aiModelVariant}
       conversations={$tab?.property?.aiRequest?.ai?.conversations}
       prompt={$tab?.property?.aiRequest?.ai?.prompt}
-      isPromptBoxActive={$tab?.property?.aiRequest?.state
-        ?.isChatbotPromptBoxActive}
+      isPromptBoxActive={!$tab?.property?.aiRequest?.state
+        ?.isChatbotConversationLoading}
       chatPanelTitle={$tab.property?.aiRequest?.ai.conversationTitle}
       isResponseGenerating={$tab?.property?.aiRequest?.state
         ?.isChatbotGeneratingResponse}
@@ -150,6 +150,9 @@
       {environmentVariables}
       {onUpdateEnvironment}
     />
+    <!-- <button class="chatten-box">
+      <span class="chatten-box-icon">ASIF</span>
+    </button> -->
   </div>
 {/if}
 

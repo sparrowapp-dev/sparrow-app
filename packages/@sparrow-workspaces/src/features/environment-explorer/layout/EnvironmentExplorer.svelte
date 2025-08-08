@@ -175,7 +175,7 @@
           bind:value={environmentName}
           variant={"inline"}
           placeholder={""}
-          width={"398px"}
+          style="min-width: 200px; max-width: 400px;"
           disabled={$currentEnvironment?.property?.environment?.type ==
             "GLOBAL" || userRole === WorkspaceRole.WORKSPACE_VIEWER}
           on:input={(e) => {
@@ -390,7 +390,9 @@
     overflow-y: auto;
   }
   .quick-help {
-    width: 360px;
+    width: 100%;
+    max-width: 360px;
+    min-width: 240px;
   }
   .quick-help-active {
     width: calc(100% - 280px) !important;
@@ -401,5 +403,11 @@
   .link {
     color: var(--bg-primary-300);
     text-decoration: underline;
+  }
+  .env-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    width: 100%;
   }
 </style>

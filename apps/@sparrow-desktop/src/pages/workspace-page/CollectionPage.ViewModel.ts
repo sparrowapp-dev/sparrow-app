@@ -3033,6 +3033,7 @@ export default class CollectionsViewModel {
       sampleFolder.updateName(data.name);
       sampleFolder.updatePath(path);
       sampleFolder.updateIsSave(true);
+      sampleFolder.updateTabType(TabPersistenceTypeEnum.PERMANENT);
 
       this.handleCreateTab(sampleFolder.getValue());
       scrollToTab("");
@@ -3081,6 +3082,7 @@ export default class CollectionsViewModel {
       sampleFolder.updateName(response.data.data.name);
       sampleFolder.updatePath(path);
       sampleFolder.updateIsSave(true);
+      sampleFolder.updateTabType(TabPersistenceTypeEnum.PERMANENT);
       if (collection?.collectionType === CollectionTypeBaseEnum.MOCK) {
         sampleFolder.updateLabel(CollectionTypeBaseEnum.MOCK);
       }

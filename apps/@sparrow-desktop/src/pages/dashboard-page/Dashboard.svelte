@@ -50,6 +50,12 @@
   import { ResponseMessage, TeamRole } from "@sparrow/common/enums";
   import { planInfoByRole } from "@sparrow/common/utils";
   import { planBannerisOpen, shouldRunThrottled } from "@sparrow/common/store";
+  import {
+    addCollectionItem,
+    isExpandCollection,
+    isExpandEnvironment,
+    isExpandTestflow,
+  } from "@sparrow/workspaces/stores";
 
   const _viewModel = new DashboardViewModel();
   const osDetector = new OSDetector();
@@ -422,17 +428,21 @@
     try {
       const isActiveWorkspace =
         await _viewModel.checkActiveWorkspace(workspaceId);
+      const workspaceData = await _viewModel.getWorkspaceById(workspaceId);
       if (!isActiveWorkspace) {
         handlehideGlobalSearch(true);
-        const workspaceData = await _viewModel.getWorkspaceById(workspaceId);
         handleSwitchWorkspaceModal(workspaceData.name, "Request", workspaceId);
       }
+      await _viewModel.setOpenTeam(workspaceData.toMutableJSON().team?.teamId);
       await _viewModel.switchAndCreateRequestTab(
         workspaceId,
         collectionId,
         folderId,
         tree,
       );
+      isExpandCollection.set(true);
+      addCollectionItem(collectionId, "collection");
+      addCollectionItem(folderId, "folder");
       if (isActiveWorkspace) {
         navigate("collections");
       }
@@ -452,17 +462,19 @@
     try {
       const isActiveWorkspace =
         await _viewModel.checkActiveWorkspace(workspaceId);
-
+      const workspaceData = await _viewModel.getWorkspaceById(workspaceId);
       if (!isActiveWorkspace) {
         handlehideGlobalSearch(true);
-        const workspaceData = await _viewModel.getWorkspaceById(workspaceId);
         handleSwitchWorkspaceModal(
           workspaceData.name,
           "Collection",
           workspaceId,
         );
       }
+      await _viewModel.setOpenTeam(workspaceData.toMutableJSON().team?.teamId);
       await _viewModel.switchAndCreateCollectionTab(workspaceId, collection);
+      isExpandCollection.set(true);
+      addCollectionItem(collection.id, "collection");
       if (isActiveWorkspace) {
         navigate("collections");
       }
@@ -484,16 +496,20 @@
     try {
       const isActiveWorkspace =
         await _viewModel.checkActiveWorkspace(workspaceId);
+      const workspaceData = await _viewModel.getWorkspaceById(workspaceId);
       if (!isActiveWorkspace) {
         handlehideGlobalSearch(true);
-        const workspaceData = await _viewModel.getWorkspaceById(workspaceId);
         handleSwitchWorkspaceModal(workspaceData.name, "Folder", workspaceId);
       }
+      await _viewModel.setOpenTeam(workspaceData.toMutableJSON().team?.teamId);
       await _viewModel.switchAndCreateFolderTab(
         workspaceId,
         collectionId,
         folder,
       );
+      isExpandCollection.set(true);
+      addCollectionItem(collectionId, "collection");
+      addCollectionItem(folder.id, "folder");
       if (isActiveWorkspace) {
         navigate("collections");
       }
@@ -512,14 +528,14 @@
       const isActiveWorkspace = await _viewModel.checkActiveWorkspace(
         workspace._id,
       );
-
       if (!isActiveWorkspace) {
         await _viewModel.activateWorkspace(workspace._id);
         closeGlobalSearch();
         handlehideGlobalSearch(false);
       }
-
       _viewModel.switchAndCreateWorkspaceTab(workspace);
+      const workspaceData = await _viewModel.getWorkspaceById(workspace?._id);
+      await _viewModel.setOpenTeam(workspaceData.toMutableJSON().team?.teamId);
       navigate("collections");
       // Additional workspace opening logic here if needed
       closeGlobalSearch();
@@ -537,19 +553,20 @@
       const isActiveWorkspace = await _viewModel.checkActiveWorkspace(
         environment.workspace,
       );
-
+      const workspaceData = await _viewModel.getWorkspaceById(
+        environment.workspace,
+      );
       if (!isActiveWorkspace) {
         handlehideGlobalSearch(true);
-        const workspaceData = await _viewModel.getWorkspaceById(
-          environment.workspace,
-        );
         handleSwitchWorkspaceModal(
           workspaceData.name,
           "Environment",
           environment.workspace,
         );
       }
+      await _viewModel.setOpenTeam(workspaceData.toMutableJSON().team?.teamId);
       await _viewModel.switchAndCreateEnvironmentTab(environment);
+      isExpandEnvironment.set(true);
       if (isActiveWorkspace) {
         navigate("collections");
       }
@@ -568,19 +585,20 @@
       const isActiveWorkspace = await _viewModel.checkActiveWorkspace(
         testflow.workspaceId,
       );
-
+      const workspaceData = await _viewModel.getWorkspaceById(
+        testflow.workspaceId,
+      );
       if (!isActiveWorkspace) {
         handlehideGlobalSearch(true);
-        const workspaceData = await _viewModel.getWorkspaceById(
-          testflow.workspaceId,
-        );
         handleSwitchWorkspaceModal(
           workspaceData.name,
           "Testflow",
           testflow.workspaceId,
         );
       }
+      await _viewModel.setOpenTeam(workspaceData.toMutableJSON().team?.teamId);
       await _viewModel.switchAndCreateTestflowTab(testflow);
+      isExpandTestflow.set(true);
       if (isActiveWorkspace) {
         navigate("collections");
       }

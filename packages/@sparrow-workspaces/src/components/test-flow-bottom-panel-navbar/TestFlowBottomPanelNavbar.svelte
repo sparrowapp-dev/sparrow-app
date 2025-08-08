@@ -1,15 +1,13 @@
-<script>
+<script lang="ts">
   import { ArrowOutwardIcon, MathFormulaRegular } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
   import TestFlowTourGuide from "../test-flow-tour-guide/TestFlowTourGuide.svelte";
   import { currentStep, isTestFlowTourGuideOpen } from "../../stores";
   import { Select } from "@sparrow/library/forms";
   import { Button } from "@sparrow/library/ui";
-  import {
-    extractQueryParams,
-    httpMethodData,
-  } from "../../../../@sparrow-common/src/utils/testFlow.helper";
+  import { httpMethodData } from "../../../../@sparrow-common/src/utils/testFlow.helper";
   import HttpUrlSection from "../../features/testflow-explorer/components/http-url-section/HttpUrlSection.svelte";
+  import type { KeyValueChecked } from "@sparrow/common/types/workspace";
 
   export let selectedBlock;
   export let onRedirect;
@@ -32,6 +30,45 @@
   }
 
   let dispatcher;
+
+  const extractQueryParams = (url: string) => {
+    let queryString: string = "";
+    let flag: boolean = false;
+
+    for (let i = 0; i < url.length; i++) {
+      if (flag) {
+        queryString += url[i];
+      }
+      if (url[i] === "?") {
+        flag = true;
+      }
+    }
+
+    if (queryString === "") {
+      return [{ key: "", value: "", checked: false }];
+    } else {
+      const paramsArray = queryString.split("&");
+      const params: KeyValueChecked[] = paramsArray.map((param) => {
+        const keyValue = param.split("=");
+        if (keyValue.length === 1) {
+          return { key: keyValue[0] || "", value: "", checked: true };
+        } else if (keyValue.length === 2) {
+          return {
+            key: keyValue[0] || "",
+            value: keyValue[1] || "",
+            checked: true,
+          };
+        } else {
+          return { key: "", value: "", checked: true };
+        }
+      });
+      const response: KeyValueChecked[] = [
+        ...params,
+        { key: "", value: "", checked: false },
+      ];
+      return response;
+    }
+  };
 </script>
 
 <div class="header-container">
@@ -75,6 +112,8 @@
       {requestUrl}
       onUpdateRequestUrl={(e) => {
         handleUpdateRequestData("url", e);
+        const queryParam = extractQueryParams(e);
+        handleUpdateRequestData("queryParams", queryParam);
       }}
       {onUpdateEnvironment}
       {userRole}

@@ -434,7 +434,7 @@
   title={`Generate ${generatePromptTarget === "UserPrompt" ? "User Prompt" : "System Prompt"}`}
   zIndex={1000}
   isOpen={isGeneratePromptModalOpen}
-  width="35%"
+  width="45%"
   handleModalState={() => {
     isGeneratePromptModalOpen = false;
     generatePromptTarget = "None";

@@ -160,17 +160,19 @@
       >
         Your Message
       </label>
-      <CodeMirrorInput
-        value={userPromptExpectation}
-        onUpdateInput={(val) => (userPromptExpectation = val)}
-        placeholder="Describe your task..."
-        {theme}
-        {environmentVariables}
-        {onUpdateEnvironment}
-        isFocusedOnMount={false}
-        isNewLineOnEnter={true}
-        isNewLineOnShiftEnter={true}
-      />
+      <div>
+        <CodeMirrorInput
+          value={userPromptExpectation}
+          onUpdateInput={(val) => (userPromptExpectation = val)}
+          placeholder="Describe your task..."
+          {theme}
+          {environmentVariables}
+          {onUpdateEnvironment}
+          isFocusedOnMount={false}
+          isNewLineOnEnter={true}
+          isNewLineOnShiftEnter={true}
+        />
+      </div>
       <!-- <Textarea
         id="user-prompt-textarea"
         bind:value={userPromptExpectation}
@@ -292,7 +294,7 @@
 {/if}
 
 <!-- Action Buttons -->
-<div class="d-flex justify-content-between gap-2 mt-2 w-100">
+<div class="d-flex flex-wrap justify-content-between gap-2 mt-2 w-100">
   <Button
     title={generateButtonTitle}
     size="medium"

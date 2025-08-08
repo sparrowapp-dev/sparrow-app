@@ -36,7 +36,7 @@
 
 <div class="sidebar-recentapi-list" style="flex:1; overflow: auto;">
   {#if filteredApis?.length}
-    <List height={"100%"} overflowY={"auto"} classProps={"px-2 py-0"}>
+    <List height={"100%"} overflowY={"auto"} classProps={"ps-2 py-0"}>
       {#each filteredApis as api, index}
         <ApiListItem {api} {data} {onApiClick} {collectionList} />
       {/each}

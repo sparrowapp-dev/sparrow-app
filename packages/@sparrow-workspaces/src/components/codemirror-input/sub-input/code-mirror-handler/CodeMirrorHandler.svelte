@@ -94,6 +94,10 @@
   const ENV_HIGHLIGHT_FOUND = "env-found" + id + " env-found";
   const ENV_HIGHLIGHT_NOT_FOUND = "env-not-found" + id + " env-not-found";
   const languageConf = new Compartment();
+
+  // Create a compartment for the readOnly state
+  const readOnlyConf = new Compartment();
+
   let codeMirrorView: EditorView;
   let prevValue = "";
 
@@ -114,7 +118,7 @@
     }
     handleHighlightClass();
     if (inputWrapper) {
-      const dialogboxWidth = 400;
+      const dialogboxWidth = 300;
       const dialogboxHeight = 170;
       const rightDistance = inputWrapper.getBoundingClientRect().right;
       const leftDistance = inputWrapper.getBoundingClientRect().left;
@@ -573,7 +577,8 @@
         history(), // Add history extension
         keymap.of([...historyKeymap, ...defaultKeymap]),
         languageConf.of(javascriptLanguage),
-        EditorState.readOnly.of(disabled ? true : false),
+        //Use the compartment for readOnly state
+        readOnlyConf.of(EditorState.readOnly.of(disabled ? true : false)),
         handleEventsRegister,
         CreatePlaceHolder(placeholder),
       ],
@@ -617,10 +622,20 @@
           annotations: [{ autoChange: true }],
         });
       }
+      //Handle both language configuration and readOnly state updates
       codeMirrorView.dispatch({
-        effects: languageConf.reconfigure([
-          environmentHighlightStyle(filterData, enableEnvironmentHighlighting),
-        ]),
+        effects: [
+          languageConf.reconfigure([
+            environmentHighlightStyle(
+              filterData,
+              enableEnvironmentHighlighting,
+            ),
+          ]),
+          //Reconfigure the readOnly state when disabled prop changes
+          readOnlyConf.reconfigure(
+            EditorState.readOnly.of(disabled ? true : false),
+          ),
+        ],
       });
     }
   });
@@ -636,7 +651,10 @@
 </script>
 
 <div class="w-100 basic-code-mirror-input" bind:this={inputWrapper}>
-  <div class={componentClass} bind:this={codeMirrorEditorDiv} />
+  <div
+    class={`${componentClass} ${disabled ? "codemirror-disabled" : ""}`}
+    bind:this={codeMirrorEditorDiv}
+  />
 </div>
 <svelte:window on:keydown={handleKeyPress} />
 

@@ -8,6 +8,8 @@
   import { Tooltip } from "@sparrow/library/ui";
   export let response: Response;
 
+  export let isWebApp = false;
+
   /**
    * Checks if the current request was successful based on the response status.
    * @param _status - The current status of the request.
@@ -99,7 +101,11 @@
             </p>
           </span>
         </Tooltip>
-        <Tooltip title="Size" placement={"bottom-center"} zIndex={1000}>
+        <Tooltip
+          title="Size"
+          placement={isWebApp ? "bottom-center" : "top-center"}
+          zIndex={1000}
+        >
           <span
             class="d-flex align-items-center justify-content-center rounded border-0 text-backgroundColor size-primary1 response-text"
             style="font-size: 12px;"

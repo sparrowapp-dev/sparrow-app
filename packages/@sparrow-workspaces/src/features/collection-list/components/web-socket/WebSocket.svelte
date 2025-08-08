@@ -328,7 +328,6 @@
           type="teritiary-regular"
           startIcon={MoreHorizontalRegular}
           onClick={(e) => {
-            e.stopPropagation();
             rightClickContextMenu(e);
           }}
         />

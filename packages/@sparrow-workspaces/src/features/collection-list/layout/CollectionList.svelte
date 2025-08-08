@@ -563,15 +563,15 @@
     style="cursor:pointer; justify-content: space-between; height:32px; margin-bottom:0;"
     on:mouseover={handleMouseOver}
     on:mouseout={handleMouseOut}
-    on:click={() => {
-      toggleExpandCollection();
-      handleTabUpdate("collection");
-    }}
   >
     <div
       class=" d-flex align-items-center"
       style="width: calc(100% - 30px);  padding: 4px 2px; height:32px; "
       bind:this={collectionTabWrapper}
+      on:click={() => {
+        toggleExpandCollection();
+        handleTabUpdate("collection");
+      }}
     >
       <span style=" display: flex; margin-right:4px;">
         <Button
@@ -642,7 +642,6 @@
               startIcon={AddRegular}
               disable={userRole === WorkspaceRole.WORKSPACE_VIEWER}
               onClick={(e) => {
-                e.stopPropagation();
                 rightClickContextMenu(e);
               }}
             />

@@ -169,6 +169,7 @@
       graghQlCount = 0;
       socketIoCount = 0;
       webSocketCount = 0;
+      aiRequestCount = 0;
 
       if (explorer.items) {
         explorer.items.forEach((item: any) => {
@@ -314,6 +315,10 @@
         <div class="d-flex gap-1">
           <span class="text-plusButton">{socketIoCount}</span>
           <p>Socket.IO</p>
+        </div>
+        <div class="d-flex gap-1 text-ds-font-size-12">
+          <span class="text-plusButton">{aiRequestCount}</span>
+          <p>AI Request</p>
         </div>
       {/if}
     </div>

@@ -2447,6 +2447,7 @@ class RestExplorerMockViewModel {
     componentData: RequestTab,
     errorMessage: string,
   ) {
+    Sentry.captureException(errorMessage || "Socket Connection Break");
     await this.updateRequestAIConversation([
       ...(componentData?.property?.request?.ai?.conversations || []),
       {
@@ -2539,6 +2540,7 @@ class RestExplorerMockViewModel {
       );
 
       if (!socketResponse) {
+        Sentry.captureException("Socket Connection Break");
         throw new Error("Something went wrong. Please try again");
       }
 
@@ -2567,6 +2569,7 @@ class RestExplorerMockViewModel {
             events.forEach((event) =>
               this.aiAssistentWebSocketService.removeListener(event),
             );
+            Sentry.captureException("Socket Connection Break");
             await this.handleAIResponseError(
               componentData,
               "Something went wrong. Please try again",

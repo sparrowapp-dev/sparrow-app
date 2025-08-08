@@ -268,6 +268,7 @@ export class EnvironmentViewModel {
       .setVariable(environment?.variable);
     initEnvironmentTab.setTabType(TabPersistenceTypeEnum.TEMPORARY);
     this.tabRepository.createTab(initEnvironmentTab.getValue());
+    scrollToTab(initEnvironmentTab.getValue().id);
   };
 
   /**
@@ -275,7 +276,7 @@ export class EnvironmentViewModel {
    * @param env - environment needs to be deleted
    * @returns
    */
-  public onDeleteEnvironment = async (env) => {
+  public onDeleteEnvironment = async (env, activeEnvironmentId: string) => {
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
       env.workspaceId,
     );
@@ -286,9 +287,11 @@ export class EnvironmentViewModel {
     const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
     if (isGuestUser) {
       this.environmentRepository.removeEnvironment(env.id);
-      this.workspaceRepository.updateWorkspace(currentWorkspace._id, {
-        environmentId: "none",
-      });
+      if (activeEnvironmentId === env.id) {
+        this.workspaceRepository.updateWorkspace(currentWorkspace._id, {
+          environmentId: "none",
+        });
+      }
       this.deleteEnvironmentTab(env.id);
       notifications.success(
         `${env.name} environment is removed from ${currentWorkspace.name}.`,
@@ -305,9 +308,11 @@ export class EnvironmentViewModel {
     );
     if (response.isSuccessful) {
       this.environmentRepository.removeEnvironment(env.id);
-      this.workspaceRepository.updateWorkspace(currentWorkspace._id, {
-        environmentId: "none",
-      });
+      if (activeEnvironmentId === env.id) {
+        this.workspaceRepository.updateWorkspace(currentWorkspace._id, {
+          environmentId: "none",
+        });
+      }
       this.deleteEnvironmentTab(env.id);
       notifications.success(
         `${env.name} environment is removed from ${currentWorkspace.name}.`,
@@ -392,6 +397,7 @@ export class EnvironmentViewModel {
     initEnvironmentTab.setTabType(TabPersistenceTypeEnum.TEMPORARY);
 
     this.tabRepository.createTab(initEnvironmentTab.getValue());
+    scrollToTab(initEnvironmentTab.getValue().id);
   };
 
   /**

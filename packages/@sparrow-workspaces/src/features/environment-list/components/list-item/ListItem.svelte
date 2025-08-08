@@ -52,9 +52,14 @@
   let noOfColumns = 180;
   let noOfRows = 4;
   function rightClickContextMenu(e) {
-    setTimeout(() => {
-      showMenu = !showMenu;
-    }, 100);
+    if (
+      loggedUserRoleInWorkspace !== WorkspaceRole.WORKSPACE_VIEWER &&
+      !currentWorkspace?.isShared
+    ) {
+      setTimeout(() => {
+        showMenu = !showMenu;
+      }, 100);
+    }
   }
 
   function handleSelectClick(event: MouseEvent) {
@@ -71,7 +76,10 @@
   };
 
   const handleEnvironmentPopUpSuccess = async () => {
-    const response = await onDeleteEnvironment(env);
+    const response = await onDeleteEnvironment(
+      env,
+      currentWorkspace?.environmentId,
+    );
     if (response.isSuccessful) {
       handleEnvironmentPopUpCancel(false);
     }

@@ -71,18 +71,19 @@
     <div
       style="margin-bottom: 12px;"
       class={reviewEnv?.type === "G"
-        ? "global-base text-fs-10"
-        : "local-base text-fs-10"}
+        ? "global-base text-fs-10 ellipsis"
+        : "local-base text-fs-10 ellipsis"}
     >
       <DotIcon
         color={reviewEnv?.type === "G" ? "#3670f7" : "#69d696"}
         height={"6px"}
         width={"6px"}
-      /> baseURL
+      />
+      {reviewEnv?.key || ""}
     </div>
 
     <div class="d-flex justify-content-between">
-      <div>
+      <div style="width: calc(100% - 55px);">
         <div class="d-flex">
           <span
             class="text-secondary-200 text-fs-11"
@@ -102,8 +103,8 @@
           >
           <div class="d-flex" style="width: calc(100% - 55px);">
             <div
-              class="ellipsis"
-              style="width: calc(100% - 20px); font-weight: 400; font-size: 12px; line-height: 18px; color:var(--text-ds-neutral-50); max-width:105px;whitespace:nowrap; overflow:hidden; text-overflow:ellipsis;"
+              class="env-value"
+              style=" font-weight: 400; font-size: 12px; line-height: 18px; color:var(--text-ds-neutral-50); "
             >
               {reviewEnv?.value}
             </div>
@@ -134,12 +135,13 @@
 
 <style>
   .select-environment-popup {
-    width: 203px;
-    height: auto;
+    width: 300px;
+    height: 170px;
     position: fixed;
     z-index: 900;
     flex-wrap: wrap;
     overflow-y: auto;
+    box-shadow: 0 16px 32px 0 rgba(0, 0, 0, 0.3);
   }
 
   .local-base {
@@ -152,8 +154,9 @@
     display: -webkit-box;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    -webkit-line-clamp: 3; /* Number of lines to show */
+    -webkit-line-clamp: 5; /* Number of lines to show */
     text-overflow: ellipsis;
+    word-break: break-all;
     white-space: normal; /* Use 'normal' instead of 'nowrap' */
   }
   .copyIcon {

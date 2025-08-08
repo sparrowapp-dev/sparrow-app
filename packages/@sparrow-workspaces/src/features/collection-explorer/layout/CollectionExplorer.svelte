@@ -710,32 +710,36 @@
               API.
             </p>
           </div>
-          <div class="d-flex gap-2 align-items-center">
-            <div class="d-flex justify-content-center">
-              <Tag
-                size="medium"
-                type={collection?.isMockCollectionRunning ? "green" : "grey"}
-                text={collection?.isMockCollectionRunning
-                  ? "Running"
-                  : "Inactive"}
+          {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
+            <div class="d-flex gap-2 align-items-center">
+              <div class="d-flex justify-content-center">
+                <Tag
+                  size="medium"
+                  type={collection?.isMockCollectionRunning ? "green" : "grey"}
+                  text={collection?.isMockCollectionRunning
+                    ? "Running"
+                    : "Inactive"}
+                />
+              </div>
+              <Button
+                size="small"
+                type={collection?.isMockCollectionRunning
+                  ? "danger"
+                  : "primary"}
+                title={collection?.isMockCollectionRunning
+                  ? "Stop Mock"
+                  : "Run Mock"}
+                onClick={() => {
+                  mockRunningStatus();
+                }}
+                startIcon={collection?.isMockCollectionRunning
+                  ? RecordStopRegular
+                  : PlayCircleRegular}
+                disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+                  isSharedWorkspace}
               />
             </div>
-            <Button
-              size="small"
-              type={collection?.isMockCollectionRunning ? "danger" : "primary"}
-              title={collection?.isMockCollectionRunning
-                ? "Stop Mock"
-                : "Run Mock"}
-              onClick={() => {
-                mockRunningStatus();
-              }}
-              startIcon={collection?.isMockCollectionRunning
-                ? RecordStopRegular
-                : PlayCircleRegular}
-              disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
-                isSharedWorkspace}
-            />
-          </div>
+          {/if}
         </div>
         <div class="d-flex">
           <div
