@@ -56,7 +56,7 @@ export default class WorkspaceExplorerViewModel {
     const t = createDeepCopy(_tab.toMutableJSON());
     delete t.isActive;
     delete t.index;
-    t.persistence = TabPersistenceTypeEnum.PERMANENT;
+    // t.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = t;
   }
 
