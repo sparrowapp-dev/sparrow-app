@@ -47,8 +47,15 @@
   export let onFetchEnvironmentGuide: (query) => void;
   export let onUpdateEnvironmentGuide: (query, isActive) => void;
   export let onGenerateVariables: (collectionId: string) => any;
+  export let updateGeneratedVariables: (
+    globalPairs: { key: string; value: string }[],
+    updatedPairs: { key: string; value: string }[],
+  ) => void;
   export let userRole;
-  let isLoadingVariables: boolean = true;
+
+  let isLoadingVariables: boolean = false;
+  let isReGenerateVariable: boolean = false;
+  let isAcceptedVariables: boolean = false;
   let generatedVariables: KeyValuePair[] = [];
   let isPopoverContainer = false;
 
@@ -58,7 +65,16 @@
 
   $: {
     if ($currentEnvironment) {
-      environmentName = $currentEnvironment?.name;
+      environmentName = $currentEnvironment?.name || "";
+
+      isLoadingVariables = false;
+    }
+    const existingAiVariables =
+      $currentEnvironment?.property?.environment?.aiVariable;
+    if (existingAiVariables && existingAiVariables.length > 0) {
+      generatedVariables = [...existingAiVariables];
+    } else {
+      generatedVariables = [];
     }
   }
 
@@ -76,6 +92,7 @@
   ) => {
     onUpdateVariable(pairs);
   };
+
   let isGuidePopup = false;
 
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -107,20 +124,87 @@
 
   const handleGenerateVariable = async () => {
     isLoadingVariables = true;
-    const response = await onGenerateVariables(
-      $currentEnvironment?.generateProperty?.collectionId,
-    );
-    if (response) {
-      generatedVariables = response;
+    try {
+      const response = await onGenerateVariables($currentEnvironment);
+      if (response && response.length > 0) {
+        isReGenerateVariable = !isReGenerateVariable;
+        generatedVariables = [...response];
+      }
+    } catch (error) {
+      console.error("Error generating variables:", error);
+    } finally {
       isLoadingVariables = false;
     }
   };
 
+  // Improved reactive statement with single call protection
   $: {
-    if ($currentEnvironment?.generateVariable) {
-      handleGenerateVariable();
+    const currentEnv = $currentEnvironment;
+    if (currentEnv?.generateVariable && !isLoadingVariables) {
+      const existingAiVariables = currentEnv?.property?.environment?.aiVariable;
+
+      if (
+        !existingAiVariables ||
+        (existingAiVariables.length === 0 &&
+          !isReGenerateVariable &&
+          !isAcceptedVariables)
+      ) {
+        handleGenerateVariable();
+      }
     }
   }
+
+  const onClickGenerateVariable = async (type?: string, index?: number) => {
+    if (type === "regenerate") {
+      await handleGenerateVariable();
+      return;
+    }
+    if (type === "accept" && typeof index === "number") {
+      try {
+        const foundIndex = generatedVariables.findIndex((_, i) => i === index);
+        if (foundIndex !== -1) {
+          const foundObject = generatedVariables[foundIndex];
+          const currentPairs =
+            $currentEnvironment.property?.environment?.variable || [];
+          const updatedPairs = [...currentPairs];
+          if (updatedPairs.length > 0) {
+            updatedPairs.splice(updatedPairs.length - 1, 0, foundObject);
+          } else {
+            updatedPairs.push(foundObject);
+          }
+          const remainingGeneratedVariables = generatedVariables.filter(
+            (_, i) => i !== foundIndex,
+          );
+          updateGeneratedVariables(updatedPairs, remainingGeneratedVariables);
+          generatedVariables = [...remainingGeneratedVariables];
+          onUpdateVariable(updatedPairs);
+        }
+      } catch (error) {
+        console.error("Error accepting generated variable:", error);
+      }
+    } else if (type === "accept-all") {
+      try {
+        const currentPairs =
+          $currentEnvironment.property?.environment?.variable || [];
+        const updatedPairs = [...currentPairs];
+        if (updatedPairs.length > 0) {
+          updatedPairs.splice(
+            updatedPairs.length - 1,
+            0,
+            ...generatedVariables,
+          );
+        } else {
+          updatedPairs.push(...generatedVariables);
+        }
+        updateGeneratedVariables(updatedPairs, []);
+        generatedVariables = [];
+        onUpdateVariable(updatedPairs);
+        isAcceptedVariables = true;
+      } catch (error) {
+        console.error("Error accepting all generated variables:", error);
+      }
+    }
+  };
 
   onDestroy(() => {
     window.removeEventListener("keydown", handleKeyDown);
@@ -283,8 +367,12 @@
           >
             <GenerateVariables
               {isLoadingVariables}
-              collection={$currentEnvironment?.generateProperty}
+              currentEnvironment={$currentEnvironment}
               bind:generatedVariables
+              bind:isReGenerateVariable
+              {isAcceptedVariables}
+              {onClickGenerateVariable}
+              {updateGeneratedVariables}
             />
           </div>
         {/if}
@@ -301,8 +389,6 @@
       </div>
     {/if}
   </div>
-{:else}
-  <Loader loaderSize="12" loaderMessage="Environment items are loading." />
 {/if}
 
 <!--Disabling the Quick Help feature, will be taken up in next release-->
@@ -402,7 +488,6 @@
   .env-save-btn {
     padding: 6px 16px;
     opacity: 0.3;
-    // background-color: var(--border-color);
   }
   .env-save-btn:disabled {
     color: white;
@@ -410,7 +495,6 @@
   .env-save-btn-enabled {
     padding: 6px;
     opacity: 1;
-    // background-color: var(--border-color);
     background-color: transparent;
     position: relative;
     color: white;

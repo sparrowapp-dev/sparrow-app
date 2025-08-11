@@ -34,6 +34,8 @@
    */
   export let disabled = false;
   export let isGeneratedVariable = false;
+  export let onClickGenerateVariable: (type?: string, index?: number) => void;
+
   let pairs: KeyValueChecked[] = keyValue;
   let controller: boolean = false;
   const theme = new TabularInputTheme().build();
@@ -93,7 +95,7 @@
    * @param index - index of the pairs that needs to be deleted
    */
   const deletePairs = (index: number): void => {
-    if (pairs.length > 1) {
+    if (pairs.length > 1 || isGeneratedVariable) {
       let filteredKeyValue = pairs.filter((elem, i) => {
         if (i !== index) {
           return true;
@@ -170,6 +172,12 @@
       </p>
     </div>
     <div class="pe-1 d-flex">
+      {#if isGeneratedVariable}
+        <button
+          class="border-0 d-flex text-nowrap generate-action-button common-text align-items-center"
+          on:click={onClickGenerateVariable("accept-all")}>Accept All</button
+        >
+      {/if}
       <button class="bg-transparent border-0 d-flex d-none" style="">
         <p
           class="text-nowrap text-primary-300 mb-0 me-2"
@@ -219,13 +227,6 @@
               style="height: 28px;"
             >
               <div class="d-flex justify-content-center align-items-center">
-                <!-- <div class="button-container">
-                  <Button
-                    size="extra-small"
-                    type="teritiary-regular"
-                    startIcon={ReOrderDotsRegular}
-                  />
-                </div> -->
                 <div style="width:24px;">
                   {#if pairs.length - 1 != index && !isGeneratedVariable}
                     <Checkbox
@@ -298,11 +299,31 @@
                   </div>
                 </Tooltip>
               {:else if isGeneratedVariable}
+                <!-- {#if element?.aiUndo}
+                  <div class="d-flex align-items-center gap-1">
+                    <Tooltip
+                      title={"Undo delete"}
+                      placement={"bottom-right"}
+                      distance={10}
+                    >
+                      <button
+                        class="generate-action-button undo"
+                        on:click|stopPropagation={() =>
+                          undoGeneratedDelete(index)}
+                      >
+                        <ArrowUndoRegular
+                          size="12"
+                          color={"var(--icon-ds-neutral-50)"}
+                        />
+                      </button>
+                    </Tooltip>
+                  </div>
+                {:else} -->
                 <div class="d-flex gap-1">
                   <button
-                    class="generate-action-button reject"
+                    class="generate-action-button accept"
                     on:click|stopPropagation={() => {
-                      console.log("accept it------>");
+                      onClickGenerateVariable("accept", index);
                     }}
                   >
                     <CheckMarkIcon
@@ -322,6 +343,7 @@
                     />
                   </button>
                 </div>
+                <!-- {/if} -->
               {:else}
                 <div class="h-75 pe-1">
                   <button
@@ -413,5 +435,22 @@
     color: var(--text-ds-primary-300);
     background-color: var(--bg-ds-surface-400);
     border: 0px;
+  }
+  .countdown-text {
+    font-size: 10px;
+    color: var(--text-ds-neutral-300);
+    min-width: 20px;
+    text-align: center;
+  }
+  .common-text {
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    font-size: 12px;
+    line-height: 130%;
+    letter-spacing: 0;
+    text-align: center;
+    vertical-align: middle;
+    color: var(--text-ds-primary-300);
   }
 </style>

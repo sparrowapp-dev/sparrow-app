@@ -35,6 +35,7 @@ class InitEnvironmentTab {
           state: {
             isSaveInProgress: false,
           },
+          aiVariable: [],
         },
       },
       path: {
