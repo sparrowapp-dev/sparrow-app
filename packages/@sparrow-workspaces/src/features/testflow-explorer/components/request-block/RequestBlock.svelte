@@ -236,6 +236,15 @@
       },
     },
     {
+      name: "Duplicate",
+      iconSize: "16px",
+      iconColor: "var(--icon-ds-neutral-50)",
+      Icon: ArrowExportRegular,
+      onClick: () => {
+        data.onContextMenu(id, "duplicate");
+      },
+    },
+    {
       name: "Rename Block",
       iconSize: "16px",
       iconColor: "var(--icon-ds-neutral-50)",

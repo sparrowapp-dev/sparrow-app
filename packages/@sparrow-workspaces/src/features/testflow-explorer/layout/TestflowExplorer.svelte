@@ -764,6 +764,7 @@
     _id: string,
     _requestData = undefined,
     _direction = "add-block-after",
+    _duplicate: { duplicate: boolean } = { duplicate: false },
   ) => {
     if (!_id) return;
     // handles run from from start button click
@@ -778,18 +779,39 @@
     }
     if ($nodes.length >= planLimitTestFlowBlocks + 1 && !isGuestUser) {
       testflowBlocksPlanModalOpen = true;
-      // notifications.error(
-      //   `You’ve reached the limit of ${planLimitTestFlowBlocks} Blocks per test flow on your current plan. Upgrade to increase this limit.`,
-      // );
       return;
     }
-    let requestData;
+    let requestCoreData;
+    let requestMetaData;
+    const { duplicate } = _duplicate;
+
     if (_requestData) {
-      requestData = await createCustomRequestObject(
+      // create a new node object using existing request (meta and core data)
+      requestCoreData = await createCustomRequestObject(
         _requestData?.collectionId,
         _requestData?.requestId,
         _requestData?.folderId,
       );
+      requestMetaData = {
+        collectionId: _requestData?.collectionId,
+        requestId: _requestData?.requestId,
+        folderId: _requestData?.folderId,
+      };
+    } else if (duplicate) {
+      // create a new node object using copy request (meta and core data)
+      nodes.update((_nodes: Node[] | any[]) => {
+        _nodes.forEach((_nodeItem) => {
+          if (_nodeItem.id === _id) {
+            requestCoreData = _nodeItem.data.requestData;
+            requestMetaData = {
+              requestId: _nodeItem?.data?.requestId || uuidv4(),
+              folderId: _nodeItem?.data?.folderId,
+              collectionId: _nodeItem?.data?.collectionId,
+            };
+          }
+        });
+        return _nodes;
+      });
     }
 
     // if (checkIfEdgesExist(_id)) {
@@ -838,6 +860,10 @@
                 _event === "add-block-after"
               ) {
                 createNewNode(id, undefined, _event);
+              } else if (_event === "duplicate") {
+                createNewNode(id, undefined, "add-block-after", {
+                  duplicate: true,
+                });
               }
             },
             onOpenAddCustomRequestModal: function (id: string) {
@@ -863,12 +889,13 @@
             updateBlockName: function (_id: string, value: string) {
               handleUpdateBlockName(_id, value);
             },
-            collectionId: _requestData?.collectionId,
-            folderId: _requestData?.folderId,
-            requestId: _requestData?.requestId,
+            collectionId: requestMetaData?.collectionId,
+            folderId: requestMetaData?.folderId,
+            requestId: requestMetaData?.requestId,
             collections: filteredCollections,
             tabId: $tab.tabId,
-            requestData: requestData || createBlankRequestObject("", "", ""),
+            requestData:
+              requestCoreData || createBlankRequestObject("", "", ""),
           },
           position: nextNodePosition,
           deletable: isNodeDeletable,
@@ -1048,6 +1075,10 @@
                       _event === "add-block-after"
                     ) {
                       createNewNode(id, undefined, _event);
+                    } else if (_event === "duplicate") {
+                      createNewNode(id, undefined, "add-block-after", {
+                        duplicate: true,
+                      });
                     }
                   },
                   onOpenAddCustomRequestModal: function (id: string) {
