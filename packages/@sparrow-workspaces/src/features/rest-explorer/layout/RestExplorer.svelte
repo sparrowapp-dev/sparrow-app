@@ -144,7 +144,7 @@
   export let onUpdateAiModel;
   export let onGenerateDocumentation;
   export let onStopGeneratingAIResponse;
-  export let onImportCurl;
+  export let onHandleUrlInput;
 
   /**
    * Role of user in active workspace
@@ -589,7 +589,7 @@
       {toggleSaveRequest}
       {onSaveRequest}
       {isGuestUser}
-      {onImportCurl}
+      {onHandleUrlInput}
     />
 
     {#if isPopoverContainer}

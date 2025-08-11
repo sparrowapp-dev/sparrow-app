@@ -97,6 +97,8 @@ import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/htt
 
 import { getClientUser } from "@app/utils/jwt";
 import constants from "@app/constants/constants";
+import * as curlconverter from "curlconverter";
+
 import * as Sentry from "@sentry/svelte";
 
 class RestExplorerViewModel {
@@ -765,6 +767,208 @@ class RestExplorerViewModel {
       console.error("Error importing cURL:", error);
       notifications.error("Failed to import cURL. Please try again.");
       return false;
+    }
+  };
+
+  public handleFormatCurl = (curlCommand: string): string => {
+    const rawLiteralRegex = /(\$'[\s\S]*?')$/m;
+    let rawLiteral = "";
+    const rawMatch = curlCommand.match(rawLiteralRegex);
+    if (rawMatch) {
+      rawLiteral = rawMatch[0];
+      curlCommand = curlCommand.slice(0, rawMatch.index).trim();
+    }
+    const heredocRegex = /(<<\s*EOF[\s\S]*?^EOF\s*)$/m;
+    const heredocMatch = curlCommand.match(heredocRegex);
+    let heredoc = "";
+    if (heredocMatch) {
+      heredoc = heredocMatch[0]
+        .replace(/\r\n/g, "\n")
+        .replace(/^\s+|\s+$/g, "");
+      curlCommand = curlCommand.slice(0, heredocMatch.index).trim();
+    }
+    curlCommand = curlCommand.replace(/\\\s*\n\s*/g, " ");
+    curlCommand = curlCommand.replace(/\\\s*/g, " ");
+    curlCommand = curlCommand.replace(/\s+/g, " ").trim();
+    const parts = curlCommand.match(/"[^"]*"|'[^']*'|\S+/g) || [];
+    let formatted = "";
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      if (i === 0) {
+        formatted += part;
+      } else if (
+        part.startsWith("--") ||
+        (part.startsWith("-") && !/^-\d/.test(part))
+      ) {
+        formatted += " \\\n  " + part;
+      } else if (
+        /^https?:\/\//.test(part) ||
+        /^\$\{.*\}/.test(part) ||
+        /^[\w\/:.?&=%-]+$/.test(part)
+      ) {
+        if (parts[i - 1] && parts[i - 1].startsWith("--request")) {
+          formatted += " " + part;
+        } else {
+          formatted += " \\\n  " + part;
+        }
+      } else {
+        formatted += " " + part;
+      }
+    }
+    if (heredoc) {
+      const [firstLine, ...restLines] = heredoc.split("\n");
+      formatted += " \\\n  " + firstLine + "\n" + restLines.join("\n");
+    }
+    if (rawLiteral && !formatted.includes(rawLiteral)) {
+      formatted += ` \\\n  ${rawLiteral}`;
+    }
+    return formatted.trim();
+  };
+
+  public handleFormatUrl = (url: string) => {
+    url = url.replace(/^(https?:\/\/\s*)+(https?:\/\/)/, "$2");
+    return url;
+  };
+
+  public transformRequest = (requestObject: any, username: string) => {
+    let url = requestObject.url || "";
+    let raw_url = requestObject.raw_url || "";
+    let method = requestObject.method || "GET";
+    let headers = requestObject.headers || [];
+    let body = requestObject.body || requestObject.data || "";
+    let files = requestObject.files || [];
+    let params = [];
+    let auth = requestObject.auth || {};
+    let queryParams = [];
+
+    // Format queryParams (always add an empty param at the end)
+    if (raw_url && raw_url.includes("?")) {
+      const [baseUrl, queryString] = raw_url.split("?");
+      url = baseUrl;
+      queryParams = queryString
+        .split("&")
+        .map((pair) => {
+          const eqIdx = pair.indexOf("=");
+          if (eqIdx === -1) {
+            return { key: pair.trim(), value: "", checked: true };
+          }
+          const key = pair.slice(0, eqIdx).trim();
+          const value = pair.slice(eqIdx + 1).trim();
+          return { key, value, checked: true };
+        })
+        .filter((item) => item.key);
+      queryParams.push({ key: "", value: "", checked: true });
+    } else {
+      queryParams = [{ key: "", value: "", checked: true }];
+    }
+
+    // Format headers
+    if (
+      !Array.isArray(headers) &&
+      typeof headers === "object" &&
+      headers !== null
+    ) {
+      headers = Object.entries(headers)
+        .filter(([key]) => key && key.trim() !== "")
+        .map(([key, value]) => ({
+          key: key.trim(),
+          value:
+            value !== undefined && value !== null ? String(value).trim() : "",
+          checked: true,
+        }));
+      headers.push({ key: "", value: "", checked: true });
+    } else {
+      headers = [{ key: "", value: "", checked: true }];
+    }
+
+    // Format files
+    files = Array.isArray(files)
+      ? files.map((f) =>
+          typeof f === "string"
+            ? {
+                key: f.split("=")[0],
+                value: f.split("=").slice(1).join("="),
+                checked: true,
+              }
+            : { key: f.key, value: f.value, checked: true },
+        )
+      : [];
+
+    // Format body (for JSON, form, etc.)
+    if (typeof body === "object" && body !== null) {
+      try {
+        body = JSON.stringify(body, null, 2);
+      } catch {
+        body = String(body);
+      }
+    }
+
+    // Format auth
+    if (auth && typeof auth === "object") {
+      auth = {
+        ...auth,
+        checked: true,
+      };
+    }
+
+    return {
+      request: {
+        url: this.handleFormatUrl(url),
+        method,
+        headers,
+        body,
+        files,
+        params,
+        auth,
+        queryParams,
+      },
+      username,
+    };
+  };
+
+  public parseCurl = (curl: string): TransformedRequest => {
+    if (!curl || !curl.length) {
+      throw new Error();
+    }
+    const updatedCurl = this.handleFormatCurl(curl);
+    const stringifiedCurl = curlconverter.toJsonString(updatedCurl);
+    const parsedCurl = JSON.parse(stringifiedCurl);
+
+    // Match all -F flags with their key-value pairs
+    const formDataMatches = curl.match(/-F\s+'([^=]+)=@([^;]+)/g);
+    const formDataItems = formDataMatches
+      ? formDataMatches.map((match) => {
+          const [, keyValue] = match.split("-F '");
+          const [key, filePath] = keyValue.split("=@");
+          const value = filePath.replace(/'/g, "");
+          return {
+            key,
+            value,
+            checked: true,
+            base: value,
+          };
+        })
+      : [];
+    if (formDataItems.length > 0) {
+      parsedCurl.files = formDataItems;
+    }
+    return this.transformRequest(parsedCurl, "anonymous");
+  };
+
+  public handleUrlInput = async (value: string) => {
+    if (typeof value === "string" && value.trim().startsWith("curl ")) {
+      try {
+        const parsed = this.parseCurl(value);
+        if (parsed) {
+          await this.handleImportCurl(parsed);
+        }
+      } catch (err) {
+        console.error("Failed to parse cURL command:", err);
+        notifications.error("Failed to parse cURL command.");
+        this.updateRequestUrl(value);
+      }
+    } else {
+      this.updateRequestUrl(value);
     }
   };
 
