@@ -50,7 +50,9 @@
 
 <div class="sidebar-workspace-list" style="flex:1; overflow:auto;">
   {#if workspaces.length === 0}
-    <div class="text-center py-3">No recent workspaces</div>
+    <div class="text-center py-3 text-ds-font-size-12">
+      No recent workspaces
+    </div>
   {:else}
     <List height={"100%"} overflowY={"auto"} classProps={"ps-2 py-0"}>
       {#each topFiveWorkspaces as list, index}

@@ -67,7 +67,7 @@
       y: buttonRect.top + 2 * buttonRect.height + -buttonRect.height,
     };
 
-    showMenu = true;
+    showMenu = !showMenu;
   };
 
   function closeContextMenu() {

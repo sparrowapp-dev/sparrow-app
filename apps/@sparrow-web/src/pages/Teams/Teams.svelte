@@ -192,7 +192,7 @@
               class="d-flex align-items-center justify-content-center border-0 angleRight w-16 position-absolute {$leftPanelCollapse
                 ? 'd-block'
                 : 'd-none'}"
-              style="left:57px; bottom: 20px; width: 20px; height:20px ; background-color: transparent; z-index: {$leftPanelCollapse
+              style="left:57px; bottom: 15px; width: 20px; height:20px ; background-color: transparent; z-index: {$leftPanelCollapse
                 ? '2'
                 : '0'}"
               on:click={() => {
