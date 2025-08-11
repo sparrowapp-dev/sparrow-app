@@ -68,9 +68,6 @@ jobs:
       - name: Install project dependencies
         run: yarn
 
-      - name: Sync version across all files
-        run: yarn sync-version
-
       - name: Update updater endpoint in tauri.conf.json file
         run: |
           content=$(<apps/@sparrow-desktop/src-tauri/tauri.conf.json)
