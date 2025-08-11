@@ -6,8 +6,6 @@
   import { UrlInputTheme } from "../../../../utils/";
   import { Tooltip } from "@sparrow/library/ui";
   import { SaveRegular } from "@sparrow/library/icons";
-  import * as curlconverter from "curlconverter";
-  import type { TransformedRequest } from "@sparrow/common/types/workspace/collection-base";
 
   let componentClass = "";
   export { componentClass as class };
