@@ -165,7 +165,7 @@
   // intial surface 700
   .custom-surface700 {
     background-color: var(--bg-ds-surface-400);
-    border: none;
+    border: 1px solid transparent;
     caret-color: var(--border-ds-primary-300);
   }
   // when focused without text
