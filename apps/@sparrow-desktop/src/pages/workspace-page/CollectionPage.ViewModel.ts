@@ -1366,6 +1366,8 @@ export default class CollectionsViewModel {
         this.tabRepository.createTab(adaptCollection);
         scrollToTab("");
 
+        addCollectionItem(response.data.data._id, "collection");
+
         await this.workspaceRepository.updateCollectionInWorkspace(
           workspaceId,
           {
@@ -1401,6 +1403,7 @@ export default class CollectionsViewModel {
       this.tabRepository.createTab(adaptCollection);
       scrollToTab("");
 
+      addCollectionItem(dt.id, "collection");
       await this.workspaceRepository.updateCollectionInWorkspace(workspaceId, {
         id: dt.id,
         name: dt.name,
@@ -3038,7 +3041,7 @@ export default class CollectionsViewModel {
 
       this.handleCreateTab(sampleFolder.getValue());
       scrollToTab("");
-
+      addCollectionItem(data.id, "folder");
       // Update the locally added folder with server response
       const folderObj = data;
       await this.collectionRepository.updateRequestOrFolderInCollection(
@@ -3089,6 +3092,7 @@ export default class CollectionsViewModel {
       }
       this.handleCreateTab(sampleFolder.getValue());
       scrollToTab("");
+      addCollectionItem(response.data.data.id, "folder");
 
       // Update the locally added folder with server response
       const folderObj = response.data.data;
@@ -8206,7 +8210,9 @@ export default class CollectionsViewModel {
 
   public handleRedirectToAdminPanel = async (teamId: string) => {
     const [authToken] = getAuthJwt();
-    await open(`${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`);
+    await open(
+      `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+    );
   };
 
   public handleContactSales = async () => {

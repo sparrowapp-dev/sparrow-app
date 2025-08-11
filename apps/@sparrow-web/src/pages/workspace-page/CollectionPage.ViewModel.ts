@@ -1372,6 +1372,7 @@ export default class CollectionsViewModel {
 
         this.tabRepository.createTab(adaptCollection);
         scrollToTab("");
+        addCollectionItem(response.data.data._id, "collection");
 
         await this.workspaceRepository.updateCollectionInWorkspace(
           workspaceId,
@@ -1409,6 +1410,7 @@ export default class CollectionsViewModel {
 
       this.tabRepository.createTab(adaptCollection);
       scrollToTab("");
+      addCollectionItem(dt.id, "collection");
 
       await this.workspaceRepository.updateCollectionInWorkspace(workspaceId, {
         id: dt.id,
@@ -3056,6 +3058,7 @@ export default class CollectionsViewModel {
 
       this.handleCreateTab(sampleFolder.getValue());
       scrollToTab("");
+      addCollectionItem(data.id, "folder");
 
       // Update the locally added folder with server response
       const folderObj = data;
@@ -3108,6 +3111,7 @@ export default class CollectionsViewModel {
 
       this.handleCreateTab(sampleFolder.getValue());
       scrollToTab("");
+      addCollectionItem(response.data.data.id, "folder");
 
       // Update the locally added folder with server response
       const folderObj = response.data.data;
