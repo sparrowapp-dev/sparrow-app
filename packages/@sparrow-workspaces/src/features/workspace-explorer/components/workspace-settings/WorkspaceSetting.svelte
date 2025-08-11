@@ -60,7 +60,7 @@
     <hr />
     {#if !searchedUsers.length && search}
       <div class="skeleton-parent">
-        <p style="margin-top: 10px; color: var(--text-secondary-550);">
+        <p style="margin-top: 10px; color:var(--text-ds-neutral-400);">
           No result found.
         </p>
       </div>
