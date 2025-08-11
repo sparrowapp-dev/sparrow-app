@@ -8,7 +8,7 @@ on:
   push:
     # Trigger on push to the <branch_name> branch. Make sure to remove the branch name from the branches list below, once you are done testing.
     branches:
-      - <branch_name>
+      - feat/tauri-upgrade-2.7.0-v2
 
   workflow_dispatch:
 
@@ -46,3 +46,74 @@ env:
   SNAPCRAFT_STORE_CREDENTIALS: ${{ vars.SNAPCRAFT_STORE_CREDENTIALS }}
 
 jobs:
+  release_macos:
+    runs-on: macos-latest
+    environment: production
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Install Rust 1.82.0
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          rustup install 1.82.0
+          rustup default 1.82.0
+
+      - name: Sync node version and setup cache
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20.8"
+
+      - name: Install project dependencies
+        run: yarn
+
+      - name: Sync version across all files
+        run: yarn sync-version
+
+      - name: Update updater endpoint in tauri.conf.json file
+        run: |
+          content=$(<apps/@sparrow-desktop/src-tauri/tauri.conf.json)
+          newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_PROD }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
+          echo "$newContent" > apps/@sparrow-desktop/src-tauri/tauri.conf.json
+        shell: bash
+
+      - name: Remove App Store specific properties
+        run: |
+          sed -i '' 's/dev.sparrowapp.desktop/com.sparrow.app/g' apps/@sparrow-desktop/src-tauri/Info.plist
+          sed -i '' '/"macOS": {/,/},/ {
+              /"entitlements":.*/d
+              /"minimumSystemVersion":.*/d
+              /"files": {/,/      }/d
+          }' apps/@sparrow-desktop/src-tauri/tauri.conf.json
+        shell: bash
+        
+      - name: Increase Yarn network timeout
+        run: yarn config set network-timeout 600000
+
+      - name: Build Tauri App
+        run: |
+          yarn cache clean
+          yarn install
+          yarn desktop-build
+          # yarn tauri build --debug
+        env:
+          APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
+          APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
+          APPLE_CERTIFICATE_PASSWORD: "${{ secrets.APPLE_CERTIFICATE_PASSWORD }}"
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          CI: false
+
+      - name: dmg sig
+        run: cat /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/*.sig
+    
+      - name: Save Macos build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sparrow-macos-build
+          path: /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg
