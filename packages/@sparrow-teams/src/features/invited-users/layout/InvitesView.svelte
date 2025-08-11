@@ -33,7 +33,7 @@
             <InviteRow
               user={data?.email}
               role={data?.role}
-              id={data?.id}
+              id={data?.id || data?.email}
               {onWithDrawInvite}
               {onResendInvite}
               {openTeam}

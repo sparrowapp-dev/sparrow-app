@@ -81,6 +81,7 @@
         headerObject={tableHeaderContent}
         onSortToggle={handleSortToggle}
         {isAscending}
+        isNoData={data?.length < 1}
       >
         <tbody class="overflow-y-auto position-relative z-0">
           {#if data}

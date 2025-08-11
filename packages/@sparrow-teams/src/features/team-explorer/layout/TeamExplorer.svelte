@@ -417,12 +417,17 @@
 
             <div class="d-flex align-items-end justify-content-end gap-3">
               {#if openTeam?.users?.length > 1 && !isGuestUser}
-                <p class="d-flex my-auto sparrow-fs-12">
-                  <PeopleIcon
-                    color={"var(--sparrow-text-color)"}
-                    classProp="mx-2 my-auto d-flex"
-                  />
-                  <span class="my-auto" style="width: 66px;"
+                <p
+                  class="d-flex my-auto sparrow-fs-12"
+                  style="align-items: center;"
+                >
+                  <span>
+                    <PeopleIcon
+                      color={"var(--sparrow-text-color)"}
+                      classProp="mx-2 my-auto d-flex"
+                    /></span
+                  >
+                  <span class="my-auto" style="min-width: fit-content;"
                     >{openTeam?.users.length} Members</span
                   >
                 </p>

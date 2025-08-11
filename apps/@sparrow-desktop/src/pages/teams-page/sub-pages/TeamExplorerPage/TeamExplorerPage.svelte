@@ -4,7 +4,7 @@
   import { TeamExplorerPageViewModel } from "./TeamExplorerPage.ViewModel";
   import type { TeamDocument, WorkspaceDocument } from "@app/database/database";
   import { user } from "@app/store/auth.store";
-  import { Modal } from "@sparrow/library/ui";
+  import { Modal, notifications } from "@sparrow/library/ui";
   import { LeaveTeam } from "@sparrow/teams/features";
   import { DeleteWorkspace } from "@sparrow/common/features";
   import { onDestroy, onMount } from "svelte";
@@ -84,6 +84,7 @@
     await copyToClipBoard(
       `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${workspaceId}`,
     );
+    notifications.success("Link copied to clipboard.");
   };
 
   const handleSendInvite = async (
