@@ -138,8 +138,8 @@ jobs:
       - name: Increase Yarn network timeout
         run: yarn config set network-timeout 600000
 
-      - name: Sync version across all files
-        run: yarn sync-version
+      # - name: Sync version across all files
+      #   run: yarn sync-version
 
       - name: Build Tauri App
         run: |
@@ -579,6 +579,7 @@ jobs:
 
       - name: Install Yarn (Ubuntu 24.04 compatible)
         run: |
+          sudo yarn cache clean
           sudo mkdir -p /etc/apt/keyrings
           curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/yarn.gpg
           echo "deb [signed-by=/etc/apt/keyrings/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
@@ -588,8 +589,8 @@ jobs:
       - name: Install project dependencies
         run: yarn
 
-      - name: Sync version across all files
-        run: yarn sync-version
+      # - name: Sync version across all files
+      #   run: yarn sync-version
 
       - name: Update updater endpoint in tauri.conf.json file
         run: |
@@ -768,8 +769,8 @@ jobs:
       - name: Install project dependencies
         run: yarn
 
-      - name: Sync version across all files
-        run: yarn sync-version
+      # - name: Sync version across all files
+      #   run: yarn sync-version
 
       - name: Update updater endpoint in tauri.conf.json file
         run: |
