@@ -115,14 +115,16 @@
     await _viewModel.requestToUpgradePlan($activeTeam?.teamId);
   };
 
-  const handleRedirectAdminPanel = async () => {
-    await _viewModel.handleRedirectToAdminPanel($activeTeam?.teamId);
-  };
-
-  const handleRedirectToAdminPanelWorkspace = async () => {
-    await _viewModel.handleRedirectToAdminPanel($activeTeam?.teamId, {
-      toWorkspace: true,
-    });
+  const handleRedirectAdminPanel = async (options?: {
+    toWorkspace?: boolean;
+  }) => {
+    if (options?.toWorkspace) {
+      await _viewModel.handleRedirectToAdminPanel($activeTeam?.teamId, {
+        toWorkspace: true,
+      });
+    } else {
+      await _viewModel.handleRedirectToAdminPanel($activeTeam?.teamId);
+    }
   };
 
   const handleCreateWorkspace = async (teamId: string) => {
@@ -191,7 +193,6 @@
   planLimits={handleUserLimits}
   contactOwner={handleRequestPlan}
   {handleRedirectAdminPanel}
-  {handleRedirectToAdminPanelWorkspace}
   handleContactSales={_viewModel.handleContactSales}
 />
 
