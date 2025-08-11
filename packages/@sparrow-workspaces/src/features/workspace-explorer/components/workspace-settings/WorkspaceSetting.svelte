@@ -60,7 +60,9 @@
     <hr />
     {#if !searchedUsers.length && search}
       <div class="skeleton-parent">
-        <p class="skeleton-text" style="margin-top: 10px;">No result found.</p>
+        <p style="margin-top: 10px; color:var(--text-ds-neutral-400);">
+          No result found.
+        </p>
       </div>
     {:else if searchedUsers.length}
       {#each filteredUser as user}
