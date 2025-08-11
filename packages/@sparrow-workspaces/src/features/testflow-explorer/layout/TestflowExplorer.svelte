@@ -804,7 +804,7 @@
           if (_nodeItem.id === _id) {
             requestCoreData = _nodeItem.data.requestData;
             requestMetaData = {
-              requestId: _nodeItem?.data?.requestId || uuidv4(),
+              requestId: _nodeItem?.data?.requestId,
               folderId: _nodeItem?.data?.folderId,
               collectionId: _nodeItem?.data?.collectionId,
             };
@@ -812,6 +812,14 @@
         });
         return _nodes;
       });
+    } else {
+      // create a new blank node object
+      requestCoreData = createBlankRequestObject("", "", "");
+      requestMetaData = {
+        requestId: "",
+        folderId: "",
+        collectionId: "",
+      };
     }
 
     // if (checkIfEdgesExist(_id)) {
@@ -894,8 +902,7 @@
             requestId: requestMetaData?.requestId,
             collections: filteredCollections,
             tabId: $tab.tabId,
-            requestData:
-              requestCoreData || createBlankRequestObject("", "", ""),
+            requestData: requestCoreData,
           },
           position: nextNodePosition,
           deletable: isNodeDeletable,
