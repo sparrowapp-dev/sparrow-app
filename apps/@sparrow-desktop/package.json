@@ -34,7 +34,7 @@
     "@lezer/highlight": "^1.2.0",
     "@microsoft/applicationinsights-web": "^3.3.1",
     "@tauri-apps/api": "2.7.0",
-    "@tauri-apps/cli": "2.7.1",
+    "@tauri-apps/cli": "2.6.2",
     "@tauri-apps/plugin-deep-link": "2.4.1",
     "@tauri-apps/plugin-dialog": "2.3.2",
     "@tauri-apps/plugin-fs": "2.4.1",
