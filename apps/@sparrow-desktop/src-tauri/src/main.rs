@@ -401,9 +401,9 @@ async fn make_request_v2(
 ) -> Result<String, std::io::Error> {
     // Create a client
     let client = reqwest::Client::builder()
-    .danger_accept_invalid_certs(true)
-    .build()
-    .unwrap();
+        .danger_accept_invalid_certs(true)
+        .build()
+        .unwrap();
 
     // Convert method string to reqwest::Method
     let reqwest_method = match method {
@@ -988,7 +988,7 @@ async fn connect_socket_io(
                 SocketIoPayload::Binary(bin_data) => {
                     json!({
                         "event": event.as_str(),
-                        "message": bin_data
+                        "message": bin_data.to_vec()
                     })
                 }
             };
@@ -1194,9 +1194,9 @@ async fn send_graphql_request(
 ) -> Result<String, String> {
     // Initialize an HTTP client for making requests.
     let client = reqwest::Client::builder()
-    .danger_accept_invalid_certs(true)
-    .build()
-    .unwrap();
+        .danger_accept_invalid_certs(true)
+        .build()
+        .unwrap();
 
     // Deserialize the JSON string `headers` into a Vec of key-value pairs.
     // Each key-value pair is represented by the KeyValue struct.
