@@ -477,7 +477,6 @@ class FolderExplorerPage {
     collection: CollectionBaseInterface,
     explorer: CollectionItemBaseInterface,
   ) => {
-    debugger;
     const sampleRequest = new InitMockRequestTab(
       UntrackedItems.UNTRACKED + uuidv4(),
       workspaceId,
