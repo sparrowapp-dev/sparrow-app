@@ -1,6 +1,6 @@
 # Environment Variables Guide
 
-This guide provides an overview of the environment variables used in the Sparrow application, including MongoDB, Kafka, Sparrow-API, and Sparrow-Auth configurations. Each section is categorized for clarity.
+This guide provides an overview of the environment variables used in the Sparrow application, including MongoDB, Sparrow-API, and Sparrow-Auth configurations. Each section is categorized for clarity.
 
 ### Important points to note:
 
@@ -52,12 +52,6 @@ These variables configure the Sparrow API server.
 | Variable Name | Description             | Default Value                                |
 | ------------- | ----------------------- | -------------------------------------------- |
 | `DB_URL`      | MongoDB connection URL. | `mongodb://sparowapp:sparrow123@mongo:27017` |
-
-### **Kafka Broker Settings**
-
-| Variable Name  | Description           | Default Value |
-| -------------- | --------------------- | ------------- |
-| `KAFKA_BROKER` | Kafka broker address. | `kafka:9094`  |
 
 ### **Optional Settings**
 
@@ -156,28 +150,26 @@ These variables configure the Sparrow Auth service.
 | `VITE_SPARROW_WEB_URL`        | URL for the Sparrow web application.                     | `http://localhost:1422`                          |
 | `VITE_SPARROW_PRIVACY_POLICY` | URL for the privacy policy.                              | `https://example.com/privacy-policy`             |
 
-
 ## **4. Sparrow-Web Environment Variables**
 
 These variables configure the Sparrow Web service.
 
-| Variable Name                        | Description                                                         | Default Value |
-|--------------------------------------|---------------------------------------------------------------------|--------------|
-| `VITE_WEB_API_URL`                   | Base URL for the Sparrow Web API.                                  | `N/A`        |
-| `VITE_WEB_BASE_URL`                  | Base URL for the Sparrow Web service.                             | `N/A`        |
-| `VITE_WEB_API_TIMEOUT`               | Timeout duration for API requests in milliseconds.                | `7000`       |
-| `VITE_WEB_ENABLE_MIX_PANEL`          | Flag to enable or disable MixPanel analytics.                     | `false`      |
-| `VITE_WEB_MIX_PANEL_TOKEN`           | MixPanel authentication token.                                    | `N/A`        |
-| `VITE_WEB_SPARROW_SUPPORT_EMAIL`     | Support email for Sparrow Web service inquiries.                  | `support@sparrowapp.dev` |
-| `VITE_WEB_AUTH_URL`                   | URL for the authentication service.                               | `N/A`        |
-| `VITE_WEB_SPARROW_GITHUB`            | GitHub repository link for Sparrow Web.                          | `https://github.com/sparrowapp-dev` |
-| `VITE_WEB_SPARROW_LINKEDIN`          | LinkedIn showcase page for Sparrow Web.                          | `https://www.linkedin.com/showcase/sparrow-app/` |
-| `VITE_WEB_SPARROW_DOWNLOAD_LINK`     | URL to download Sparrow Web releases.                            | `https://github.com/sparrowapp-dev/sparrow-app/releases` |
-| `VITE_WEB_RELEASE_NOTES_PAT_TOKEN`   | Personal Access Token (PAT) for fetching release notes.          | `N/A`        |
-| `VITE_WEB_RELEASE_NOTES_API`         | API endpoint for fetching release notes from GitHub.             | `https://api.github.com/repos/sparrowapp-dev/sparrow-app/releases` |
-| `VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING` | Azure Application Insights connection string.           | `N/A`        |
-| `VITE_WEB_CANNY_API`                 | API key for integrating with Canny feedback system.              | `N/A`        |
-| `VITE_WEB_CANNY_URL`                 | Canny feedback system URL.                                       | `N/A`        |
-| `VITE_WEB_SPARROW_DOCS`              | URL to Sparrow Web documentation.                               | `https://docs.sparrowapp.dev/docs/intro` |
-| `VITE_WEB_PROXY_SERVICE`             | URL for the Sparrow Proxy service.                              | `http://localhost:3000` |
-
+| Variable Name                               | Description                                             | Default Value                                                      |
+| ------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------ |
+| `VITE_WEB_API_URL`                          | Base URL for the Sparrow Web API.                       | `N/A`                                                              |
+| `VITE_WEB_BASE_URL`                         | Base URL for the Sparrow Web service.                   | `N/A`                                                              |
+| `VITE_WEB_API_TIMEOUT`                      | Timeout duration for API requests in milliseconds.      | `7000`                                                             |
+| `VITE_WEB_ENABLE_MIX_PANEL`                 | Flag to enable or disable MixPanel analytics.           | `false`                                                            |
+| `VITE_WEB_MIX_PANEL_TOKEN`                  | MixPanel authentication token.                          | `N/A`                                                              |
+| `VITE_WEB_SPARROW_SUPPORT_EMAIL`            | Support email for Sparrow Web service inquiries.        | `support@sparrowapp.dev`                                           |
+| `VITE_WEB_AUTH_URL`                         | URL for the authentication service.                     | `N/A`                                                              |
+| `VITE_WEB_SPARROW_GITHUB`                   | GitHub repository link for Sparrow Web.                 | `https://github.com/sparrowapp-dev`                                |
+| `VITE_WEB_SPARROW_LINKEDIN`                 | LinkedIn showcase page for Sparrow Web.                 | `https://www.linkedin.com/showcase/sparrow-app/`                   |
+| `VITE_WEB_SPARROW_DOWNLOAD_LINK`            | URL to download Sparrow Web releases.                   | `https://github.com/sparrowapp-dev/sparrow-app/releases`           |
+| `VITE_WEB_RELEASE_NOTES_PAT_TOKEN`          | Personal Access Token (PAT) for fetching release notes. | `N/A`                                                              |
+| `VITE_WEB_RELEASE_NOTES_API`                | API endpoint for fetching release notes from GitHub.    | `https://api.github.com/repos/sparrowapp-dev/sparrow-app/releases` |
+| `VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING` | Azure Application Insights connection string.           | `N/A`                                                              |
+| `VITE_WEB_CANNY_API`                        | API key for integrating with Canny feedback system.     | `N/A`                                                              |
+| `VITE_WEB_CANNY_URL`                        | Canny feedback system URL.                              | `N/A`                                                              |
+| `VITE_WEB_SPARROW_DOCS`                     | URL to Sparrow Web documentation.                       | `https://docs.sparrowapp.dev/docs/intro`                           |
+| `VITE_WEB_PROXY_SERVICE`                    | URL for the Sparrow Proxy service.                      | `http://localhost:3000`                                            |
