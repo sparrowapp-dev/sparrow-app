@@ -2741,7 +2741,7 @@ class RestExplorerViewModel {
       if (!socketResponse) {
         Sentry.withScope((scope) => {
             scope.setTag("emailId", userEmail);
-            scope.setTag("isAIError", true);
+            scope.setTag("errorType", "AI");
             Sentry.captureException("No response from Socket (web)");
         });
         Sentry.captureException("Socket Connection Break");
@@ -2775,7 +2775,7 @@ class RestExplorerViewModel {
             );
             Sentry.withScope((scope) => {
                 scope.setTag("emailId", userEmail);
-                scope.setTag("isAIError", true);
+                scope.setTag("errorType", "AI");
                 Sentry.captureException(`Socket Connection Break. Socket Status: ${event} RestExplorerPage.viewmodel(Web)`);   
             });
             await this.handleAIResponseError(
@@ -2887,7 +2887,7 @@ class RestExplorerViewModel {
     } catch (error) {
       Sentry.withScope((scope) => {
           scope.setTag("emailId", userEmail);
-          scope.setTag("isAIError", true);
+          scope.setTag("errorType", "AI");
           Sentry.captureException(`Error in websocket streaming ${error} RestExplorerPage.viewmodel(Web)`);
       });
       console.error("Something went wrong!:", error.message);

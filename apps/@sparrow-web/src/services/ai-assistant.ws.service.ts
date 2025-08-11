@@ -349,7 +349,7 @@ export class AiAssistantWebSocketService {
       Sentry.withScope((scope) => {
           scope.setTag("emailId", userEmail);
           scope.setExtra("userPrompt", prompt);
-          scope.setTag("isAIError", true);
+          scope.setTag("errorType", "AI");
           Sentry.captureException("WebSocket not connected, cannot send message ai-assistant.ws.service(Web)");
       });
       console.error("WebSocket not connected, cannot send message");
@@ -363,7 +363,7 @@ export class AiAssistantWebSocketService {
       Sentry.withScope((scope) => {
           scope.setTag("emailId", userEmail);
           scope.setExtra("userPrompt", prompt);
-          scope.setTag("isAIError", true);
+          scope.setTag("errorType", "AI");
           Sentry.captureException(`Error sending message:${error} ai-assistant.ws.service(Web)`);
       });
       console.error("Error sending message:", error);
@@ -385,7 +385,7 @@ export class AiAssistantWebSocketService {
       Sentry.withScope((scope) => {
           scope.setTag("emailId", data.emailId);
           scope.setExtra("userPrompt", data.userInput);
-          scope.setTag("isAIError", true);
+          scope.setTag("errorType", "AI");
           Sentry.captureException("WebSocket not connected, cannot send message ai-assistant.ws.service(Web)-LLM");
       });
       console.error("WebSocket not connected, cannot send message");
@@ -402,7 +402,7 @@ export class AiAssistantWebSocketService {
       Sentry.withScope((scope) => {
           scope.setTag("emailId", data.emailId);
           scope.setExtra("userPrompt", data.userInput);
-          scope.setTag("isAIError", true);
+          scope.setTag("errorType", "AI");
           Sentry.captureException(`Error sending message:${error} ai-assistant.ws.service(web)-LLM`);
       });
       console.error("Error sending message:", error);
