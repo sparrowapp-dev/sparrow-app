@@ -24,7 +24,7 @@ import {
   type TeamDocument,
   type WorkspaceDocument,
 } from "../../database/database";
-import { clearAuthJwt, getClientUser } from "@app/utils/jwt";
+import { clearAuthJwt, getAuthJwt, getClientUser } from "@app/utils/jwt";
 import { userLogout } from "../../services/auth.service";
 import { FeatureSwitchService } from "../../services/feature-switch.service";
 import { FeatureSwitchRepository } from "../../repositories/feature-switch.repository";
@@ -101,7 +101,6 @@ export class DashboardViewModel {
   public get openTeam() {
     return this.teamRepository.getOpenTeam();
   }
-
 
   /**
    * @description - get recent visited public workspace list from local db
@@ -234,7 +233,7 @@ export class DashboardViewModel {
           invites,
           isNewInvite,
           isOpen: isOpenTeam,
-          billing
+          billing,
         };
         data.push(item);
       }
@@ -422,7 +421,8 @@ export class DashboardViewModel {
     return;
   };
   public onAdminRedirect = async () => {
-    await open(`${constants.ADMIN_URL}`);
+    const [authToken] = getAuthJwt();
+    await open(`${constants.ADMIN_URL}/hubs?xid=${authToken}`);
     return;
   };
   /**
@@ -1302,8 +1302,10 @@ export class DashboardViewModel {
   };
 
   public handleRedirectToAdminPanel = async (teamId: string) => {
+    const [authToken] = getAuthJwt();
     window.open(
-      constants.ADMIN_URL + `/billing/billingOverview/${teamId}`,
+      constants.ADMIN_URL +
+        `/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
       "_blank",
     );
     return;
