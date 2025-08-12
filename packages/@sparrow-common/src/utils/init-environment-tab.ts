@@ -48,6 +48,10 @@ class InitEnvironmentTab {
         collectionId: "",
         collectionName: "",
       },
+      isGenerateVariableAccepted: false,
+      isGenerateVariableEmpty: false,
+      isGenerateVariableLoading: false,
+      isGenerateVariableRejected: false,
       isSaved: true,
       index: 0,
       isActive: true,
@@ -85,6 +89,9 @@ class InitEnvironmentTab {
     this._tab.property.environment.variable = _variable;
     return this;
   }
+  public setAiVariable(_variable) {
+    this._tab.property.environment.aiVariable = _variable;
+  }
 
   public setType(_type: string) {
     this._tab.property.environment.type = _type;
@@ -100,6 +107,22 @@ class InitEnvironmentTab {
   ) {
     this._tab.generateProperty.collectionId = _generatingCollectionId;
     this._tab.generateProperty.collectionName = _generatingCollectionName;
+    return this;
+  }
+  public setGenerateVariableAccepted(_type: boolean) {
+    this._tab.isGenerateVariableAccepted = _type;
+    return this;
+  }
+  public setGenerateVariableEmpty(_type: boolean) {
+    this._tab.isGenerateVariableEmpty = _type;
+    return this;
+  }
+  public setGenerateVariableLoading(_type: boolean) {
+    this._tab.isGenerateVariableLoading = _type;
+    return this;
+  }
+  public setGenerateVariableRejected(_type: boolean) {
+    this._tab.isGenerateVariableRejected = _type;
     return this;
   }
 }

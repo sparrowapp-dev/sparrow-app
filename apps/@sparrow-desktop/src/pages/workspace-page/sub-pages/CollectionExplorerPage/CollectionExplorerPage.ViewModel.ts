@@ -2240,8 +2240,9 @@ class CollectionExplorerPage {
       .setType(environmentType.GLOBAL)
       .setVariable(environment?.variable)
       .setGenerativeVariables(true)
+      .setGenerateVariableLoading(true)
       .setGenerativeProperties(collectionId, collectionName);
-    initEnvironmentTab.setTabType(TabPersistenceTypeEnum.TEMPORARY);
+    initEnvironmentTab.setTabType(TabPersistenceTypeEnum.PERMANENT);
     this.tabRepository.createTab(initEnvironmentTab.getValue());
     scrollToTab(initEnvironmentTab.getValue().id);
   };

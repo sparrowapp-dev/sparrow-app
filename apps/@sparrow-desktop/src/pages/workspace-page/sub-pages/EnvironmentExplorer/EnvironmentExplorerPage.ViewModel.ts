@@ -96,7 +96,12 @@ export class EnvironmentExplorerViewModel {
       checked: true,
     }));
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.environment.aiVariable = newVariables;
+    if (aiVariables.length < 1) {
+      progressiveTab.isGenerateVariableEmpty = true;
+    } else {
+      progressiveTab.property.environment.aiVariable = newVariables;
+    }
+    progressiveTab.isGenerateVariableLoading = false;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -192,16 +197,17 @@ export class EnvironmentExplorerViewModel {
   public updateGeneratedVariables = async (
     _variable: any,
     aiVariables?: any,
+    acceptAll?: boolean,
   ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const envTab = createDeepCopy(progressiveTab);
     envTab.property.environment.aiVariable = aiVariables;
     envTab.property.environment.variable = _variable;
+    if (acceptAll && aiVariables.length < 1) {
+      envTab.isGenerateVariableAccepted = true;
+    }
     this.tab = envTab;
-    await this.tabRepository.updateTab(progressiveTab as string, {
-      property: envTab.property,
-      isSaved: envTab.isSaved,
-    });
+    await this.tabRepository.updateTab(envTab.tabId, envTab);
     return;
   };
 
@@ -326,8 +332,6 @@ export class EnvironmentExplorerViewModel {
   public getGenerateVariables = async (
     env: any,
   ): Promise<{ [key: string]: any }> => {
-    console.log("this is the env for it -", env);
-
     return new Promise((resolve) => {
       setTimeout(() => {
         const response = [

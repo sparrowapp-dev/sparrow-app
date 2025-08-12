@@ -3,15 +3,21 @@
   import { TabularInputV2 } from "../../../components";
   import GenerateVariablesLoading from "../components/GenerateVariablesLoading.svelte";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
+  import { ChevronDownRegular, ChevronUpRegular } from "@sparrow/library/icons";
   export let currentEnvironment: any;
   export let generatedVariables: KeyValuePair[] = [];
+  export let onClickGenerateVariable: (type?: string, index?: number) => void;
   export let isReGenerateVariable: boolean = false;
-  export let isLoadingVariables: boolean = true;
-  export let isAcceptedVariables: boolean = false;
   export let updateGeneratedVariables: (
-    globalPairs: { key: string; value: string }[],
-    updatedPairs: { key: string; value: string }[],
+    globalPairs: KeyValuePair[],
+    updatedPairs: KeyValuePair[],
+    acceptAll?: boolean,
   ) => void;
+  let showMoreInfo = false;
+
+  function toggleMoreInfo() {
+    showMoreInfo = !showMoreInfo;
+  }
 
   const onChangeGeneratedVariable = (pairs: any) => {
     generatedVariables = pairs;
@@ -20,8 +26,6 @@
       pairs,
     );
   };
-
-  export let onClickGenerateVariable: (type?: string, index?: number) => void;
 </script>
 
 <div class="flex flex-column" style="margin-top: 12px;">
@@ -75,7 +79,89 @@
         </div>
       </div>
     </div>
-  {:else if isAcceptedVariables}
+  {:else if currentEnvironment?.isGenerateVariableEmpty}
+    <div class="d-flex flex-column">
+      <div class="" style="margin-top: 16px; margin-bottom:12px;">
+        <TabularInputV2
+          disabled={false}
+          keyValue={[]}
+          callback={() => {}}
+          search={""}
+          isGeneratedVariable={true}
+          isCheckBoxNotRequired={true}
+        />
+      </div>
+      <div
+        class="d-flex flex-column justify-content-center align-items-center"
+        style="margin-top: 2px;"
+      >
+        <p
+          class="d-flex justify-content-center align-items-center common-text title-text"
+          style="margin: 0px;"
+        >
+          Nothing to Suggest
+        </p>
+        <p
+          class="d-flex justify-content-center align-items-center common-text description-text"
+        >
+          We scanned the "Manage Pets" collection and didn't find any repeating
+          values to suggest as
+        </p>
+        <p
+          class="d-flex justify-content-center align-items-center common-text description-text"
+        >
+          variables. This means your collection is already well-organized.
+          <Button
+            type="link-primary"
+            onClick={toggleMoreInfo}
+            title="More Info"
+            size="small"
+            endIcon={showMoreInfo ? ChevronUpRegular : ChevronDownRegular}
+          />
+        </p>
+        {#if showMoreInfo}
+          <div
+            class="d-flex flex-column justify-content-center align-items-center"
+            style="
+        border: 0.5px solid var(--border-ds-neutral-100);
+        border-radius: 10px;
+        background-color: var(--bg-ds-surface-800);
+        width:770px;
+      "
+          >
+            <ul
+              class="common-text description-text"
+              style="margin-bottom: 5px;"
+            >
+              <li>
+                Using a common URL across your requests is the number one way
+                for Sparrow to spot a potential variable.
+              </li>
+              <li>
+                If your collection includes APIs from different services,
+                consider splitting them into separate collections for more
+                accurate suggestions within the same workspace.
+              </li>
+              <li>
+                Our documentation has a full guide on how this feature works and
+                how you can use it.
+                <a href="#" style="color: var(--text-ds-primary-300);"
+                  >See How It Works</a
+                >
+              </li>
+              <li>
+                Have an idea on how to make this feature better? We'd love to
+                hear from you.
+                <a href="#" style="color: var(--text-ds-primary-300);"
+                  >Help Us Improve</a
+                >
+              </li>
+            </ul>
+          </div>
+        {/if}
+      </div>
+    </div>
+  {:else if currentEnvironment?.isGenerateVariableAccepted}
     <div class="d-flex flex-column">
       <div class="" style="margin-top: 16px; margin-bottom:12px;">
         <TabularInputV2
@@ -98,13 +184,18 @@
           class="d-flex justify-content-center align-items-center common-text description-text"
         >
           Accepted suggestions have been added to your 'Global Variables'
-          environment. Click on Save button to apply these changes permanently.
+          environment. Click
+        </p>
+        <p
+          class="d-flex justify-content-center align-items-center common-text description-text"
+        >
+          on Save button to apply these changes permanently.
         </p>
       </div>
     </div>
   {:else}
     <div>
-      {#if isLoadingVariables}
+      {#if currentEnvironment?.isGenerateVariableLoading}
         <div class="d-flex flex-column">
           <div class="" style="margin-top: 16px; margin-bottom:12px;">
             <TabularInputV2
