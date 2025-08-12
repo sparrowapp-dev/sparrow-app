@@ -40,7 +40,12 @@
     "",
     "",
   ];
-
+  $: {
+    selectedFilter;
+    searchQuery;
+    filterText;
+    currPage = 1;
+  }
   function handleSortToggle(field) {
     if (currentSortField === field) {
       isAscending = !isAscending;
