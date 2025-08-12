@@ -288,6 +288,7 @@ export class EnvironmentExplorerViewModel {
       );
       const progressiveTab = this._tab.getValue();
       progressiveTab.isSaved = true;
+      progressiveTab.generateVariable = false;
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
       await this.updateEnvironmentState({
