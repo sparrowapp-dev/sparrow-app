@@ -536,9 +536,6 @@ export class RxDB {
           3: function (oldDoc: EnvironmentDocument) {
             return oldDoc;
           },
-          4: function (oldDoc: EnvironmentDocument) {
-            return oldDoc;
-          },
         },
       },
       testflow: {
@@ -639,6 +636,9 @@ export class RxDB {
             return oldDoc;
           },
           3: function (oldDoc: EnvironmentTabDocument) {
+            return oldDoc;
+          },
+          4: function (oldDoc: EnvironmentTabDocument) {
             return oldDoc;
           },
         },
