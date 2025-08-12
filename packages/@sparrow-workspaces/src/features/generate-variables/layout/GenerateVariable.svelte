@@ -13,15 +13,7 @@
     updatedPairs: { key: string; value: string }[],
   ) => void;
 
-  const onChangeGeneratedVariable = (pairs: any) => {
-    generatedVariables = pairs;
-    updateGeneratedVariables(
-      currentEnvironment?.property?.environment?.variable,
-      pairs,
-    );
-  };
-
-  export let onClickGenerateVariable: (type?: string, index?: number) => void;
+  export let onUpdateVariableSelection;
 </script>
 
 <div class="flex flex-column" style="margin-top: 12px;">
@@ -68,7 +60,7 @@
         <div class="d-flex justify-content-center" style="margin-top: 30px;">
           <Button
             type="outline-primary"
-            onClick={async () => await onClickGenerateVariable("regenerate")}
+            onClick={async () => await onUpdateVariableSelection("regenerate")}
             title="Re-Generate Variables"
             size="medium"
           />
@@ -125,10 +117,10 @@
           <TabularInputV2
             disabled={false}
             keyValue={generatedVariables}
-            callback={onChangeGeneratedVariable}
+            callback={updateGeneratedVariables}
             search={""}
             isGeneratedVariable={true}
-            {onClickGenerateVariable}
+            {onUpdateVariableSelection}
           />
         </div>
       {/if}

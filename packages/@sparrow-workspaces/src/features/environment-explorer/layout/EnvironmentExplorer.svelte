@@ -51,12 +51,12 @@
     globalPairs: { key: string; value: string }[],
     updatedPairs: { key: string; value: string }[],
   ) => void;
+  export let onUpdateVariableSelection;
   export let userRole;
 
   let isLoadingVariables: boolean = false;
   let isReGenerateVariable: boolean = false;
   let isAcceptedVariables: boolean = false;
-  let generatedVariables: KeyValuePair[] = [];
   let isPopoverContainer = false;
 
   let quickHelp: boolean = false;
@@ -68,13 +68,6 @@
       environmentName = $currentEnvironment?.name || "";
 
       isLoadingVariables = false;
-    }
-    const existingAiVariables =
-      $currentEnvironment?.property?.environment?.aiVariable;
-    if (existingAiVariables && existingAiVariables.length > 0) {
-      generatedVariables = [...existingAiVariables];
-    } else {
-      generatedVariables = [];
     }
   }
 
@@ -128,7 +121,6 @@
       const response = await onGenerateVariables($currentEnvironment);
       if (response && response.length > 0) {
         isReGenerateVariable = !isReGenerateVariable;
-        generatedVariables = [...response];
       }
     } catch (error) {
       console.error("Error generating variables:", error);
@@ -153,58 +145,6 @@
       }
     }
   }
-
-  const onClickGenerateVariable = async (type?: string, index?: number) => {
-    if (type === "regenerate") {
-      await handleGenerateVariable();
-      return;
-    }
-    if (type === "accept" && typeof index === "number") {
-      try {
-        const foundIndex = generatedVariables.findIndex((_, i) => i === index);
-        if (foundIndex !== -1) {
-          const foundObject = generatedVariables[foundIndex];
-          const currentPairs =
-            $currentEnvironment.property?.environment?.variable || [];
-          const updatedPairs = [...currentPairs];
-          if (updatedPairs.length > 0) {
-            updatedPairs.splice(updatedPairs.length - 1, 0, foundObject);
-          } else {
-            updatedPairs.push(foundObject);
-          }
-          const remainingGeneratedVariables = generatedVariables.filter(
-            (_, i) => i !== foundIndex,
-          );
-          updateGeneratedVariables(updatedPairs, remainingGeneratedVariables);
-          generatedVariables = [...remainingGeneratedVariables];
-          onUpdateVariable(updatedPairs);
-        }
-      } catch (error) {
-        console.error("Error accepting generated variable:", error);
-      }
-    } else if (type === "accept-all") {
-      try {
-        const currentPairs =
-          $currentEnvironment.property?.environment?.variable || [];
-        const updatedPairs = [...currentPairs];
-        if (updatedPairs.length > 0) {
-          updatedPairs.splice(
-            updatedPairs.length - 1,
-            0,
-            ...generatedVariables,
-          );
-        } else {
-          updatedPairs.push(...generatedVariables);
-        }
-        updateGeneratedVariables(updatedPairs, []);
-        generatedVariables = [];
-        onUpdateVariable(updatedPairs);
-        isAcceptedVariables = true;
-      } catch (error) {
-        console.error("Error accepting all generated variables:", error);
-      }
-    }
-  };
 
   onDestroy(() => {
     window.removeEventListener("keydown", handleKeyDown);
@@ -368,11 +308,12 @@
             <GenerateVariables
               {isLoadingVariables}
               currentEnvironment={$currentEnvironment}
-              bind:generatedVariables
+              generatedVariables={$currentEnvironment?.property?.environment
+                ?.aiVariable}
               bind:isReGenerateVariable
               {isAcceptedVariables}
-              {onClickGenerateVariable}
               {updateGeneratedVariables}
+              {onUpdateVariableSelection}
             />
           </div>
         {/if}
