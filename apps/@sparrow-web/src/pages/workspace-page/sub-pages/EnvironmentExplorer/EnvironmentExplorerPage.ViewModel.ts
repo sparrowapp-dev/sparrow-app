@@ -4,7 +4,7 @@ import { WorkspaceRepository } from "../../../../repositories/workspace.reposito
 import { EnvironmentService } from "../../../../services/environment.service";
 import { Events } from "@sparrow/common/enums";
 import { environmentType } from "@sparrow/common/enums/environment.enum";
-import { createDeepCopy } from "@sparrow/common/utils";
+import { createDeepCopy, Sleep } from "@sparrow/common/utils";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { BehaviorSubject, type Observable } from "rxjs";
 import { GuideRepository } from "../../../../repositories/guide.repository";
@@ -30,6 +30,7 @@ export class EnvironmentExplorerViewModel {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         this.tab = t;
+        this.getGenerateVariables();
       }, 0);
     }
   }
@@ -179,7 +180,7 @@ export class EnvironmentExplorerViewModel {
 
     public updateVariableSelection = async (type?: string, index?: number) => {
     if (type === "regenerate") {
-      await this.getGenerateVariables();
+      await this.reGenerateVariables();
       return;
     }
     if (type === "accept" && typeof index === "number") {
@@ -202,23 +203,31 @@ export class EnvironmentExplorerViewModel {
           );
           this.updateGeneratedVariables(remainingGeneratedVariables);
           this.updateVariables(updatedPairs);
-
-          // 
+          // console.log()
+          if(!remainingGeneratedVariables?.length){
+          await  this.updateEnvironmentAiVariableGenerationStatus("accepted");
+          }
 
         }
       } catch (error) {
         console.error("Error accepting generated variable:", error);
       }
+    }
+    else if (type === "reject" && typeof index === "number") {
+        const progressiveTab = createDeepCopy(this._tab.getValue());
+          const remainingGeneratedVariables = progressiveTab.property.environment.aiVariable;
+          if(!remainingGeneratedVariables?.length){
+          await  this.updateEnvironmentAiVariableGenerationStatus("rejected");
+        }
     } else if (type === "accept-all") {
-       const progressiveTab = createDeepCopy(this._tab.getValue());
-       progressiveTab.property.environment.variable = [...progressiveTab.property.environment.variable, ...progressiveTab.property.environment.aiVariable, {
-        key: "",
-        value: "",
-        checked: true,
-       } ];
-       progressiveTab.property.environment.aiVariable = [];
-      this.tab = progressiveTab;
-      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+        const progressiveTab = createDeepCopy(this._tab.getValue());
+        await this.updateVariables([...progressiveTab.property.environment.variable, ...progressiveTab.property.environment.aiVariable, {
+          key: "",
+          value: "",
+          checked: true,
+        } ]);
+        await this.updateEnvironmentAiVariableGenerationStatus("accepted");
+        await this.updateGeneratedVariables([]);
     }
   };
 
@@ -226,13 +235,9 @@ export class EnvironmentExplorerViewModel {
     aiVariables?: any,
   ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    const envTab = createDeepCopy(progressiveTab);
-    envTab.property.environment.aiVariable = aiVariables;
-    this.tab = envTab;
-    await this.tabRepository.updateTab(progressiveTab as string, {
-      property: envTab.property,
-      isSaved: envTab.isSaved,
-    });
+    progressiveTab.property.environment.aiVariable = aiVariables;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     return;
   };
 
@@ -350,43 +355,149 @@ export class EnvironmentExplorerViewModel {
     return await this.workspaceRepository.getActiveWorkspaceDoc();
   };
 
+
+  public updateEnvironmentAiVariableGenerationStatus = async (_status) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.aiGenerationStatus = _status;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  };
+
+
+
   /**
    * Handle create generative variables for a collection.
    * @param collectionId :CollectionId - the collection in which new request is going to be created
    * @returns :void
    */
   public getGenerateVariables = async (
-    env: any,
-  ): Promise<{ [key: string]: any }> => {
-    console.log("this is the env for it -", env);
+  ) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if(progressiveTab.generateVariable && progressiveTab.aiGenerationStatus === "") {
+      this.updateEnvironmentAiVariableGenerationStatus("generating"); 
+      const response = [
+            {
+              key: "name",
+              value: "world",
+              checked: false,
+            },
+            {
+              key: "sample-my-one", 
+              value: "test",
+              checked: false,
+            },
+            {
+              key: "sample-1",
+              value: "test-1",
+              checked: false,
+            },
+            {
+              key: "sample-2",
+              value: "test-2",
+              checked: false,
+            },
+              {
+              key: "name",
+              value: "world",
+              checked: false,
+            },
+            {
+              key: "sample-my-one", 
+              value: "test",
+              checked: false,
+            },
+            {
+              key: "sample-1",
+              value: "test-1",
+              checked: false,
+            },
+            {
+              key: "sample-2",
+              value: "test-2",
+              checked: false,
+            },
+              {
+              key: "name",
+              value: "world",
+              checked: false,
+            },
+            {
+              key: "sample-my-one", 
+              value: "test",
+              checked: false,
+            },
+            {
+              key: "sample-1",
+              value: "test-1",
+              checked: false,
+            },
+            {
+              key: "sample-2",
+              value: "test-2",
+              checked: false,
+            },
+              {
+              key: "name",
+              value: "world",
+              checked: false,
+            },
+            {
+              key: "sample-my-one", 
+              value: "test",
+              checked: false,
+            },
+            {
+              key: "sample-1",
+              value: "test-1",
+              checked: false,
+            },
+            {
+              key: "sample-2",
+              value: "test-2",
+              checked: false,
+            },
+          ];
+          
+          await new Sleep().setTime(2000).exec();
+        await this.updateEnvironmentAiVariableGenerationStatus("generated");
+          await this.updateGeneratedVariables(response);
+    }
+    };
 
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const response = [
-          {
-            key: "name",
-            value: "world",
-            checked: false,
-          },
-          {
-            key: "sample-my-one",
-            value: "test",
-            checked: false,
-          },
-          {
-            key: "sample-1",
-            value: "test-1",
-            checked: false,
-          },
-          {
-            key: "sample-2",
-            value: "test-2",
-            checked: false,
-          },
-        ];
-        this.updateGeneratedVariables(response);
-        resolve(response);
-      }, 3000);
-    });
-  };
+     /**
+   * Handle create generative variables for a collection.
+   * @param collectionId :CollectionId - the collection in which new request is going to be created
+   * @returns :void
+   */
+  public reGenerateVariables = async (
+  ) => {
+    this.updateEnvironmentAiVariableGenerationStatus("generating"); 
+      const response = [
+            {
+              key: "name",
+              value: "world",
+              checked: false,
+            },
+            {
+              key: "sample-my-one", 
+              value: "test",
+              checked: false,
+            },
+            {
+              key: "sample-1",
+              value: "test-1",
+              checked: false,
+            },
+            {
+              key: "sample-2",
+              value: "test-2",
+              checked: false,
+            },
+          ];
+          
+          await new Sleep().setTime(2000).exec();
+        await this.updateEnvironmentAiVariableGenerationStatus("generated");
+          await this.updateGeneratedVariables(response);
+    
+    };
 }

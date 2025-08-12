@@ -172,7 +172,7 @@
       </p>
     </div>
     <div class="pe-1 d-flex">
-      {#if isGeneratedVariable}
+      {#if isGeneratedVariable && pairs.length > 0}
         <button
           class="border-0 d-flex text-nowrap generate-action-button common-text align-items-center"
           on:click={onUpdateVariableSelection("accept-all")}>Accept All</button
@@ -324,7 +324,6 @@
                     class="generate-action-button accept"
                     on:click|stopPropagation={() => {
                       onUpdateVariableSelection("accept", index);
-                      // deletePairs(index);
                     }}
                   >
                     <CheckMarkIcon
@@ -336,6 +335,7 @@
                     class="generate-action-button reject"
                     on:click|stopPropagation={() => {
                       deletePairs(index);
+                      onUpdateVariableSelection("reject", index);
                     }}
                   >
                     <DismissRegular

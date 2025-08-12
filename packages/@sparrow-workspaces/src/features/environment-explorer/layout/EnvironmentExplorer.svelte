@@ -46,7 +46,6 @@
 
   export let onFetchEnvironmentGuide: (query) => void;
   export let onUpdateEnvironmentGuide: (query, isActive) => void;
-  export let onGenerateVariables: (collectionId: string) => any;
   export let updateGeneratedVariables: (
     globalPairs: { key: string; value: string }[],
     updatedPairs: { key: string; value: string }[],
@@ -54,9 +53,6 @@
   export let onUpdateVariableSelection;
   export let userRole;
 
-  let isLoadingVariables: boolean = false;
-  let isReGenerateVariable: boolean = false;
-  let isAcceptedVariables: boolean = false;
   let isPopoverContainer = false;
 
   let quickHelp: boolean = false;
@@ -66,8 +62,6 @@
   $: {
     if ($currentEnvironment) {
       environmentName = $currentEnvironment?.name || "";
-
-      isLoadingVariables = false;
     }
   }
 
@@ -114,37 +108,6 @@
     }
     window.addEventListener("keydown", handleKeyDown);
   });
-
-  const handleGenerateVariable = async () => {
-    isLoadingVariables = true;
-    try {
-      const response = await onGenerateVariables($currentEnvironment);
-      if (response && response.length > 0) {
-        isReGenerateVariable = !isReGenerateVariable;
-      }
-    } catch (error) {
-      console.error("Error generating variables:", error);
-    } finally {
-      isLoadingVariables = false;
-    }
-  };
-
-  // Improved reactive statement with single call protection
-  $: {
-    const currentEnv = $currentEnvironment;
-    if (currentEnv?.generateVariable && !isLoadingVariables) {
-      const existingAiVariables = currentEnv?.property?.environment?.aiVariable;
-
-      if (
-        !existingAiVariables ||
-        (existingAiVariables.length === 0 &&
-          !isReGenerateVariable &&
-          !isAcceptedVariables)
-      ) {
-        handleGenerateVariable();
-      }
-    }
-  }
 
   onDestroy(() => {
     window.removeEventListener("keydown", handleKeyDown);
@@ -303,15 +266,13 @@
           <!-- Generate Variable Section -->
           <div
             class="generate-variable-container"
-            style="flex: 1; min-height: 0;"
+            style="flex: 1; min-height: 0; overflow: auto;"
           >
             <GenerateVariables
-              {isLoadingVariables}
               currentEnvironment={$currentEnvironment}
               generatedVariables={$currentEnvironment?.property?.environment
                 ?.aiVariable}
-              bind:isReGenerateVariable
-              {isAcceptedVariables}
+              aiGenerationStatus={$currentEnvironment?.aiGenerationStatus}
               {updateGeneratedVariables}
               {onUpdateVariableSelection}
             />
