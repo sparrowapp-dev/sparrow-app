@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   # MongoDB
@@ -6,21 +6,6 @@ services:
     image: mongo:7.0
     ports:
       - "27017:27017"
-    env_file:
-      - .env.docker-setup
-    networks:
-      - localnet
-
-  # Kafka
-  kafka:
-    image: bitnami/kafka:3.4.1
-    hostname: kafka
-    ports:
-      - "9092:9092" # Broker listener
-      - "9093:9093" # Controller listener
-      - "9094:9094" # External listener
-    volumes:
-      - "kafka_data:/bitnami"
     env_file:
       - .env.docker-setup
     networks:
@@ -38,7 +23,6 @@ services:
       - localnet
     depends_on:
       - mongo
-      - kafka
     env_file:
       - .env.docker-setup
 
@@ -55,7 +39,6 @@ services:
     depends_on:
       - sparrow-api
       - mongo
-      - kafka
     env_file:
       - .env.docker-setup
     command: >-
@@ -115,7 +98,6 @@ services:
       - sparrow-api
       - sparrow-auth
       - mongo
-      - kafka
 
   # Nginx Reverse Proxy with SSL
   nginx-proxy:
