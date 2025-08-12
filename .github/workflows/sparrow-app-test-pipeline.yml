@@ -160,30 +160,30 @@ jobs:
 
 
       # --- STAGE 4: CONVERT TO MSIX USING MAKEAPPX ---
-      # - name: Prepare App Folder for MakeAppx
-      #   run: |
-      #     New-Item -ItemType Directory -Force -Path "app-root/Assets"
-      #     $msiPath = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
-      #     $extractPath = "app-root"
-      #     Start-Process msiexec.exe -ArgumentList "/a `"$msiPath`" /qn TARGETDIR=`"$extractPath`"" -Wait -NoNewWindow
+      - name: Prepare App Folder for MakeAppx
+        run: |
+          New-Item -ItemType Directory -Force -Path "app-root/Assets"
+          $msiPath = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
+          $extractPath = "app-root"
+          Start-Process msiexec.exe -ArgumentList "/a `"$msiPath`" /qn TARGETDIR=`"$extractPath`"" -Wait -NoNewWindow
 
-      #     #Copy app executable (MakeAppx requires it)
-      #     $exeSource = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug" -Filter "Sparrow.exe" -Recurse | Select-Object -First 1
-      #     if ($exeSource) {
-      #       Copy-Item $exeSource.FullName -Destination "app-root/Sparrow.exe"
-      #     } else {
-      #       Write-Host "::warning::Real Sparrow.exe not found. Inserting dummy executable."
-      #       Set-Content -Path "app-root/Sparrow.exe" -Value "placeholder"
-      #     }
+          #Copy app executable (MakeAppx requires it)
+          $exeSource = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug" -Filter "Sparrow.exe" -Recurse | Select-Object -First 1
+          if ($exeSource) {
+            Copy-Item $exeSource.FullName -Destination "app-root/Sparrow.exe"
+          } else {
+            Write-Host "::warning::Real Sparrow.exe not found. Inserting dummy executable."
+            Set-Content -Path "app-root/Sparrow.exe" -Value "placeholder"
+          }
 
-      #      # Copy actual StoreLogo from known path
-      #     $logo = "apps/@sparrow-desktop/src-tauri/icons/StoreLogo.png"
-      #     Copy-Item $logo -Destination "app-root/Assets/StoreLogo.png"
-      #     Copy-Item $logo -Destination "app-root/Assets/Square150x150Logo.png"
-      #     Copy-Item $logo -Destination "app-root/Assets/Square44x44Logo.png"
-      #     Copy-Item $logo -Destination "app-root/Assets/SplashScreen.png"
+           # Copy actual StoreLogo from known path
+          $logo = "apps/@sparrow-desktop/src-tauri/icons/StoreLogo.png"
+          Copy-Item $logo -Destination "app-root/Assets/StoreLogo.png"
+          Copy-Item $logo -Destination "app-root/Assets/Square150x150Logo.png"
+          Copy-Item $logo -Destination "app-root/Assets/Square44x44Logo.png"
+          Copy-Item $logo -Destination "app-root/Assets/SplashScreen.png"
 
-      #   shell: powershell
+        shell: powershell
 
       - name: Ensure app-root directory exists
         run: |
