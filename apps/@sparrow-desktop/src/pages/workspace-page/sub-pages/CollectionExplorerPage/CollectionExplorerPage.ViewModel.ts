@@ -77,6 +77,7 @@ class CollectionExplorerPage {
   private environmentRepository = new EnvironmentRepository();
   private environmentService = new EnvironmentService();
   private guestUserRepository = new GuestUserRepository();
+  private initTab = new InitTab();
 
   // Private Services
   private collectionService = new CollectionService();
