@@ -39,7 +39,7 @@ import {
   search,
 } from "@codemirror/search";
 import { lintKeymap, linter } from "@codemirror/lint";
-import { json, jsonLanguage, jsonParseLinter } from "@codemirror/lang-json";
+import { json5, json5ParseLinter, json5Language } from "codemirror-json5";
 import {
   jsonSchemaLinter,
   jsonSchemaHover,
@@ -459,14 +459,13 @@ export const basicSetup: Extension = getBasicSetup();
 
 export const jsonSetup: Extension = [
   closeBrackets(),
-  json(),
-  linter(jsonParseLinter(), {
-    delay: 300,
-  }),
+  // Use JS mode with JSON dialect so comments are allowed
+  json5(),
+  linter(json5ParseLinter(), { delay: 300 }), // custom comment-friendly linter
   linter(jsonSchemaLinter(), {
     needsRefresh: handleRefresh,
   }),
-  jsonLanguage.data.of({
+  json5Language.data.of({
     autocomplete: jsonCompletion(),
   }),
   hoverTooltip(jsonSchemaHover()),
