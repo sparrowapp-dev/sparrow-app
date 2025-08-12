@@ -280,20 +280,20 @@ jobs:
 
           # Construct the App Installer XML
           $appInstallerContent = @"
-            <?xml version="1.0" encoding="utf-8"?>
-            <AppInstaller
-                xmlns="http://schemas.microsoft.com/appx/appinstaller/2017/2"
-                Version="1.0.0.0" # Version of the App Installer file itself
-                Uri="https://sparrow-assest.s3.us-east-1.amazonaws.com/windows/Sparrow.appinstaller"> # URI where the appinstaller file will be hosted
-                # URI where the signed MSIX package will be hosted
-                <UpdateSettings>
-                    <OnLaunch
-                        HoursBetweenUpdateChecks="0"
-                        UpdateBlocksActivation="true" />
-                    <AutomaticBackgroundTask />
-                </UpdateSettings>
-            </AppInstaller>
-            "@
+<?xml version="1.0" encoding="utf-8"?>
+<AppInstaller
+    xmlns="http://schemas.microsoft.com/appx/appinstaller/2017/2"
+    Version="1.0.0.0" # Version of the App Installer file itself
+    Uri="https://sparrow-assest.s3.us-east-1.amazonaws.com/windows/Sparrow.appinstaller"> # URI where the appinstaller file will be hosted
+    # URI where the signed MSIX package will be hosted
+    <UpdateSettings>
+        <OnLaunch
+            HoursBetweenUpdateChecks="0"
+            UpdateBlocksActivation="true" />
+        <AutomaticBackgroundTask />
+    </UpdateSettings>
+</AppInstaller>
+"@
           # Save the App Installer file
           Set-Content -Path "Sparrow.appinstaller" -Value $appInstallerContent
 
