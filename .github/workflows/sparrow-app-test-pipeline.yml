@@ -271,13 +271,12 @@ jobs:
         id: generate_appinstaller
         run: |
           # Get package info from the signed MSIX (Name, Publisher, Version, Architecture)
-          $packagePath = "Sparrow.msix"
-          $msixInfo = Get-AppxPackageManifest -Path $packagePath
-          $identityName = $msixInfo.Package.Identity.Name
-          $publisher = $msixInfo.Package.Identity.Publisher
-          $version = $msixInfo.Package.Identity.Version
-          $architecture = $msixInfo.Package.Identity.ProcessorArchitecture
-
+          $manifestPath = "app-root\AppxManifest.xml"
+          [xml]$manifest = Get-Content $manifestPath
+          $identityName = $manifest.Package.Identity.Name
+          $publisher = $manifest.Package.Identity.Publisher
+          $version = $manifest.Package.Identity.Version
+          $architecture = $manifest.Package.Identity.ProcessorArchitecture
 
           # Construct the App Installer XML
           $appInstallerContent = @"
