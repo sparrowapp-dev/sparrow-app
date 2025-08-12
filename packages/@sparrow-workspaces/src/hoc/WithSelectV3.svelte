@@ -25,9 +25,6 @@
    */
   export let disabled;
   $: ({ id, data, titleId, onclick, zIndex, disabled } = $$props);
-
-  export let minHeaderWidth = "50px";
-  export let minBodyWidth = "50px";
 </script>
 
 <Select
@@ -48,6 +45,6 @@
   menuItem={"v2"}
   headerFontSize={"10px"}
   isDropIconFilled={true}
-  {minHeaderWidth}
-  {minBodyWidth}
+  minHeaderWidth="115px"
+  minBodyWidth="115px"
 />

@@ -263,8 +263,6 @@
             onclick={handleTypeDropdown}
             zIndex={499}
             disabled={false}
-            minHeaderWidth="115px"
-            minBodyWidth="115px"
           />
         </span>
       {/if}
