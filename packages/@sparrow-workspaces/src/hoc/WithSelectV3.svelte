@@ -45,4 +45,6 @@
   menuItem={"v2"}
   headerFontSize={"10px"}
   isDropIconFilled={true}
+  minHeaderWidth="115px"
+  minBodyWidth="115px"
 />
