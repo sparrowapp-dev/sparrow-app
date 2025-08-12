@@ -49,6 +49,7 @@
   export let onUpdateEnvironment;
   export let onSyncCollection;
   export let isSharedWorkspace = false;
+  export let globalEnvInUse = null;
 
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
 
@@ -628,15 +629,17 @@
           <div style="margin-right: 8px;">
             <Tooltip
               title={"Generate Variables"}
-              subtext={"Use AI to quickly generate env variables by analyzing every API request in your collection."}
+              subtext={globalEnvInUse?.collectionName
+                ? `You're already generating variables for "${globalEnvInUse?.collectionName}"  collection. Please finish or close that task before starting another.`
+                : "Use AI to quickly generate env variables by analyzing every API request in your collection."}
               placement={"bottom-center"}
               size="medium"
             >
               <div
-                style="border: 2px solid var(--border-ds-primary-400); border-radius:8.5px;"
+                style={`${globalEnvInUse?.collectionName ? "" : "border: 2px solid var(--border-ds-primary-400); border-radius:8.5px;"} `}
               >
                 <Button
-                  disable={false}
+                  disable={globalEnvInUse?.collectionName ? true : false}
                   startIcon={SparkleFilled}
                   title={"Generate Variables"}
                   size="medium"

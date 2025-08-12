@@ -2257,6 +2257,17 @@ class CollectionExplorerPage {
     );
     return;
   };
+
+  public handleCheckGlobalVariableActive = async (globalEnvId: string) => {
+    const tab = await this.tabRepository.getTabById(globalEnvId);
+    if (tab) {
+      const reponse = {
+        collectionName: tab.toMutableJSON()?.generateProperty?.collectionName,
+      };
+      return reponse;
+    }
+    return;
+  };
 }
 
 export default CollectionExplorerPage;

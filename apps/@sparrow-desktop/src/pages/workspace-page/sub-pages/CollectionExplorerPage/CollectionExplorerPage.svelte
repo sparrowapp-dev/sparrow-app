@@ -140,6 +140,7 @@
   let currentWorkspaceId = "";
   let currentWorkspace;
   let globalEnvironment: any;
+  let globalEnvInUse: any = null;
 
   let activeWorkspaceSubscribe;
 
@@ -202,10 +203,17 @@
     }
   };
 
+  const handleCheckGlobalInUse = async () => {
+    globalEnvInUse = await _viewModel.handleCheckGlobalVariableActive(
+      globalEnvironment.id,
+    );
+  };
+
   $: {
     if (environmentId || $environments || currentWorkspaceId) {
       refreshEnvironment();
       handleFetchGlobalEnvironment();
+      handleCheckGlobalInUse();
     }
   }
 
@@ -243,4 +251,5 @@
   onDeleteAuthProfile={_viewModel.handleDeleteAuthProfile}
   onGenerateVariables={_viewModel.handleGenerateVariableTab}
   {globalEnvironment}
+  {globalEnvInUse}
 />
