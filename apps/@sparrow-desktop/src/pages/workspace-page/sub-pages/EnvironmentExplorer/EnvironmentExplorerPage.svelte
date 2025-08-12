@@ -68,4 +68,6 @@
   onFetchEnvironmentGuide={_viewModel.fetchEnvironmentGuide}
   onUpdateEnvironmentGuide={_viewModel.updateEnvironmentGuide}
   azureBlobCDN={constants.AZURE_CDN_URL}
+  onGenerateVariables={_viewModel.getGenerateVariables}
+  updateGeneratedVariables={_viewModel.updateGeneratedVariables}
 />
