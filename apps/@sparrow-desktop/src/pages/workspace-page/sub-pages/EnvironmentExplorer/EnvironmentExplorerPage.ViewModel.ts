@@ -89,6 +89,19 @@ export class EnvironmentExplorerViewModel {
     this.compareRequestWithServer();
   };
 
+  public updateGenerativeVariables = async (aiVariables?: any) => {
+    const newVariables = aiVariables.map(({ key, value }) => ({
+      key,
+      value,
+      checked: true,
+    }));
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.environment.aiVariable = newVariables;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
+  };
+
   /**
    * Compares the current environment tab with the server version and updates the saved status accordingly.
    * This method is debounced to reduce the number of server requests.
@@ -174,6 +187,22 @@ export class EnvironmentExplorerViewModel {
       return `${hubUrl}/${envSuffix}`;
     }
     return constants.API_URL;
+  };
+
+  public updateGeneratedVariables = async (
+    _variable: any,
+    aiVariables?: any,
+  ) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const envTab = createDeepCopy(progressiveTab);
+    envTab.property.environment.aiVariable = aiVariables;
+    envTab.property.environment.variable = _variable;
+    this.tab = envTab;
+    await this.tabRepository.updateTab(progressiveTab as string, {
+      property: envTab.property,
+      isSaved: envTab.isSaved,
+    });
+    return;
   };
 
   /**
@@ -287,5 +316,45 @@ export class EnvironmentExplorerViewModel {
    */
   public getWorkspace = async () => {
     return await this.workspaceRepository.getActiveWorkspaceDoc();
+  };
+
+  /**
+   * Handle create generative variables for a collection.
+   * @param collectionId :CollectionId - the collection in which new request is going to be created
+   * @returns :void
+   */
+  public getGenerateVariables = async (
+    env: any,
+  ): Promise<{ [key: string]: any }> => {
+    console.log("this is the env for it -", env);
+
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const response = [
+          {
+            key: "name",
+            value: "world",
+            checked: false,
+          },
+          {
+            key: "sample-my-one",
+            value: "test",
+            checked: false,
+          },
+          {
+            key: "sample-1",
+            value: "test-1",
+            checked: false,
+          },
+          {
+            key: "sample-2",
+            value: "test-2",
+            checked: false,
+          },
+        ];
+        this.updateGenerativeVariables(response);
+        resolve(response);
+      }, 3000);
+    });
   };
 }

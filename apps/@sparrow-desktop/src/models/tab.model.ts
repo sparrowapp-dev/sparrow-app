@@ -1053,6 +1053,24 @@ export const tabSchemaLiteral = {
                 required: ["key", "value", "checked"],
               },
             },
+            aIVariable: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  key: {
+                    type: "string",
+                  },
+                  value: {
+                    type: "string",
+                  },
+                  checked: {
+                    type: "boolean",
+                  },
+                },
+                required: ["key", "value", "checked"],
+              },
+            },
             type: {
               type: "string",
             },
@@ -1066,7 +1084,7 @@ export const tabSchemaLiteral = {
               required: ["isSaveInProgress"],
             },
           },
-          required: ["variable", "type", "state"],
+          required: ["variable", "aIVariable", "type", "state"],
         },
         websocket: {
           type: "object",

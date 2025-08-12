@@ -44,6 +44,24 @@ export const environmentTabSchemaLiteral = {
         },
       },
     },
+    aiVariable: {
+      type: "array",
+      default: [],
+      items: {
+        type: "object",
+        properties: {
+          key: {
+            type: "string",
+          },
+          value: {
+            type: "string",
+          },
+          checked: {
+            type: "boolean",
+          },
+        },
+      },
+    },
     type: {
       type: "string",
     },
