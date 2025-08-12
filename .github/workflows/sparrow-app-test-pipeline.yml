@@ -185,6 +185,10 @@ jobs:
 
       #   shell: powershell
 
+      - name: Ensure app-root directory exists
+        run: |
+          New-Item -ItemType Directory -Force -Path "app-root"
+        shell: pwsh      
       - name: Generate AppxManifest.xml with version injection
         shell: pwsh
         run: |
@@ -260,6 +264,8 @@ jobs:
           Write-Host "✅ Found MakeAppx.exe at: $($makeAppx.FullName)"
           & "$($makeAppx.FullName)" pack /d "app-root" /p $msixPath
         shell: powershell
+
+        
 
       - name: Generate App Installer File
         id: generate_appinstaller
