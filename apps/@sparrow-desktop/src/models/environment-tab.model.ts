@@ -8,7 +8,7 @@ export const environmentTabSchemaLiteral = {
   title: "environment",
   primaryKey: "environmentId",
   type: "object",
-  version: 3,
+  version: 4,
   properties: {
     // ---- RxDocumentId
     environmentId: {
