@@ -176,7 +176,7 @@ export class EnvironmentExplorerViewModel {
     return constants.API_URL;
   };
 
-      public updateVariableSelection = async (type?: string, index?: number) => {
+  public updateVariableSelection = async (type?: string, index?: number) => {
     if (type === "regenerate") {
       await this.getGenerateVariables();
       return;
@@ -197,25 +197,25 @@ export class EnvironmentExplorerViewModel {
             updatedPairs.push(foundObject);
           }
           const remainingGeneratedVariables = progressiveTab.property.environment.aiVariable.filter(
-            (_, i) => i !== foundIndex,
-          );
+              (_, i) => i !== foundIndex,
+            );
           this.updateGeneratedVariables(remainingGeneratedVariables);
           this.updateVariables(updatedPairs);
 
-          // 
+          //
 
         }
       } catch (error) {
         console.error("Error accepting generated variable:", error);
       }
     } else if (type === "accept-all") {
-       const progressiveTab = createDeepCopy(this._tab.getValue());
+      const progressiveTab = createDeepCopy(this._tab.getValue());
        progressiveTab.property.environment.variable = [...progressiveTab.property.environment.variable, ...progressiveTab.property.environment.aiVariable, {
-        key: "",
-        value: "",
-        checked: true,
+          key: "",
+          value: "",
+          checked: true,
        } ];
-       progressiveTab.property.environment.aiVariable = [];
+      progressiveTab.property.environment.aiVariable = [];
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     }
@@ -383,10 +383,15 @@ export class EnvironmentExplorerViewModel {
             checked: false,
           },
         ];
-        
+
         this.updateGeneratedVariables(response);
         resolve(response);
       }, 3000);
     });
+  };
+
+  public redirectDocsGenerateVariables = async () => {
+    await open(constants.INTRO_DOCS_URL);
+    return;
   };
 }

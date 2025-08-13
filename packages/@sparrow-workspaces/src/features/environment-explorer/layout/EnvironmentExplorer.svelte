@@ -52,6 +52,8 @@
   ) => void;
   export let onUpdateVariableSelection;
   export let userRole;
+  export let handleRedirectToDocs: () => {};
+  export let isWebApp;
 
   let isPopoverContainer = false;
 
@@ -278,6 +280,8 @@
               aiGenerationStatus={$currentEnvironment?.aiGenerationStatus}
               {updateGeneratedVariables}
               {onUpdateVariableSelection}
+              {handleRedirectToDocs}
+              {isWebApp}
             />
           </div>
         {/if}
