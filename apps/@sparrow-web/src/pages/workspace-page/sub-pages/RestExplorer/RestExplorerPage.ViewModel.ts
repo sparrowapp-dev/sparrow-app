@@ -3176,6 +3176,8 @@ class RestExplorerViewModel {
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
 
+    const userEmail = getClientUser().email;
+
     let workspaceId = componentData.path.workspaceId;
 
     let workspaceVal = await this.readWorkspace(workspaceId);
@@ -3220,6 +3222,11 @@ class RestExplorerViewModel {
       );
 
       if (!socketResponse) {
+        Sentry.withScope((scope) => {
+            scope.setTag("emailId", userEmail);
+            scope.setTag("errorType", "AI");
+            Sentry.captureException("No response from Socket (web)");
+        });
         Sentry.captureException("Socket Connection Break");
         throw new Error("Something went wrong. Please try again");
       }
@@ -3249,7 +3256,11 @@ class RestExplorerViewModel {
             events.forEach((event) =>
               this.aiAssistentWebSocketService.removeListener(event),
             );
-            Sentry.captureException("Socket Connection Break");
+            Sentry.withScope((scope) => {
+                scope.setTag("emailId", userEmail);
+                scope.setTag("errorType", "AI");
+                Sentry.captureException(`Socket Connection Break. Socket Status: ${event} RestExplorerPage.viewmodel(Web)`);   
+            });
             await this.handleAIResponseError(
               componentData,
               "Something went wrong. Please try again",
@@ -3357,6 +3368,11 @@ class RestExplorerViewModel {
         ),
       );
     } catch (error) {
+      Sentry.withScope((scope) => {
+          scope.setTag("emailId", userEmail);
+          scope.setTag("errorType", "AI");
+          Sentry.captureException(`Error in websocket streaming ${error} RestExplorerPage.viewmodel(Web)`);
+      });
       console.error("Something went wrong!:", error.message);
       await this.handleAIResponseError(componentData, error.message);
     }

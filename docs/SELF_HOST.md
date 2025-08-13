@@ -50,7 +50,6 @@ cd sparrow-app
    - Auth Server
    - Proxy Server
    - MongoDB
-   - Kafka
 
 3. Access the Sparrow app via the web browser at [http://localhost:1422](http://localhost:1422).
 

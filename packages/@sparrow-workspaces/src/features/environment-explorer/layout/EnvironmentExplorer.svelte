@@ -23,6 +23,9 @@
   import { WithButtonV3 } from "@sparrow/workspaces/hoc";
   import { SaveRegular } from "@sparrow/library/icons";
   import { QuestionCirlceReqular } from "@sparrow/library/icons";
+  import { GenerateVariables } from "../../generate-variables";
+  import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
+  import { Loader } from "@sparrow/library/ui";
   export let azureBlobCDN;
   /**
    * selected environmet to be shown on API
@@ -43,7 +46,15 @@
 
   export let onFetchEnvironmentGuide: (query) => void;
   export let onUpdateEnvironmentGuide: (query, isActive) => void;
+  export let updateGeneratedVariables: (
+    globalPairs: { key: string; value: string }[],
+    updatedPairs: { key: string; value: string }[],
+  ) => void;
+  export let onUpdateVariableSelection;
   export let userRole;
+  export let handleRedirectToDocs: () => {};
+  export let isWebApp;
+
   let isPopoverContainer = false;
 
   let quickHelp: boolean = false;
@@ -52,7 +63,7 @@
 
   $: {
     if ($currentEnvironment) {
-      environmentName = $currentEnvironment?.name;
+      environmentName = $currentEnvironment?.name || "";
     }
   }
 
@@ -70,6 +81,7 @@
   ) => {
     onUpdateVariable(pairs);
   };
+
   let isGuidePopup = false;
 
   const handleKeyDown = (event: KeyboardEvent) => {
@@ -96,7 +108,6 @@
     } else {
       isPopoverContainer = false;
     }
-
     window.addEventListener("keydown", handleKeyDown);
   });
 
@@ -106,172 +117,177 @@
 </script>
 
 {#if $currentEnvironment?.tabId}
-  <div class={`h-100 env-panel d-flex`}>
+  <div class="h-100 env-panel d-flex">
     <div
       class="d-flex flex-column h-100 env-parent p-3 w-100 {quickHelp
         ? 'quick-help-active'
         : ''}"
     >
-      <header
-        class={`env-header align-items-start justify-content-between d-flex gap-4 `}
-        style="position: relative ;"
-      >
-        <!--Disabling the Quick Help feature, will be taken up in next release-->
-        {#if $currentEnvironment?.property?.environment?.type === environmentType.GLOBAL}
-          <button
-            class="btn p-0"
-            style="position: absolute; left:133px;  top:5px; border:none; z-index:5; curser:pointer;"
-            on:click={() => {
-              isPopoverContainer = !isPopoverContainer;
-              if (isPopoverContainer === true) {
-                onUpdateEnvironmentGuide(
-                  {
-                    id: "environment-guide",
-                  },
-                  true,
-                );
-              } else {
-                onUpdateEnvironmentGuide(
-                  {
-                    id: "environment-guide",
-                  },
-                  false,
-                );
-              }
-            }}
+      <div class="env-body d-flex flex-column" style="flex: 1; min-height: 0;">
+        <!-- Top Section: Header + TabularInput -->
+        <div
+          class="var-value-container d-flex flex-column"
+          style="flex: 1; min-height: 0;"
+        >
+          <header
+            class="env-header align-items-start justify-content-between d-flex gap-4"
+            style="position: relative;"
           >
-            <HelpIcon height={"12.67px"} width={"12.67px"} />
-          </button>
-        {/if}
-
-        <!-- <Input
-          id={"environment-name"}
-          width={"calc(100% - 500px)"}
-          type="text"
-          bind:value={environmentName}
-          on:input={(e) => {
-            handleCurrentEnvironmentNameChange(environmentName, "");
-          }}
-          on:blur={(e) => {
-            handleCurrentEnvironmentNameChange(environmentName, "blur");
-          }}
-          defaultBorderColor="transparent"
-          hoveredBorderColor={"var(--border-ds-primary-300)"}
-          focusedBorderColor={"var(--border-ds-primary-300)"}
-          class="text-fs-18 bg-transparent ellipsis fw-normal px-2 rounded-1 "
-          style="outline:none;"
-          disabled={$currentEnvironment?.property?.environment?.type ==
-            "GLOBAL" || userRole === WorkspaceRole.WORKSPACE_VIEWER}
-          placeholder=""
-          height="36px"
-          isPencilIconRequired={false}
-        /> -->
-
-        <Input
-          type={"text"}
-          size={"medium"}
-          maxlength={500}
-          id={"environment-name"}
-          bind:value={environmentName}
-          variant={"inline"}
-          placeholder={""}
-          style="min-width: 200px; max-width: 400px;"
-          disabled={$currentEnvironment?.property?.environment?.type ==
-            "GLOBAL" || userRole === WorkspaceRole.WORKSPACE_VIEWER}
-          on:input={(e) => {
-            handleCurrentEnvironmentNameChange(environmentName, "");
-          }}
-          on:blur={(e) => {
-            handleCurrentEnvironmentNameChange(environmentName, "blur");
-          }}
-        />
-
-        <div class={`d-flex env-btn-container`} style="gap: 6px;">
-          <div class="position-relative">
-            <Search
-              id={"environment-search"}
-              variant={"primary"}
-              size={"medium"}
-              bind:value={search}
-              on:input={() => {}}
-              customWidth={"220px"}
-              placeholder="Search"
-            />
-          </div>
-          {#if !(userRole === WorkspaceRole.WORKSPACE_VIEWER)}
-            <div class="position-relative">
-              <Tooltip
-                title="Save (Ctrl+S)"
-                placement="bottom-center"
-                distance={10}
+            {#if $currentEnvironment?.property?.environment?.type === environmentType.GLOBAL}
+              <button
+                class="btn p-0"
+                style="position: absolute; left:133px;  top:5px; border:none; z-index:5; cursor:pointer;"
+                on:click={() => {
+                  isPopoverContainer = !isPopoverContainer;
+                  onUpdateEnvironmentGuide(
+                    { id: "environment-guide" },
+                    isPopoverContainer,
+                  );
+                }}
               >
+                <HelpIcon height={"12.67px"} width={"12.67px"} />
+              </button>
+            {/if}
+
+            <Input
+              type={"text"}
+              size={"medium"}
+              maxlength={500}
+              id={"environment-name"}
+              bind:value={environmentName}
+              variant={"inline"}
+              placeholder={""}
+              style="min-width: 200px; max-width: 400px;"
+              disabled={$currentEnvironment?.property?.environment?.type ==
+                "GLOBAL" || userRole === WorkspaceRole.WORKSPACE_VIEWER}
+              on:input={() =>
+                handleCurrentEnvironmentNameChange(environmentName, "")}
+              on:blur={() =>
+                handleCurrentEnvironmentNameChange(environmentName, "blur")}
+            />
+
+            <div class="d-flex env-btn-container" style="gap: 6px;">
+              <div class="position-relative">
+                <Search
+                  id={"environment-search"}
+                  variant={"primary"}
+                  size={"medium"}
+                  bind:value={search}
+                  on:input={() => {}}
+                  customWidth={"220px"}
+                  placeholder="Search"
+                />
+              </div>
+
+              {#if !(userRole === WorkspaceRole.WORKSPACE_VIEWER)}
+                <div class="position-relative">
+                  <Tooltip
+                    title="Save (Ctrl+S)"
+                    placement="bottom-center"
+                    distance={10}
+                  >
+                    <Button
+                      type="primary"
+                      startIcon={SaveRegular}
+                      onClick={onSaveEnvironment}
+                      title="Save"
+                      size="medium"
+                      disable={$currentEnvironment?.property?.environment?.state
+                        ?.isSaveInProgress ||
+                        $currentEnvironment?.isSaved ||
+                        userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+                        ($currentEnvironment?.aiGenerationStatus !==
+                          "accepted" &&
+                          $currentEnvironment?.generateVariable)}
+                      loader={$currentEnvironment?.property?.environment?.state
+                        ?.isSaveInProgress}
+                    />
+                  </Tooltip>
+                </div>
+              {/if}
+
+              <Tooltip title="Help" placement="bottom-center" distance={10}>
                 <Button
-                  type="primary"
-                  startIcon={SaveRegular}
-                  onClick={onSaveEnvironment}
-                  title="Save"
+                  type="secondary"
+                  startIcon={QuestionCirlceReqular}
                   size="medium"
-                  disable={$currentEnvironment?.property?.environment?.state
-                    ?.isSaveInProgress ||
-                    $currentEnvironment?.isSaved ||
-                    userRole === WorkspaceRole.WORKSPACE_VIEWER}
-                  loader={$currentEnvironment?.property?.environment?.state
-                    ?.isSaveInProgress}
+                  customWidth="28px"
+                  onClick={() => {
+                    quickHelp = true;
+                  }}
+                  disable={false}
+                  loader={false}
                 />
               </Tooltip>
             </div>
-          {/if}
-          <span>
-            <Tooltip title="Help" placement="bottom-center" distance={10}>
-              <Button
-                type="secondary"
-                startIcon={QuestionCirlceReqular}
-                size="medium"
-                customWidth="28px"
-                onClick={() => {
-                  quickHelp = true;
-                }}
-                disable={false}
-                loader={false}
-              />
-            </Tooltip>
-          </span>
-        </div>
-      </header>
-      <!--Disabling the Quick Help feature, will be taken up in next release-->
-      <div class="env-heading-popup">
-        {#if isPopoverContainer && $currentEnvironment?.property?.environment?.type === environmentType.GLOBAL}
-          <Popover
-            heading={`Welcome to Environments!`}
-            text={` `}
-            onClose={closeEnvHelpText}
-            ><p style="font-size: 12px;">
-              Environments allow you to manage different sets of configuration
-              variables for various stages of your application (e.g.
-              Development, Staging, Production). This helps in organizing and
-              isolating settings, making testing and deployment easier and more
-              efficient.
-              <span
-                on:click={() => {
-                  isGuidePopup = true;
-                }}
-                class="link btn p-0 border-0"
-                style="font-size: 12px;"
-                >See how it works.
-              </span>
-            </p></Popover
+          </header>
+
+          <div class="env-heading-popup" style="margin-bottom: 4px;">
+            {#if isPopoverContainer && $currentEnvironment?.property?.environment?.type === environmentType.GLOBAL}
+              <Popover
+                heading="Welcome to Environments!"
+                text=""
+                onClose={closeEnvHelpText}
+              >
+                <p style="font-size: 12px;">
+                  Environments allow you to manage different sets of
+                  configuration variables for various stages of your application
+                  (e.g. Development, Staging, Production). This helps in
+                  organizing and isolating settings, making testing and
+                  deployment easier and more efficient.
+                  <span
+                    on:click={() => {
+                      isGuidePopup = true;
+                    }}
+                    class="link btn p-0 border-0"
+                    style="font-size: 12px;">See how it works.</span
+                  >
+                </p>
+              </Popover>
+            {/if}
+          </div>
+
+          <div
+            class="tabular-section"
+            style="flex: 1; min-height: 0; overflow: auto;"
           >
+            <TabularInputV2
+              disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+              keyValue={$currentEnvironment?.property?.environment?.variable}
+              callback={handleCurrentEnvironmentKeyValuePairChange}
+              {search}
+            />
+          </div>
+        </div>
+
+        <!-- Optional Bottom Section -->
+        {#if $currentEnvironment?.generateVariable}
+          <!-- Divider -->
+          <div
+            class="env-divider"
+            style="height: 1px; background: var(--border-ds-surface-100); margin: 8px 0;"
+          ></div>
+
+          <!-- Generate Variable Section -->
+          <div
+            class="generate-variable-container"
+            style="flex: 1; min-height: 0; overflow: auto;"
+          >
+            <GenerateVariables
+              currentEnvironment={$currentEnvironment}
+              generatedVariables={$currentEnvironment?.property?.environment
+                ?.aiVariable}
+              aiGenerationStatus={$currentEnvironment?.aiGenerationStatus}
+              {updateGeneratedVariables}
+              {onUpdateVariableSelection}
+              {handleRedirectToDocs}
+              {isWebApp}
+            />
+          </div>
         {/if}
       </div>
-      <section class={`var-value-container pe-1 mt-2`} style="flex:1;">
-        <TabularInputV2
-          disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-          keyValue={$currentEnvironment?.property?.environment?.variable}
-          callback={handleCurrentEnvironmentKeyValuePairChange}
-          {search}
-        />
-      </section>
     </div>
+
     {#if quickHelp}
       <div class="quick-help h-100">
         <QuickHelp
@@ -328,6 +344,28 @@
 </Modal>
 
 <style lang="scss">
+  .tabular-section {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+  }
+  .env-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .var-value-container,
+  .generate-variable-container {
+    flex: 1;
+    min-height: 0;
+  }
+
+  .env-divider {
+    height: 1px;
+    background: var(--border-ds-surface-100);
+  }
   .env-panel {
     background-color: var(--bg-ds-surface-900);
   }
@@ -359,7 +397,6 @@
   .env-save-btn {
     padding: 6px 16px;
     opacity: 0.3;
-    // background-color: var(--border-color);
   }
   .env-save-btn:disabled {
     color: white;
@@ -367,7 +404,6 @@
   .env-save-btn-enabled {
     padding: 6px;
     opacity: 1;
-    // background-color: var(--border-color);
     background-color: transparent;
     position: relative;
     color: white;
@@ -384,10 +420,6 @@
   }
   .env-btn-container {
     gap: 16px;
-  }
-  .var-value-container {
-    width: 100%;
-    overflow-y: auto;
   }
   .quick-help {
     width: 100%;

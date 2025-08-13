@@ -68,4 +68,8 @@
   onFetchEnvironmentGuide={_viewModel.fetchEnvironmentGuide}
   onUpdateEnvironmentGuide={_viewModel.updateEnvironmentGuide}
   azureBlobCDN={constants.AZURE_CDN_URL}
+  updateGeneratedVariables={_viewModel.updateGeneratedVariables}
+  onUpdateVariableSelection={_viewModel.updateVariableSelection}
+  isWebApp={true}
+  handleRedirectToDocs={_viewModel.redirectDocsGenerateVariables}
 />

@@ -35,6 +35,7 @@ class InitEnvironmentTab {
           state: {
             isSaveInProgress: false,
           },
+          aiVariable: [],
         },
       },
       path: {
@@ -42,6 +43,12 @@ class InitEnvironmentTab {
         collectionId: "",
         folderId: "",
       },
+      generateVariable: false,
+      generateProperty: {
+        collectionId: "",
+        collectionName: "",
+      },
+      aiGenerationStatus: "",
       isSaved: true,
       index: 0,
       isActive: true,
@@ -82,6 +89,18 @@ class InitEnvironmentTab {
 
   public setType(_type: string) {
     this._tab.property.environment.type = _type;
+    return this;
+  }
+  public setGenerativeVariables(_genertiveVariable: boolean) {
+    this._tab.generateVariable = _genertiveVariable;
+    return this;
+  }
+  public setGenerativeProperties(
+    _generatingCollectionId: string,
+    _generatingCollectionName: string,
+  ) {
+    this._tab.generateProperty.collectionId = _generatingCollectionId;
+    this._tab.generateProperty.collectionName = _generatingCollectionName;
     return this;
   }
 }
