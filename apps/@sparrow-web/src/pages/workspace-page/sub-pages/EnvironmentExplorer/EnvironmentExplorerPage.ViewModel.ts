@@ -16,6 +16,7 @@ import { CollectionService } from "src/services/collection.service";
 import constants from "src/constants/constants";
 import { prepareFolders } from "rxdb/plugins/backup";
 import { dataDir } from "@tauri-apps/api/path";
+import { CollectionRepository } from "src/repositories/collection.repository";
 
 export class EnvironmentExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -24,6 +25,7 @@ export class EnvironmentExplorerViewModel {
   private collectionService = new CollectionService();
   private guideRepository = new GuideRepository();
   private guestUserRepository = new GuestUserRepository();
+  private collectionRepository = new CollectionRepository();
   private _tab: BehaviorSubject<any> = new BehaviorSubject({});
   private tabRepository = new TabRepository();
   private compareArray = new CompareArray();
@@ -312,7 +314,7 @@ export class EnvironmentExplorerViewModel {
       );
       const progressiveTab = this._tab.getValue();
       progressiveTab.isSaved = true;
-      progressiveTab.generateVariable = false;
+      progressiveTab.property.environment.generateVariable = false;
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
       await this.updateEnvironmentState({
@@ -321,6 +323,7 @@ export class EnvironmentExplorerViewModel {
       notifications.success(
         `Changes saved for ${currentEnvironment.name} environment.`,
       );
+      debugger;
       const aiGeneratedVariables = progressiveTab.property.environment.variable.filter(
         (variable) => variable.lifespan === "short"
       );
@@ -334,7 +337,25 @@ export class EnvironmentExplorerViewModel {
           };
         }));
         await this.updateGeneratedVariables([]);
+
+        const baseUrl = await this.constructBaseUrl(progressiveTab?.path?.workspaceId);
+        const insertGenerateVariableResponse = await this.collectionService.insertGeneratedVariables(
+          progressiveTab?.path?.workspaceId,
+          progressiveTab?.property?.environment?.generateProperty.collectionId,
+          aiGeneratedVariables,
+          baseUrl,
+        );
+        if (insertGenerateVariableResponse.isSuccessful) {
+          await this.collectionRepository.updateCollection(
+            insertGenerateVariableResponse.data.data._id,
+            insertGenerateVariableResponse.data.data,
+          );
+          notifications.success(`Successfully added generated variables to “Global Variables” environment and applied them to your “${progressiveTab?.property?.environment?.generateProperty.collectionName}” collection.`);
+        } else {
+          notifications.error("Failed to apply generated variables to the “Manage Pets” collection.");
+        }
       }
+
 
     } else {
       await this.updateEnvironmentState({ isSaveInProgress: false });
@@ -391,7 +412,7 @@ export class EnvironmentExplorerViewModel {
 
   public updateEnvironmentAiVariableGenerationStatus = async (_status) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.aiGenerationStatus = _status;
+    progressiveTab.property.environment.aiGenerationStatus = _status;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
@@ -407,13 +428,13 @@ export class EnvironmentExplorerViewModel {
       progressiveTab?.path?.workspaceId,
     );
     if (
-      progressiveTab.generateVariable &&
-      progressiveTab.aiGenerationStatus === ""
+      progressiveTab?.property?.environment?.generateVariable &&
+      progressiveTab?.property?.environment?.aiGenerationStatus === ""
     ) {
       this.updateEnvironmentAiVariableGenerationStatus("generating");
       const response = await this.collectionService.generateVariables(
         progressiveTab?.path?.workspaceId,
-        progressiveTab?.generateProperty?.collectionId,
+        progressiveTab?.property?.environment.generateProperty?.collectionId,
         baseUrl,
       );
       if (response?.isSuccessful) {
@@ -442,7 +463,7 @@ export class EnvironmentExplorerViewModel {
     );
     const response = await this.collectionService.generateVariables(
       progressiveTab?.path?.workspaceId,
-      progressiveTab?.generateProperty?.collectionId,
+      progressiveTab?.property?.environment?.generateProperty?.collectionId,
       baseUrl,
     );
     if (response?.isSuccessful) {

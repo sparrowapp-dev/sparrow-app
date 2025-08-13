@@ -193,10 +193,7 @@
                       disable={$currentEnvironment?.property?.environment?.state
                         ?.isSaveInProgress ||
                         $currentEnvironment?.isSaved ||
-                        userRole === WorkspaceRole.WORKSPACE_VIEWER ||
-                        ($currentEnvironment?.aiGenerationStatus !==
-                          "accepted" &&
-                          $currentEnvironment?.generateVariable)}
+                        userRole === WorkspaceRole.WORKSPACE_VIEWER}
                       loader={$currentEnvironment?.property?.environment?.state
                         ?.isSaveInProgress}
                     />
@@ -259,7 +256,7 @@
         </div>
 
         <!-- Optional Bottom Section -->
-        {#if $currentEnvironment?.generateVariable}
+        {#if $currentEnvironment?.property.environment.generateVariable}
           <!-- Divider -->
           <div
             class="env-divider"
@@ -275,7 +272,8 @@
               currentEnvironment={$currentEnvironment}
               generatedVariables={$currentEnvironment?.property?.environment
                 ?.aiVariable}
-              aiGenerationStatus={$currentEnvironment?.aiGenerationStatus}
+              aiGenerationStatus={$currentEnvironment?.property?.environment
+                ?.aiGenerationStatus}
               {updateGeneratedVariables}
               {onUpdateVariableSelection}
             />

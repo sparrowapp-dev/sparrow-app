@@ -32,8 +32,8 @@
       class="d-flex justify-content-start align-items-center common-text title-text"
       style="margin: 0px; padding:8px;"
     >
-      Generated Variables from "{currentEnvironment?.generateProperty
-        .collectionName}"
+      Generated Variables from "{currentEnvironment?.property?.environment
+        ?.generateProperty.collectionName}"
     </p>
     <p
       class="d-flex justify-content-start align-items-center common-text description-text"
