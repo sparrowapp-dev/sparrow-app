@@ -255,6 +255,42 @@ export class EnvironmentExplorerViewModel {
     return;
   };
 
+
+    private updatedRequestInCollection(
+    generatedVariables: any[],
+    requestItem: any,
+  ): any {
+    // Recursive function to deeply replace matches
+    const replaceValues = (obj: any, path: string = ""): any => {
+      if (Array.isArray(obj)) {
+        return obj.map((item, index) =>
+          replaceValues(item, `${path}[${index}]`),
+        );
+      } else if (obj && typeof obj === "object") {
+        const newObj: any = {};
+        for (const [key, value] of Object.entries(obj)) {
+          newObj[key] = replaceValues(value, `${path}.${key}`);
+        }
+        return newObj;
+      } else if (typeof obj === "string") {
+        for (const variable of generatedVariables) {
+          if (obj === variable.value) {
+            return `{{${variable.key}}}`;
+          }
+          if (obj.includes(variable.value)) {
+            obj = obj.replace(
+              new RegExp(variable.value, "g"),
+              `{{${variable.key}}}`,
+            );
+          }
+        }
+        return obj;
+      }
+      return obj;
+    };
+    return replaceValues(requestItem, "root");
+  }
+
   /**
    * @description - saves environment to the mongo server
    */
@@ -323,7 +359,6 @@ export class EnvironmentExplorerViewModel {
       notifications.success(
         `Changes saved for ${currentEnvironment.name} environment.`,
       );
-      debugger;
       const aiGeneratedVariables = progressiveTab.property.environment.variable.filter(
         (variable) => variable.lifespan === "short"
         );
@@ -350,6 +385,17 @@ export class EnvironmentExplorerViewModel {
             insertGenerateVariableResponse.data.data._id,
             insertGenerateVariableResponse.data.data,
           );
+
+          const tabRxDocs = await this.tabRepository.getTabsByCollectionId(progressiveTab?.property?.environment?.generateProperty.collectionId);
+          const tabsJson = tabRxDocs.map((doc) => doc.toMutableJSON()).map((doc)=>{
+
+             doc.property = this.updatedRequestInCollection(aiGeneratedVariables, doc.property );
+             doc.isSaved = false;
+             doc.persistence = "PERMANENT";
+             return doc;
+          });
+          this.tabRepository.bulkUpsertTabs(tabsJson);
+          
           notifications.success(`Successfully added generated variables to “Global Variables” environment and applied them to your “${progressiveTab?.property?.environment?.generateProperty.collectionName}” collection.`);
         } else {
           notifications.error("Failed to apply generated variables to the “Manage Pets” collection.");
