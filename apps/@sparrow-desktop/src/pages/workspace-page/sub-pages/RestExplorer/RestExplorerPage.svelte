@@ -246,5 +246,4 @@
   onGenerateAiResponse={_viewModel.generateAIResponseWS}
   onToggleLike={_viewModel.toggleChatMessageLike}
   onUpdateAiModel={_viewModel.updateAIModel}
-  onHandleUrlInput={_viewModel.handleUrlInput}
 />

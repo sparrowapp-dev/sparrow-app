@@ -955,41 +955,40 @@ class RestExplorerViewModel {
     return this.transformRequest(parsedCurl, "anonymous");
   };
 
-  public handleUrlInput = async (value: string) => {
+  /**
+   * Updates the request URL or imports a cURL command.
+   * If the input starts with "curl ", it will parse and import the cURL.
+   * Otherwise, it will treat the input as a plain URL.
+   * @param value - The URL or cURL command.
+   * @param effectQueryParams - Whether to update query params from the URL.
+   */
+  public updateRequestUrl = async (
+    value: string,
+    effectQueryParams: boolean = true,
+  ) => {
     if (typeof value === "string" && value.trim().startsWith("curl ")) {
       try {
         const parsed = this.parseCurl(value);
         if (parsed) {
           await this.handleImportCurl(parsed);
+          return;
         }
       } catch (err) {
         console.error("Failed to parse cURL command:", err);
         notifications.error("Failed to parse cURL command.");
-        this.updateRequestUrl(value);
       }
-    } else {
-      this.updateRequestUrl(value);
     }
-  };
 
-  /**
-   *
-   * @param _url - request url
-   * @param _effectQueryParams  - flag that effect request query parameter
-   */
-  public updateRequestUrl = async (
-    _url: string,
-    _effectQueryParams: boolean = true,
-  ) => {
+    // Handle as plain URL
     const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
-    if (_url === progressiveTab.property.request.url) {
+    if (value === progressiveTab.property.request.url) {
       return;
     }
-    progressiveTab.property.request.url = _url;
+    progressiveTab.property.request.url = value;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    if (_effectQueryParams) {
-      const reducedURL = new ReduceRequestURL(_url);
+    if (effectQueryParams) {
+      const reducedURL = new ReduceRequestURL(value);
       await this.updateParams(reducedURL.getQueryParameters(), false);
     }
     this.compareRequestWithServer();

@@ -24,7 +24,6 @@
   export let isSave;
   export let userRole;
   export let isSaveLoad = false;
-  export let onHandleUrlInput;
 
   const theme = new UrlInputTheme().build();
   const handleDropdown = (tab: string) => {
@@ -134,7 +133,7 @@
     <div class="position-absolute top-0" style="width: calc(100% );">
       <CodeMirrorInput
         value={requestUrl}
-        onUpdateInput={onHandleUrlInput}
+        onUpdateInput={onUpdateRequestUrl}
         placeholder={"Enter a URL or paste a cURL command"}
         {theme}
         {onUpdateEnvironment}
