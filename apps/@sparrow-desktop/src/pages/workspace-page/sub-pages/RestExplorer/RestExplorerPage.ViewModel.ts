@@ -963,12 +963,12 @@ class RestExplorerViewModel {
    * @param effectQueryParams - Whether to update query params from the URL.
    */
   public updateRequestUrl = async (
-    value: string,
-    effectQueryParams: boolean = true,
+    _url: string,
+    _effectQueryParams: boolean = true,
   ) => {
-    if (typeof value === "string" && value.trim().startsWith("curl ")) {
+    if (typeof _url === "string" && _url.trim().startsWith("curl ")) {
       try {
-        const parsed = this.parseCurl(value);
+        const parsed = this.parseCurl(_url);
         if (parsed) {
           await this.handleImportCurl(parsed);
           return;
@@ -978,17 +978,16 @@ class RestExplorerViewModel {
         notifications.error("Failed to parse cURL command.");
       }
     }
-
     // Handle as plain URL
     const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
-    if (value === progressiveTab.property.request.url) {
+    if (_url === progressiveTab.property.request.url) {
       return;
     }
-    progressiveTab.property.request.url = value;
+    progressiveTab.property.request.url = _url;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    if (effectQueryParams) {
-      const reducedURL = new ReduceRequestURL(value);
+    if (_effectQueryParams) {
+      const reducedURL = new ReduceRequestURL(_url);
       await this.updateParams(reducedURL.getQueryParameters(), false);
     }
     this.compareRequestWithServer();
