@@ -238,7 +238,7 @@ export const authProfileItemProperties = {
   description: { type: "string" },
   authType: {
     type: "string",
-    enum: ["Basic Auth", "Bearer Token", "API Key"]
+    enum: ["Basic Auth", "Bearer Token", "API Key"],
   },
   auth: {
     type: "object",
@@ -247,7 +247,7 @@ export const authProfileItemProperties = {
         type: "object",
         properties: {
           username: { type: "string" },
-          password: { type: "string" }
+          password: { type: "string" },
         },
       },
       bearerToken: { type: "string" },
@@ -258,18 +258,18 @@ export const authProfileItemProperties = {
           authValue: { type: "string" },
           addTo: {
             type: "string",
-            enum: ["Header", "Query Parameter"]
-          }
-        }
-      }
-    }
+            enum: ["Header", "Query Parameter"],
+          },
+        },
+      },
+    },
   },
   defaultKey: { type: "boolean" },
   createdAt: { type: "string", format: "date-time" },
   updatedAt: { type: "string", format: "date-time" },
   createdBy: { type: "string" },
-  updatedBy: { type: "string" }
-}
+  updatedBy: { type: "string" },
+};
 
 export const authProfiles = {
   type: "array",
@@ -277,14 +277,14 @@ export const authProfiles = {
   items: {
     type: "object",
     properties: authProfileItemProperties,
-  }
-}
+  },
+};
 
 export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 15,
+  version: 16,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -520,8 +520,8 @@ export const tabSchemaLiteral = {
                   type: "boolean",
                 },
                 selectedRequestAuthProfileId: {
-                  type: "string"
-                }
+                  type: "string",
+                },
               },
             },
             auth: {
@@ -1050,6 +1050,24 @@ export const tabSchemaLiteral = {
                 required: ["key", "value", "checked"],
               },
             },
+            aiVariable: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  key: {
+                    type: "string",
+                  },
+                  value: {
+                    type: "string",
+                  },
+                  checked: {
+                    type: "boolean",
+                  },
+                },
+                required: ["key", "value", "checked"],
+              },
+            },
             type: {
               type: "string",
             },
@@ -1063,7 +1081,7 @@ export const tabSchemaLiteral = {
               required: ["isSaveInProgress"],
             },
           },
-          required: ["variable", "type", "state"],
+          required: ["variable", "aiVariable", "type", "state"],
         },
         websocket: {
           type: "object",
@@ -1499,8 +1517,8 @@ export const tabSchemaLiteral = {
                   type: "boolean",
                 },
                 selectedRequestAuthProfileId: {
-                  type: "string"
-                }
+                  type: "string",
+                },
               },
             },
             auth: {

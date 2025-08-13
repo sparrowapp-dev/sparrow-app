@@ -296,6 +296,51 @@ export default class CollectionsViewModel {
     };
   };
 
+  /**
+   * @description - refreshes workspace data with sync to mongo server
+   * @param workspaceId - workspace Id
+   * @returns
+   */
+  public fetchWorkspace = async (workspaceId: string): Promise<void> => {
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
+      return;
+    }
+
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const workspaceData =
+      await this.workspaceRepository.readWorkspace(workspaceId);
+
+    let response;
+    if (
+      workspaceData &&
+      workspaceData.workspaceType === WorkspaceType.PUBLIC &&
+      workspaceData.isShared
+    ) {
+      response = await this.workspaceService.fetchPublicWorkspace(workspaceId);
+    } else {
+      response = await this.workspaceService.fetchWorkspace(
+        workspaceId,
+        baseUrl,
+      );
+    }
+
+    if (!response?.isSuccessful || !response?.data?.data) {
+      return;
+    }
+
+    const responseWorkspaceData = response.data.data;
+    await this.workspaceRepository.updateWorkspace(workspaceId, {
+      name: responseWorkspaceData.name,
+      description: responseWorkspaceData.description,
+    });
+    return;
+  };
+
   public deleteTabsWithTabIdInAWorkspace = (
     _workspaceId: string,
     _tabIds: string[],

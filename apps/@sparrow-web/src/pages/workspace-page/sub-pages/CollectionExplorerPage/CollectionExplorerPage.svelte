@@ -139,6 +139,8 @@
   let environmentId: string;
   let currentWorkspaceId = "";
   let currentWorkspace;
+  let globalEnvironment: any;
+  let globalEnvInUse: any = null;
 
   let activeWorkspaceSubscribe;
 
@@ -187,9 +189,31 @@
     }
   };
 
+  const handleFetchGlobalEnvironment = () => {
+    if ($environments && currentWorkspaceId) {
+      const env = $environments.find((env: any) => {
+        return (
+          env._data.workspaceId === currentWorkspaceId &&
+          env._data?.type === environmentType.GLOBAL
+        );
+      });
+
+      globalEnvironment =
+        env?.toMutableJSON() as EnvironmentDocumentBaseInterface;
+    }
+  };
+
+  const handleCheckGlobalInUse = async () => {
+    globalEnvInUse = await _viewModel.handleCheckGlobalVariableActive(
+      globalEnvironment.id,
+    );
+  };
+
   $: {
     if (environmentId || $environments || currentWorkspaceId) {
       refreshEnvironment();
+      handleFetchGlobalEnvironment();
+      handleCheckGlobalInUse();
     }
   }
 
@@ -225,4 +249,7 @@
   onCreateAuthProfile={_viewModel.handleCreateAuthProfile}
   onUpdateAuthProfile={_viewModel.handleUpdateAuthProfile}
   onDeleteAuthProfile={_viewModel.handleDeleteAuthProfile}
+  onGenerateVariables={_viewModel.handleGenerateVariableTab}
+  {globalEnvironment}
+  {globalEnvInUse}
 />
