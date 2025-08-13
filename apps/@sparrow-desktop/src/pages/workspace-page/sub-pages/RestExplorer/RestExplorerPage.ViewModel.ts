@@ -697,7 +697,6 @@ class RestExplorerViewModel {
   public handleImportCurl = async (parsedCurlData: TransformedRequest) => {
     if (!parsedCurlData) return false;
     const progressiveTab = createDeepCopy(this._tab.getValue());
-
     try {
       // Update URL Name
       if (parsedCurlData.request.url && !progressiveTab.path.collectionId) {
@@ -942,7 +941,7 @@ class RestExplorerViewModel {
       }
     }
 
-    // Handle formdata from -F flags
+    // Handle formdata from -F/--form flags
     if (requestObject.files && Array.isArray(requestObject.files)) {
       requestObject.files.forEach((fileObj: any) => {
         transformedObject.request!.body.formdata.push({
@@ -961,11 +960,9 @@ class RestExplorerViewModel {
       requestObject.data &&
       typeof requestObject.data === "string"
     ) {
-      // Extract boundary
       const boundaryMatch = contentType.match(/boundary=(.+)$/);
       const boundary = boundaryMatch ? boundaryMatch[1] : "";
       if (boundary) {
-        // Split body by boundary
         const parts = requestObject.data.split(`--${boundary}`);
         for (const part of parts) {
           if (
@@ -974,7 +971,6 @@ class RestExplorerViewModel {
           ) {
             const nameMatch = part.match(/name="([^"]+)"/);
             const key = nameMatch ? nameMatch[1] : "";
-            // Value is after two CRLFs
             const valueMatch = part.match(/\r\n\r\n([\s\S]*?)\r\n$/);
             const value = valueMatch ? valueMatch[1] : "";
             if (key) {
@@ -991,11 +987,20 @@ class RestExplorerViewModel {
       }
     }
 
-    // Only add one extra empty formdata item if body type is multipart/form-data
+    // If formdata is present, set body type and clear raw
+    if (
+      transformedObject.request!.body.formdata.length > 0 &&
+      transformedObject.request!.selectedRequestBodyType !==
+        "multipart/form-data"
+    ) {
+      transformedObject.request!.selectedRequestBodyType =
+        "multipart/form-data";
+    }
     if (
       transformedObject.request!.selectedRequestBodyType ===
       "multipart/form-data"
     ) {
+      transformedObject.request!.body.raw = "";
       transformedObject.request!.body.formdata.push({
         key: "",
         value: "",
@@ -1029,7 +1034,10 @@ class RestExplorerViewModel {
         }
         transformedObject.request!.selectedRequestBodyType =
           "application/x-www-form-urlencoded";
-      } else {
+      } else if (
+        transformedObject.request!.selectedRequestBodyType !==
+        "multipart/form-data"
+      ) {
         transformedObject.request!.body.raw =
           typeof requestObject.data === "string"
             ? requestObject.data
@@ -1047,7 +1055,6 @@ class RestExplorerViewModel {
             value,
           }));
       for (const { key, value } of headersArr) {
-        // Add header to request
         transformedObject.request!.headers!.push({
           key,
           value,
@@ -1132,19 +1139,27 @@ class RestExplorerViewModel {
     const stringifiedCurl = curlconverter.toJsonString(updatedCurl);
     const parsedCurl = JSON.parse(stringifiedCurl);
 
-    // Match all -F flags with their key-value pairs (handles both files and text)
-    const formDataMatches = curl.match(/-F\s+'([^=]+)=([^']*)'/g);
+    // Match all --form/-F flags with their key-value pairs (handles both single and double quotes)
+    const formDataMatches = curl.match(
+      /(--form|-F)\s+['"]([^=]+)=((?:".*?")|(?:'.*?')|[^'"]*)['"]/g,
+    );
     const formDataItems = formDataMatches
-      ? formDataMatches.map((match) => {
-          const [, keyValue] = match.split("-F '");
-          const [key, value] = keyValue.split("=");
-          return {
-            key: key,
-            value: value.replace(/'/g, ""),
-            checked: true,
-            base: value.replace(/'/g, ""),
-          };
-        })
+      ? formDataMatches
+          .map((match) => {
+            const keyValue = match.match(
+              /(--form|-F)\s+['"]([^=]+)=((?:".*?")|(?:'.*?')|[^'"]*)['"]/,
+            );
+            if (!keyValue) return null;
+            let [, , key, value] = keyValue;
+            // Remove surrounding quotes from value if present
+            value = value.replace(/^["']|["']$/g, "");
+            return {
+              key: key,
+              value: value,
+              checked: true,
+            };
+          })
+          .filter(Boolean)
       : [];
 
     // Attach all form fields to parsedCurl.files
