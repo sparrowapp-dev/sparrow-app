@@ -89,19 +89,6 @@ export class EnvironmentExplorerViewModel {
     this.compareRequestWithServer();
   };
 
-  public updateGenerativeVariables = async (aiVariables?: any) => {
-    const newVariables = aiVariables.map(({ key, value }) => ({
-      key,
-      value,
-      checked: true,
-    }));
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.environment.aiVariable = newVariables;
-    this.tab = progressiveTab;
-    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    this.compareRequestWithServer();
-  };
-
   /**
    * Compares the current environment tab with the server version and updates the saved status accordingly.
    * This method is debounced to reduce the number of server requests.
@@ -189,14 +176,57 @@ export class EnvironmentExplorerViewModel {
     return constants.API_URL;
   };
 
+      public updateVariableSelection = async (type?: string, index?: number) => {
+    if (type === "regenerate") {
+      await this.getGenerateVariables();
+      return;
+    }
+    if (type === "accept" && typeof index === "number") {
+      try {
+        const progressiveTab = createDeepCopy(this._tab.getValue());
+       progressiveTab
+        const foundIndex = progressiveTab.property.environment.aiVariable.findIndex((_, i) => i === index);
+        if (foundIndex !== -1) {
+          const foundObject = progressiveTab.property.environment.aiVariable[foundIndex];
+          const currentPairs =
+            progressiveTab.property?.environment?.variable || [];
+          const updatedPairs = [...currentPairs];
+          if (updatedPairs.length > 0) {
+            updatedPairs.splice(updatedPairs.length - 1, 0, foundObject);
+          } else {
+            updatedPairs.push(foundObject);
+          }
+          const remainingGeneratedVariables = progressiveTab.property.environment.aiVariable.filter(
+            (_, i) => i !== foundIndex,
+          );
+          this.updateGeneratedVariables(remainingGeneratedVariables);
+          this.updateVariables(updatedPairs);
+
+          // 
+
+        }
+      } catch (error) {
+        console.error("Error accepting generated variable:", error);
+      }
+    } else if (type === "accept-all") {
+       const progressiveTab = createDeepCopy(this._tab.getValue());
+       progressiveTab.property.environment.variable = [...progressiveTab.property.environment.variable, ...progressiveTab.property.environment.aiVariable, {
+        key: "",
+        value: "",
+        checked: true,
+       } ];
+       progressiveTab.property.environment.aiVariable = [];
+      this.tab = progressiveTab;
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    }
+  };
+
   public updateGeneratedVariables = async (
-    _variable: any,
     aiVariables?: any,
   ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const envTab = createDeepCopy(progressiveTab);
     envTab.property.environment.aiVariable = aiVariables;
-    envTab.property.environment.variable = _variable;
     this.tab = envTab;
     await this.tabRepository.updateTab(progressiveTab as string, {
       property: envTab.property,
@@ -257,6 +287,7 @@ export class EnvironmentExplorerViewModel {
       );
       const progressiveTab = this._tab.getValue();
       progressiveTab.isSaved = true;
+      progressiveTab.generateVariable = false;
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
       await this.updateEnvironmentState({
@@ -352,7 +383,8 @@ export class EnvironmentExplorerViewModel {
             checked: false,
           },
         ];
-        this.updateGenerativeVariables(response);
+        
+        this.updateGeneratedVariables(response);
         resolve(response);
       }, 3000);
     });

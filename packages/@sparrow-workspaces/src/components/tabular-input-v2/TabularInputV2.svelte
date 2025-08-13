@@ -34,7 +34,7 @@
    */
   export let disabled = false;
   export let isGeneratedVariable = false;
-  export let onClickGenerateVariable: (type?: string, index?: number) => void;
+  export let onUpdateVariableSelection: (type?: string, index?: number) => void;
 
   let pairs: KeyValueChecked[] = keyValue;
   let controller: boolean = false;
@@ -172,10 +172,10 @@
       </p>
     </div>
     <div class="pe-1 d-flex">
-      {#if isGeneratedVariable}
+      {#if isGeneratedVariable && pairs.length > 0}
         <button
           class="border-0 d-flex text-nowrap generate-action-button common-text align-items-center"
-          on:click={onClickGenerateVariable("accept-all")}>Accept All</button
+          on:click={onUpdateVariableSelection("accept-all")}>Accept All</button
         >
       {/if}
       <button class="bg-transparent border-0 d-flex d-none" style="">
@@ -323,7 +323,7 @@
                   <button
                     class="generate-action-button accept"
                     on:click|stopPropagation={() => {
-                      onClickGenerateVariable("accept", index);
+                      onUpdateVariableSelection("accept", index);
                     }}
                   >
                     <CheckMarkIcon
@@ -335,6 +335,7 @@
                     class="generate-action-button reject"
                     on:click|stopPropagation={() => {
                       deletePairs(index);
+                      onUpdateVariableSelection("reject", index);
                     }}
                   >
                     <DismissRegular

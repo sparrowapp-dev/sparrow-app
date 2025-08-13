@@ -8,20 +8,15 @@
   export let isReGenerateVariable: boolean = false;
   export let isLoadingVariables: boolean = true;
   export let isAcceptedVariables: boolean = false;
-  export let updateGeneratedVariables: (
-    globalPairs: { key: string; value: string }[],
-    updatedPairs: { key: string; value: string }[],
-  ) => void;
+  export let updateGeneratedVariables;
 
-  const onChangeGeneratedVariable = (pairs: any) => {
-    generatedVariables = pairs;
-    updateGeneratedVariables(
-      currentEnvironment?.property?.environment?.variable,
-      pairs,
-    );
-  };
-
-  export let onClickGenerateVariable: (type?: string, index?: number) => void;
+  export let onUpdateVariableSelection;
+  export let aiGenerationStatus:
+    | "generating"
+    | "regenerating"
+    | "accepted"
+    | "rejected"
+    | "generated" = "";
 </script>
 
 <div class="flex flex-column" style="margin-top: 12px;">
@@ -40,100 +35,98 @@
       environment.
     </p>
   </div>
-  {#if isReGenerateVariable}
-    <div class="d-flex flex-column">
-      <div class="" style="margin-top: 16px; margin-bottom:12px;">
-        <TabularInputV2
-          disabled={false}
-          keyValue={[]}
-          callback={() => {}}
-          search={""}
-          isGeneratedVariable={true}
-          isCheckBoxNotRequired={true}
-        />
-      </div>
-      <div class="" style="margin-top: 24px;">
-        <p
-          class="d-flex justify-content-center align-items-center common-text title-text"
-          style="margin: 0px;"
-        >
-          No Variables
-        </p>
-        <p
-          class="d-flex justify-content-center align-items-center common-text description-text"
-        >
-          You have reviewed and cleared all the suggestions for this collection.
-          Your environment has not been changed.
-        </p>
-        <div class="d-flex justify-content-center" style="margin-top: 30px;">
-          <Button
-            type="outline-primary"
-            onClick={async () => await onClickGenerateVariable("regenerate")}
-            title="Re-Generate Variables"
-            size="medium"
-          />
-        </div>
-      </div>
-    </div>
-  {:else if isAcceptedVariables}
-    <div class="d-flex flex-column">
-      <div class="" style="margin-top: 16px; margin-bottom:12px;">
-        <TabularInputV2
-          disabled={false}
-          keyValue={[]}
-          callback={() => {}}
-          search={""}
-          isGeneratedVariable={true}
-          isCheckBoxNotRequired={true}
-        />
-      </div>
-      <div class="" style="margin-top: 24px;">
-        <p
-          class="d-flex justify-content-center align-items-center common-text title-text"
-          style="margin: 0px;"
-        >
-          Ready to Save!
-        </p>
-        <p
-          class="d-flex justify-content-center align-items-center common-text description-text"
-        >
-          Accepted suggestions have been added to your 'Global Variables'
-          environment. Click on Save button to apply these changes permanently.
-        </p>
-      </div>
-    </div>
-  {:else}
-    <div>
-      {#if isLoadingVariables}
-        <div class="d-flex flex-column">
-          <div class="" style="margin-top: 16px; margin-bottom:12px;">
-            <TabularInputV2
-              disabled={false}
-              keyValue={[]}
-              callback={() => {}}
-              search={""}
-              isGeneratedVariable={true}
-              isCheckBoxNotRequired={true}
-            />
-          </div>
-          <div class="">
-            <GenerateVariablesLoading />
-          </div>
-        </div>
-      {:else}
-        <div class="d-flex">
+  <div>
+    {#if aiGenerationStatus === "generating"}
+      <div class="d-flex flex-column">
+        <div class="" style="margin-top: 16px; margin-bottom:12px;">
           <TabularInputV2
             disabled={false}
-            keyValue={generatedVariables}
-            callback={onChangeGeneratedVariable}
+            keyValue={[]}
+            callback={() => {}}
             search={""}
             isGeneratedVariable={true}
-            {onClickGenerateVariable}
           />
         </div>
-      {/if}
-    </div>
-  {/if}
+        <div class="">
+          <GenerateVariablesLoading />
+        </div>
+      </div>
+    {:else if aiGenerationStatus === "generated"}
+      <div class="d-flex">
+        <TabularInputV2
+          disabled={false}
+          keyValue={generatedVariables}
+          callback={updateGeneratedVariables}
+          search={""}
+          isGeneratedVariable={true}
+          {onUpdateVariableSelection}
+        />
+      </div>
+    {:else if aiGenerationStatus === "accepted"}
+      <div class="d-flex flex-column">
+        <div class="" style="margin-top: 16px; margin-bottom:12px;">
+          <TabularInputV2
+            disabled={false}
+            keyValue={[]}
+            callback={() => {}}
+            search={""}
+            isGeneratedVariable={true}
+          />
+        </div>
+        <div class="" style="margin-top: 24px;">
+          <p
+            class="d-flex justify-content-center align-items-center common-text title-text"
+            style="margin: 0px;"
+          >
+            Ready to Save!
+          </p>
+          <p
+            class="d-flex justify-content-center align-items-center common-text description-text"
+          >
+            Accepted suggestions have been added to your 'Global Variables'
+            environment. Click on Save button to apply these changes
+            permanently.
+          </p>
+        </div>
+      </div>
+    {:else if aiGenerationStatus === "rejected"}
+      <div class="d-flex flex-column">
+        <div class="" style="margin-top: 16px; margin-bottom:12px;">
+          <TabularInputV2
+            disabled={false}
+            keyValue={[]}
+            callback={() => {}}
+            search={""}
+            isGeneratedVariable={true}
+            isCheckBoxNotRequired={true}
+          />
+        </div>
+        <div class="" style="margin-top: 24px;">
+          <p
+            class="d-flex justify-content-center align-items-center common-text title-text"
+            style="margin: 0px;"
+          >
+            No Variables
+          </p>
+          <p
+            class="d-flex justify-content-center align-items-center common-text description-text"
+          >
+            You have reviewed and cleared all the suggestions for this
+            collection. Your environment has not been changed.
+          </p>
+          <div class="d-flex justify-content-center" style="margin-top: 30px;">
+            <Button
+              type="outline-primary"
+              onClick={async () =>
+                await onUpdateVariableSelection("regenerate")}
+              title="Re-Generate Variables"
+              size="medium"
+            />
+          </div>
+        </div>
+      </div>
+    {/if}
+  </div>
 </div>
 
 <style>

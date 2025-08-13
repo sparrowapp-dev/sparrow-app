@@ -70,4 +70,5 @@
   azureBlobCDN={constants.AZURE_CDN_URL}
   onGenerateVariables={_viewModel.getGenerateVariables}
   updateGeneratedVariables={_viewModel.updateGeneratedVariables}
+  onUpdateVariableSelection={_viewModel.updateVariableSelection}
 />

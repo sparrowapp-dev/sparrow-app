@@ -48,6 +48,7 @@ class InitEnvironmentTab {
         collectionId: "",
         collectionName: "",
       },
+      aiGenerationStatus: "",
       isSaved: true,
       index: 0,
       isActive: true,
