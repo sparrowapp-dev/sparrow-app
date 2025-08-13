@@ -201,9 +201,9 @@ export class EnvironmentExplorerViewModel {
             progressiveTab.property?.environment?.variable || [];
           const updatedPairs = [...currentPairs];
           if (updatedPairs.length > 0) {
-            updatedPairs.splice(updatedPairs.length - 1, 0, foundObject);
+            updatedPairs.splice(updatedPairs.length - 1, 0, {...foundObject,  type: "ai-generated", lifespan: "short", });
           } else {
-            updatedPairs.push(foundObject);
+            updatedPairs.push({...foundObject,  type: "ai-generated", lifespan: "short", });
           }
           const remainingGeneratedVariables =
             progressiveTab.property.environment.aiVariable.filter(
@@ -227,11 +227,14 @@ export class EnvironmentExplorerViewModel {
         await this.updateEnvironmentAiVariableGenerationStatus("rejected");
       }
     } else if (type === "accept-all") {
-      const progressiveTab = createDeepCopy(this._tab.getValue());
-      await this.updateVariables([
-        ...progressiveTab.property.environment.variable,
-        ...progressiveTab.property.environment.aiVariable,
-        {
+        const progressiveTab = createDeepCopy(this._tab.getValue());
+        await this.updateVariables([...progressiveTab.property.environment.variable, ...progressiveTab.property.environment.aiVariable.map((item)=>{
+          return {
+            ...item,
+            type: "ai-generated",
+            lifespan: "short",
+          }
+        }), {
           key: "",
           value: "",
           checked: true,
@@ -291,7 +294,14 @@ export class EnvironmentExplorerViewModel {
       currentEnvironment.id,
       {
         name: currentEnvironment.name,
-        variable: currentEnvironment?.property?.environment?.variable,
+        variable: currentEnvironment?.property?.environment?.variable.map((item) => {
+          return {
+            key: item.key,
+            value: item.value,
+            checked: item.checked,
+            type: item.type || "user-generated",
+          };
+        }),
       },
       baseUrl,
     );
@@ -311,6 +321,21 @@ export class EnvironmentExplorerViewModel {
       notifications.success(
         `Changes saved for ${currentEnvironment.name} environment.`,
       );
+      const aiGeneratedVariables = progressiveTab.property.environment.variable.filter(
+        (variable) => variable.lifespan === "short"
+      );
+      if (aiGeneratedVariables.length > 0) {
+        await this.updateVariables(currentEnvironment?.property?.environment?.variable.map((item) => {
+          return {
+            key: item.key,
+            value: item.value,
+            checked: item.checked,
+            type: item.type || "user-generated",
+          };
+        }));
+        await this.updateGeneratedVariables([]);
+      }
+
     } else {
       await this.updateEnvironmentState({ isSaveInProgress: false });
       if (response.message === "Network Error") {
