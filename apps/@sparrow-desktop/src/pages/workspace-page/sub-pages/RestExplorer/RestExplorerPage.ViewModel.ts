@@ -780,8 +780,10 @@ class RestExplorerViewModel {
         navigation = RequestDatasetEnum.FORMDATA;
       } else if (bodyType === "application/x-www-form-urlencoded") {
         navigation = RequestDatasetEnum.URLENCODED;
-      } else {
+      } else if (bodyType === "application/json" || bodyType === "text/plain") {
         navigation = RequestDatasetEnum.RAW;
+      } else {
+        navigation = RequestDatasetEnum.NONE; // <-- Default to NONE if no body type
       }
 
       await this.updateRequestState({
