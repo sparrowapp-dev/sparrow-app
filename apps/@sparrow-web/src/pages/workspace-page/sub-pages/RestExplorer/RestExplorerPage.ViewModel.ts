@@ -755,12 +755,34 @@ class RestExplorerViewModel {
         });
       }
 
-      // Update auth if present
       if (
         parsedCurlData.request.auth &&
         Object.keys(parsedCurlData.request.auth).length > 0
       ) {
         await this.updateRequestAuth(parsedCurlData.request.auth);
+
+        // Select the correct auth button based on the imported auth type
+        if (parsedCurlData.request.selectedRequestAuthType === "Bearer Token") {
+          await this.updateRequestState({
+            requestAuthNavigation: HttpRequestAuthTypeBaseEnum.BEARER_TOKEN,
+          });
+        } else if (
+          parsedCurlData.request.selectedRequestAuthType === "API Key"
+        ) {
+          await this.updateRequestState({
+            requestAuthNavigation: HttpRequestAuthTypeBaseEnum.API_KEY,
+          });
+        } else if (
+          parsedCurlData.request.selectedRequestAuthType === "Basic Auth"
+        ) {
+          await this.updateRequestState({
+            requestAuthNavigation: HttpRequestAuthTypeBaseEnum.BASIC_AUTH,
+          });
+        } else {
+          await this.updateRequestState({
+            requestAuthNavigation: HttpRequestAuthTypeBaseEnum.NO_AUTH,
+          });
+        }
       }
       let navigation: RequestDatasetEnum;
       const bodyType = parsedCurlData?.request?.selectedRequestBodyType;
@@ -934,7 +956,7 @@ class RestExplorerViewModel {
     // Handle formdata from -F flags
     if (requestObject.files && Array.isArray(requestObject.files)) {
       requestObject.files.forEach((fileObj: any) => {
-        (transformedObject.request!.body.formdata as KeyValueChecked[]).push({
+        transformedObject.request!.body.formdata.push({
           key: fileObj?.key || "",
           value: fileObj?.value || "",
           checked: true,
@@ -942,6 +964,54 @@ class RestExplorerViewModel {
       });
       transformedObject.request!.selectedRequestBodyType =
         "multipart/form-data";
+    }
+
+    // Handle raw multipart body with boundary (for --data-raw)
+    if (
+      contentType.startsWith("multipart/form-data") &&
+      requestObject.data &&
+      typeof requestObject.data === "string"
+    ) {
+      // Extract boundary
+      const boundaryMatch = contentType.match(/boundary=(.+)$/);
+      const boundary = boundaryMatch ? boundaryMatch[1] : "";
+      if (boundary) {
+        // Split body by boundary
+        const parts = requestObject.data.split(`--${boundary}`);
+        for (const part of parts) {
+          if (
+            part.includes("Content-Disposition: form-data;") &&
+            part.includes('name="')
+          ) {
+            const nameMatch = part.match(/name="([^"]+)"/);
+            const key = nameMatch ? nameMatch[1] : "";
+            // Value is after two CRLFs
+            const valueMatch = part.match(/\r\n\r\n([\s\S]*?)\r\n$/);
+            const value = valueMatch ? valueMatch[1] : "";
+            if (key) {
+              transformedObject.request!.body.formdata.push({
+                key,
+                value,
+                checked: true,
+              });
+            }
+          }
+        }
+        transformedObject.request!.selectedRequestBodyType =
+          "multipart/form-data";
+      }
+    }
+
+    // Only add one extra empty formdata item if body type is multipart/form-data
+    if (
+      transformedObject.request!.selectedRequestBodyType ===
+      "multipart/form-data"
+    ) {
+      transformedObject.request!.body.formdata.push({
+        key: "",
+        value: "",
+        checked: true,
+      });
     }
 
     // Handle body based on Content-Type
@@ -988,20 +1058,14 @@ class RestExplorerViewModel {
             value,
           }));
       for (const { key, value } of headersArr) {
-        if (
-          !(
-            transformedObject.request!.selectedRequestBodyType ===
-              "multipart/form-data" &&
-            (key === "Content-Type" || key === "content-type")
-          )
-        ) {
-          transformedObject.request!.headers!.push({
-            key,
-            value,
-            checked: true,
-          });
-        }
-        // Bearer token
+        // Add header to request
+        transformedObject.request!.headers!.push({
+          key,
+          value,
+          checked: true,
+        });
+
+        // Bearer token detection
         if (
           key.toLowerCase() === "authorization" &&
           typeof value === "string" &&
@@ -1010,7 +1074,7 @@ class RestExplorerViewModel {
           transformedObject.request!.auth.bearerToken = value.slice(7).trim();
           transformedObject.request!.selectedRequestAuthType = "Bearer Token";
         }
-        // API key
+        // API key detection
         if (
           key.toLowerCase() === "api-key" ||
           key.toLowerCase() === "x-api-key"
@@ -1022,7 +1086,7 @@ class RestExplorerViewModel {
           };
           transformedObject.request!.selectedRequestAuthType = "API Key";
         }
-        // Basic Auth
+        // Basic Auth detection
         if (
           key.toLowerCase() === "authorization" &&
           typeof value === "string" &&
@@ -1065,16 +1129,6 @@ class RestExplorerViewModel {
         key: "",
         value: "",
         checked: false,
-      });
-    }
-    if (
-      transformedObject.request!.selectedRequestBodyType ===
-      "multipart/form-data"
-    ) {
-      (transformedObject.request!.body.formdata as KeyValueChecked[]).push({
-        key: "",
-        value: "",
-        checked: true,
       });
     }
 
