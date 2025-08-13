@@ -67,6 +67,7 @@ import {
   ResponseFormatterEnum,
   type HttpRequestCollectionLevelAuthTabInterface,
   type HttpRequestCollectionLevelAuthProfileTabInterface,
+  RequestDatasetEnum,
 } from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
 import { RequestTabAdapter } from "../../../../adapter/request-tab";
@@ -90,11 +91,14 @@ import {
   CollectionRequestAddToBaseEnum,
   type CollectionAuthBaseInterface,
   type CollectionAuthProifleBaseInterface as AuthProfileDto,
+  type TransformedRequest,
 } from "@sparrow/common/types/workspace/collection-base";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 
 import { getClientUser } from "@app/utils/jwt";
 import constants from "@app/constants/constants";
+import * as curlconverter from "curlconverter";
+
 import * as Sentry from "@sentry/svelte";
 
 class RestExplorerViewModel {
@@ -687,14 +691,294 @@ class RestExplorerViewModel {
   };
 
   /**
-   *
-   * @param _url - request url
-   * @param _effectQueryParams  - flag that effect request query parameter
+   * Handles importing cURL data directly into the current tab
+   * @param parsedCurlData The parsed cURL command data
+   */
+  public handleImportCurl = async (parsedCurlData: TransformedRequest) => {
+    if (!parsedCurlData) return false;
+
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+
+    try {
+      // Update URL Name
+      if (parsedCurlData.request.url && !progressiveTab.path.collectionId) {
+        await this.updateRequestName(parsedCurlData.request.url);
+      }
+      // Update URL
+      if (parsedCurlData.request.url) {
+        await this.updateRequestUrl(parsedCurlData.request.url, false);
+      }
+
+      // Update method
+      if (parsedCurlData.request.method) {
+        await this.updateRequestMethod(
+          parsedCurlData.request.method.toUpperCase(),
+        );
+      }
+
+      // Update headers
+      if (
+        parsedCurlData.request.headers &&
+        parsedCurlData.request.headers.length > 0
+      ) {
+        await this.updateHeaders(parsedCurlData.request.headers);
+      }
+
+      // Update query parameters if they exist in the parsed data
+      if (
+        parsedCurlData.request.queryParams &&
+        parsedCurlData.request.queryParams.length > 0
+      ) {
+        await this.updateParams(parsedCurlData.request.queryParams, false);
+      }
+
+      // Update body
+      if (parsedCurlData.request.body) {
+        await this.updateRequestBody({
+          raw: parsedCurlData.request.body,
+          urlencoded:
+            parsedCurlData.request.body.urlencoded ||
+            progressiveTab.property.request.body.urlencoded,
+          formdata:
+            parsedCurlData.request.body.formdata ||
+            progressiveTab.property.request.body.formdata,
+        });
+      }
+
+      // Update auth if present
+      if (
+        parsedCurlData.request.auth &&
+        Object.keys(parsedCurlData.request.auth).length > 0
+      ) {
+        await this.updateRequestAuth(parsedCurlData.request.auth);
+      }
+      await this.updateRequestState({
+        requestBodyNavigation: RequestDatasetEnum.RAW,
+      });
+
+      // Track the event
+      MixpanelEvent(Events.IMPORT_API_VIA_CURL, {
+        source: "URL input",
+      });
+
+      notifications.success("cURL imported successfully!");
+      return true;
+    } catch (error) {
+      console.error("Error importing cURL:", error);
+      notifications.error("Failed to import cURL. Please try again.");
+      return false;
+    }
+  };
+
+  public handleFormatCurl = (curlCommand: string): string => {
+    const rawLiteralRegex = /(\$'[\s\S]*?')$/m;
+    let rawLiteral = "";
+    const rawMatch = curlCommand.match(rawLiteralRegex);
+    if (rawMatch) {
+      rawLiteral = rawMatch[0];
+      curlCommand = curlCommand.slice(0, rawMatch.index).trim();
+    }
+    const heredocRegex = /(<<\s*EOF[\s\S]*?^EOF\s*)$/m;
+    const heredocMatch = curlCommand.match(heredocRegex);
+    let heredoc = "";
+    if (heredocMatch) {
+      heredoc = heredocMatch[0]
+        .replace(/\r\n/g, "\n")
+        .replace(/^\s+|\s+$/g, "");
+      curlCommand = curlCommand.slice(0, heredocMatch.index).trim();
+    }
+    curlCommand = curlCommand.replace(/\\\s*\n\s*/g, " ");
+    curlCommand = curlCommand.replace(/\\\s*/g, " ");
+    curlCommand = curlCommand.replace(/\s+/g, " ").trim();
+    const parts = curlCommand.match(/"[^"]*"|'[^']*'|\S+/g) || [];
+    let formatted = "";
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      if (i === 0) {
+        formatted += part;
+      } else if (
+        part.startsWith("--") ||
+        (part.startsWith("-") && !/^-\d/.test(part))
+      ) {
+        formatted += " \\\n  " + part;
+      } else if (
+        /^https?:\/\//.test(part) ||
+        /^\$\{.*\}/.test(part) ||
+        /^[\w\/:.?&=%-]+$/.test(part)
+      ) {
+        if (parts[i - 1] && parts[i - 1].startsWith("--request")) {
+          formatted += " " + part;
+        } else {
+          formatted += " \\\n  " + part;
+        }
+      } else {
+        formatted += " " + part;
+      }
+    }
+    if (heredoc) {
+      const [firstLine, ...restLines] = heredoc.split("\n");
+      formatted += " \\\n  " + firstLine + "\n" + restLines.join("\n");
+    }
+    if (rawLiteral && !formatted.includes(rawLiteral)) {
+      formatted += ` \\\n  ${rawLiteral}`;
+    }
+    return formatted.trim();
+  };
+
+  public handleFormatUrl = (url: string) => {
+    url = url.replace(/^(https?:\/\/\s*)+(https?:\/\/)/, "$2");
+    return url;
+  };
+
+  public transformRequest = (requestObject: any, username: string) => {
+    let url = requestObject.url || "";
+    let raw_url = requestObject.raw_url || "";
+    let method = requestObject.method || "GET";
+    let headers = requestObject.headers || [];
+    let body = requestObject.body || requestObject.data || "";
+    let files = requestObject.files || [];
+    let params = [];
+    let auth = requestObject.auth || {};
+    let queryParams = [];
+
+    // Format queryParams (always add an empty param at the end)
+    if (raw_url && raw_url.includes("?")) {
+      const [baseUrl, queryString] = raw_url.split("?");
+      url = baseUrl;
+      queryParams = queryString
+        .split("&")
+        .map((pair) => {
+          const eqIdx = pair.indexOf("=");
+          if (eqIdx === -1) {
+            return { key: pair.trim(), value: "", checked: true };
+          }
+          const key = pair.slice(0, eqIdx).trim();
+          const value = pair.slice(eqIdx + 1).trim();
+          return { key, value, checked: true };
+        })
+        .filter((item) => item.key);
+      queryParams.push({ key: "", value: "", checked: true });
+    } else {
+      queryParams = [{ key: "", value: "", checked: true }];
+    }
+
+    // Format headers
+    if (
+      !Array.isArray(headers) &&
+      typeof headers === "object" &&
+      headers !== null
+    ) {
+      headers = Object.entries(headers)
+        .filter(([key]) => key && key.trim() !== "")
+        .map(([key, value]) => ({
+          key: key.trim(),
+          value:
+            value !== undefined && value !== null ? String(value).trim() : "",
+          checked: true,
+        }));
+      headers.push({ key: "", value: "", checked: true });
+    } else {
+      headers = [{ key: "", value: "", checked: true }];
+    }
+
+    // Format files
+    files = Array.isArray(files)
+      ? files.map((f) =>
+          typeof f === "string"
+            ? {
+                key: f.split("=")[0],
+                value: f.split("=").slice(1).join("="),
+                checked: true,
+              }
+            : { key: f.key, value: f.value, checked: true },
+        )
+      : [];
+
+    // Format body (for JSON, form, etc.)
+    if (typeof body === "object" && body !== null) {
+      try {
+        body = JSON.stringify(body, null, 2);
+      } catch {
+        body = String(body);
+      }
+    }
+
+    // Format auth
+    if (auth && typeof auth === "object") {
+      auth = {
+        ...auth,
+        checked: true,
+      };
+    }
+
+    return {
+      request: {
+        url: this.handleFormatUrl(url),
+        method,
+        headers,
+        body,
+        files,
+        params,
+        auth,
+        queryParams,
+      },
+      username,
+    };
+  };
+
+  public parseCurl = (curl: string): TransformedRequest => {
+    if (!curl || !curl.length) {
+      throw new Error();
+    }
+    const updatedCurl = this.handleFormatCurl(curl);
+    const stringifiedCurl = curlconverter.toJsonString(updatedCurl);
+    const parsedCurl = JSON.parse(stringifiedCurl);
+
+    // Match all -F flags with their key-value pairs
+    const formDataMatches = curl.match(/-F\s+'([^=]+)=@([^;]+)/g);
+    const formDataItems = formDataMatches
+      ? formDataMatches.map((match) => {
+          const [, keyValue] = match.split("-F '");
+          const [key, filePath] = keyValue.split("=@");
+          const value = filePath.replace(/'/g, "");
+          return {
+            key,
+            value,
+            checked: true,
+            base: value,
+          };
+        })
+      : [];
+    if (formDataItems.length > 0) {
+      parsedCurl.files = formDataItems;
+    }
+    return this.transformRequest(parsedCurl, "anonymous");
+  };
+
+  /**
+   * Updates the request URL or imports a cURL command.
+   * If the input starts with "curl ", it will parse and import the cURL.
+   * Otherwise, it will treat the input as a plain URL.
+   * @param value - The URL or cURL command.
+   * @param effectQueryParams - Whether to update query params from the URL.
    */
   public updateRequestUrl = async (
     _url: string,
     _effectQueryParams: boolean = true,
   ) => {
+    if (typeof _url === "string" && _url.trim().startsWith("curl ")) {
+      try {
+        const parsed = this.parseCurl(_url);
+        if (parsed) {
+          await this.handleImportCurl(parsed);
+          return;
+        }
+      } catch (err) {
+        console.error("Failed to parse cURL command:", err);
+        notifications.error("Failed to parse cURL command.");
+      }
+    }
+    // Handle as plain URL
     const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
     if (_url === progressiveTab.property.request.url) {
       return;
