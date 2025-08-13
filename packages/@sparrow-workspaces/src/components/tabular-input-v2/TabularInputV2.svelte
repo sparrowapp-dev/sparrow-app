@@ -10,11 +10,16 @@
   import { partition } from "rxjs";
   import { Button, Tooltip } from "@sparrow/library/ui";
   import { Checkbox } from "@sparrow/library/forms";
-  import { DeleteRegular, ReOrderDotsRegular } from "@sparrow/library/icons";
+  import {
+    ArrowHookRegular,
+    DeleteRegular,
+    ReOrderDotsRegular,
+  } from "@sparrow/library/icons";
   import { CodeMirrorInput } from "..";
   import { TabularInputTheme } from "../../utils";
   import { DismissRegular } from "@sparrow/library/icons";
   import { CheckMarkIcon } from "@sparrow/library/icons";
+  import SparkleFilled from "../../../../@sparrow-library/src/icons/SparkleFilled.svelte";
 
   /**
    * tabular pair entries
@@ -227,7 +232,13 @@
               style="height: 28px;"
             >
               <div class="d-flex justify-content-center align-items-center">
-                <div style="width:24px;">
+                <div class="d-flex" style="width:50px; text-align: right;">
+                  {#if element.type === "ai-generated"}
+                    <SparkleFilled
+                      size="12px"
+                      color="var(--text-ds-primary-300)"
+                    />
+                  {/if}
                   {#if pairs.length - 1 != index && !isGeneratedVariable}
                     <Checkbox
                       checked={element.checked}
@@ -298,6 +309,12 @@
                     />
                   </div>
                 </Tooltip>
+                {#if element.lifespan === "short"}
+                  <ArrowHookRegular
+                    size="12px"
+                    color="var(--text-ds-primary-300)"
+                  />
+                {/if}
               {:else if isGeneratedVariable}
                 <!-- {#if element?.aiUndo}
                   <div class="d-flex align-items-center gap-1">
