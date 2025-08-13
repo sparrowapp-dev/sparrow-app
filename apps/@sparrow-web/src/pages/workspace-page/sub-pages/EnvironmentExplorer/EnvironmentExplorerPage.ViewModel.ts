@@ -229,7 +229,7 @@ export class EnvironmentExplorerViewModel {
         await this.updateEnvironmentAiVariableGenerationStatus("rejected");
       }
     } else if (type === "accept-all") {
-        const progressiveTab = createDeepCopy(this._tab.getValue());
+      const progressiveTab = createDeepCopy(this._tab.getValue());
         await this.updateVariables([...progressiveTab.property.environment.variable, ...progressiveTab.property.environment.aiVariable.map((item)=>{
           return {
             ...item,
@@ -297,12 +297,12 @@ export class EnvironmentExplorerViewModel {
       {
         name: currentEnvironment.name,
         variable: currentEnvironment?.property?.environment?.variable.map((item) => {
-          return {
-            key: item.key,
-            value: item.value,
-            checked: item.checked,
-            type: item.type || "user-generated",
-          };
+            return {
+              key: item.key,
+              value: item.value,
+              checked: item.checked,
+              type: item.type || "user-generated",
+            };
         }),
       },
       baseUrl,
@@ -326,15 +326,15 @@ export class EnvironmentExplorerViewModel {
       debugger;
       const aiGeneratedVariables = progressiveTab.property.environment.variable.filter(
         (variable) => variable.lifespan === "short"
-      );
+        );
       if (aiGeneratedVariables.length > 0) {
         await this.updateVariables(currentEnvironment?.property?.environment?.variable.map((item) => {
-          return {
-            key: item.key,
-            value: item.value,
-            checked: item.checked,
-            type: item.type || "user-generated",
-          };
+            return {
+              key: item.key,
+              value: item.value,
+              checked: item.checked,
+              type: item.type || "user-generated",
+            };
         }));
         await this.updateGeneratedVariables([]);
 
@@ -476,5 +476,10 @@ export class EnvironmentExplorerViewModel {
     } else {
       notifications.error("Failed to Generate Variables.");
     }
+  };
+
+  public redirectDocsGenerateVariables = async () => {
+    window.open(constants.INTRO_DOCS_URL, "_blank");
+    return;
   };
 }

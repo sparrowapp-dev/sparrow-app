@@ -10,6 +10,8 @@
   export let isLoadingVariables: boolean = true;
   export let isAcceptedVariables: boolean = false;
   export let updateGeneratedVariables;
+  export let handleRedirectToDocs = () => {};
+  export let isWebApp;
 
   export let onUpdateVariableSelection;
   export let aiGenerationStatus:
@@ -198,17 +200,23 @@
                 <li>
                   Our documentation has a full guide on how this feature works
                   and how you can use it.
-                  <a href="#" style="color: var(--text-ds-primary-300);"
+                  <a
+                    on:click={handleRedirectToDocs}
+                    style="color: var(--text-ds-primary-300); cursor: pointer; text-decoration: underline;"
                     >See How It Works</a
                   >
                 </li>
-                <li>
-                  Have an idea on how to make this feature better? We'd love to
-                  hear from you.
-                  <a href="#" style="color: var(--text-ds-primary-300);"
-                    >Help Us Improve</a
-                  >
-                </li>
+                {#if !isWebApp}
+                  <li>
+                    Have an idea on how to make this feature better? We'd love
+                    to hear from you.
+                    <a
+                      style="color: var(--text-ds-primary-300); cursor: pointer; text-decoration: underline;"
+                    >
+                      Help Us Improve
+                    </a>
+                  </li>
+                {/if}
               </ul>
             </div>
           {/if}
