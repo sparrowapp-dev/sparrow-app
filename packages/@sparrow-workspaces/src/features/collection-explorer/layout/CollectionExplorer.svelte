@@ -50,6 +50,7 @@
   export let onSyncCollection;
   export let isSharedWorkspace = false;
   export let globalEnvInUse = null;
+  export let isGuestUser = false;
 
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
 
@@ -626,35 +627,37 @@
             {/if}
           </div>
 
-          <div style="margin-right: 8px;">
-            <Tooltip
-              title={"Generate Variables"}
-              subtext={globalEnvInUse?.collectionName
-                ? `You're already generating variables for "${globalEnvInUse?.collectionName}"  collection. Please finish or close that task before starting another.`
-                : "Use AI to quickly generate env variables by analyzing every API request in your collection."}
-              placement={"bottom-center"}
-              size="medium"
-            >
-              <div
-                style={`${globalEnvInUse?.collectionName ? "" : "border: 2px solid var(--border-ds-primary-400); border-radius:8.5px;"} `}
+          {#if !isGuestUser}
+            <div style="margin-right: 8px;">
+              <Tooltip
+                title={"Generate Variables"}
+                subtext={globalEnvInUse?.collectionName
+                  ? `You're already generating variables for "${globalEnvInUse?.collectionName}"  collection. Please finish or close that task before starting another.`
+                  : "Use AI to quickly generate env variables by analyzing every API request in your collection."}
+                placement={"bottom-center"}
+                size="medium"
               >
-                <Button
-                  disable={globalEnvInUse?.collectionName ? true : false}
-                  startIcon={SparkleFilled}
-                  title={"Generate Variables"}
-                  size="medium"
-                  type={"secondary"}
-                  onClick={async () => {
-                    onGenerateVariables(
-                      collection?.id,
-                      globalEnvironment,
-                      collection?.name,
-                    );
-                  }}
-                />
-              </div>
-            </Tooltip>
-          </div>
+                <div
+                  style={`${globalEnvInUse?.collectionName ? "" : "border: 2px solid var(--border-ds-primary-400); border-radius:8.5px;"} `}
+                >
+                  <Button
+                    disable={globalEnvInUse?.collectionName ? true : false}
+                    startIcon={SparkleFilled}
+                    title={"Generate Variables"}
+                    size="medium"
+                    type={"secondary"}
+                    onClick={async () => {
+                      onGenerateVariables(
+                        collection?.id,
+                        globalEnvironment,
+                        collection?.name,
+                      );
+                    }}
+                  />
+                </div>
+              </Tooltip>
+            </div>
+          {/if}
 
           <div
             class="d-flex me-2 flex-column justify-content-center"

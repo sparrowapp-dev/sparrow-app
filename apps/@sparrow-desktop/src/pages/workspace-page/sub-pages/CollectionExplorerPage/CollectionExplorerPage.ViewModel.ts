@@ -2265,9 +2265,10 @@ class CollectionExplorerPage {
       const reponse = {
         collectionName: tab.toMutableJSON()?.generateProperty?.collectionName,
       };
-      return reponse;
+      if (tab.toMutableJSON().generateVariable) {
+        return reponse;
+      }
     }
-    return;
   };
 }
 
