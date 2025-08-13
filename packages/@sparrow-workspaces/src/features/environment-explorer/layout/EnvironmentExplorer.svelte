@@ -193,7 +193,10 @@
                       disable={$currentEnvironment?.property?.environment?.state
                         ?.isSaveInProgress ||
                         $currentEnvironment?.isSaved ||
-                        userRole === WorkspaceRole.WORKSPACE_VIEWER}
+                        userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+                        ($currentEnvironment?.aiGenerationStatus !==
+                          "accepted" &&
+                          $currentEnvironment?.generateVariable)}
                       loader={$currentEnvironment?.property?.environment?.state
                         ?.isSaveInProgress}
                     />
