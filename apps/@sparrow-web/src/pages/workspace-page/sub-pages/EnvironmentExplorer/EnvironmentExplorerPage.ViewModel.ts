@@ -236,15 +236,20 @@ export class EnvironmentExplorerViewModel {
       }
     } else if (type === "accept-all") {
       const progressiveTab = createDeepCopy(this._tab.getValue());
+      // Remove the last item from environment.variable
+      if (
+        Array.isArray(progressiveTab.property?.environment?.variable) &&
+        progressiveTab.property.environment.variable.length > 0
+      ) {
+        progressiveTab.property.environment.variable.pop();
+      }
       await this.updateVariables([
         ...progressiveTab.property.environment.variable,
-        ...progressiveTab.property.environment.aiVariable.map((item) => {
-          return {
-            ...item,
-            type: "ai-generated",
-            lifespan: "short",
-          };
-        }),
+        ...progressiveTab.property.environment.aiVariable.map((item) => ({
+          ...item,
+          type: "ai-generated",
+          lifespan: "short",
+        })),
         {
           key: "",
           value: "",
@@ -366,9 +371,6 @@ export class EnvironmentExplorerViewModel {
       await this.updateEnvironmentState({
         isSaveInProgress: false,
       });
-      notifications.success(
-        `Changes saved for ${currentEnvironment.name} environment.`,
-      );
       const aiGeneratedVariables =
         progressiveTab.property.environment.variable.filter(
           (variable) => variable.lifespan === "short",
@@ -432,9 +434,13 @@ export class EnvironmentExplorerViewModel {
           );
         } else {
           notifications.error(
-            "Failed to apply generated variables to the “Manage Pets” collection.",
+            `Failed to apply generated variables to the ${progressiveTab?.property?.environment?.generateProperty.collectionName}  collection.`,
           );
         }
+      } else {
+        notifications.success(
+          `Changes saved for ${currentEnvironment.name} environment.`,
+        );
       }
     } else {
       await this.updateEnvironmentState({ isSaveInProgress: false });

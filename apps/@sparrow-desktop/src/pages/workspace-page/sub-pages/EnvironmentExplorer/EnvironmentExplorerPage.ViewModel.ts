@@ -184,10 +184,14 @@ export class EnvironmentExplorerViewModel {
     if (type === "accept" && typeof index === "number") {
       try {
         const progressiveTab = createDeepCopy(this._tab.getValue());
-       progressiveTab
-        const foundIndex = progressiveTab.property.environment.aiVariable.findIndex((_, i) => i === index);
+        progressiveTab;
+        const foundIndex =
+          progressiveTab.property.environment.aiVariable.findIndex(
+            (_, i) => i === index,
+          );
         if (foundIndex !== -1) {
-          const foundObject = progressiveTab.property.environment.aiVariable[foundIndex];
+          const foundObject =
+            progressiveTab.property.environment.aiVariable[foundIndex];
           const currentPairs =
             progressiveTab.property?.environment?.variable || [];
           const updatedPairs = [...currentPairs];
@@ -196,34 +200,46 @@ export class EnvironmentExplorerViewModel {
           } else {
             updatedPairs.push(foundObject);
           }
-          const remainingGeneratedVariables = progressiveTab.property.environment.aiVariable.filter(
+          const remainingGeneratedVariables =
+            progressiveTab.property.environment.aiVariable.filter(
               (_, i) => i !== foundIndex,
             );
           this.updateGeneratedVariables(remainingGeneratedVariables);
           this.updateVariables(updatedPairs);
 
           //
-
         }
       } catch (error) {
         console.error("Error accepting generated variable:", error);
       }
     } else if (type === "accept-all") {
       const progressiveTab = createDeepCopy(this._tab.getValue());
-       progressiveTab.property.environment.variable = [...progressiveTab.property.environment.variable, ...progressiveTab.property.environment.aiVariable, {
+      // Remove the last item from environment.variable
+      if (
+        Array.isArray(progressiveTab.property?.environment?.variable) &&
+        progressiveTab.property.environment.variable.length > 0
+      ) {
+        progressiveTab.property.environment.variable.pop();
+      }
+      await this.updateVariables([
+        ...progressiveTab.property.environment.variable,
+        ...progressiveTab.property.environment.aiVariable.map((item) => ({
+          ...item,
+          type: "ai-generated",
+          lifespan: "short",
+        })),
+        {
           key: "",
           value: "",
           checked: true,
-       } ];
-      progressiveTab.property.environment.aiVariable = [];
-      this.tab = progressiveTab;
-      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+        },
+      ]);
+      await this.updateEnvironmentAiVariableGenerationStatus("accepted");
+      await this.updateGeneratedVariables([]);
     }
   };
 
-  public updateGeneratedVariables = async (
-    aiVariables?: any,
-  ) => {
+  public updateGeneratedVariables = async (aiVariables?: any) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const envTab = createDeepCopy(progressiveTab);
     envTab.property.environment.aiVariable = aiVariables;
@@ -347,47 +363,6 @@ export class EnvironmentExplorerViewModel {
    */
   public getWorkspace = async () => {
     return await this.workspaceRepository.getActiveWorkspaceDoc();
-  };
-
-  /**
-   * Handle create generative variables for a collection.
-   * @param collectionId :CollectionId - the collection in which new request is going to be created
-   * @returns :void
-   */
-  public getGenerateVariables = async (
-    env: any,
-  ): Promise<{ [key: string]: any }> => {
-    console.log("this is the env for it -", env);
-
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const response = [
-          {
-            key: "name",
-            value: "world",
-            checked: false,
-          },
-          {
-            key: "sample-my-one",
-            value: "test",
-            checked: false,
-          },
-          {
-            key: "sample-1",
-            value: "test-1",
-            checked: false,
-          },
-          {
-            key: "sample-2",
-            value: "test-2",
-            checked: false,
-          },
-        ];
-
-        this.updateGeneratedVariables(response);
-        resolve(response);
-      }, 3000);
-    });
   };
 
   public redirectDocsGenerateVariables = async () => {
