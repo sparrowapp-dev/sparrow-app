@@ -349,47 +349,6 @@ export class EnvironmentExplorerViewModel {
     return await this.workspaceRepository.getActiveWorkspaceDoc();
   };
 
-  /**
-   * Handle create generative variables for a collection.
-   * @param collectionId :CollectionId - the collection in which new request is going to be created
-   * @returns :void
-   */
-  public getGenerateVariables = async (
-    env: any,
-  ): Promise<{ [key: string]: any }> => {
-    console.log("this is the env for it -", env);
-
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const response = [
-          {
-            key: "name",
-            value: "world",
-            checked: false,
-          },
-          {
-            key: "sample-my-one",
-            value: "test",
-            checked: false,
-          },
-          {
-            key: "sample-1",
-            value: "test-1",
-            checked: false,
-          },
-          {
-            key: "sample-2",
-            value: "test-2",
-            checked: false,
-          },
-        ];
-
-        this.updateGeneratedVariables(response);
-        resolve(response);
-      }, 3000);
-    });
-  };
-
   public redirectDocsGenerateVariables = async () => {
     await open(constants.INTRO_DOCS_URL);
     return;

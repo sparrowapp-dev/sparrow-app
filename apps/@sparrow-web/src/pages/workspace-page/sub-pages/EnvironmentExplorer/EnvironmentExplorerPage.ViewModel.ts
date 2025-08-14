@@ -366,9 +366,6 @@ export class EnvironmentExplorerViewModel {
       await this.updateEnvironmentState({
         isSaveInProgress: false,
       });
-      notifications.success(
-        `Changes saved for ${currentEnvironment.name} environment.`,
-      );
       const aiGeneratedVariables =
         progressiveTab.property.environment.variable.filter(
           (variable) => variable.lifespan === "short",
@@ -432,9 +429,13 @@ export class EnvironmentExplorerViewModel {
           );
         } else {
           notifications.error(
-            "Failed to apply generated variables to the “Manage Pets” collection.",
+            `Failed to apply generated variables to the ${progressiveTab?.property?.environment?.generateProperty.collectionName}  collection.`,
           );
         }
+      } else {
+        notifications.success(
+          `Changes saved for ${currentEnvironment.name} environment.`,
+        );
       }
     } else {
       await this.updateEnvironmentState({ isSaveInProgress: false });
