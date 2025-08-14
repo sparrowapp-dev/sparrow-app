@@ -43,6 +43,8 @@
   export let isGeneratedVariable = false;
   export let onUpdateVariableSelection: (type?: string, index?: number) => void;
 
+  export let isRevertEnabled = false;
+
   let pairs: KeyValueChecked[] = keyValue;
   let controller: boolean = false;
   const theme = new TabularInputTheme().build();
@@ -251,10 +253,10 @@
 
 <div class="mb-0 me-0 w-100 py-0 section-layout">
   <div
-    class="d-flex align-items-center w-100 px-1 header-box"
-    style="height: 28px; background-color:var(--bg-ds-surface-400); gap:11px;"
+    class="d-flex align-items-center w-100 px-1 header-box gap-2"
+    style="height: 28px; background-color:var(--bg-ds-surface-400);"
   >
-    <div style="width:24px; margin-left: 4px;">
+    <div style="width:50px; padding-left: 28px;">
       {#if !isGeneratedVariable}
         <Checkbox
           disabled={pairs.length === 1 || disabled}
@@ -267,48 +269,53 @@
       class="d-flex pair-title align-items-center w-100"
       style="font-size: 12px; font-weight: 500;"
     >
-      <p class="mb-0 w-50 header-text p-1">Key</p>
-      <p
-        class="mb-0 w-50 header-text"
-        style="padding-left: {isGeneratedVariable
-          ? '5px'
-          : '17px'}; padding-right:4px"
-      >
-        Value
-      </p>
+      <p class="mb-0 w-50 header-text" style="padding-left: 16px;">Key</p>
+      <p class="mb-0 w-50 header-text" style="padding-left: 30px;">Value</p>
     </div>
-    <div class="pe-1 d-flex">
-      {#if isGeneratedVariable && pairs.length > 0}
-        <button
-          class="border-0 d-flex text-nowrap generate-action-button common-text align-items-center"
-          on:click={onUpdateVariableSelection("accept-all")}>Accept All</button
-        >
+    <div class="d-flex justify-content-end pe-2" style="width: 100px;">
+      {#if isGeneratedVariable}
+        {#if isGeneratedVariable && pairs.length > 0}
+          <button
+            class="bg-transparent border-0 d-flex text-nowrap common-text align-items-center"
+            style="color: var(--text-ds-primary-300);"
+            on:click={onUpdateVariableSelection("accept-all")}
+            >Accept All</button
+          >
+        {:else if isRevertEnabled}
+          <button
+            class="bg-transparent border-0 d-flex text-nowrap common-text align-items-center"
+            style="color: var(--text-ds-neutral-300); text-decoration: underline;"
+            on:click={onUpdateVariableSelection("revert-all")}
+            >Revert Changes</button
+          >
+        {/if}
+      {:else}
+        <button class="bg-transparent border-0 d-flex d-none" style="">
+          <p
+            class="text-nowrap text-primary-300 mb-0 me-2"
+            style="font-size: 10px;"
+          >
+            Bulk Edit
+          </p>
+          <img
+            class="my-auto d-none"
+            src={editIcon}
+            alt="Edit Icon"
+            style="height: 10px; width: 10px;"
+          />
+        </button>
+        <button class="bg-transparent border-0 d-flex d-none" style="">
+          <img
+            class="my-auto"
+            src={moreOptions}
+            alt="Edit Icon"
+            style="height: 10px; width: 10px;"
+          />
+        </button>
+        <div class="h-75 pe-1 invisible">
+          <button class="border-0" style="width:40px;" />
+        </div>
       {/if}
-      <button class="bg-transparent border-0 d-flex d-none" style="">
-        <p
-          class="text-nowrap text-primary-300 mb-0 me-2"
-          style="font-size: 10px;"
-        >
-          Bulk Edit
-        </p>
-        <img
-          class="my-auto d-none"
-          src={editIcon}
-          alt="Edit Icon"
-          style="height: 10px; width: 10px;"
-        />
-      </button>
-      <button class="bg-transparent border-0 d-flex d-none" style="">
-        <img
-          class="my-auto"
-          src={moreOptions}
-          alt="Edit Icon"
-          style="height: 10px; width: 10px;"
-        />
-      </button>
-      <div class="h-75 pe-1 invisible">
-        <button class="border-0" style="width:40px;" />
-      </div>
     </div>
   </div>
 
@@ -332,156 +339,194 @@
               class="d-flex w-100 px-1 align-items-center justify-content-center gap-2 pair-container position-relative"
               style="height: 28px;"
             >
-              <div class="d-flex justify-content-center align-items-center">
-                <div class="d-flex" style="width:50px; text-align: right;">
-                  {#if element.type === "ai-generated"}
-                    <SparkleFilled
-                      size="12px"
-                      color="var(--text-ds-primary-300)"
-                    />
-                  {/if}
-                  {#if pairs.length - 1 != index && !isGeneratedVariable}
-                    <Checkbox
-                      checked={element.checked}
-                      on:input={() => {
-                        updateCheck(index);
+              <div
+                class="d-flex justify-content-center align-items-center"
+                style="width:50px;"
+              >
+                <div class="d-flex w-100">
+                  <span style="width: 25px;">
+                    {#if element.type === "ai-generated"}
+                      <Tooltip
+                        title={"Generated Variable"}
+                        placement={"top-right"}
+                        distance={10}
+                      >
+                        <button
+                          class="generate-action-button sparkle-icon-parent accept"
+                          on:click|stopPropagation={() => {}}
+                        >
+                          <SparkleFilled size="12px" color="" />
+                        </button>
+                      </Tooltip>
+                    {/if}
+                  </span>
+
+                  <span style="width: 25px;">
+                    {#if pairs.length - 1 != index && !isGeneratedVariable}
+                      <Checkbox
+                        checked={element.checked}
+                        on:input={() => {
+                          updateCheck(index);
+                        }}
+                        {disabled}
+                      />
+                    {/if}
+                  </span>
+                </div>
+              </div>
+              <div
+                class="d-flex"
+                style="width: calc(100% - 100px); height:28px;"
+              >
+                <div class="w-50 position-relative">
+                  <div
+                    class="position-absolute w-100 top-0 left-0 right-0"
+                    style="width: calc(50% - {isGeneratedVariable
+                      ? '45px'
+                      : '33px'} );"
+                  >
+                    <CodeMirrorInput
+                      bind:value={element.key}
+                      onUpdateInput={() => {
+                        updatePairs(index);
                       }}
-                      {disabled}
-                    />
-                  {/if}
-                </div>
-              </div>
-
-              <div class="w-50">
-                <div
-                  class="position-absolute top-0"
-                  style="width: calc(50% - {isGeneratedVariable
-                    ? '45px'
-                    : '33px'} );"
-                >
-                  <CodeMirrorInput
-                    bind:value={element.key}
-                    onUpdateInput={() => {
-                      updatePairs(index);
-                    }}
-                    disabled={disabled || element.aiUndo}
-                    placeholder={"Add Variable"}
-                    {theme}
-                    enableEnvironmentHighlighting={false}
-                  />
-                </div>
-              </div>
-
-              <div class="w-50">
-                <div
-                  class="position-absolute top-0"
-                  style="width: calc(50% - {isGeneratedVariable
-                    ? '45px'
-                    : '33px'});"
-                >
-                  <CodeMirrorInput
-                    bind:value={element.value}
-                    onUpdateInput={() => {
-                      updatePairs(index);
-                    }}
-                    disabled={disabled || element.aiUndo}
-                    placeholder={"Add Value"}
-                    {theme}
-                    enableEnvironmentHighlighting={false}
-                  />
-                </div>
-              </div>
-
-              {#if pairs.length - 1 != index && !disabled && !isGeneratedVariable}
-                <Tooltip
-                  title={"Delete"}
-                  placement={"bottom-right"}
-                  distance={10}
-                >
-                  <div class="button-container">
-                    <Button
-                      buttonClassProp=""
-                      size="extra-small"
-                      type="teritiary-regular"
-                      startIcon={DeleteRegular}
-                      onClick={() => {
-                        deletePairs(index);
-                      }}
+                      disabled={disabled || element.aiUndo}
+                      placeholder={"Add Variable"}
+                      {theme}
+                      enableEnvironmentHighlighting={false}
                     />
                   </div>
-                </Tooltip>
-                {#if element.lifespan === "short"}
-                  <ArrowHookRegular
-                    size="12px"
-                    color="var(--text-ds-primary-300)"
-                  />
-                {/if}
-              {:else if isGeneratedVariable}
-                {#if element?.aiUndo}
-                  <div class="d-flex align-items-center gap-1">
+                </div>
+
+                <div class="w-50 position-relative">
+                  <div
+                    class="position-absolute w-100 top-0 left-0 right-0"
+                    style="width: calc(50% - {isGeneratedVariable
+                      ? '45px'
+                      : '33px'});"
+                  >
+                    <CodeMirrorInput
+                      bind:value={element.value}
+                      onUpdateInput={() => {
+                        updatePairs(index);
+                      }}
+                      disabled={disabled || element.aiUndo}
+                      placeholder={"Add Value"}
+                      {theme}
+                      enableEnvironmentHighlighting={false}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex justify-content-end" style="width: 50px;">
+                {#if pairs.length - 1 != index && !disabled && !isGeneratedVariable}
+                  <span style="width: 25px;">
                     <Tooltip
-                      title={"Undo delete"}
-                      placement={"top-right"}
+                      title={"Delete"}
+                      placement={"bottom-right"}
                       distance={10}
                     >
-                      <button
-                        class="generate-action-button undo"
-                        on:click|stopPropagation={() =>
-                          undoGeneratedDelete(index)}
-                      >
-                        <ArrowUndoRegular
-                          size="12"
-                          color={"var(--icon-ds-neutral-50)"}
+                      <div class="button-container">
+                        <Button
+                          buttonClassProp=""
+                          size="extra-small"
+                          type="teritiary-regular"
+                          startIcon={DeleteRegular}
+                          onClick={() => {
+                            deletePairs(index);
+                          }}
                         />
-                      </button>
+                      </div>
                     </Tooltip>
-                  </div>
+                  </span>
+                  <span style="width: 25px;">
+                    {#if element.lifespan === "short"}
+                      <Tooltip
+                        title={"Revert"}
+                        placement={"top-right"}
+                        distance={10}
+                      >
+                        <button
+                          class="generate-action-button accept"
+                          on:click|stopPropagation={() => {
+                            onUpdateVariableSelection("revert", index);
+                          }}
+                        >
+                          <ArrowHookRegular
+                            size="12px"
+                            color="var(--text-ds-neutral-100)"
+                          />
+                        </button>
+                      </Tooltip>
+                    {/if}
+                  </span>
+                {:else if isGeneratedVariable}
+                  {#if element?.aiUndo}
+                    <div class="d-flex align-items-center gap-1">
+                      <Tooltip
+                        title={"Undo delete"}
+                        placement={"top-right"}
+                        distance={10}
+                      >
+                        <button
+                          class="generate-action-button undo"
+                          on:click|stopPropagation={() =>
+                            undoGeneratedDelete(index)}
+                        >
+                          <ArrowUndoRegular
+                            size="12"
+                            color={"var(--icon-ds-neutral-50)"}
+                          />
+                        </button>
+                      </Tooltip>
+                    </div>
+                  {:else}
+                    <div class="d-flex gap-1">
+                      <Tooltip
+                        title={"Add"}
+                        placement={"top-right"}
+                        distance={10}
+                      >
+                        <button
+                          class="generate-action-button accept"
+                          on:click|stopPropagation={() => {
+                            onUpdateVariableSelection("accept", index);
+                          }}
+                        >
+                          <CheckMarkIcon
+                            size="12"
+                            color={"var(--icon-ds-success-300)"}
+                          />
+                        </button>
+                      </Tooltip>
+                      <Tooltip
+                        title={"Remove"}
+                        placement={"top-right"}
+                        distance={10}
+                      >
+                        <button
+                          class="generate-action-button reject"
+                          on:click|stopPropagation={() => {
+                            deletePairs(index);
+                          }}
+                        >
+                          <DismissRegular
+                            size="12"
+                            color={"var(--icon-ds-danger-300)"}
+                          />
+                        </button>
+                      </Tooltip>
+                    </div>
+                  {/if}
                 {:else}
-                  <div class="d-flex gap-1">
-                    <Tooltip
-                      title={"Add"}
-                      placement={"top-right"}
-                      distance={10}
-                    >
-                      <button
-                        class="generate-action-button accept"
-                        on:click|stopPropagation={() => {
-                          onUpdateVariableSelection("accept", index);
-                        }}
-                      >
-                        <CheckMarkIcon
-                          size="12"
-                          color={"var(--icon-ds-success-300)"}
-                        />
-                      </button>
-                    </Tooltip>
-                    <Tooltip
-                      title={"Remove"}
-                      placement={"top-right"}
-                      distance={10}
-                    >
-                      <button
-                        class="generate-action-button reject"
-                        on:click|stopPropagation={() => {
-                          deletePairs(index);
-                        }}
-                      >
-                        <DismissRegular
-                          size="12"
-                          color={"var(--icon-ds-danger-300)"}
-                        />
-                      </button>
-                    </Tooltip>
+                  <div class="h-75 pe-1">
+                    <button
+                      class="bg-backgroundColor border-0"
+                      style="width:20px;"
+                    ></button>
                   </div>
                 {/if}
-              {:else}
-                <div class="h-75 pe-1">
-                  <button
-                    class="bg-backgroundColor border-0"
-                    style="width:20px;"
-                  ></button>
-                </div>
-              {/if}
+              </div>
             </div>
           </div>
         </div>
@@ -581,6 +626,11 @@
     letter-spacing: 0;
     text-align: center;
     vertical-align: middle;
-    color: var(--text-ds-primary-300);
+  }
+  .sparkle-icon-parent {
+    color: var(--text-ds-neutral-400);
+  }
+  .sparkle-icon-parent:hover {
+    color: var(--text-ds-neutral-100);
   }
 </style>

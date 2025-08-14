@@ -333,7 +333,6 @@
         transformedObject.request!.selectedRequestBodyType = "text/plain";
       }
     }
-
     // Handle files from request object
     if (requestObject.files) {
       // If files is an array of objects
@@ -341,20 +340,28 @@
         requestObject.files.forEach((fileObj: any) => {
           transformedObject.request!.body.formdata!.text.push({
             key: fileObj?.key || "",
-            value: "",
+            value: fileObj?.value || "", // Use the actual value from fileObj
             checked: true,
           });
         });
+        // Set the body type to multipart/form-data and clear raw body
+        transformedObject.request!.selectedRequestBodyType =
+          "multipart/form-data";
+        transformedObject.request!.body.raw = ""; // Clear raw body
       }
       // If files is an object with key-value pairs
       else {
         for (const key of Object.keys(requestObject.files)) {
           transformedObject.request!.body.formdata!.text.push({
             key,
-            value: "",
+            value: requestObject.files[key] || "", // Use the actual value
             checked: true,
           });
         }
+        // Set the body type to multipart/form-data and clear raw body
+        transformedObject.request!.selectedRequestBodyType =
+          "multipart/form-data";
+        transformedObject.request!.body.raw = ""; // Clear raw body
       }
     }
 
@@ -441,37 +448,47 @@
       throw new Error();
     }
 
+    // Remove line continuation backslashes before parsing
+    curl = curl.replace(/\\\s*\n\s*/g, " ");
+    curl = curl.replace(/\\\s*/g, " ");
+
     const updatedCurl = handleFormatCurl(curl);
     const stringifiedCurl = curlconverter.toJsonString(updatedCurl);
     const parsedCurl = JSON.parse(stringifiedCurl);
 
-    // Match all -F flags with their key-value pairs
-    const formDataMatches = curl.match(/-F\s+'([^=]+)=@([^;]+)/g);
-    const formDataItems = formDataMatches
-      ? formDataMatches.map((match) => {
-          // Extract key and filename
-          const [, keyValue] = match.split("-F '");
-          const [key, filePath] = keyValue.split("=@");
-          const value = filePath.replace(/'/g, "");
+    // This regex matches --form/-F with quoted or unquoted values, including empty values
+    const formDataMatches = curl.match(
+      /(?:--form|-F)\s+'([^=]+)=((?:".*?")|(?:'.*?')|[^']*)'/g,
+    );
 
-          return {
-            key,
-            value,
-            checked: true,
-            base: value,
-          };
-        })
+    const formDataItems = formDataMatches
+      ? formDataMatches
+          .map((match) => {
+            // Extract key and value
+            const keyValueMatch = match.match(
+              /(?:--form|-F)\s+'([^=]+)=((?:".*?")|(?:'.*?')|[^']*)'/,
+            );
+            if (!keyValueMatch) return null;
+            const key = keyValueMatch[1];
+            let value = keyValueMatch[2] || "";
+            // Remove surrounding quotes if present
+            value = value.replace(/^["']|["']$/g, "");
+            return {
+              key,
+              value,
+              checked: true,
+              base: value,
+            };
+          })
+          .filter(Boolean)
       : [];
 
-    // Override the form data in second
+    // Attach all form fields to parsedCurl.files and clear raw if formdata is present
     if (formDataItems.length > 0) {
       parsedCurl.files = formDataItems;
+      parsedCurl.data = ""; // Clear raw data if formdata is present
     }
 
-    // Override the form data in second
-    if (formDataItems.length > 0) {
-      parsedCurl.files = formDataItems;
-    }
     return transformRequest(parsedCurl, "anonymous");
   };
 
