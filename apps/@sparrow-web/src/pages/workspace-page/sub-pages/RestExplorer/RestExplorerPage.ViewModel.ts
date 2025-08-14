@@ -707,7 +707,6 @@ class RestExplorerViewModel {
    */
   public handleImportCurl = async (parsedCurlData: TransformedRequest) => {
     if (!parsedCurlData) return false;
-
     const progressiveTab = createDeepCopy(this._tab.getValue());
 
     try {
@@ -746,7 +745,7 @@ class RestExplorerViewModel {
       // Update body
       if (parsedCurlData.request.body) {
         await this.updateRequestBody({
-          raw: parsedCurlData.request.body,
+          raw: parsedCurlData.request.body.raw,
           urlencoded:
             parsedCurlData.request.body.urlencoded ||
             progressiveTab.property.request.body.urlencoded,
@@ -756,15 +755,50 @@ class RestExplorerViewModel {
         });
       }
 
-      // Update auth if present
       if (
         parsedCurlData.request.auth &&
         Object.keys(parsedCurlData.request.auth).length > 0
       ) {
         await this.updateRequestAuth(parsedCurlData.request.auth);
+
+        // Select the correct auth button based on the imported auth type
+        if (parsedCurlData.request.selectedRequestAuthType === "Bearer Token") {
+          await this.updateRequestState({
+            requestAuthNavigation: HttpRequestAuthTypeBaseEnum.BEARER_TOKEN,
+          });
+        } else if (
+          parsedCurlData.request.selectedRequestAuthType === "API Key"
+        ) {
+          await this.updateRequestState({
+            requestAuthNavigation: HttpRequestAuthTypeBaseEnum.API_KEY,
+          });
+        } else if (
+          parsedCurlData.request.selectedRequestAuthType === "Basic Auth"
+        ) {
+          await this.updateRequestState({
+            requestAuthNavigation: HttpRequestAuthTypeBaseEnum.BASIC_AUTH,
+          });
+        } else {
+          await this.updateRequestState({
+            requestAuthNavigation: HttpRequestAuthTypeBaseEnum.NO_AUTH,
+          });
+        }
       }
+      let navigation: RequestDatasetEnum;
+      const bodyType = parsedCurlData?.request?.selectedRequestBodyType;
+
+      if (bodyType === "multipart/form-data") {
+        navigation = RequestDatasetEnum.FORMDATA;
+      } else if (bodyType === "application/x-www-form-urlencoded") {
+        navigation = RequestDatasetEnum.URLENCODED;
+      } else if (bodyType === "application/json" || bodyType === "text/plain") {
+        navigation = RequestDatasetEnum.RAW;
+      } else {
+        navigation = RequestDatasetEnum.NONE; // <-- Default to NONE if no body type
+      }
+
       await this.updateRequestState({
-        requestBodyNavigation: RequestDatasetEnum.RAW,
+        requestBodyNavigation: navigation,
       });
 
       // Track the event
@@ -842,99 +876,265 @@ class RestExplorerViewModel {
   };
 
   public transformRequest = (requestObject: any, username: string) => {
-    let url = requestObject.url || "";
-    let raw_url = requestObject.raw_url || "";
-    let method = requestObject.method || "GET";
-    let headers = requestObject.headers || [];
-    let body = requestObject.body || requestObject.data || "";
-    let files = requestObject.files || [];
-    let params = [];
-    let auth = requestObject.auth || {};
-    let queryParams = [];
+    const keyValueDefaultObj = { key: "", value: "", checked: true };
+    let method = (requestObject.method || "GET").toUpperCase();
+    if (!["GET", "POST", "PUT", "PATCH", "DELETE"].includes(method)) {
+      method = "INVALID";
+    }
+    const url = this.handleFormatUrl(
+      requestObject.raw_url || requestObject.url || "",
+    );
+    const transformedObject: TransformedRequest = {
+      name: url || "",
+      description: "",
+      type: "REQUEST",
+      source: "USER",
+      request: {
+        method,
+        url: url ?? "",
+        body: {
+          raw: "",
+          urlencoded: [],
+          formdata: [],
+        },
+        headers: [],
+        queryParams: [],
+        auth: {
+          bearerToken: "",
+          basicAuth: { username: "", password: "" },
+          apiKey: { authKey: "", authValue: "", addTo: "Header" },
+        },
+        selectedRequestBodyType: "none",
+        selectedRequestAuthType: "No Auth",
+      },
+      createdBy: username,
+      updatedBy: username,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
 
-    // Format queryParams (always add an empty param at the end)
-    if (raw_url && raw_url.includes("?")) {
-      const [baseUrl, queryString] = raw_url.split("?");
-      url = baseUrl;
-      queryParams = queryString
-        .split("&")
-        .map((pair) => {
-          const eqIdx = pair.indexOf("=");
-          if (eqIdx === -1) {
-            return { key: pair.trim(), value: "", checked: true };
-          }
-          const key = pair.slice(0, eqIdx).trim();
-          const value = pair.slice(eqIdx + 1).trim();
-          return { key, value, checked: true };
-        })
-        .filter((item) => item.key);
-      queryParams.push({ key: "", value: "", checked: true });
-    } else {
-      queryParams = [{ key: "", value: "", checked: true }];
+    // Query params
+    const queryString = url.split("?")[1];
+    const queryParams = [];
+    if (queryString) {
+      const pairs = queryString.split("&");
+      for (const pair of pairs) {
+        const [key, rawValue] = pair.split("=");
+        const value = rawValue || "";
+        queryParams.push({ key, value, checked: true });
+        if (
+          key.toLowerCase() === "api-key" ||
+          key.toLowerCase() === "x-api-key"
+        ) {
+          transformedObject.request!.auth.apiKey = {
+            authKey: key,
+            authValue: value,
+            addTo: "Query Parameter",
+          };
+          transformedObject.request!.selectedRequestAuthType = "API Key";
+        }
+      }
+      queryParams.push({ key: "", value: "", checked: false });
+      transformedObject.request!.queryParams = queryParams;
+      transformedObject.request!.url = url;
     }
 
-    // Format headers
-    if (
-      !Array.isArray(headers) &&
-      typeof headers === "object" &&
-      headers !== null
-    ) {
-      headers = Object.entries(headers)
-        .filter(([key]) => key && key.trim() !== "")
-        .map(([key, value]) => ({
-          key: key.trim(),
-          value:
-            value !== undefined && value !== null ? String(value).trim() : "",
-          checked: true,
-        }));
-      headers.push({ key: "", value: "", checked: true });
-    } else {
-      headers = [{ key: "", value: "", checked: true }];
-    }
-
-    // Format files
-    files = Array.isArray(files)
-      ? files.map((f) =>
-          typeof f === "string"
-            ? {
-                key: f.split("=")[0],
-                value: f.split("=").slice(1).join("="),
-                checked: true,
-              }
-            : { key: f.key, value: f.value, checked: true },
-        )
-      : [];
-
-    // Format body (for JSON, form, etc.)
-    if (typeof body === "object" && body !== null) {
-      try {
-        body = JSON.stringify(body, null, 2);
-      } catch {
-        body = String(body);
+    // Detect Content-Type
+    let contentType = "";
+    if (requestObject.headers) {
+      if (Array.isArray(requestObject.headers)) {
+        const ctHeader = requestObject.headers.find(
+          (h) => h.key?.toLowerCase() === "content-type",
+        );
+        contentType = ctHeader?.value || "";
+      } else if (typeof requestObject.headers === "object") {
+        contentType =
+          requestObject.headers["content-type"] ||
+          requestObject.headers["Content-Type"] ||
+          "";
       }
     }
 
-    // Format auth
-    if (auth && typeof auth === "object") {
-      auth = {
-        ...auth,
-        checked: true,
-      };
+    // Handle formdata from -F flags
+    if (requestObject.files && Array.isArray(requestObject.files)) {
+      requestObject.files.forEach((fileObj: any) => {
+        transformedObject.request!.body.formdata.push({
+          key: fileObj?.key || "",
+          value: fileObj?.value || "",
+          checked: true,
+        });
+      });
+      transformedObject.request!.selectedRequestBodyType =
+        "multipart/form-data";
     }
 
-    return {
-      request: {
-        url: this.handleFormatUrl(url),
-        method,
-        headers,
-        body,
-        files,
-        params,
-        auth,
-        queryParams,
-      },
-      username,
-    };
+    // Handle raw multipart body with boundary (for --data-raw)
+    if (
+      contentType.startsWith("multipart/form-data") &&
+      requestObject.data &&
+      typeof requestObject.data === "string"
+    ) {
+      // Extract boundary
+      const boundaryMatch = contentType.match(/boundary=(.+)$/);
+      const boundary = boundaryMatch ? boundaryMatch[1] : "";
+      if (boundary) {
+        // Split body by boundary
+        const parts = requestObject.data.split(`--${boundary}`);
+        for (const part of parts) {
+          if (
+            part.includes("Content-Disposition: form-data;") &&
+            part.includes('name="')
+          ) {
+            const nameMatch = part.match(/name="([^"]+)"/);
+            const key = nameMatch ? nameMatch[1] : "";
+            // Value is after two CRLFs
+            const valueMatch = part.match(/\r\n\r\n([\s\S]*?)\r\n$/);
+            const value = valueMatch ? valueMatch[1] : "";
+            if (key) {
+              transformedObject.request!.body.formdata.push({
+                key,
+                value,
+                checked: true,
+              });
+            }
+          }
+        }
+        transformedObject.request!.selectedRequestBodyType =
+          "multipart/form-data";
+      }
+    }
+
+    // Only add one extra empty formdata item if body type is multipart/form-data
+    if (
+      transformedObject.request!.selectedRequestBodyType ===
+      "multipart/form-data"
+    ) {
+      transformedObject.request!.body.formdata.push({
+        key: "",
+        value: "",
+        checked: true,
+      });
+    }
+
+    // Handle body based on Content-Type
+    if (requestObject.data) {
+      if (contentType.startsWith("multipart/form-data")) {
+        transformedObject.request!.selectedRequestBodyType =
+          "multipart/form-data";
+      } else if (contentType.includes("application/json")) {
+        if (typeof requestObject.data === "string") {
+          transformedObject.request!.body.raw = requestObject.data;
+        } else {
+          transformedObject.request!.body.raw = JSON.stringify(
+            requestObject.data,
+            null,
+            2,
+          );
+        }
+        transformedObject.request!.selectedRequestBodyType = "application/json";
+      } else if (contentType.includes("application/x-www-form-urlencoded")) {
+        for (const [key, value] of new URLSearchParams(requestObject.data)) {
+          transformedObject.request!.body.urlencoded!.push({
+            key,
+            value,
+            checked: true,
+          });
+        }
+        transformedObject.request!.selectedRequestBodyType =
+          "application/x-www-form-urlencoded";
+      } else {
+        transformedObject.request!.body.raw =
+          typeof requestObject.data === "string"
+            ? requestObject.data
+            : JSON.stringify(requestObject.data);
+        transformedObject.request!.selectedRequestBodyType = "text/plain";
+      }
+    }
+
+    // Handle headers and auth
+    if (requestObject.headers) {
+      const headersArr = Array.isArray(requestObject.headers)
+        ? requestObject.headers
+        : Object.entries(requestObject.headers).map(([key, value]) => ({
+            key,
+            value,
+          }));
+      for (const { key, value } of headersArr) {
+        // Add header to request
+        transformedObject.request!.headers!.push({
+          key,
+          value,
+          checked: true,
+        });
+
+        // Bearer token detection
+        if (
+          key.toLowerCase() === "authorization" &&
+          typeof value === "string" &&
+          (value.startsWith("bearer ") || value.startsWith("Bearer "))
+        ) {
+          transformedObject.request!.auth.bearerToken = value.slice(7).trim();
+          transformedObject.request!.selectedRequestAuthType = "Bearer Token";
+        }
+        // API key detection
+        if (
+          key.toLowerCase() === "api-key" ||
+          key.toLowerCase() === "x-api-key"
+        ) {
+          transformedObject.request!.auth.apiKey = {
+            authKey: key,
+            authValue: value,
+            addTo: "Header",
+          };
+          transformedObject.request!.selectedRequestAuthType = "API Key";
+        }
+        // Basic Auth detection
+        if (
+          key.toLowerCase() === "authorization" &&
+          typeof value === "string" &&
+          (value.startsWith("basic ") || value.startsWith("Basic "))
+        ) {
+          try {
+            const decodedValue = Buffer.from(value.slice(6), "base64").toString(
+              "utf8",
+            );
+            const [username, password] = decodedValue.split(":");
+            transformedObject.request!.auth.basicAuth = { username, password };
+            transformedObject.request!.selectedRequestAuthType = "Basic Auth";
+          } catch {}
+        }
+      }
+      transformedObject.request!.headers!.push({
+        key: "",
+        value: "",
+        checked: false,
+      });
+    }
+
+    // Assign default values
+    if (!transformedObject.request!.headers!.length) {
+      transformedObject.request!.headers!.push({
+        key: "",
+        value: "",
+        checked: false,
+      });
+    }
+    if (!transformedObject.request!.queryParams!.length) {
+      transformedObject.request!.queryParams!.push({
+        key: "",
+        value: "",
+        checked: false,
+      });
+    }
+    if (!transformedObject.request!.body.urlencoded!.length) {
+      transformedObject.request!.body.urlencoded!.push({
+        key: "",
+        value: "",
+        checked: false,
+      });
+    }
+
+    return transformedObject;
   };
 
   public parseCurl = (curl: string): TransformedRequest => {
@@ -945,24 +1145,26 @@ class RestExplorerViewModel {
     const stringifiedCurl = curlconverter.toJsonString(updatedCurl);
     const parsedCurl = JSON.parse(stringifiedCurl);
 
-    // Match all -F flags with their key-value pairs
-    const formDataMatches = curl.match(/-F\s+'([^=]+)=@([^;]+)/g);
+    // Match all -F flags with their key-value pairs (handles both files and text)
+    const formDataMatches = curl.match(/-F\s+'([^=]+)=([^']*)'/g);
     const formDataItems = formDataMatches
       ? formDataMatches.map((match) => {
           const [, keyValue] = match.split("-F '");
-          const [key, filePath] = keyValue.split("=@");
-          const value = filePath.replace(/'/g, "");
+          const [key, value] = keyValue.split("=");
           return {
-            key,
-            value,
+            key: key,
+            value: value.replace(/'/g, ""),
             checked: true,
-            base: value,
+            base: value.replace(/'/g, ""),
           };
         })
       : [];
+
+    // Attach all form fields to parsedCurl.files
     if (formDataItems.length > 0) {
       parsedCurl.files = formDataItems;
     }
+
     return this.transformRequest(parsedCurl, "anonymous");
   };
 
