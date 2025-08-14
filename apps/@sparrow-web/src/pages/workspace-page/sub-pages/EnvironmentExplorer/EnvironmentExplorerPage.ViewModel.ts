@@ -14,7 +14,7 @@ import { Debounce, CompareArray } from "@sparrow/common/utils";
 import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 import { CollectionService } from "src/services/collection.service";
 import constants from "src/constants/constants";
-import { prepareFolders } from "rxdb/plugins/backup";
+// import { prepareFolders } from "rxdb/plugins/backup";
 import { CollectionRepository } from "src/repositories/collection.repository";
 
 export class EnvironmentExplorerViewModel {
@@ -202,9 +202,17 @@ export class EnvironmentExplorerViewModel {
             progressiveTab.property?.environment?.variable || [];
           const updatedPairs = [...currentPairs];
           if (updatedPairs.length > 0) {
-            updatedPairs.splice(updatedPairs.length - 1, 0, {...foundObject,  type: "ai-generated", lifespan: "short", });
+            updatedPairs.splice(updatedPairs.length - 1, 0, {
+              ...foundObject,
+              type: "ai-generated",
+              lifespan: "short",
+            });
           } else {
-            updatedPairs.push({...foundObject,  type: "ai-generated", lifespan: "short", });
+            updatedPairs.push({
+              ...foundObject,
+              type: "ai-generated",
+              lifespan: "short",
+            });
           }
           const remainingGeneratedVariables =
             progressiveTab.property.environment.aiVariable.filter(
@@ -229,13 +237,16 @@ export class EnvironmentExplorerViewModel {
       }
     } else if (type === "accept-all") {
       const progressiveTab = createDeepCopy(this._tab.getValue());
-        await this.updateVariables([...progressiveTab.property.environment.variable, ...progressiveTab.property.environment.aiVariable.map((item)=>{
+      await this.updateVariables([
+        ...progressiveTab.property.environment.variable,
+        ...progressiveTab.property.environment.aiVariable.map((item) => {
           return {
             ...item,
             type: "ai-generated",
             lifespan: "short",
-          }
-        }), {
+          };
+        }),
+        {
           key: "",
           value: "",
           checked: true,
@@ -254,8 +265,7 @@ export class EnvironmentExplorerViewModel {
     return;
   };
 
-
-    private updatedRequestInCollection(
+  private updatedRequestInCollection(
     generatedVariables: any[],
     requestItem: any,
   ): any {
@@ -331,14 +341,16 @@ export class EnvironmentExplorerViewModel {
       currentEnvironment.id,
       {
         name: currentEnvironment.name,
-        variable: currentEnvironment?.property?.environment?.variable.map((item) => {
+        variable: currentEnvironment?.property?.environment?.variable.map(
+          (item) => {
             return {
               key: item.key,
               value: item.value,
               checked: item.checked,
               type: item.type || "user-generated",
             };
-        }),
+          },
+        ),
       },
       baseUrl,
     );
@@ -358,56 +370,73 @@ export class EnvironmentExplorerViewModel {
       notifications.success(
         `Changes saved for ${currentEnvironment.name} environment.`,
       );
-      const aiGeneratedVariables = progressiveTab.property.environment.variable.filter(
-        (variable) => variable.lifespan === "short"
+      const aiGeneratedVariables =
+        progressiveTab.property.environment.variable.filter(
+          (variable) => variable.lifespan === "short",
         );
 
-      const uniqueAiGeneratedVariables = new SetDataStructure().pushArrayOfObjects(
-              aiGeneratedVariables,
-              "value",
-      );
-          
+      const uniqueAiGeneratedVariables =
+        new SetDataStructure().pushArrayOfObjects(
+          aiGeneratedVariables,
+          "value",
+        );
+
       if (uniqueAiGeneratedVariables.length > 0) {
-        await this.updateVariables(currentEnvironment?.property?.environment?.variable.map((item) => {
+        await this.updateVariables(
+          currentEnvironment?.property?.environment?.variable.map((item) => {
             return {
               key: item.key,
               value: item.value,
               checked: item.checked,
               type: item.type || "user-generated",
             };
-        }));
+          }),
+        );
         await this.updateGeneratedVariables([]);
 
-        const baseUrl = await this.constructBaseUrl(progressiveTab?.path?.workspaceId);
-        const insertGenerateVariableResponse = await this.collectionService.insertGeneratedVariables(
+        const baseUrl = await this.constructBaseUrl(
           progressiveTab?.path?.workspaceId,
-          progressiveTab?.property?.environment?.generateProperty.collectionId,
-          uniqueAiGeneratedVariables,
-          baseUrl,
         );
+        const insertGenerateVariableResponse =
+          await this.collectionService.insertGeneratedVariables(
+            progressiveTab?.path?.workspaceId,
+            progressiveTab?.property?.environment?.generateProperty
+              .collectionId,
+            uniqueAiGeneratedVariables,
+            baseUrl,
+          );
         if (insertGenerateVariableResponse.isSuccessful) {
           await this.collectionRepository.updateCollection(
             insertGenerateVariableResponse.data.data._id,
             insertGenerateVariableResponse.data.data,
           );
 
-          const tabRxDocs = await this.tabRepository.getTabsByCollectionId(progressiveTab?.property?.environment?.generateProperty.collectionId);
-          const tabsJson = tabRxDocs.map((doc) => doc.toMutableJSON()).map((doc)=>{
-
-             doc.property = this.updatedRequestInCollection(uniqueAiGeneratedVariables, doc.property );
-             doc.isSaved = false;
-             doc.persistence = "PERMANENT";
-             return doc;
-          });
+          const tabRxDocs = await this.tabRepository.getTabsByCollectionId(
+            progressiveTab?.property?.environment?.generateProperty
+              .collectionId,
+          );
+          const tabsJson = tabRxDocs
+            .map((doc) => doc.toMutableJSON())
+            .map((doc) => {
+              doc.property = this.updatedRequestInCollection(
+                uniqueAiGeneratedVariables,
+                doc.property,
+              );
+              doc.isSaved = false;
+              doc.persistence = "PERMANENT";
+              return doc;
+            });
           this.tabRepository.bulkUpsertTabs(tabsJson);
-          
-          notifications.success(`Successfully added generated variables to “Global Variables” environment and applied them to your “${progressiveTab?.property?.environment?.generateProperty.collectionName}” collection.`);
+
+          notifications.success(
+            `Successfully added generated variables to “Global Variables” environment and applied them to your “${progressiveTab?.property?.environment?.generateProperty.collectionName}” collection.`,
+          );
         } else {
-          notifications.error("Failed to apply generated variables to the “Manage Pets” collection.");
+          notifications.error(
+            "Failed to apply generated variables to the “Manage Pets” collection.",
+          );
         }
       }
-
-
     } else {
       await this.updateEnvironmentState({ isSaveInProgress: false });
       if (response.message === "Network Error") {
