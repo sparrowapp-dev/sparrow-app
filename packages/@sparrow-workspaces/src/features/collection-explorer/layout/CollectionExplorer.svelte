@@ -638,7 +638,7 @@
                 placement={"bottom-center"}
                 size="medium"
               >
-                {#if globalEnvInUse?.collectionName}
+                {#if globalEnvInUse?.collectionName || userRole === WorkspaceRole.WORKSPACE_VIEWER}
                   <Button
                     disable={globalEnvInUse?.collectionName ? true : false}
                     startIcon={SparkleFilled}
