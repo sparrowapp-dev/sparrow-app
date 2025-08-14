@@ -6,9 +6,6 @@
   import { ChevronDownRegular, ChevronUpRegular } from "@sparrow/library/icons";
   export let currentEnvironment: any;
   export let generatedVariables: KeyValuePair[] = [];
-  export let isReGenerateVariable: boolean = false;
-  export let isLoadingVariables: boolean = true;
-  export let isAcceptedVariables: boolean = false;
   export let updateGeneratedVariables;
   export let handleRedirectToDocs = () => {};
   export let isWebApp;
@@ -159,7 +156,8 @@
           <p
             class="d-flex justify-content-center align-items-center common-text description-text"
           >
-            We scanned the "Manage Pets" collection and didn't find any
+            We scanned the "{currentEnvironment?.property?.environment
+              ?.generateProperty.collectionName}" collection and didn't find any
             repeating values to suggest as
           </p>
           <p

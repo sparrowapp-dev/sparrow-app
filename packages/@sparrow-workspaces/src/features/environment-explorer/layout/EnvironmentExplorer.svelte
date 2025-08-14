@@ -4,7 +4,10 @@
   import type { EnvValuePair } from "@sparrow/common/interfaces/request.interface";
   import { QuickHelp } from "../components";
   import { Search } from "@sparrow/library/forms";
-  import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
+  import {
+    hasWorkpaceLevelPermission,
+    SetDataStructure,
+  } from "@sparrow/common/utils";
   import {
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
@@ -26,6 +29,7 @@
   import { GenerateVariables } from "../../generate-variables";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import { Loader } from "@sparrow/library/ui";
+  import ApplyGeneratedVariables from "../components/apply-generated-variables/ApplyGeneratedVariables.svelte";
   export let azureBlobCDN;
   /**
    * selected environmet to be shown on API
@@ -83,6 +87,7 @@
   };
 
   let isGuidePopup = false;
+  let isApplyAiVariablesModalOpen = false;
 
   const handleKeyDown = (event: KeyboardEvent) => {
     if ((event.ctrlKey || event.metaKey) && event.key === "s") {
@@ -189,7 +194,24 @@
                     <Button
                       type="primary"
                       startIcon={SaveRegular}
-                      onClick={onSaveEnvironment}
+                      onClick={() => {
+                        const aiGeneratedVariables =
+                          $currentEnvironment.property.environment.variable.filter(
+                            (variable) => variable.lifespan === "short",
+                          );
+
+                        const uniqueAiGeneratedVariables =
+                          new SetDataStructure().pushArrayOfObjects(
+                            aiGeneratedVariables,
+                            "value",
+                          );
+
+                        if (uniqueAiGeneratedVariables.length > 0) {
+                          isApplyAiVariablesModalOpen = true;
+                        } else {
+                          onSaveEnvironment();
+                        }
+                      }}
                       title="Save"
                       size="medium"
                       disable={$currentEnvironment?.property?.environment?.state
@@ -299,6 +321,37 @@
 {/if}
 
 <!--Disabling the Quick Help feature, will be taken up in next release-->
+<Modal
+  title={""}
+  type={"dark"}
+  width={"474px"}
+  zIndex={10000}
+  isOpen={isApplyAiVariablesModalOpen}
+  handleModalState={(flag = false) => {
+    isApplyAiVariablesModalOpen = flag;
+  }}
+  canClose={false}
+>
+  <div style="position: relative;">
+    <ApplyGeneratedVariables
+      collectionName={$currentEnvironment?.property?.environment
+        ?.generateProperty.collectionName || ""}
+      onSaveApplyVariableFlow={async () => {
+        await onSaveEnvironment();
+        isApplyAiVariablesModalOpen = false;
+      }}
+      onCancelApplyVariableFlow={() => {
+        isApplyAiVariablesModalOpen = false;
+      }}
+      totalAiGeneratedVariablesCount={$currentEnvironment?.property?.environment
+        ?.variable?.length || 0}
+      applyingAiGeneratedVariablesCount={$currentEnvironment?.property?.environment?.variable?.filter(
+        (variable) => variable.lifespan === "short",
+      )?.length || 0}
+    />
+  </div>
+</Modal>
+
 <Modal
   title={""}
   type={"dark"}
