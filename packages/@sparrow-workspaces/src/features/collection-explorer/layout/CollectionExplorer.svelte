@@ -628,7 +628,7 @@
             {/if}
           </div>
 
-          {#if !isGuestUser}
+          {#if !isGuestUser && collection?.collectionType !== CollectionTypeBaseEnum.MOCK}
             <div style="margin-right: 8px;">
               <Tooltip
                 title={"Generate Variables"}
