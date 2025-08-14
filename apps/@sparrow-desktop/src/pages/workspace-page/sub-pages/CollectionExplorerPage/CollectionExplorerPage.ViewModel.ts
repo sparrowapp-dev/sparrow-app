@@ -77,6 +77,7 @@ class CollectionExplorerPage {
   private environmentRepository = new EnvironmentRepository();
   private environmentService = new EnvironmentService();
   private guestUserRepository = new GuestUserRepository();
+  private initTab = new InitTab();
 
   // Private Services
   private collectionService = new CollectionService();
@@ -2225,11 +2226,24 @@ class CollectionExplorerPage {
     return response;
   };
 
-  public onOpenGlobalEnvironmentToGenerate = (
+  public onOpenGlobalEnvironmentToGenerate = async(
     environment: any,
     collectionId: string,
     collectionName: string,
   ) => {
+    const environmentTabRxDoc = await  this.tabRepository.getTabById(environment?.id);
+    let environmentTabJson = environmentTabRxDoc?.toMutableJSON();
+    if(environmentTabJson){
+      environmentTabJson.property.environment.generateProperty = {
+        collectionId: collectionId,
+        collectionName: collectionName,
+      };
+      environmentTabJson.property.environment.generateVariable = true;
+      environmentTabJson.property.environment.aiGenerationStatus = "";
+    }
+    await this.tabRepository.updateTabByMongoId(environment?.id, environmentTabJson);
+    
+
     const initEnvironmentTab = this.initTab.environment(
       environment?.id,
       environment.workspaceId,
@@ -2262,11 +2276,12 @@ class CollectionExplorerPage {
     const tab = await this.tabRepository.getTabById(globalEnvId);
     if (tab) {
       const reponse = {
-        collectionName: tab.toMutableJSON()?.generateProperty?.collectionName,
+        collectionName: tab.toMutableJSON()?.property.environment?.generateProperty?.collectionName,
       };
-      return reponse;
+      if (tab.toMutableJSON()?.property.environment?.generateVariable) {
+        return reponse;
+      }
     }
-    return;
   };
 }
 

@@ -28,6 +28,7 @@
 
   export let onSyncCollection: (collectionId: string) => void;
   export let onMockCollectionModelOpen;
+  export let isGuestUser
 
   // ViewModel initialization
   let _viewModel;
@@ -228,6 +229,7 @@
   {isCollectionEditable}
   onUpdateEnvironment={_viewModel.updateEnvironment}
   isWebApp={true}
+  {isGuestUser}
   tab={_viewModel.tab}
   bind:collection
   {environmentVariables}

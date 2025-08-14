@@ -66,6 +66,7 @@ import type {
   HttpResponseMockUpdatePayloadDtoInterface,
   HttpResponseRatiosMockUpdatePayloadDtoInterface,
 } from "@sparrow/common/types/workspace/http-response-mock-dto";
+import type { GeneratedVariable } from "@sparrow/common/dto";
 
 export class CollectionService {
   constructor() {}
@@ -928,7 +929,7 @@ export class CollectionService {
     },
   ) => {
     const response = await makeRequest(
-      "POST", 
+      "POST",
       `${baseUrl}/api/collection/auth-profiles`,
       {
         body: updatedPayload,
@@ -972,6 +973,45 @@ export class CollectionService {
       `${_baseUrl}/api/collection/auth-profiles`,
       {
         body: _authProfileDeletionPayload,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public generateVariables = async (
+    workspaceId: string,
+    collectionId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/collection/${collectionId}/generate-variables`,
+      {
+        body: {
+          workspaceId: `${workspaceId}`,
+        },
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public insertGeneratedVariables = async (
+    workspaceId: string,
+    collectionId: string,
+    generatedeVariables: GeneratedVariable[],
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/collection/${collectionId}/insert-variables`,
+      {
+        body: {
+          collectionId: `${collectionId}`,
+          workspaceId: `${workspaceId}`,
+          generatedeVariables: generatedeVariables,
+        },
         headers: getAuthHeaders(),
       },
     );

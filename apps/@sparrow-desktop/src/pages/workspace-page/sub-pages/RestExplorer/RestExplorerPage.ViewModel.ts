@@ -67,6 +67,7 @@ import {
   ResponseFormatterEnum,
   type HttpRequestCollectionLevelAuthTabInterface,
   type HttpRequestCollectionLevelAuthProfileTabInterface,
+  RequestDatasetEnum,
 } from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
 import { RequestTabAdapter } from "../../../../adapter/request-tab";
@@ -90,11 +91,14 @@ import {
   CollectionRequestAddToBaseEnum,
   type CollectionAuthBaseInterface,
   type CollectionAuthProifleBaseInterface as AuthProfileDto,
+  type TransformedRequest,
 } from "@sparrow/common/types/workspace/collection-base";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 
 import { getClientUser } from "@app/utils/jwt";
 import constants from "@app/constants/constants";
+import * as curlconverter from "curlconverter";
+
 import * as Sentry from "@sentry/svelte";
 
 class RestExplorerViewModel {
@@ -687,14 +691,496 @@ class RestExplorerViewModel {
   };
 
   /**
-   *
-   * @param _url - request url
-   * @param _effectQueryParams  - flag that effect request query parameter
+   * Handles importing cURL data directly into the current tab
+   * @param parsedCurlData The parsed cURL command data
+   */
+  public handleImportCurl = async (parsedCurlData: TransformedRequest) => {
+    if (!parsedCurlData) return false;
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+
+    try {
+      // Update URL Name
+      if (parsedCurlData.request.url && !progressiveTab.path.collectionId) {
+        await this.updateRequestName(parsedCurlData.request.url);
+      }
+      // Update URL
+      if (parsedCurlData.request.url) {
+        await this.updateRequestUrl(parsedCurlData.request.url, false);
+      }
+
+      // Update method
+      if (parsedCurlData.request.method) {
+        await this.updateRequestMethod(
+          parsedCurlData.request.method.toUpperCase(),
+        );
+      }
+
+      // Update headers
+      if (
+        parsedCurlData.request.headers &&
+        parsedCurlData.request.headers.length > 0
+      ) {
+        await this.updateHeaders(parsedCurlData.request.headers);
+      }
+
+      // Update query parameters if they exist in the parsed data
+      if (
+        parsedCurlData.request.queryParams &&
+        parsedCurlData.request.queryParams.length > 0
+      ) {
+        await this.updateParams(parsedCurlData.request.queryParams, false);
+      }
+
+      // Update body
+      if (parsedCurlData.request.body) {
+        await this.updateRequestBody({
+          raw: parsedCurlData.request.body.raw,
+          urlencoded:
+            parsedCurlData.request.body.urlencoded ||
+            progressiveTab.property.request.body.urlencoded,
+          formdata:
+            parsedCurlData.request.body.formdata ||
+            progressiveTab.property.request.body.formdata,
+        });
+      }
+
+      if (
+        parsedCurlData.request.auth &&
+        Object.keys(parsedCurlData.request.auth).length > 0
+      ) {
+        await this.updateRequestAuth(parsedCurlData.request.auth);
+
+        // Select the correct auth button based on the imported auth type
+        if (parsedCurlData.request.selectedRequestAuthType === "Bearer Token") {
+          await this.updateRequestState({
+            requestAuthNavigation: HttpRequestAuthTypeBaseEnum.BEARER_TOKEN,
+          });
+        } else if (
+          parsedCurlData.request.selectedRequestAuthType === "API Key"
+        ) {
+          await this.updateRequestState({
+            requestAuthNavigation: HttpRequestAuthTypeBaseEnum.API_KEY,
+          });
+        } else if (
+          parsedCurlData.request.selectedRequestAuthType === "Basic Auth"
+        ) {
+          await this.updateRequestState({
+            requestAuthNavigation: HttpRequestAuthTypeBaseEnum.BASIC_AUTH,
+          });
+        } else {
+          await this.updateRequestState({
+            requestAuthNavigation: HttpRequestAuthTypeBaseEnum.NO_AUTH,
+          });
+        }
+      }
+      let navigation: RequestDatasetEnum;
+      const bodyType = parsedCurlData?.request?.selectedRequestBodyType;
+
+      if (bodyType === "multipart/form-data") {
+        navigation = RequestDatasetEnum.FORMDATA;
+      } else if (bodyType === "application/x-www-form-urlencoded") {
+        navigation = RequestDatasetEnum.URLENCODED;
+      } else if (bodyType === "application/json" || bodyType === "text/plain") {
+        navigation = RequestDatasetEnum.RAW;
+      } else {
+        navigation = RequestDatasetEnum.NONE; // <-- Default to NONE if no body type
+      }
+
+      await this.updateRequestState({
+        requestBodyNavigation: navigation,
+      });
+
+      // Track the event
+      MixpanelEvent(Events.IMPORT_API_VIA_CURL, {
+        source: "URL input",
+      });
+
+      notifications.success("cURL imported successfully!");
+      return true;
+    } catch (error) {
+      console.error("Error importing cURL:", error);
+      notifications.error("Failed to import cURL. Please try again.");
+      return false;
+    }
+  };
+
+  public handleFormatCurl = (curlCommand: string): string => {
+    const rawLiteralRegex = /(\$'[\s\S]*?')$/m;
+    let rawLiteral = "";
+    const rawMatch = curlCommand.match(rawLiteralRegex);
+    if (rawMatch) {
+      rawLiteral = rawMatch[0];
+      curlCommand = curlCommand.slice(0, rawMatch.index).trim();
+    }
+    const heredocRegex = /(<<\s*EOF[\s\S]*?^EOF\s*)$/m;
+    const heredocMatch = curlCommand.match(heredocRegex);
+    let heredoc = "";
+    if (heredocMatch) {
+      heredoc = heredocMatch[0]
+        .replace(/\r\n/g, "\n")
+        .replace(/^\s+|\s+$/g, "");
+      curlCommand = curlCommand.slice(0, heredocMatch.index).trim();
+    }
+    curlCommand = curlCommand.replace(/\\\s*\n\s*/g, " ");
+    curlCommand = curlCommand.replace(/\\\s*/g, " ");
+    curlCommand = curlCommand.replace(/\s+/g, " ").trim();
+    const parts = curlCommand.match(/"[^"]*"|'[^']*'|\S+/g) || [];
+    let formatted = "";
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      if (i === 0) {
+        formatted += part;
+      } else if (
+        part.startsWith("--") ||
+        (part.startsWith("-") && !/^-\d/.test(part))
+      ) {
+        formatted += " \\\n  " + part;
+      } else if (
+        /^https?:\/\//.test(part) ||
+        /^\$\{.*\}/.test(part) ||
+        /^[\w\/:.?&=%-]+$/.test(part)
+      ) {
+        if (parts[i - 1] && parts[i - 1].startsWith("--request")) {
+          formatted += " " + part;
+        } else {
+          formatted += " \\\n  " + part;
+        }
+      } else {
+        formatted += " " + part;
+      }
+    }
+    if (heredoc) {
+      const [firstLine, ...restLines] = heredoc.split("\n");
+      formatted += " \\\n  " + firstLine + "\n" + restLines.join("\n");
+    }
+    if (rawLiteral && !formatted.includes(rawLiteral)) {
+      formatted += ` \\\n  ${rawLiteral}`;
+    }
+    return formatted.trim();
+  };
+
+  public handleFormatUrl = (url: string) => {
+    url = url.replace(/^(https?:\/\/\s*)+(https?:\/\/)/, "$2");
+    return url;
+  };
+
+  public transformRequest = (requestObject: any, username: string) => {
+    const keyValueDefaultObj = { key: "", value: "", checked: true };
+    let method = (requestObject.method || "GET").toUpperCase();
+    if (!["GET", "POST", "PUT", "PATCH", "DELETE"].includes(method)) {
+      method = "INVALID";
+    }
+    const url = this.handleFormatUrl(
+      requestObject.raw_url || requestObject.url || "",
+    );
+    const transformedObject: TransformedRequest = {
+      name: url || "",
+      description: "",
+      type: "REQUEST",
+      source: "USER",
+      request: {
+        method,
+        url: url ?? "",
+        body: {
+          raw: "",
+          urlencoded: [],
+          formdata: [],
+        },
+        headers: [],
+        queryParams: [],
+        auth: {
+          bearerToken: "",
+          basicAuth: { username: "", password: "" },
+          apiKey: { authKey: "", authValue: "", addTo: "Header" },
+        },
+        selectedRequestBodyType: "none",
+        selectedRequestAuthType: "No Auth",
+      },
+      createdBy: username,
+      updatedBy: username,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    // Query params
+    const queryString = url.split("?")[1];
+    const queryParams = [];
+    if (queryString) {
+      const pairs = queryString.split("&");
+      for (const pair of pairs) {
+        const [key, rawValue] = pair.split("=");
+        const value = rawValue || "";
+        queryParams.push({ key, value, checked: true });
+        if (
+          key.toLowerCase() === "api-key" ||
+          key.toLowerCase() === "x-api-key"
+        ) {
+          transformedObject.request!.auth.apiKey = {
+            authKey: key,
+            authValue: value,
+            addTo: "Query Parameter",
+          };
+          transformedObject.request!.selectedRequestAuthType = "API Key";
+        }
+      }
+      queryParams.push({ key: "", value: "", checked: false });
+      transformedObject.request!.queryParams = queryParams;
+      transformedObject.request!.url = url;
+    }
+
+    // Detect Content-Type
+    let contentType = "";
+    if (requestObject.headers) {
+      if (Array.isArray(requestObject.headers)) {
+        const ctHeader = requestObject.headers.find(
+          (h) => h.key?.toLowerCase() === "content-type",
+        );
+        contentType = ctHeader?.value || "";
+      } else if (typeof requestObject.headers === "object") {
+        contentType =
+          requestObject.headers["content-type"] ||
+          requestObject.headers["Content-Type"] ||
+          "";
+      }
+    }
+
+    // Handle formdata from -F flags
+    if (requestObject.files && Array.isArray(requestObject.files)) {
+      requestObject.files.forEach((fileObj: any) => {
+        transformedObject.request!.body.formdata.push({
+          key: fileObj?.key || "",
+          value: fileObj?.value || "",
+          checked: true,
+        });
+      });
+      transformedObject.request!.selectedRequestBodyType =
+        "multipart/form-data";
+    }
+
+    // Handle raw multipart body with boundary (for --data-raw)
+    if (
+      contentType.startsWith("multipart/form-data") &&
+      requestObject.data &&
+      typeof requestObject.data === "string"
+    ) {
+      // Extract boundary
+      const boundaryMatch = contentType.match(/boundary=(.+)$/);
+      const boundary = boundaryMatch ? boundaryMatch[1] : "";
+      if (boundary) {
+        // Split body by boundary
+        const parts = requestObject.data.split(`--${boundary}`);
+        for (const part of parts) {
+          if (
+            part.includes("Content-Disposition: form-data;") &&
+            part.includes('name="')
+          ) {
+            const nameMatch = part.match(/name="([^"]+)"/);
+            const key = nameMatch ? nameMatch[1] : "";
+            // Value is after two CRLFs
+            const valueMatch = part.match(/\r\n\r\n([\s\S]*?)\r\n$/);
+            const value = valueMatch ? valueMatch[1] : "";
+            if (key) {
+              transformedObject.request!.body.formdata.push({
+                key,
+                value,
+                checked: true,
+              });
+            }
+          }
+        }
+        transformedObject.request!.selectedRequestBodyType =
+          "multipart/form-data";
+      }
+    }
+
+    // Only add one extra empty formdata item if body type is multipart/form-data
+    if (
+      transformedObject.request!.selectedRequestBodyType ===
+      "multipart/form-data"
+    ) {
+      transformedObject.request!.body.formdata.push({
+        key: "",
+        value: "",
+        checked: true,
+      });
+    }
+
+    // Handle body based on Content-Type
+    if (requestObject.data) {
+      if (contentType.startsWith("multipart/form-data")) {
+        transformedObject.request!.selectedRequestBodyType =
+          "multipart/form-data";
+      } else if (contentType.includes("application/json")) {
+        if (typeof requestObject.data === "string") {
+          transformedObject.request!.body.raw = requestObject.data;
+        } else {
+          transformedObject.request!.body.raw = JSON.stringify(
+            requestObject.data,
+            null,
+            2,
+          );
+        }
+        transformedObject.request!.selectedRequestBodyType = "application/json";
+      } else if (contentType.includes("application/x-www-form-urlencoded")) {
+        for (const [key, value] of new URLSearchParams(requestObject.data)) {
+          transformedObject.request!.body.urlencoded!.push({
+            key,
+            value,
+            checked: true,
+          });
+        }
+        transformedObject.request!.selectedRequestBodyType =
+          "application/x-www-form-urlencoded";
+      } else {
+        transformedObject.request!.body.raw =
+          typeof requestObject.data === "string"
+            ? requestObject.data
+            : JSON.stringify(requestObject.data);
+        transformedObject.request!.selectedRequestBodyType = "text/plain";
+      }
+    }
+
+    // Handle headers and auth
+    if (requestObject.headers) {
+      const headersArr = Array.isArray(requestObject.headers)
+        ? requestObject.headers
+        : Object.entries(requestObject.headers).map(([key, value]) => ({
+            key,
+            value,
+          }));
+      for (const { key, value } of headersArr) {
+        // Add header to request
+        transformedObject.request!.headers!.push({
+          key,
+          value,
+          checked: true,
+        });
+
+        // Bearer token detection
+        if (
+          key.toLowerCase() === "authorization" &&
+          typeof value === "string" &&
+          (value.startsWith("bearer ") || value.startsWith("Bearer "))
+        ) {
+          transformedObject.request!.auth.bearerToken = value.slice(7).trim();
+          transformedObject.request!.selectedRequestAuthType = "Bearer Token";
+        }
+        // API key detection
+        if (
+          key.toLowerCase() === "api-key" ||
+          key.toLowerCase() === "x-api-key"
+        ) {
+          transformedObject.request!.auth.apiKey = {
+            authKey: key,
+            authValue: value,
+            addTo: "Header",
+          };
+          transformedObject.request!.selectedRequestAuthType = "API Key";
+        }
+        // Basic Auth detection
+        if (
+          key.toLowerCase() === "authorization" &&
+          typeof value === "string" &&
+          (value.startsWith("basic ") || value.startsWith("Basic "))
+        ) {
+          try {
+            const decodedValue = Buffer.from(value.slice(6), "base64").toString(
+              "utf8",
+            );
+            const [username, password] = decodedValue.split(":");
+            transformedObject.request!.auth.basicAuth = { username, password };
+            transformedObject.request!.selectedRequestAuthType = "Basic Auth";
+          } catch {}
+        }
+      }
+      transformedObject.request!.headers!.push({
+        key: "",
+        value: "",
+        checked: false,
+      });
+    }
+
+    // Assign default values
+    if (!transformedObject.request!.headers!.length) {
+      transformedObject.request!.headers!.push({
+        key: "",
+        value: "",
+        checked: false,
+      });
+    }
+    if (!transformedObject.request!.queryParams!.length) {
+      transformedObject.request!.queryParams!.push({
+        key: "",
+        value: "",
+        checked: false,
+      });
+    }
+    if (!transformedObject.request!.body.urlencoded!.length) {
+      transformedObject.request!.body.urlencoded!.push({
+        key: "",
+        value: "",
+        checked: false,
+      });
+    }
+
+    return transformedObject;
+  };
+
+  public parseCurl = (curl: string): TransformedRequest => {
+    if (!curl || !curl.length) {
+      throw new Error();
+    }
+    const updatedCurl = this.handleFormatCurl(curl);
+    const stringifiedCurl = curlconverter.toJsonString(updatedCurl);
+    const parsedCurl = JSON.parse(stringifiedCurl);
+
+    // Match all -F flags with their key-value pairs (handles both files and text)
+    const formDataMatches = curl.match(/-F\s+'([^=]+)=([^']*)'/g);
+    const formDataItems = formDataMatches
+      ? formDataMatches.map((match) => {
+          const [, keyValue] = match.split("-F '");
+          const [key, value] = keyValue.split("=");
+          return {
+            key: key,
+            value: value.replace(/'/g, ""),
+            checked: true,
+            base: value.replace(/'/g, ""),
+          };
+        })
+      : [];
+
+    // Attach all form fields to parsedCurl.files
+    if (formDataItems.length > 0) {
+      parsedCurl.files = formDataItems;
+    }
+
+    return this.transformRequest(parsedCurl, "anonymous");
+  };
+
+  /**
+   * Updates the request URL or imports a cURL command.
+   * If the input starts with "curl ", it will parse and import the cURL.
+   * Otherwise, it will treat the input as a plain URL.
+   * @param value - The URL or cURL command.
+   * @param effectQueryParams - Whether to update query params from the URL.
    */
   public updateRequestUrl = async (
     _url: string,
     _effectQueryParams: boolean = true,
   ) => {
+    if (typeof _url === "string" && _url.trim().startsWith("curl ")) {
+      try {
+        const parsed = this.parseCurl(_url);
+        if (parsed) {
+          await this.handleImportCurl(parsed);
+          return;
+        }
+      } catch (err) {
+        console.error("Failed to parse cURL command:", err);
+        notifications.error("Failed to parse cURL command.");
+      }
+    }
+    // Handle as plain URL
     const progressiveTab: RequestTab = createDeepCopy(this._tab.getValue());
     if (_url === progressiveTab.property.request.url) {
       return;
@@ -2680,6 +3166,8 @@ class RestExplorerViewModel {
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
 
+    const userEmail = getClientUser().email;
+
     let workspaceId = componentData.path.workspaceId;
 
     let workspaceVal = await this.readWorkspace(workspaceId);
@@ -2724,6 +3212,11 @@ class RestExplorerViewModel {
       );
 
       if (!socketResponse) {
+        Sentry.withScope((scope) => {
+            scope.setTag("emailId", userEmail);
+            scope.setTag("errorType", "AI");
+            Sentry.captureException("No response from Socket (desktop)");
+        });
         Sentry.captureException("Socket Connection Break");
         throw new Error("Something went wrong. Please try again");
       }
@@ -2753,6 +3246,11 @@ class RestExplorerViewModel {
             events.forEach((event) =>
               this.aiAssistentWebSocketService.removeListener(event),
             );
+            Sentry.withScope((scope) => {
+                scope.setTag("emailId", userEmail);
+                scope.setTag("errorType", "AI");
+                Sentry.captureException(`Socket Connection Break. Socket Status: ${event} RestExplorerPage.viewmodel(desktop)`);   
+            });
             await this.handleAIResponseError(
               componentData,
               "Something went wrong. Please try again",
@@ -2860,6 +3358,11 @@ class RestExplorerViewModel {
         ),
       );
     } catch (error) {
+      Sentry.withScope((scope) => {
+          scope.setTag("emailId", userEmail);
+          scope.setTag("errorType", "AI");
+          Sentry.captureException(`Error in websocket streaming ${error} RestExplorerPage.viewmodel(desktop)`);
+      });
       console.error("Something went wrong!:", error.message);
       await this.handleAIResponseError(componentData, error.message);
     }

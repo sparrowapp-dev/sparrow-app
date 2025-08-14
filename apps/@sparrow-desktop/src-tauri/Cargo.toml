@@ -9,10 +9,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "2.0.3", features = [] }
+tauri-build = { version = "2.3.1", features = [] }
 
 [dependencies]
-tauri = { version = "2.1.1", features = [] }
+tauri = { version = "2.7.0", features = [] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 json = "0.12.4"
@@ -37,23 +37,29 @@ tokio = { version = "1", features = ["full"] }
 tokio-util = { version = "0.6", features = ["full"] }
 tokio-tungstenite = { version = "0.16", features = ["native-tls"] }
 native-tls = "0.2"
+tokio-native-tls = "0.3"
 tungstenite = "0.20.1"
 url = "2.2"
 futures = "0.3"
 rust_socketio = { version = "*", features = ["async"] }
-tauri-plugin-os = "2.2.0"
-tauri-plugin-updater = "2.2.0"
-tauri-plugin-process = "2.2.0"
-tauri-plugin-single-instance = "2.2.0"
-tauri-plugin-shell = "2.2.0"
-tauri-plugin-dialog = "2.2.0"
-tauri-plugin-fs = "2.2.0"
-tauri-plugin-deep-link = "2.2.0"
+tauri-plugin-os = "2.3.0"
+tauri-plugin-updater = "2.9.0"
+tauri-plugin-process = "2.3.0"
+tauri-plugin-single-instance = "2.3.2"
+tauri-plugin-shell = "2.3.0"
+tauri-plugin-dialog = "2.3.2"
+tauri-plugin-fs = "2.4.1"
+tauri-plugin-deep-link = "2.4.1"
+
+# Windows Specific Dependencies
 [target.'cfg(windows)'.dependencies]
 winreg = "0.11"
+
+# Mac Specific Dependencies
 [target.'cfg(target_os = "macos")'.dependencies]
 objc = "0.2"
 cocoa = "0.26.0"
 
+# Linux Specific Dependencies
 [target.'cfg(target_os = "linux")'.dependencies]
 gtk = "0.18.2"

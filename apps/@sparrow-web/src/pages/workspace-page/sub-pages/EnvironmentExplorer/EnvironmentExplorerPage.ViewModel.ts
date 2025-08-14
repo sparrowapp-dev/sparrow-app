@@ -4,7 +4,7 @@ import { WorkspaceRepository } from "../../../../repositories/workspace.reposito
 import { EnvironmentService } from "../../../../services/environment.service";
 import { Events } from "@sparrow/common/enums";
 import { environmentType } from "@sparrow/common/enums/environment.enum";
-import { createDeepCopy } from "@sparrow/common/utils";
+import { createDeepCopy, SetDataStructure, Sleep } from "@sparrow/common/utils";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { BehaviorSubject, type Observable } from "rxjs";
 import { GuideRepository } from "../../../../repositories/guide.repository";
@@ -12,14 +12,18 @@ import { GuestUserRepository } from "../../../../repositories/guest-user.reposit
 import { TabRepository } from "../../../../repositories/tab.repository";
 import { Debounce, CompareArray } from "@sparrow/common/utils";
 import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
+import { CollectionService } from "src/services/collection.service";
 import constants from "src/constants/constants";
+import { CollectionRepository } from "src/repositories/collection.repository";
 
 export class EnvironmentExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private environmentRepository = new EnvironmentRepository();
   private environmentService = new EnvironmentService();
+  private collectionService = new CollectionService();
   private guideRepository = new GuideRepository();
   private guestUserRepository = new GuestUserRepository();
+  private collectionRepository = new CollectionRepository();
   private _tab: BehaviorSubject<any> = new BehaviorSubject({});
   private tabRepository = new TabRepository();
   private compareArray = new CompareArray();
@@ -30,6 +34,7 @@ export class EnvironmentExplorerViewModel {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         this.tab = t;
+        this.getGenerateVariables();
       }, 0);
     }
   }
@@ -84,19 +89,6 @@ export class EnvironmentExplorerViewModel {
   public updateVariables = async (_variable: any) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.environment.variable = _variable;
-    this.tab = progressiveTab;
-    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    this.compareRequestWithServer();
-  };
-
-  public updateGenerativeVariables = async (aiVariables?: any) => {
-    const newVariables = aiVariables.map(({ key, value }) => ({
-      key,
-      value,
-      checked: true,
-    }));
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.environment.aiVariable = newVariables;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -189,21 +181,128 @@ export class EnvironmentExplorerViewModel {
     return constants.API_URL;
   };
 
-  public updateGeneratedVariables = async (
-    _variable: any,
-    aiVariables?: any,
-  ) => {
+  public updateVariableSelection = async (type?: string, index?: number) => {
+    if (type === "regenerate") {
+      await this.reGenerateVariables();
+      return;
+    }
+    if (type === "accept" && typeof index === "number") {
+      try {
+        const progressiveTab = createDeepCopy(this._tab.getValue());
+        progressiveTab;
+        const foundIndex =
+          progressiveTab.property.environment.aiVariable.findIndex(
+            (_, i) => i === index,
+          );
+        if (foundIndex !== -1) {
+          const foundObject =
+            progressiveTab.property.environment.aiVariable[foundIndex];
+          const currentPairs =
+            progressiveTab.property?.environment?.variable || [];
+          const updatedPairs = [...currentPairs];
+          if (updatedPairs.length > 0) {
+            updatedPairs.splice(updatedPairs.length - 1, 0, {
+              ...foundObject,
+              type: "ai-generated",
+              lifespan: "short",
+            });
+          } else {
+            updatedPairs.push({
+              ...foundObject,
+              type: "ai-generated",
+              lifespan: "short",
+            });
+          }
+          const remainingGeneratedVariables =
+            progressiveTab.property.environment.aiVariable.filter(
+              (_, i) => i !== foundIndex,
+            );
+          this.updateGeneratedVariables(remainingGeneratedVariables);
+          this.updateVariables(updatedPairs);
+          // console.log()
+          if (!remainingGeneratedVariables?.length) {
+            await this.updateEnvironmentAiVariableGenerationStatus("accepted");
+          }
+        }
+      } catch (error) {
+        console.error("Error accepting generated variable:", error);
+      }
+    } else if (type === "reject" && typeof index === "number") {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const remainingGeneratedVariables =
+        progressiveTab.property.environment.aiVariable;
+      if (!remainingGeneratedVariables?.length) {
+        await this.updateEnvironmentAiVariableGenerationStatus("rejected");
+      }
+    } else if (type === "accept-all") {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      // Remove the last item from environment.variable
+      if (
+        Array.isArray(progressiveTab.property?.environment?.variable) &&
+        progressiveTab.property.environment.variable.length > 0
+      ) {
+        progressiveTab.property.environment.variable.pop();
+      }
+      await this.updateVariables([
+        ...progressiveTab.property.environment.variable,
+        ...progressiveTab.property.environment.aiVariable.map((item) => ({
+          ...item,
+          type: "ai-generated",
+          lifespan: "short",
+        })),
+        {
+          key: "",
+          value: "",
+          checked: true,
+        },
+      ]);
+      await this.updateEnvironmentAiVariableGenerationStatus("accepted");
+      await this.updateGeneratedVariables([]);
+    }
+  };
+
+  public updateGeneratedVariables = async (aiVariables?: any) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    const envTab = createDeepCopy(progressiveTab);
-    envTab.property.environment.aiVariable = aiVariables;
-    envTab.property.environment.variable = _variable;
-    this.tab = envTab;
-    await this.tabRepository.updateTab(progressiveTab as string, {
-      property: envTab.property,
-      isSaved: envTab.isSaved,
-    });
+    progressiveTab.property.environment.aiVariable = aiVariables;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     return;
   };
+
+  private updatedRequestInCollection(
+    generatedVariables: any[],
+    requestItem: any,
+  ): any {
+    // Recursive function to deeply replace matches
+    const replaceValues = (obj: any, path: string = ""): any => {
+      if (Array.isArray(obj)) {
+        return obj.map((item, index) =>
+          replaceValues(item, `${path}[${index}]`),
+        );
+      } else if (obj && typeof obj === "object") {
+        const newObj: any = {};
+        for (const [key, value] of Object.entries(obj)) {
+          newObj[key] = replaceValues(value, `${path}.${key}`);
+        }
+        return newObj;
+      } else if (typeof obj === "string") {
+        for (const variable of generatedVariables) {
+          if (obj === variable.value) {
+            return `{{${variable.key}}}`;
+          }
+          if (obj.includes(variable.value)) {
+            obj = obj.replace(
+              new RegExp(variable.value, "g"),
+              `{{${variable.key}}}`,
+            );
+          }
+        }
+        return obj;
+      }
+      return obj;
+    };
+    return replaceValues(requestItem, "root");
+  }
 
   /**
    * @description - saves environment to the mongo server
@@ -246,7 +345,16 @@ export class EnvironmentExplorerViewModel {
       currentEnvironment.id,
       {
         name: currentEnvironment.name,
-        variable: currentEnvironment?.property?.environment?.variable,
+        variable: currentEnvironment?.property?.environment?.variable.map(
+          (item) => {
+            return {
+              key: item.key,
+              value: item.value,
+              checked: item.checked,
+              type: item.type || "user-generated",
+            };
+          },
+        ),
       },
       baseUrl,
     );
@@ -257,14 +365,83 @@ export class EnvironmentExplorerViewModel {
       );
       const progressiveTab = this._tab.getValue();
       progressiveTab.isSaved = true;
+      progressiveTab.property.environment.generateVariable = false;
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
       await this.updateEnvironmentState({
         isSaveInProgress: false,
       });
-      notifications.success(
-        `Changes saved for ${currentEnvironment.name} environment.`,
-      );
+      const aiGeneratedVariables =
+        progressiveTab.property.environment.variable.filter(
+          (variable) => variable.lifespan === "short",
+        );
+
+      const uniqueAiGeneratedVariables =
+        new SetDataStructure().pushArrayOfObjects(
+          aiGeneratedVariables,
+          "value",
+        );
+
+      if (uniqueAiGeneratedVariables.length > 0) {
+        await this.updateVariables(
+          currentEnvironment?.property?.environment?.variable.map((item) => {
+            return {
+              key: item.key,
+              value: item.value,
+              checked: item.checked,
+              type: item.type || "user-generated",
+            };
+          }),
+        );
+        await this.updateGeneratedVariables([]);
+
+        const baseUrl = await this.constructBaseUrl(
+          progressiveTab?.path?.workspaceId,
+        );
+        const insertGenerateVariableResponse =
+          await this.collectionService.insertGeneratedVariables(
+            progressiveTab?.path?.workspaceId,
+            progressiveTab?.property?.environment?.generateProperty
+              .collectionId,
+            uniqueAiGeneratedVariables,
+            baseUrl,
+          );
+        if (insertGenerateVariableResponse.isSuccessful) {
+          await this.collectionRepository.updateCollection(
+            insertGenerateVariableResponse.data.data._id,
+            insertGenerateVariableResponse.data.data,
+          );
+
+          const tabRxDocs = await this.tabRepository.getTabsByCollectionId(
+            progressiveTab?.property?.environment?.generateProperty
+              .collectionId,
+          );
+          const tabsJson = tabRxDocs
+            .map((doc) => doc.toMutableJSON())
+            .map((doc) => {
+              doc.property = this.updatedRequestInCollection(
+                uniqueAiGeneratedVariables,
+                doc.property,
+              );
+              doc.isSaved = false;
+              doc.persistence = "PERMANENT";
+              return doc;
+            });
+          this.tabRepository.bulkUpsertTabs(tabsJson);
+
+          notifications.success(
+            `Successfully added generated variables to “Global Variables” environment and applied them to your “${progressiveTab?.property?.environment?.generateProperty.collectionName}” collection.`,
+          );
+        } else {
+          notifications.error(
+            `Failed to apply generated variables to the ${progressiveTab?.property?.environment?.generateProperty.collectionName}  collection.`,
+          );
+        }
+      } else {
+        notifications.success(
+          `Changes saved for ${currentEnvironment.name} environment.`,
+        );
+      }
     } else {
       await this.updateEnvironmentState({ isSaveInProgress: false });
       if (response.message === "Network Error") {
@@ -318,43 +495,76 @@ export class EnvironmentExplorerViewModel {
     return await this.workspaceRepository.getActiveWorkspaceDoc();
   };
 
+  public updateEnvironmentAiVariableGenerationStatus = async (_status) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.environment.aiGenerationStatus = _status;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  };
+
   /**
    * Handle create generative variables for a collection.
    * @param collectionId :CollectionId - the collection in which new request is going to be created
    * @returns :void
    */
-  public getGenerateVariables = async (
-    env: any,
-  ): Promise<{ [key: string]: any }> => {
-    console.log("this is the env for it -", env);
+  public getGenerateVariables = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab?.path?.workspaceId,
+    );
+    if (
+      progressiveTab?.property?.environment?.generateVariable &&
+      progressiveTab?.property?.environment?.aiGenerationStatus === ""
+    ) {
+      this.updateEnvironmentAiVariableGenerationStatus("generating");
+      const response = await this.collectionService.generateVariables(
+        progressiveTab?.path?.workspaceId,
+        progressiveTab?.property?.environment.generateProperty?.collectionId,
+        baseUrl,
+      );
+      if (response?.isSuccessful) {
+        await this.updateEnvironmentAiVariableGenerationStatus("generated");
+        const generatedData = response?.data?.data || [];
+        if (generatedData.length < 1) {
+          await this.updateEnvironmentAiVariableGenerationStatus("empty");
+        }
+        await this.updateGeneratedVariables(generatedData);
+      } else {
+        notifications.error("Failed to Generate Variables.");
+      }
+    }
+  };
 
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const response = [
-          {
-            key: "name",
-            value: "world",
-            checked: false,
-          },
-          {
-            key: "sample-my-one",
-            value: "test",
-            checked: false,
-          },
-          {
-            key: "sample-1",
-            value: "test-1",
-            checked: false,
-          },
-          {
-            key: "sample-2",
-            value: "test-2",
-            checked: false,
-          },
-        ];
-        this.updateGenerativeVariables(response);
-        resolve(response);
-      }, 3000);
-    });
+  /**
+   * Handle create generative variables for a collection.
+   * @param collectionId :CollectionId - the collection in which new request is going to be created
+   * @returns :void
+   */
+  public reGenerateVariables = async () => {
+    this.updateEnvironmentAiVariableGenerationStatus("generating");
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab?.path?.workspaceId,
+    );
+    const response = await this.collectionService.generateVariables(
+      progressiveTab?.path?.workspaceId,
+      progressiveTab?.property?.environment?.generateProperty?.collectionId,
+      baseUrl,
+    );
+    if (response?.isSuccessful) {
+      await this.updateEnvironmentAiVariableGenerationStatus("generated");
+      const generatedData = response?.data?.data || [];
+      if (generatedData.length < 1) {
+        await this.updateEnvironmentAiVariableGenerationStatus("empty");
+      }
+      await this.updateGeneratedVariables(generatedData);
+    } else {
+      notifications.error("Failed to Generate Variables.");
+    }
+  };
+
+  public redirectDocsGenerateVariables = async () => {
+    window.open(constants.INTRO_DOCS_URL, "_blank");
+    return;
   };
 }

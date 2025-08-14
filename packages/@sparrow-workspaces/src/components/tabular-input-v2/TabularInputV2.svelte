@@ -10,11 +10,16 @@
   import { partition } from "rxjs";
   import { Button, Tooltip } from "@sparrow/library/ui";
   import { Checkbox } from "@sparrow/library/forms";
-  import { DeleteRegular, ReOrderDotsRegular } from "@sparrow/library/icons";
+  import {
+    ArrowHookRegular,
+    DeleteRegular,
+    ReOrderDotsRegular,
+  } from "@sparrow/library/icons";
   import { CodeMirrorInput } from "..";
   import { TabularInputTheme } from "../../utils";
   import { DismissRegular } from "@sparrow/library/icons";
   import { CheckMarkIcon } from "@sparrow/library/icons";
+  import SparkleFilled from "../../../../@sparrow-library/src/icons/SparkleFilled.svelte";
 
   /**
    * tabular pair entries
@@ -34,7 +39,7 @@
    */
   export let disabled = false;
   export let isGeneratedVariable = false;
-  export let onClickGenerateVariable: (type?: string, index?: number) => void;
+  export let onUpdateVariableSelection: (type?: string, index?: number) => void;
 
   let pairs: KeyValueChecked[] = keyValue;
   let controller: boolean = false;
@@ -172,10 +177,10 @@
       </p>
     </div>
     <div class="pe-1 d-flex">
-      {#if isGeneratedVariable}
+      {#if isGeneratedVariable && pairs.length > 0}
         <button
           class="border-0 d-flex text-nowrap generate-action-button common-text align-items-center"
-          on:click={onClickGenerateVariable("accept-all")}>Accept All</button
+          on:click={onUpdateVariableSelection("accept-all")}>Accept All</button
         >
       {/if}
       <button class="bg-transparent border-0 d-flex d-none" style="">
@@ -227,7 +232,13 @@
               style="height: 28px;"
             >
               <div class="d-flex justify-content-center align-items-center">
-                <div style="width:24px;">
+                <div class="d-flex" style="width:50px; text-align: right;">
+                  {#if element.type === "ai-generated"}
+                    <SparkleFilled
+                      size="12px"
+                      color="var(--text-ds-primary-300)"
+                    />
+                  {/if}
                   {#if pairs.length - 1 != index && !isGeneratedVariable}
                     <Checkbox
                       checked={element.checked}
@@ -298,6 +309,12 @@
                     />
                   </div>
                 </Tooltip>
+                {#if element.lifespan === "short"}
+                  <ArrowHookRegular
+                    size="12px"
+                    color="var(--text-ds-primary-300)"
+                  />
+                {/if}
               {:else if isGeneratedVariable}
                 <!-- {#if element?.aiUndo}
                   <div class="d-flex align-items-center gap-1">
@@ -323,7 +340,7 @@
                   <button
                     class="generate-action-button accept"
                     on:click|stopPropagation={() => {
-                      onClickGenerateVariable("accept", index);
+                      onUpdateVariableSelection("accept", index);
                     }}
                   >
                     <CheckMarkIcon
@@ -335,6 +352,7 @@
                     class="generate-action-button reject"
                     on:click|stopPropagation={() => {
                       deletePairs(index);
+                      onUpdateVariableSelection("reject", index);
                     }}
                   >
                     <DismissRegular
