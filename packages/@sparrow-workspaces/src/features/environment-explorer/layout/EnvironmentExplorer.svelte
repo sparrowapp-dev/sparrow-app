@@ -275,6 +275,7 @@
               keyValue={$currentEnvironment?.property?.environment?.variable}
               callback={handleCurrentEnvironmentKeyValuePairChange}
               {search}
+              {onUpdateVariableSelection}
             />
           </div>
         </div>
