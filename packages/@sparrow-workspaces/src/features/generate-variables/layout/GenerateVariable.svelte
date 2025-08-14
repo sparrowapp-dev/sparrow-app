@@ -23,13 +23,26 @@
   const toggleMoreInfo = () => {
     showMoreInfo = !showMoreInfo;
   };
+
+  let isRevertEnabled = false;
+
+  $: {
+    const shortLivedVariable =
+      currentEnvironment.property.environment.variable.filter(
+        (variable) => variable.lifespan === "short",
+      );
+    if (shortLivedVariable?.length) {
+      isRevertEnabled = true;
+    } else {
+      isRevertEnabled = false;
+    }
+  }
 </script>
 
 <div class="flex flex-column" style="margin-top: 12px;">
   <div>
     <p
       class="d-flex justify-content-start align-items-center common-text title-text"
-      style="margin: 0px; padding:8px;"
     >
       Generated Variables from "{currentEnvironment?.property?.environment
         ?.generateProperty.collectionName}"
@@ -44,13 +57,15 @@
   <div>
     {#if aiGenerationStatus === "generating"}
       <div class="d-flex flex-column">
-        <div class="" style="margin-top: 16px; margin-bottom:12px;">
+        <div class="" style="margin-bottom:12px;">
           <TabularInputV2
             disabled={false}
             keyValue={[]}
             callback={() => {}}
             search={""}
             isGeneratedVariable={true}
+            {onUpdateVariableSelection}
+            {isRevertEnabled}
           />
         </div>
         <div class="">
@@ -66,20 +81,23 @@
           search={""}
           isGeneratedVariable={true}
           {onUpdateVariableSelection}
+          {isRevertEnabled}
         />
       </div>
     {:else if aiGenerationStatus === "accepted"}
       <div class="d-flex flex-column">
-        <div class="" style="margin-top: 16px; margin-bottom:12px;">
+        <div class="" style="padding-bottom:12px;">
           <TabularInputV2
             disabled={false}
             keyValue={[]}
             callback={() => {}}
             search={""}
             isGeneratedVariable={true}
+            {onUpdateVariableSelection}
+            {isRevertEnabled}
           />
         </div>
-        <div class="" style="margin-top: 24px;">
+        <div class="" style="padding-top: 24px;">
           <p
             class="d-flex justify-content-center align-items-center common-text title-text"
             style="margin: 0px;"
@@ -97,14 +115,15 @@
       </div>
     {:else if aiGenerationStatus === "rejected"}
       <div class="d-flex flex-column">
-        <div class="" style="margin-top: 16px; margin-bottom:12px;">
+        <div class="" style="margin-bottom:12px;">
           <TabularInputV2
             disabled={false}
             keyValue={[]}
             callback={() => {}}
             search={""}
             isGeneratedVariable={true}
-            isCheckBoxNotRequired={true}
+            {onUpdateVariableSelection}
+            {isRevertEnabled}
           />
         </div>
         <div class="" style="margin-top: 24px;">
@@ -133,14 +152,15 @@
       </div>
     {:else if aiGenerationStatus === "empty"}
       <div class="d-flex flex-column">
-        <div class="" style="margin-top: 16px; margin-bottom:12px;">
+        <div class="" style="margin-bottom:12px;">
           <TabularInputV2
             disabled={false}
             keyValue={[]}
             callback={() => {}}
             search={""}
             isGeneratedVariable={true}
-            isCheckBoxNotRequired={true}
+            {onUpdateVariableSelection}
+            {isRevertEnabled}
           />
         </div>
         <div
@@ -148,7 +168,7 @@
           style="margin-top: 2px;"
         >
           <p
-            class="d-flex justify-content-center align-items-center common-text title-text"
+            class="d-flex justify-content-center pb-3 align-items-center common-text title-text"
             style="margin: 0px;"
           >
             Nothing to Suggest
@@ -174,12 +194,12 @@
           </p>
           {#if showMoreInfo}
             <div
-              class="d-flex flex-column justify-content-center align-items-center"
+              class="d-flex flex-column pt-3 px-4 justify-content-center align-items-center"
               style="
         border: 0.5px solid var(--border-ds-neutral-100);
         border-radius: 10px;
         background-color: var(--bg-ds-surface-800);
-        width:770px;
+        width:80%;
       "
             >
               <ul
@@ -232,7 +252,6 @@
   .description-text {
     font-size: 12px;
     color: var(--text-ds-neutral-200);
-    margin: 10px 0 0 8px;
   }
   .common-text {
     font-family: "Inter", sans-serif;
@@ -240,5 +259,8 @@
     line-height: 150%;
     letter-spacing: 0;
     text-align: left;
+  }
+  ul li {
+    padding-bottom: 12px;
   }
 </style>

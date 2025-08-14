@@ -258,6 +258,58 @@ export class EnvironmentExplorerViewModel {
       ]);
       await this.updateEnvironmentAiVariableGenerationStatus("accepted");
       await this.updateGeneratedVariables([]);
+    } else if (type === "revert" && typeof index === "number") {
+        const progressiveTab = createDeepCopy(this._tab.getValue());
+        const foundIndex =
+          progressiveTab.property.environment.variable.findIndex(
+            (_, i) => i === index,
+          );
+        if (foundIndex !== -1) {
+          const foundObject =
+            progressiveTab.property.environment.variable[foundIndex];
+          const currentPairs =
+            progressiveTab.property?.environment?.aiVariable || [];
+          const updatedPairs = [...currentPairs];
+          if (updatedPairs.length > 0) {
+            updatedPairs.splice(updatedPairs.length - 1, 0, {
+              ...foundObject,
+               type: "user-generated",
+               lifespan: "long",
+            });
+          } else {
+            updatedPairs.push({
+              ...foundObject,
+               type: "user-generated",
+               lifespan: "long",
+            });
+          }
+          const remainingVariables =
+            progressiveTab.property.environment.variable.filter(
+              (_, i) => i !== foundIndex,
+            );
+          this.updateVariables(remainingVariables);
+          this.updateGeneratedVariables(updatedPairs);
+          await this.updateEnvironmentAiVariableGenerationStatus("generated");
+        }
+    }else if (type === "revert-all") {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const aiVariable = [];
+      const userVariable = []; 
+      progressiveTab.property?.environment?.variable.forEach((variable)=>{
+          if(variable.lifespan === "short"){
+            aiVariable.push({
+              ...variable,
+               type: "user-generated",
+               lifespan: "long",
+            });
+          }else{
+            userVariable.push(variable);
+          }
+      });
+      
+      await this.updateVariables([...userVariable]);
+      await this.updateGeneratedVariables([...progressiveTab.property?.environment?.aiVariable, ...aiVariable]);
+      await this.updateEnvironmentAiVariableGenerationStatus("generated");
     }
   };
 

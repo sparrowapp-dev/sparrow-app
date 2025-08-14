@@ -640,7 +640,7 @@
               >
                 {#if globalEnvInUse?.collectionName || userRole === WorkspaceRole.WORKSPACE_VIEWER}
                   <Button
-                    disable={globalEnvInUse?.collectionName ? true : false}
+                    disable={false}
                     startIcon={SparkleFilled}
                     title={"Generate Variables"}
                     size="medium"
