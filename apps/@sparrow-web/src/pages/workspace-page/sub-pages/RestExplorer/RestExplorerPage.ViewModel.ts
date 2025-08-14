@@ -101,6 +101,7 @@ import { getClientUser } from "src/utils/jwt";
 import constants from "src/constants/constants";
 import * as curlconverter from "curlconverter";
 import * as Sentry from "@sentry/svelte";
+import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection-tab";
 
 class RestExplorerViewModel {
   /**
@@ -272,14 +273,16 @@ class RestExplorerViewModel {
     }
   }
 
-  public openCollection = async () => {
+  public openCollection = async (isAuthRedirect: boolean = false) => {
     const collectionRx = await this.collectionRepository.readCollection(
       this._tab.getValue().path.collectionId,
     );
+    const navigation = isAuthRedirect ? CollectionNavigationTabEnum.AUTH : null;
     const collectionDoc = collectionRx?.toMutableJSON();
     const collectionTab = new CollectionTabAdapter().adapt(
       this._tab.getValue().path.workspaceId,
       collectionDoc,
+      navigation,
     );
     this.tabRepository.createTab(collectionTab);
   };
