@@ -232,7 +232,7 @@ export class EnvironmentExplorerViewModel {
       const progressiveTab = createDeepCopy(this._tab.getValue());
       const remainingGeneratedVariables =
         progressiveTab.property.environment.aiVariable;
-      if (!remainingGeneratedVariables?.length) {
+      if (remainingGeneratedVariables?.length < 2)  {
         await this.updateEnvironmentAiVariableGenerationStatus("rejected");
       }
     } else if (type === "accept-all") {
@@ -260,56 +260,56 @@ export class EnvironmentExplorerViewModel {
       await this.updateEnvironmentAiVariableGenerationStatus("accepted");
       await this.updateGeneratedVariables([]);
     } else if (type === "revert" && typeof index === "number") {
-        const progressiveTab = createDeepCopy(this._tab.getValue());
+      const progressiveTab = createDeepCopy(this._tab.getValue());
         const foundIndex =
           progressiveTab.property.environment.variable.findIndex(
-            (_, i) => i === index,
-          );
-        if (foundIndex !== -1) {
-          const foundObject =
-            progressiveTab.property.environment.variable[foundIndex];
-          const currentPairs =
-            progressiveTab.property?.environment?.aiVariable || [];
-          const updatedPairs = [...currentPairs];
-          if (updatedPairs.length > 0) {
-            updatedPairs.splice(updatedPairs.length - 1, 0, {
-              ...foundObject,
-               type: "user-generated",
-               lifespan: "long",
-            });
-          } else {
-            updatedPairs.push({
-              ...foundObject,
-               type: "user-generated",
-               lifespan: "long",
-            });
-          }
-          const remainingVariables =
-            progressiveTab.property.environment.variable.filter(
-              (_, i) => i !== foundIndex,
-            );
-          this.updateVariables(remainingVariables);
-          this.updateGeneratedVariables(updatedPairs);
-          await this.updateEnvironmentAiVariableGenerationStatus("generated");
+        (_, i) => i === index,
+      );
+      if (foundIndex !== -1) {
+        const foundObject =
+          progressiveTab.property.environment.variable[foundIndex];
+        const currentPairs =
+          progressiveTab.property?.environment?.aiVariable || [];
+        const updatedPairs = [...currentPairs];
+        if (updatedPairs.length > 0) {
+          updatedPairs.splice(updatedPairs.length - 1, 0, {
+            ...foundObject,
+            type: "user-generated",
+            lifespan: "long",
+          });
+        } else {
+          updatedPairs.push({
+            ...foundObject,
+            type: "user-generated",
+            lifespan: "long",
+          });
         }
+        const remainingVariables =
+          progressiveTab.property.environment.variable.filter(
+            (_, i) => i !== foundIndex,
+          );
+        this.updateVariables(remainingVariables);
+        this.updateGeneratedVariables(updatedPairs);
+        await this.updateEnvironmentAiVariableGenerationStatus("generated");
+      }
     }else if (type === "revert-all") {
       const progressiveTab = createDeepCopy(this._tab.getValue());
       // Remove the last item from environment.variable
 
       const aiVariable = [];
-      const userVariable = []; 
+      const userVariable = [];
       progressiveTab.property?.environment?.variable.forEach((variable)=>{
           if(variable.lifespan === "short"){
-            aiVariable.push({
-              ...variable,
-               type: "user-generated",
-               lifespan: "long",
-            });
+          aiVariable.push({
+            ...variable,
+            type: "user-generated",
+            lifespan: "long",
+          });
           }else{
-            userVariable.push(variable);
-          }
+          userVariable.push(variable);
+        }
       });
-      
+
       await this.updateVariables([...userVariable]);
       await this.updateGeneratedVariables([...progressiveTab.property?.environment?.aiVariable, ...aiVariable]);
       await this.updateEnvironmentAiVariableGenerationStatus("generated");
@@ -525,14 +525,14 @@ export class EnvironmentExplorerViewModel {
 
           const tabsJson = tabRxDocs.map((doc) => doc.toMutableJSON()).filter((doc)=>{
             if(doc.type === TabTypeEnum.REQUEST || doc.type === TabTypeEnum.WEB_SOCKET || doc.type === TabTypeEnum.GRAPHQL || doc.type === TabTypeEnum.SOCKET_IO){
-              return true;
+                return true;
             }else{
-              return false;
-            }
+                return false;
+              }
           }).map((doc)=>{
              doc.property = this.updatedRequestInCollection(uniqueAiGeneratedVariables, doc.property );
-             return doc;
-          });
+              return doc;
+            });
           this.tabRepository.bulkUpsertTabs(tabsJson);
 
           notifications.success(
@@ -636,6 +636,7 @@ export class EnvironmentExplorerViewModel {
         }
         await this.updateGeneratedVariables(generatedData);
       } else {
+        await this.updateEnvironmentAiVariableGenerationStatus("rejected");
         notifications.error("Failed to Generate Variables.");
       }
     }
@@ -665,6 +666,7 @@ export class EnvironmentExplorerViewModel {
       }
       await this.updateGeneratedVariables(generatedData);
     } else {
+      await this.updateEnvironmentAiVariableGenerationStatus("rejected");
       notifications.error("Failed to Generate Variables.");
     }
   };
