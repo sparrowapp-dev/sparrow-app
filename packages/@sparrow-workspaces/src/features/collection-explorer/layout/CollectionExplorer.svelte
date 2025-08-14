@@ -122,6 +122,7 @@
   import { getMethodStyle } from "@sparrow/common/utils";
   import { WorkspaceRole, WorkspaceType } from "@sparrow/common/enums";
   import { SparkleFilled } from "@sparrow/common/icons";
+  import { borderAnimation } from "@sparrow/common/store";
 
   /**
    * Role of user in active workspace
@@ -390,6 +391,10 @@
     const response = await onDeleteAuthProfile(collection, authId);
     return response;
   };
+  $: console.log(
+    "this is the data we are getting ----------------->",
+    $borderAnimation,
+  );
 </script>
 
 <div class="main-container d-flex h-100">
@@ -654,7 +659,7 @@
                     }}
                   />
                 {:else}
-                  <BorderAnimation>
+                  <BorderAnimation disable={$borderAnimation}>
                     <Button
                       disable={globalEnvInUse?.collectionName ? true : false}
                       startIcon={SparkleFilled}
@@ -667,6 +672,7 @@
                           globalEnvironment,
                           collection?.name,
                         );
+                        borderAnimation.set(true);
                       }}
                     />
                   </BorderAnimation>
