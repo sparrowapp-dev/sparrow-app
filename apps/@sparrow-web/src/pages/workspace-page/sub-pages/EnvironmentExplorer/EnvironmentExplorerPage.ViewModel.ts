@@ -236,15 +236,20 @@ export class EnvironmentExplorerViewModel {
       }
     } else if (type === "accept-all") {
       const progressiveTab = createDeepCopy(this._tab.getValue());
+      // Remove the last item from environment.variable
+      if (
+        Array.isArray(progressiveTab.property?.environment?.variable) &&
+        progressiveTab.property.environment.variable.length > 0
+      ) {
+        progressiveTab.property.environment.variable.pop();
+      }
       await this.updateVariables([
         ...progressiveTab.property.environment.variable,
-        ...progressiveTab.property.environment.aiVariable.map((item) => {
-          return {
-            ...item,
-            type: "ai-generated",
-            lifespan: "short",
-          };
-        }),
+        ...progressiveTab.property.environment.aiVariable.map((item) => ({
+          ...item,
+          type: "ai-generated",
+          lifespan: "short",
+        })),
         {
           key: "",
           value: "",
