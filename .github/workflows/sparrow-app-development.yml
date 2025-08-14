@@ -176,6 +176,9 @@ jobs:
           }
         shell: pwsh
       
+      - name: msi zip sig
+        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.zip.sig
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
