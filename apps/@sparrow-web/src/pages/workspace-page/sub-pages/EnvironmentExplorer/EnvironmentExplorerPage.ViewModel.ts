@@ -231,7 +231,7 @@ export class EnvironmentExplorerViewModel {
       const progressiveTab = createDeepCopy(this._tab.getValue());
       const remainingGeneratedVariables =
         progressiveTab.property.environment.aiVariable;
-      if (!remainingGeneratedVariables?.length) {
+      if (remainingGeneratedVariables?.length < 2) {
         await this.updateEnvironmentAiVariableGenerationStatus("rejected");
       }
     } else if (type === "accept-all") {
@@ -635,6 +635,7 @@ private updatedRequestInCollection(
         }
         await this.updateGeneratedVariables(generatedData);
       } else {
+        await this.updateEnvironmentAiVariableGenerationStatus("rejected");
         notifications.error("Failed to Generate Variables.");
       }
     }
@@ -664,6 +665,7 @@ private updatedRequestInCollection(
       }
       await this.updateGeneratedVariables(generatedData);
     } else {
+      await this.updateEnvironmentAiVariableGenerationStatus("rejected");
       notifications.error("Failed to Generate Variables.");
     }
   };
