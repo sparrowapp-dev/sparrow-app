@@ -1007,7 +1007,7 @@ export class CollectionService {
   ) => {
     const response = await makeRequest(
       "POST",
-      `${baseUrl}/api/collection/generate-variables/${collectionId}`,
+      `${baseUrl}/api/collection/${collectionId}/generate-variables`,
       {
         body: {
           workspaceId: `${workspaceId}`,
@@ -1026,7 +1026,7 @@ export class CollectionService {
   ) => {
     const response = await makeRequest(
       "POST",
-      `${baseUrl}/api/collection/insert-variables`,
+      `${baseUrl}/api/collection/${collectionId}/insert-variables`,
       {
         body: {
           collectionId: `${collectionId}`,
