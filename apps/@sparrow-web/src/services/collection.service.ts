@@ -1026,7 +1026,7 @@ export class CollectionService {
   ) => {
     const response = await makeRequest(
       "POST",
-      `${baseUrl}/api/collection/generate-variables/insert`,
+      `${baseUrl}/api/collection/insert-variables`,
       {
         body: {
           collectionId: `${collectionId}`,

@@ -4,7 +4,7 @@ import { WorkspaceRepository } from "../../../../repositories/workspace.reposito
 import { EnvironmentService } from "../../../../services/environment.service";
 import { Events } from "@sparrow/common/enums";
 import { environmentType } from "@sparrow/common/enums/environment.enum";
-import { createDeepCopy, Sleep } from "@sparrow/common/utils";
+import { createDeepCopy, SetDataStructure, Sleep } from "@sparrow/common/utils";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { BehaviorSubject, type Observable } from "rxjs";
 import { GuideRepository } from "../../../../repositories/guide.repository";
@@ -15,7 +15,7 @@ import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 import { CollectionService } from "src/services/collection.service";
 import constants from "src/constants/constants";
 import { prepareFolders } from "rxdb/plugins/backup";
-import { dataDir } from "@tauri-apps/api/path";
+import { CollectionRepository } from "src/repositories/collection.repository";
 
 export class EnvironmentExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -24,6 +24,7 @@ export class EnvironmentExplorerViewModel {
   private collectionService = new CollectionService();
   private guideRepository = new GuideRepository();
   private guestUserRepository = new GuestUserRepository();
+  private collectionRepository = new CollectionRepository();
   private _tab: BehaviorSubject<any> = new BehaviorSubject({});
   private tabRepository = new TabRepository();
   private compareArray = new CompareArray();
@@ -253,6 +254,42 @@ export class EnvironmentExplorerViewModel {
     return;
   };
 
+
+    private updatedRequestInCollection(
+    generatedVariables: any[],
+    requestItem: any,
+  ): any {
+    // Recursive function to deeply replace matches
+    const replaceValues = (obj: any, path: string = ""): any => {
+      if (Array.isArray(obj)) {
+        return obj.map((item, index) =>
+          replaceValues(item, `${path}[${index}]`),
+        );
+      } else if (obj && typeof obj === "object") {
+        const newObj: any = {};
+        for (const [key, value] of Object.entries(obj)) {
+          newObj[key] = replaceValues(value, `${path}.${key}`);
+        }
+        return newObj;
+      } else if (typeof obj === "string") {
+        for (const variable of generatedVariables) {
+          if (obj === variable.value) {
+            return `{{${variable.key}}}`;
+          }
+          if (obj.includes(variable.value)) {
+            obj = obj.replace(
+              new RegExp(variable.value, "g"),
+              `{{${variable.key}}}`,
+            );
+          }
+        }
+        return obj;
+      }
+      return obj;
+    };
+    return replaceValues(requestItem, "root");
+  }
+
   /**
    * @description - saves environment to the mongo server
    */
@@ -312,7 +349,7 @@ export class EnvironmentExplorerViewModel {
       );
       const progressiveTab = this._tab.getValue();
       progressiveTab.isSaved = true;
-      progressiveTab.generateVariable = false;
+      progressiveTab.property.environment.generateVariable = false;
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
       await this.updateEnvironmentState({
@@ -324,7 +361,13 @@ export class EnvironmentExplorerViewModel {
       const aiGeneratedVariables = progressiveTab.property.environment.variable.filter(
         (variable) => variable.lifespan === "short"
         );
-      if (aiGeneratedVariables.length > 0) {
+
+      const uniqueAiGeneratedVariables = new SetDataStructure().pushArrayOfObjects(
+              aiGeneratedVariables,
+              "value",
+      );
+          
+      if (uniqueAiGeneratedVariables.length > 0) {
         await this.updateVariables(currentEnvironment?.property?.environment?.variable.map((item) => {
             return {
               key: item.key,
@@ -334,7 +377,36 @@ export class EnvironmentExplorerViewModel {
             };
         }));
         await this.updateGeneratedVariables([]);
+
+        const baseUrl = await this.constructBaseUrl(progressiveTab?.path?.workspaceId);
+        const insertGenerateVariableResponse = await this.collectionService.insertGeneratedVariables(
+          progressiveTab?.path?.workspaceId,
+          progressiveTab?.property?.environment?.generateProperty.collectionId,
+          uniqueAiGeneratedVariables,
+          baseUrl,
+        );
+        if (insertGenerateVariableResponse.isSuccessful) {
+          await this.collectionRepository.updateCollection(
+            insertGenerateVariableResponse.data.data._id,
+            insertGenerateVariableResponse.data.data,
+          );
+
+          const tabRxDocs = await this.tabRepository.getTabsByCollectionId(progressiveTab?.property?.environment?.generateProperty.collectionId);
+          const tabsJson = tabRxDocs.map((doc) => doc.toMutableJSON()).map((doc)=>{
+
+             doc.property = this.updatedRequestInCollection(uniqueAiGeneratedVariables, doc.property );
+             doc.isSaved = false;
+             doc.persistence = "PERMANENT";
+             return doc;
+          });
+          this.tabRepository.bulkUpsertTabs(tabsJson);
+          
+          notifications.success(`Successfully added generated variables to “Global Variables” environment and applied them to your “${progressiveTab?.property?.environment?.generateProperty.collectionName}” collection.`);
+        } else {
+          notifications.error("Failed to apply generated variables to the “Manage Pets” collection.");
+        }
       }
+
 
     } else {
       await this.updateEnvironmentState({ isSaveInProgress: false });
@@ -391,7 +463,7 @@ export class EnvironmentExplorerViewModel {
 
   public updateEnvironmentAiVariableGenerationStatus = async (_status) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.aiGenerationStatus = _status;
+    progressiveTab.property.environment.aiGenerationStatus = _status;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
@@ -407,13 +479,13 @@ export class EnvironmentExplorerViewModel {
       progressiveTab?.path?.workspaceId,
     );
     if (
-      progressiveTab.generateVariable &&
-      progressiveTab.aiGenerationStatus === ""
+      progressiveTab?.property?.environment?.generateVariable &&
+      progressiveTab?.property?.environment?.aiGenerationStatus === ""
     ) {
       this.updateEnvironmentAiVariableGenerationStatus("generating");
       const response = await this.collectionService.generateVariables(
         progressiveTab?.path?.workspaceId,
-        progressiveTab?.generateProperty?.collectionId,
+        progressiveTab?.property?.environment.generateProperty?.collectionId,
         baseUrl,
       );
       if (response?.isSuccessful) {
@@ -442,7 +514,7 @@ export class EnvironmentExplorerViewModel {
     );
     const response = await this.collectionService.generateVariables(
       progressiveTab?.path?.workspaceId,
-      progressiveTab?.generateProperty?.collectionId,
+      progressiveTab?.property?.environment?.generateProperty?.collectionId,
       baseUrl,
     );
     if (response?.isSuccessful) {
