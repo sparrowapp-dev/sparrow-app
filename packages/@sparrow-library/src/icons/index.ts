@@ -288,3 +288,4 @@ export { default as PersonKeyRegular } from "./PersonKeyRegular.svelte";
 export { default as SparkleRegular } from "./SparkleRegular.svelte";
 export { default as SparkleFilled } from "./SparkleFilled.svelte";
 export { default as ArrowHookRegular } from "./ArrowHookRegular.svelte";
+export { default as CopyAddRegular } from "./CopyAddRegular.svelte";
