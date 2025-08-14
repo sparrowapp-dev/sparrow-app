@@ -87,6 +87,7 @@
     Options,
     Tag,
     Tooltip,
+    BorderAnimation,
   } from "@sparrow/library/ui";
   import {
     AddRegular,
@@ -637,9 +638,7 @@
                 placement={"bottom-center"}
                 size="medium"
               >
-                <div
-                  style={`${globalEnvInUse?.collectionName ? "" : "border: 2px solid var(--border-ds-primary-400); border-radius:8.5px;"} `}
-                >
+                {#if globalEnvInUse?.collectionName}
                   <Button
                     disable={globalEnvInUse?.collectionName ? true : false}
                     startIcon={SparkleFilled}
@@ -654,7 +653,24 @@
                       );
                     }}
                   />
-                </div>
+                {:else}
+                  <BorderAnimation>
+                    <Button
+                      disable={globalEnvInUse?.collectionName ? true : false}
+                      startIcon={SparkleFilled}
+                      title={"Generate Variables"}
+                      size="medium"
+                      type={"secondary"}
+                      onClick={async () => {
+                        onGenerateVariables(
+                          collection?.id,
+                          globalEnvironment,
+                          collection?.name,
+                        );
+                      }}
+                    />
+                  </BorderAnimation>
+                {/if}
               </Tooltip>
             </div>
           {/if}
