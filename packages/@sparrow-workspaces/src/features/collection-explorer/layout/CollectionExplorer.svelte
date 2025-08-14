@@ -391,10 +391,6 @@
     const response = await onDeleteAuthProfile(collection, authId);
     return response;
   };
-  $: console.log(
-    "this is the data we are getting ----------------->",
-    $borderAnimation,
-  );
 </script>
 
 <div class="main-container d-flex h-100">
