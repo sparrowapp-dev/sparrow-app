@@ -153,6 +153,7 @@
       type="primary"
       customWidth={"96px"}
       onClick={() => {
+        debugger;
         if (requestUrl === "") {
           const codeMirrorElement = document.querySelector(
             ".input-url .cm-editor",

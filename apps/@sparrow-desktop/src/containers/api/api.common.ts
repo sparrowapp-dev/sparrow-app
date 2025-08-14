@@ -890,7 +890,7 @@ const makeHttpRequestV2 = async (
 ) => {
   console.table({ url, method, headers, body, request });
   const startTime = performance.now();
-
+  debugger;
   try {
     const data = await Promise.race([
       invoke("make_http_request_v2", {
