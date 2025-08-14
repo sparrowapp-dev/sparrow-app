@@ -14,7 +14,6 @@ import { Debounce, CompareArray } from "@sparrow/common/utils";
 import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 import { CollectionService } from "src/services/collection.service";
 import constants from "src/constants/constants";
-// import { prepareFolders } from "rxdb/plugins/backup";
 import { CollectionRepository } from "src/repositories/collection.repository";
 
 export class EnvironmentExplorerViewModel {
