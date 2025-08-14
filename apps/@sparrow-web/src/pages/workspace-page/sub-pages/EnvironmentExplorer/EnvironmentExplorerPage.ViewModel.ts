@@ -11,7 +11,7 @@ import { GuideRepository } from "../../../../repositories/guide.repository";
 import { GuestUserRepository } from "../../../../repositories/guest-user.repository";
 import { TabRepository } from "../../../../repositories/tab.repository";
 import { Debounce, CompareArray } from "@sparrow/common/utils";
-import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
+import { TabPersistenceTypeEnum, TabTypeEnum } from "@sparrow/common/types/workspace/tab";
 import { CollectionService } from "src/services/collection.service";
 import constants from "src/constants/constants";
 import { prepareFolders } from "rxdb/plugins/backup";
@@ -255,39 +255,92 @@ export class EnvironmentExplorerViewModel {
   };
 
 
-    private updatedRequestInCollection(
+private updatedRequestInCollection(
     generatedVariables: any[],
     requestItem: any,
   ): any {
-    // Recursive function to deeply replace matches
-    const replaceValues = (obj: any, path: string = ""): any => {
-      if (Array.isArray(obj)) {
-        return obj.map((item, index) =>
-          replaceValues(item, `${path}[${index}]`),
-        );
-      } else if (obj && typeof obj === "object") {
-        const newObj: any = {};
-        for (const [key, value] of Object.entries(obj)) {
-          newObj[key] = replaceValues(value, `${path}.${key}`);
-        }
-        return newObj;
-      } else if (typeof obj === "string") {
-        for (const variable of generatedVariables) {
-          if (obj === variable.value) {
-            return `{{${variable.key}}}`;
+    // Helper: replace only outside {{ }} blocks
+    const replaceOutsideBraces = (text: string): string => {
+      return text.replace(
+        /(\{\{.*?\}\})|([^{}]+)/g,
+        (match, insideBraces, outside) => {
+          if (insideBraces) return insideBraces;
+          let updated = outside;
+          for (const variable of generatedVariables) {
+            if (updated === variable.value) {
+              updated = `{{${variable.key}}}`;
+            } else if (updated.includes(variable.value)) {
+              updated = updated.replace(
+                new RegExp(variable.value, "g"),
+                `{{${variable.key}}}`,
+              );
+            }
           }
-          if (obj.includes(variable.value)) {
-            obj = obj.replace(
-              new RegExp(variable.value, "g"),
-              `{{${variable.key}}}`,
+          return updated;
+        },
+      );
+    };
+
+    // Special updater for array of key-value objects
+    const updateKeyValueArray = (arr: any[]) => {
+      return arr.map((entry) => ({
+        ...entry,
+        key:
+          typeof entry.key === "string"
+            ? replaceOutsideBraces(entry.key)
+            : entry.key,
+        value:
+          typeof entry.value === "string"
+            ? replaceOutsideBraces(entry.value)
+            : entry.value,
+      }));
+    };
+
+    // Main recursive update
+    const replaceValues = (obj: any): any => {
+      if (!obj || typeof obj !== "object") {
+        return typeof obj === "string" ? replaceOutsideBraces(obj) : obj;
+      }
+      const newObj: any = Array.isArray(obj) ? [] : {};
+      for (const [key, value] of Object.entries(obj)) {
+        if (key === "url" && typeof value === "string") {
+          newObj[key] = replaceOutsideBraces(value);
+        } else if (key === "headers" && Array.isArray(value)) {
+          newObj[key] = updateKeyValueArray(value);
+        } else if (key === "queryParams" && Array.isArray(value)) {
+          newObj[key] = updateKeyValueArray(value);
+        } else if (
+          key === "body" &&
+          typeof value === "object" &&
+          value !== null
+        ) {
+          const updatedBody = { ...(value as any) };
+          if (typeof updatedBody.raw === "string") {
+            updatedBody.raw = replaceOutsideBraces(updatedBody.raw);
+          }
+          if (Array.isArray(updatedBody.urlencoded)) {
+            updatedBody.urlencoded = updateKeyValueArray(
+              updatedBody.urlencoded,
             );
           }
+          if (
+            updatedBody.formdata &&
+            typeof updatedBody.formdata === "object"
+          ) {
+            if (Array.isArray(updatedBody.formdata.text)) {
+              updatedBody.formdata.text = updateKeyValueArray(
+                updatedBody.formdata.text,
+              );
+            }
+          }
+          newObj[key] = updatedBody;
+        } else {
+          newObj[key] = replaceValues(value);
         }
-        return obj;
       }
-      return obj;
+      return newObj;
     };
-    return replaceValues(requestItem, "root");
+    return replaceValues(requestItem);
   }
 
   /**
@@ -392,11 +445,14 @@ export class EnvironmentExplorerViewModel {
           );
 
           const tabRxDocs = await this.tabRepository.getTabsByCollectionId(progressiveTab?.property?.environment?.generateProperty.collectionId);
-          const tabsJson = tabRxDocs.map((doc) => doc.toMutableJSON()).map((doc)=>{
-
+          const tabsJson = tabRxDocs.map((doc) => doc.toMutableJSON()).filter((doc)=>{
+            if(doc.type === TabTypeEnum.REQUEST || doc.type === TabTypeEnum.WEB_SOCKET || doc.type === TabTypeEnum.GRAPHQL || doc.type === TabTypeEnum.SOCKET_IO){
+              return true;
+            }else{
+              return false;
+            }
+          }).map((doc)=>{
              doc.property = this.updatedRequestInCollection(uniqueAiGeneratedVariables, doc.property );
-             doc.isSaved = false;
-             doc.persistence = "PERMANENT";
              return doc;
           });
           this.tabRepository.bulkUpsertTabs(tabsJson);
