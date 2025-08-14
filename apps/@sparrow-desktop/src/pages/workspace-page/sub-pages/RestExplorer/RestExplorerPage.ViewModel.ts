@@ -774,20 +774,32 @@ class RestExplorerViewModel {
         }
       }
       let navigation: RequestDatasetEnum;
-      const bodyType = parsedCurlData?.request?.selectedRequestBodyType;
-
+      let language: RequestDataTypeEnum = RequestDataTypeEnum.TEXT;
+      const bodyType = parsedCurlData?.request?.selectedRequestBodyType; // Default to TEXT
       if (bodyType === "multipart/form-data") {
         navigation = RequestDatasetEnum.FORMDATA;
       } else if (bodyType === "application/x-www-form-urlencoded") {
         navigation = RequestDatasetEnum.URLENCODED;
-      } else if (bodyType === "application/json" || bodyType === "text/plain") {
+      } else if (bodyType === "application/json") {
         navigation = RequestDatasetEnum.RAW;
-      } else {
-        navigation = RequestDatasetEnum.NONE; // <-- Default to NONE if no body type
+        language = RequestDataTypeEnum.JSON; // Set language to JSON for application/json
+      } else if (bodyType === "text/plain") {
+        navigation = RequestDatasetEnum.RAW;
+        language = RequestDataTypeEnum.TEXT;
+      } else if (bodyType.includes("xml")) {
+        navigation = RequestDatasetEnum.RAW;
+        language = RequestDataTypeEnum.XML;
+      } else if (bodyType.includes("javascript")) {
+        navigation = RequestDatasetEnum.RAW;
+        language = RequestDataTypeEnum.JAVASCRIPT;
+      } else if (bodyType.includes("html")) {
+        navigation = RequestDatasetEnum.RAW;
+        language = RequestDataTypeEnum.HTML;
       }
 
       await this.updateRequestState({
         requestBodyNavigation: navigation,
+        requestBodyLanguage: language,
       });
 
       // Track the event
@@ -944,19 +956,33 @@ class RestExplorerViewModel {
       }
     }
 
-    // Handle formdata from -F flags
-    if (requestObject.files && Array.isArray(requestObject.files)) {
-      requestObject.files.forEach((fileObj: any) => {
-        transformedObject.request!.body.formdata.push({
-          key: fileObj?.key || "",
-          value: fileObj?.value || "",
-          checked: true,
-          type: fileObj?.type || "text",
-          base: fileObj?.value || "",
+    // Handle formdata from -F/--form flags (array or object)
+    if (requestObject.files) {
+      if (Array.isArray(requestObject.files)) {
+        requestObject.files.forEach((fileObj: any) => {
+          transformedObject.request!.body.formdata.push({
+            key: fileObj?.key || "",
+            value: fileObj?.value || "",
+            checked: true,
+            type: fileObj?.type || "text",
+            base: fileObj?.value || "",
+          });
         });
-      });
-      transformedObject.request!.selectedRequestBodyType =
-        "multipart/form-data";
+        transformedObject.request!.selectedRequestBodyType =
+          "multipart/form-data";
+      } else if (typeof requestObject.files === "object") {
+        Object.entries(requestObject.files).forEach(([key, value]) => {
+          transformedObject.request!.body.formdata.push({
+            key,
+            value: value || "",
+            checked: true,
+            type: "text",
+            base: value || "",
+          });
+        });
+        transformedObject.request!.selectedRequestBodyType =
+          "multipart/form-data";
+      }
     }
 
     // Handle raw multipart body with boundary (for --data-raw)
@@ -1013,6 +1039,7 @@ class RestExplorerViewModel {
 
     // Handle body based on Content-Type
     if (requestObject.data) {
+      debugger;
       if (contentType.startsWith("multipart/form-data")) {
         transformedObject.request!.selectedRequestBodyType =
           "multipart/form-data";
@@ -1142,34 +1169,48 @@ class RestExplorerViewModel {
     if (!curl || !curl.length) {
       throw new Error();
     }
+
+    // Remove line continuation backslashes before parsing
+    curl = curl.replace(/\\\s*\n\s*/g, " ");
+    curl = curl.replace(/\\\s*/g, " ");
+
     const updatedCurl = this.handleFormatCurl(curl);
     const stringifiedCurl = curlconverter.toJsonString(updatedCurl);
     const parsedCurl = JSON.parse(stringifiedCurl);
 
-    // Match all -F flags with their key-value pairs (handles single quoted values)
-    const formDataMatches = curl.match(/-F\s+'([^=]+)=([^']*)'/g);
+    // Use the same regex as ImportCurl.svelte
+    const formDataMatches = curl.match(
+      /(?:--form|-F)\s+'([^=]+)=((?:".*?")|(?:'.*?')|[^']*)'/g,
+    );
+
     const formDataItems = formDataMatches
-      ? formDataMatches.map((match) => {
-          const [, keyValue] = match.split("-F '");
-          const [key, value] = keyValue.split("=");
-          return {
-            key: key,
-            value: value.replace(/'/g, ""),
-            checked: true,
-            base: value.replace(/'/g, ""),
-            type: "text",
-          };
-        })
+      ? formDataMatches
+          .map((match) => {
+            const keyValueMatch = match.match(
+              /(?:--form|-F)\s+'([^=]+)=((?:".*?")|(?:'.*?')|[^']*)'/,
+            );
+            if (!keyValueMatch) return null;
+            const key = keyValueMatch[1];
+            let value = keyValueMatch[2] || "";
+            value = value.replace(/^["']|["']$/g, "");
+            return {
+              key,
+              value,
+              checked: true,
+              base: value,
+              type: "text",
+            };
+          })
+          .filter(Boolean)
       : [];
 
-    // Attach all form fields to parsedCurl.files
     if (formDataItems.length > 0) {
       parsedCurl.files = formDataItems;
+      parsedCurl.data = ""; // Clear raw data if formdata is present
     }
 
     return this.transformRequest(parsedCurl, "anonymous");
   };
-
   /**
    * Updates the request URL or imports a cURL command.
    * If the input starts with "curl ", it will parse and import the cURL.
@@ -3226,9 +3267,9 @@ class RestExplorerViewModel {
 
       if (!socketResponse) {
         Sentry.withScope((scope) => {
-            scope.setTag("emailId", userEmail);
-            scope.setTag("errorType", "AI");
-            Sentry.captureException("No response from Socket (desktop)");
+          scope.setTag("emailId", userEmail);
+          scope.setTag("errorType", "AI");
+          Sentry.captureException("No response from Socket (desktop)");
         });
         Sentry.captureException("Socket Connection Break");
         throw new Error("Something went wrong. Please try again");
@@ -3260,9 +3301,11 @@ class RestExplorerViewModel {
               this.aiAssistentWebSocketService.removeListener(event),
             );
             Sentry.withScope((scope) => {
-                scope.setTag("emailId", userEmail);
-                scope.setTag("errorType", "AI");
-                Sentry.captureException(`Socket Connection Break. Socket Status: ${event} RestExplorerPage.viewmodel(desktop)`);   
+              scope.setTag("emailId", userEmail);
+              scope.setTag("errorType", "AI");
+              Sentry.captureException(
+                `Socket Connection Break. Socket Status: ${event} RestExplorerPage.viewmodel(desktop)`,
+              );
             });
             await this.handleAIResponseError(
               componentData,
@@ -3372,9 +3415,11 @@ class RestExplorerViewModel {
       );
     } catch (error) {
       Sentry.withScope((scope) => {
-          scope.setTag("emailId", userEmail);
-          scope.setTag("errorType", "AI");
-          Sentry.captureException(`Error in websocket streaming ${error} RestExplorerPage.viewmodel(desktop)`);
+        scope.setTag("emailId", userEmail);
+        scope.setTag("errorType", "AI");
+        Sentry.captureException(
+          `Error in websocket streaming ${error} RestExplorerPage.viewmodel(desktop)`,
+        );
       });
       console.error("Something went wrong!:", error.message);
       await this.handleAIResponseError(componentData, error.message);
