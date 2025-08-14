@@ -962,6 +962,8 @@ class RestExplorerViewModel {
           key: fileObj?.key || "",
           value: fileObj?.value || "",
           checked: true,
+          type: fileObj?.type || "text",
+          base: fileObj?.value || "",
         });
       });
       transformedObject.request!.selectedRequestBodyType =
@@ -995,6 +997,8 @@ class RestExplorerViewModel {
                 key,
                 value,
                 checked: true,
+                type: "text",
+                base: value,
               });
             }
           }
@@ -1013,6 +1017,8 @@ class RestExplorerViewModel {
         key: "",
         value: "",
         checked: true,
+        type: "text",
+        base: "",
       });
     }
 
@@ -1042,7 +1048,10 @@ class RestExplorerViewModel {
         }
         transformedObject.request!.selectedRequestBodyType =
           "application/x-www-form-urlencoded";
-      } else {
+      } else if (
+        transformedObject.request!.selectedRequestBodyType !==
+        "multipart/form-data"
+      ) {
         transformedObject.request!.body.raw =
           typeof requestObject.data === "string"
             ? requestObject.data
@@ -1061,11 +1070,14 @@ class RestExplorerViewModel {
           }));
       for (const { key, value } of headersArr) {
         // Add header to request
-        transformedObject.request!.headers!.push({
-          key,
-          value,
-          checked: true,
-        });
+        if (key.toLowerCase() !== "content-type") {
+          // Add header to request
+          transformedObject.request!.headers!.push({
+            key,
+            value,
+            checked: true,
+          });
+        }
 
         // Bearer token detection
         if (
