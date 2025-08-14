@@ -4,7 +4,7 @@ import { WorkspaceRepository } from "../../../../repositories/workspace.reposito
 import { EnvironmentService } from "../../../../services/environment.service";
 import { Events } from "@sparrow/common/enums";
 import { environmentType } from "@sparrow/common/enums/environment.enum";
-import { createDeepCopy, Sleep } from "@sparrow/common/utils";
+import { createDeepCopy, SetDataStructure, Sleep } from "@sparrow/common/utils";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { BehaviorSubject, type Observable } from "rxjs";
 import { GuideRepository } from "../../../../repositories/guide.repository";
@@ -15,7 +15,6 @@ import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
 import { CollectionService } from "src/services/collection.service";
 import constants from "src/constants/constants";
 import { prepareFolders } from "rxdb/plugins/backup";
-import { dataDir } from "@tauri-apps/api/path";
 import { CollectionRepository } from "src/repositories/collection.repository";
 
 export class EnvironmentExplorerViewModel {
@@ -362,7 +361,13 @@ export class EnvironmentExplorerViewModel {
       const aiGeneratedVariables = progressiveTab.property.environment.variable.filter(
         (variable) => variable.lifespan === "short"
         );
-      if (aiGeneratedVariables.length > 0) {
+
+      const uniqueAiGeneratedVariables = new SetDataStructure().pushArrayOfObjects(
+              aiGeneratedVariables,
+              "value",
+      );
+          
+      if (uniqueAiGeneratedVariables.length > 0) {
         await this.updateVariables(currentEnvironment?.property?.environment?.variable.map((item) => {
             return {
               key: item.key,
@@ -377,7 +382,7 @@ export class EnvironmentExplorerViewModel {
         const insertGenerateVariableResponse = await this.collectionService.insertGeneratedVariables(
           progressiveTab?.path?.workspaceId,
           progressiveTab?.property?.environment?.generateProperty.collectionId,
-          aiGeneratedVariables,
+          uniqueAiGeneratedVariables,
           baseUrl,
         );
         if (insertGenerateVariableResponse.isSuccessful) {
@@ -389,7 +394,7 @@ export class EnvironmentExplorerViewModel {
           const tabRxDocs = await this.tabRepository.getTabsByCollectionId(progressiveTab?.property?.environment?.generateProperty.collectionId);
           const tabsJson = tabRxDocs.map((doc) => doc.toMutableJSON()).map((doc)=>{
 
-             doc.property = this.updatedRequestInCollection(aiGeneratedVariables, doc.property );
+             doc.property = this.updatedRequestInCollection(uniqueAiGeneratedVariables, doc.property );
              doc.isSaved = false;
              doc.persistence = "PERMANENT";
              return doc;
