@@ -534,25 +534,25 @@ jobs:
           $appInstallerUrl = "https://sparrow-assest.s3.us-east-1.amazonaws.com/desktop/Sparrow.appinstaller"
 
           $appInstallerContent = @"
-<?xml version="1.0" encoding="utf-8"?>
-<AppInstaller
-    xmlns="http://schemas.microsoft.com/appx/appinstaller/2017/2"
-    Version="1.0.0.0"
-    Uri="$appInstallerUrl">
+          <?xml version="1.0" encoding="utf-8"?>
+          <AppInstaller
+              xmlns="http://schemas.microsoft.com/appx/appinstaller/2017/2"
+              Version="1.0.0.0"
+              Uri="$appInstallerUrl">
 
-  <MainPackage
-      Name="$identityName"
-      Publisher="$publisher"
-      Version="$version"
-      ProcessorArchitecture="$architecture"
-      Uri="$msixUrl" />
+            <MainPackage
+                Name="$identityName"
+                Publisher="$publisher"
+                Version="$version"
+                ProcessorArchitecture="$architecture"
+                Uri="$msixUrl" />
 
-  <UpdateSettings>
-    <OnLaunch HoursBetweenUpdateChecks="0" UpdateBlocksActivation="true" />
-    <AutomaticBackgroundTask />
-  </UpdateSettings>
-</AppInstaller>
-"@
+            <UpdateSettings>
+              <OnLaunch HoursBetweenUpdateChecks="0" UpdateBlocksActivation="true" />
+              <AutomaticBackgroundTask />
+            </UpdateSettings>
+          </AppInstaller>
+          "@
 
           Set-Content -Path "Sparrow.appinstaller" -Value $appInstallerContent -Encoding UTF8
           echo "MSIX_BASE_NAME=$msiBaseName" >> $env:GITHUB_ENV
