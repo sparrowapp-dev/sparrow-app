@@ -277,8 +277,11 @@ jobs:
           $version = $manifest.Package.Identity.Version
           $architecture = $manifest.Package.Identity.ProcessorArchitecture
 
-          # Get MSI file name for consistent naming
-          $msiFile = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
+          # Get MSI file name for consistent naming - fix path
+          $msiFile = Get-ChildItem -Path "apps\@sparrow-desktop\src-tauri\target\release\bundle\msi" -Filter "Sparrow_*_x64_en-US.msi" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $msiFile) {
+            $msiFile = Get-ChildItem -Path "apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
+          }
           $msiBaseName = [System.IO.Path]::GetFileNameWithoutExtension($msiFile.Name)
           
           $msixUrl = "https://sparrow-assest.s3.us-east-1.amazonaws.com/windows/$msiBaseName.msix"
@@ -324,9 +327,9 @@ jobs:
                       Select-Object -First 1 -ExpandProperty FullName
           Write-Host "Using SignTool at: $signTool"
 
-          # 3. Sign all MSIX packages
+          # 3. Sign all MSIX packages - fix path
           $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
-          Get-ChildItem -Path "C:\a\sparrow-app\sparrow-app\msix-output" -Filter "*.msix" | ForEach-Object {
+          Get-ChildItem -Path "msix-output" -Filter "*.msix" | ForEach-Object {
             Write-Host "🔐 Signing: $($_.FullName)"
             
             & "$signTool" sign /v /debug /sm /sha1 $certThumb /td SHA256 /fd sha256 /tr http://timestamp.digicert.com "$($_.FullName)"
@@ -340,22 +343,22 @@ jobs:
 
       - name: Verify MSIX Signature
         run: |
-          # Verify the MSIX file exists
-          if (-Not (Test-Path C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix)) {
-              Write-Host "MSIX file not found at msix-output/sparrow.msix"
+          # Verify the MSIX file exists - fix path
+          if (-Not (Test-Path "msix-output\sparrow.msix")) {
+              Write-Host "MSIX file not found at msix-output\sparrow.msix"
               exit 1
           }
 
-          Write-Host "Verifying signature for: C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix"
+          Write-Host "Verifying signature for: msix-output\sparrow.msix"
 
           # Get the Authenticode signature
-          $sig = Get-AuthenticodeSignature -FilePath C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix
+          $sig = Get-AuthenticodeSignature -FilePath "msix-output\sparrow.msix"
 
           # Check the signature status
           if ($sig.Status -eq 'Valid') {
-              Write-Host "Valid signature on C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix"
+              Write-Host "Valid signature on msix-output\sparrow.msix"
           } else {
-              Write-Host "Invalid signature on C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix: $($sig.Status)"
+              Write-Host "Invalid signature on msix-output\sparrow.msix: $($sig.Status)"
               exit 1
           }
         shell: powershell
@@ -364,10 +367,10 @@ jobs:
       - name: Upload to S3
         shell: pwsh
         run: |
-          # Rename the MSIX file to match MSI pattern
-          $msixOriginal = "C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix"
+          # Rename the MSIX file to match MSI pattern - fix path
+          $msixOriginal = "msix-output\sparrow.msix"
           $msixNewName = "$env:MSIX_BASE_NAME.msix"
-          $msixNewPath = Join-Path -Path (Split-Path -Path $msixOriginal -Parent) -ChildPath $msixNewName
+          $msixNewPath = Join-Path -Path "msix-output" -ChildPath $msixNewName
           Rename-Item -Path $msixOriginal -NewName $msixNewName
           
           # Upload MSIX and App Installer files to S3
@@ -381,12 +384,18 @@ jobs:
         
       - name: Post Windows Build Links to Teams
         run: |
-          # Get file URLs
-          $msiFile = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
+          # Get file URLs - fix paths
+          $msiFile = Get-ChildItem -Path "apps\@sparrow-desktop\src-tauri\target\release\bundle\msi" -Filter "Sparrow_*_x64_en-US.msi" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $msiFile) {
+            $msiFile = Get-ChildItem -Path "apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
+          }
           $msiBaseName = [System.IO.Path]::GetFileNameWithoutExtension($msiFile.Name)
           $msiUrl = "https://sparrow-assest.s3.amazonaws.com/windows/$msiBaseName.msi"
 
-          $exeFile = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/nsis" -Filter "Sparrow_*_x64-setup.exe" | Select-Object -First 1
+          $exeFile = Get-ChildItem -Path "apps\@sparrow-desktop\src-tauri\target\release\bundle\nsis" -Filter "Sparrow_*_x64-setup.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $exeFile) {
+            $exeFile = Get-ChildItem -Path "apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis" -Filter "Sparrow_*_x64-setup.exe" | Select-Object -First 1
+          }
           $exeBaseName = [System.IO.Path]::GetFileNameWithoutExtension($exeFile.Name)
           $exeUrl = "https://sparrow-assest.s3.amazonaws.com/windows/$exeBaseName.exe"
 
@@ -410,7 +419,7 @@ jobs:
                     }
                     @{
                       "type" = "TextBlock"
-                      "text" = "Download Links Test:"
+                      "text" = "📦 Install via App Installer (Click to install directly):"
                       "weight" = "bolder"
                       "spacing" = "medium"
                     }
@@ -423,13 +432,20 @@ jobs:
                           "items" = @(
                             @{
                               "type" = "TextBlock"
-                              "text" = "[App Installer (Recommended)]($appInstallerUrl)"
+                              "text" = "🚀 [Install Sparrow (One-Click)]($appInstallerUrl)"
                               "color" = "accent"
                               "wrap" = $true
+                              "weight" = "bolder"
                             }
                             @{
                               "type" = "TextBlock"
-                              "text" = "[MSIX Package]($msixUrl)"
+                              "text" = "Alternative Downloads:"
+                              "spacing" = "medium"
+                              "weight" = "bolder"
+                            }
+                            @{
+                              "type" = "TextBlock"
+                              "text" = "📦 [MSIX Package]($msixUrl)"
                               "color" = "accent"
                               "wrap" = $true
                             }
