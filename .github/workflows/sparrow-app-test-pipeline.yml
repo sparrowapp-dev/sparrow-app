@@ -162,72 +162,23 @@ jobs:
       # --- STAGE 4: CONVERT TO MSIX USING MAKEAPPX ---
       - name: Prepare App Folder for MakeAppx
         run: |
-          New-Item -ItemType Directory -Force -Path "app-root\Assets"
-          
-          # Find MSI files in both release and debug
-          Write-Host "🔍 Searching for MSI files..."
-          $msiPath = $null
-          
-          # Try release first
-          $releasePath = "apps\@sparrow-desktop\src-tauri\target\release\bundle\msi"
-          if (Test-Path $releasePath) {
-            $msiPath = Get-ChildItem -Path $releasePath -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
-            if ($msiPath) {
-              Write-Host "📁 Found release MSI: $($msiPath.FullName)"
-            }
-          }
-          
-          # Fallback to debug
-          if (-not $msiPath) {
-            $debugPath = "apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi"
-            if (Test-Path $debugPath) {
-              $msiPath = Get-ChildItem -Path $debugPath -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
-              if ($msiPath) {
-                Write-Host "📁 Found debug MSI: $($msiPath.FullName)"
-              }
-            }
-          }
-          
-          if (-not $msiPath) {
-            Write-Host "❌ No MSI file found"
-            exit 1
-          }
-          
-          # Extract MSI
+          New-Item -ItemType Directory -Force -Path "app-root/Assets"
+          $msiPath = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
           $extractPath = "app-root"
-          Write-Host "📦 Extracting MSI: $($msiPath.FullName)"
-          Start-Process msiexec.exe -ArgumentList "/a `"$($msiPath.FullName)`" /qn TARGETDIR=`"$extractPath`"" -Wait -NoNewWindow
+          Start-Process msiexec.exe -ArgumentList "/a `"$msiPath`" /qn TARGETDIR=`"$extractPath`"" -Wait -NoNewWindow
 
-          # Copy executable
-          Write-Host "🔍 Searching for Sparrow.exe..."
-          $exeSource = Get-ChildItem -Path "apps\@sparrow-desktop\src-tauri\target\release" -Filter "Sparrow.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
-          if (-not $exeSource) {
-            $exeSource = Get-ChildItem -Path "apps\@sparrow-desktop\src-tauri\target\debug" -Filter "Sparrow.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
-          }
-          
+          $exeSource = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug" -Filter "Sparrow.exe" -Recurse | Select-Object -First 1
           if ($exeSource) {
-            Write-Host "✅ Found executable: $($exeSource.FullName)"
-            Copy-Item $exeSource.FullName -Destination "app-root\Sparrow.exe"
+            Copy-Item $exeSource.FullName -Destination "app-root/Sparrow.exe"
           } else {
-            Write-Host "⚠️ Creating placeholder executable"
-            "MZ" | Out-File -FilePath "app-root\Sparrow.exe" -Encoding ASCII
+            Set-Content -Path "app-root/Sparrow.exe" -Value "placeholder"
           }
 
-          # Copy logos
-          $logoPath = "apps\@sparrow-desktop\src-tauri\icons\StoreLogo.png"
-          if (Test-Path $logoPath) {
-            Copy-Item $logoPath -Destination "app-root\Assets\StoreLogo.png"
-            Copy-Item $logoPath -Destination "app-root\Assets\Square150x150Logo.png"
-            Copy-Item $logoPath -Destination "app-root\Assets\Square44x44Logo.png"
-            Copy-Item $logoPath -Destination "app-root\Assets\SplashScreen.png"
-          } else {
-            Write-Host "⚠️ Creating placeholder images"
-            $pngBytes = [Convert]::FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAI9jU77zgAAAABJRU5ErkJggg==")
-            [System.IO.File]::WriteAllBytes("app-root\Assets\StoreLogo.png", $pngBytes)
-            Copy-Item "app-root\Assets\StoreLogo.png" -Destination "app-root\Assets\Square150x150Logo.png"
-            Copy-Item "app-root\Assets\StoreLogo.png" -Destination "app-root\Assets\Square44x44Logo.png"
-            Copy-Item "app-root\Assets\StoreLogo.png" -Destination "app-root\Assets\SplashScreen.png"
-          }
+          $logo = "apps/@sparrow-desktop/src-tauri/icons/StoreLogo.png"
+          Copy-Item $logo -Destination "app-root/Assets/StoreLogo.png"
+          Copy-Item $logo -Destination "app-root/Assets/Square150x150Logo.png"
+          Copy-Item $logo -Destination "app-root/Assets/Square44x44Logo.png"
+          Copy-Item $logo -Destination "app-root/Assets/SplashScreen.png"
         shell: powershell
 
       - name: Ensure app-root directory exists
@@ -235,6 +186,56 @@ jobs:
           New-Item -ItemType Directory -Force -Path "app-root"
         shell: pwsh      
       - name: Generate AppxManifest.xml with version injection
+        shell: pwsh
+        run: |
+          $cargoFile = "apps/@sparrow-desktop/src-tauri/Cargo.toml"
+          $versionLine = Select-String -Path $cargoFile -Pattern '^\s*version\s*=\s*"(.*?)"' | Select-Object -First 1
+          $version = $versionLine.Matches.Groups[1].Value
+
+          $thumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
+          $cert = Get-ChildItem Cert:\LocalMachine\My | Where-Object Thumbprint -eq $thumb
+          $publisherDN = $cert.Subject
+
+          $manifest = @"
+<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+         xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+         xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+         xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+         IgnorableNamespaces="uap mp rescap">
+  <Identity Name="Sparrow"
+            Publisher="$publisherDN"
+            Version="$version.0"
+            ProcessorArchitecture="x64" />
+  <Properties>
+    <DisplayName>Sparrow</DisplayName>
+    <PublisherDisplayName>sparrowapp</PublisherDisplayName>
+    <Description>Sparrow</Description>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.0.0" MaxVersionTested="10.0.19041.0" />
+  </Dependencies>
+  <Resources>
+    <Resource Language="en-us" />
+  </Resources>
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+  <Applications>
+    <Application Id="SparrowApp" Executable="Sparrow.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements DisplayName="Sparrow"
+                          Description="Sparrow App"
+                          BackgroundColor="transparent"
+                          Square150x150Logo="Assets\Square150x150Logo.png"
+                          Square44x44Logo="Assets\Square44x44Logo.png">
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+</Package>
+"@
+
+          $manifest | Set-Content -Encoding UTF8 -Path "app-root\AppxManifest.xml"
         shell: pwsh
         run: |
           # 1. Read version from Cargo.toml - ADDED: Fix path and add debugging
@@ -588,5 +589,123 @@ jobs:
           
           $jsonBody = $body | ConvertTo-Json -Depth 10
 
+          Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
+        shell: pwsh
+
+      - name: Create MSIX Package using MakeAppx
+        run: |
+          New-Item -ItemType Directory -Force -Path "msix-output"
+          $msixPath = "msix-output\sparrow.msix"
+
+          $makeAppx = Get-ChildItem -Path 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter MakeAppx.exe -ErrorAction SilentlyContinue |
+                      Where-Object { $_.FullName -match '\\x64\\MakeAppx\.exe$' } |
+                      Sort-Object LastWriteTime -Descending |
+                      Select-Object -First 1
+
+          & "$($makeAppx.FullName)" pack /d "app-root" /p $msixPath
+        shell: powershell
+
+      - name: Generate App Installer File
+        run: |
+          $manifestPath = "app-root\AppxManifest.xml"
+          [xml]$manifest = Get-Content $manifestPath
+          $identityName = $manifest.Package.Identity.Name
+          $publisher = $manifest.Package.Identity.Publisher
+          $version = $manifest.Package.Identity.Version
+          $architecture = $manifest.Package.Identity.ProcessorArchitecture
+
+          $msiFile = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
+          $msiBaseName = [System.IO.Path]::GetFileNameWithoutExtension($msiFile.Name)
+          
+          $msixUrl = "https://sparrow-assest.s3.us-east-1.amazonaws.com/desktop/$msiBaseName.msix"
+          $appInstallerUrl = "https://sparrow-assest.s3.us-east-1.amazonaws.com/desktop/Sparrow.appinstaller"
+
+          $appInstallerContent = @"
+<?xml version="1.0" encoding="utf-8"?>
+<AppInstaller
+    xmlns="http://schemas.microsoft.com/appx/appinstaller/2017/2"
+    Version="1.0.0.0"
+    Uri="$appInstallerUrl">
+
+  <MainPackage
+      Name="$identityName"
+      Publisher="$publisher"
+      Version="$version"
+      ProcessorArchitecture="$architecture"
+      Uri="$msixUrl" />
+
+  <UpdateSettings>
+    <OnLaunch HoursBetweenUpdateChecks="0" UpdateBlocksActivation="true" />
+    <AutomaticBackgroundTask />
+  </UpdateSettings>
+</AppInstaller>
+"@
+
+          Set-Content -Path "Sparrow.appinstaller" -Value $appInstallerContent -Encoding UTF8
+          echo "MSIX_BASE_NAME=$msiBaseName" >> $env:GITHUB_ENV
+        shell: pwsh
+
+      - name: Sign MSIX files
+        shell: pwsh
+        run: |
+          smctl windows certsync --keypair-alias="$env:KEYPAIR_ALIAS"
+          $signTool = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter signtool.exe |
+                      Where-Object FullName -Match '\\x64\\signtool\.exe$' |
+                      Sort-Object LastWriteTime -Descending |
+                      Select-Object -First 1 -ExpandProperty FullName
+
+          $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
+          Get-ChildItem -Path "msix-output" -Filter "*.msix" | ForEach-Object {
+            & "$signTool" sign /v /debug /sm /sha1 $certThumb /td SHA256 /fd sha256 /tr http://timestamp.digicert.com "$($_.FullName)"
+          }
+
+      - name: Upload to S3
+        shell: pwsh
+        run: |
+          $msixFile = Get-ChildItem -Path "msix-output" -Filter "*.msix" | Select-Object -First 1
+          $msixNewName = "$env:MSIX_BASE_NAME.msix"
+          $msixNewPath = Join-Path -Path "msix-output" -ChildPath $msixNewName
+          Rename-Item -Path $msixFile.FullName -NewName $msixNewName
+          
+          aws s3 cp $msixNewPath s3://sparrow-assest/desktop/
+          aws s3 cp "Sparrow.appinstaller" s3://sparrow-assest/desktop/
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Post Teams Notification
+        run: |
+          $appInstallerUrl = "https://sparrow-assest.s3.amazonaws.com/desktop/Sparrow.appinstaller"
+          
+          $body = @{
+            "type" = "message"
+            "attachments" = @(
+              @{
+                "contentType" = "application/vnd.microsoft.card.adaptive"
+                "content" = @{
+                  "type" = "AdaptiveCard"
+                  "body" = @(
+                    @{
+                      "type" = "TextBlock"
+                      "text" = "🚀 Sparrow MSIX Available"
+                      "weight" = "bolder"
+                      "size" = "large"
+                    }
+                    @{
+                      "type" = "TextBlock"
+                      "text" = "🚀 [Install Sparrow (One-Click)]($appInstallerUrl)"
+                      "color" = "accent"
+                      "wrap" = $true
+                      "weight" = "bolder"
+                    }
+                  )
+                  "$schema" = "http://adaptivecards.io/schemas/adaptive-card.json"
+                  "version" = "1.2"
+                }
+              }
+            )
+          }
+          
+          $jsonBody = $body | ConvertTo-Json -Depth 10
           Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
         shell: pwsh
