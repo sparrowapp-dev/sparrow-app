@@ -277,7 +277,11 @@ jobs:
           $version = $manifest.Package.Identity.Version
           $architecture = $manifest.Package.Identity.ProcessorArchitecture
 
-          $msixUrl = "https://sparrow-assest.s3.us-east-1.amazonaws.com/windows/Sparrow.msix"
+          # Get MSI file name for consistent naming
+          $msiFile = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
+          $msiBaseName = [System.IO.Path]::GetFileNameWithoutExtension($msiFile.Name)
+          
+          $msixUrl = "https://sparrow-assest.s3.us-east-1.amazonaws.com/windows/$msiBaseName.msix"
           $appInstallerUrl = "https://sparrow-assest.s3.us-east-1.amazonaws.com/windows/Sparrow.appinstaller"
 
           $appInstallerContent = @"
@@ -302,6 +306,8 @@ jobs:
           "@
 
           Set-Content -Path "Sparrow.appinstaller" -Value $appInstallerContent -Encoding UTF8
+          echo "MSIX_BASE_NAME=$msiBaseName" >> $env:GITHUB_ENV
+        shell: pwsh
 
 
       # --- STAGE 5: SIGN AND VERIFY MSIX ---
@@ -358,33 +364,34 @@ jobs:
       - name: Upload to S3
         shell: pwsh
         run: |
-          
-          # 3. Rename the MSIX file to match MSI pattern (just change extension)
+          # Rename the MSIX file to match MSI pattern
           $msixOriginal = "C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix"
-          $msixNewName = "$msiBaseName.msix"
+          $msixNewName = "$env:MSIX_BASE_NAME.msix"
           $msixNewPath = Join-Path -Path (Split-Path -Path $msixOriginal -Parent) -ChildPath $msixNewName
           Rename-Item -Path $msixOriginal -NewName $msixNewName
           
-          # 4. Upload to S3
-          aws s3 cp $msixNewPath s3://sparrow-assest/windows
+          # Upload MSIX and App Installer files to S3
+          aws s3 cp $msixNewPath s3://sparrow-assest/windows/
+          aws s3 cp "Sparrow.appinstaller" s3://sparrow-assest/windows/
           
-          Write-Host "Uploaded $msixNewName to S3 bucket"
+          Write-Host "Uploaded $msixNewName and Sparrow.appinstaller to S3 bucket"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         
       - name: Post Windows Build Links to Teams
         run: |
-          # Get the MSI file to determine the naming pattern
-          # $msiFile = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
-          # $msiBaseName = [System.IO.Path]::GetFileNameWithoutExtension($msiFile.Name)
+          # Get file URLs
+          $msiFile = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
+          $msiBaseName = [System.IO.Path]::GetFileNameWithoutExtension($msiFile.Name)
+          $msiUrl = "https://sparrow-assest.s3.amazonaws.com/windows/$msiBaseName.msi"
 
-          # $exeFile = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/nsis" -Filter "Sparrow_*_x64-setup.exe" | Select-Object -First 1
-          # $exeBaseName = [System.IO.Path]::GetFileNameWithoutExtension($exeFile.Name)
-          # $exeUrl = "https://sparrow-assest.s3.amazonaws.com/$exeBaseName.exe"
+          $exeFile = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/nsis" -Filter "Sparrow_*_x64-setup.exe" | Select-Object -First 1
+          $exeBaseName = [System.IO.Path]::GetFileNameWithoutExtension($exeFile.Name)
+          $exeUrl = "https://sparrow-assest.s3.amazonaws.com/windows/$exeBaseName.exe"
 
-          # Construct URLs for all file types
-          $msixUrl = "https://sparrow-assest.s3.amazonaws.com/$msiBaseName.msix"
+          $msixUrl = "https://sparrow-assest.s3.amazonaws.com/windows/$msiBaseName.msix"
+          $appInstallerUrl = "https://sparrow-assest.s3.amazonaws.com/windows/Sparrow.appinstaller"
           
 
           $body = @{
@@ -403,7 +410,7 @@ jobs:
                     }
                     @{
                       "type" = "TextBlock"
-                      "text" = "Download Links:"
+                      "text" = "Download Links Test:"
                       "weight" = "bolder"
                       "spacing" = "medium"
                     }
@@ -416,7 +423,13 @@ jobs:
                           "items" = @(
                             @{
                               "type" = "TextBlock"
-                              "text" = "[MSIX Installer]($msixUrl)"
+                              "text" = "[App Installer (Recommended)]($appInstallerUrl)"
+                              "color" = "accent"
+                              "wrap" = $true
+                            }
+                            @{
+                              "type" = "TextBlock"
+                              "text" = "[MSIX Package]($msixUrl)"
                               "color" = "accent"
                               "wrap" = $true
                             }
