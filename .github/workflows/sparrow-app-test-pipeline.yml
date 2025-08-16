@@ -164,7 +164,7 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path "app-root\Assets"
           
-          # ADDED: Debug - Find MSI files in both release and debug
+          # Find MSI files in both release and debug
           Write-Host "🔍 Searching for MSI files..."
           $msiPath = $null
           
@@ -172,7 +172,9 @@ jobs:
           $releasePath = "apps\@sparrow-desktop\src-tauri\target\release\bundle\msi"
           if (Test-Path $releasePath) {
             $msiPath = Get-ChildItem -Path $releasePath -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
-            Write-Host "📁 Found release MSI: $($msiPath.FullName)"
+            if ($msiPath) {
+              Write-Host "📁 Found release MSI: $($msiPath.FullName)"
+            }
           }
           
           # Fallback to debug
@@ -180,29 +182,26 @@ jobs:
             $debugPath = "apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi"
             if (Test-Path $debugPath) {
               $msiPath = Get-ChildItem -Path $debugPath -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
-              Write-Host "📁 Found debug MSI: $($msiPath.FullName)"
+              if ($msiPath) {
+                Write-Host "📁 Found debug MSI: $($msiPath.FullName)"
+              }
             }
           }
           
           if (-not $msiPath) {
-            Write-Host "❌ No MSI file found in either release or debug directories"
-            Write-Host "📁 Available directories:"
-            Get-ChildItem -Path "apps\@sparrow-desktop\src-tauri\target" -Directory | ForEach-Object { Write-Host "  - $($_.Name)" }
+            Write-Host "❌ No MSI file found"
             exit 1
           }
           
+          # Extract MSI
           $extractPath = "app-root"
           Write-Host "📦 Extracting MSI: $($msiPath.FullName)"
           Start-Process msiexec.exe -ArgumentList "/a `"$($msiPath.FullName)`" /qn TARGETDIR=`"$extractPath`"" -Wait -NoNewWindow
 
-          # ADDED: Copy app executable with better path handling
+          # Copy executable
           Write-Host "🔍 Searching for Sparrow.exe..."
-          $exeSource = $null
-          
-          # Try release first
           $exeSource = Get-ChildItem -Path "apps\@sparrow-desktop\src-tauri\target\release" -Filter "Sparrow.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
           if (-not $exeSource) {
-            # Fallback to debug
             $exeSource = Get-ChildItem -Path "apps\@sparrow-desktop\src-tauri\target\debug" -Filter "Sparrow.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
           }
           
@@ -210,30 +209,25 @@ jobs:
             Write-Host "✅ Found executable: $($exeSource.FullName)"
             Copy-Item $exeSource.FullName -Destination "app-root\Sparrow.exe"
           } else {
-            Write-Host "⚠️ Real Sparrow.exe not found. Creating placeholder."
-            # Create a minimal Windows executable placeholder
-            $placeholder = [byte[]](0x4D, 0x5A, 0x90, 0x00)  # MZ header
-            [System.IO.File]::WriteAllBytes("app-root\Sparrow.exe", $placeholder)
+            Write-Host "⚠️ Creating placeholder executable"
+            "MZ" | Out-File -FilePath "app-root\Sparrow.exe" -Encoding ASCII
           }
 
-          # ADDED: Copy logos with path validation
+          # Copy logos
           $logoPath = "apps\@sparrow-desktop\src-tauri\icons\StoreLogo.png"
           if (Test-Path $logoPath) {
-            Write-Host "✅ Found logo: $logoPath"
             Copy-Item $logoPath -Destination "app-root\Assets\StoreLogo.png"
             Copy-Item $logoPath -Destination "app-root\Assets\Square150x150Logo.png"
             Copy-Item $logoPath -Destination "app-root\Assets\Square44x44Logo.png"
             Copy-Item $logoPath -Destination "app-root\Assets\SplashScreen.png"
           } else {
-            Write-Host "⚠️ Logo not found at $logoPath, creating placeholder"
-            # Create minimal PNG placeholder (1x1 transparent pixel)
+            Write-Host "⚠️ Creating placeholder images"
             $pngBytes = [Convert]::FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAI9jU77zgAAAABJRU5ErkJggg==")
             [System.IO.File]::WriteAllBytes("app-root\Assets\StoreLogo.png", $pngBytes)
             Copy-Item "app-root\Assets\StoreLogo.png" -Destination "app-root\Assets\Square150x150Logo.png"
             Copy-Item "app-root\Assets\StoreLogo.png" -Destination "app-root\Assets\Square44x44Logo.png"
             Copy-Item "app-root\Assets\StoreLogo.png" -Destination "app-root\Assets\SplashScreen.png"
           }
-
         shell: powershell
 
       - name: Ensure app-root directory exists
