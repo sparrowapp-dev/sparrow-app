@@ -252,50 +252,51 @@ jobs:
 
       - name: Generate App Installer File
         id: generate_appinstaller
-        run: |
-          $manifestPath = "app-root\AppxManifest.xml"
-          [xml]$manifest = Get-Content $manifestPath
-          $identityName = $manifest.Package.Identity.Name
-          $publisher = $manifest.Package.Identity.Publisher
-          $version = $manifest.Package.Identity.Version
-          $architecture = $manifest.Package.Identity.ProcessorArchitecture
-
-          # Get MSI file name for consistent naming - fix path
-          $msiFile = Get-ChildItem -Path "apps\@sparrow-desktop\src-tauri\target\release\bundle\msi" -Filter "Sparrow_*_x64_en-US.msi" -ErrorAction SilentlyContinue | Select-Object -First 1
-          if (-not $msiFile) {
-            $msiFile = Get-ChildItem -Path "apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
-          }
-          $msiBaseName = [System.IO.Path]::GetFileNameWithoutExtension($msiFile.Name)
-          
-          $msixUrl = "https://sparrow-assest.s3.us-east-1.amazonaws.com/desktop/$msiBaseName.msix"
-          $appInstallerUrl = "https://sparrow-assest.s3.us-east-1.amazonaws.com/desktop/Sparrow.appinstaller"
-
-          $appInstallerContent = @"
-          <?xml version="1.0" encoding="utf-8"?>
-          <AppInstaller
-              xmlns="http://schemas.microsoft.com/appx/appinstaller/2017/2"
-              Version="1.0.0.0"
-              Uri="$appInstallerUrl">
-
-            <MainPackage
-                Name="$identityName"
-                Publisher="$publisher"
-                Version="$version"
-                ProcessorArchitecture="$architecture"
-                Uri="$msixUrl" />
-
-            <UpdateSettings>
-              <OnLaunch HoursBetweenUpdateChecks="0" UpdateBlocksActivation="true" />
-              <AutomaticBackgroundTask />
-            </UpdateSettings>
-          </AppInstaller>
-          "@
-
-          Set-Content -Path "Sparrow.appinstaller" -Value $appInstallerContent -Encoding UTF8
-          echo "MSIX_BASE_NAME=$msiBaseName" >> $env:GITHUB_ENV
         shell: pwsh
+        run: |
+            $manifestPath = "app-root\AppxManifest.xml"
+            [xml]$manifest = Get-Content $manifestPath
+            $identityName = $manifest.Package.Identity.Name
+            $publisher = $manifest.Package.Identity.Publisher
+            $version = $manifest.Package.Identity.Version
+            $architecture = $manifest.Package.Identity.ProcessorArchitecture
 
+            # Find the actual MSIX file that was generated
+            $msixFile = Get-ChildItem -Path "msix-output" -Filter "*.msix" | Select-Object -First 1
+            if (-not $msixFile) {
+                Write-Error "❌ No MSIX file found in msix-output folder!"
+                exit 1
+            }
+            $msixBaseName = [System.IO.Path]::GetFileName($msixFile.Name)
 
+            # URLs for hosting on S3
+            $msixUrl = "https://sparrow-assest.s3.us-east-1.amazonaws.com/desktop/$msixBaseName"
+            $appInstallerUrl = "https://sparrow-assest.s3.us-east-1.amazonaws.com/desktop/Sparrow.appinstaller"
+
+            $appInstallerContent = @"
+            <?xml version="1.0" encoding="utf-8"?>
+            <AppInstaller
+                xmlns="http://schemas.microsoft.com/appx/appinstaller/2018"
+                Version="$version"
+                Uri="$appInstallerUrl">
+
+              <MainPackage
+                  Name="$identityName"
+                  Publisher="$publisher"
+                  Version="$version"
+                  ProcessorArchitecture="$architecture"
+                  Uri="$msixUrl" />
+
+              <UpdateSettings>
+                <OnLaunch HoursBetweenUpdateChecks="0" UpdateBlocksActivation="true" />
+                <AutomaticBackgroundTask />
+              </UpdateSettings>
+            </AppInstaller>
+            "@
+
+            Set-Content -Path "Sparrow.appinstaller" -Value $appInstallerContent -Encoding UTF8
+            echo "MSIX_FILE_NAME=$msixBaseName" >> $env:GITHUB_ENV
+              
       # --- STAGE 5: SIGN AND VERIFY MSIX ---
       - name: Find and Sign MSIX files
         shell: pwsh
