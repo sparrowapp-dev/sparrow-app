@@ -325,12 +325,13 @@ jobs:
           }
 
       - name: Verify MSIX Signature
+        shell: pwsh
         run: |
-          # ADDED: List all files in msix-output for debugging
+          # List all files in msix-output for debugging
           Write-Host "📁 Contents of msix-output directory:"
           Get-ChildItem -Path "msix-output" -Force | ForEach-Object { Write-Host "  $($_.Name)" }
-          
-          # Verify the MSIX file exists - fix path
+
+          # Verify the MSIX file exists
           if (-Not (Test-Path "msix-output\sparrow.msix")) {
               Write-Host "❌ MSIX file not found at msix-output\sparrow.msix"
               Write-Host "📁 Available files:"
@@ -345,12 +346,12 @@ jobs:
 
           # Check the signature status
           if ($sig.Status -eq 'Valid') {
-              Write-Host "Valid signature on msix-output\sparrow.msix"
+              Write-Host "✅ Valid signature on msix-output\sparrow.msix"
           } else {
-              Write-Host "Invalid signature on msix-output\sparrow.msix: $($sig.Status)"
+              Write-Host "❌ Invalid signature on msix-output\sparrow.msix: $($sig.Status)"
               exit 1
           }
-        shell: powershell
+            
 
       # --- STAGE 6: DEPLOY & NOTIFY ---
       - name: Upload to S3
