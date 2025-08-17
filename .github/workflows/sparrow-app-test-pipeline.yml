@@ -378,9 +378,9 @@ jobs:
           
           # Upload MSIX and App Installer files to S3
           # CHANGED: windows/ -> desktop/ for better naming
-          aws s3 cp $msixNewPath s3://sparrow-assest/desktop/
-          aws s3 cp "Sparrow.appinstaller" s3://sparrow-assest/desktop/
-          
+          aws s3 cp $msixNewPath s3://sparrow-assest/desktop/ --acl public-read
+          aws s3 cp "Sparrow.appinstaller" s3://sparrow-assest/desktop/ --acl public-read
+
           Write-Host "Uploaded $msixNewName and Sparrow.appinstaller to S3 bucket"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
