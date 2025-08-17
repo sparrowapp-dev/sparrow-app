@@ -405,8 +405,16 @@ jobs:
           # CHANGED: windows/ -> desktop/ for better naming
           $exeUrl = "https://sparrow-assest.s3.amazonaws.com/desktop/$exeBaseName.exe"
 
-          # CHANGED: windows/ -> desktop/ for better naming
-          $msixUrl = "https://sparrow-assest.s3.amazonaws.com/desktop/$msiBaseName.msix"
+          # Get MSIX file
+          $msixFile = Get-ChildItem -Path "msix-output" -Filter "*.msix" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $msixFile) {
+            Write-Host "❌ No MSIX files found"
+            exit 1
+          }
+          $msixBaseName = $msixFile.Name
+          $msixUrl = "https://sparrow-assest.s3.amazonaws.com/desktop/$msixBaseName"
+
+          # AppInstaller URL (static name)
           $appInstallerUrl = "https://sparrow-assest.s3.amazonaws.com/desktop/Sparrow.appinstaller"
           
 
