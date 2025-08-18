@@ -13,6 +13,7 @@ import { ReduceAuthHeader, ReduceAuthParameter } from ".";
 import { createDeepCopy } from "@sparrow/common/utils";
 import { SetDataStructure } from "@sparrow/common/utils";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
+import JSON5 from "json5";
 
 class DecodeRequest {
   constructor() { }
@@ -238,8 +239,21 @@ class DecodeRequest {
   ): string => {
     const { raw, urlencoded, formdata } = body;
     if (datatype === RequestDatasetEnum.RAW) {
-      if (rawData === RequestDataTypeEnum.JSON && raw === "") {
-        return "{}";
+      if (rawData === RequestDataTypeEnum.JSON) {
+        if(raw === ""){
+          return "{}";
+        }else{
+           try {
+            // Parse JSON5 (comments/trailing commas allowed)
+            const parsed = JSON5.parse(raw);
+
+            // Stringify back to pure JSON
+            const cleanJson = JSON.stringify(parsed, null, 2);
+            return cleanJson;
+          } catch (e) {
+            return raw;
+          }
+        }
       }
       return raw;
     } else if (datatype === RequestDatasetEnum.FORMDATA) {
