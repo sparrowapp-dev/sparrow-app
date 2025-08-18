@@ -8259,7 +8259,7 @@ export default class CollectionsViewModel {
     const [authToken] = getAuthJwt();
     window.open(
       constants.ADMIN_URL +
-        `/billing/billingOverview/${teamId}?redirect=changePlan&xid=${authToken}`,
+        `/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
       "_blank",
     );
   };
