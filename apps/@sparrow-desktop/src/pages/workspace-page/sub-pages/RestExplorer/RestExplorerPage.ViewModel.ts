@@ -661,7 +661,7 @@ class RestExplorerViewModel {
     );
     let responseCode = "";
     restExplorerDataStore.update((restApiDataMap) => {
-      const data = restApiDataMap.get(progressiveTab?.tabId);
+      let data = restApiDataMap.get(progressiveTab?.tabId);
       if (data) {
         savedRequestTab.updateResponseBody(data.response.body);
         savedRequestTab.updateResponseHeaders(data.response.headers);
@@ -1668,7 +1668,7 @@ class RestExplorerViewModel {
     const { signal } = abortController; // Extract the signal for the request
 
     restExplorerDataStore.update((restApiDataMap) => {
-      const data = restApiDataMap.get(progressiveTab?.tabId);
+      let data = restApiDataMap.get(progressiveTab?.tabId);
       if (data) {
         data.isSendRequestInProgress = true;
       }
@@ -1723,12 +1723,12 @@ class RestExplorerViewModel {
               value: elem[1],
             });
           });
-          const responseStatus = response.data.status;
+          let responseStatus = response.data.status;
           const bodyLanguage =
             this._decodeRequest.setResponseContentType(responseHeaders);
 
           restExplorerDataStore.update((restApiDataMap) => {
-            const data = restApiDataMap.get(progressiveTab?.tabId);
+            let data = restApiDataMap.get(progressiveTab?.tabId);
             if (data) {
               data.response.body = responseBody;
               data.response.headers = responseHeaders;
@@ -2779,7 +2779,7 @@ class RestExplorerViewModel {
     });
     if (isGlobalVariable) {
       // api payload
-      const payload = {
+      let payload = {
         name: environmentVariables.global.name,
         variable: [
           ...environmentVariables.global.variable,
@@ -2809,7 +2809,7 @@ class RestExplorerViewModel {
           payload,
         );
 
-        const currentTab = await this.tabRepository.getTabById(
+        let currentTab = await this.tabRepository.getTabById(
           environmentVariables.global.id,
         );
         if (currentTab) {
@@ -2844,12 +2844,12 @@ class RestExplorerViewModel {
           response.data.data,
         );
 
-        const currentTab = await this.tabRepository.getTabById(
+        let currentTab = await this.tabRepository.getTabById(
           response.data.data._id,
         );
 
         if (currentTab) {
-          const currentTabId = currentTab.tabId;
+          let currentTabId = currentTab.tabId;
           const envTab = createDeepCopy(currentTab);
           envTab.property.environment.variable = response.data.data.variable;
           envTab.isSaved = true;
@@ -2934,7 +2934,7 @@ class RestExplorerViewModel {
           response.data.data,
         );
 
-        const currentTab = await this.tabRepository.getTabById(
+        let currentTab = await this.tabRepository.getTabById(
           response.data.data._id,
         );
         if (currentTab) {
@@ -3227,11 +3227,11 @@ class RestExplorerViewModel {
 
     const userEmail = getClientUser().email;
 
-    const workspaceId = componentData.path.workspaceId;
+    let workspaceId = componentData.path.workspaceId;
 
-    const workspaceVal = await this.readWorkspace(workspaceId);
+    let workspaceVal = await this.readWorkspace(workspaceId);
 
-    const teamId = workspaceVal.team?.teamId;
+    let teamId = workspaceVal.team?.teamId;
 
     // extraction of request API data for setting AI Context
     const apiData = {
@@ -3254,7 +3254,7 @@ class RestExplorerViewModel {
 
     try {
       const userEmail = getClientUser().email;
-      const responseMessageId = uuidv4(); // Generate a single message ID for the entire response
+      let responseMessageId = uuidv4(); // Generate a single message ID for the entire response
       let accumulatedMessage = ""; // Track the accumulated message content
       let messageCreated = false; // Flag to track if we've created the initial message
 
@@ -3647,11 +3647,11 @@ class RestExplorerViewModel {
     await this.updateRequestState({ isDocGenerating: true });
     const componentData = this._tab.getValue();
 
-    const workspaceId = componentData.path.workspaceId;
+    let workspaceId = componentData.path.workspaceId;
 
-    const workspaceVal = await this.readWorkspace(workspaceId);
+    let workspaceVal = await this.readWorkspace(workspaceId);
 
-    const teamId = workspaceVal.team?.teamId;
+    let teamId = workspaceVal.team?.teamId;
 
     const apiData = {
       body: componentData.property.request.body,
