@@ -36,17 +36,19 @@ class InitEnvironmentTab {
             isSaveInProgress: false,
           },
           aiVariable: [],
+          generateVariable: false,
+          generateProperty: {
+            collectionId: "",
+            collectionName: "",
+          },
+          aiGenerationStatus: "",
         },
+
       },
       path: {
         workspaceId: _workspaceId,
         collectionId: "",
         folderId: "",
-      },
-      generateVariable: false,
-      generateProperty: {
-        collectionId: "",
-        collectionName: "",
       },
       isSaved: true,
       index: 0,
@@ -81,7 +83,7 @@ class InitEnvironmentTab {
     this._tab.description = _description;
     return this;
   }
-  public setVariable(_variable) {
+  public setVariable(_variable: any) {
     this._tab.property.environment.variable = _variable;
     return this;
   }
@@ -91,15 +93,15 @@ class InitEnvironmentTab {
     return this;
   }
   public setGenerativeVariables(_genertiveVariable: boolean) {
-    this._tab.generateVariable = _genertiveVariable;
+    this._tab.property.environment.generateVariable = _genertiveVariable;
     return this;
   }
   public setGenerativeProperties(
     _generatingCollectionId: string,
     _generatingCollectionName: string,
   ) {
-    this._tab.generateProperty.collectionId = _generatingCollectionId;
-    this._tab.generateProperty.collectionName = _generatingCollectionName;
+    this._tab.property.environment.generateProperty.collectionId = _generatingCollectionId;
+    this._tab.property.environment.generateProperty.collectionName = _generatingCollectionName;
     return this;
   }
 }

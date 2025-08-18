@@ -4,7 +4,10 @@
   import type { EnvValuePair } from "@sparrow/common/interfaces/request.interface";
   import { QuickHelp } from "../components";
   import { Search } from "@sparrow/library/forms";
-  import { hasWorkpaceLevelPermission } from "@sparrow/common/utils";
+  import {
+    hasWorkpaceLevelPermission,
+    SetDataStructure,
+  } from "@sparrow/common/utils";
   import {
     PERMISSION_NOT_FOUND_TEXT,
     workspaceLevelPermissions,
@@ -26,6 +29,7 @@
   import { GenerateVariables } from "../../generate-variables";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import { Loader } from "@sparrow/library/ui";
+  import ApplyGeneratedVariables from "../components/apply-generated-variables/ApplyGeneratedVariables.svelte";
   export let azureBlobCDN;
   /**
    * selected environmet to be shown on API
@@ -46,17 +50,15 @@
 
   export let onFetchEnvironmentGuide: (query) => void;
   export let onUpdateEnvironmentGuide: (query, isActive) => void;
-  export let onGenerateVariables: (collectionId: string) => any;
   export let updateGeneratedVariables: (
     globalPairs: { key: string; value: string }[],
     updatedPairs: { key: string; value: string }[],
   ) => void;
+  export let onUpdateVariableSelection;
   export let userRole;
+  export let handleRedirectToDocs: () => {};
+  export let isWebApp;
 
-  let isLoadingVariables: boolean = false;
-  let isReGenerateVariable: boolean = false;
-  let isAcceptedVariables: boolean = false;
-  let generatedVariables: KeyValuePair[] = [];
   let isPopoverContainer = false;
 
   let quickHelp: boolean = false;
@@ -66,15 +68,6 @@
   $: {
     if ($currentEnvironment) {
       environmentName = $currentEnvironment?.name || "";
-
-      isLoadingVariables = false;
-    }
-    const existingAiVariables =
-      $currentEnvironment?.property?.environment?.aiVariable;
-    if (existingAiVariables && existingAiVariables.length > 0) {
-      generatedVariables = [...existingAiVariables];
-    } else {
-      generatedVariables = [];
     }
   }
 
@@ -94,6 +87,7 @@
   };
 
   let isGuidePopup = false;
+  let isApplyAiVariablesModalOpen = false;
 
   const handleKeyDown = (event: KeyboardEvent) => {
     if ((event.ctrlKey || event.metaKey) && event.key === "s") {
@@ -121,90 +115,6 @@
     }
     window.addEventListener("keydown", handleKeyDown);
   });
-
-  const handleGenerateVariable = async () => {
-    isLoadingVariables = true;
-    try {
-      const response = await onGenerateVariables($currentEnvironment);
-      if (response && response.length > 0) {
-        isReGenerateVariable = !isReGenerateVariable;
-        generatedVariables = [...response];
-      }
-    } catch (error) {
-      console.error("Error generating variables:", error);
-    } finally {
-      isLoadingVariables = false;
-    }
-  };
-
-  // Improved reactive statement with single call protection
-  $: {
-    const currentEnv = $currentEnvironment;
-    if (currentEnv?.generateVariable && !isLoadingVariables) {
-      const existingAiVariables = currentEnv?.property?.environment?.aiVariable;
-
-      if (
-        !existingAiVariables ||
-        (existingAiVariables.length === 0 &&
-          !isReGenerateVariable &&
-          !isAcceptedVariables)
-      ) {
-        handleGenerateVariable();
-      }
-    }
-  }
-
-  const onClickGenerateVariable = async (type?: string, index?: number) => {
-    if (type === "regenerate") {
-      await handleGenerateVariable();
-      return;
-    }
-    if (type === "accept" && typeof index === "number") {
-      try {
-        const foundIndex = generatedVariables.findIndex((_, i) => i === index);
-        if (foundIndex !== -1) {
-          const foundObject = generatedVariables[foundIndex];
-          const currentPairs =
-            $currentEnvironment.property?.environment?.variable || [];
-          const updatedPairs = [...currentPairs];
-          if (updatedPairs.length > 0) {
-            updatedPairs.splice(updatedPairs.length - 1, 0, foundObject);
-          } else {
-            updatedPairs.push(foundObject);
-          }
-          const remainingGeneratedVariables = generatedVariables.filter(
-            (_, i) => i !== foundIndex,
-          );
-          updateGeneratedVariables(updatedPairs, remainingGeneratedVariables);
-          generatedVariables = [...remainingGeneratedVariables];
-          onUpdateVariable(updatedPairs);
-        }
-      } catch (error) {
-        console.error("Error accepting generated variable:", error);
-      }
-    } else if (type === "accept-all") {
-      try {
-        const currentPairs =
-          $currentEnvironment.property?.environment?.variable || [];
-        const updatedPairs = [...currentPairs];
-        if (updatedPairs.length > 0) {
-          updatedPairs.splice(
-            updatedPairs.length - 1,
-            0,
-            ...generatedVariables,
-          );
-        } else {
-          updatedPairs.push(...generatedVariables);
-        }
-        updateGeneratedVariables(updatedPairs, []);
-        generatedVariables = [];
-        onUpdateVariable(updatedPairs);
-        isAcceptedVariables = true;
-      } catch (error) {
-        console.error("Error accepting all generated variables:", error);
-      }
-    }
-  };
 
   onDestroy(() => {
     window.removeEventListener("keydown", handleKeyDown);
@@ -284,7 +194,24 @@
                     <Button
                       type="primary"
                       startIcon={SaveRegular}
-                      onClick={onSaveEnvironment}
+                      onClick={() => {
+                        const aiGeneratedVariables =
+                          $currentEnvironment.property.environment.variable.filter(
+                            (variable) => variable.lifespan === "short",
+                          );
+
+                        const uniqueAiGeneratedVariables =
+                          new SetDataStructure().pushArrayOfObjects(
+                            aiGeneratedVariables,
+                            "value",
+                          );
+
+                        if (uniqueAiGeneratedVariables.length > 0) {
+                          isApplyAiVariablesModalOpen = true;
+                        } else {
+                          onSaveEnvironment();
+                        }
+                      }}
                       title="Save"
                       size="medium"
                       disable={$currentEnvironment?.property?.environment?.state
@@ -348,12 +275,13 @@
               keyValue={$currentEnvironment?.property?.environment?.variable}
               callback={handleCurrentEnvironmentKeyValuePairChange}
               {search}
+              {onUpdateVariableSelection}
             />
           </div>
         </div>
 
         <!-- Optional Bottom Section -->
-        {#if $currentEnvironment?.generateVariable}
+        {#if $currentEnvironment?.property.environment.generateVariable}
           <!-- Divider -->
           <div
             class="env-divider"
@@ -363,16 +291,18 @@
           <!-- Generate Variable Section -->
           <div
             class="generate-variable-container"
-            style="flex: 1; min-height: 0;"
+            style="flex: 1; min-height: 0; overflow: auto;"
           >
             <GenerateVariables
-              {isLoadingVariables}
               currentEnvironment={$currentEnvironment}
-              bind:generatedVariables
-              bind:isReGenerateVariable
-              {isAcceptedVariables}
-              {onClickGenerateVariable}
+              generatedVariables={$currentEnvironment?.property?.environment
+                ?.aiVariable}
+              aiGenerationStatus={$currentEnvironment?.property?.environment
+                ?.aiGenerationStatus}
               {updateGeneratedVariables}
+              {onUpdateVariableSelection}
+              {handleRedirectToDocs}
+              {isWebApp}
             />
           </div>
         {/if}
@@ -392,6 +322,37 @@
 {/if}
 
 <!--Disabling the Quick Help feature, will be taken up in next release-->
+<Modal
+  title={""}
+  type={"dark"}
+  width={"474px"}
+  zIndex={10000}
+  isOpen={isApplyAiVariablesModalOpen}
+  handleModalState={(flag = false) => {
+    isApplyAiVariablesModalOpen = flag;
+  }}
+  canClose={false}
+>
+  <div style="position: relative;">
+    <ApplyGeneratedVariables
+      collectionName={$currentEnvironment?.property?.environment
+        ?.generateProperty.collectionName || ""}
+      onSaveApplyVariableFlow={async () => {
+        await onSaveEnvironment();
+        isApplyAiVariablesModalOpen = false;
+      }}
+      onCancelApplyVariableFlow={() => {
+        isApplyAiVariablesModalOpen = false;
+      }}
+      totalAiGeneratedVariablesCount={$currentEnvironment?.property?.environment
+        ?.variable?.length || 0}
+      applyingAiGeneratedVariablesCount={$currentEnvironment?.property?.environment?.variable?.filter(
+        (variable) => variable.lifespan === "short",
+      )?.length || 0}
+    />
+  </div>
+</Modal>
+
 <Modal
   title={""}
   type={"dark"}

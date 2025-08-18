@@ -25,7 +25,7 @@ const constants = {
   AZURE_INSIGHTS_CONNECTION_STRING: import.meta.env
     .VITE_AZURE_INSIGHTS_CONNECTION_STRING,
   BASE_URL: import.meta.env.VITE_BASE_URL,
-  INTRO_DOCS_URL: import.meta.env.VITE_SPARROW_DOCS + "/docs/intro",
+  INTRO_DOCS_URL: import.meta.env.VITE_SPARROW_DOCS + "/docs/user-manual/application/introduction/introduction-to-sparrow",
   TESTFLOW_DOCS_URL:
     import.meta.env.VITE_SPARROW_DOCS + "/docs/user-manual/application/workspace-features/testflows",
   APP_ENVIRONMENT_PATH: import.meta.env.VITE_APP_ENVIRONMENT_PATH,

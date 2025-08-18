@@ -937,6 +937,7 @@
                           tab={$activeTab}
                           onSyncCollection={handleSyncCollection}
                           onMockCollectionModelOpen={handleMockCollectionModel}
+                          {isGuestUser}
                         />
                       </div>
                     </Motion>

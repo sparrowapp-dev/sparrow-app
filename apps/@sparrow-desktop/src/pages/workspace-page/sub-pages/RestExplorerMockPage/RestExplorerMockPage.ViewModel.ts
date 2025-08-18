@@ -180,7 +180,7 @@ class RestExplorerMockViewModel {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         delete t.index;
-        t.persistence = TabPersistenceTypeEnum.PERMANENT;
+        // t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
         await this.fetchCollection(t.path.collectionId as string);
         const m = this._tab.getValue() as Tab;

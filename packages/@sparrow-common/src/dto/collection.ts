@@ -77,3 +77,9 @@ export interface CreateApiRequestPostBody {
   folderId?: string;
   items?: CollectionItemsPayload;
 }
+
+export interface GeneratedVariable {
+  key: string;
+  value: string;
+  checked: boolean;
+}
