@@ -186,7 +186,7 @@ class RestExplorerViewModel {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         delete t.index;
-        t.persistence = TabPersistenceTypeEnum.PERMANENT;
+        // t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
         const collectionDoc = await this.fetchCollection(
           t.path.collectionId as string,
@@ -489,6 +489,7 @@ class RestExplorerViewModel {
         isSaved: false,
       });
       progressiveTab.isSaved = false;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };
