@@ -434,7 +434,7 @@ jobs:
                     }
                     @{
                       "type" = "TextBlock"
-                      "text" = "📦 Install via App Installer (Click to install directly):"
+                      "text" = "📦 Install via App Installer:"
                       "weight" = "bolder"
                       "spacing" = "medium"
                     }
@@ -447,7 +447,7 @@ jobs:
                           "items" = @(
                             @{
                               "type" = "TextBlock"
-                              "text" = "🚀 [Install Sparrow (One-Click)]($appInstallerUrl)"
+                              "text" = "🚀 [Install Sparrow]($appInstallerUrl)"
                               "color" = "accent"
                               "wrap" = $true
                               "weight" = "bolder"
