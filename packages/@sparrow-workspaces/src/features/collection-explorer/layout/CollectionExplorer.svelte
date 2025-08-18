@@ -875,9 +875,7 @@ margin-right: 8px;
               disabled={!isCollectionEditable}
               id="updateCollectionDescField"
               value={$tab?.description || ""}
-              class=" border-0 text-fs-12 collection-area {!isSharedWorkspace
-                ? 'input-outline'
-                : ''} w-100 p-2"
+              class=" border-0 text-fs-12 collection-area w-100 p-2"
               placeholder={isSharedWorkspace
                 ? "No description added."
                 : "Add Description"}
