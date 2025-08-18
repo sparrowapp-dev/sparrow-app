@@ -357,7 +357,6 @@ class GraphqlExplorerViewModel {
 
   public updateSchemaAsPerQuery = async () => {
     try {
-      debugger;
       const progressiveTab = createDeepCopy(this._tab.getValue());
       let query;
       if (
