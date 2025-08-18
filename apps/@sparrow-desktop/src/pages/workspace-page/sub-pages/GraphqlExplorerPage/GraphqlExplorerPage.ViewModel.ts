@@ -109,7 +109,7 @@ class GraphqlExplorerViewModel {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         delete t.index;
-        t.persistence = TabPersistenceTypeEnum.PERMANENT;
+        // t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
         this.authHeader = new ReduceAuthHeader(
           this._tab.getValue().property?.graphql
@@ -324,6 +324,7 @@ class GraphqlExplorerViewModel {
       return;
     }
     progressiveTab.property.graphql.url = _url;
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -402,6 +403,7 @@ class GraphqlExplorerViewModel {
       }
       const stringifiedUpdatedJSON = JSON.stringify(updatedQueryMutationJSON);
       progressiveTab.property.graphql.schema = stringifiedUpdatedJSON;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     } catch (error) {
@@ -423,6 +425,7 @@ class GraphqlExplorerViewModel {
     } else {
       progressiveTab.property.graphql.mutation = _query;
     }
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     await this.updateSchemaAsPerQuery();
@@ -533,6 +536,7 @@ class GraphqlExplorerViewModel {
   private updateRequestPath = async (_path: Path) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.path = _path;
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -809,7 +813,6 @@ class GraphqlExplorerViewModel {
 
   // This function will reverse the GraphQL query to JSON object.
   private reverseGraphQLToJSON = (query) => {
-
     // Helper to process object fields
     const processObjectFields = (fields) => {
       return fields.map((field) => {
@@ -826,7 +829,7 @@ class GraphqlExplorerViewModel {
               items: [], // No nested items
             };
           case "IntValue":
-          // For IntValue, set value directly
+            // For IntValue, set value directly
             return {
               name: field.name.value,
               itemType: "argument",
@@ -1135,6 +1138,7 @@ class GraphqlExplorerViewModel {
 
           progressiveTab.property.graphql.schema = JSON.stringify(parsedSchema);
           progressiveTab.property.graphql.state.isRequestSchemaFetched = true;
+          progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
           this.tab = progressiveTab;
           await this.tabRepository.updateTab(
             progressiveTab.tabId,
@@ -1148,6 +1152,7 @@ class GraphqlExplorerViewModel {
           const newProgressiveTab = createDeepCopy(this._tab.getValue());
           newProgressiveTab.property.graphql.state.isRequestSchemaFetched =
             true;
+          newProgressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
           this.tab = newProgressiveTab;
           await this.tabRepository.updateTab(
             newProgressiveTab.tabId,
@@ -1164,6 +1169,7 @@ class GraphqlExplorerViewModel {
       console.error(error);
       const newProgressiveTab = createDeepCopy(this._tab.getValue());
       newProgressiveTab.property.graphql.state.isRequestSchemaFetched = true;
+      newProgressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = newProgressiveTab;
       await this.tabRepository.updateTab(
         newProgressiveTab.tabId,
@@ -1185,6 +1191,7 @@ class GraphqlExplorerViewModel {
   public updateRequestVariables = async (_variables: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.graphql.variables = _variables;
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -1209,6 +1216,7 @@ class GraphqlExplorerViewModel {
   public updateRequestDescription = async (_description: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.description = _description;
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     try {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
@@ -1228,6 +1236,7 @@ class GraphqlExplorerViewModel {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     if (_name !== progressiveTab.name) {
       progressiveTab.name = _name;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     }
     this.tab = progressiveTab;
   };
@@ -1239,6 +1248,7 @@ class GraphqlExplorerViewModel {
   public updateRequestName = async (_name: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.name = _name;
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -1253,6 +1263,7 @@ class GraphqlExplorerViewModel {
   ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.graphql.headers = _headers;
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -1368,6 +1379,7 @@ class GraphqlExplorerViewModel {
         }
         progressiveTab.property.graphql.mutation = _query;
       }
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     } catch (error) {
@@ -1379,9 +1391,13 @@ class GraphqlExplorerViewModel {
    *
    * @param _headers - request headers
    */
-  public updateSchema = async (_schema: string, _isQueryUpdateRequired: boolean) => {
+  public updateSchema = async (
+    _schema: string,
+    _isQueryUpdateRequired: boolean,
+  ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.graphql.schema = _schema;
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     await this.updateQueryAsPerSchema(_isQueryUpdateRequired);
