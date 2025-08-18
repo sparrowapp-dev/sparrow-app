@@ -197,23 +197,43 @@
         isFormData = true;
         const boundary = contentType.split("boundary=")[1];
         if (contentType.includes("boundary=")) {
-          const formDataParts = requestObject.data.split(`--${boundary}\r\n`);
-          formDataParts.shift(); // Remove the first boundary part
+          // Normalize request data to handle both real CRLF (\r\n) and literal " r n"
+          const normalizedData =
+            typeof requestObject.data === "string"
+              ? requestObject.data.replace(/ r n/g, "\r\n")
+              : requestObject.data;
 
-          for (const part of formDataParts) {
-            const lines = part.trim().split("\r\n");
+          // Split multipart data by boundary
+          const formDataParts = normalizedData.split(`--${boundary}`);
+          formDataParts.shift(); // Remove first empty part
+
+          for (let part of formDataParts) {
+            part = part.trim();
+            if (!part || part === "--") continue; // skip closing or empty part
+            const lines = part.split("\r\n");
             const disposition = lines[0]; // Content-Disposition line
+            if (!disposition) continue;
+
+            // Ignore special _method
             if (disposition.includes('name="_method"')) {
-              // Ignore the _method part
               continue;
             }
-            const key = disposition.split('name="')[1].split('"')[0];
-            let value = "";
 
-            if (lines.length > 2) {
-              value = lines.slice(2).join("\r\n").trim(); // Extract value from part content
+            // Extract key from Content-Disposition
+            const keyMatch = disposition.match(/name="([^"]+)"/);
+            const key = keyMatch ? keyMatch[1] : "";
+
+            // Extract value → after first blank line
+            const blankLineIndex = lines.indexOf("");
+            let value = "";
+            if (blankLineIndex !== -1) {
+              value = lines
+                .slice(blankLineIndex + 1)
+                .join("\r\n")
+                .trim();
             }
 
+            // If boundary leaked in value, clear it
             if (value.includes(boundary)) {
               value = "";
             }
@@ -226,7 +246,9 @@
                 value,
                 checked: true,
               });
-            } else if (
+            }
+            // Handle file fields
+            else if (
               disposition.includes(
                 'Content-Disposition: form-data; name="file"',
               ) &&
