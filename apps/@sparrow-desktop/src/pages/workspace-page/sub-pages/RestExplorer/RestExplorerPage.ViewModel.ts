@@ -100,6 +100,7 @@ import constants from "@app/constants/constants";
 import * as curlconverter from "curlconverter";
 
 import * as Sentry from "@sentry/svelte";
+import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection-tab";
 
 class RestExplorerViewModel {
   /**
@@ -261,14 +262,16 @@ class RestExplorerViewModel {
     }
   }
 
-  public openCollection = async () => {
+  public openCollection = async (isAuthRedirect: boolean = false) => {
     const collectionRx = await this.collectionRepository.readCollection(
       this._tab.getValue().path.collectionId,
     );
+    const navigation = isAuthRedirect ? CollectionNavigationTabEnum.AUTH : null;
     const collectionDoc = collectionRx?.toMutableJSON();
     const collectionTab = new CollectionTabAdapter().adapt(
       this._tab.getValue().path.workspaceId,
       collectionDoc,
+      navigation,
     );
     this.tabRepository.createTab(collectionTab);
   };
@@ -658,7 +661,7 @@ class RestExplorerViewModel {
     );
     let responseCode = "";
     restExplorerDataStore.update((restApiDataMap) => {
-      let data = restApiDataMap.get(progressiveTab?.tabId);
+      const data = restApiDataMap.get(progressiveTab?.tabId);
       if (data) {
         savedRequestTab.updateResponseBody(data.response.body);
         savedRequestTab.updateResponseHeaders(data.response.headers);
@@ -1665,7 +1668,7 @@ class RestExplorerViewModel {
     const { signal } = abortController; // Extract the signal for the request
 
     restExplorerDataStore.update((restApiDataMap) => {
-      let data = restApiDataMap.get(progressiveTab?.tabId);
+      const data = restApiDataMap.get(progressiveTab?.tabId);
       if (data) {
         data.isSendRequestInProgress = true;
       }
@@ -1720,12 +1723,12 @@ class RestExplorerViewModel {
               value: elem[1],
             });
           });
-          let responseStatus = response.data.status;
+          const responseStatus = response.data.status;
           const bodyLanguage =
             this._decodeRequest.setResponseContentType(responseHeaders);
 
           restExplorerDataStore.update((restApiDataMap) => {
-            let data = restApiDataMap.get(progressiveTab?.tabId);
+            const data = restApiDataMap.get(progressiveTab?.tabId);
             if (data) {
               data.response.body = responseBody;
               data.response.headers = responseHeaders;
@@ -2776,7 +2779,7 @@ class RestExplorerViewModel {
     });
     if (isGlobalVariable) {
       // api payload
-      let payload = {
+      const payload = {
         name: environmentVariables.global.name,
         variable: [
           ...environmentVariables.global.variable,
@@ -2806,11 +2809,11 @@ class RestExplorerViewModel {
           payload,
         );
 
-        let currentTab = await this.tabRepository.getTabById(
+        const currentTab = await this.tabRepository.getTabById(
           environmentVariables.global.id,
         );
         if (currentTab) {
-          let currentTabId = currentTab.tabId;
+          const currentTabId = currentTab.tabId;
           const envTab = createDeepCopy(currentTab);
           envTab.property.environment.variable = payload.variable;
           envTab.isSaved = true;
@@ -2841,12 +2844,12 @@ class RestExplorerViewModel {
           response.data.data,
         );
 
-        let currentTab = await this.tabRepository.getTabById(
+        const currentTab = await this.tabRepository.getTabById(
           response.data.data._id,
         );
 
         if (currentTab) {
-          let currentTabId = currentTab.tabId;
+          const currentTabId = currentTab.tabId;
           const envTab = createDeepCopy(currentTab);
           envTab.property.environment.variable = response.data.data.variable;
           envTab.isSaved = true;
@@ -2894,12 +2897,12 @@ class RestExplorerViewModel {
           payload,
         );
 
-        let currentTab = await this.tabRepository.getTabById(
+        const currentTab = await this.tabRepository.getTabById(
           environmentVariables.local.id,
         );
 
         if (currentTab) {
-          let currentTabId = currentTab.tabId;
+          const currentTabId = currentTab.tabId;
           const envTab = createDeepCopy(currentTab);
           envTab.property.environment.variable = payload.variable;
           envTab.isSaved = true;
@@ -2931,7 +2934,7 @@ class RestExplorerViewModel {
           response.data.data,
         );
 
-        let currentTab = await this.tabRepository.getTabById(
+        const currentTab = await this.tabRepository.getTabById(
           response.data.data._id,
         );
         if (currentTab) {
@@ -3224,11 +3227,11 @@ class RestExplorerViewModel {
 
     const userEmail = getClientUser().email;
 
-    let workspaceId = componentData.path.workspaceId;
+    const workspaceId = componentData.path.workspaceId;
 
-    let workspaceVal = await this.readWorkspace(workspaceId);
+    const workspaceVal = await this.readWorkspace(workspaceId);
 
-    let teamId = workspaceVal.team?.teamId;
+    const teamId = workspaceVal.team?.teamId;
 
     // extraction of request API data for setting AI Context
     const apiData = {
@@ -3251,7 +3254,7 @@ class RestExplorerViewModel {
 
     try {
       const userEmail = getClientUser().email;
-      let responseMessageId = uuidv4(); // Generate a single message ID for the entire response
+      const responseMessageId = uuidv4(); // Generate a single message ID for the entire response
       let accumulatedMessage = ""; // Track the accumulated message content
       let messageCreated = false; // Flag to track if we've created the initial message
 
@@ -3644,11 +3647,11 @@ class RestExplorerViewModel {
     await this.updateRequestState({ isDocGenerating: true });
     const componentData = this._tab.getValue();
 
-    let workspaceId = componentData.path.workspaceId;
+    const workspaceId = componentData.path.workspaceId;
 
-    let workspaceVal = await this.readWorkspace(workspaceId);
+    const workspaceVal = await this.readWorkspace(workspaceId);
 
-    let teamId = workspaceVal.team?.teamId;
+    const teamId = workspaceVal.team?.teamId;
 
     const apiData = {
       body: componentData.property.request.body,
