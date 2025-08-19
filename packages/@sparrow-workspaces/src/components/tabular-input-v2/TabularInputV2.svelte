@@ -244,7 +244,6 @@
     pairs = filteredKeyValue;
     callback(pairs);
   };
-
 </script>
 
 <div class="mb-0 me-0 w-100 py-0 section-layout">
@@ -445,7 +444,7 @@
                         <button
                           class="generate-action-button accept"
                           on:click|stopPropagation={() => {
-                            onUpdateVariableSelection("revert", element.id);
+                            onUpdateVariableSelection("revert", index);
                           }}
                         >
                           <ArrowHookRegular
@@ -486,7 +485,7 @@
                         <button
                           class="generate-action-button accept"
                           on:click|stopPropagation={() => {
-                            onUpdateVariableSelection("accept", element.id);
+                            onUpdateVariableSelection("accept", index);
                           }}
                         >
                           <CheckMarkIcon

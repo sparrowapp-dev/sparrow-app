@@ -213,6 +213,7 @@ export class EnvironmentExplorerViewModel {
     if (type === "accept" && typeof index === "number") {
       try {
         const progressiveTab = createDeepCopy(this._tab.getValue());
+        progressiveTab;
         const foundIndex =
           progressiveTab.property.environment.aiVariable.findIndex(
             (_, i) => i === index,
@@ -220,7 +221,6 @@ export class EnvironmentExplorerViewModel {
         if (foundIndex !== -1) {
           const foundObject =
             progressiveTab.property.environment.aiVariable[foundIndex];
-          // ✅ Keep id and undo (no destructuring removal)
           const currentPairs =
             progressiveTab.property?.environment?.variable || [];
           const updatedPairs = [...currentPairs];
