@@ -244,7 +244,6 @@
     callback(pairs);
   };
 
-  $: console.log("this is the ------------------>", keyValue);
 </script>
 
 <div class="mb-0 me-0 w-100 py-0 section-layout">
