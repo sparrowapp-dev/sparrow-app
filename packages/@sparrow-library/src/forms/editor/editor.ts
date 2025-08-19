@@ -9,6 +9,7 @@ import { html } from "@codemirror/lang-html";
 import { jsonSetup } from "./theme";
 import { xml } from "@codemirror/lang-xml";
 import { html_beautify, js_beautify } from "js-beautify";
+import * as Sentry from "@sentry/svelte";
 
 /**
  * @description - remove indentation from the string
@@ -38,73 +39,78 @@ const removeIndentation = (str: string = "") => {
  * @returns {string} A newly formatted JSON string with consistent brace/bracket indentation
  */
 function fixJsonBraces(jsonString: string, indentLevel: number = 4): string {
-  const INDENT: string = " ".repeat(indentLevel);
+  try {
+    const INDENT: string = " ".repeat(indentLevel);
 
-  const lastLineIndent = (str: string, offset: number): string => {
-    const before: string = str.slice(0, offset);
-    const lines: string[] = before.split("\n");
-    const lastLine: string = lines[lines.length - 1];
-    const m: RegExpMatchArray | null = lastLine.match(/^\s*/);
-    return m ? m[0] : "";
-  };
+    const lastLineIndent = (str: string, offset: number): string => {
+      const before: string = str.slice(0, offset);
+      const lines: string[] = before.split("\n");
+      const lastLine: string = lines[lines.length - 1];
+      const m: RegExpMatchArray | null = lastLine.match(/^\s*/);
+      return m ? m[0] : "";
+    };
 
-  const outdentOnce = (indent: string): string =>
-    indent.length >= INDENT.length
-      ? indent.slice(0, indent.length - INDENT.length)
-      : "";
+    const outdentOnce = (indent: string): string =>
+      indent.length >= INDENT.length
+        ? indent.slice(0, indent.length - INDENT.length)
+        : "";
 
-  // 1) Ensure [{ starts on a new line and { is one level deeper than [
-  jsonString = jsonString.replace(
-    /(\[\s*)\{/g,
-    (match: string, open: string, offset: number, str: string) => {
-      const indent: string = lastLineIndent(str, offset); // indent of line containing [
-      return "[\n" + indent + INDENT + "{";
-    },
-  );
+    // 1) Ensure [{ starts on a new line and { is one level deeper than [
+    jsonString = jsonString.replace(
+      /(\[\s*)\{/g,
+      (match: string, open: string, offset: number, str: string) => {
+        const indent: string = lastLineIndent(str, offset); // indent of line containing [
+        return "[\n" + indent + INDENT + "{";
+      },
+    );
 
-  // 2) Ensure }, { becomes a newline with { aligned to the SAME indent for all siblings
-  // Use arrayIndent = outdent(objectIndent). Siblings go at arrayIndent + INDENT.
-  jsonString = jsonString.replace(
-    /\}\s*,\s*\{/g,
-    (match: string, offset: number, str: string) => {
-      const objectIndent: string = lastLineIndent(str, offset); // indent of the line with }
-      const arrayIndent: string = outdentOnce(objectIndent);
-      return "},\n" + arrayIndent + INDENT + "{";
-    },
-  );
+    // 2) Ensure }, { becomes a newline with { aligned to the SAME indent for all siblings
+    // Use arrayIndent = outdent(objectIndent). Siblings go at arrayIndent + INDENT.
+    jsonString = jsonString.replace(
+      /\}\s*,\s*\{/g,
+      (match: string, offset: number, str: string) => {
+        const objectIndent: string = lastLineIndent(str, offset); // indent of the line with }
+        const arrayIndent: string = outdentOnce(objectIndent);
+        return "},\n" + arrayIndent + INDENT + "{";
+      },
+    );
 
-  // 3) Ensure }] has ] on its own line, OUTDENTED one level relative to object indent
-  jsonString = jsonString.replace(
-    /\}\s*\]/g,
-    (match: string, offset: number, str: string) => {
-      const objectIndent: string = lastLineIndent(str, offset); // indent of the line with }
-      const arrayIndent: string = outdentOnce(objectIndent);
-      return "}\n" + arrayIndent + "]";
-    },
-  );
+    // 3) Ensure }] has ] on its own line, OUTDENTED one level relative to object indent
+    jsonString = jsonString.replace(
+      /\}\s*\]/g,
+      (match: string, offset: number, str: string) => {
+        const objectIndent: string = lastLineIndent(str, offset); // indent of the line with }
+        const arrayIndent: string = outdentOnce(objectIndent);
+        return "}\n" + arrayIndent + "]";
+      },
+    );
 
-  // 4) Handle top-of-string case: [{ at the very start
-  jsonString = jsonString.replace(
-    /^\[\s*\{/m,
-    (match: string, offset: number, str: string) => {
-      const indent: string = lastLineIndent(str, offset);
-      return "[\n" + indent + INDENT + "{";
-    },
-  );
+    // 4) Handle top-of-string case: [{ at the very start
+    jsonString = jsonString.replace(
+      /^\[\s*\{/m,
+      (match: string, offset: number, str: string) => {
+        const indent: string = lastLineIndent(str, offset);
+        return "[\n" + indent + INDENT + "{";
+      },
+    );
 
-  // 5) Normalization pass: any { that starts a new array sibling after a comma,
-  // align it to arrayIndent + INDENT as well (catches odd inputs)
-  jsonString = jsonString.replace(
-    /,\s*\n\s*\{/g,
-    (match: string, offset: number, str: string) => {
-      // objectIndent = indent of the comma's line (same as previous object)
-      const objectIndent: string = lastLineIndent(str, offset);
-      const arrayIndent: string = outdentOnce(objectIndent);
-      return ",\n" + arrayIndent + INDENT + "{";
-    },
-  );
+    // 5) Normalization pass: any { that starts a new array sibling after a comma,
+    // align it to arrayIndent + INDENT as well (catches odd inputs)
+    jsonString = jsonString.replace(
+      /,\s*\n\s*\{/g,
+      (match: string, offset: number, str: string) => {
+        // objectIndent = indent of the comma's line (same as previous object)
+        const objectIndent: string = lastLineIndent(str, offset);
+        const arrayIndent: string = outdentOnce(objectIndent);
+        return ",\n" + arrayIndent + INDENT + "{";
+      },
+    );
 
-  return jsonString;
+    return jsonString;
+  } catch (error) {
+    Sentry.captureException(error);
+    return jsonString;
+  }
 }
 
 /**
