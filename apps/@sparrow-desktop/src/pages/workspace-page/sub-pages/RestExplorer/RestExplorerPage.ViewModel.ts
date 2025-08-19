@@ -1042,7 +1042,6 @@ class RestExplorerViewModel {
 
     // Handle body based on Content-Type
     if (requestObject.data) {
-      debugger;
       if (contentType.startsWith("multipart/form-data")) {
         transformedObject.request!.selectedRequestBodyType =
           "multipart/form-data";
