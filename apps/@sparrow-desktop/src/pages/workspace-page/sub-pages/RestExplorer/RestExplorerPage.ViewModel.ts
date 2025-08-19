@@ -1183,8 +1183,7 @@ class RestExplorerViewModel {
 
     const updatedCurl = this.handleFormatCurl(curl);
     const stringifiedCurl = curlconverter.toJsonString(updatedCurl);
-    const ert = curlconverter.toJavaScriptJquery(updatedCurl);
-    debugger;
+
     const parsedCurl = JSON.parse(stringifiedCurl);
 
     // Use the same regex as ImportCurl.svelte
