@@ -332,7 +332,7 @@ jobs:
                   "body" = @(
                     @{
                       "type" = "TextBlock"
-                      "text" = "DO NOT TEST - Windows 2.28.0"
+                      "text" = "DO NOT TEST - Windows 2.28.1"
                       "weight" = "bolder"
                       "size" = "large"
                     }
