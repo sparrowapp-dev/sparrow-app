@@ -357,6 +357,7 @@
         placement={"top-right"}
         size={"medium"}
         styleProp={"width: 220px;"}
+        zIndex={5}
       >
         <Button
           type={"teritiary-regular"}
