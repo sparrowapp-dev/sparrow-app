@@ -55,31 +55,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Add createUpdaterArtifacts to tauri.conf.json
+      - name: Add createUpdaterArtifacts to bundle in tauri.conf.json
         run: |
           $confPath = "apps/@sparrow-desktop/src-tauri/tauri.conf.json"
-          $conf = Get-Content $confPath | ConvertFrom-Json
-          if ($conf.tauri.bundle) {
-            $bundle = $conf.tauri.bundle
+          $json = Get-Content $confPath -Raw | ConvertFrom-Json
+          if ($json.tauri.bundle) {
+            $bundle = $json.tauri.bundle
             if (-not $bundle.PSObject.Properties.Name -contains "createUpdaterArtifacts") {
-              $props = $bundle.PSObject.Properties | ForEach-Object {
-                if ($_.Name -eq "licenseFile") {
-                  [PSCustomObject]@{ createUpdaterArtifacts = $true }
-                  $_
-                } else {
-                  $_
+              $props = @{}
+              foreach ($p in $bundle.PSObject.Properties) {
+                if ($p.Name -eq "licenseFile") {
+                  $props["createUpdaterArtifacts"] = $true
                 }
+                $props[$p.Name] = $p.Value
               }
-              $newBundle = @{}
-              foreach ($p in $props) {
-                if ($p -is [System.Management.Automation.PSCustomObject]) {
-                  foreach ($k in $p.PSObject.Properties) { $newBundle[$k.Name] = $k.Value }
-                } else {
-                  $newBundle[$p.Name] = $p.Value
-                }
-              }
-              $conf.tauri.bundle = $newBundle
-              $conf | ConvertTo-Json -Depth 20 | Set-Content $confPath
+              $json.tauri.bundle = $props
+              $json | ConvertTo-Json -Depth 20 | Set-Content $confPath
             }
           }
         shell: pwsh
