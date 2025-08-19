@@ -1025,7 +1025,8 @@ class RestExplorerViewModel {
             const key = nameMatch ? nameMatch[1] : "";
 
             // extract value
-            const valueMatch = part.match(/\r\n\r\n([\s\S]*?)(?:\r\n)?$/);
+            const cleaned = part.replace(/\\?\s*r\s*\\?\s*n\s*/g, "\r\n");
+            const valueMatch = cleaned.match(/\r\n\r\n([\s\S]*?)(?:\r\n)?$/);
             const value = valueMatch ? valueMatch[1].trim() : "";
 
             if (key) {

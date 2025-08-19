@@ -993,6 +993,7 @@ class RestExplorerViewModel {
       requestObject.data &&
       typeof requestObject.data === "string"
     ) {
+      debugger;
       // Extract boundary
       const boundaryMatch = contentType.match(/boundary=(.+)$/);
       const boundary = boundaryMatch ? boundaryMatch[1] : "";
@@ -1009,9 +1010,9 @@ class RestExplorerViewModel {
           ) {
             const nameMatch = part.match(/name="([^"]+)"/);
             const key = nameMatch ? nameMatch[1] : "";
-
             // extract value
-            const valueMatch = part.match(/\r\n\r\n([\s\S]*?)(?:\r\n)?$/);
+            const cleaned = part.replace(/\\?\s*r\s*\\?\s*n\s*/g, "\r\n");
+            const valueMatch = cleaned.match(/\r\n\r\n([\s\S]*?)(?:\r\n)?$/);
             const value = valueMatch ? valueMatch[1].trim() : "";
 
             if (key) {
@@ -1183,6 +1184,8 @@ class RestExplorerViewModel {
 
     const updatedCurl = this.handleFormatCurl(curl);
     const stringifiedCurl = curlconverter.toJsonString(updatedCurl);
+    const ert = curlconverter.toJavaScriptJquery(updatedCurl);
+    debugger;
     const parsedCurl = JSON.parse(stringifiedCurl);
 
     // Use the same regex as ImportCurl.svelte
