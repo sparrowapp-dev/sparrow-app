@@ -523,6 +523,7 @@ class RestExplorerMockViewModel {
         isSaved: false,
       });
       progressiveTab.isSaved = false;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };
