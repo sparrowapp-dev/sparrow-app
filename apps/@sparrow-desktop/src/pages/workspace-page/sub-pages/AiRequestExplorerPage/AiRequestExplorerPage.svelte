@@ -51,7 +51,7 @@
   });
 
   let renameWithCollectionList;
-
+  let onCloseChatHistoryPanel;
   let prevTabName = "";
   let prevTabId = "";
   /**
@@ -84,6 +84,9 @@
               collection = data?.toMutableJSON();
             },
           );
+          if (onCloseChatHistoryPanel) {
+            onCloseChatHistoryPanel();
+          }
           environments = _viewModel.environments;
           activeWorkspace = _viewModel.activeWorkspace;
 
@@ -237,4 +240,5 @@
   onGenerateAiPrompt={_viewModel.generateAiPrompt}
   onHandleInsertPrompt={_viewModel.handleInsertAiPrompt}
   onUploadFiles={_viewModel.handleUploadFilesToCloud}
+  bind:onCloseChatHistoryPanel
 />
