@@ -386,6 +386,11 @@
         transformedObject.request!.body.raw = ""; // Clear raw body
       }
     }
+    transformedObject.request!.body.formdata!.text.push({
+      key: "",
+      value: "",
+      checked: false,
+    });
 
     // Handle headers and populate auth details
     if (requestObject.headers) {
@@ -452,11 +457,6 @@
     }
     if (!transformedObject.request!.body.formdata!.text.length) {
       transformedObject.request!.body.formdata!.text.push(keyValueDefaultObj);
-    }
-    if (!transformedObject.request!.body.formdata!.file.length) {
-      transformedObject.request!.body.formdata!.file.push(
-        formDataFileDefaultObj,
-      );
     }
     if (!transformedObject.request!.body.urlencoded!.length) {
       transformedObject.request!.body.urlencoded!.push(keyValueDefaultObj);
