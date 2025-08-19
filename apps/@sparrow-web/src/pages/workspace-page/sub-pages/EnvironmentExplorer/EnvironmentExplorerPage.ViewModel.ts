@@ -11,7 +11,10 @@ import { GuideRepository } from "../../../../repositories/guide.repository";
 import { GuestUserRepository } from "../../../../repositories/guest-user.repository";
 import { TabRepository } from "../../../../repositories/tab.repository";
 import { Debounce, CompareArray } from "@sparrow/common/utils";
-import { TabPersistenceTypeEnum, TabTypeEnum } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  TabTypeEnum,
+} from "@sparrow/common/types/workspace/tab";
 import { CollectionService } from "src/services/collection.service";
 import constants from "src/constants/constants";
 import { CollectionRepository } from "src/repositories/collection.repository";
@@ -292,63 +295,57 @@ export class EnvironmentExplorerViewModel {
       await this.updateGeneratedVariables([]);
     } else if (type === "revert" && typeof index === "number") {
       const progressiveTab = createDeepCopy(this._tab.getValue());
-        const foundIndex =
-          progressiveTab.property.environment.variable.findIndex(
-            (_, i) => i === index,
-          );
-        if (foundIndex !== -1) {
-          const foundObject =
-            progressiveTab.property.environment.variable[foundIndex];
-          const currentPairs =
-            progressiveTab.property?.environment?.aiVariable || [];
-          const updatedPairs = [...currentPairs];
-          if (updatedPairs.length > 0) {
-            updatedPairs.splice(updatedPairs.length - 1, 0, {
-              ...foundObject,
-               type: "user-generated",
-               lifespan: "long",
-            });
-          } else {
-            updatedPairs.push({
-              ...foundObject,
-               type: "user-generated",
-               lifespan: "long",
-            });
-          }
-          const remainingVariables =
-            progressiveTab.property.environment.variable.filter(
-              (_, i) => i !== foundIndex,
-            );
-          await this.updateVariables(remainingVariables);
-          await this.updateGeneratedVariables(updatedPairs);
-          await this.updateEnvironmentAiVariableGenerationStatus("generated");
+      const foundIndex = progressiveTab.property.environment.variable.findIndex(
+        (_, i) => i === index,
+      );
+      if (foundIndex !== -1) {
+        const foundObject =
+          progressiveTab.property.environment.variable[foundIndex];
+        const currentPairs =
+          progressiveTab.property?.environment?.aiVariable || [];
+        const updatedPairs = [...currentPairs];
+        if (updatedPairs.length > 0) {
+          updatedPairs.splice(updatedPairs.length - 1, 0, {
+            ...foundObject,
+            type: "user-generated",
+            lifespan: "long",
+          });
+        } else {
+          updatedPairs.push({
+            ...foundObject,
+            type: "user-generated",
+            lifespan: "long",
+          });
         }
         const remainingVariables =
           progressiveTab.property.environment.variable.filter(
             (_, i) => i !== foundIndex,
           );
-        this.updateVariables(remainingVariables);
-        this.updateGeneratedVariables(updatedPairs);
+        await this.updateVariables(remainingVariables);
+        await this.updateGeneratedVariables(updatedPairs);
         await this.updateEnvironmentAiVariableGenerationStatus("generated");
       }
-    }else if (type === "revert-all") {
+    } else if (type === "revert-all") {
       const progressiveTab = createDeepCopy(this._tab.getValue());
       const aiVariable = [];
       const userVariable = [];
-      progressiveTab.property?.environment?.variable.forEach((variable)=>{
-          if(variable.lifespan === "short"){
+      progressiveTab.property?.environment?.variable.forEach((variable) => {
+        if (variable.lifespan === "short") {
           aiVariable.push({
             ...variable,
             type: "user-generated",
             lifespan: "long",
           });
-          }else{
+        } else {
           userVariable.push(variable);
         }
       });
 
       await this.updateVariables([...userVariable]);
-      await this.updateGeneratedVariables([...progressiveTab.property?.environment?.aiVariable, ...aiVariable]);
+      await this.updateGeneratedVariables([
+        ...progressiveTab.property?.environment?.aiVariable,
+        ...aiVariable,
+      ]);
       await this.updateEnvironmentAiVariableGenerationStatus("generated");
     }
   };
@@ -361,9 +358,7 @@ export class EnvironmentExplorerViewModel {
     return;
   };
 
-
   private updatedRequestInCollection(
-
     generatedVariables: any[],
     requestItem: any,
   ): any {
@@ -559,16 +554,29 @@ export class EnvironmentExplorerViewModel {
             insertGenerateVariableResponse.data.data,
           );
 
-
-          const tabRxDocs = await this.tabRepository.getTabsByCollectionId(progressiveTab?.property?.environment?.generateProperty.collectionId);
-          const tabsJson = tabRxDocs.map((doc) => doc.toMutableJSON()).filter((doc)=>{
-            if(doc.type === TabTypeEnum.REQUEST || doc.type === TabTypeEnum.WEB_SOCKET || doc.type === TabTypeEnum.GRAPHQL || doc.type === TabTypeEnum.SOCKET_IO){
+          const tabRxDocs = await this.tabRepository.getTabsByCollectionId(
+            progressiveTab?.property?.environment?.generateProperty
+              .collectionId,
+          );
+          const tabsJson = tabRxDocs
+            .map((doc) => doc.toMutableJSON())
+            .filter((doc) => {
+              if (
+                doc.type === TabTypeEnum.REQUEST ||
+                doc.type === TabTypeEnum.WEB_SOCKET ||
+                doc.type === TabTypeEnum.GRAPHQL ||
+                doc.type === TabTypeEnum.SOCKET_IO
+              ) {
                 return true;
-            }else{
+              } else {
                 return false;
               }
-          }).map((doc)=>{
-             doc.property = this.updatedRequestInCollection(uniqueAiGeneratedVariables, doc.property );
+            })
+            .map((doc) => {
+              doc.property = this.updatedRequestInCollection(
+                uniqueAiGeneratedVariables,
+                doc.property,
+              );
               return doc;
             });
 
