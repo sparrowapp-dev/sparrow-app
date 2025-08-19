@@ -993,7 +993,6 @@ class RestExplorerViewModel {
       requestObject.data &&
       typeof requestObject.data === "string"
     ) {
-      debugger;
       // Extract boundary
       const boundaryMatch = contentType.match(/boundary=(.+)$/);
       const boundary = boundaryMatch ? boundaryMatch[1] : "";
