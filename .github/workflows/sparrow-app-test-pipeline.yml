@@ -59,19 +59,17 @@ jobs:
         run: |
           $confPath = "apps/@sparrow-desktop/src-tauri/tauri.conf.json"
           $json = Get-Content $confPath -Raw | ConvertFrom-Json
-          if ($json.tauri.bundle) {
-            $bundle = $json.tauri.bundle
-            if (-not $bundle.PSObject.Properties.Name -contains "createUpdaterArtifacts") {
-              $props = @{}
-              foreach ($p in $bundle.PSObject.Properties) {
-                if ($p.Name -eq "licenseFile") {
-                  $props["createUpdaterArtifacts"] = $true
-                }
-                $props[$p.Name] = $p.Value
-              }
-              $json.tauri.bundle = $props
-              $json | ConvertTo-Json -Depth 20 | Set-Content $confPath
+
+          if ($null -ne $json.bundle) {
+            if (-not ($json.bundle.PSObject.Properties.Name -contains "createUpdaterArtifacts")) {
+              $json.bundle | Add-Member -NotePropertyName "createUpdaterArtifacts" -NotePropertyValue $true
             }
+            elseif ($json.bundle.createUpdaterArtifacts -ne $true) {
+              # enforce correct value in case it exists but is false
+              $json.bundle.createUpdaterArtifacts = $true
+            }
+
+            $json | ConvertTo-Json -Depth 20 | Set-Content $confPath -Encoding UTF8
           }
         shell: pwsh
 
