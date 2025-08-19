@@ -1014,16 +1014,22 @@ class RestExplorerViewModel {
       if (boundary) {
         // Split body by boundary
         const parts = requestObject.data.split(`--${boundary}`);
-        for (const part of parts) {
+        for (const rawPart of parts) {
+          // convert " r n" into real newlines
+          const part = rawPart.replace(/ r n/g, "\r\n");
+
           if (
             part.includes("Content-Disposition: form-data;") &&
             part.includes('name="')
           ) {
             const nameMatch = part.match(/name="([^"]+)"/);
             const key = nameMatch ? nameMatch[1] : "";
-            // Value is after two CRLFs
-            const valueMatch = part.match(/\r\n\r\n([\s\S]*?)\r\n$/);
-            const value = valueMatch ? valueMatch[1] : "";
+
+            // extract value
+            const cleaned = part.replace(/\\?\s*r\s*\\?\s*n\s*/g, "\r\n");
+            const valueMatch = cleaned.match(/\r\n\r\n([\s\S]*?)(?:\r\n)?$/);
+            const value = valueMatch ? valueMatch[1].trim() : "";
+
             if (key) {
               transformedObject.request!.body.formdata.push({
                 key,
@@ -1035,6 +1041,7 @@ class RestExplorerViewModel {
             }
           }
         }
+
         transformedObject.request!.selectedRequestBodyType =
           "multipart/form-data";
       }
