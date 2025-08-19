@@ -217,20 +217,19 @@ export class EnvironmentExplorerViewModel {
         if (foundIndex !== -1) {
           const foundObject =
             progressiveTab.property.environment.aiVariable[foundIndex];
-          // ✅ Remove id and undo
-          const { id, undo, ...cleanedObject } = foundObject;
+          // ✅ Keep id and undo (no destructuring removal)
           const currentPairs =
             progressiveTab.property?.environment?.variable || [];
           const updatedPairs = [...currentPairs];
           if (updatedPairs.length > 0) {
             updatedPairs.splice(updatedPairs.length - 1, 0, {
-              ...cleanedObject,
+              ...foundObject,
               type: "ai-generated",
               lifespan: "short",
             });
           } else {
             updatedPairs.push({
-              ...cleanedObject,
+              ...foundObject,
               type: "ai-generated",
               lifespan: "short",
             });
@@ -273,15 +272,12 @@ export class EnvironmentExplorerViewModel {
       ) {
         progressiveTab.property.environment.variable.pop();
       }
-      // Map aiVariable, removing id and undo
       const sanitizedAiVariables =
-        progressiveTab.property.environment.aiVariable.map(
-          ({ id, undo, ...rest }) => ({
-            ...rest,
-            type: "ai-generated",
-            lifespan: "short",
-          }),
-        );
+        progressiveTab.property.environment.aiVariable.map((variable) => ({
+          ...variable,
+          type: "ai-generated",
+          lifespan: "short",
+        }));
       await this.updateVariables([
         ...progressiveTab.property.environment.variable,
         ...sanitizedAiVariables,
@@ -357,7 +353,7 @@ export class EnvironmentExplorerViewModel {
   };
 
 
-private updatedRequestInCollection(
+  private updatedRequestInCollection(
 
     generatedVariables: any[],
     requestItem: any,
@@ -558,14 +554,14 @@ private updatedRequestInCollection(
           const tabRxDocs = await this.tabRepository.getTabsByCollectionId(progressiveTab?.property?.environment?.generateProperty.collectionId);
           const tabsJson = tabRxDocs.map((doc) => doc.toMutableJSON()).filter((doc)=>{
             if(doc.type === TabTypeEnum.REQUEST || doc.type === TabTypeEnum.WEB_SOCKET || doc.type === TabTypeEnum.GRAPHQL || doc.type === TabTypeEnum.SOCKET_IO){
-              return true;
+                return true;
             }else{
-              return false;
-            }
+                return false;
+              }
           }).map((doc)=>{
              doc.property = this.updatedRequestInCollection(uniqueAiGeneratedVariables, doc.property );
-             return doc;
-          });
+              return doc;
+            });
 
           this.tabRepository.bulkUpsertTabs(tabsJson);
 

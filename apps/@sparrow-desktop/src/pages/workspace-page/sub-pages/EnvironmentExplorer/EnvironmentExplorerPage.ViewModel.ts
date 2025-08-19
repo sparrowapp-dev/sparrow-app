@@ -218,20 +218,19 @@ export class EnvironmentExplorerViewModel {
         if (foundIndex !== -1) {
           const foundObject =
             progressiveTab.property.environment.aiVariable[foundIndex];
-          // ✅ Remove id and undo
-          const { id, undo, ...cleanedObject } = foundObject;
+          // ✅ Keep id and undo (no destructuring removal)
           const currentPairs =
             progressiveTab.property?.environment?.variable || [];
           const updatedPairs = [...currentPairs];
           if (updatedPairs.length > 0) {
             updatedPairs.splice(updatedPairs.length - 1, 0, {
-              ...cleanedObject,
+              ...foundObject,
               type: "ai-generated",
               lifespan: "short",
             });
           } else {
             updatedPairs.push({
-              ...cleanedObject,
+              ...foundObject,
               type: "ai-generated",
               lifespan: "short",
             });
@@ -274,15 +273,12 @@ export class EnvironmentExplorerViewModel {
       ) {
         progressiveTab.property.environment.variable.pop();
       }
-      // Map aiVariable, removing id and undo
       const sanitizedAiVariables =
-        progressiveTab.property.environment.aiVariable.map(
-          ({ id, undo, ...rest }) => ({
-            ...rest,
-            type: "ai-generated",
-            lifespan: "short",
-          }),
-        );
+        progressiveTab.property.environment.aiVariable.map((variable) => ({
+          ...variable,
+          type: "ai-generated",
+          lifespan: "short",
+        }));
       await this.updateVariables([
         ...progressiveTab.property.environment.variable,
         ...sanitizedAiVariables,
@@ -329,8 +325,6 @@ export class EnvironmentExplorerViewModel {
       }
     }else if (type === "revert-all") {
       const progressiveTab = createDeepCopy(this._tab.getValue());
-      // Remove the last item from environment.variable
-
       const aiVariable = [];
       const userVariable = [];
       progressiveTab.property?.environment?.variable.forEach((variable)=>{
