@@ -191,7 +191,7 @@ jobs:
         run: |
           Get-Content apps/@sparrow-desktop/src-tauri/tauri.conf.json
         shell: pwsh
-        
+
       - name: Build Tauri App
         run: |
           yarn cache clean
@@ -204,7 +204,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
 
       - name: msi zip sig
-        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.zip.sig
+        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi.sig
 
       # --- STAGE 3: SIGN MSIX and NSIS FILES ---
       - name: Find and Sign MSI files
