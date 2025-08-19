@@ -186,7 +186,7 @@ class RestExplorerViewModel {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         delete t.index;
-        t.persistence = TabPersistenceTypeEnum.PERMANENT;
+        // t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
         const collectionDoc = await this.fetchCollection(
           t.path.collectionId as string,
@@ -489,6 +489,7 @@ class RestExplorerViewModel {
         isSaved: false,
       });
       progressiveTab.isSaved = false;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };
@@ -795,6 +796,8 @@ class RestExplorerViewModel {
       } else if (bodyType.includes("html")) {
         navigation = RequestDatasetEnum.RAW;
         language = RequestDataTypeEnum.HTML;
+      } else {
+        navigation = RequestDatasetEnum.NONE;
       }
 
       await this.updateRequestState({
@@ -1039,7 +1042,6 @@ class RestExplorerViewModel {
 
     // Handle body based on Content-Type
     if (requestObject.data) {
-      debugger;
       if (contentType.startsWith("multipart/form-data")) {
         transformedObject.request!.selectedRequestBodyType =
           "multipart/form-data";

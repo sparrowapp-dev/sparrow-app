@@ -103,6 +103,7 @@
         key: "",
         value: "",
         checked: false,
+        type: "user-generated",
       });
       pairs = pairs;
     }

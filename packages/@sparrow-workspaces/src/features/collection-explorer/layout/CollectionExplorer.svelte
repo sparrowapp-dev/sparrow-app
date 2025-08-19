@@ -629,7 +629,7 @@
             {/if}
           </div>
 
-          {#if !isGuestUser && collection?.collectionType !== CollectionTypeBaseEnum.MOCK}
+          {#if !isGuestUser && collection?.collectionType !== CollectionTypeBaseEnum.MOCK && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
             <div style="margin-right: 8px;">
               <Tooltip
                 title={"Generate Variables"}
@@ -639,9 +639,9 @@
                 placement={"bottom-center"}
                 size="medium"
               >
-                {#if globalEnvInUse?.collectionName || userRole === WorkspaceRole.WORKSPACE_VIEWER}
+                {#if globalEnvInUse?.collectionName}
                   <Button
-                    disable={false}
+                    disable={true}
                     startIcon={SparkleFilled}
                     title={"Generate Variables"}
                     size="medium"
@@ -657,7 +657,7 @@
                 {:else}
                   <BorderAnimation disable={$borderAnimation}>
                     <Button
-                      disable={globalEnvInUse?.collectionName ? true : false}
+                      disable={false}
                       startIcon={SparkleFilled}
                       title={"Generate Variables"}
                       size="medium"

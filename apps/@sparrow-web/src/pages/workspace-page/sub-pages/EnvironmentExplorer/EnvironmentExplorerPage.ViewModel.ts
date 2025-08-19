@@ -284,7 +284,8 @@ export class EnvironmentExplorerViewModel {
         {
           key: "",
           value: "",
-          checked: true,
+          checked: false,
+          type: "user-generated",
         },
       ]);
       await this.updateEnvironmentAiVariableGenerationStatus("accepted");
@@ -293,26 +294,34 @@ export class EnvironmentExplorerViewModel {
       const progressiveTab = createDeepCopy(this._tab.getValue());
         const foundIndex =
           progressiveTab.property.environment.variable.findIndex(
-        (_, i) => i === index,
-      );
-      if (foundIndex !== -1) {
-        const foundObject =
-          progressiveTab.property.environment.variable[foundIndex];
-        const currentPairs =
-          progressiveTab.property?.environment?.aiVariable || [];
-        const updatedPairs = [...currentPairs];
-        if (updatedPairs.length > 0) {
-          updatedPairs.splice(updatedPairs.length - 1, 0, {
-            ...foundObject,
-            type: "user-generated",
-            lifespan: "long",
-          });
-        } else {
-          updatedPairs.push({
-            ...foundObject,
-            type: "user-generated",
-            lifespan: "long",
-          });
+            (_, i) => i === index,
+          );
+        if (foundIndex !== -1) {
+          const foundObject =
+            progressiveTab.property.environment.variable[foundIndex];
+          const currentPairs =
+            progressiveTab.property?.environment?.aiVariable || [];
+          const updatedPairs = [...currentPairs];
+          if (updatedPairs.length > 0) {
+            updatedPairs.splice(updatedPairs.length - 1, 0, {
+              ...foundObject,
+               type: "user-generated",
+               lifespan: "long",
+            });
+          } else {
+            updatedPairs.push({
+              ...foundObject,
+               type: "user-generated",
+               lifespan: "long",
+            });
+          }
+          const remainingVariables =
+            progressiveTab.property.environment.variable.filter(
+              (_, i) => i !== foundIndex,
+            );
+          await this.updateVariables(remainingVariables);
+          await this.updateGeneratedVariables(updatedPairs);
+          await this.updateEnvironmentAiVariableGenerationStatus("generated");
         }
         const remainingVariables =
           progressiveTab.property.environment.variable.filter(

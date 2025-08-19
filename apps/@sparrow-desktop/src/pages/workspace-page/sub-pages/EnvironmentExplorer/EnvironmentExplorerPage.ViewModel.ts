@@ -107,7 +107,7 @@ export class EnvironmentExplorerViewModel {
     let environmentServer = await this.environmentRepository.readEnvironment(
       progressiveTab.id,
     );
-
+    
     if (!environmentServer) {
       result = false;
     }
@@ -285,7 +285,8 @@ export class EnvironmentExplorerViewModel {
         {
           key: "",
           value: "",
-          checked: true,
+          checked: false,
+          type: "user-generated",
         },
       ]);
       await this.updateEnvironmentAiVariableGenerationStatus("accepted");
@@ -319,8 +320,8 @@ export class EnvironmentExplorerViewModel {
           progressiveTab.property.environment.variable.filter(
             (_, i) => i !== foundIndex,
           );
-        this.updateVariables(remainingVariables);
-        this.updateGeneratedVariables(updatedPairs);
+        await this.updateVariables(remainingVariables);
+        await this.updateGeneratedVariables(updatedPairs);
         await this.updateEnvironmentAiVariableGenerationStatus("generated");
       }
     }else if (type === "revert-all") {

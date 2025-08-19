@@ -503,6 +503,7 @@ class RestExplorerViewModel {
         isSaved: false,
       });
       progressiveTab.isSaved = false;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };
@@ -809,6 +810,8 @@ class RestExplorerViewModel {
       } else if (bodyType.includes("html")) {
         navigation = RequestDatasetEnum.RAW;
         language = RequestDataTypeEnum.HTML;
+      } else {
+        navigation = RequestDatasetEnum.NONE;
       }
 
       await this.updateRequestState({
