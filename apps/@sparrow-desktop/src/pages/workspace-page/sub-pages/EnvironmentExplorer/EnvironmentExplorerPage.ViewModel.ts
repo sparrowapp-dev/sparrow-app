@@ -182,7 +182,28 @@ export class EnvironmentExplorerViewModel {
     return constants.API_URL;
   };
 
-  public updateVariableSelection = async (type?: string, index?: number) => {
+  private updateUndoStatus(id: string, status: boolean) {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    let aiGeneratedVariables =
+      progressiveTab.property.environment.aiVariable || [];
+
+    aiGeneratedVariables = aiGeneratedVariables.map((v: any) => {
+      if (v.id === id) {
+        return {
+          ...v,
+          undo: status,
+        };
+      }
+      return v;
+    });
+
+    this.updateGeneratedVariables(aiGeneratedVariables);
+  }
+
+  public updateVariableSelection = async (
+    type?: string,
+    index?: number | string,
+  ) => {
     if (type === "regenerate") {
       await this.reGenerateVariables();
       return;
@@ -190,7 +211,6 @@ export class EnvironmentExplorerViewModel {
     if (type === "accept" && typeof index === "number") {
       try {
         const progressiveTab = createDeepCopy(this._tab.getValue());
-        progressiveTab;
         const foundIndex =
           progressiveTab.property.environment.aiVariable.findIndex(
             (_, i) => i === index,
@@ -198,18 +218,20 @@ export class EnvironmentExplorerViewModel {
         if (foundIndex !== -1) {
           const foundObject =
             progressiveTab.property.environment.aiVariable[foundIndex];
+          // ✅ Remove id and undo
+          const { id, undo, ...cleanedObject } = foundObject;
           const currentPairs =
             progressiveTab.property?.environment?.variable || [];
           const updatedPairs = [...currentPairs];
           if (updatedPairs.length > 0) {
             updatedPairs.splice(updatedPairs.length - 1, 0, {
-              ...foundObject,
+              ...cleanedObject,
               type: "ai-generated",
               lifespan: "short",
             });
           } else {
             updatedPairs.push({
-              ...foundObject,
+              ...cleanedObject,
               type: "ai-generated",
               lifespan: "short",
             });
@@ -220,7 +242,6 @@ export class EnvironmentExplorerViewModel {
             );
           this.updateGeneratedVariables(remainingGeneratedVariables);
           this.updateVariables(updatedPairs);
-          // console.log()
           if (!remainingGeneratedVariables?.length) {
             await this.updateEnvironmentAiVariableGenerationStatus("accepted");
           }
@@ -228,13 +249,22 @@ export class EnvironmentExplorerViewModel {
       } catch (error) {
         console.error("Error accepting generated variable:", error);
       }
-    } else if (type === "reject" && typeof index === "number") {
+    } else if (type === "undo" && typeof index === "string") {
+      this.updateUndoStatus(index, true);
+    } else if (type === "remove" && typeof index === "string") {
       const progressiveTab = createDeepCopy(this._tab.getValue());
-      const remainingGeneratedVariables =
-        progressiveTab.property.environment.aiVariable;
-      if (remainingGeneratedVariables?.length < 2)  {
+      let aiGeneratedVariables =
+        progressiveTab.property.environment.aiVariable || [];
+      if (aiGeneratedVariables?.length < 2) {
         await this.updateEnvironmentAiVariableGenerationStatus("rejected");
       }
+      // remove only the "undo" object with matching id
+      aiGeneratedVariables = aiGeneratedVariables.filter(
+        (v: any) => !(v.id === index && v.undo === true),
+      );
+      this.updateGeneratedVariables(aiGeneratedVariables);
+    } else if (type === "removeUndo" && typeof index === "string") {
+      this.updateUndoStatus(index, false);
     } else if (type === "accept-all") {
       const progressiveTab = createDeepCopy(this._tab.getValue());
       // Remove the last item from environment.variable
@@ -244,13 +274,18 @@ export class EnvironmentExplorerViewModel {
       ) {
         progressiveTab.property.environment.variable.pop();
       }
+      // Map aiVariable, removing id and undo
+      const sanitizedAiVariables =
+        progressiveTab.property.environment.aiVariable.map(
+          ({ id, undo, ...rest }) => ({
+            ...rest,
+            type: "ai-generated",
+            lifespan: "short",
+          }),
+        );
       await this.updateVariables([
         ...progressiveTab.property.environment.variable,
-        ...progressiveTab.property.environment.aiVariable.map((item) => ({
-          ...item,
-          type: "ai-generated",
-          lifespan: "short",
-        })),
+        ...sanitizedAiVariables,
         {
           key: "",
           value: "",
@@ -631,10 +666,15 @@ export class EnvironmentExplorerViewModel {
       if (response?.isSuccessful) {
         await this.updateEnvironmentAiVariableGenerationStatus("generated");
         const generatedData = response?.data?.data || [];
-        if (generatedData.length < 1) {
+        const updatedGeneratedData = generatedData.map((item: any) => ({
+          ...item,
+          id: crypto.randomUUID(),
+          undo: false,
+        }));
+        if (updatedGeneratedData.length < 1) {
           await this.updateEnvironmentAiVariableGenerationStatus("empty");
         }
-        await this.updateGeneratedVariables(generatedData);
+        await this.updateGeneratedVariables(updatedGeneratedData);
       } else {
         await this.updateEnvironmentAiVariableGenerationStatus("rejected");
         notifications.error("Failed to Generate Variables.");
@@ -661,10 +701,15 @@ export class EnvironmentExplorerViewModel {
     if (response?.isSuccessful) {
       await this.updateEnvironmentAiVariableGenerationStatus("generated");
       const generatedData = response?.data?.data || [];
-      if (generatedData.length < 1) {
+      const updatedGeneratedData = generatedData.map((item: any) => ({
+        ...item,
+        id: crypto.randomUUID(),
+        undo: false,
+      }));
+      if (updatedGeneratedData.length < 1) {
         await this.updateEnvironmentAiVariableGenerationStatus("empty");
       }
-      await this.updateGeneratedVariables(generatedData);
+      await this.updateGeneratedVariables(updatedGeneratedData);
     } else {
       await this.updateEnvironmentAiVariableGenerationStatus("rejected");
       notifications.error("Failed to Generate Variables.");
