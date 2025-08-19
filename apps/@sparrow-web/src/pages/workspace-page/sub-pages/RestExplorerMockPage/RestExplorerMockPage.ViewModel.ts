@@ -524,7 +524,6 @@ class RestExplorerMockViewModel {
         isSaved: false,
       });
       progressiveTab.isSaved = false;
-      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };
@@ -736,6 +735,7 @@ class RestExplorerMockViewModel {
       return;
     }
     progressiveTab.property.mockRequest.url = _url;
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     if (_effectQueryParams) {
@@ -757,6 +757,7 @@ class RestExplorerMockViewModel {
         data.mockRequestResponse.responseBody = _body;
       }
     });
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -777,6 +778,7 @@ class RestExplorerMockViewModel {
         data.mockRequestResponse.responseHeaders = _headers;
       }
     });
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -794,6 +796,7 @@ class RestExplorerMockViewModel {
         data.mockRequestResponse.responseStatus = _status;
       }
     });
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -806,6 +809,7 @@ class RestExplorerMockViewModel {
   private updateRequestPath = async (_path: Path) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.path = _path;
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -830,6 +834,7 @@ class RestExplorerMockViewModel {
   public updateRequestDescription = async (_description: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.description = _description;
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     try {
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
@@ -860,6 +865,7 @@ class RestExplorerMockViewModel {
   public updateRequestName = async (_name: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.name = _name;
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -874,6 +880,7 @@ class RestExplorerMockViewModel {
   public updateRequestAIPrompt = async (_prompt: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.mockRequest.ai.prompt = _prompt;
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
@@ -915,6 +922,7 @@ class RestExplorerMockViewModel {
   ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.mockRequest.ai.conversations = _conversations;
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
@@ -926,6 +934,7 @@ class RestExplorerMockViewModel {
   public updateRequestMethod = async (method: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.mockRequest.method = method;
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -938,6 +947,7 @@ class RestExplorerMockViewModel {
   public updateHeaders = async (_headers: KeyValueChecked[]) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.mockRequest.headers = _headers;
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -960,6 +970,7 @@ class RestExplorerMockViewModel {
       return;
     }
     progressiveTab.property.mockRequest.queryParams = _params;
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     if (_effectURL) {
@@ -989,6 +1000,7 @@ class RestExplorerMockViewModel {
   public updateAutoGeneratedHeaders = async (headers: KeyValueChecked[]) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.mockRequest.autoGeneratedHeaders = headers;
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
@@ -1084,6 +1096,7 @@ class RestExplorerMockViewModel {
       ...progressiveTab.property.mockRequest.auth,
       ..._auth,
     };
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.authHeader = new ReduceAuthHeader(
@@ -1107,6 +1120,7 @@ class RestExplorerMockViewModel {
       ...progressiveTab.property.mockRequest.body,
       ..._body,
     };
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -1119,6 +1133,7 @@ class RestExplorerMockViewModel {
   public updateResponse = async (_response: Response) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.response = _response;
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };

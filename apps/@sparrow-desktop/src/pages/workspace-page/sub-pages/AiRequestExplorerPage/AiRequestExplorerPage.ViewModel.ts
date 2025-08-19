@@ -190,7 +190,7 @@ class AiRequestExplorerViewModel {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         delete t.index;
-        t.persistence = TabPersistenceTypeEnum.PERMANENT;
+        // t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
 
         const collectionDoc = await this.fetchCollection(
@@ -449,6 +449,7 @@ class AiRequestExplorerViewModel {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
       });
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       progressiveTab.isSaved = false;
       this.tab = progressiveTab;
     }
