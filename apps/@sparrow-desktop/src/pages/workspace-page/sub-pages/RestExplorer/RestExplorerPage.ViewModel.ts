@@ -1093,14 +1093,19 @@ class RestExplorerViewModel {
           }));
       for (const { key, value } of headersArr) {
         // Add header to request
-        if (key.toLowerCase() !== "content-type") {
-          // Add header to request
-          transformedObject.request!.headers!.push({
-            key,
-            value,
-            checked: true,
-          });
+        if (
+          transformedObject.request!.selectedRequestBodyType ===
+            "multipart/form-data" &&
+          (key === "Content-Type" || key === "content-type")
+        ) {
+          // Skip Content-Type header for formdata
+          continue;
         }
+        transformedObject.request!.headers!.push({
+          key,
+          value,
+          checked: true,
+        });
 
         // Bearer token detection
         if (
