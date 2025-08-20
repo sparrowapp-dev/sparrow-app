@@ -70,6 +70,6 @@
   azureBlobCDN={constants.AZURE_CDN_URL}
   updateGeneratedVariables={_viewModel.updateGeneratedVariables}
   onUpdateVariableSelection={_viewModel.updateVariableSelection}
-  isWebApp={true}
+  isWebApp={false}
   handleRedirectToDocs={_viewModel.redirectDocsGenerateVariables}
 />

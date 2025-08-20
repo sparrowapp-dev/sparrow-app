@@ -12,7 +12,7 @@
     </div>
     <div class="d-flex flex-column text-block">
       <p class="text-center common-text title-text">
-        Sparrow AI is on the Job
+        Sparrow is on the Job
         <span class="dot-container">
           <span class="dot dot-1">.</span>
           <span class="dot dot-2">.</span>
