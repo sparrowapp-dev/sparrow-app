@@ -219,8 +219,20 @@ jobs:
               Write-Host "  $($_.FullName)"
           }
         shell: pwsh
-      
-      - name: msi zip sig
+
+      - name: MSI Old Signature
+        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi.sig
+
+      - name: Regenerate msi.sig after signing
+        run: |
+          $msiPath = "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi"
+          $msiFile = Get-ChildItem "$msiPath\*.msi" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if (-not $msiFile) { throw "No MSI file found to sign" }
+          # Regenerate signature using Tauri updater CLI with key and password
+          yarn tauri signer sign -k "$env:TAURI_SIGNING_PRIVATE_KEY" -p "$env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD" "$($msiFile.FullName)"
+        shell: pwsh
+
+      - name: MSI New Signature
         run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi.sig
 
       - name: Configure AWS credentials
