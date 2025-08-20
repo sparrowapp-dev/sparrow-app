@@ -434,8 +434,6 @@ export class EnvironmentExplorerViewModel {
             }
           }
           newObj[key] = updatedBody;
-        } else {
-          newObj[key] = replaceValues(value);
         }
       }
       return newObj;
