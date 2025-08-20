@@ -286,6 +286,7 @@ class GraphqlExplorerViewModel {
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
+        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = false;
       progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
