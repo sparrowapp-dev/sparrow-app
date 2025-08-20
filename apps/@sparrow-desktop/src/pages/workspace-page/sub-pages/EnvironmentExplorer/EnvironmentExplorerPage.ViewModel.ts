@@ -273,12 +273,21 @@ export class EnvironmentExplorerViewModel {
       ) {
         progressiveTab.property.environment.variable.pop();
       }
+
+      // Split aiVariables into undo:true and undo:false
+      const undoAiVariables =
+        progressiveTab.property.environment.aiVariable.filter(
+          (variable) => variable.undo === true,
+        );
+
       const sanitizedAiVariables =
-        progressiveTab.property.environment.aiVariable.map((variable) => ({
-          ...variable,
-          type: "ai-generated",
-          lifespan: "short",
-        }));
+        progressiveTab.property.environment.aiVariable
+          .filter((variable) => !variable.undo)
+          .map((variable) => ({
+            ...variable,
+            type: "ai-generated",
+            lifespan: "short",
+          }));
       await this.updateVariables([
         ...progressiveTab.property.environment.variable,
         ...sanitizedAiVariables,
@@ -289,8 +298,10 @@ export class EnvironmentExplorerViewModel {
           type: "user-generated",
         },
       ]);
-      await this.updateEnvironmentAiVariableGenerationStatus("accepted");
-      await this.updateGeneratedVariables([]);
+      if (undoAiVariables.length < 1) {
+        await this.updateEnvironmentAiVariableGenerationStatus("accepted");
+      }
+      await this.updateGeneratedVariables(undoAiVariables);
     } else if (type === "revert" && typeof index === "number") {
       const progressiveTab = createDeepCopy(this._tab.getValue());
         const foundIndex =
