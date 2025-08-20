@@ -339,7 +339,7 @@ jobs:
                   "body" = @(
                     @{
                       "type" = "TextBlock"
-                      "text" = "DO NOT TEST - Windows 2.28.1"
+                      "text" = "DO NOT TEST - Windows 2.28.3"
                       "weight" = "bolder"
                       "size" = "large"
                     }
@@ -412,9 +412,6 @@ jobs:
 
       - name: Increase Yarn network timeout
         run: yarn config set network-timeout 600000
-
-      # - name: Sync version across all files
-      #   run: yarn sync-version
 
       - name: Build Tauri App
         run: |
@@ -553,9 +550,6 @@ jobs:
 
       - name: Install project dependencies
         run: yarn
-
-      # - name: Sync version across all files
-      #   run: yarn sync-version
 
       - name: Update updater endpoint in tauri.conf.json file
         run: |
