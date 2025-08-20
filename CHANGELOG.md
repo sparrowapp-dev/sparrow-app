@@ -1,4 +1,4 @@
-# [2.29.0](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.28.3...v2.29.0) (2025-07-29)
+# [2.29.0](https://github.com/sparrowapp-dev/sparrow-app/compare/v2.28.0...v2.29.0) (2025-07-29)
 
 ### Bug Fixes
 
