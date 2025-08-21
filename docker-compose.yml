@@ -12,7 +12,7 @@ services:
 
   # Sparrow Api Server
   sparrow-api:
-    image: sparrowapi/sparrow-api:self-hostv1
+    image: sparrowapi/sparrow-api:self-host-v1
     container_name: sparrow-api
     env_file:
       - .env.docker-setup
@@ -37,14 +37,18 @@ services:
     command: >-
       sh -c "
         echo 'window.runtimeConfig = {
+          VITE_APP_EDITION: \"${VITE_APP_EDITION}\",
           VITE_API_URL: \"${VITE_API_URL}\",
+          VITE_SPARROW_WEB_URL: \"${VITE_SPARROW_WEB_URL}\",
           VITE_SPARROW_SUPPORT_EMAIL: \"${VITE_SPARROW_SUPPORT_EMAIL}\",
+          VITE_TERMS_OF_SERVICE: \"${VITE_TERMS_OF_SERVICE}\",
+          VITE_SPARROW_PRIVACY_POLICY: \"${VITE_SPARROW_PRIVACY_POLICY}\"
           VITE_SPARROW_OAUTH: \"${VITE_SPARROW_OAUTH}\",
           VITE_ENABLE_MIX_PANEL: \"${VITE_ENABLE_MIX_PANEL}\",
           VITE_MIX_PANEL_TOKEN: \"${VITE_MIX_PANEL_TOKEN}\",
-          VITE_TERMS_OF_SERVICE: \"${VITE_TERMS_OF_SERVICE}\",
-          VITE_SPARROW_WEB_URL: \"${VITE_SPARROW_WEB_URL}\",
-          VITE_SPARROW_PRIVACY_POLICY: \"${VITE_SPARROW_PRIVACY_POLICY}\"
+          VITE_SPARROW_MARKETING_URL: \"${VITE_SPARROW_MARKETING_URL}\",
+          VITE_CANNY_FEEDBACK_URL: \"${VITE_CANNY_FEEDBACK_URL}\",
+          VITE_SPARROW_CONTACT_SALES_URL: \"${VITE_SPARROW_CONTACT_SALES_URL}\"
         }' > /usr/share/nginx/html/runtime-config.js && nginx -g 'daemon off;'
       "
     env_file:
