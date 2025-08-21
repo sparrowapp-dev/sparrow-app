@@ -7,11 +7,15 @@ services:
       - "27017:27017"
     networks:
       - localnet
+    env_file:
+      - .env.docker-setup
 
   # Sparrow Api Server
   sparrow-api:
     image: sparrowapi/sparrow-api:self-hostv1
     container_name: sparrow-api
+    env_file:
+      - .env.docker-setup
     networks:
       - localnet
     depends_on:
@@ -43,6 +47,8 @@ services:
           VITE_SPARROW_PRIVACY_POLICY: \"${VITE_SPARROW_PRIVACY_POLICY}\"
         }' > /usr/share/nginx/html/runtime-config.js && nginx -g 'daemon off;'
       "
+    env_file:
+      - .env.docker-setup
 
   # Sparrow Proxy Service
   sparrow-proxy:
@@ -87,6 +93,7 @@ services:
         VITE_WEB_ENABLE_MIX_PANEL: ${VITE_WEB_ENABLE_MIX_PANEL}
         VITE_WEB_MIX_PANEL_TOKEN: ${VITE_WEB_MIX_PANEL_TOKEN}
         VITE_WEB_SPARROW_SUPPORT_EMAIL: ${VITE_WEB_SPARROW_SUPPORT_EMAIL}
+    container_name: sparrow-web
     networks:
       - localnet
     depends_on:
@@ -96,6 +103,8 @@ services:
       - mongo
     ports:
       - 1422:1422
+    env_file:
+      - .env.docker-setup
 
   # Sparrow Admin Service
   sparrow-admin:
@@ -128,10 +137,6 @@ services:
   #     - sparrow-auth
   #     - sparrow-web
   #   restart: always
-
-volumes:
-  sparrow_data:
-    driver: local
 
 networks:
   localnet:
