@@ -638,6 +638,7 @@
                   : "Use AI to quickly generate env variables by analyzing every API request in your collection."}
                 placement={"bottom-center"}
                 size="medium"
+                zIndex={1000}
               >
                 {#if globalEnvInUse?.collectionName}
                   <Button

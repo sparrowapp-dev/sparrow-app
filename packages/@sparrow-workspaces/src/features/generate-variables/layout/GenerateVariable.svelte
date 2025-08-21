@@ -4,6 +4,7 @@
   import GenerateVariablesLoading from "../components/GenerateVariablesLoading.svelte";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import { ChevronDownRegular, ChevronUpRegular } from "@sparrow/library/icons";
+  import { navigate } from "svelte-navigator";
   export let currentEnvironment: any;
   export let generatedVariables: KeyValuePair[] = [];
   export let updateGeneratedVariables;
@@ -189,7 +190,7 @@
               onClick={toggleMoreInfo}
               title="More Info"
               size="small"
-              endIcon={showMoreInfo ? ChevronDownRegular : ChevronUpRegular}
+              endIcon={showMoreInfo ? ChevronUpRegular : ChevronDownRegular}
             />
           </p>
           {#if showMoreInfo}
@@ -230,6 +231,9 @@
                     to hear from you.
                     <a
                       style="color: var(--text-ds-primary-300); cursor: pointer; text-decoration: underline;"
+                      on:click={() => {
+                        navigate("/app/help");
+                      }}
                     >
                       Help Us Improve
                     </a>
