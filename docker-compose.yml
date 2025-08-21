@@ -5,8 +5,6 @@ services:
     container_name: sparrow-mongo
     ports:
       - "27017:27017"
-    env_file:
-      - .env.docker-setup
     networks:
       - localnet
 
@@ -18,8 +16,6 @@ services:
       - localnet
     depends_on:
       - mongo
-    env_file:
-      - .env.docker-setup
     ports:
       - "9000:9000"
 
@@ -32,8 +28,6 @@ services:
     depends_on:
       - sparrow-api
       - mongo
-    env_file:
-      - .env.docker-setup
     ports:
       - "1421:1421"
     command: >-
@@ -93,8 +87,6 @@ services:
         VITE_WEB_ENABLE_MIX_PANEL: ${VITE_WEB_ENABLE_MIX_PANEL}
         VITE_WEB_MIX_PANEL_TOKEN: ${VITE_WEB_MIX_PANEL_TOKEN}
         VITE_WEB_SPARROW_SUPPORT_EMAIL: ${VITE_WEB_SPARROW_SUPPORT_EMAIL}
-    env_file:
-      - .env.docker-setup
     networks:
       - localnet
     depends_on:
@@ -115,8 +107,6 @@ services:
       - sparrow-api
       - sparrow-auth
       - mongo
-    env_file:
-      - .env.docker-setup
     ports:
       - 5173:5173
 
