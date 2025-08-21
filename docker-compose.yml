@@ -33,7 +33,7 @@ services:
       - sparrow-api
       - mongo
     ports:
-      - "1421:1421"
+      - "1421:80"
     command: >-
       sh -c "
         echo 'window.runtimeConfig = {
@@ -102,7 +102,7 @@ services:
       - sparrow-auth
       - mongo
     ports:
-      - 1422:1422
+      - 1422:80
     env_file:
       - .env.docker-setup
 
@@ -117,7 +117,7 @@ services:
       - sparrow-auth
       - mongo
     ports:
-      - 5173:5173
+      - 5173:80
 
   # Nginx Reverse Proxy with SSL
   # nginx-proxy:
