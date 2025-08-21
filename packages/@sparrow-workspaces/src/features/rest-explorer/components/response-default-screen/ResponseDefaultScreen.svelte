@@ -1,6 +1,6 @@
 <script lang="ts">
   import { ComboText } from "@sparrow/workspaces/components";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { SparrowLogo } from "@sparrow/common/images";
   import { OSDetector } from "@sparrow/common/utils";
   import { Button } from "@sparrow/library/ui";
@@ -12,26 +12,33 @@
 
   let ctrlCommands: { [key: string]: string } = {};
   let altCommands: { [key: string]: string } = {};
-
+  let shortcutEl: HTMLDivElement | null = null;
+  let originalWidth = 0;
   const osDetector = new OSDetector();
 
   const slowCurve = (t: number) => {
     return 1 - Math.pow(1 - t, 3);
   };
 
-  // Animation state management
-  let animatingElements = new Set();
-
   const animateExistingShortcuts = (expanding) => {
     const existingShortcuts = document.querySelectorAll(".existing-shortcut");
     existingShortcuts.forEach((element, index) => {
       const delay = expanding
-        ? index * 30
-        : (existingShortcuts.length - 1 - index) * 30;
-      const targetX = expanding ? -25 : 0;
+        ? 0
+        : isUpAnimation
+          ? 100
+          : (existingShortcuts.length - 1 - index) * 100;
+
+      // Use y animation when isUpAnimation is true, x animation otherwise
+      const targetX = expanding ? (isUpAnimation ? 0 : -20) : 0;
+      const targetY = expanding ? (isUpAnimation ? -20 : 0) : 0;
 
       setTimeout(() => {
-        element.style.transform = `translateX(${targetX}px)`;
+        if (isUpAnimation) {
+          element.style.transform = `translateY(${targetY}px)`;
+        } else {
+          element.style.transform = `translateX(${targetX}px)`;
+        }
       }, delay);
     });
   };
@@ -39,7 +46,9 @@
   $: if (typeof window !== "undefined") {
     setTimeout(() => animateExistingShortcuts(isExpandShortcuts), 0);
   }
-
+  let width = 0;
+  let isUpAnimation = false;
+  let observer: ResizeObserver;
   onMount(async () => {
     platformName = osDetector.getOS();
 
@@ -58,11 +67,24 @@
       "Add Header": [`${altKey}`, "H"],
       "Edit Body": [`${altKey}`, "B"],
     };
+    if (shortcutEl) {
+      observer = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          width = entry.contentRect.width;
+        }
+      });
+      observer.observe(shortcutEl);
+    }
+  });
+  onDestroy(() => {
+    observer?.disconnect();
   });
   let isExpandShortcuts = false;
+  $: isUpAnimation = width < 932;
 </script>
 
 <div
+  bind:this={shortcutEl}
   class="{isMainScreen
     ? 'pt-5 pb-3'
     : ''} response-default h-100 d-flex flex-column justify-content-between align-items-center"
@@ -82,11 +104,15 @@
   <div>
     <div
       class="shortcuts-container d-flex flex-wrap justify-content-center mt-auto"
+      style={isUpAnimation ? "max-width: 600px;" : ""}
+      bind:this={shortcutEl}
     >
       {#each Object.entries(ctrlCommands) as [key, value], index}
         {#if key === "Save Request" || key === "New Request" || key === "Send Request"}
           <div
-            class="px-3 flex items-center shortcut-item existing-shortcut"
+            class="px-3 flex items-center shortcut-item existing-shortcut {isUpAnimation
+              ? 'up-animation'
+              : ''}"
             data-index={index}
           >
             <ComboText {key} {value} type="combo" bind:isExpandShortcuts />
@@ -94,7 +120,12 @@
         {/if}
       {/each}
 
-      <div class="px-3 shortcut-item existing-shortcut" data-index="3">
+      <div
+        class="px-3 shortcut-item existing-shortcut {isUpAnimation
+          ? 'up-animation'
+          : ''}"
+        data-index="3"
+      >
         <ComboText
           key="Add Parameter"
           value={altCommands["Add Parameter"]}
@@ -109,15 +140,13 @@
             <div
               class="px-3 shortcut-item new-shortcut"
               in:fly={{
-                x: 80,
+                ...(isUpAnimation ? { y: 80 } : { x: 80 }),
                 duration: 500,
-                delay: 150 + index * 100,
                 easing: slowCurve,
               }}
               out:fly={{
-                x: 80,
+                ...(isUpAnimation ? { y: 80 } : { x: 80 }),
                 duration: 400,
-                delay: (2 - index) * 60,
                 easing: slowCurve,
               }}
             >
@@ -170,11 +199,14 @@
     will-change: transform;
   }
 
+  .existing-shortcut.up-animation {
+    transform: translateY(0);
+  }
+
   .new-shortcut {
     will-change: transform;
   }
 
-  /* Ensure smooth transitions without conflicts */
   .shortcut-item {
     position: relative;
     backface-visibility: hidden;
