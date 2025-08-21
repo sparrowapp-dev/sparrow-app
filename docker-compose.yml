@@ -1,63 +1,35 @@
-version: '3'
-
 services:
   # MongoDB
   mongo:
     image: mongo:7.0
+    container_name: sparrow-mongo
     ports:
       - "27017:27017"
-    env_file:
-      - .env.docker-setup
-    networks:
-      - localnet
-
-  # Kafka
-  kafka:
-    image: bitnami/kafka:3.4.1
-    hostname: kafka
-    ports:
-      - "9092:9092" # Broker listener
-      - "9093:9093" # Controller listener
-      - "9094:9094" # External listener
-    volumes:
-      - "kafka_data:/bitnami"
-    env_file:
-      - .env.docker-setup
     networks:
       - localnet
 
   # Sparrow Api Server
   sparrow-api:
-    image: sparrowapi/sparrow-api:7
-    # Don't expose ports directly, as they'll be proxied through nginx
-    # ports:
-    #   - "9000:9000"
-    #   - "9001:9001"
-    #   - "9002:9002"
+    image: sparrowapi/sparrow-api:self-hostv1
+    container_name: sparrow-api
     networks:
       - localnet
     depends_on:
       - mongo
-      - kafka
-    env_file:
-      - .env.docker-setup
+    ports:
+      - "9000:9000"
 
   # Sparrow Auth Server
   sparrow-auth:
-    build:
-      context: https://github.com/sparrowapp-dev/sparrow-app-auth.git
-      dockerfile: Dockerfile
-    # Don't expose port directly
-    # ports:
-    #   - "1421:80"
+    image: sparrowapi/sparrow-auth:self-host-v1
+    container_name: sparrow-auth
     networks:
       - localnet
     depends_on:
       - sparrow-api
       - mongo
-      - kafka
-    env_file:
-      - .env.docker-setup
+    ports:
+      - "1421:1421"
     command: >-
       sh -c "
         echo 'window.runtimeConfig = {
@@ -74,14 +46,12 @@ services:
 
   # Sparrow Proxy Service
   sparrow-proxy:
-    build:
-      context: https://github.com/sparrowapp-dev/sparrow-proxy-service.git
-      dockerfile: Dockerfile
-    # Don't expose port directly
-    # ports:
-    #   - "3000:3000"
+    image: sparrowapi/sparrow-proxy-service:self-host-v1
+    container_name: sparrow-proxy
     networks:
       - localnet
+    ports:
+      - 3000:3000
 
   # Sparrow Web App
   sparrow-web:
@@ -89,25 +59,34 @@ services:
       context: .
       dockerfile: Sparrow-Web.Dockerfile
       args:
-        VITE_WEB_API_TIMEOUT: 5000
+        VITE_WEB_BASE_URL: ${VITE_WEB_BASE_URL}
         VITE_WEB_API_URL: ${VITE_WEB_API_URL}
         VITE_WEB_AUTH_URL: ${VITE_WEB_AUTH_URL}
+        VITE_WEB_SPARROW_ADMIN_URL: ${VITE_WEB_SPARROW_ADMIN_URL}
         VITE_WEB_SOCKET_IO_API_URL: ${VITE_WEB_SOCKET_IO_API_URL}
         VITE_WEB_SPARROW_OAUTH: ${VITE_WEB_SPARROW_OAUTH}
-        VITE_WEB_TERMS_OF_SERVICE: https://example.dev/termsandconditions
-        VITE_WEB_BASE_URL: ${VITE_WEB_BASE_URL}
-        VITE_WEB_SPARROW_GITHUB: https://github.com/sparrowapp-dev
-        VITE_WEB_SPARROW_LINKEDIN: https://www.linkedin.com/showcase/sparrow-app/
-        VITE_WEB_SPARROW_DOWNLOAD_LINK: https://github.com/sparrowapp-dev/sparrow-app/releases
-        VITE_WEB_RELEASE_NOTES_API: https://api.github.com/repos/sparrowapp-dev/sparrow-app/releases
-        VITE_WEB_SPARROW_DOCS: https://docs.sparrowapp.dev/docs/intro
         VITE_WEB_PROXY_SERVICE: ${VITE_WEB_PROXY_SERVICE}
-        VITE_WEB_ENABLE_MIX_PANEL: false
-        VITE_WEB_MIX_PANEL_TOKEN:
         VITE_WEB_SPARROW_AI_WEBSOCKET: ${VITE_WEB_SPARROW_AI_WEBSOCKET}
-    # Don't expose port directly
-    # ports:
-    #   - "1422:80"
+        VITE_WEB_AZURE_CDN_URL: ${VITE_WEB_AZURE_CDN_URL}
+        VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING: ${VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING}
+        VITE_WEB_MARKETING_URL: ${VITE_WEB_MARKETING_URL}
+        VITE_WEB_SENTRY_DSN: ${VITE_WEB_SENTRY_DSN}
+        VITE_WEB_APP_ENVIRONMENT: ${VITE_WEB_APP_ENVIRONMENT}
+        VITE_WEB_POSTHOG_CONNECTION_API_KEY: ${VITE_WEB_POSTHOG_CONNECTION_API_KEY}
+        VITE_WEB_POSTHOG_API_URL: ${VITE_WEB_POSTHOG_API_URL}
+        VITE_WEB_RELEASE_NOTES_PAT_TOKEN: ${VITE_WEB_RELEASE_NOTES_PAT_TOKEN}
+        VITE_WEB_CANNY_URL: ${VITE_WEB_CANNY_URL}
+        VITE_WEB_CANNY_API: ${VITE_WEB_CANNY_API}
+        VITE_WEB_API_TIMEOUT: ${VITE_WEB_API_TIMEOUT}
+        VITE_WEB_SPARROW_GITHUB: ${VITE_WEB_SPARROW_GITHUB}
+        VITE_WEB_SPARROW_LINKEDIN: ${VITE_WEB_SPARROW_LINKEDIN}
+        VITE_WEB_SPARROW_DOWNLOAD_LINK: ${VITE_WEB_SPARROW_DOWNLOAD_LINK}
+        VITE_WEB_RELEASE_NOTES_API: ${VITE_WEB_RELEASE_NOTES_API}
+        VITE_WEB_SPARROW_DOCS: ${VITE_WEB_SPARROW_DOCS}
+        VITE_WEB_TERMS_OF_SERVICE: ${VITE_WEB_TERMS_OF_SERVICE}
+        VITE_WEB_ENABLE_MIX_PANEL: ${VITE_WEB_ENABLE_MIX_PANEL}
+        VITE_WEB_MIX_PANEL_TOKEN: ${VITE_WEB_MIX_PANEL_TOKEN}
+        VITE_WEB_SPARROW_SUPPORT_EMAIL: ${VITE_WEB_SPARROW_SUPPORT_EMAIL}
     networks:
       - localnet
     depends_on:
@@ -115,29 +94,43 @@ services:
       - sparrow-api
       - sparrow-auth
       - mongo
-      - kafka
-
-  # Nginx Reverse Proxy with SSL
-  nginx-proxy:
-    image: nginx:alpine
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/ssl:/etc/nginx/ssl
-      - ./nginx/html:/usr/share/nginx/html
-      - ./nginx/logs:/var/log/nginx
+      - 1422:1422
+
+  # Sparrow Admin Service
+  sparrow-admin:
+    image: sparrowapi/sparrow-admin-app:self-host-v1
+    container_name: sparrow-admin
     networks:
       - localnet
     depends_on:
       - sparrow-api
       - sparrow-auth
-      - sparrow-web
-    restart: always
+      - mongo
+    ports:
+      - 5173:5173
+
+  # Nginx Reverse Proxy with SSL
+  # nginx-proxy:
+  #   image: nginx:alpine
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx/conf.d:/etc/nginx/conf.d
+  #     - ./nginx/ssl:/etc/nginx/ssl
+  #     - ./nginx/html:/usr/share/nginx/html
+  #     - ./nginx/logs:/var/log/nginx
+  #   networks:
+  #     - localnet
+  #   depends_on:
+  #     - sparrow-api
+  #     - sparrow-auth
+  #     - sparrow-web
+  #   restart: always
 
 volumes:
-  kafka_data:
+  sparrow_data:
     driver: local
 
 networks:
