@@ -102,6 +102,7 @@
   } from "../utils";
 
   import { policyConfig } from "@sparrow/common/store";
+  import GenerateVariableCard from "../components/generate-variable-card/GenerateVariableCard.svelte";
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
   export let requestAuthHeader: Observable<KeyValue>;
@@ -131,6 +132,7 @@
   export let environmentVariables;
   export let isGuestUser = false;
   export let onOpenCollection;
+  export let updateIsGeneratedVariable: (value: boolean) => {};
 
   export let onGenerateAiResponse;
   export let onToggleLike;
@@ -764,7 +766,7 @@
                       : 'ps-2'}"
                   >
                     <div class="h-100 d-flex flex-column">
-                      <div style="flex:1; overflow:auto;">
+                      <div style="flex:1; overflow:auto; position:relative;">
                         {#if storeData?.isSendRequestInProgress}
                           <ResponseDefaultScreen {isWebApp} />
                           <div
@@ -858,6 +860,19 @@
                                 </div>
                               {/if}
                             </div>
+                          </div>
+                        {/if}
+                        {#if $tab?.property?.request?.isGeneratedVariable}
+                          <div
+                            style="position:absolute; bottom:12px; right:{!$tab
+                              ?.property?.request?.state?.isChatbotActive
+                              ? '50px'
+                              : '0px'}; z-index:10;"
+                          >
+                            <GenerateVariableCard
+                              onClose={async () =>
+                                await updateIsGeneratedVariable(false)}
+                            />
                           </div>
                         {/if}
                       </div>

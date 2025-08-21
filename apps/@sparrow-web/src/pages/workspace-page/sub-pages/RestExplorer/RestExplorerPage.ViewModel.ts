@@ -3801,6 +3801,26 @@ class RestExplorerViewModel {
       }
     }
   };
+
+  /**
+   * updates the property of isGeneratedVariable in all .
+   */
+  public updateIsGeneratedVariable = async (value: boolean) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const tabs = await this.tabRepository.getTabsByCollectionId(
+      progressiveTab?.path?.collectionId,
+    );
+    const updatedTabs = tabs.map((tab: any) => {
+      const newTab = createDeepCopy(tab._data ?? tab);
+      if (newTab?.property?.request) {
+        newTab.property.request.isGeneratedVariable = value;
+      }
+      return newTab;
+    });
+    progressiveTab.property.request.isGeneratedVariable = value;
+    this.tab = progressiveTab;
+    await this.tabRepository.bulkUpsertTabs(updatedTabs);
+  };
 }
 
 export default RestExplorerViewModel;
