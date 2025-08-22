@@ -26,9 +26,9 @@ const constants = {
     .VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING,
   BASE_URL: import.meta.env.VITE_WEB_BASE_URL,
   MARKETING_URL: import.meta.env.VITE_WEB_MARKETING_URL,
-  INTRO_DOCS_URL: import.meta.env.VITE_WEB_SPARROW_DOCS + "/docs/intro",
+  INTRO_DOCS_URL: import.meta.env.VITE_WEB_SPARROW_DOCS + "/docs/user-manual/application/introduction/introduction-to-sparrow",
   TESTFLOW_DOCS_URL:
-    import.meta.env.VITE_WEB_SPARROW_DOCS + "/docs/usermanual/testflows",
+    import.meta.env.VITE_WEB_SPARROW_DOCS + "/docs/user-manual/application/workspace-features/testflows",
   PROXY_SERVICE: import.meta.env.VITE_WEB_PROXY_SERVICE,
   SOCKET_IO_API_URL: import.meta.env.VITE_WEB_SOCKET_IO_API_URL,
   APP_ENVIRONMENT_PATH: import.meta.env.VITE_WEB_APP_ENVIRONMENT_PATH,

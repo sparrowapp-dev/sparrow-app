@@ -71,7 +71,10 @@
         <div
           class="sparrow-choose-file-input-button d-flex justify-content-center my-4"
         >
-          <span style="color: var(--text-ds-neutral-200); text-ds-font-weight-regular text-ds-line-height-143">Drag & drop or</span>
+          <span
+            style="color: var(--text-ds-neutral-200); text-ds-font-weight-regular text-ds-line-height-143"
+            >Drag & drop or</span
+          >
           <label
             for={inputId}
             class="sparrow-choose-file-label ps-2"
@@ -181,12 +184,16 @@
   .sparrow-input-label {
     font-size: var(--base-text);
   }
-  .sparrow-text-input-container:hover {
-    border: 1px dashed var(--border-ds-neutral-300);
+  .sparrow-text-input-container {
+    border: 2px dashed transparent;
     border-radius: 5px;
+    transition: border-color 0.2s;
+  }
+  .sparrow-text-input-container:hover {
+    border-color: var(--border-ds-neutral-300);
   }
   .sparrow-text-input-container:active {
-    border: 2px dashed var(--border-ds-primary-300);
+    border-color: var(--border-ds-primary-300);
   }
   .sparrow-input-required {
     color: var(--dangerColor);

@@ -586,6 +586,7 @@
         _viewModel.fetchCollections(workspaceId),
         _viewModel2.refreshEnvironment(workspaceId),
         _viewModel3.refreshTestflow(workspaceId),
+        _viewModel.fetchWorkspace(workspaceId),
       ]);
       await tick();
       const collectionTabsToBeDeleted =
@@ -936,6 +937,7 @@
                           tab={$activeTab}
                           onSyncCollection={handleSyncCollection}
                           onMockCollectionModelOpen={handleMockCollectionModel}
+                          {isGuestUser}
                         />
                       </div>
                     </Motion>

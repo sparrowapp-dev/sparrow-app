@@ -134,7 +134,7 @@
       <CodeMirrorInput
         value={requestUrl}
         onUpdateInput={onUpdateRequestUrl}
-        placeholder={"Enter a URL"}
+        placeholder={"Enter a URL or paste a cURL command"}
         {theme}
         {onUpdateEnvironment}
         {environmentVariables}

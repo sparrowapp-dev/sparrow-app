@@ -318,7 +318,7 @@
   };
 
   const handleRedirectToAdmin = async () => {
-    await handleRedirectAdminPanel();
+    await handleRedirectAdminPanel({ toWorkspace: true });
   };
 
   const handleRequestOwner = async () => {

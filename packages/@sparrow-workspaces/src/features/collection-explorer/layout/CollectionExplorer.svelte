@@ -49,6 +49,8 @@
   export let onUpdateEnvironment;
   export let onSyncCollection;
   export let isSharedWorkspace = false;
+  export let globalEnvInUse = null;
+  export let isGuestUser = false;
 
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
 
@@ -85,6 +87,7 @@
     Options,
     Tag,
     Tooltip,
+    BorderAnimation,
   } from "@sparrow/library/ui";
   import {
     AddRegular,
@@ -118,6 +121,8 @@
   } from "@sparrow/common/types/workspace/collection-base";
   import { getMethodStyle } from "@sparrow/common/utils";
   import { WorkspaceRole, WorkspaceType } from "@sparrow/common/enums";
+  import { SparkleFilled } from "@sparrow/common/icons";
+  import { borderAnimation } from "@sparrow/common/store";
 
   /**
    * Role of user in active workspace
@@ -131,6 +136,8 @@
   export let onCreateAuthProfile;
   export let onUpdateAuthProfile;
   export let onDeleteAuthProfile;
+  export let onGenerateVariables;
+  export let globalEnvironment;
 
   /**
    * Local variables
@@ -602,6 +609,75 @@
             </div>
           {/if}
 
+          <!-- Show save button only for overview tab, not for collection auth -->
+          <div style="margin-right: 8px;">
+            {#if $tab?.property?.collection?.state?.collectionNavigation !== CollectionNavigationTabEnum.AUTH_PROFILES}
+              <Button
+                disable={$tab?.isSaved || !isCollectionEditable
+                  ? true
+                  : false || isSharedWorkspace}
+                startIcon={SaveRegular}
+                type={"secondary"}
+                size="medium"
+                onClick={() => {
+                  onSaveCollection();
+                  handlecollection_collection_saved({
+                    name: "Collection Saved",
+                  });
+                }}
+              />
+            {/if}
+          </div>
+
+          {#if !isGuestUser && collection?.collectionType !== CollectionTypeBaseEnum.MOCK && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+            <div style="margin-right: 8px;">
+              <Tooltip
+                title={"Generate Variables"}
+                subtext={globalEnvInUse?.collectionName
+                  ? `You're already generating variables for "${globalEnvInUse?.collectionName}"  collection. Please finish or close that task before starting another.`
+                  : "Use AI to quickly generate env variables by analyzing every API request in your collection."}
+                placement={"bottom-center"}
+                size="medium"
+                zIndex={1000}
+              >
+                {#if globalEnvInUse?.collectionName}
+                  <Button
+                    disable={true}
+                    startIcon={SparkleFilled}
+                    title={"Generate Variables"}
+                    size="medium"
+                    type={"secondary"}
+                    onClick={async () => {
+                      onGenerateVariables(
+                        collection?.id,
+                        globalEnvironment,
+                        collection?.name,
+                      );
+                    }}
+                  />
+                {:else}
+                  <BorderAnimation disable={$borderAnimation}>
+                    <Button
+                      disable={false}
+                      startIcon={SparkleFilled}
+                      title={"Generate Variables"}
+                      size="medium"
+                      type={"secondary"}
+                      onClick={async () => {
+                        onGenerateVariables(
+                          collection?.id,
+                          globalEnvironment,
+                          collection?.name,
+                        );
+                        borderAnimation.set(true);
+                      }}
+                    />
+                  </BorderAnimation>
+                {/if}
+              </Tooltip>
+            </div>
+          {/if}
+
           <div
             class="d-flex me-2 flex-column justify-content-center"
             bind:this={collectionTabButtonWrapper}
@@ -633,21 +709,6 @@
               />
             </Dropdown>
           </div>
-
-          <!-- Show save button only for overview tab, not for collection auth -->
-          {#if $tab?.property?.collection?.state?.collectionNavigation !== CollectionNavigationTabEnum.AUTH_PROFILES}
-            <Button
-              disable={$tab?.isSaved || !isCollectionEditable
-                ? true
-                : false || isSharedWorkspace}
-              startIcon={SaveRegular}
-              type={"secondary"}
-              onClick={() => {
-                onSaveCollection();
-                handlecollection_collection_saved({ name: "Collection Saved" });
-              }}
-            />
-          {/if}
         </div>
       {/if}
     </div>
@@ -710,36 +771,32 @@
               API.
             </p>
           </div>
-          {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
-            <div class="d-flex gap-2 align-items-center">
-              <div class="d-flex justify-content-center">
-                <Tag
-                  size="medium"
-                  type={collection?.isMockCollectionRunning ? "green" : "grey"}
-                  text={collection?.isMockCollectionRunning
-                    ? "Running"
-                    : "Inactive"}
-                />
-              </div>
-              <Button
-                size="small"
-                type={collection?.isMockCollectionRunning
-                  ? "danger"
-                  : "primary"}
-                title={collection?.isMockCollectionRunning
-                  ? "Stop Mock"
-                  : "Run Mock"}
-                onClick={() => {
-                  mockRunningStatus();
-                }}
-                startIcon={collection?.isMockCollectionRunning
-                  ? RecordStopRegular
-                  : PlayCircleRegular}
-                disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
-                  isSharedWorkspace}
+          <div class="d-flex gap-2 align-items-center">
+            <div class="d-flex justify-content-center">
+              <Tag
+                size="medium"
+                type={collection?.isMockCollectionRunning ? "green" : "grey"}
+                text={collection?.isMockCollectionRunning
+                  ? "Running"
+                  : "Inactive"}
               />
             </div>
-          {/if}
+            <Button
+              size="small"
+              type={collection?.isMockCollectionRunning ? "danger" : "primary"}
+              title={collection?.isMockCollectionRunning
+                ? "Stop Mock"
+                : "Run Mock"}
+              onClick={() => {
+                mockRunningStatus();
+              }}
+              startIcon={collection?.isMockCollectionRunning
+                ? RecordStopRegular
+                : PlayCircleRegular}
+              disable={userRole === WorkspaceRole.WORKSPACE_VIEWER ||
+                isSharedWorkspace}
+            />
+          </div>
         </div>
         <div class="d-flex">
           <div
