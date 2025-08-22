@@ -1122,6 +1122,7 @@ class GraphqlExplorerViewModel {
       );
       const responseBody = response.data.body;
       const parsedResponse = JSON.parse(responseBody);
+      debugger;
       this.transformSchema(parsedResponse.data)
         .then(async (formattedSchema) => {
           let previousSchema;

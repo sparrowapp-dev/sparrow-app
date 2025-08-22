@@ -8,4 +8,4 @@ export const appInsights = new ApplicationInsights({
     disableFetchTracking: true,
   },
 });
-appInsights.loadAppInsights();
+appInsights?.loadAppInsights();

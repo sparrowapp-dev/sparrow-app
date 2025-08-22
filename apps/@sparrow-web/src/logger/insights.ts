@@ -10,7 +10,7 @@ if (constants.AZURE_INSIGHTS_CONNECTION_STRING) {
       disableFetchTracking: true,
     },
   });
-  appInsights.loadAppInsights();
+  appInsights?.loadAppInsights();
 } else {
   console.warn(
     "Azure Application Insights is not configured. Skipping initialization.",
