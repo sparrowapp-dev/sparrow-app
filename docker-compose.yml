@@ -39,7 +39,7 @@ services:
 
   # Sparrow Proxy Service
   sparrow-proxy:
-    image: sparrowapi/sparrow-proxy-service:self-host-v1
+    image: sparrowapi/sparrow-proxy:self-host-v1
     container_name: sparrow-proxy
     networks:
       - localnet
@@ -95,7 +95,7 @@ services:
 
   # Sparrow Admin Service
   sparrow-admin:
-    image: sparrowapi/sparrow-admin-app:self-host-v1
+    image: sparrowapi/sparrow-admin:self-host-v1
     container_name: sparrow-admin
     networks:
       - localnet
