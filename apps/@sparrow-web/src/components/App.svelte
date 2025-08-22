@@ -8,9 +8,11 @@
   import { onMount } from "svelte";
   import { handleLogin } from "./App";
   import { initPostHog } from "@app/utils/posthog/posthogConfig";
+  import constants from "src/constants/constants";
   export let url = "/";
 
   onMount(async () => {
+    console.log("constants===============", constants);
     if (typeof window !== "undefined") {
       initPostHog();
     }
