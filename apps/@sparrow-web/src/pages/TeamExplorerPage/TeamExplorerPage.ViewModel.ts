@@ -961,9 +961,8 @@ export class TeamExplorerPageViewModel {
           _invitedUserCount === 1 ? "person" : "people"
         } for ${_workspaceName}.`,
       );
-    }
-    else{
-        if (response?.message === "Plan limit reached") {
+    } else {
+      if (response?.message === "Plan limit reached") {
         // notifications.error("Failed to send invite. please upgrade your plan.");
       } else {
         notifications.error(
@@ -1086,10 +1085,15 @@ export class TeamExplorerPageViewModel {
   };
 
   public handleRedirectToAdminPanel = async (teamId: string) => {
-    window.open(
-      constants.ADMIN_URL + `/billing/billingOverview/${teamId}`,
-      "_blank",
-    );
+    if (constants.APP_EDITION !== "SELFHOSTED") {
+      window.open(
+        constants.ADMIN_URL + `/billing/billingOverview/${teamId}`,
+        "_blank",
+      );
+    } else {
+      window.open(constants.ADMIN_URL, "_blank");
+    }
+
     return;
   };
 
