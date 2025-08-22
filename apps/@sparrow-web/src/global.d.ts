@@ -16,8 +16,6 @@ interface Window {
     VITE_WEB_POSTHOG_API_URL?: string;
     VITE_WEB_API_TIMEOUT?: string;
     VITE_WEB_AUTH_URL?: string;
-    VITE_WEB_GITHUB?: string;
-    VITE_WEB_LINKEDIN?: string;
     VITE_WEB_DOWNLOAD_LINK?: string;
     VITE_WEB_RELEASE_NOTES_PAT_TOKEN?: string;
     VITE_WEB_RELEASE_NOTES_API?: string;
@@ -34,5 +32,7 @@ interface Window {
     VITE_WEB_SENTRY_DSN?: string;
     VITE_WEB_APP_ENVIRONMENT?: string;
     VITE_WEB_SPARROW_WEB_APP_URL?: string;
+    VITE_WEB_SPARROW_LINKEDIN?: string;
+    VITE_WEB_SPARROW_GITHUB?: string;
   };
 }

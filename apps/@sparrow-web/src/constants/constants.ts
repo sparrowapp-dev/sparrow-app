@@ -27,9 +27,9 @@ const constants = {
   SPARROW_AUTH_URL:
     runtimeConfig.VITE_WEB_AUTH_URL ?? import.meta.env.VITE_WEB_AUTH_URL,
   SPARROW_GITHUB:
-    runtimeConfig.VITE_WEB_GITHUB ?? import.meta.env.VITE_WEB_GITHUB,
+    runtimeConfig.VITE_WEB_SPARROW_GITHUB ?? import.meta.env.VITE_WEB_SPARROW_GITHUB,
   SPARROW_LINKEDIN:
-    runtimeConfig.VITE_WEB_LINKEDIN ?? import.meta.env.VITE_WEB_LINKEDIN,
+    runtimeConfig.VITE_WEB_SPARROW_LINKEDIN ?? import.meta.env.VITE_WEB_SPARROW_LINKEDIN,
   SPARROW_DOWNLOAD_LINK:
     runtimeConfig.VITE_WEB_DOWNLOAD_LINK ??
     import.meta.env.VITE_WEB_DOWNLOAD_LINK,
