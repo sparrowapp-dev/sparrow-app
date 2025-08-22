@@ -59,17 +59,33 @@ const constants = {
     (runtimeConfig.VITE_WEB_SPARROW_DOCS ??
       import.meta.env.VITE_WEB_SPARROW_DOCS) + "/docs/intro",
   TESTFLOW_DOCS_URL:
-    import.meta.env.VITE_WEB_SPARROW_DOCS + "/docs/usermanual/testflows",
-  PROXY_SERVICE: import.meta.env.VITE_WEB_PROXY_SERVICE,
-  SOCKET_IO_API_URL: import.meta.env.VITE_WEB_SOCKET_IO_API_URL,
-  APP_ENVIRONMENT_PATH: import.meta.env.VITE_WEB_APP_ENVIRONMENT_PATH,
-  VITE_WEB_SPARROW_AI_WEBSOCKET_URL: import.meta.env
-    .VITE_WEB_SPARROW_AI_WEBSOCKET,
-  SENTRY_DSN: import.meta.env.VITE_WEB_SENTRY_DSN,
-  APP_ENVIRONMENT: import.meta.env.VITE_WEB_APP_ENVIRONMENT,
-  SPARROW_WEB_APP_URL: import.meta.env.VITE_WEB_SPARROW_WEB_APP_URL,
-  ADMIN_URL: import.meta.env.VITE_WEB_SPARROW_ADMIN_URL,
-  APP_EDITION: import.meta.env.VITE_WEB_APP_EDITION,
+    (runtimeConfig.VITE_WEB_SPARROW_DOCS ??
+      import.meta.env.VITE_WEB_SPARROW_DOCS) + "/docs/usermanual/testflows",
+  PROXY_SERVICE:
+    runtimeConfig.VITE_WEB_PROXY_SERVICE ??
+    import.meta.env.VITE_WEB_PROXY_SERVICE,
+  SOCKET_IO_API_URL:
+    runtimeConfig.VITE_WEB_SOCKET_IO_API_URL ??
+    import.meta.env.VITE_WEB_SOCKET_IO_API_URL,
+  APP_ENVIRONMENT_PATH:
+    runtimeConfig.VITE_WEB_APP_ENVIRONMENT_PATH ??
+    import.meta.env.VITE_WEB_APP_ENVIRONMENT_PATH,
+  VITE_WEB_SPARROW_AI_WEBSOCKET_URL:
+    runtimeConfig.VITE_WEB_SPARROW_AI_WEBSOCKET ??
+    import.meta.env.VITE_WEB_SPARROW_AI_WEBSOCKET,
+  SENTRY_DSN:
+    runtimeConfig.VITE_WEB_SENTRY_DSN ?? import.meta.env.VITE_WEB_SENTRY_DSN,
+  APP_ENVIRONMENT:
+    runtimeConfig.VITE_WEB_APP_ENVIRONMENT ??
+    import.meta.env.VITE_WEB_APP_ENVIRONMENT,
+  SPARROW_WEB_APP_URL:
+    runtimeConfig.VITE_WEB_SPARROW_WEB_APP_URL ??
+    import.meta.env.VITE_WEB_SPARROW_WEB_APP_URL,
+  ADMIN_URL:
+    runtimeConfig.VITE_WEB_SPARROW_ADMIN_URL ??
+    import.meta.env.VITE_WEB_SPARROW_ADMIN_URL,
+  APP_EDITION:
+    runtimeConfig.VITE_WEB_APP_EDITION ?? import.meta.env.VITE_WEB_APP_EDITION,
 };
 
 export default constants;
