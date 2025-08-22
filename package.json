@@ -151,7 +151,10 @@
     "typescript": "^5.0.2",
     "vite": "^4.4.4"
   },
-  "repository": "https://github.com/sparrowapp-dev/sparrow-app.git",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sparrowapp-dev/sparrow-app.git"
+  },
   "release": {
     "branches": [
       "main"
