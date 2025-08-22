@@ -57,10 +57,10 @@ const constants = {
     import.meta.env.VITE_WEB_MARKETING_URL,
   INTRO_DOCS_URL:
     (runtimeConfig.VITE_WEB_SPARROW_DOCS ??
-      import.meta.env.VITE_WEB_SPARROW_DOCS) + "/docs/intro",
+      import.meta.env.VITE_WEB_SPARROW_DOCS) + "/docs/user-manual/application/introduction/introduction-to-sparrow",
   TESTFLOW_DOCS_URL:
     (runtimeConfig.VITE_WEB_SPARROW_DOCS ??
-      import.meta.env.VITE_WEB_SPARROW_DOCS) + "/docs/usermanual/testflows",
+      import.meta.env.VITE_WEB_SPARROW_DOCS) + "/docs/user-manual/application/workspace-features/testflows",
   PROXY_SERVICE:
     runtimeConfig.VITE_WEB_PROXY_SERVICE ??
     import.meta.env.VITE_WEB_PROXY_SERVICE,
