@@ -132,7 +132,11 @@
   export let environmentVariables;
   export let isGuestUser = false;
   export let onOpenCollection;
-  export let updateIsGeneratedVariable: (value: boolean) => {};
+  export let updateIsGeneratedVariable: (value: boolean) => void;
+  export let handleGenerateVariableDemo: (
+    collectionId: string | undefined,
+    workspaceId: string,
+  ) => void;
 
   export let onGenerateAiResponse;
   export let onToggleLike;
@@ -870,6 +874,11 @@
                               : '0px'}; z-index:10;"
                           >
                             <GenerateVariableCard
+                              onAction={async () =>
+                                await handleGenerateVariableDemo(
+                                  $tab?.path?.collectionId,
+                                  $tab?.path?.workspaceId,
+                                )}
                               onClose={async () =>
                                 await updateIsGeneratedVariable(false)}
                             />

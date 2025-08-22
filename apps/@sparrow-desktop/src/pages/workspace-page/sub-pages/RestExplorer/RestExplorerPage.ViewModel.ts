@@ -32,6 +32,7 @@ import { WorkspaceRepository } from "../../../../repositories/workspace.reposito
 import { EnvironmentRepository } from "../../../../repositories/environment.repository";
 import { BehaviorSubject, Observable } from "rxjs";
 import {
+  environmentType,
   Events,
   ItemType,
   ResponseStatusCode,
@@ -94,6 +95,10 @@ import {
   type TransformedRequest,
 } from "@sparrow/common/types/workspace/collection-base";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
+import {
+  generatedVariableDemo,
+  generateVariableStep,
+} from "@sparrow/workspaces/stores";
 
 import { getClientUser } from "@app/utils/jwt";
 import constants from "@app/constants/constants";
@@ -112,6 +117,7 @@ class RestExplorerViewModel {
   private guideRepository = new GuideRepository();
   private guestUserRepository = new GuestUserRepository();
   private compareArray = new CompareArray();
+  private initTab = new InitTab();
 
   /**
    * Service
@@ -192,6 +198,12 @@ class RestExplorerViewModel {
           t.path.collectionId as string,
         );
         const m = this._tab.getValue() as Tab;
+
+        if (collectionDoc) {
+          await this.updateIsGeneratedVariable(
+            collectionDoc?.isGenerateVariableTrial || false,
+          );
+        }
 
         //   "selectedRequestAuthProfileId:>> ",
         //   m.property.request?.state?.selectedRequestAuthProfileId,
@@ -487,7 +499,7 @@ class RestExplorerViewModel {
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
-        persistence: TabPersistenceTypeEnum.PERMANENT
+        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = false;
       progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
@@ -3802,6 +3814,63 @@ class RestExplorerViewModel {
     progressiveTab.property.request.isGeneratedVariable = value;
     this.tab = progressiveTab;
     await this.tabRepository.bulkUpsertTabs(updatedTabs);
+  };
+
+  private onOpenGlobalEnvironmentToGenerate = async (
+    environment: any,
+    collectionId: string,
+    collectionName: string | undefined,
+  ) => {
+    const environmentTabRxDoc = await this.tabRepository.getTabById(
+      environment?.id,
+    );
+    let environmentTabJson = environmentTabRxDoc?.toMutableJSON();
+    if (environmentTabJson) {
+      environmentTabJson.property.environment.generateProperty = {
+        collectionId: collectionId,
+        collectionName: collectionName,
+      };
+      environmentTabJson.property.environment.generateVariable = true;
+      environmentTabJson.property.environment.aiGenerationStatus = "";
+      environmentTabJson.persistence = TabPersistenceTypeEnum.PERMANENT;
+    }
+    await this.tabRepository.updateTabByMongoId(
+      environment?.id,
+      environmentTabJson,
+    );
+
+    const initEnvironmentTab = this.initTab.environment(
+      environment?.id,
+      environment.workspaceId,
+    );
+    initEnvironmentTab
+      .setName(environment?.name)
+      .setType(environmentType.GLOBAL)
+      .setVariable(environment?.variable)
+      .setGenerativeVariables(true)
+      .setGenerativeProperties(collectionId, collectionName)
+      .setTabType(TabPersistenceTypeEnum.PERMANENT);
+    this.tabRepository.createTab(initEnvironmentTab.getValue());
+    scrollToTab(initEnvironmentTab.getValue().id);
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    generatedVariableDemo.set(true);
+    generateVariableStep.set(1);
+  };
+
+  public handleGenerateVariableTabForTrial = async (
+    collectionId: string,
+    workspaceId: string,
+  ) => {
+    const collectionData =
+      await this.collectionRepository.readCollection(collectionId);
+    const globalEnvironment =
+      await this.environmentRepository.getGlobalEnvironment(workspaceId);
+    this.onOpenGlobalEnvironmentToGenerate(
+      globalEnvironment?.toMutableJSON(),
+      collectionId,
+      collectionData.toMutableJSON()?.name,
+    );
+    return;
   };
 }
 

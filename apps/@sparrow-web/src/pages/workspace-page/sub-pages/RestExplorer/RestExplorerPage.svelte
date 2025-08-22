@@ -251,4 +251,5 @@
   onToggleLike={_viewModel.toggleChatMessageLike}
   onUpdateAiModel={_viewModel.updateAIModel}
   updateIsGeneratedVariable={_viewModel.updateIsGeneratedVariable}
+  handleGenerateVariableDemo={_viewModel.handleGenerateVariableTabForTrial}
 />

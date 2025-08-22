@@ -149,7 +149,7 @@ class InitRequestTab {
             time: 0,
             size: 0,
           },
-          isGeneratedVariable: true,
+          isGeneratedVariable: false,
         },
       },
       path: {

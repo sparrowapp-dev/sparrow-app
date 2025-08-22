@@ -3,17 +3,18 @@
   import { Button } from "@sparrow/library/ui";
   import { SparkleColored } from "../../assets/images";
 
+  // Props
   export let title: string = "Level Up Your Workflow!";
   export let message: string =
     "Great job on those successful API calls! We see a pattern here. We can automatically organize and create reusable variables for you.";
   export let buttonText: string = "Show Me How";
-  export let onClose: () => void = () => {};
-  export let onAction: () => void = () => {};
+  export let onClose: () => void | Promise<void> = () => {};
+  export let onAction: () => void | Promise<void> = () => {};
 </script>
 
 <div class="card custom-card gradient-border">
   <!-- header -->
-  <div class="d-flex align-items-center" style="margin-bottom: 12px;">
+  <div class="d-flex align-items-center mb-3">
     <div class="me-2">
       <span
         class="d-flex align-items-center justify-content-center"
@@ -24,7 +25,7 @@
     </div>
     <div class="flex-grow-1 fw-semibold">{title}</div>
     <Button
-      size={"small"}
+      size="small"
       startIcon={DismissRegular}
       type={"teritiary-regular"}
       onClick={onClose}
@@ -32,23 +33,18 @@
   </div>
 
   <!-- message -->
-  <div
-    class="text-secondary small card-message me-2"
-    style="margin-bottom: 24px;"
-  >
+  <div class="card-message me-2 mb-4">
     {message}
   </div>
 
   <div class="d-flex align-items-center justify-content-end">
-    <div>
-      <Button
-        type={"secondary"}
-        size={"medium"}
-        startIcon={SparkleRegular}
-        title={buttonText}
-        onClick={onAction}
-      />
-    </div>
+    <Button
+      type="secondary"
+      size="medium"
+      startIcon={SparkleRegular}
+      title={buttonText}
+      onClick={onAction}
+    />
   </div>
 </div>
 
