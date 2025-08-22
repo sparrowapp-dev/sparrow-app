@@ -1,43 +1,89 @@
+const runtimeConfig = window.runtimeConfig || {};
+
 const constants = {
-  API_URL: import.meta.env.VITE_WEB_API_URL,
-  ENABLE_MIX_PANEL: import.meta.env.VITE_WEB_ENABLE_MIX_PANEL,
-  MIX_PANEL_TOKEN: import.meta.env.VITE_WEB_MIX_PANEL_TOKEN,
-  POSTHOG_CONNECTION_API_KEY: import.meta.env
-    .VITE_WEB_POSTHOG_CONNECTION_API_KEY,
-  POSTHOG_API_URL: import.meta.env.VITE_WEB_POSTHOG_API_URL,
-  API_SEND_TIMEOUT: import.meta.env.VITE_WEB_API_TIMEOUT,
+  API_URL: runtimeConfig.VITE_WEB_API_URL ?? import.meta.env.VITE_WEB_API_URL,
+  ENABLE_MIX_PANEL:
+    runtimeConfig.VITE_WEB_ENABLE_MIX_PANEL ??
+    import.meta.env.VITE_WEB_ENABLE_MIX_PANEL,
+  MIX_PANEL_TOKEN:
+    runtimeConfig.VITE_WEB_MIX_PANEL_TOKEN ??
+    import.meta.env.VITE_WEB_MIX_PANEL_TOKEN,
+  POSTHOG_CONNECTION_API_KEY:
+    runtimeConfig.VITE_WEB_POSTHOG_CONNECTION_API_KEY ??
+    import.meta.env.VITE_WEB_POSTHOG_CONNECTION_API_KEY,
+  POSTHOG_API_URL:
+    runtimeConfig.VITE_WEB_POSTHOG_API_URL ??
+    import.meta.env.VITE_WEB_POSTHOG_API_URL,
+  API_SEND_TIMEOUT:
+    runtimeConfig.VITE_WEB_API_TIMEOUT ?? import.meta.env.VITE_WEB_API_TIMEOUT,
   RXDB_DB_NAME: "sparrow-db",
   AUTH_TOKEN: "AUTH_TOKEN",
   REF_TOKEN: "REF_TOKEN",
   WORKSPACE_LIMIT: 5,
   API_LIMIT: 5,
-  SPARROW_SUPPORT_EMAIL: import.meta.env.VITE_WEB_SPARROW_SUPPORT_EMAIL,
-  SPARROW_AUTH_URL: import.meta.env.VITE_WEB_AUTH_URL,
-  SPARROW_GITHUB: import.meta.env.VITE_WEB_SPARROW_GITHUB,
-  SPARROW_LINKEDIN: import.meta.env.VITE_WEB_SPARROW_LINKEDIN,
-  SPARROW_DOWNLOAD_LINK: import.meta.env.VITE_WEB_SPARROW_DOWNLOAD_LINK,
+  SPARROW_SUPPORT_EMAIL:
+    runtimeConfig.VITE_WEB_SPARROW_SUPPORT_EMAIL ??
+    import.meta.env.VITE_WEB_SPARROW_SUPPORT_EMAIL,
+  SPARROW_AUTH_URL:
+    runtimeConfig.VITE_WEB_AUTH_URL ?? import.meta.env.VITE_WEB_AUTH_URL,
+  SPARROW_GITHUB:
+    runtimeConfig.VITE_WEB_GITHUB ?? import.meta.env.VITE_WEB_GITHUB,
+  SPARROW_LINKEDIN:
+    runtimeConfig.VITE_WEB_LINKEDIN ?? import.meta.env.VITE_WEB_LINKEDIN,
+  SPARROW_DOWNLOAD_LINK:
+    runtimeConfig.VITE_WEB_DOWNLOAD_LINK ??
+    import.meta.env.VITE_WEB_DOWNLOAD_LINK,
   GITHUB_API: "https://api.github.com",
-  RELEASE_NOTES_PAT_TOKEN: import.meta.env.VITE_WEB_RELEASE_NOTES_PAT_TOKEN,
-  RELEASE_NOTES_API: import.meta.env.VITE_WEB_RELEASE_NOTES_API,
-  AZURE_CDN_URL: import.meta.env.VITE_WEB_AZURE_CDN_URL,
-  CANNY_API: import.meta.env.VITE_WEB_CANNY_API,
-  CANNY_URL: import.meta.env.VITE_WEB_CANNY_URL,
-  AZURE_INSIGHTS_CONNECTION_STRING: import.meta.env
-    .VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING,
-  BASE_URL: import.meta.env.VITE_WEB_BASE_URL,
-  MARKETING_URL: import.meta.env.VITE_WEB_MARKETING_URL,
-  INTRO_DOCS_URL: import.meta.env.VITE_WEB_SPARROW_DOCS + "/docs/intro",
+  RELEASE_NOTES_PAT_TOKEN:
+    runtimeConfig.VITE_WEB_RELEASE_NOTES_PAT_TOKEN ??
+    import.meta.env.VITE_WEB_RELEASE_NOTES_PAT_TOKEN,
+  RELEASE_NOTES_API:
+    runtimeConfig.VITE_WEB_RELEASE_NOTES_API ??
+    import.meta.env.VITE_WEB_RELEASE_NOTES_API,
+  AZURE_CDN_URL:
+    runtimeConfig.VITE_WEB_AZURE_CDN_URL ??
+    import.meta.env.VITE_WEB_AZURE_CDN_URL,
+  CANNY_API:
+    runtimeConfig.VITE_WEB_CANNY_API ?? import.meta.env.VITE_WEB_CANNY_API,
+  CANNY_URL:
+    runtimeConfig.VITE_WEB_CANNY_URL ?? import.meta.env.VITE_WEB_CANNY_URL,
+  AZURE_INSIGHTS_CONNECTION_STRING:
+    runtimeConfig.VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING ??
+    import.meta.env.VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING,
+  BASE_URL:
+    runtimeConfig.VITE_WEB_BASE_URL ?? import.meta.env.VITE_WEB_BASE_URL,
+  MARKETING_URL:
+    runtimeConfig.VITE_WEB_MARKETING_URL ??
+    import.meta.env.VITE_WEB_MARKETING_URL,
+  INTRO_DOCS_URL:
+    (runtimeConfig.VITE_WEB_SPARROW_DOCS ??
+      import.meta.env.VITE_WEB_SPARROW_DOCS) + "/docs/intro",
   TESTFLOW_DOCS_URL:
-    import.meta.env.VITE_WEB_SPARROW_DOCS + "/docs/usermanual/testflows",
-  PROXY_SERVICE: import.meta.env.VITE_WEB_PROXY_SERVICE,
-  SOCKET_IO_API_URL: import.meta.env.VITE_WEB_SOCKET_IO_API_URL,
-  APP_ENVIRONMENT_PATH: import.meta.env.VITE_WEB_APP_ENVIRONMENT_PATH,
-  VITE_WEB_SPARROW_AI_WEBSOCKET_URL: import.meta.env
-    .VITE_WEB_SPARROW_AI_WEBSOCKET,
-  SENTRY_DSN: import.meta.env.VITE_WEB_SENTRY_DSN,
-  APP_ENVIRONMENT: import.meta.env.VITE_WEB_APP_ENVIRONMENT,
-  SPARROW_WEB_APP_URL: import.meta.env.VITE_WEB_SPARROW_WEB_APP_URL,
-  ADMIN_URL:import.meta.env.VITE_WEB_SPARROW_ADMIN_URL,
+    (runtimeConfig.VITE_WEB_SPARROW_DOCS ??
+      import.meta.env.VITE_WEB_SPARROW_DOCS) + "/docs/usermanual/testflows",
+  PROXY_SERVICE:
+    runtimeConfig.VITE_WEB_PROXY_SERVICE ??
+    import.meta.env.VITE_WEB_PROXY_SERVICE,
+  SOCKET_IO_API_URL:
+    runtimeConfig.VITE_WEB_SOCKET_IO_API_URL ??
+    import.meta.env.VITE_WEB_SOCKET_IO_API_URL,
+  APP_ENVIRONMENT_PATH:
+    runtimeConfig.VITE_WEB_APP_ENVIRONMENT_PATH ??
+    import.meta.env.VITE_WEB_APP_ENVIRONMENT_PATH,
+  VITE_WEB_SPARROW_AI_WEBSOCKET_URL:
+    runtimeConfig.VITE_WEB_SPARROW_AI_WEBSOCKET ??
+    import.meta.env.VITE_WEB_SPARROW_AI_WEBSOCKET,
+  SENTRY_DSN:
+    runtimeConfig.VITE_WEB_SENTRY_DSN ?? import.meta.env.VITE_WEB_SENTRY_DSN,
+  APP_ENVIRONMENT:
+    runtimeConfig.VITE_WEB_APP_ENVIRONMENT ??
+    import.meta.env.VITE_WEB_APP_ENVIRONMENT,
+  SPARROW_WEB_APP_URL:
+    runtimeConfig.VITE_WEB_SPARROW_WEB_APP_URL ??
+    import.meta.env.VITE_WEB_SPARROW_WEB_APP_URL,
+  ADMIN_URL:
+    runtimeConfig.VITE_WEB_SPARROW_ADMIN_URL ??
+    import.meta.env.VITE_WEB_SPARROW_ADMIN_URL,
 };
 
 export default constants;
