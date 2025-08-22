@@ -658,6 +658,7 @@
     handleFeaturesRedirect={_viewModel.redirectFeatureUpdates}
     onAdminRedirect={_viewModel.onAdminRedirect}
     recentVisitedWorkspaces={$recentVisitedWorkspaces}
+    appEdition={constants.APP_EDITION}
   />
 
   {#if $location.pathname === "/app/home"}

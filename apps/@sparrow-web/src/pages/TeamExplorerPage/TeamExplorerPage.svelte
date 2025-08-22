@@ -315,6 +315,7 @@
     contactOwner={handleRequestPlan}
     {handleRedirectAdminPanel}
     handleContactSales={_viewModel.handleContactSales}
+    appEdition={constants.APP_EDITION}
   />
 {/if}
 

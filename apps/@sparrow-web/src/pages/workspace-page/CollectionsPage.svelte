@@ -936,6 +936,7 @@
           onUpdateRunningState={_viewModel.handleMockCollectionState}
           onOpenWorkspace={_viewModel.handleOpenWorkspace}
           onCreateMockCollection={handleCreateMockCollectionModel}
+          appEdition={constants.APP_EDITION}
         />
       </Pane>
       <Pane
