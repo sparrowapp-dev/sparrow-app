@@ -79,9 +79,6 @@ jobs:
       - name: Increase Yarn network timeout
         run: yarn config set network-timeout 600000
 
-      # - name: Sync version across all files
-      #   run: yarn sync-version
-
       - name: Build Tauri App
         run: |
           yarn cache clean
@@ -328,7 +325,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Use latest stable Xcode
         uses: maxim-lobanov/setup-xcode@v1
@@ -355,7 +352,7 @@ jobs:
       - name: Update updater endpoint in tauri.conf.json file
         run: |
           content=$(<apps/@sparrow-desktop/src-tauri/tauri.conf.json)
-          newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_PROD }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
+          newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_DEV }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
           echo "$newContent" > apps/@sparrow-desktop/src-tauri/tauri.conf.json
         shell: bash
 
@@ -372,25 +369,7 @@ jobs:
       - name: Increase Yarn network timeout
         run: yarn config set network-timeout 600000
 
-      # ------- ARM64 (Apple Silicon) build -------
-      - name: Build & Sign Tauri App (Apple Silicon / arm64)
-        env:
-          APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
-          APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
-          APPLE_CERTIFICATE_PASSWORD: "${{ secrets.APPLE_CERTIFICATE_PASSWORD }}"
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          CI: "false"
-        run: |
-          yarn cache clean
-          yarn install
-          yarn desktop-build
-
-      - name: Configure Env Variables for x86_64 cross-compile
+      - name: Configure Env Variables for Mac (Intel Build)
         shell: bash
         run: |
           # Resolve compilers and SDK path from the selected Xcode
@@ -422,6 +401,24 @@ jobs:
           echo "CXXFLAGS_x86_64-apple-darwin=$COMMON_CFLAGS" >> "$GITHUB_ENV"
           echo "LDFLAGS_x86_64_apple_darwin=$COMMON_LDFLAGS" >> "$GITHUB_ENV"
           echo "LDFLAGS_x86_64-apple-darwin=$COMMON_LDFLAGS" >> "$GITHUB_ENV"
+
+      # ------- ARM64 (Apple Silicon) build -------
+      - name: Build & Sign Tauri App (Apple Silicon / arm64)
+        env:
+          APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
+          APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
+          APPLE_CERTIFICATE_PASSWORD: "${{ secrets.APPLE_CERTIFICATE_PASSWORD }}"
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          CI: "false"
+        run: |
+          yarn cache clean
+          yarn install
+          yarn desktop-build
 
       # ------- Intel (x86_64) build -------
       - name: Build & Sign Tauri App (Intel / x86_64)
@@ -455,26 +452,24 @@ jobs:
 
       - name: Set build datetime
         run: echo "BUILD_DATETIME=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
-        
-      - name: Upload macOS artifacts (both archs) to S3 with datetime suffix
-        run: |
-          # Copy ARM64 files with datetime suffix
-          for file in /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/*.gz; do
-            filename=$(basename "$file")
-            extension="${filename##*.}"
-            name="${filename%.*}"
-            new_filename="${name}-${BUILD_DATETIME}.${extension}"
-            aws s3 cp "$file" "s3://sparrow-release-assests-prod/macos/$new_filename"
-          done
 
-          # Copy Intel files with datetime suffix
-          for file in /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos/*.gz; do
-            filename=$(basename "$file")
-            extension="${filename##*.}"
-            name="${filename%.*}"
-            new_filename="${name}-${BUILD_DATETIME}.${extension}"
-            aws s3 cp "$file" "s3://sparrow-release-assests-prod/macos/$new_filename"
-          done
+      - name: Upload macOS DMG(Both archs) to S3
+        run: |
+          # Upload macOS (ARM64) DMG
+          MX_DMG_SRC_DIR="/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg"
+          DMG_FILE=$(ls "$MX_DMG_SRC_DIR"/*.dmg | head -n 1)
+          DMG_BASENAME=$(basename "$DMG_FILE" .dmg)
+          DMG_SUFFIXED_FILE="$MX_DMG_SRC_DIR/${DMG_BASENAME}_${{ env.BUILD_DATETIME }}.dmg"
+          cp "$DMG_FILE" "$DMG_SUFFIXED_FILE"
+          aws s3 cp "$DMG_SUFFIXED_FILE" s3://sparrow-release-assests-dev/macos/
+
+          # Upload macOS (Intel) DMG
+          INTEL_DMG_SRC_DIR="/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/dmg"
+          DMG_FILE=$(ls "$INTEL_DMG_SRC_DIR"/*.dmg | head -n 1)
+          DMG_BASENAME=$(basename "$DMG_FILE" .dmg)
+          DMG_SUFFIXED_FILE="$INTEL_DMG_SRC_DIR/${DMG_BASENAME}_${{ env.BUILD_DATETIME }}.dmg"
+          cp "$DMG_FILE" "$DMG_SUFFIXED_FILE"
+          aws s3 cp "$DMG_SUFFIXED_FILE" s3://sparrow-release-assests-dev/macos/
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -583,9 +578,6 @@ jobs:
 
       - name: Install project dependencies
         run: yarn
-
-      # - name: Sync version across all files
-      #   run: yarn sync-version
 
       - name: Update updater endpoint in tauri.conf.json file
         run: |
