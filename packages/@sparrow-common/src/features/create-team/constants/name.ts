@@ -3,5 +3,5 @@ export const NAME_CONFIG = {
   MAX_TEXT_SIZE: 100,
   REQUIRED_ERROR_MESSAGE: `Please enter your hub name.`,
   PLACEHOLDER: `Enter your hub name`,
-  INVALID_ERROR_MESSAGE: `Hub name cannot contain only special characters.`,
+  INVALID_ERROR_MESSAGE: `Hub name can't contain emojis. Please avoid consecutive special characters (e.g., @@ or @#).`,
 };
