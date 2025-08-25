@@ -454,7 +454,7 @@
         <Input
           type={"text"}
           size={"medium"}
-          maxlength={500}
+          maxlength={100}
           width={"398px"}
           id={"renameInputFieldCollection"}
           value={$tab?.name || ""}
