@@ -62,7 +62,7 @@
           {#if response.status}
             <Tooltip
               title="HTTP Status - {response.status}"
-              placement={"top-center"}
+              placement={"top-left"}
               zIndex={500}
             >
               <span
