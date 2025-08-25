@@ -11,6 +11,7 @@
   export let generatedVariables: KeyValuePair[] = [];
   export let updateGeneratedVariables;
   export let handleRedirectToDocs = () => {};
+  export let handleCloseTourGuide: () => void;
   export let isWebApp;
 
   export let onUpdateVariableSelection;
@@ -40,10 +41,6 @@
       isRevertEnabled = false;
     }
   }
-  const handleCloseTourGuide = () => {
-    generatedVariableDemo.set(false);
-    generateVariableStep.set(0);
-  };
 </script>
 
 <div class="flex flex-column" style="margin-top: 12px;">
@@ -101,7 +98,7 @@
     <GenerateVariablesLoading />
   {/if}
   <div>
-    {#if $generatedVariableDemo && $generateVariableStep !== 2 && $generateVariableStep !== 3 && $generateVariableStep !== 4}
+    {#if $generatedVariableDemo && $generateVariableStep !== 2 && $generateVariableStep !== 3 && $generateVariableStep !== 4 && $generateVariableStep !== 5}
       <div>
         <div class="d-flex flex-column">
           <div class="" style="margin-bottom:12px;">
@@ -120,11 +117,34 @@
           </div>
         </div>
       </div>
-    {:else if ($generatedVariableDemo && $generateVariableStep === 3) || $generateVariableStep === 4}
+    {:else if ($generatedVariableDemo && $generateVariableStep === 3) || $generateVariableStep === 4 || $generateVariableStep === 5}
       <div class="d-flex">
         <TabularInputV2
           disabled={false}
-          keyValue={generatedVariables}
+          keyValue={generatedVariables.length > 0
+            ? generatedVariables
+            : [
+                {
+                  key: "DEVs",
+                  checked: true,
+                  value: "isApr",
+                },
+                {
+                  key: "base_url",
+                  checked: true,
+                  value: "closed",
+                },
+                {
+                  key: "Cookie",
+                  value: "gzip, deflate, br",
+                  checked: false,
+                },
+                {
+                  key: "",
+                  checked: false,
+                  value: "",
+                },
+              ]}
           callback={() => {}}
           search={""}
           isGeneratedVariable={true}

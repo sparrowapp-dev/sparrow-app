@@ -16,12 +16,15 @@ import { CollectionService } from "../../../../../src/services/collection.servic
 import constants from "../../../../../src/constants/constants";
 import { CollectionRepository } from "../../../../../src/repositories/collection.repository";
 import { open } from "@tauri-apps/plugin-shell";
+import { getClientUser } from "@app/utils/jwt";
+import { UserService } from "@app/services/user.service";
 
 export class EnvironmentExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private environmentRepository = new EnvironmentRepository();
   private environmentService = new EnvironmentService();
   private collectionService = new CollectionService();
+  private userService = new UserService();
   private guideRepository = new GuideRepository();
   private guestUserRepository = new GuestUserRepository();
   private collectionRepository = new CollectionRepository();
@@ -718,5 +721,15 @@ export class EnvironmentExplorerViewModel {
   public redirectDocsGenerateVariables = async () => {
     await open(constants.INTRO_DOCS_URL);
     return;
+  };
+
+  public generateVariableDemoCompleted = async () => {
+    const userDetails = getClientUser();
+    const response = await this.userService.generateVariableDemoCompleted(
+      userDetails?.email,
+    );
+    if (response?.data?.data) {
+      return response;
+    }
   };
 }

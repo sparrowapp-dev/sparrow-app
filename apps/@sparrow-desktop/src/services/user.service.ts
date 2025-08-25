@@ -69,4 +69,42 @@ export class UserService {
     );
     return response;
   };
+
+  /**
+   * Insert Trial flow collectionId into users.
+   *
+   * @param email - The email address of the user.
+   * @param collectionId - The collection Id which user has completed the trial.
+   * @returns A promise that resolves to the server's response.
+   */
+  public InsertGenerateTrialCollectionIds = async (
+    email: string,
+    collectionId: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${apiUrl}/api/user/${collectionId}/trial-generate-variable/${email}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  /**
+   * If the user has completed Demo of Generate variables.
+   *
+   * @param email - The email address of the user.
+   * @returns A promise that resolves to the server's response.
+   */
+  public generateVariableDemoCompleted = async (email: string) => {
+    const response = await makeRequest(
+      "POST",
+      `${apiUrl}/api/user/${email}/generate-variable-demo`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }

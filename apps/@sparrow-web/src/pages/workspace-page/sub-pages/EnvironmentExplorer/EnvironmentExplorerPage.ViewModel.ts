@@ -18,6 +18,8 @@ import {
 import { CollectionService } from "src/services/collection.service";
 import constants from "src/constants/constants";
 import { CollectionRepository } from "src/repositories/collection.repository";
+import { getClientUser } from "src/utils/jwt";
+import { UserService } from "src/services/user.service";
 
 export class EnvironmentExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -28,6 +30,7 @@ export class EnvironmentExplorerViewModel {
   private guestUserRepository = new GuestUserRepository();
   private collectionRepository = new CollectionRepository();
   private _tab: BehaviorSubject<any> = new BehaviorSubject({});
+  private userService = new UserService();
   private tabRepository = new TabRepository();
   private compareArray = new CompareArray();
 
@@ -734,5 +737,15 @@ export class EnvironmentExplorerViewModel {
   public redirectDocsGenerateVariables = async () => {
     window.open(constants.INTRO_DOCS_URL, "_blank");
     return;
+  };
+
+  public generateVariableDemoCompleted = async () => {
+    const userDetails = getClientUser();
+    const response = await this.userService.generateVariableDemoCompleted(
+      userDetails?.email,
+    );
+    if (response?.data?.data) {
+      return response;
+    }
   };
 }

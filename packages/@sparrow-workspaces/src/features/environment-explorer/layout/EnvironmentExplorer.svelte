@@ -61,6 +61,7 @@
   export let onUpdateVariableSelection;
   export let userRole;
   export let handleRedirectToDocs: () => {};
+  export let generateVariableDemoCompleted: () => void;
   export let isWebApp;
 
   let isPopoverContainer = false;
@@ -368,8 +369,11 @@
               TotalsCards={5}
               top={40}
               right={40}
-              rightButtonName={"finish"}
-              onNext={handleCloseTourGuide}
+              rightButtonName={"Finish"}
+              onNext={async () => {
+                await generateVariableDemoCompleted();
+                handleCloseTourGuide();
+              }}
               placement={"right"}
               onClose={handleCloseTourGuide}
             />
@@ -399,6 +403,7 @@
               {updateGeneratedVariables}
               {onUpdateVariableSelection}
               {handleRedirectToDocs}
+              {handleCloseTourGuide}
               {isWebApp}
             />
             <div>

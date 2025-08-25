@@ -72,4 +72,5 @@
   onUpdateVariableSelection={_viewModel.updateVariableSelection}
   isWebApp={true}
   handleRedirectToDocs={_viewModel.redirectDocsGenerateVariables}
+  generateVariableDemoCompleted={_viewModel.generateVariableDemoCompleted}
 />
