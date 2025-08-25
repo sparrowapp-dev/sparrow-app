@@ -114,13 +114,38 @@ jobs:
       #     yarn install
       #     yarn desktop-build
 
-      - name: Configure x86_64 macOS Build Environment
+      - name: Configure SDK/sysroot for x86_64 cross-compile (fix stdlib.h not found)
+        shell: bash
         run: |
-          echo "CC_x86_64_apple_darwin=$(xcrun --sdk macosx -f clang)" >> $GITHUB_ENV
-          echo "CXX_x86_64_apple_darwin=$(xcrun --sdk macosx -f clang++)" >> $GITHUB_ENV
-          echo "CFLAGS_x86_64_apple_darwin=-target x86_64-apple-macos10.13" >> $GITHUB_ENV
-          echo "CXXFLAGS_x86_64_apple_darwin=-target x86_64-apple-macos10.13" >> $GITHUB_ENV
-          echo "MACOSX_DEPLOYMENT_TARGET=10.13" >> $GITHUB_ENV
+          # Resolve compilers and SDK path from the selected Xcode
+          SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
+          CLANG="$(xcrun --sdk macosx -f clang)"
+          CLANGXX="$(xcrun --sdk macosx -f clang++)"
+
+          echo "Using SDKROOT: $SDKROOT"
+          echo "Clang: $CLANG"
+          echo "Clang++: $CLANGXX"
+
+          # Make SDK available to all subsequent steps (incl. cc crate)
+          echo "SDKROOT=$SDKROOT" >> "$GITHUB_ENV"
+          echo "MACOSX_DEPLOYMENT_TARGET=10.13" >> "$GITHUB_ENV"
+
+          # Set BOTH underscore and hyphen forms (cc crate may read either)
+          echo "CC_x86_64_apple_darwin=$CLANG" >> "$GITHUB_ENV"
+          echo "CXX_x86_64_apple_darwin=$CLANGXX" >> "$GITHUB_ENV"
+          echo "CC_x86_64-apple-darwin=$CLANG" >> "$GITHUB_ENV"
+          echo "CXX_x86_64-apple-darwin=$CLANGXX" >> "$GITHUB_ENV"
+
+          # Ensure headers/libs are found when cross-compiling C/C++
+          COMMON_CFLAGS="-target x86_64-apple-macos10.13 -isysroot $SDKROOT -mmacosx-version-min=10.13"
+          COMMON_LDFLAGS="-isysroot $SDKROOT -mmacosx-version-min=10.13"
+
+          echo "CFLAGS_x86_64_apple_darwin=$COMMON_CFLAGS" >> "$GITHUB_ENV"
+          echo "CXXFLAGS_x86_64_apple_darwin=$COMMON_CFLAGS" >> "$GITHUB_ENV"
+          echo "CFLAGS_x86_64-apple-darwin=$COMMON_CFLAGS" >> "$GITHUB_ENV"
+          echo "CXXFLAGS_x86_64-apple-darwin=$COMMON_CFLAGS" >> "$GITHUB_ENV"
+          echo "LDFLAGS_x86_64_apple_darwin=$COMMON_LDFLAGS" >> "$GITHUB_ENV"
+          echo "LDFLAGS_x86_64-apple-darwin=$COMMON_LDFLAGS" >> "$GITHUB_ENV"
 
       # ------- Intel (x86_64) build -------
       - name: Build & Sign Tauri App (Intel / x86_64)
