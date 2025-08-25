@@ -47,7 +47,7 @@ env:
 
 jobs:
   build_x86_64:
-    runs-on: macos-15-large
+    runs-on: macos-13
     environment: production
 
     steps:
@@ -110,7 +110,7 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: x86_64-app
+          name: universal-app
           path: apps/@sparrow-desktop/src-tauri/target/*
 
   # build_arm64_and_universal:
