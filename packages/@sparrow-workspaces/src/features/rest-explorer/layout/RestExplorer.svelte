@@ -102,6 +102,7 @@
   } from "../utils";
 
   import { policyConfig } from "@sparrow/common/store";
+  import { tick } from "svelte";
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
   export let requestAuthHeader: Observable<KeyValue>;
@@ -161,12 +162,12 @@
 
   // Props for showing merge/diff view in RequestBody, Headers and Params
   let isAIDebugBtnEnable = false;
-  let isMergeViewEnableForRequestBody = false;
-  let isMergeViewEnableForParams = false;
-  let isMergeViewEnableForHeaders = false;
-  let isMergeViewLoading = false;
-  let newModifiedContent: string | KeyValuePair[];
-  let mergeViewRequestDatasetType: RequestDatasetEnum;
+  export let isMergeViewEnableForRequestBody = false;
+  export let isMergeViewEnableForParams = false;
+  export let isMergeViewEnableForHeaders = false;
+  export let isMergeViewLoading = false;
+  export let newModifiedContent: string | KeyValuePair[];
+  export let mergeViewRequestDatasetType: RequestDatasetEnum;
 
   // Reference to the splitpane container element
   let splitpaneContainer;
@@ -292,11 +293,6 @@
     onUpdateRequestState({ requestBodyNavigation: requestDatasetType });
     onUpdateRequestState({ requestBodyLanguage: contentType });
 
-    if (isMergeViewEnableForRequestBody) {
-      notifications.info("Please accept the current suggested changes first.");
-      return;
-    }
-
     if (requestDatasetType === RequestDatasetEnum.RAW) {
       newModifiedContent = newContent;
     } else if (requestDatasetType === RequestDatasetEnum.URLENCODED) {
@@ -305,6 +301,12 @@
       newModifiedContent = convertJsonToKeyValPairs(JSON.parse(newContent));
     } else if (requestDatasetType === RequestDatasetEnum.BINARY) return;
     else return;
+    await tick();
+
+    if (isMergeViewEnableForRequestBody) {
+      notifications.info("Please accept the current suggested changes first.");
+      return;
+    }
 
     mergeViewRequestDatasetType = requestDatasetType;
     isMergeViewEnableForRequestBody = true;
