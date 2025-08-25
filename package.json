@@ -19,7 +19,7 @@
   "scripts": {
     "desktop-start": "yarn workspace @sparrow/desktop tauri dev",
     "desktop-build": "yarn workspace @sparrow/desktop tauri build --debug",
-    "desktop-build-intel-mac": "yarn workspace @sparrow/desktop tauri build --target x86_64-apple-darwin --debug --verbose",
+    "desktop-build-intel-mac": "yarn workspace @sparrow/desktop tauri build --target x86_64-apple-darwin --debug",
     "web-start": "yarn workspace @sparrow/web dev",
     "web-build": "yarn workspace @sparrow/web build",
     "docker:up": "docker-compose build --no-cache && docker compose up -d --force-recreate",

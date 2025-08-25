@@ -472,14 +472,14 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Post both macOS Builds to Teams with download buttons
+      - name: Post macOS Build Links to Teams
         run: |
           ARM64_DMG=$(ls apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg | head -n 1)
           INTEL_DMG=$(ls apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/dmg/*.dmg | head -n 1)
 
           # Get filenames with datetime suffix
-          ARM64_FILENAME="$(basename "${ARM64_DMG%.dmg}")-${BUILD_DATETIME}.dmg"
-          INTEL_FILENAME="$(basename "${INTEL_DMG%.dmg}")-${BUILD_DATETIME}.dmg"
+          ARM64_FILENAME="$(basename "${ARM64_DMG%.dmg}").dmg"
+          INTEL_FILENAME="$(basename "${INTEL_DMG%.dmg}").dmg"
 
           ARM64_URL="https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/macos/$ARM64_FILENAME"
           INTEL_URL="https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/macos/$INTEL_FILENAME"

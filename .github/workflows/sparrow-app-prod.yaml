@@ -886,7 +886,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Post both macOS Builds to Teams
+      - name: Post macOS Build Links to Teams
         run: |
           ARM64_DMG=$(ls apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg | head -n 1)
           INTEL_DMG=$(ls apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/dmg/*.dmg | head -n 1)
