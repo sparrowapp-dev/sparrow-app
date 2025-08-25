@@ -52,7 +52,8 @@
     />
     {#if isTeamNameInvalid}
       <p class="help-label-error text-ds-font-size-12">
-        Invalid Hub Name. It cannot contain only special characters.
+        Invalid team name. Please remove unsupported characters (like emojis or
+        consecutive symbols, e.g., @@).
       </p>
     {/if}
   </div>
