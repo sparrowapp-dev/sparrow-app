@@ -100,6 +100,7 @@ import constants from "@app/constants/constants";
 import * as curlconverter from "curlconverter";
 
 import * as Sentry from "@sentry/svelte";
+import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection-tab";
 
 class RestExplorerViewModel {
   /**
@@ -261,14 +262,16 @@ class RestExplorerViewModel {
     }
   }
 
-  public openCollection = async () => {
+  public openCollection = async (isAuthRedirect: boolean = false) => {
     const collectionRx = await this.collectionRepository.readCollection(
       this._tab.getValue().path.collectionId,
     );
+    const navigation = isAuthRedirect ? CollectionNavigationTabEnum.AUTH : null;
     const collectionDoc = collectionRx?.toMutableJSON();
     const collectionTab = new CollectionTabAdapter().adapt(
       this._tab.getValue().path.workspaceId,
       collectionDoc,
+      navigation,
     );
     this.tabRepository.createTab(collectionTab);
   };
@@ -2823,7 +2826,7 @@ class RestExplorerViewModel {
           environmentVariables.global.id,
         );
         if (currentTab) {
-          let currentTabId = currentTab.tabId;
+          const currentTabId = currentTab.tabId;
           const envTab = createDeepCopy(currentTab);
           envTab.property.environment.variable = payload.variable;
           envTab.isSaved = true;
@@ -2907,12 +2910,12 @@ class RestExplorerViewModel {
           payload,
         );
 
-        let currentTab = await this.tabRepository.getTabById(
+        const currentTab = await this.tabRepository.getTabById(
           environmentVariables.local.id,
         );
 
         if (currentTab) {
-          let currentTabId = currentTab.tabId;
+          const currentTabId = currentTab.tabId;
           const envTab = createDeepCopy(currentTab);
           envTab.property.environment.variable = payload.variable;
           envTab.isSaved = true;

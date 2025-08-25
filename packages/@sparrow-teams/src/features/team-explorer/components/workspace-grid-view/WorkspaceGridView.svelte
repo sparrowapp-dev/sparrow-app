@@ -17,6 +17,7 @@
     ChevronRightRegular,
   } from "@sparrow/library/icons";
   import { WorkspaceType } from "@sparrow/common/enums";
+
   export let openInDesktop: (workspaceID: string) => void;
   export let isWebEnvironment: boolean;
   export let searchQuery = "";
@@ -50,6 +51,7 @@
   export let isWorkspaceCreationInProgress = false;
   export let onCopyLink;
   export let selectedFilter;
+
   let workspacePerPage = 5;
   let filterText = "";
   let currPage = 1;
@@ -58,56 +60,92 @@
   let prevSelectedFilter = selectedFilter;
   let prevSearchQuery = searchQuery;
 
-  // filters the workspaces based on the search query
+  // Filter workspaces and handle pagination logic
   $: {
     const filteredResults = workspaces.filter(
       (item) =>
         typeof item.name === "string" &&
         item.name.toLowerCase().includes(searchQuery.toLowerCase()),
     );
+
     const filterChanged = selectedFilter !== prevSelectedFilter;
     const searchChanged = searchQuery !== prevSearchQuery;
-    currPage =
-      filterChanged || searchChanged
-        ? 1
-        : prevPage !== -1
-          ? prevPage
-          : currPage;
+
+    // Reset to page 1 only for filter/search changes
+    if (filterChanged || searchChanged) {
+      currPage = 1;
+      prevPage = 1;
+    }
+
     prevSelectedFilter = selectedFilter;
     prevSearchQuery = searchQuery;
+
     filteredWorkspaces = filteredResults.sort(
       (a, b) =>
         new Date(b._data.updatedAt).getTime() -
         new Date(a._data.updatedAt).getTime(),
     );
+
+    // CRITICAL: Validate current page after any workspace changes
+    const total = filteredWorkspaces.length;
+    const maxPages = total <= 6 ? 1 : Math.ceil((total - 6) / 6) + 1;
+
+    // If current page exceeds available pages, adjust to last valid page
+    if (currPage > maxPages && maxPages > 0) {
+      currPage = maxPages;
+      prevPage = maxPages;
+    }
+
+    // Handle empty workspace case
+    if (total === 0) {
+      currPage = 1;
+      prevPage = 1;
+    }
   }
 
-  // This will split workspaces into pages
-  $: paginatedWorkspaces = (() => {
-    if (currPage === 1) {
-      return filteredWorkspaces.slice(0, 6);
-    } else {
-      const startIndex = 6 + (currPage - 2) * 6;
-      return filteredWorkspaces.slice(startIndex, startIndex + 6); //will check the start index based on current page
-    }
-  })();
-
-  // This will calculate the total number of pages
+  // Calculate total pages with bounds checking
   $: totalPages = (() => {
     const total = filteredWorkspaces.length;
+    if (total === 0) return 1;
     if (total <= 6) return 1;
     return Math.ceil((total - 6) / 6) + 1;
   })();
 
-  $: startIndex = currPage === 1 ? 1 : 6 + (currPage - 2) * 6 + 1;
-  $: endIndex = Math.min(
-    currPage === 1 ? 6 : startIndex + 5,
-    filteredWorkspaces.length,
-  );
+  // Split workspaces into pages with validation
+  $: paginatedWorkspaces = (() => {
+    const total = filteredWorkspaces.length;
+
+    if (total === 0) return [];
+
+    // Ensure currPage is within valid bounds
+    const maxPages = totalPages;
+    const validPage = Math.max(1, Math.min(currPage, maxPages));
+
+    if (validPage === 1) {
+      return filteredWorkspaces.slice(0, 6);
+    } else {
+      const startIndex = 6 + (validPage - 2) * 6;
+      return filteredWorkspaces.slice(startIndex, startIndex + 6);
+    }
+  })();
+
+  // Calculate display indices with error handling
+  $: startIndex = (() => {
+    if (filteredWorkspaces.length === 0) return 0;
+    return currPage === 1 ? 1 : 6 + (currPage - 2) * 6 + 1;
+  })();
+
+  $: endIndex = (() => {
+    if (filteredWorkspaces.length === 0) return 0;
+    const calculatedEnd = currPage === 1 ? 6 : startIndex + 5;
+    return Math.min(calculatedEnd, filteredWorkspaces.length);
+  })();
 
   const setPageWithinBounds = (newPage: number) => {
-    currPage = Math.max(1, Math.min(newPage, totalPages));
-    prevPage = Math.max(1, Math.min(newPage, totalPages));
+    const maxPages = totalPages;
+    const validPage = Math.max(1, Math.min(newPage, maxPages));
+    currPage = validPage;
+    prevPage = validPage;
   };
 
   const handleClick = async () => {
