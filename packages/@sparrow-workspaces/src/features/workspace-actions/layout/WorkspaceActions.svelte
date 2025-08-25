@@ -156,6 +156,7 @@
   export let onCompareCollection;
   export let onSyncCollection;
   export let onUpdateRunningState;
+  export let appEdition = "MANAGED";
 
   let collectionListMounted = false;
   function delayFrames(count: number): Promise<void> {
@@ -899,7 +900,7 @@
     </div>
 
     <!-- Launch sparrow desktop -->
-    {#if isWebApp}
+    {#if isWebApp && appEdition !== "SELFHOSTED"}
       <LaunchDesktop {launchSparrowWebApp} />
     {/if}
   </div>

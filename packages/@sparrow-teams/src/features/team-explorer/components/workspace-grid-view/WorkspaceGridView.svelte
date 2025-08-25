@@ -50,6 +50,8 @@
   export let isWorkspaceCreationInProgress = false;
   export let onCopyLink;
   export let selectedFilter;
+  export let appEdition = "MANAGED";
+
   let workspacePerPage = 5;
   let filterText = "";
   let currPage = 1;
@@ -202,6 +204,7 @@
               {openInDesktop}
               {isWebEnvironment}
               {onCopyLink}
+              {appEdition}
             />
           {/each}
         </div>
