@@ -104,6 +104,8 @@
         value: "",
         checked: false,
         type: "user-generated",
+        id: crypto.randomUUID(),
+        undo: false,
       });
       pairs = pairs;
     }
