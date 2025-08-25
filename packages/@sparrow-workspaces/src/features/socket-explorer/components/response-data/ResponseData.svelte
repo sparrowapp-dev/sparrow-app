@@ -252,72 +252,71 @@
   </div>
   <div class="pt-1"></div>
   <div style="flex:1; overflow:auto;">
-    <div bind:this={virtualScrollEl} class="h-100">
-      <VirtualScroll data={filteredWebsocketMessage} key="uuid" let:data>
-        <div
-          class="response-message d-flex align-items-center gap-2"
-          style="cursor: pointer;"
-          on:click={() => {
-            onUpdateMessageBody(data.uuid);
+    <div bind:this={virtualScrollEl} class="h-100 d-flex flex-column">
+      {#if filteredWebsocketMessage?.length}
+        <VirtualScroll data={filteredWebsocketMessage} key="uuid" let:data>
+          <div
+            class="response-message d-flex align-items-center gap-2"
+            style="cursor: pointer;"
+            on:click={() => {
+              onUpdateMessageBody(data.uuid);
 
-            try {
-              if (data.data) {
-                JSON.parse(data.data);
-                onUpdateContentType(RequestDataTypeEnum.JSON);
+              try {
+                if (data.data) {
+                  JSON.parse(data.data);
+                  onUpdateContentType(RequestDataTypeEnum.JSON);
+                }
+              } catch (e) {
+                onUpdateContentType(RequestDataTypeEnum.TEXT);
               }
-            } catch (e) {
-              onUpdateContentType(RequestDataTypeEnum.TEXT);
-            }
-          }}
+            }}
+          >
+            <span
+              class="py-2 d-flex align-items-center"
+              style="padding: 0 6px;"
+            >
+              {#if data?.transmitter === "sender"}
+                <ArrowUpRightRegular
+                  size="16px"
+                  color="var(--icon-ds-success-400)"
+                />
+              {:else if data?.transmitter === "disconnector"}
+                <ErrorCircleFilled
+                  size="16px"
+                  color="var(--icon-ds-danger-400)"
+                />
+              {:else if data?.transmitter === "connecter"}
+                <CheckmarkCircleFilled
+                  size="16px"
+                  color="var(--icon-ds-success-400)"
+                />
+              {:else if data?.transmitter === "receiver"}
+                <ArrowDownLeftFilled
+                  size="16px"
+                  color="var(--icon-ds-primary-400)"
+                />
+              {/if}
+            </span>
+
+            <span
+              class="text-fs-12 py-2 timestamp"
+              style="white-space: nowrap; line-height: 1;"
+            >
+              {data?.timestamp}
+            </span>
+            <p class="ellipsis text-fs-12 mb-0" style="line-height: 1;">
+              {@html highlightSearchText(data?.data, searchData)}
+            </p>
+          </div>
+        </VirtualScroll>
+      {:else if searchData || webSocket.filter !== "All Messages"}
+        <div
+          class="flex-grow-1 d-flex align-items-center justify-content-center"
         >
-          <span
-            class="py-2 d-flex align-items-center"
-            style="padding-left:6px ;padding-right: 6px;"
-          >
-            {#if data?.transmitter === "sender"}
-              <ArrowUpRightRegular
-                size={"16px"}
-                color="var(--icon-ds-success-400)"
-              />
-              <!-- senderIcon -->
-            {:else if data?.transmitter === "disconnector"}
-              <!-- DisconnectIcon -->
-              <ErrorCircleFilled
-                size={"16px"}
-                color="var(--icon-ds-danger-400)"
-              />
-            {:else if data?.transmitter === "connecter"}
-              <!-- ConnectIcon -->
-
-              <CheckmarkCircleFilled
-                size={"16px"}
-                color="var(--icon-ds-success-400)"
-              />
-            {:else if data?.transmitter === "receiver"}
-              <ArrowDownLeftFilled
-                color="var(--icon-ds-primary-400)"
-                size={"16px"}
-              />
-            {/if}
-          </span>
-          <!-- <div class="d-flex align-items-center"> -->
-          <span
-            class="text-fs-12 py-2 timestamp"
-            style="white-space: nowrap; line-height: 1;"
-          >
-            {data?.timestamp}
-          </span>
-          <p class="ellipsis text-fs-12 mb-0" style="line-height: 1;">
-            {@html highlightSearchText(data?.data, searchData)}
+          <p class="text-fs-16 text-center text-secondary-200 m-0">
+            No result found.
           </p>
-          <!-- </div> -->
         </div>
-      </VirtualScroll>
-
-      {#if !filteredWebsocketMessage?.length && (searchData || webSocket.filter !== "All Messages")}
-        <p class="text-fs-16 text-center text-secondary-200">
-          No result found.
-        </p>
       {/if}
     </div>
   </div>
