@@ -862,8 +862,6 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           CI: "false"
         run: |
-          yarn cache clean
-          yarn install
           yarn desktop-build-intel-mac
 
       - name: Show DMG signatures for Apple(MX Build)
