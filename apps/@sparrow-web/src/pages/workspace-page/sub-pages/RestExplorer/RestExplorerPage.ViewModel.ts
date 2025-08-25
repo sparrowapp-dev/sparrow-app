@@ -1111,7 +1111,7 @@ class RestExplorerViewModel {
         if (
           transformedObject.request!.selectedRequestBodyType ===
             "multipart/form-data" &&
-          key.toLowerCase() === "content-type"
+          key?.toLowerCase() === "content-type"
         ) {
           // Skip Content-Type header for formdata
           continue;
