@@ -114,7 +114,7 @@ jobs:
           yarn install
           yarn desktop-build
 
-      - name: Configure SDK/sysroot for x86_64 cross-compile (fix stdlib.h not found)
+      - name: Configure Env Variables for x86_64 cross-compile
         shell: bash
         run: |
           # Resolve compilers and SDK path from the selected Xcode
@@ -177,22 +177,43 @@ jobs:
           sudo installer -pkg AWSCLIV2.pkg -target /
           aws --version
 
-      - name: Upload macOS artifacts (both archs) to S3
+      - name: Set build datetime
+        run: echo "BUILD_DATETIME=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+        
+      - name: Upload macOS artifacts (both archs) to S3 with datetime suffix
         run: |
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-prod --recursive --exclude "*" --include "*.gz"
+          # Copy ARM64 files with datetime suffix
+          for file in /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/*.gz; do
+            filename=$(basename "$file")
+            extension="${filename##*.}"
+            name="${filename%.*}"
+            new_filename="${name}-${BUILD_DATETIME}.${extension}"
+            aws s3 cp "$file" "s3://sparrow-release-assests-prod/macos/$new_filename"
+          done
 
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos s3://sparrow-release-assests-prod --recursive --exclude "*" --include "*.gz"
+          # Copy Intel files with datetime suffix
+          for file in /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos/*.gz; do
+            filename=$(basename "$file")
+            extension="${filename##*.}"
+            name="${filename%.*}"
+            new_filename="${name}-${BUILD_DATETIME}.${extension}"
+            aws s3 cp "$file" "s3://sparrow-release-assests-prod/macos/$new_filename"
+          done
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-      - name: Post both macOS Builds to Teams
+      - name: Post both macOS Builds to Teams with download buttons
         run: |
           ARM64_DMG=$(ls apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg | head -n 1)
           INTEL_DMG=$(ls apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/dmg/*.dmg | head -n 1)
 
-          ARM64_URL="https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/macos/$(basename "$ARM64_DMG")"
-          INTEL_URL="https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/macos/$(basename "$INTEL_DMG")"
+          # Get filenames with datetime suffix
+          ARM64_FILENAME="$(basename "${ARM64_DMG%.dmg}")-${BUILD_DATETIME}.dmg"
+          INTEL_FILENAME="$(basename "${INTEL_DMG%.dmg}")-${BUILD_DATETIME}.dmg"
+
+          ARM64_URL="https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/macos/$ARM64_FILENAME"
+          INTEL_URL="https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/macos/$INTEL_FILENAME"
 
           curl -H "Content-Type: application/json" -d "{
             \"type\": \"message\",
@@ -215,15 +236,20 @@ jobs:
                     },
                     {
                       \"type\": \"TextBlock\",
-                      \"text\": \"Apple Silicon (arm64): $ARM64_URL\",
-                      \"color\": \"accent\",
+                      \"text\": \"Build Date: $(date +'%Y-%m-%d %H:%M:%S')\",
                       \"wrap\": true
+                    }
+                  ],
+                  \"actions\": [
+                    {
+                      \"type\": \"Action.OpenUrl\",
+                      \"title\": \"📥 Download Apple Silicon (arm64)\",
+                      \"url\": \"$ARM64_URL\"
                     },
                     {
-                      \"type\": \"TextBlock\",
-                      \"text\": \"Intel (x86_64): $INTEL_URL\",
-                      \"color\": \"accent\",
-                      \"wrap\": true
+                      \"type\": \"Action.OpenUrl\",
+                      \"title\": \"📥 Download Intel (x86_64)\",
+                      \"url\": \"$INTEL_URL\"
                     }
                   ],
                   \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
