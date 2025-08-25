@@ -5,16 +5,30 @@
   import Authguard from "../routing/Authguard.svelte";
   import Navigate from "../routing/Navigate.svelte";
   import Dashboard from "../pages/Dashboard/Dashboard.svelte";
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import { handleLogin } from "./App";
   import { initPostHog } from "@app/utils/posthog/posthogConfig";
   export let url = "/";
 
+  let channel: BroadcastChannel;
+
   onMount(async () => {
     if (typeof window !== "undefined") {
       initPostHog();
+
+      // Listen for refresh events from other tabs
+      channel = new BroadcastChannel("sparrow_app_channel");
+      channel.onmessage = (event) => {
+        if (event.data === "refresh") {
+          window.location.reload();
+        }
+      };
     }
     handleLogin(window.location.search);
+  });
+
+  onDestroy(() => {
+    if (channel) channel.close();
   });
 </script>
 

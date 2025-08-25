@@ -521,4 +521,7 @@ export async function handleLogin(url: string) {
     _guideRepository.insert({ isActive: false, id: "environment-guide" });
     _guideRepository.insert({ isActive: false, id: "collection-guide" });
   }
+  const bc = new BroadcastChannel("sparrow_app_channel");
+  bc.postMessage("refresh");
+  bc.close();
 }

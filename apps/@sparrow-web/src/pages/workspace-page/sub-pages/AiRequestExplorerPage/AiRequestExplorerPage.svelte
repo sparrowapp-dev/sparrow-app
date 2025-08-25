@@ -39,6 +39,7 @@
   let isGuestUser = false;
   let userId = "";
   let userRole = "";
+  let isSharedWorkspace = false;
 
   isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
@@ -99,6 +100,7 @@
                 currentWorkspace = activeWorkspaceRxDoc;
                 currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
                 environmentId = activeWorkspaceRxDoc.get("environmentId");
+                isSharedWorkspace = activeWorkspaceRxDoc.get("isShared");
               }
             },
           );
@@ -205,6 +207,7 @@
   bind:userRole
   {collection}
   {environmentVariables}
+  {isSharedWorkspace}
   {isGuestUser}
   isWebApp={true}
   storeData={AiRequestExplorerData}

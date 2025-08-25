@@ -35,6 +35,7 @@ import constants from "@app/constants/constants";
 import { TeamService } from "@app/services/team.service";
 import { PlanRepository } from "@app/repositories/plan.repository";
 import { open } from "@tauri-apps/plugin-shell";
+import { getAuthJwt } from "@app/utils/jwt";
 
 export default class WorkspaceExplorerViewModel {
   // Private Repositories
@@ -56,7 +57,7 @@ export default class WorkspaceExplorerViewModel {
     const t = createDeepCopy(_tab.toMutableJSON());
     delete t.isActive;
     delete t.index;
-    t.persistence = TabPersistenceTypeEnum.PERMANENT;
+    // t.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = t;
   }
 
@@ -333,11 +334,11 @@ export default class WorkspaceExplorerViewModel {
       );
     } else {
       if (response?.message === "Plan limit reached") {
-          // notifications.error("Failed to send invite. please upgrade your plan.");
-        } else {
-          notifications.error(
-            response?.message || "Failed to send invite. Please try again.",
-          );
+        // notifications.error("Failed to send invite. please upgrade your plan.");
+      } else {
+        notifications.error(
+          response?.message || "Failed to send invite. Please try again.",
+        );
       }
     }
     if (_data.role === WorkspaceRole.WORKSPACE_VIEWER) {
@@ -644,7 +645,10 @@ export default class WorkspaceExplorerViewModel {
    * @description - This function will redirect you to billing section.
    */
   public handleRedirectToAdminPanel = async (teamId: string) => {
-    await open(`${constants.ADMIN_URL}/billing/billingOverview/${teamId}`);
+    const [authToken] = getAuthJwt();
+    await open(
+      `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+    );
   };
 
   public handleContactSales = async () => {

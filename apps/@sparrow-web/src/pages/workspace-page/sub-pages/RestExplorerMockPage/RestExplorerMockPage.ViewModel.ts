@@ -180,7 +180,7 @@ class RestExplorerMockViewModel {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         delete t.index;
-        t.persistence = TabPersistenceTypeEnum.PERMANENT;
+        // t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
         await this.fetchCollection(t.path.collectionId as string);
         const m = this._tab.getValue() as Tab;
@@ -522,8 +522,10 @@ class RestExplorerMockViewModel {
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
+        persistence: TabPersistenceTypeEnum.PERMANENT
       });
       progressiveTab.isSaved = false;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };
@@ -2452,7 +2454,6 @@ class RestExplorerMockViewModel {
       ...(componentData?.property?.request?.ai?.conversations || []),
       {
         message: errorMessage || "Something went wrong. Please try again",
-        message: errorMessage || "Something went wrong. Please try again",
         messageId: uuidv4(),
         type: MessageTypeEnum.RECEIVER,
         isLiked: false,
@@ -2569,7 +2570,9 @@ class RestExplorerMockViewModel {
             events.forEach((event) =>
               this.aiAssistentWebSocketService.removeListener(event),
             );
-            Sentry.captureException("Socket Connection Break");
+            Sentry.captureException(
+              `Socket Connection Break. Socket Status: ${event} RestExplorerMockPage.viewmodel(Web)`,
+            );
             await this.handleAIResponseError(
               componentData,
               "Something went wrong. Please try again",
@@ -2678,6 +2681,9 @@ class RestExplorerMockViewModel {
         ),
       );
     } catch (error) {
+      Sentry.captureException(
+        `Error in websocket streaming ${error} RestExplorerMockPage.viewmodel(Web)`,
+      );
       console.error("Something went wrong!:", error.message);
       await this.handleAIResponseError(componentData, error.message);
     }

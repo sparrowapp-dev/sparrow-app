@@ -8,7 +8,7 @@ export const environmentTabSchemaLiteral = {
   title: "environment",
   primaryKey: "environmentId",
   type: "object",
-  version: 3,
+  version: 4,
   properties: {
     // ---- RxDocumentId
     environmentId: {
@@ -27,6 +27,24 @@ export const environmentTabSchemaLiteral = {
       type: "string",
     },
     variable: {
+      type: "array",
+      default: [],
+      items: {
+        type: "object",
+        properties: {
+          key: {
+            type: "string",
+          },
+          value: {
+            type: "string",
+          },
+          checked: {
+            type: "boolean",
+          },
+        },
+      },
+    },
+    aiVariable: {
       type: "array",
       default: [],
       items: {

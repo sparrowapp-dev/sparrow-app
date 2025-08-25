@@ -65,6 +65,7 @@ import { TeamRepository } from "@app/repositories/team.repository";
 import { PlanRepository } from "@app/repositories/plan.repository";
 import { TeamService } from "src/services/team.service";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
+import { getAuthJwt } from "src/utils/jwt";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -1787,8 +1788,10 @@ export class TestflowExplorerPageViewModel {
    * @description - This function will redirect you to billing section.
    */
   public handleRedirectToAdminPanel = async (teamId: string) => {
+    const [authToken] = getAuthJwt();
     window.open(
-      constants.ADMIN_URL + `/billing/billingOverview/${teamId}`,
+      constants.ADMIN_URL +
+        `/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
       "_blank",
     );
     return;

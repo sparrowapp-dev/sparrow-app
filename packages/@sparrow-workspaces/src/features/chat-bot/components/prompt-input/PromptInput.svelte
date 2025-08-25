@@ -141,6 +141,7 @@
         maxHeaderWidth={"110px"}
         minBodyWidth={"182px"}
         menuItem={"v2"}
+        position={"absolute"}
       >
         <div
           slot="post-select"

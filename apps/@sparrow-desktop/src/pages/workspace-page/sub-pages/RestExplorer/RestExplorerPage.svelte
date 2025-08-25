@@ -45,6 +45,7 @@
   let renameWithCollectionList;
   let debouncedAPIUpdater;
   let guestUser;
+  let isSharedWorkspace = false;
 
   const restExplorerDataStoreSubscriber = restExplorerDataStore.subscribe(
     (_webSocketMap) => {
@@ -121,6 +122,7 @@
                 currentWorkspace = activeWorkspaceRxDoc;
                 currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
                 environmentId = activeWorkspaceRxDoc.get("environmentId");
+                isSharedWorkspace = activeWorkspaceRxDoc.get("isShared");
               }
             },
           );
@@ -210,6 +212,7 @@
   {environmentVariables}
   {isGuestUser}
   {isLoginBannerActive}
+  {isSharedWorkspace}
   onOpenCollection={_viewModel.openCollection}
   onSendRequest={_viewModel.sendRequest}
   onCancelRequest={_viewModel.cancelRequest}

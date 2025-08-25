@@ -15,6 +15,7 @@
     ArrowImportRegular,
     ArrowExitRegular,
     ArrowEnterRegular,
+    CopyAddRegular,
   } from "@sparrow/library/icons";
   import { ChevronDownRegular } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
@@ -233,6 +234,15 @@
       Icon: ArrowImportRegular,
       onClick: () => {
         data.onContextMenu(id, "add-block-before");
+      },
+    },
+    {
+      name: "Duplicate Block",
+      iconSize: "16px",
+      iconColor: "var(--icon-ds-neutral-50)",
+      Icon: CopyAddRegular,
+      onClick: () => {
+        data.onContextMenu(id, "duplicate");
       },
     },
     {

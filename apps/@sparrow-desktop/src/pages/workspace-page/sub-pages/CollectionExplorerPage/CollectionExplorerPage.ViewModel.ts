@@ -67,6 +67,7 @@ import constants from "@app/constants/constants";
 import * as Sentry from "@sentry/svelte";
 import { MockHistoryTabAdapter } from "@app/adapter/mock-history-tab";
 import type { AiRequestBaseInterface } from "@sparrow/common/types/workspace/ai-request-base";
+import { environmentType } from "@sparrow/common/enums/environment.enum";
 
 class CollectionExplorerPage {
   // Private Repositories
@@ -76,6 +77,7 @@ class CollectionExplorerPage {
   private environmentRepository = new EnvironmentRepository();
   private environmentService = new EnvironmentService();
   private guestUserRepository = new GuestUserRepository();
+  private initTab = new InitTab();
 
   // Private Services
   private collectionService = new CollectionService();
@@ -2222,6 +2224,65 @@ class CollectionExplorerPage {
       notifications.error("Failed to delete authentication profile.");
     }
     return response;
+  };
+
+  public onOpenGlobalEnvironmentToGenerate = async(
+    environment: any,
+    collectionId: string,
+    collectionName: string,
+  ) => {
+    const environmentTabRxDoc = await  this.tabRepository.getTabById(environment?.id);
+    let environmentTabJson = environmentTabRxDoc?.toMutableJSON();
+    if(environmentTabJson){
+      environmentTabJson.property.environment.generateProperty = {
+        collectionId: collectionId,
+        collectionName: collectionName,
+      };
+      environmentTabJson.property.environment.generateVariable = true;
+      environmentTabJson.property.environment.aiGenerationStatus = "";
+      environmentTabJson.persistence = TabPersistenceTypeEnum.PERMANENT;
+    }
+    await this.tabRepository.updateTabByMongoId(environment?.id, environmentTabJson);
+    
+
+    const initEnvironmentTab = this.initTab.environment(
+      environment?.id,
+      environment.workspaceId,
+    );
+    initEnvironmentTab
+      .setName(environment?.name)
+      .setType(environmentType.GLOBAL)
+      .setVariable(environment?.variable)
+      .setGenerativeVariables(true)
+      .setGenerativeProperties(collectionId, collectionName)
+      .setTabType(TabPersistenceTypeEnum.PERMANENT);
+    this.tabRepository.createTab(initEnvironmentTab.getValue());
+    scrollToTab(initEnvironmentTab.getValue().id);
+  };
+
+  public handleGenerateVariableTab = async (
+    collectionId: string,
+    globalEnv: any,
+    collectionName: string,
+  ) => {
+    this.onOpenGlobalEnvironmentToGenerate(
+      globalEnv,
+      collectionId,
+      collectionName,
+    );
+    return;
+  };
+
+  public handleCheckGlobalVariableActive = async (globalEnvId: string) => {
+    const tab = await this.tabRepository.getTabById(globalEnvId);
+    if (tab) {
+      const reponse = {
+        collectionName: tab.toMutableJSON()?.property.environment?.generateProperty?.collectionName,
+      };
+      if (tab.toMutableJSON()?.property.environment?.generateVariable) {
+        return reponse;
+      }
+    }
   };
 }
 

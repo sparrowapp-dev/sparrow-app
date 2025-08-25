@@ -222,6 +222,10 @@ export class TabRepository {
     return selectedTab;
   };
 
+    public bulkUpsertTabs = async (tabs: TabDocument[]): Promise<void> => {
+      await RxDB?.getInstance()?.rxdb?.tab.bulkUpsert(tabs);
+    };
+
   /**
    * Retrieves the currently active tab as an observable.
    *

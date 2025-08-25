@@ -267,9 +267,17 @@
         window.innerHeight;
 
       // Position either above or below based on available space
-      bodyTopDistance = wouldOverflowBottom
-        ? selectHeaderWrapper.getBoundingClientRect().top - actualBodyHeight - 5
-        : selectHeaderWrapper.getBoundingClientRect().bottom + 5;
+      if (position === "fixed") {
+        bodyTopDistance = wouldOverflowBottom
+          ? selectHeaderWrapper.getBoundingClientRect().top -
+            actualBodyHeight -
+            5
+          : selectHeaderWrapper.getBoundingClientRect().bottom + 5;
+      } else {
+        bodyTopDistance = wouldOverflowBottom
+          ? actualBodyHeight * -1 - 5
+          : Number(headerHeight.replace(/\D/g, "")) + 5;
+      }
 
       bodyRightDistance =
         window.innerWidth - selectHeaderWrapper.getBoundingClientRect().right;
@@ -546,9 +554,7 @@
       : bodyAlignment === 'right'
         ? '0px;'
         : 'auto;'} 
-    top: {position === 'fixed'
-      ? `${bodyTopDistance}px;`
-      : `${Number(headerHeight.replace(/\D/g, '')) + 5}px;`}  
+    top: {`${bodyTopDistance}px;`}  
     right: {position === 'fixed'
       ? bodyAlignment === 'right'
         ? `${bodyRightDistance}px;`

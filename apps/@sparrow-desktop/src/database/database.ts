@@ -428,6 +428,9 @@ export class RxDB {
             }
             return oldDoc;
           },
+          32: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
         },
       },
       collection: {
@@ -633,6 +636,9 @@ export class RxDB {
             return oldDoc;
           },
           3: function (oldDoc: EnvironmentTabDocument) {
+            return oldDoc;
+          },
+          4: function (oldDoc: EnvironmentTabDocument) {
             return oldDoc;
           },
         },

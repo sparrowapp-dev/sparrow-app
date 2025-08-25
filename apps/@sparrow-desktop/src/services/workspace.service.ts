@@ -64,6 +64,20 @@ export class WorkspaceService {
     return response;
   };
 
+  public fetchWorkspace = async (
+    workspaceId: string,
+    baseUrl: string,
+  ): Promise<HttpClientResponseInterface<any>> => {
+    const response = await makeRequest(
+      "GET",
+      `${baseUrl}/api/workspace/${workspaceId}`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
   public createWorkspace = async (
     workspace: WorkspacePostBody,
     baseUrl: string,
