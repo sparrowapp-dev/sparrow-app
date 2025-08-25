@@ -445,7 +445,13 @@
       handleKeyDownChange(event);
     },
 
-    paste: handlePaste, // triggers paste event
+    paste: (event, view: EditorView) => {
+      if (disabled) {
+        event.preventDefault();
+        return;
+      }
+      handlePaste(event);
+    },
   });
 
   /**
