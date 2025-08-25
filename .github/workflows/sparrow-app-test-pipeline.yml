@@ -97,22 +97,30 @@ jobs:
         run: yarn config set network-timeout 600000
 
       # ------- ARM64 (Apple Silicon) build -------
-      - name: Build & Sign Tauri App (Apple Silicon / arm64)
-        env:
-          APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
-          APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
-          APPLE_CERTIFICATE_PASSWORD: "${{ secrets.APPLE_CERTIFICATE_PASSWORD }}"
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          CI: "false"
+      # - name: Build & Sign Tauri App (Apple Silicon / arm64)
+      #   env:
+      #     APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
+      #     APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
+      #     APPLE_CERTIFICATE_PASSWORD: "${{ secrets.APPLE_CERTIFICATE_PASSWORD }}"
+      #     TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+      #     TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+      #     GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+      #     APPLE_ID: ${{ secrets.APPLE_ID }}
+      #     APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+      #     APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      #     CI: "false"
+      #   run: |
+      #     yarn cache clean
+      #     yarn install
+      #     yarn desktop-build
+
+      - name: Configure x86_64 macOS Build Environment
         run: |
-          yarn cache clean
-          yarn install
-          yarn desktop-build
+          echo "CC_x86_64_apple_darwin=$(xcrun --sdk macosx -f clang)" >> $GITHUB_ENV
+          echo "CXX_x86_64_apple_darwin=$(xcrun --sdk macosx -f clang++)" >> $GITHUB_ENV
+          echo "CFLAGS_x86_64_apple_darwin=-target x86_64-apple-macos10.13" >> $GITHUB_ENV
+          echo "CXXFLAGS_x86_64_apple_darwin=-target x86_64-apple-macos10.13" >> $GITHUB_ENV
+          echo "MACOSX_DEPLOYMENT_TARGET=10.13" >> $GITHUB_ENV
 
       # ------- Intel (x86_64) build -------
       - name: Build & Sign Tauri App (Intel / x86_64)
@@ -128,10 +136,12 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           CI: "false"
         run: |
+          yarn cache clean
+          yarn install
           yarn desktop-build-intel-mac
 
-      - name: Show DMG signatures for Apple(MX Build)
-        run: cat /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/*.sig
+      # - name: Show DMG signatures for Apple(MX Build)
+      #   run: cat /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/*.sig
 
       - name: Show DMG signatures for Apple(Intel Build)
         run: cat /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos/*.sig
@@ -144,16 +154,16 @@ jobs:
 
       - name: Upload macOS artifacts (both archs) to S3
         run: |
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-prod --recursive --exclude "*" --include "*.gz"
+          # aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-prod --recursive --exclude "*" --include "*.gz"
 
           aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos s3://sparrow-release-assests-prod --recursive --exclude "*" --include "*.gz"
 
       - name: Post both macOS Builds to Teams
         run: |
-          ARM64_DMG=$(ls apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg | head -n 1)
+          # ARM64_DMG=$(ls apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg | head -n 1)
           INTEL_DMG=$(ls apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/dmg/*.dmg | head -n 1)
 
-          ARM64_URL="https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/macos/$(basename "$ARM64_DMG")"
+          # ARM64_URL="https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/macos/$(basename "$ARM64_DMG")"
           INTEL_URL="https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/macos/$(basename "$INTEL_DMG")"
 
           curl -H "Content-Type: application/json" -d "{
