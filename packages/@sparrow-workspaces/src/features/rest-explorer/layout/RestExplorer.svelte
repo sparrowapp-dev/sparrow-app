@@ -798,7 +798,7 @@
                               />
 
                               <div class="d-flex">
-                                {#if !isGuestUser && $policyConfig.enableAIAssistance}
+                                {#if !isGuestUser && $policyConfig.enableAIAssistance && !isSharedWorkspace}
                                   <!-- AI debugging trigger button -->
                                   <!-- As chip component is not available,so using custom styleing to match, will replace it will chip component in later -->
                                   <div
