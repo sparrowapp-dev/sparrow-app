@@ -389,7 +389,7 @@
     <div
       class="api-method text-{httpMethodUIStyle} {api?.isDeleted &&
         'api-method-deleted'}"
-      style="font-size: 9px;"
+      style="font-size: 9px; width: 100%; text-align: left; display: flex; justify-content: flex-start;"
     >
       {api.request?.method?.toUpperCase() === "DELETE"
         ? "DEL"
