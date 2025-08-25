@@ -522,8 +522,10 @@ class RestExplorerMockViewModel {
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
+        persistence: TabPersistenceTypeEnum.PERMANENT
       });
       progressiveTab.isSaved = false;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };
@@ -2568,7 +2570,9 @@ class RestExplorerMockViewModel {
             events.forEach((event) =>
               this.aiAssistentWebSocketService.removeListener(event),
             );
-            Sentry.captureException(`Socket Connection Break. Socket Status: ${event} RestExplorerMockPage.viewmodel(Web)`);
+            Sentry.captureException(
+              `Socket Connection Break. Socket Status: ${event} RestExplorerMockPage.viewmodel(Web)`,
+            );
             await this.handleAIResponseError(
               componentData,
               "Something went wrong. Please try again",
@@ -2677,7 +2681,9 @@ class RestExplorerMockViewModel {
         ),
       );
     } catch (error) {
-      Sentry.captureException(`Error in websocket streaming ${error} RestExplorerMockPage.viewmodel(Web)`);
+      Sentry.captureException(
+        `Error in websocket streaming ${error} RestExplorerMockPage.viewmodel(Web)`,
+      );
       console.error("Something went wrong!:", error.message);
       await this.handleAIResponseError(componentData, error.message);
     }

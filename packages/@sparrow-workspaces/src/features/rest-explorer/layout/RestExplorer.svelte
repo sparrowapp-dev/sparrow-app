@@ -156,6 +156,7 @@
   export let onSaveResponse;
   export let collectionAuth;
   export let collection;
+  export let isSharedWorkspace = false;
   const loading = writable<boolean>(false);
 
   // Props for showing merge/diff view in RequestBody, Headers and Params
@@ -797,7 +798,7 @@
                               />
 
                               <div class="d-flex">
-                                {#if !isGuestUser && $policyConfig.enableAIAssistance}
+                                {#if !isGuestUser && $policyConfig.enableAIAssistance && !isSharedWorkspace}
                                   <!-- AI debugging trigger button -->
                                   <!-- As chip component is not available,so using custom styleing to match, will replace it will chip component in later -->
                                   <div
@@ -870,7 +871,7 @@
             {/if}
           </Pane>
           <!-- AI Chatbot Interface -->
-          {#if !isGuestUser && $tab?.property?.request?.state?.isChatbotActive && $policyConfig.enableAIAssistance}
+          {#if !isGuestUser && $tab?.property?.request?.state?.isChatbotActive && $policyConfig.enableAIAssistance && !isSharedWorkspace}
             <Pane
               class="position-relative bg-transparent"
               minSize={minSizePct}

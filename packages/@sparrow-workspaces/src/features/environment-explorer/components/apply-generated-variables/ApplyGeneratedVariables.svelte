@@ -14,6 +14,9 @@
   export let totalAiGeneratedVariablesCount = 0;
   export let applyingAiGeneratedVariablesCount = 0;
 
+  const freezeApplyingAiGeneratedVariablesCount =
+    applyingAiGeneratedVariablesCount;
+
   let timeoutId;
   let showCancel = true; // Controls Cancel button visibility
 
@@ -44,8 +47,8 @@
   <SparkleRotating />
 </p>
 <p class="text-fs-20 text-center" style="font-weight: 600;">
-  {applyingAiGeneratedVariablesCount}/{totalAiGeneratedVariablesCount} Applying Your
-  Variables
+  {freezeApplyingAiGeneratedVariablesCount}/{totalAiGeneratedVariablesCount} Applying
+  Your Variables
 </p>
 <p class="text-fs-14 text-center">
   Applying variables to your "{collectionName}" collection. If you cancel now,
