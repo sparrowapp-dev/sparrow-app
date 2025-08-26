@@ -23,7 +23,7 @@ import { notifications } from "@sparrow/library/ui";
 import { BehaviorSubject, Observable } from "rxjs";
 import { navigate } from "svelte-navigator";
 import { v4 as uuidv4 } from "uuid";
-import { getClientUser } from "../../utils/jwt";
+import { getAuthJwt, getClientUser } from "../../utils/jwt";
 import { WorkspaceTabAdapter } from "src/adapter";
 import constants from "src/constants/constants";
 import { Sleep } from "@sparrow/common/utils";
@@ -1084,12 +1084,23 @@ export class TeamExplorerPageViewModel {
     }
   };
 
-  public handleRedirectToAdminPanel = async (teamId: string) => {
+  public handleRedirectToAdminPanel = async (
+    teamId: string,
+    options?: { toWorkspace?: boolean },
+  ) => {
+    const [authToken] = getAuthJwt();
     if (constants.APP_EDITION !== "SELFHOSTED") {
-      window.open(
-        constants.ADMIN_URL + `/billing/billingOverview/${teamId}`,
-        "_blank",
-      );
+      if (options?.toWorkspace) {
+        window.open(
+          `${constants.ADMIN_URL}/hubs/workspace/${teamId}?xid=${authToken}`,
+          "_blank",
+        );
+      } else {
+        window.open(
+          `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+          "_blank",
+        );
+      }
     } else {
       window.open(constants.ADMIN_URL, "_blank");
     }

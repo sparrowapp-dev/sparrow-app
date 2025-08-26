@@ -13,6 +13,7 @@ import { ReduceAuthHeader, ReduceAuthParameter} from ".";
 import { createDeepCopy } from "@sparrow/common/utils";
 import { SetDataStructure } from "@sparrow/common/utils";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
+import JSON5 from "json5";
 
 class DecodeTestflow {
   constructor() {}
@@ -230,10 +231,18 @@ class DecodeTestflow {
           if(x === ""){
             return "{}";    
           }   
-          return x;
+           try {
+              // Parse JSON5 (comments/trailing commas allowed)
+              const parsed = JSON5.parse(x);
+              // Stringify back to pure JSON
+              const cleanJson = JSON.stringify(parsed, null, 2);
+              return cleanJson;
+            } catch (e) {
+              return x;
+            }          
         }
       }
-      if (rawData === RequestDataTypeEnum.JAVASCRIPT ) {
+      else if (rawData === RequestDataTypeEnum.JAVASCRIPT ) {
         return this.setDynamicExpression2(this.setEnvironmentVariables(raw, environmentVariables),_previousResponse);     
         
       }

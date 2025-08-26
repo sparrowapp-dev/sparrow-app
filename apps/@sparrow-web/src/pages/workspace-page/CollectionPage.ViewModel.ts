@@ -160,6 +160,7 @@ import { TeamRepository } from "src/repositories/team.repository";
 import { TeamService } from "src/services/team.service";
 import { PlanRepository } from "src/repositories/plan.repository";
 import { tick } from "svelte";
+import { getAuthJwt } from "src/utils/jwt";
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
   private workspaceRepository = new WorkspaceRepository();
@@ -292,6 +293,51 @@ export default class CollectionsViewModel {
     return {
       collectionItemTabsToBeDeleted,
     };
+  };
+
+  /**
+   * @description - refreshes workspace data with sync to mongo server
+   * @param workspaceId - workspace Id
+   * @returns
+   */
+  public fetchWorkspace = async (workspaceId: string): Promise<void> => {
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
+      return;
+    }
+
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const workspaceData =
+      await this.workspaceRepository.readWorkspace(workspaceId);
+
+    let response;
+    if (
+      workspaceData &&
+      workspaceData.workspaceType === WorkspaceType.PUBLIC &&
+      workspaceData.isShared
+    ) {
+      response = await this.workspaceService.fetchPublicWorkspace(workspaceId);
+    } else {
+      response = await this.workspaceService.fetchWorkspace(
+        workspaceId,
+        baseUrl,
+      );
+    }
+
+    if (!response?.isSuccessful || !response?.data?.data) {
+      return;
+    }
+
+    const responseWorkspaceData = response.data.data;
+    await this.workspaceRepository.updateWorkspace(workspaceId, {
+      name: responseWorkspaceData.name,
+      description: responseWorkspaceData.description,
+    });
+    return;
   };
 
   public deleteTabsWithTabIdInAWorkspace = (
@@ -1371,6 +1417,7 @@ export default class CollectionsViewModel {
 
         this.tabRepository.createTab(adaptCollection);
         scrollToTab("");
+        addCollectionItem(response.data.data._id, "collection");
 
         await this.workspaceRepository.updateCollectionInWorkspace(
           workspaceId,
@@ -1408,6 +1455,7 @@ export default class CollectionsViewModel {
 
       this.tabRepository.createTab(adaptCollection);
       scrollToTab("");
+      addCollectionItem(dt.id, "collection");
 
       await this.workspaceRepository.updateCollectionInWorkspace(workspaceId, {
         id: dt.id,
@@ -3055,6 +3103,7 @@ export default class CollectionsViewModel {
 
       this.handleCreateTab(sampleFolder.getValue());
       scrollToTab("");
+      addCollectionItem(data.id, "folder");
 
       // Update the locally added folder with server response
       const folderObj = data;
@@ -3107,6 +3156,7 @@ export default class CollectionsViewModel {
 
       this.handleCreateTab(sampleFolder.getValue());
       scrollToTab("");
+      addCollectionItem(response.data.data.id, "folder");
 
       // Update the locally added folder with server response
       const folderObj = response.data.data;
@@ -8255,8 +8305,10 @@ export default class CollectionsViewModel {
   };
 
   public handleRedirectToAdminPanel = async (teamId: string) => {
+    const [authToken] = getAuthJwt();
     window.open(
-      constants.ADMIN_URL + `/billing/billingOverview/${teamId}`,
+      constants.ADMIN_URL +
+        `/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
       "_blank",
     );
   };

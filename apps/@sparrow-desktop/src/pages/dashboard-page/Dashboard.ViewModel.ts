@@ -24,7 +24,7 @@ import {
   type TeamDocument,
   type WorkspaceDocument,
 } from "../../database/database";
-import { clearAuthJwt, getClientUser } from "@app/utils/jwt";
+import { clearAuthJwt, getAuthJwt, getClientUser } from "@app/utils/jwt";
 import { userLogout } from "../../services/auth.service";
 import { FeatureSwitchService } from "../../services/feature-switch.service";
 import { FeatureSwitchRepository } from "../../repositories/feature-switch.repository";
@@ -157,9 +157,11 @@ export class DashboardViewModel {
   };
 
   public onAdminRedirect = async () => {
-    await open(`${constants.ADMIN_URL}`);
+    const [authToken] = getAuthJwt();
+    await open(`${constants.ADMIN_URL}/hubs?xid=${authToken}`);
     return;
   };
+
   /**
    *
    * @returns guest user state
@@ -1236,7 +1238,10 @@ export class DashboardViewModel {
    * @description - This function will redirect you to billing section.
    */
   public handleRedirectToAdminPanel = async (teamId: string) => {
-    await open(`${constants.ADMIN_URL}/billing/billingOverview/${teamId}`);
+    const [authToken] = getAuthJwt();
+    await open(
+      `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+    );
   };
 
   public handleContactSales = async () => {

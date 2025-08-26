@@ -57,6 +57,8 @@
   let currPage = 1;
   let prevPage = -1;
   let filteredWorkspaces: any[] = [];
+  let prevSelectedFilter = selectedFilter;
+  let prevSearchQuery = searchQuery;
 
   // filters the workspaces based on the search query
   $: {
@@ -65,14 +67,16 @@
         typeof item.name === "string" &&
         item.name.toLowerCase().includes(searchQuery.toLowerCase()),
     );
-
+    const filterChanged = selectedFilter !== prevSelectedFilter;
+    const searchChanged = searchQuery !== prevSearchQuery;
     currPage =
-      searchQuery && filteredResults.length > 0
+      filterChanged || searchChanged
         ? 1
         : prevPage !== -1
           ? prevPage
           : currPage;
-
+    prevSelectedFilter = selectedFilter;
+    prevSearchQuery = searchQuery;
     filteredWorkspaces = filteredResults.sort(
       (a, b) =>
         new Date(b._data.updatedAt).getTime() -

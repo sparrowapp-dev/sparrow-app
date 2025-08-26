@@ -35,7 +35,15 @@ class InitEnvironmentTab {
           state: {
             isSaveInProgress: false,
           },
+          aiVariable: [],
+          generateVariable: false,
+          generateProperty: {
+            collectionId: "",
+            collectionName: "",
+          },
+          aiGenerationStatus: "",
         },
+
       },
       path: {
         workspaceId: _workspaceId,
@@ -75,13 +83,25 @@ class InitEnvironmentTab {
     this._tab.description = _description;
     return this;
   }
-  public setVariable(_variable) {
+  public setVariable(_variable: any) {
     this._tab.property.environment.variable = _variable;
     return this;
   }
 
   public setType(_type: string) {
     this._tab.property.environment.type = _type;
+    return this;
+  }
+  public setGenerativeVariables(_genertiveVariable: boolean) {
+    this._tab.property.environment.generateVariable = _genertiveVariable;
+    return this;
+  }
+  public setGenerativeProperties(
+    _generatingCollectionId: string,
+    _generatingCollectionName: string,
+  ) {
+    this._tab.property.environment.generateProperty.collectionId = _generatingCollectionId;
+    this._tab.property.environment.generateProperty.collectionName = _generatingCollectionName;
     return this;
   }
 }

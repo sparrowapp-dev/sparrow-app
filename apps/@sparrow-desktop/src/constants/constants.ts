@@ -25,16 +25,16 @@ const constants = {
   AZURE_INSIGHTS_CONNECTION_STRING: import.meta.env
     .VITE_AZURE_INSIGHTS_CONNECTION_STRING,
   BASE_URL: import.meta.env.VITE_BASE_URL,
-  INTRO_DOCS_URL: import.meta.env.VITE_SPARROW_DOCS + "/docs/intro",
+  INTRO_DOCS_URL: import.meta.env.VITE_SPARROW_DOCS + "/docs/user-manual/application/introduction/introduction-to-sparrow",
   TESTFLOW_DOCS_URL:
-    import.meta.env.VITE_SPARROW_DOCS + "/docs/usermanual/testflows",
+    import.meta.env.VITE_SPARROW_DOCS + "/docs/user-manual/application/workspace-features/testflows",
   APP_ENVIRONMENT_PATH: import.meta.env.VITE_APP_ENVIRONMENT_PATH,
   SPARROW_AI_WEBSOCKET_URL: import.meta.env.VITE_SPARROW_AI_WEBSOCKET,
   SENTRY_DSN: import.meta.env.VITE_SENTRY_DSN,
   APP_ENVIRONMENT: import.meta.env.VITE_APP_ENVIRONMENT,
   SPARROW_WEB_APP_URL: import.meta.env.VITE_SPARROW_WEB_APP_URL,
   MARKETING_URL: import.meta.env.VITE_MARKETING_URL,
-  LINUX_INSTALL_DOCS: import.meta.env.VITE_SPARROW_DOCS + "/docs/usermanual/linux-install",
+  LINUX_INSTALL_DOCS: import.meta.env.VITE_SPARROW_DOCS + "/docs/user-manual/application/sparrow-on-linux/install-sparrow-linux",
   ADMIN_URL: import.meta.env.VITE_SPARROW_ADMIN_URL,
 };
 

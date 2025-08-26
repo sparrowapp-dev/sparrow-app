@@ -159,6 +159,7 @@ import { TeamService } from "@app/services/team.service";
 import { PlanRepository } from "@app/repositories/plan.repository";
 import { open } from "@tauri-apps/plugin-shell";
 import type { TransformedRequest } from "@sparrow/common/types/workspace/collection-base";
+import { getAuthJwt } from "@app/utils/jwt";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -293,6 +294,51 @@ export default class CollectionsViewModel {
     return {
       collectionItemTabsToBeDeleted,
     };
+  };
+
+  /**
+   * @description - refreshes workspace data with sync to mongo server
+   * @param workspaceId - workspace Id
+   * @returns
+   */
+  public fetchWorkspace = async (workspaceId: string): Promise<void> => {
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
+      return;
+    }
+
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const workspaceData =
+      await this.workspaceRepository.readWorkspace(workspaceId);
+
+    let response;
+    if (
+      workspaceData &&
+      workspaceData.workspaceType === WorkspaceType.PUBLIC &&
+      workspaceData.isShared
+    ) {
+      response = await this.workspaceService.fetchPublicWorkspace(workspaceId);
+    } else {
+      response = await this.workspaceService.fetchWorkspace(
+        workspaceId,
+        baseUrl,
+      );
+    }
+
+    if (!response?.isSuccessful || !response?.data?.data) {
+      return;
+    }
+
+    const responseWorkspaceData = response.data.data;
+    await this.workspaceRepository.updateWorkspace(workspaceId, {
+      name: responseWorkspaceData.name,
+      description: responseWorkspaceData.description,
+    });
+    return;
   };
 
   public deleteTabsWithTabIdInAWorkspace = (
@@ -1365,6 +1411,8 @@ export default class CollectionsViewModel {
         this.tabRepository.createTab(adaptCollection);
         scrollToTab("");
 
+        addCollectionItem(response.data.data._id, "collection");
+
         await this.workspaceRepository.updateCollectionInWorkspace(
           workspaceId,
           {
@@ -1400,6 +1448,7 @@ export default class CollectionsViewModel {
       this.tabRepository.createTab(adaptCollection);
       scrollToTab("");
 
+      addCollectionItem(dt.id, "collection");
       await this.workspaceRepository.updateCollectionInWorkspace(workspaceId, {
         id: dt.id,
         name: dt.name,
@@ -3037,7 +3086,7 @@ export default class CollectionsViewModel {
 
       this.handleCreateTab(sampleFolder.getValue());
       scrollToTab("");
-
+      addCollectionItem(data.id, "folder");
       // Update the locally added folder with server response
       const folderObj = data;
       await this.collectionRepository.updateRequestOrFolderInCollection(
@@ -3088,6 +3137,7 @@ export default class CollectionsViewModel {
       }
       this.handleCreateTab(sampleFolder.getValue());
       scrollToTab("");
+      addCollectionItem(response.data.data.id, "folder");
 
       // Update the locally added folder with server response
       const folderObj = response.data.data;
@@ -8204,7 +8254,10 @@ export default class CollectionsViewModel {
   };
 
   public handleRedirectToAdminPanel = async (teamId: string) => {
-    await open(`${constants.ADMIN_URL}/billing/billingOverview/${teamId}`);
+    const [authToken] = getAuthJwt();
+    await open(
+      `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+    );
   };
 
   public handleContactSales = async () => {

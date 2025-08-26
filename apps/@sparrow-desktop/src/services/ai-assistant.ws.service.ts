@@ -349,6 +349,12 @@ export class AiAssistantWebSocketService {
     };
 
     if (!this.webSocket || !this.isWsConnected()) {
+      Sentry.withScope((scope) => {
+          scope.setTag("emailId", userEmail);
+          scope.setExtra("userPrompt", prompt);
+          scope.setTag("errorType", "AI");
+          Sentry.captureException("WebSocket not connected, cannot send message ai-assistant.ws.service(desktop)");
+      });
       console.error("WebSocket not connected, cannot send message");
       return false;
     }
@@ -357,6 +363,12 @@ export class AiAssistantWebSocketService {
       this.webSocket.send(JSON.stringify(message));
       return true;
     } catch (error) {
+      Sentry.withScope((scope) => {
+          scope.setTag("emailId", userEmail);
+          scope.setExtra("userPrompt", prompt);
+          scope.setTag("errorType", "AI");
+          Sentry.captureException(`Error sending message:${error} ai-assistant.ws.service(desktop)`);
+      });
       console.error("Error sending message:", error);
       return false;
     }
@@ -369,21 +381,34 @@ export class AiAssistantWebSocketService {
     systemPrompt?: string;
     userInput: { role: 'user' | 'assistant' | 'system'; content: string; }[] | string;
     conversation?: "",
-    configs: modelsConfigType
+    configs: modelsConfigType,
+    emailId?: string;
   }): Promise<boolean> => {
 
     if (!this.webSocket || !this.isWsConnected()) {
+      Sentry.withScope((scope) => {
+          scope.setTag("emailId", data.emailId);
+          scope.setExtra("userPrompt", data.userInput);
+          scope.setTag("errorType", "AI");
+          Sentry.captureException("WebSocket not connected, cannot send message ai-assistant.ws.service(desktop)-LLM");
+      });
       console.error("WebSocket not connected, cannot send message");
       return false;
     }
 
-    const { configs, ...rest } = data;
+    const { configs, emailId, ...rest } = data;
     const message = { ...rest, ...configs }; // spread configs at root level
 
     try {
       this.webSocket.send(JSON.stringify(message));
       return true;
     } catch (error) {
+      Sentry.withScope((scope) => {
+          scope.setTag("emailId", data.emailId);
+          scope.setExtra("userPrompt", data.userInput);
+          scope.setTag("errorType", "AI");
+          Sentry.captureException(`Error sending message:${error} ai-assistant.ws.service(desktop)`);
+      });
       console.error("Error sending message:", error);
       return false;
     }

@@ -27,9 +27,11 @@ const constants = {
   SPARROW_AUTH_URL:
     runtimeConfig.VITE_WEB_AUTH_URL ?? import.meta.env.VITE_WEB_AUTH_URL,
   SPARROW_GITHUB:
-    runtimeConfig.VITE_WEB_SPARROW_GITHUB ?? import.meta.env.VITE_WEB_SPARROW_GITHUB,
+    runtimeConfig.VITE_WEB_SPARROW_GITHUB ??
+    import.meta.env.VITE_WEB_SPARROW_GITHUB,
   SPARROW_LINKEDIN:
-    runtimeConfig.VITE_WEB_SPARROW_LINKEDIN ?? import.meta.env.VITE_WEB_SPARROW_LINKEDIN,
+    runtimeConfig.VITE_WEB_SPARROW_LINKEDIN ??
+    import.meta.env.VITE_WEB_SPARROW_LINKEDIN,
   SPARROW_DOWNLOAD_LINK:
     runtimeConfig.VITE_WEB_DOWNLOAD_LINK ??
     import.meta.env.VITE_WEB_DOWNLOAD_LINK,
@@ -57,10 +59,12 @@ const constants = {
     import.meta.env.VITE_WEB_MARKETING_URL,
   INTRO_DOCS_URL:
     (runtimeConfig.VITE_WEB_SPARROW_DOCS ??
-      import.meta.env.VITE_WEB_SPARROW_DOCS) + "/docs/user-manual/application/introduction/introduction-to-sparrow",
+      import.meta.env.VITE_WEB_SPARROW_DOCS) +
+    "/docs/user-manual/application/introduction/introduction-to-sparrow",
   TESTFLOW_DOCS_URL:
     (runtimeConfig.VITE_WEB_SPARROW_DOCS ??
-      import.meta.env.VITE_WEB_SPARROW_DOCS) + "/docs/user-manual/application/workspace-features/testflows",
+      import.meta.env.VITE_WEB_SPARROW_DOCS) +
+    "/docs/user-manual/application/workspace-features/testflows",
   PROXY_SERVICE:
     runtimeConfig.VITE_WEB_PROXY_SERVICE ??
     import.meta.env.VITE_WEB_PROXY_SERVICE,

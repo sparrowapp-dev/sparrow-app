@@ -109,7 +109,7 @@ class GraphqlExplorerViewModel {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         delete t.index;
-        t.persistence = TabPersistenceTypeEnum.PERMANENT;
+        // t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
         this.authHeader = new ReduceAuthHeader(
           this._tab.getValue().property?.graphql
@@ -289,8 +289,10 @@ class GraphqlExplorerViewModel {
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
+        persistence: TabPersistenceTypeEnum.PERMANENT
       });
       progressiveTab.isSaved = false;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };
@@ -809,7 +811,6 @@ class GraphqlExplorerViewModel {
 
   // This function will reverse the GraphQL query to JSON object.
   private reverseGraphQLToJSON = (query) => {
-
     // Helper to process object fields
     const processObjectFields = (fields) => {
       return fields.map((field) => {
@@ -826,7 +827,7 @@ class GraphqlExplorerViewModel {
               items: [], // No nested items
             };
           case "IntValue":
-          // For IntValue, set value directly
+            // For IntValue, set value directly
             return {
               name: field.name.value,
               itemType: "argument",
@@ -860,7 +861,9 @@ class GraphqlExplorerViewModel {
     // Helper to process fields
     const processFields = (fields) => {
       return fields.map((field) => {
-        const args = field.arguments ? processObjectFields(field.arguments) : [];
+        const args = field.arguments
+          ? processObjectFields(field.arguments)
+          : [];
         const nestedFields =
           field.selectionSet && field.selectionSet.selections
             ? processFields(field.selectionSet.selections)
@@ -1379,7 +1382,10 @@ class GraphqlExplorerViewModel {
    *
    * @param _headers - request headers
    */
-  public updateSchema = async (_schema: string, _isQueryUpdateRequired: boolean) => {
+  public updateSchema = async (
+    _schema: string,
+    _isQueryUpdateRequired: boolean,
+  ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.graphql.schema = _schema;
     this.tab = progressiveTab;
