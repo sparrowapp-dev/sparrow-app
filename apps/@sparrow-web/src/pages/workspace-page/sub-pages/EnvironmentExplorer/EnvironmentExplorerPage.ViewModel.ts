@@ -21,6 +21,7 @@ import { CollectionRepository } from "src/repositories/collection.repository";
 import { getClientUser } from "src/utils/jwt";
 import { UserService } from "src/services/user.service";
 import { captureEvent } from "src/utils/posthog/posthogConfig";
+import { generateVariableTourCompleted } from "../../../../../../../packages/@sparrow-workspaces/src/stores/generate-variable-demo";
 
 export class EnvironmentExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -753,6 +754,7 @@ export class EnvironmentExplorerViewModel {
 
   public generateVariableDemoCompleted = async () => {
     const userDetails = getClientUser();
+    generateVariableTourCompleted.set(true);
     const response = await this.userService.generateVariableDemoCompleted(
       userDetails?.email,
     );

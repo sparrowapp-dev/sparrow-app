@@ -30,4 +30,5 @@ export { updateActiveSyncStates } from "./active-sync";
 export {
   generatedVariableDemo,
   generateVariableStep,
+  generateVariableTourCompleted,
 } from "./generate-variable-demo";
