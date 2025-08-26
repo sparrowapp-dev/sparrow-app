@@ -1093,6 +1093,7 @@ margin-right: 8px;
           onUpdateAuthProfile={handleOnUpdateAuthProfile}
           onDeleteAuthProfile={handleOnDeleteAuthProfile}
           onUpdateRequestState={onUpdateCollectionState}
+          {userRole}
         />
       {/if}
     {/if}
