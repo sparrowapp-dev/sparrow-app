@@ -74,11 +74,11 @@
     background-color: var(--bg-ds-surface-500);
     box-shadow: 0px 16px 32px 0px #0000004d;
     overflow: hidden;
+    padding: 12px;
   }
   .content-wrapper {
     display: flex;
     align-items: center;
-    padding: 12px;
   }
   .icon {
     position: relative;
