@@ -80,10 +80,10 @@
     {/if}
     {#if $generatedVariableDemo && $generateVariableStep === 2}
       <GenerateVariableGuideCard
-        TitleName={GenerateVariableTourContent[1].Title}
-        DescriptionContent={GenerateVariableTourContent[1].description}
-        CardNumber={$generateVariableStep}
-        TotalsCards={5}
+        titleName={GenerateVariableTourContent[1].Title}
+        descriptionContent={GenerateVariableTourContent[1].description}
+        cardNumber={$generateVariableStep}
+        totalsCards={5}
         top={0}
         left={400}
         onNext={() => {

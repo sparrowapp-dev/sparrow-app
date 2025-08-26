@@ -873,7 +873,7 @@
                           <div
                             style="position:absolute; bottom:12px; right:{!$tab
                               ?.property?.request?.state?.isChatbotActive
-                              ? '50px'
+                              ? '56px'
                               : '0px'}; z-index:10;"
                           >
                             <GenerateVariableCard

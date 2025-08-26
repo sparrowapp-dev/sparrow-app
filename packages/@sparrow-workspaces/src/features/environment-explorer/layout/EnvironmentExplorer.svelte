@@ -348,10 +348,10 @@
           {/if}
           {#if $generatedVariableDemo && $generateVariableStep === 1}
             <GenerateVariableGuideCard
-              TitleName={GenerateVariableTourContent[0].Title}
-              DescriptionContent={GenerateVariableTourContent[0].description}
-              CardNumber={$generateVariableStep}
-              TotalsCards={5}
+              titleName={GenerateVariableTourContent[0].Title}
+              descriptionContent={GenerateVariableTourContent[0].description}
+              cardNumber={$generateVariableStep}
+              totalsCards={5}
               top={15}
               left={200}
               onNext={() => {
@@ -363,10 +363,10 @@
           {/if}
           {#if $generatedVariableDemo && $generateVariableStep === 5}
             <GenerateVariableGuideCard
-              TitleName={GenerateVariableTourContent[4].Title}
-              DescriptionContent={GenerateVariableTourContent[4].description}
-              CardNumber={$generateVariableStep}
-              TotalsCards={5}
+              titleName={GenerateVariableTourContent[4].Title}
+              descriptionContent={GenerateVariableTourContent[4].description}
+              cardNumber={$generateVariableStep}
+              totalsCards={5}
               top={40}
               right={40}
               rightButtonName={"Finish"}
@@ -409,11 +409,11 @@
             <div>
               {#if $generatedVariableDemo && $generateVariableStep === 3}
                 <GenerateVariableGuideCard
-                  TitleName={GenerateVariableTourContent[2].Title}
-                  DescriptionContent={GenerateVariableTourContent[2]
+                  titleName={GenerateVariableTourContent[2].Title}
+                  descriptionContent={GenerateVariableTourContent[2]
                     .description}
-                  CardNumber={$generateVariableStep}
-                  TotalsCards={5}
+                  cardNumber={$generateVariableStep}
+                  totalsCards={5}
                   top={110}
                   right={0}
                   onNext={() => {
@@ -425,11 +425,9 @@
               {/if}
               {#if $generatedVariableDemo && $generateVariableStep === 4}
                 <GenerateVariableGuideCard
-                  TitleName={GenerateVariableTourContent[3].Title}
-                  DescriptionContent={GenerateVariableTourContent[3]
-                    .description}
-                  CardNumber={$generateVariableStep}
-                  TotalsCards={5}
+                  titleName={GenerateVariableTourContent[3].Title}
+                  cardNumber={$generateVariableStep}
+                  totalsCards={5}
                   top={150}
                   right={0}
                   onNext={() => {
@@ -437,7 +435,18 @@
                   }}
                   placement={"right"}
                   onClose={handleCloseTourGuide}
-                />
+                >
+                  <div slot="description-content">
+                    You can also manage suggestions one-by-one. Use the <span
+                      class=""
+                      style="color: var(--icon-ds-success-300);">✓</span
+                    >
+                    icon to accept a single variable, or the
+                    <span class="" style="color: var(--icon-ds-danger-300);"
+                      >✗</span
+                    > icon to remove suggestion.
+                  </div>
+                </GenerateVariableGuideCard>
               {/if}
             </div>
           </div>

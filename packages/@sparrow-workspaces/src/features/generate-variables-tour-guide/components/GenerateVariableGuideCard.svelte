@@ -1,10 +1,10 @@
 <script lang="ts">
   import { Button } from "@sparrow/library/ui";
 
-  export let TitleName: string = "";
-  export let DescriptionContent: string = "";
-  export let CardNumber: number = 0;
-  export let TotalsCards: number = 0;
+  export let titleName: string = "";
+  export let descriptionContent: string = "";
+  export let cardNumber: number = 0;
+  export let totalsCards: number = 0;
   export let rightButtonName: string = "";
   export let placement: "left" | "right" = "left";
   export let onNext: () => void = () => {};
@@ -33,22 +33,28 @@
   "
 >
   <div class="py-1 px-2">
-    <div class="title-name-text">{TitleName}</div>
-    <div class="description-content-text">{DescriptionContent}</div>
+    <div class="title-name-text">{titleName}</div>
+    {#if descriptionContent}
+      <div class="description-content-text">{descriptionContent}</div>
+    {:else}
+      <div class="description-content-text">
+        <slot name="description-content" />
+      </div>
+    {/if}
   </div>
   <div
     class={`d-flex ${
       rightButtonName === ""
         ? "justify-content-between"
-        : CardNumber > 0
+        : cardNumber > 0
           ? "justify-content-between"
           : "justify-content-end"
     } px-2`}
   >
     <div class="d-flex justify-content-center align-items-center">
       <p class="guide-card-text" style="margin: 0px;">
-        {#if rightButtonName === "" || CardNumber > 0}
-          {CardNumber}/{TotalsCards}
+        {#if rightButtonName === "" || cardNumber > 0}
+          {cardNumber}/{totalsCards}
         {/if}
       </p>
     </div>

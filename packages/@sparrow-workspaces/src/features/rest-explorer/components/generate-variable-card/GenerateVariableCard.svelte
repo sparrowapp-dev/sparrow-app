@@ -6,7 +6,7 @@
   // Props
   export let title: string = "Level Up Your Workflow!";
   export let message: string =
-    "Great job on those successful API calls! We see a pattern here. We can automatically organize and create reusable variables for you.";
+    "It looks like you're setting up a few repetitive requests. We can help you group these and automatically create reusable variables.";
   export let buttonText: string = "Show Me How";
   export let onClose: () => void | Promise<void> = () => {};
   export let onAction: () => void | Promise<void> = () => {};
