@@ -20,6 +20,7 @@ import constants from "src/constants/constants";
 import { CollectionRepository } from "src/repositories/collection.repository";
 import { getClientUser } from "src/utils/jwt";
 import { UserService } from "src/services/user.service";
+import { captureEvent } from "src/utils/posthog/posthogConfig";
 
 export class EnvironmentExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -481,6 +482,10 @@ export class EnvironmentExplorerViewModel {
       await this.updateEnvironmentState({
         isSaveInProgress: false,
       });
+      captureEvent("save_environment", {
+        event_source: "web_app",
+        buttonName: "Save",
+      });
       notifications.success(
         `Changes saved for ${currentEnvironment.name} environment.`,
       );
@@ -507,6 +512,10 @@ export class EnvironmentExplorerViewModel {
       baseUrl,
     );
     if (response.isSuccessful) {
+      captureEvent("save_environment", {
+        event_source: "web_app",
+        buttonName: "Save",
+      });
       this.environmentRepository.updateEnvironment(
         response.data.data._id,
         response.data.data,
@@ -555,6 +564,9 @@ export class EnvironmentExplorerViewModel {
             baseUrl,
           );
         if (insertGenerateVariableResponse.isSuccessful) {
+          captureEvent("generated_variables", {
+            event_source: "web_app",
+          });
           await this.collectionRepository.updateCollection(
             insertGenerateVariableResponse.data.data._id,
             insertGenerateVariableResponse.data.data,

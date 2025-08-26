@@ -532,6 +532,24 @@
     return code >= 400 && code < 600;
   };
 
+  const handleGenerateVariableShowDemoEvent = () => {
+    captureEvent("generate_variables_detected", {
+      event_source: `${isWebApp ? "web" : "desktop"}_app`,
+    });
+  };
+
+  const handleGenerateVariableClickEvent = () => {
+    captureEvent("generate_variables_discovered", {
+      event_source: `${isWebApp ? "web" : "desktop"}_app`,
+    });
+  };
+
+  $: {
+    if ($tab?.property?.request?.isGeneratedVariable) {
+      handleGenerateVariableShowDemoEvent();
+    }
+  }
+
   $: {
     if (storeData) {
       isAIDebugBtnEnable = isErrorStatus();
@@ -878,6 +896,7 @@
                           >
                             <GenerateVariableCard
                               onAction={async () => {
+                                handleGenerateVariableClickEvent();
                                 await handleGenerateVariableDemo(
                                   $tab?.path?.collectionId ?? "",
                                   $tab?.path?.workspaceId ?? "",

@@ -18,6 +18,7 @@ import { CollectionRepository } from "../../../../../src/repositories/collection
 import { open } from "@tauri-apps/plugin-shell";
 import { getClientUser } from "@app/utils/jwt";
 import { UserService } from "@app/services/user.service";
+import { captureEvent } from "@app/utils/posthog/posthogConfig";
 
 export class EnvironmentExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -479,6 +480,10 @@ export class EnvironmentExplorerViewModel {
       await this.updateEnvironmentState({
         isSaveInProgress: false,
       });
+      captureEvent("save_environment", {
+        event_source: "desktop_app",
+        buttonName: "Save",
+      });
       notifications.success(
         `Changes saved for ${currentEnvironment.name} environment.`,
       );
@@ -505,6 +510,10 @@ export class EnvironmentExplorerViewModel {
       baseUrl,
     );
     if (response.isSuccessful) {
+      captureEvent("save_environment", {
+        event_source: "desktop_app",
+        buttonName: "Save",
+      });
       this.environmentRepository.updateEnvironment(
         response.data.data._id,
         response.data.data,
@@ -553,6 +562,9 @@ export class EnvironmentExplorerViewModel {
             baseUrl,
           );
         if (insertGenerateVariableResponse.isSuccessful) {
+          captureEvent("generated_variables", {
+              event_source: "desktop_app",
+          });
           await this.collectionRepository.updateCollection(
             insertGenerateVariableResponse.data.data._id,
             insertGenerateVariableResponse.data.data,
