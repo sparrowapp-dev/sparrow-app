@@ -157,50 +157,52 @@
       </p>
     </div>
   </button>
-  <div class="d-flex" style="gap: 8px;">
-    <Tooltip
-      title={"Add Mock Response"}
-      placement={"top-center"}
-      distance={10}
-      show={true}
-      zIndex={701}
-    >
-      <span class="add-icon-container">
-        <Button
-          size="extra-small"
-          customWidth={"24px"}
-          type="teritiary-regular"
-          disable={isResponseCreating}
-          onClick={async () => {
-            isResponseCreating = true;
-            await onCreateMockResponse();
-            isResponseCreating = false;
-          }}
-          startIcon={AddRegular}
-        />
-      </span>
-    </Tooltip>
-    <Tooltip
-      title={"Set Response Ratios"}
-      placement={"top-center"}
-      distance={10}
-      show={true}
-      zIndex={701}
-    >
-      <span class="add-icon-container">
-        <Button
-          size="extra-small"
-          customWidth={"24px"}
-          type="teritiary-regular"
-          disable={false}
-          onClick={() => {
-            isResponseRatioModalOpen = true;
-          }}
-          startIcon={DocumentPercentRegular}
-        />
-      </span>
-    </Tooltip>
-  </div>
+  {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+    <div class="d-flex" style="gap: 8px;">
+      <Tooltip
+        title={"Add Mock Response"}
+        placement={"top-center"}
+        distance={10}
+        show={true}
+        zIndex={701}
+      >
+        <span class="add-icon-container">
+          <Button
+            size="extra-small"
+            customWidth={"24px"}
+            type="teritiary-regular"
+            disable={isResponseCreating}
+            onClick={async () => {
+              isResponseCreating = true;
+              await onCreateMockResponse();
+              isResponseCreating = false;
+            }}
+            startIcon={AddRegular}
+          />
+        </span>
+      </Tooltip>
+      <Tooltip
+        title={"Set Response Ratios"}
+        placement={"top-center"}
+        distance={10}
+        show={true}
+        zIndex={701}
+      >
+        <span class="add-icon-container">
+          <Button
+            size="extra-small"
+            customWidth={"24px"}
+            type="teritiary-regular"
+            disable={false}
+            onClick={() => {
+              isResponseRatioModalOpen = true;
+            }}
+            startIcon={DocumentPercentRegular}
+          />
+        </span>
+      </Tooltip>
+    </div>
+  {/if}
 </div>
 {#if mockResponses.length === 0}
   <div

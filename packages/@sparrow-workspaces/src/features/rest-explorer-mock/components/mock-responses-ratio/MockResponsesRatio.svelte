@@ -217,7 +217,7 @@
           isResponseRatioModalOpen = false;
         }
       }}
-      disable={exceededLimit}
+      disable={exceededLimit || activeResponses?.length === 0}
     />
   </div>
 </div>

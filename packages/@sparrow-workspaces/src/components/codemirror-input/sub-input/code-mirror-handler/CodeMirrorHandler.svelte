@@ -614,12 +614,6 @@
     };
 
     initializeAsync();
-    // Prevent paste if editor is disabled (readonly)
-    codeMirrorEditorDiv.addEventListener("paste", (event) => {
-      if (disabled) {
-        event.preventDefault();
-      }
-    });
   });
 
   afterUpdate(() => {

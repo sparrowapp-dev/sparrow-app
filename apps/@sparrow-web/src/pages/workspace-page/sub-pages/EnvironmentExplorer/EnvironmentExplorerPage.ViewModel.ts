@@ -11,7 +11,10 @@ import { GuideRepository } from "../../../../repositories/guide.repository";
 import { GuestUserRepository } from "../../../../repositories/guest-user.repository";
 import { TabRepository } from "../../../../repositories/tab.repository";
 import { Debounce, CompareArray } from "@sparrow/common/utils";
-import { TabPersistenceTypeEnum, TabTypeEnum } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  TabTypeEnum,
+} from "@sparrow/common/types/workspace/tab";
 import { CollectionService } from "src/services/collection.service";
 import constants from "src/constants/constants";
 import { CollectionRepository } from "src/repositories/collection.repository";
@@ -181,7 +184,28 @@ export class EnvironmentExplorerViewModel {
     return constants.API_URL;
   };
 
-  public updateVariableSelection = async (type?: string, index?: number) => {
+  private updateUndoStatus(id: string, status: boolean) {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    let aiGeneratedVariables =
+      progressiveTab.property.environment.aiVariable || [];
+
+    aiGeneratedVariables = aiGeneratedVariables.map((v: any) => {
+      if (v.id === id) {
+        return {
+          ...v,
+          undo: status,
+        };
+      }
+      return v;
+    });
+
+    this.updateGeneratedVariables(aiGeneratedVariables);
+  }
+
+  public updateVariableSelection = async (
+    type?: string,
+    index?: number | string,
+  ) => {
     if (type === "regenerate") {
       await this.reGenerateVariables();
       return;
@@ -219,7 +243,6 @@ export class EnvironmentExplorerViewModel {
             );
           this.updateGeneratedVariables(remainingGeneratedVariables);
           this.updateVariables(updatedPairs);
-          // console.log()
           if (!remainingGeneratedVariables?.length) {
             await this.updateEnvironmentAiVariableGenerationStatus("accepted");
           }
@@ -227,13 +250,22 @@ export class EnvironmentExplorerViewModel {
       } catch (error) {
         console.error("Error accepting generated variable:", error);
       }
-    } else if (type === "reject" && typeof index === "number") {
+    } else if (type === "undo" && typeof index === "string") {
+      this.updateUndoStatus(index, true);
+    } else if (type === "remove" && typeof index === "string") {
       const progressiveTab = createDeepCopy(this._tab.getValue());
-      const remainingGeneratedVariables =
-        progressiveTab.property.environment.aiVariable;
-      if (remainingGeneratedVariables?.length < 2) {
+      let aiGeneratedVariables =
+        progressiveTab.property.environment.aiVariable || [];
+      if (aiGeneratedVariables?.length < 2) {
         await this.updateEnvironmentAiVariableGenerationStatus("rejected");
       }
+      // remove only the "undo" object with matching id
+      aiGeneratedVariables = aiGeneratedVariables.filter(
+        (v: any) => !(v.id === index && v.undo === true),
+      );
+      this.updateGeneratedVariables(aiGeneratedVariables);
+    } else if (type === "removeUndo" && typeof index === "string") {
+      this.updateUndoStatus(index, false);
     } else if (type === "accept-all") {
       const progressiveTab = createDeepCopy(this._tab.getValue());
       // Remove the last item from environment.variable
@@ -243,13 +275,23 @@ export class EnvironmentExplorerViewModel {
       ) {
         progressiveTab.property.environment.variable.pop();
       }
+      // Split aiVariables into undo:true and undo:false
+      const undoAiVariables =
+        progressiveTab.property.environment.aiVariable.filter(
+          (variable) => variable.undo === true,
+        );
+
+      const sanitizedAiVariables =
+        progressiveTab.property.environment.aiVariable
+          .filter((variable) => !variable.undo)
+          .map((variable) => ({
+            ...variable,
+            type: "ai-generated",
+            lifespan: "short",
+          }));
       await this.updateVariables([
         ...progressiveTab.property.environment.variable,
-        ...progressiveTab.property.environment.aiVariable.map((item) => ({
-          ...item,
-          type: "ai-generated",
-          lifespan: "short",
-        })),
+        ...sanitizedAiVariables,
         {
           key: "",
           value: "",
@@ -257,59 +299,63 @@ export class EnvironmentExplorerViewModel {
           type: "user-generated",
         },
       ]);
-      await this.updateEnvironmentAiVariableGenerationStatus("accepted");
-      await this.updateGeneratedVariables([]);
+      if (undoAiVariables.length < 1) {
+        await this.updateEnvironmentAiVariableGenerationStatus("accepted");
+      }
+      await this.updateGeneratedVariables(undoAiVariables);
     } else if (type === "revert" && typeof index === "number") {
-        const progressiveTab = createDeepCopy(this._tab.getValue());
-        const foundIndex =
-          progressiveTab.property.environment.variable.findIndex(
-            (_, i) => i === index,
-          );
-        if (foundIndex !== -1) {
-          const foundObject =
-            progressiveTab.property.environment.variable[foundIndex];
-          const currentPairs =
-            progressiveTab.property?.environment?.aiVariable || [];
-          const updatedPairs = [...currentPairs];
-          if (updatedPairs.length > 0) {
-            updatedPairs.splice(updatedPairs.length - 1, 0, {
-              ...foundObject,
-               type: "user-generated",
-               lifespan: "long",
-            });
-          } else {
-            updatedPairs.push({
-              ...foundObject,
-               type: "user-generated",
-               lifespan: "long",
-            });
-          }
-          const remainingVariables =
-            progressiveTab.property.environment.variable.filter(
-              (_, i) => i !== foundIndex,
-            );
-          await this.updateVariables(remainingVariables);
-          await this.updateGeneratedVariables(updatedPairs);
-          await this.updateEnvironmentAiVariableGenerationStatus("generated");
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const foundIndex = progressiveTab.property.environment.variable.findIndex(
+        (_, i) => i === index,
+      );
+      if (foundIndex !== -1) {
+        const foundObject =
+          progressiveTab.property.environment.variable[foundIndex];
+        const currentPairs =
+          progressiveTab.property?.environment?.aiVariable || [];
+        const updatedPairs = [...currentPairs];
+        if (updatedPairs.length > 0) {
+          updatedPairs.splice(updatedPairs.length - 1, 0, {
+            ...foundObject,
+            type: "user-generated",
+            lifespan: "long",
+          });
+        } else {
+          updatedPairs.push({
+            ...foundObject,
+            type: "user-generated",
+            lifespan: "long",
+          });
         }
-    }else if (type === "revert-all") {
+        const remainingVariables =
+          progressiveTab.property.environment.variable.filter(
+            (_, i) => i !== foundIndex,
+          );
+        await this.updateVariables(remainingVariables);
+        await this.updateGeneratedVariables(updatedPairs);
+        await this.updateEnvironmentAiVariableGenerationStatus("generated");
+      }
+    } else if (type === "revert-all") {
       const progressiveTab = createDeepCopy(this._tab.getValue());
       const aiVariable = [];
-      const userVariable = []; 
-      progressiveTab.property?.environment?.variable.forEach((variable)=>{
-          if(variable.lifespan === "short"){
-            aiVariable.push({
-              ...variable,
-               type: "user-generated",
-               lifespan: "long",
-            });
-          }else{
-            userVariable.push(variable);
-          }
+      const userVariable = [];
+      progressiveTab.property?.environment?.variable.forEach((variable) => {
+        if (variable.lifespan === "short") {
+          aiVariable.push({
+            ...variable,
+            type: "user-generated",
+            lifespan: "long",
+          });
+        } else {
+          userVariable.push(variable);
+        }
       });
-      
+
       await this.updateVariables([...userVariable]);
-      await this.updateGeneratedVariables([...progressiveTab.property?.environment?.aiVariable, ...aiVariable]);
+      await this.updateGeneratedVariables([
+        ...progressiveTab.property?.environment?.aiVariable,
+        ...aiVariable,
+      ]);
       await this.updateEnvironmentAiVariableGenerationStatus("generated");
     }
   };
@@ -322,9 +368,7 @@ export class EnvironmentExplorerViewModel {
     return;
   };
 
-
-private updatedRequestInCollection(
-
+  private updatedRequestInCollection(
     generatedVariables: any[],
     requestItem: any,
   ): any {
@@ -365,51 +409,44 @@ private updatedRequestInCollection(
       }));
     };
 
-    // Main recursive update
-    const replaceValues = (obj: any): any => {
-      if (!obj || typeof obj !== "object") {
-        return typeof obj === "string" ? replaceOutsideBraces(obj) : obj;
+    // Work only on allowed fields
+    const newRequest: any = { ...requestItem };
+
+    // url
+    if (typeof newRequest.url === "string") {
+      newRequest.url = replaceOutsideBraces(newRequest.url);
+    }
+
+    // headers
+    if (Array.isArray(newRequest.headers)) {
+      newRequest.headers = updateKeyValueArray(newRequest.headers);
+    }
+
+    // queryParams
+    if (Array.isArray(newRequest.queryParams)) {
+      newRequest.queryParams = updateKeyValueArray(newRequest.queryParams);
+    }
+
+    // body
+    if (typeof newRequest.body === "object" && newRequest.body !== null) {
+      const updatedBody = { ...newRequest.body };
+      if (typeof updatedBody.raw === "string") {
+        updatedBody.raw = replaceOutsideBraces(updatedBody.raw);
       }
-      const newObj: any = Array.isArray(obj) ? [] : {};
-      for (const [key, value] of Object.entries(obj)) {
-        if (key === "url" && typeof value === "string") {
-          newObj[key] = replaceOutsideBraces(value);
-        } else if (key === "headers" && Array.isArray(value)) {
-          newObj[key] = updateKeyValueArray(value);
-        } else if (key === "queryParams" && Array.isArray(value)) {
-          newObj[key] = updateKeyValueArray(value);
-        } else if (
-          key === "body" &&
-          typeof value === "object" &&
-          value !== null
-        ) {
-          const updatedBody = { ...(value as any) };
-          if (typeof updatedBody.raw === "string") {
-            updatedBody.raw = replaceOutsideBraces(updatedBody.raw);
-          }
-          if (Array.isArray(updatedBody.urlencoded)) {
-            updatedBody.urlencoded = updateKeyValueArray(
-              updatedBody.urlencoded,
-            );
-          }
-          if (
-            updatedBody.formdata &&
-            typeof updatedBody.formdata === "object"
-          ) {
-            if (Array.isArray(updatedBody.formdata.text)) {
-              updatedBody.formdata.text = updateKeyValueArray(
-                updatedBody.formdata.text,
-              );
-            }
-          }
-          newObj[key] = updatedBody;
-        } else {
-          newObj[key] = replaceValues(value);
+      if (Array.isArray(updatedBody.urlencoded)) {
+        updatedBody.urlencoded = updateKeyValueArray(updatedBody.urlencoded);
+      }
+      if (updatedBody.formdata && typeof updatedBody.formdata === "object") {
+        if (Array.isArray(updatedBody.formdata.text)) {
+          updatedBody.formdata.text = updateKeyValueArray(
+            updatedBody.formdata.text,
+          );
         }
       }
-      return newObj;
-    };
-    return replaceValues(requestItem);
+      newRequest.body = updatedBody;
+    }
+
+    return newRequest;
   }
 
   /**
@@ -520,18 +557,31 @@ private updatedRequestInCollection(
             insertGenerateVariableResponse.data.data,
           );
 
-
-          const tabRxDocs = await this.tabRepository.getTabsByCollectionId(progressiveTab?.property?.environment?.generateProperty.collectionId);
-          const tabsJson = tabRxDocs.map((doc) => doc.toMutableJSON()).filter((doc)=>{
-            if(doc.type === TabTypeEnum.REQUEST || doc.type === TabTypeEnum.WEB_SOCKET || doc.type === TabTypeEnum.GRAPHQL || doc.type === TabTypeEnum.SOCKET_IO){
-              return true;
-            }else{
-              return false;
-            }
-          }).map((doc)=>{
-             doc.property = this.updatedRequestInCollection(uniqueAiGeneratedVariables, doc.property );
-             return doc;
-          });
+          const tabRxDocs = await this.tabRepository.getTabsByCollectionId(
+            progressiveTab?.property?.environment?.generateProperty
+              .collectionId,
+          );
+          const tabsJson = tabRxDocs
+            .map((doc) => doc.toMutableJSON())
+            .filter((doc) => {
+              if (
+                doc.type === TabTypeEnum.REQUEST ||
+                doc.type === TabTypeEnum.WEB_SOCKET ||
+                doc.type === TabTypeEnum.GRAPHQL ||
+                doc.type === TabTypeEnum.SOCKET_IO
+              ) {
+                return true;
+              } else {
+                return false;
+              }
+            })
+            .map((doc) => {
+              doc.property = this.updatedRequestInCollection(
+                uniqueAiGeneratedVariables,
+                doc.property,
+              );
+              return doc;
+            });
 
           this.tabRepository.bulkUpsertTabs(tabsJson);
 
@@ -631,10 +681,15 @@ private updatedRequestInCollection(
       if (response?.isSuccessful) {
         await this.updateEnvironmentAiVariableGenerationStatus("generated");
         const generatedData = response?.data?.data || [];
-        if (generatedData.length < 1) {
+        const updatedGeneratedData = generatedData.map((item: any) => ({
+          ...item,
+          id: crypto.randomUUID(),
+          undo: false,
+        }));
+        if (updatedGeneratedData.length < 1) {
           await this.updateEnvironmentAiVariableGenerationStatus("empty");
         }
-        await this.updateGeneratedVariables(generatedData);
+        await this.updateGeneratedVariables(updatedGeneratedData);
       } else {
         await this.updateEnvironmentAiVariableGenerationStatus("rejected");
         notifications.error("Failed to Generate Variables.");
@@ -661,10 +716,15 @@ private updatedRequestInCollection(
     if (response?.isSuccessful) {
       await this.updateEnvironmentAiVariableGenerationStatus("generated");
       const generatedData = response?.data?.data || [];
-      if (generatedData.length < 1) {
+      const updatedGeneratedData = generatedData.map((item: any) => ({
+        ...item,
+        id: crypto.randomUUID(),
+        undo: false,
+      }));
+      if (updatedGeneratedData.length < 1) {
         await this.updateEnvironmentAiVariableGenerationStatus("empty");
       }
-      await this.updateGeneratedVariables(generatedData);
+      await this.updateGeneratedVariables(updatedGeneratedData);
     } else {
       await this.updateEnvironmentAiVariableGenerationStatus("rejected");
       notifications.error("Failed to Generate Variables.");
