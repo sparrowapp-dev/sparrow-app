@@ -18,7 +18,11 @@
   <ToastContainer width={"fit-content"} let:data>
     <div
       class="d-flex position-relative custom-toast custom-toast-{data.type} toast"
-      style="height: {data.title === undefined ? '68px' : '84px'};"
+      style="height: {data.title === undefined
+        ? data.description.length < 60
+          ? '68px'
+          : '100px'
+        : '84px'};"
     >
       <div class="w-100 content-wrapper d-flex column gap-4">
         <div class="d-flex">
@@ -37,7 +41,11 @@
           {#if data.title !== undefined}
             <p class="data-title text-fs-14">{data.title}</p>
           {/if}
-          <span class="description">{data.description}</span>
+          <span
+            class="description"
+            style="-webkit-line-clamp: {data.description.length > 60 ? 5 : 3};"
+            >{data.description}</span
+          >
         </div>
       </div>
       <div
