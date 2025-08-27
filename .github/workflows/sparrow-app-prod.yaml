@@ -526,6 +526,11 @@ jobs:
                     }
                     @{
                       "type" = "TextBlock"
+                      "text" = "Branch: main"
+                      "wrap" = $true
+                    }
+                    @{
+                      "type" = "TextBlock"
                       "text" = "Download Links:"
                       "weight" = "bolder"
                       "spacing" = "medium"
