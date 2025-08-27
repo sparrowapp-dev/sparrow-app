@@ -470,7 +470,7 @@ jobs:
                     }
                     @{
                       "type" = "TextBlock"
-                      "text" = "Branch: production"
+                      "text" = "Branch: main"
                       "wrap" = $true
                     }
                     @{
@@ -683,7 +683,7 @@ jobs:
                     },
                     {
                       \"type\": \"TextBlock\",
-                      \"text\": \"Branch: production\",
+                      \"text\": \"Branch: main\",
                       \"wrap\": true
                     },
                     {
