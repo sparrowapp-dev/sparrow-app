@@ -286,8 +286,10 @@ class GraphqlExplorerViewModel {
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
+        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = false;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };
@@ -806,8 +808,7 @@ class GraphqlExplorerViewModel {
 
   // This function will reverse the GraphQL query to JSON object.
   private reverseGraphQLToJSON = (query) => {
-
-  // Helper to process object fields
+    // Helper to process object fields
     const processObjectFields = (fields) => {
       return fields.map((field) => {
         let items = [];
@@ -823,7 +824,7 @@ class GraphqlExplorerViewModel {
               items: [], // No nested items
             };
           case "IntValue":
-          // For IntValue, set value directly
+            // For IntValue, set value directly
             return {
               name: field.name.value,
               itemType: "argument",
@@ -857,7 +858,9 @@ class GraphqlExplorerViewModel {
     // Helper to process fields
     const processFields = (fields) => {
       return fields.map((field) => {
-        const args = field.arguments ? processObjectFields(field.arguments) : [];
+        const args = field.arguments
+          ? processObjectFields(field.arguments)
+          : [];
         const nestedFields =
           field.selectionSet && field.selectionSet.selections
             ? processFields(field.selectionSet.selections)
@@ -900,7 +903,7 @@ class GraphqlExplorerViewModel {
    * @returns A JSON-like representation of the query, enriched with schema details.
    */
   private reverseAndCompareGraphQLToJSON = (query, schemaJson) => {
-     if (!query.length) return;
+    if (!query.length) return;
     // Helper to process arguments
     const processArguments = (args, schemaArgs) => {
       return args.map((arg) => {
@@ -965,6 +968,16 @@ class GraphqlExplorerViewModel {
 
   // This function will compare and update the main JSON with the new generated JSON.
   private compareAndUpdateFirstJSON = (firstJSON, secondJSONItems) => {
+    // Helper to recursively set isSelected to false for all children
+    function setIsSelectedFalse(items) {
+      if (!Array.isArray(items)) return;
+      for (const item of items) {
+        item.isSelected = false;
+        if (Array.isArray(item.items)) {
+          setIsSelectedFalse(item.items);
+        }
+      }
+    }
     // Create a helper function to recursively process nested items
     function processItems(firstItems, secondItems) {
       // Create a map of secondItems for quick lookup by name
@@ -975,19 +988,26 @@ class GraphqlExplorerViewModel {
       }
 
       for (const firstItem of firstItems) {
-        const secondItem = secondMap.get(
-          firstItem.name,
-        );
+        const secondItem = secondMap.get(firstItem.name);
 
         // If `isSelected` is true in the first item but it doesn't exist in the second JSON, set `isSelected` to false
         if (firstItem.isSelected && !secondItem) {
           firstItem.isSelected = false;
+          // Also set all children isSelected to false
+          if (Array.isArray(firstItem.items)) {
+            setIsSelectedFalse(firstItem.items);
+          }
         }
 
         // If the object exists in both, update its value
         if (secondItem) {
           firstItem.value = secondItem.value;
           firstItem.isSelected = secondItem.isSelected;
+
+          // If parent isSelected is false, set all children isSelected to false
+          if (!firstItem.isSelected && Array.isArray(firstItem.items)) {
+            setIsSelectedFalse(firstItem.items);
+          }
 
           // Recursively process nested items
           if (
@@ -1380,7 +1400,10 @@ class GraphqlExplorerViewModel {
    *
    * @param _headers - request headers
    */
-  public updateSchema = async (_schema: string, _isQueryUpdateRequired: boolean) => {
+  public updateSchema = async (
+    _schema: string,
+    _isQueryUpdateRequired: boolean,
+  ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.graphql.schema = _schema;
     this.tab = progressiveTab;

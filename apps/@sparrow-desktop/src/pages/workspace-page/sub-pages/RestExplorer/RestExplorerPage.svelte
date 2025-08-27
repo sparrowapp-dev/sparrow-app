@@ -16,6 +16,8 @@
   import constants from "../../../../constants/constants";
   import type { RxDocument } from "rxdb";
   import type { CollectionDocType } from "@app/models/collection.model";
+  import { RequestDatasetEnum } from "@sparrow/common/types/workspace";
+  import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
 
   export let tab;
   export let isTourGuideOpen = false;
@@ -45,6 +47,13 @@
   let renameWithCollectionList;
   let debouncedAPIUpdater;
   let guestUser;
+  let isSharedWorkspace = false;
+  let isMergeViewEnableForRequestBody = false;
+  let isMergeViewEnableForParams = false;
+  let isMergeViewEnableForHeaders = false;
+  let isMergeViewLoading = false;
+  let newModifiedContent: string | KeyValuePair[];
+  let mergeViewRequestDatasetType: RequestDatasetEnum;
 
   const restExplorerDataStoreSubscriber = restExplorerDataStore.subscribe(
     (_webSocketMap) => {
@@ -86,6 +95,12 @@
   $: {
     if (tab) {
       if (prevTabId !== tab?.tabId) {
+        isMergeViewEnableForRequestBody = false;
+        isMergeViewEnableForParams = false;
+        isMergeViewEnableForHeaders = false;
+        isMergeViewLoading = false;
+        newModifiedContent = undefined;
+        mergeViewRequestDatasetType = undefined;
         (async () => {
           /**
            * @description - Initialize the view model for the new http request tab
@@ -121,6 +136,7 @@
                 currentWorkspace = activeWorkspaceRxDoc;
                 currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
                 environmentId = activeWorkspaceRxDoc.get("environmentId");
+                isSharedWorkspace = activeWorkspaceRxDoc.get("isShared");
               }
             },
           );
@@ -210,6 +226,13 @@
   {environmentVariables}
   {isGuestUser}
   {isLoginBannerActive}
+  {isSharedWorkspace}
+  bind:isMergeViewEnableForRequestBody
+  bind:isMergeViewEnableForParams
+  bind:isMergeViewEnableForHeaders
+  bind:isMergeViewLoading
+  bind:newModifiedContent
+  bind:mergeViewRequestDatasetType
   onOpenCollection={_viewModel.openCollection}
   onSendRequest={_viewModel.sendRequest}
   onCancelRequest={_viewModel.cancelRequest}

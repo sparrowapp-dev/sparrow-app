@@ -2239,6 +2239,7 @@ class CollectionExplorerPage {
       };
       environmentTabJson.property.environment.generateVariable = true;
       environmentTabJson.property.environment.aiGenerationStatus = "";
+      environmentTabJson.persistence = TabPersistenceTypeEnum.PERMANENT;
     }
     await this.tabRepository.updateTabByMongoId(environment?.id, environmentTabJson);
     
@@ -2251,8 +2252,8 @@ class CollectionExplorerPage {
       .setType(environmentType.GLOBAL)
       .setVariable(environment?.variable)
       .setGenerativeVariables(true)
-      .setGenerativeProperties(collectionId, collectionName);
-    initEnvironmentTab.setTabType(TabPersistenceTypeEnum.TEMPORARY);
+      .setGenerativeProperties(collectionId, collectionName)
+      .setTabType(TabPersistenceTypeEnum.PERMANENT);
     this.tabRepository.createTab(initEnvironmentTab.getValue());
     scrollToTab(initEnvironmentTab.getValue().id);
   };

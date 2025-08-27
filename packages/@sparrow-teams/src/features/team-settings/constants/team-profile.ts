@@ -10,7 +10,7 @@ export const ICON_CONFIG = {
 
 export const NAME_CONFIG = {
   TITLE: `Hub Name`,
-  MAX_TEXT_SIZE: 500,
+  MAX_TEXT_SIZE: 100,
   PLACEHOLDER: `Enter your hub name`,
 };
 

@@ -9,12 +9,14 @@
     RightIcon,
   } from "@sparrow/library/assets";
   import type { CollectionAuthProifleBaseInterface as AuthProfileDto } from "@sparrow/common/types/workspace/collection-base";
+  import { WorkspaceRole } from "@sparrow/common/enums";
 
   export let authProfilesList;
   export let onCreateAuthProfile;
   export let onUpdateAuthProfile;
   export let onDeleteAuthProfile;
   export let onUpdateRequestState;
+  export let userRole;
 
   let isEditMode = false;
   let authProfileFormData: AuthProfileDto | null = null;
@@ -129,15 +131,17 @@
     >
       Auth Profiles
     </p>
-    <Button
-      id={`add-auth-profile`}
-      disable={false}
-      title={"Add Profile"}
-      type={"outline-primary"}
-      onClick={handleOnClickCreateProfile}
-      size="medium"
-      startIcon={AddRegular}
-    />
+    {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+      <Button
+        id={`add-auth-profile`}
+        disable={false}
+        title={"Add Profile"}
+        type={"outline-primary"}
+        onClick={handleOnClickCreateProfile}
+        size="medium"
+        startIcon={AddRegular}
+      />
+    {/if}
   </div>
 
   <div
@@ -158,6 +162,7 @@
         {#each filteredAndSortedData as list, index}
           <Row
             {list}
+            {userRole}
             listIndex={index}
             {selectedDefaultKey}
             onDefaultKeyChange={handleDefaultKeyChange}

@@ -287,6 +287,7 @@
         title="More"
         distance={17}
         show={!showMenu}
+        zIndex={5}
       >
         <span class="threedot-icon-container d-flex">
           <Button

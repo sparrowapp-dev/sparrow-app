@@ -487,7 +487,6 @@ export class TeamsViewModel {
   };
 
   public handleStartTrial = () => {
-    debugger;
     const email = getClientUser().email;
     const accessToken = localStorage.getItem("AUTH_TOKEN");
     const refreshToken = localStorage.getItem("REF_TOKEN");

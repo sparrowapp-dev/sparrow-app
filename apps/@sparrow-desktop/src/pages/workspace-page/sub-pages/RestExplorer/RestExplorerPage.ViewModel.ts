@@ -100,6 +100,7 @@ import constants from "@app/constants/constants";
 import * as curlconverter from "curlconverter";
 
 import * as Sentry from "@sentry/svelte";
+import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection-tab";
 
 class RestExplorerViewModel {
   /**
@@ -186,7 +187,7 @@ class RestExplorerViewModel {
         const t = createDeepCopy(doc.toMutableJSON());
         delete t.isActive;
         delete t.index;
-        t.persistence = TabPersistenceTypeEnum.PERMANENT;
+        // t.persistence = TabPersistenceTypeEnum.PERMANENT;
         this.tab = t;
         const collectionDoc = await this.fetchCollection(
           t.path.collectionId as string,
@@ -261,14 +262,16 @@ class RestExplorerViewModel {
     }
   }
 
-  public openCollection = async () => {
+  public openCollection = async (isAuthRedirect: boolean = false) => {
     const collectionRx = await this.collectionRepository.readCollection(
       this._tab.getValue().path.collectionId,
     );
+    const navigation = isAuthRedirect ? CollectionNavigationTabEnum.AUTH : null;
     const collectionDoc = collectionRx?.toMutableJSON();
     const collectionTab = new CollectionTabAdapter().adapt(
       this._tab.getValue().path.workspaceId,
       collectionDoc,
+      navigation,
     );
     this.tabRepository.createTab(collectionTab);
   };
@@ -487,8 +490,10 @@ class RestExplorerViewModel {
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
+        persistence: TabPersistenceTypeEnum.PERMANENT
       });
       progressiveTab.isSaved = false;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };
@@ -999,16 +1004,21 @@ class RestExplorerViewModel {
       if (boundary) {
         // Split body by boundary
         const parts = requestObject.data.split(`--${boundary}`);
-        for (const part of parts) {
+        for (const rawPart of parts) {
+          // convert " r n" into real newlines
+          const part = rawPart.replace(/ r n/g, "\r\n");
+
           if (
             part.includes("Content-Disposition: form-data;") &&
             part.includes('name="')
           ) {
             const nameMatch = part.match(/name="([^"]+)"/);
             const key = nameMatch ? nameMatch[1] : "";
-            // Value is after two CRLFs
-            const valueMatch = part.match(/\r\n\r\n([\s\S]*?)\r\n$/);
-            const value = valueMatch ? valueMatch[1] : "";
+            // extract value
+            const cleaned = part.replace(/\\?\s*r\s*\\?\s*n\s*/g, "\r\n");
+            const valueMatch = cleaned.match(/\r\n\r\n([\s\S]*?)(?:\r\n)?$/);
+            const value = valueMatch ? valueMatch[1].trim() : "";
+
             if (key) {
               transformedObject.request!.body.formdata.push({
                 key,
@@ -1020,6 +1030,7 @@ class RestExplorerViewModel {
             }
           }
         }
+
         transformedObject.request!.selectedRequestBodyType =
           "multipart/form-data";
       }
@@ -1041,7 +1052,6 @@ class RestExplorerViewModel {
 
     // Handle body based on Content-Type
     if (requestObject.data) {
-      debugger;
       if (contentType.startsWith("multipart/form-data")) {
         transformedObject.request!.selectedRequestBodyType =
           "multipart/form-data";
@@ -1088,14 +1098,19 @@ class RestExplorerViewModel {
           }));
       for (const { key, value } of headersArr) {
         // Add header to request
-        if (key.toLowerCase() !== "content-type") {
-          // Add header to request
-          transformedObject.request!.headers!.push({
-            key,
-            value,
-            checked: true,
-          });
+        if (
+          transformedObject.request!.selectedRequestBodyType ===
+            "multipart/form-data" &&
+          key?.toLowerCase() === "content-type"
+        ) {
+          // Skip Content-Type header for formdata
+          continue;
         }
+        transformedObject.request!.headers!.push({
+          key,
+          value,
+          checked: true,
+        });
 
         // Bearer token detection
         if (
@@ -1178,6 +1193,7 @@ class RestExplorerViewModel {
 
     const updatedCurl = this.handleFormatCurl(curl);
     const stringifiedCurl = curlconverter.toJsonString(updatedCurl);
+
     const parsedCurl = JSON.parse(stringifiedCurl);
 
     // Use the same regex as ImportCurl.svelte
@@ -2810,7 +2826,7 @@ class RestExplorerViewModel {
           environmentVariables.global.id,
         );
         if (currentTab) {
-          let currentTabId = currentTab.tabId;
+          const currentTabId = currentTab.tabId;
           const envTab = createDeepCopy(currentTab);
           envTab.property.environment.variable = payload.variable;
           envTab.isSaved = true;
@@ -2894,12 +2910,12 @@ class RestExplorerViewModel {
           payload,
         );
 
-        let currentTab = await this.tabRepository.getTabById(
+        const currentTab = await this.tabRepository.getTabById(
           environmentVariables.local.id,
         );
 
         if (currentTab) {
-          let currentTabId = currentTab.tabId;
+          const currentTabId = currentTab.tabId;
           const envTab = createDeepCopy(currentTab);
           envTab.property.environment.variable = payload.variable;
           envTab.isSaved = true;

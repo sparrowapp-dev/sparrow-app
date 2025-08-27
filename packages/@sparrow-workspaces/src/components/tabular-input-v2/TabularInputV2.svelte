@@ -41,7 +41,7 @@
    */
   export let disabled = false;
   export let isGeneratedVariable = false;
-  export let onUpdateVariableSelection: (type?: string, index?: number) => void;
+  export let onUpdateVariableSelection: (type?: string, id?: string) => void;
 
   export let isRevertEnabled = false;
 
@@ -49,13 +49,14 @@
   let controller: boolean = false;
   const theme = new TabularInputTheme().build();
 
-  // Undo functionality state
-  let undoTimers: Map<number, NodeJS.Timeout> = new Map();
-  let undoCountdowns: Map<number, number> = new Map();
-  let countdownIntervals: Map<number, NodeJS.Timeout> = new Map();
+  // Undo functionality state - now using IDs instead of indices
+  let undoTimers: Map<string, NodeJS.Timeout> = new Map();
+  let undoCountdowns: Map<string, number> = new Map();
+  let countdownIntervals: Map<string, NodeJS.Timeout> = new Map();
 
   $: {
     if (keyValue) {
+      pairs = keyValue;
       identifySelectAllState();
     }
   }
@@ -70,8 +71,6 @@
    * @description - calculates the select all checkbox state - weather checked or not
    */
   const identifySelectAllState = () => {
-    pairs = [];
-    pairs = keyValue;
     controller = false;
     if (pairs.length > 1) {
       let isUncheckedExist: boolean = false;
@@ -104,6 +103,9 @@
         key: "",
         value: "",
         checked: false,
+        type: "user-generated",
+        id: crypto.randomUUID(),
+        undo: false,
       });
       pairs = pairs;
     }
@@ -112,84 +114,76 @@
 
   /**
    * @description - start undo countdown for generated variables
-   * @param index - index of the pairs that needs to be marked for deletion
+   * @param id - unique ID of the pairs that needs to be marked for deletion
    */
-  const startUndoCountdown = (index: number): void => {
-    // Mark item for deletion and start countdown
-    pairs[index].aiUndo = true;
-    undoCountdowns.set(index, 10);
-    // Update the pairs to reflect the change
-    pairs = pairs;
+  const startUndoCountdown = (id: string): void => {
+    // Set the undo state using the callback function
+    onUpdateVariableSelection("undo", id);
+    // Start countdown
+    undoCountdowns.set(id, 10);
     // Start countdown interval
     const countdownInterval = setInterval(() => {
-      const currentCount = undoCountdowns.get(index);
+      const currentCount = undoCountdowns.get(id);
       if (currentCount && currentCount > 1) {
-        undoCountdowns.set(index, currentCount - 1);
+        undoCountdowns.set(id, currentCount - 1);
         pairs = pairs;
       } else {
         clearInterval(countdownInterval);
-        countdownIntervals.delete(index);
+        countdownIntervals.delete(id);
       }
     }, 1000);
-    countdownIntervals.set(index, countdownInterval);
+    countdownIntervals.set(id, countdownInterval);
+
     // Set timer for permanent deletion
     const undoTimer = setTimeout(() => {
-      permanentlyDeleteItem(index);
+      permanentlyDeleteItem(id);
     }, 10000);
 
-    undoTimers.set(index, undoTimer);
+    undoTimers.set(id, undoTimer);
   };
 
   /**
    * @description - permanently delete the item after timeout
-   * @param index - index of the pairs that needs to be permanently deleted
+   * @param id - unique ID of the pairs that needs to be permanently deleted
    */
-  const permanentlyDeleteItem = (index: number): void => {
+  const permanentlyDeleteItem = (id: string): void => {
     // Clean up timers and state
-    const timer = undoTimers.get(index);
-    const interval = countdownIntervals.get(index);
+    const timer = undoTimers.get(id);
+    const interval = countdownIntervals.get(id);
     if (timer) {
       clearTimeout(timer);
-      undoTimers.delete(index);
+      undoTimers.delete(id);
     }
     if (interval) {
       clearInterval(interval);
-      countdownIntervals.delete(index);
+      countdownIntervals.delete(id);
     }
-    undoCountdowns.delete(index);
-    // Remove the item permanently
-    let filteredKeyValue = pairs.filter((elem, i) => {
-      if (i !== index) {
-        return true;
-      }
-      return false;
-    });
-    pairs = filteredKeyValue;
-    onUpdateVariableSelection("reject", index);
-    callback(pairs);
+    undoCountdowns.delete(id);
+
+    // Remove the item permanently using the callback
+    onUpdateVariableSelection("remove", id);
   };
 
   /**
    * @description - undo the deletion of a generated variable
-   * @param index - index of the pairs that needs to be restored
+   * @param id - unique ID of the pairs that needs to be restored
    */
-  const undoGeneratedDelete = (index: number): void => {
+  const undoGeneratedDelete = (id: string): void => {
     // Clear the timers
-    const timer = undoTimers.get(index);
-    const interval = countdownIntervals.get(index);
+    const timer = undoTimers.get(id);
+    const interval = countdownIntervals.get(id);
     if (timer) {
       clearTimeout(timer);
-      undoTimers.delete(index);
+      undoTimers.delete(id);
     }
     if (interval) {
       clearInterval(interval);
-      countdownIntervals.delete(index);
+      countdownIntervals.delete(id);
     }
-    undoCountdowns.delete(index);
-    // Restore the item
-    pairs[index].aiUndo = false;
-    pairs = pairs;
-    callback(pairs);
+    undoCountdowns.delete(id);
+
+    // Remove undo state using the callback
+    onUpdateVariableSelection("removeUndo", id);
   };
 
   /**
@@ -199,8 +193,11 @@
   const deletePairs = (index: number): void => {
     if (pairs.length > 1 || isGeneratedVariable) {
       if (isGeneratedVariable) {
-        // For generated variables, start the undo countdown
-        startUndoCountdown(index);
+        // For generated variables, start the undo countdown using the item's ID
+        const itemId = pairs[index].id;
+        if (itemId) {
+          startUndoCountdown(itemId);
+        }
       } else {
         // For regular variables, delete immediately
         let filteredKeyValue = pairs.filter((elem, i) => {
@@ -278,14 +275,14 @@
           <button
             class="bg-transparent border-0 d-flex text-nowrap common-text align-items-center"
             style="color: var(--text-ds-primary-300);"
-            on:click={onUpdateVariableSelection("accept-all")}
+            on:click={() => onUpdateVariableSelection("accept-all")}
             >Accept All</button
           >
         {:else if isRevertEnabled}
           <button
             class="bg-transparent border-0 d-flex text-nowrap common-text align-items-center"
             style="color: var(--text-ds-neutral-300); text-decoration: underline;"
-            on:click={onUpdateVariableSelection("revert-all")}
+            on:click={() => onUpdateVariableSelection("revert-all")}
             >Revert Changes</button
           >
         {/if}
@@ -321,7 +318,7 @@
 
   <div class="w-100 d-block position-relative">
     {#if pairs}
-      {#each pairs as element, index}
+      {#each pairs as element, index (element.id || `fallback-${index}`)}
         <div
           aria-label="Toggle Hover"
           class="w-100 {element.key
@@ -390,7 +387,7 @@
                       onUpdateInput={() => {
                         updatePairs(index);
                       }}
-                      disabled={disabled || element.aiUndo}
+                      disabled={disabled || element.undo}
                       placeholder={"Add Variable"}
                       {theme}
                       enableEnvironmentHighlighting={false}
@@ -410,7 +407,7 @@
                       onUpdateInput={() => {
                         updatePairs(index);
                       }}
-                      disabled={disabled || element.aiUndo}
+                      disabled={disabled || element.undo}
                       placeholder={"Add Value"}
                       {theme}
                       enableEnvironmentHighlighting={false}
@@ -461,7 +458,7 @@
                     {/if}
                   </span>
                 {:else if isGeneratedVariable}
-                  {#if element?.aiUndo}
+                  {#if element?.undo}
                     <div class="d-flex align-items-center gap-1">
                       <Tooltip
                         title={"Undo delete"}
@@ -471,7 +468,7 @@
                         <button
                           class="generate-action-button undo"
                           on:click|stopPropagation={() =>
-                            undoGeneratedDelete(index)}
+                            undoGeneratedDelete(element.id)}
                         >
                           <ArrowUndoRegular
                             size="12"
