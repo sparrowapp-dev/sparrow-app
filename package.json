@@ -178,7 +178,11 @@
           "assets": [
             {
               "path": "/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg",
-              "label": "Sparrow_2.29.0.dmg"
+              "label": "Sparrow_2.29.0_arm64.dmg"
+            },
+            {
+              "path": "/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/dmg/*.dmg",
+              "label": "Sparrow_2.29.0_x64.dmg"
             },
             {
               "path": "msi_files/*.exe",
@@ -189,20 +193,12 @@
               "label": "Sparrow_2.29.0.msi"
             },
             {
-              "path": "msi_files/*.zip",
-              "label": "Sparrow_2.29.0_x64_en-US.msi.zip"
-            },
-            {
-              "path": "/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/Sparrow.app.tar.gz",
-              "label": "Sparrow.app.tar.gz"
+              "path": "msi_files/*.msix",
+              "label": "Sparrow_2.29.0.msix"
             },
             {
               "path": "deb_files/*.deb",
               "label": "sparrow_2.29.0_amd64.deb"
-            },
-            {
-              "path": "msi_files/*.msix",
-              "label": "Sparrow_2.29.0.msix"
             }
           ]
         }
