@@ -6,6 +6,13 @@
   export let onUpdateTeam: (property: TeamPropertyEnum) => void;
   export let isTeamNameInvalid = false;
   const inputId = "input-team-name";
+
+  // Add the same validation function
+  const isOnlySpecialCharacters = (teamName: string) => {
+    // Returns true if the name is invalid (contains forbidden characters or only special chars)
+    return !/^(?=.*[a-zA-Z0-9])[a-zA-Z0-9 _\-\.@]+$/.test(teamName);
+  };
+
   const blurInputField = (event: KeyboardEvent) => {
     if (event.key === "Enter") {
       const inputField = document.getElementById(inputId) as HTMLInputElement;
@@ -34,12 +41,19 @@
         blurInputField(e);
       }}
       on:blur={() => {
+        // Use the same validation logic
+        if (isOnlySpecialCharacters(teamName.trim())) {
+          isTeamNameInvalid = true;
+        } else {
+          isTeamNameInvalid = false;
+        }
         onUpdateTeam(TeamPropertyEnum.NAME);
       }}
     />
     {#if isTeamNameInvalid}
       <p class="help-label-error text-ds-font-size-12">
-        Invalid Hub Name. It cannot contain only special characters.
+        Invalid team name. Please remove unsupported characters (like emojis or
+        consecutive symbols, e.g., @@).
       </p>
     {/if}
   </div>
