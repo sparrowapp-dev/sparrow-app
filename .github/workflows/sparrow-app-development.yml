@@ -78,17 +78,59 @@ jobs:
       - name: Increase Yarn network timeout
         run: yarn config set network-timeout 600000
 
+      - name: Update @tauri-apps/* versions in desktop package.json from root
+        run: |
+          $rootPkg = Get-Content package.json | ConvertFrom-Json
+          $desktopPkgPath = "apps/@sparrow-desktop/package.json"
+          $desktopPkg = Get-Content $desktopPkgPath | ConvertFrom-Json
+          $tauriPackages = @(
+            "@tauri-apps/api",
+            "@tauri-apps/cli",
+            "@tauri-apps/plugin-deep-link",
+            "@tauri-apps/plugin-dialog",
+            "@tauri-apps/plugin-fs",
+            "@tauri-apps/plugin-os",
+            "@tauri-apps/plugin-process",
+            "@tauri-apps/plugin-shell",
+            "@tauri-apps/plugin-updater"
+          )
+          foreach ($pkg in $tauriPackages) {
+            if ($rootPkg.dependencies.PSObject.Properties.Name -contains $pkg) {
+              $desktopPkg.dependencies.$pkg = $rootPkg.dependencies.$pkg
+            }
+          }
+          $desktopPkg | ConvertTo-Json -Depth 20 | Set-Content $desktopPkgPath
+        shell: pwsh
+
+      - name: Add createUpdaterArtifacts to bundle in tauri.conf.json
+        run: |
+          $confPath = "apps/@sparrow-desktop/src-tauri/tauri.conf.json"
+          $json = Get-Content $confPath -Raw | ConvertFrom-Json
+
+          if ($null -ne $json.bundle) {
+            if (-not ($json.bundle.PSObject.Properties.Name -contains "createUpdaterArtifacts")) {
+              $json.bundle | Add-Member -NotePropertyName "createUpdaterArtifacts" -NotePropertyValue $true
+            }
+            elseif ($json.bundle.createUpdaterArtifacts -ne $true) {
+              # enforce correct value in case it exists but is false
+              $json.bundle.createUpdaterArtifacts = $true
+            }
+
+            $json | ConvertTo-Json -Depth 20 | Set-Content $confPath -Encoding UTF8
+          }
+        shell: pwsh
+
       - name: Build Tauri App
         run: |
           yarn cache clean
           npm install -g pnpm
           yarn install
           yarn desktop-build
-          # yarn tauri build --debug
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+      
       - name: Setup kubectl
         uses: azure/setup-kubectl@v3
         with:
@@ -171,9 +213,21 @@ jobs:
               Write-Host "  $($_.FullName)"
           }
         shell: pwsh
-      
-      - name: msi zip sig
-        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.zip.sig
+
+      - name: Regenerate MSI updater signature after signing MSI
+        run: |
+          $msiPath = "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi"
+          $msiFile = Get-ChildItem "$msiPath\*.msi" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if (-not $msiFile) { throw "No MSI file found to sign" }
+          # Regenerate signature using Tauri updater CLI with key and password
+          yarn tauri signer sign -k "$env:TAURI_SIGNING_PRIVATE_KEY" -p "$env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD" "$($msiFile.FullName)"
+        shell: pwsh
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+
+      - name: Print MSI Updater Signature
+        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi.sig
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -232,7 +286,7 @@ jobs:
           
           # Upload to S3
           Write-Host "Starting S3 upload..."
-          aws s3 sync "$msiPath" s3://sparrow-release-assests-dev/windows --exclude "*" --include "*.zip" --include "*.msi"
+          aws s3 sync "$msiPath" s3://sparrow-release-assests-dev/windows --exclude "*" --include "*.zip" --include "*.msi" --include "*.msi.sig"
 
           if ($LASTEXITCODE -eq 0) {
               Write-Host "S3 upload completed successfully" -ForegroundColor Green
@@ -305,7 +359,7 @@ jobs:
           $jsonBody = $body | ConvertTo-Json -Depth 10
           Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
         shell: pwsh
-  
+
   release_macos:
     runs-on: macos-latest
     environment: development
