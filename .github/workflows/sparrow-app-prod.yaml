@@ -446,19 +446,14 @@ jobs:
         
       - name: Post Windows Build Links to Teams
         run: |
-          # Get the MSI file to determine the naming pattern
           $msiFile = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
           $msiBaseName = [System.IO.Path]::GetFileNameWithoutExtension($msiFile.Name)
-
           $exeFile = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/nsis" -Filter "Sparrow_*_x64-setup.exe" | Select-Object -First 1
           $exeBaseName = [System.IO.Path]::GetFileNameWithoutExtension($exeFile.Name)
-          $exeUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$exeBaseName.exe"
-
-          # Construct URLs for all file types
           $msixUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$msiBaseName.msix"
           $msiUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$msiBaseName.msi"
           $exeUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$exeBaseName.exe"
-
+          $buildDate = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
           $body = @{
             "type" = "message"
             "attachments" = @(
@@ -475,60 +470,30 @@ jobs:
                     }
                     @{
                       "type" = "TextBlock"
-                      "text" = "Download Links:"
-                      "weight" = "bolder"
-                      "spacing" = "medium"
+                      "text" = "Branch: production"
+                      "wrap" = $true
                     }
                     @{
-                      "type" = "ColumnSet"
-                      "columns" = @(
-                        @{
-                          "type" = "Column"
-                          "width" = "stretch"
-                          "items" = @(
-                            @{
-                              "type" = "TextBlock"
-                              "text" = "[MSIX Installer]($msixUrl)"
-                              "color" = "accent"
-                              "wrap" = $true
-                            }
-                          )
-                        }
-                      )
+                      "type" = "TextBlock"
+                      "text" = "Build Date: $buildDate"
+                      "wrap" = $true
                     }
+                  )
+                  "actions" = @(
                     @{
-                      "type" = "ColumnSet"
-                      "columns" = @(
-                        @{
-                          "type" = "Column"
-                          "width" = "stretch"
-                          "items" = @(
-                            @{
-                              "type" = "TextBlock"
-                              "text" = "[MSI Installer]($msiUrl)"
-                              "color" = "accent"
-                              "wrap" = $true
-                            }
-                          )
-                        }
-                      )
-                    }
+                      "type" = "Action.OpenUrl"
+                      "title" = "📥 Download MSIX Installer"
+                      "url" = $msixUrl
+                    },
                     @{
-                      "type" = "ColumnSet"
-                      "columns" = @(
-                        @{
-                          "type" = "Column"
-                          "width" = "stretch"
-                          "items" = @(
-                            @{
-                              "type" = "TextBlock"
-                              "text" = "[EXE Installer]($exeUrl)"
-                              "color" = "accent"
-                              "wrap" = $true
-                            }
-                          )
-                        }
-                      )
+                      "type" = "Action.OpenUrl"
+                      "title" = "📥 Download MSI Installer"
+                      "url" = $msiUrl
+                    },
+                    @{
+                      "type" = "Action.OpenUrl"
+                      "title" = "📥 Download EXE Installer"
+                      "url" = $exeUrl
                     }
                   )
                   "$schema" = "http://adaptivecards.io/schemas/adaptive-card.json"
@@ -537,9 +502,7 @@ jobs:
               }
             )
           }
-          
           $jsonBody = $body | ConvertTo-Json -Depth 10
-
           Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
         shell: pwsh
 
@@ -699,12 +662,11 @@ jobs:
           AWS_REGION: us-west-1
           TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
         run: |
-          # Find the latest .deb file in the local build output
           DEB_SRC_DIR="apps/@sparrow-desktop/src-tauri/target/release/bundle/deb"
           DEB_FILE=$(ls "$DEB_SRC_DIR"/*.deb | sort -V | tail -n 1)
           DEB_BASENAME=$(basename "$DEB_FILE")
           DEB_URL="https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/linux/pool/main/$DEB_BASENAME"
-
+          BUILD_DATE=$(date +'%Y-%m-%d %H:%M:%S')
           curl -H "Content-Type: application/json" -d "{
             \"type\": \"message\",
             \"attachments\": [
@@ -726,24 +688,24 @@ jobs:
                     },
                     {
                       \"type\": \"TextBlock\",
-                      \"text\": \"Direct Download:\",
+                      \"text\": \"Build Date: $BUILD_DATE\",
                       \"wrap\": true
                     }
                   ],
                   \"actions\": [
                     {
                       \"type\": \"Action.OpenUrl\",
-                      \"title\": \"Download .deb\",
+                      \"title\": \"📥 Download linux deb package\",
                       \"url\": \"$DEB_URL\"
                     }
                   ],
-                  \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
+                  \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
                   \"version\": \"1.2\"
                 }
               }
             ]
-          }" "$TEAMS_WEBHOOK_URL"   
-
+          }" "$TEAMS_WEBHOOK_URL"
+        shell: bash
   release_macos:
     runs-on: macos-latest
     environment: production
@@ -890,10 +852,9 @@ jobs:
         run: |
           ARM64_DMG=$(ls apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg | head -n 1)
           INTEL_DMG=$(ls apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/dmg/*.dmg | head -n 1)
-
           ARM64_URL="https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/macos/$(basename "$ARM64_DMG")"
           INTEL_URL="https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/macos/$(basename "$INTEL_DMG")"
-
+          BUILD_DATE=$(date +'%Y-%m-%d %H:%M:%S')
           curl -H "Content-Type: application/json" -d "{
             \"type\": \"message\",
             \"attachments\": [
@@ -915,18 +876,23 @@ jobs:
                     },
                     {
                       \"type\": \"TextBlock\",
-                      \"text\": \"Apple Silicon (arm64): $ARM64_URL\",
-                      \"color\": \"accent\",
-                      \"wrap\": true
-                    },
-                    {
-                      \"type\": \"TextBlock\",
-                      \"text\": \"Intel (x86_64): $INTEL_URL\",
-                      \"color\": \"accent\",
+                      \"text\": \"Build Date: $BUILD_DATE\",
                       \"wrap\": true
                     }
                   ],
-                  \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
+                  \"actions\": [
+                    {
+                      \"type\": \"Action.OpenUrl\",
+                      \"title\": \"📥 Download Apple Silicon (arm64)\",
+                      \"url\": \"$ARM64_URL\"
+                    },
+                    {
+                      \"type\": \"Action.OpenUrl\",
+                      \"title\": \"📥 Download Intel (x86_64)\",
+                      \"url\": \"$INTEL_URL\"
+                    }
+                  ],
+                  \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
                   \"version\": \"1.2\"
                 }
               }
