@@ -14,5 +14,6 @@ export interface TeamForm {
     invalid: boolean;
     showFileTypeError: boolean;
     showFileSizeError: boolean;
+    dimensionFileSizeError: boolean;
   };
 }
