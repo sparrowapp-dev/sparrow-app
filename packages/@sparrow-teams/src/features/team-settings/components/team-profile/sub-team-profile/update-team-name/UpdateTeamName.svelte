@@ -86,4 +86,9 @@
     color: var(--text-ds-danger-300);
     font-family: "Inter", sans-serif;
   }
+  .team-title {
+    font-size: 12px;
+    color: var(--text-ds-neutral-200);
+    font-weight: 500;
+  }
 </style>
