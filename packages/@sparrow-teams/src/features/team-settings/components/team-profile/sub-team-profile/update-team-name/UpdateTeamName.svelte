@@ -9,7 +9,7 @@
 
   const isOnlySpecialCharacters = (teamName: string) => {
     // Returns true if the name is invalid (contains forbidden characters or only special chars)
-    return !/^(?!.*@{3,})(?=.*[A-Za-z0-9])[A-Za-z0-9 _\-\.\@']+$/.test(
+    return !/^(?!.*[^A-Za-z0-9]{3,})(?=.*[A-Za-z0-9])[\x20-\x7E]+$/.test(
       teamName,
     );
   };
