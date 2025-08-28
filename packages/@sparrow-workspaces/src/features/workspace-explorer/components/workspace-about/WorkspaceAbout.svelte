@@ -36,7 +36,7 @@
 
   // Validation function (same as team name)
   const isInvalidWorkspaceName = (name: string) => {
-    return !/^(?=.*[a-zA-Z0-9])[a-zA-Z0-9 _\-\.@]+$/.test(name);
+    return !/^(?!.*[^A-Za-z0-9]{3,})(?=.*[A-Za-z0-9])[\x20-\x7E]+$/.test(name);
   };
 
   const handleInputDescription = (event: Event) => {
@@ -89,8 +89,8 @@
         />
         {#if isWorkspaceNameInvalid && isWorkspaceNameTouched}
           <span class="help-label-error text-ds-font-size-12">
-            Invalid workspace name. Please remove unsupported characters (like
-            emojis or consecutive symbols, e.g., @@).
+            Invalid workspace name. Please remove unsupported characters like
+            emojis or more than two special symbols.
           </span>
         {/if}
       </div>

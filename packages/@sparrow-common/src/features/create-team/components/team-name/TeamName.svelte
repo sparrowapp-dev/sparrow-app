@@ -26,7 +26,9 @@
 
   const isOnlySpecialCharacters = (teamName: string) => {
     // This regex checks if the string contains ONLY non-alphanumeric characters
-    return !/^(?=.*[a-zA-Z0-9])[a-zA-Z0-9 _\-\.@]+$/.test(teamName);
+    return !/^(?!.*[^A-Za-z0-9]{3,})(?=.*[A-Za-z0-9])[\x20-\x7E]+$/.test(
+      teamName,
+    );
   };
 </script>
 
