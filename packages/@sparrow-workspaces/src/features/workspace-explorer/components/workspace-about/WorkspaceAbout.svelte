@@ -89,8 +89,8 @@
         />
         {#if isWorkspaceNameInvalid && isWorkspaceNameTouched}
           <span class="help-label-error text-ds-font-size-12">
-            Invalid workspace name. Please remove unsupported characters (like
-            emojis or consecutive symbols, e.g., @@).
+            Invalid workspace name. Please remove unsupported characters like
+            emojis or more than two special symbols.
           </span>
         {/if}
       </div>

@@ -53,8 +53,8 @@
     />
     {#if isTeamNameInvalid}
       <p class="help-label-error text-ds-font-size-12">
-        Invalid team name. Please remove unsupported characters (like emojis or
-        consecutive symbols, e.g., @@).
+        Invalid team name. Please remove unsupported characters like emojis or
+        more than two special symbols.
       </p>
     {/if}
   </div>
