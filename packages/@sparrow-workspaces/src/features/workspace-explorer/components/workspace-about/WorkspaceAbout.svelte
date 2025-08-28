@@ -36,7 +36,7 @@
 
   // Validation function (same as team name)
   const isInvalidWorkspaceName = (name: string) => {
-    return !/^(?=.*[a-zA-Z0-9])[a-zA-Z0-9 _\-\.@]+$/.test(name);
+    return !/^(?!.*@{3,})(?=.*[A-Za-z0-9])[A-Za-z0-9 _\-\.\@']+$/.test(name);
   };
 
   const handleInputDescription = (event: Event) => {

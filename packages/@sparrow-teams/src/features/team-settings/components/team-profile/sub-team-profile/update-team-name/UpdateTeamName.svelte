@@ -7,10 +7,11 @@
   export let isTeamNameInvalid = false;
   const inputId = "input-team-name";
 
-  // Add the same validation function
   const isOnlySpecialCharacters = (teamName: string) => {
     // Returns true if the name is invalid (contains forbidden characters or only special chars)
-    return !/^(?=.*[a-zA-Z0-9])[a-zA-Z0-9 _\-\.@]+$/.test(teamName);
+    return !/^(?!.*@{3,})(?=.*[A-Za-z0-9])[A-Za-z0-9 _\-\.\@']+$/.test(
+      teamName,
+    );
   };
 
   const blurInputField = (event: KeyboardEvent) => {
