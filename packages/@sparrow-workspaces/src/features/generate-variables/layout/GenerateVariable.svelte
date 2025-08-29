@@ -7,6 +7,7 @@
   import { generatedVariableDemo, generateVariableStep } from "../../../stores";
   import GenerateVariableGuideCard from "../../generate-variables-tour-guide/components/GenerateVariableGuideCard.svelte";
   import { GenerateVariableTourContent } from "../../generate-variables-tour-guide/utils";
+  import { navigate } from "svelte-navigator";
   export let currentEnvironment: any;
   export let generatedVariables: KeyValuePair[] = [];
   export let updateGeneratedVariables;
@@ -286,7 +287,7 @@
               onClick={toggleMoreInfo}
               title="More Info"
               size="small"
-              endIcon={showMoreInfo ? ChevronDownRegular : ChevronUpRegular}
+              endIcon={showMoreInfo ? ChevronUpRegular : ChevronDownRegular}
             />
           </p>
           {#if showMoreInfo}
@@ -327,6 +328,9 @@
                     to hear from you.
                     <a
                       style="color: var(--text-ds-primary-300); cursor: pointer; text-decoration: underline;"
+                      on:click={() => {
+                        navigate("/app/help");
+                      }}
                     >
                       Help Us Improve
                     </a>
