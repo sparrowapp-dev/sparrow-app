@@ -78,12 +78,11 @@ export class UserService {
    * @returns A promise that resolves to the server's response.
    */
   public InsertGenerateTrialCollectionIds = async (
-    email: string,
     collectionId: string,
   ) => {
     const response = await makeRequest(
       "POST",
-      `${apiUrl}/api/user/${collectionId}/trial-generate-variable/${email}`,
+      `${apiUrl}/api/user/${collectionId}/trial-generate-variable`,
       {
         headers: getAuthHeaders(),
       },
@@ -97,10 +96,10 @@ export class UserService {
    * @param email - The email address of the user.
    * @returns A promise that resolves to the server's response.
    */
-  public generateVariableDemoCompleted = async (email: string) => {
+  public generateVariableDemoCompleted = async () => {
     const response = await makeRequest(
       "POST",
-      `${apiUrl}/api/user/${email}/generate-variable-demo`,
+      `${apiUrl}/api/user/generate-variable-demo`,
       {
         headers: getAuthHeaders(),
       },

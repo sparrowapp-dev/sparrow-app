@@ -204,7 +204,7 @@ class RestExplorerViewModel {
         );
         const m = this._tab.getValue() as Tab;
 
-        if (collectionDoc) {
+        if (collectionDoc?.isGenerateVariableTrial) {
           await this.updateIsGeneratedVariable(
             collectionDoc?.isGenerateVariableTrial,
           );
@@ -3833,23 +3833,12 @@ class RestExplorerViewModel {
   };
 
   /**
-   * updates the property of isGeneratedVariable in all .
+   * updates the property of isGeneratedVariable in Tab.
    */
   public updateIsGeneratedVariable = async (value: boolean) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    const tabs = await this.tabRepository.getTabsByCollectionId(
-      progressiveTab?.path?.collectionId,
-    );
-    const updatedTabs = tabs.map((tab: any) => {
-      const newTab = createDeepCopy(tab._data ?? tab);
-      if (newTab?.property?.request) {
-        newTab.property.request.isGeneratedVariable = value;
-      }
-      return newTab;
-    });
     progressiveTab.property.request.isGeneratedVariable = value;
     this.tab = progressiveTab;
-    await this.tabRepository.bulkUpsertTabs(updatedTabs);
   };
 
   private onOpenGlobalEnvironmentToGenerate = async (
@@ -4014,12 +4003,8 @@ class RestExplorerViewModel {
 
   public InsertGenerateTrialFlow = async (collectionId: string) => {
     try {
-      const email = getClientUser().email;
-      const response = await this.userService.InsertGenerateTrialCollectionIds(
-        email,
-        collectionId,
-      );
-      const tab = this._tab;
+      const response =
+        await this.userService.InsertGenerateTrialCollectionIds(collectionId);
       if (response?.data.data) {
         const progressiveTab = createDeepCopy(this._tab.getValue());
         await this.fetchCollections(progressiveTab?.path?.workspaceId);

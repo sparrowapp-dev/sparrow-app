@@ -563,7 +563,7 @@ export class EnvironmentExplorerViewModel {
           );
         if (insertGenerateVariableResponse.isSuccessful) {
           captureEvent("generated_variables", {
-              event_source: "desktop_app",
+            event_source: "desktop_app",
           });
           await this.collectionRepository.updateCollection(
             insertGenerateVariableResponse.data.data._id,
@@ -736,10 +736,7 @@ export class EnvironmentExplorerViewModel {
   };
 
   public generateVariableDemoCompleted = async () => {
-    const userDetails = getClientUser();
-    const response = await this.userService.generateVariableDemoCompleted(
-      userDetails?.email,
-    );
+    const response = await this.userService.generateVariableDemoCompleted();
     if (response?.data?.data) {
       return response;
     }

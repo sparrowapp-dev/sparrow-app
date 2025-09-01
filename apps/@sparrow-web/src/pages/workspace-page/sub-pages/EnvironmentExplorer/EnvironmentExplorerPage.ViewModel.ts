@@ -753,11 +753,8 @@ export class EnvironmentExplorerViewModel {
   };
 
   public generateVariableDemoCompleted = async () => {
-    const userDetails = getClientUser();
     generateVariableTourCompleted.set(true);
-    const response = await this.userService.generateVariableDemoCompleted(
-      userDetails?.email,
-    );
+    const response = await this.userService.generateVariableDemoCompleted();
     if (response?.data?.data) {
       return response;
     }
