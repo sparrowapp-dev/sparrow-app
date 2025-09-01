@@ -3833,11 +3833,9 @@ class RestExplorerViewModel {
           ? { text: prompt, requestType, properties }
           : { text: prompt, requestType },
       );
-      console.log("Mock data generated:", response);
-      return response;
+      return response?.data?.data;
     } catch (error) {
       console.error("Error generating mock data:", error);
-      throw error;
     }
   };
 }
