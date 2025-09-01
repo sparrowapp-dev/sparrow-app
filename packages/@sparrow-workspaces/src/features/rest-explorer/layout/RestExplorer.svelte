@@ -102,6 +102,7 @@
   } from "../utils";
 
   import { policyConfig } from "@sparrow/common/store";
+  import GenerateVariableCard from "../components/generate-variable-card/GenerateVariableCard.svelte";
   import { tick } from "svelte";
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
@@ -132,6 +133,14 @@
   export let environmentVariables;
   export let isGuestUser = false;
   export let onOpenCollection;
+  export let updateIsGeneratedVariable: (value: boolean) => void;
+  export let handleGenerateVariableDemo: (
+    collectionId: string | undefined,
+    workspaceId: string,
+  ) => void;
+  export let InsertGenerateTrialFlow: (
+    collectionId: string | undefined,
+  ) => void;
 
   export let onGenerateAiResponse;
   export let onToggleLike;
@@ -525,6 +534,24 @@
     return code >= 400 && code < 600;
   };
 
+  const handleGenerateVariableShowDemoEvent = () => {
+    captureEvent("generate_variables_detected", {
+      event_source: `${isWebApp ? "web" : "desktop"}_app`,
+    });
+  };
+
+  const handleGenerateVariableClickEvent = () => {
+    captureEvent("generate_variables_discovered", {
+      event_source: `${isWebApp ? "web" : "desktop"}_app`,
+    });
+  };
+
+  $: {
+    if ($tab?.property?.request?.isGeneratedVariable) {
+      handleGenerateVariableShowDemoEvent();
+    }
+  }
+
   $: {
     if (storeData) {
       isAIDebugBtnEnable = isErrorStatus();
@@ -766,7 +793,7 @@
                       : 'ps-2'}"
                   >
                     <div class="h-100 d-flex flex-column">
-                      <div style="flex:1; overflow:auto;">
+                      <div style="flex:1; overflow:auto; position:relative;">
                         {#if storeData?.isSendRequestInProgress}
                           <ResponseDefaultScreen {isWebApp} />
                           <div
@@ -860,6 +887,30 @@
                                 </div>
                               {/if}
                             </div>
+                          </div>
+                        {/if}
+                        {#if $tab?.property?.request?.isGeneratedVariable}
+                          <div
+                            style="position:absolute; bottom:12px; right:{!$tab
+                              ?.property?.request?.state?.isChatbotActive
+                              ? '56px'
+                              : '0px'}; z-index:10;"
+                          >
+                            <GenerateVariableCard
+                              onAction={async () => {
+                                handleGenerateVariableClickEvent();
+                                await handleGenerateVariableDemo(
+                                  $tab?.path?.collectionId ?? "",
+                                  $tab?.path?.workspaceId ?? "",
+                                );
+                              }}
+                              onClose={async () => {
+                                await updateIsGeneratedVariable(false);
+                                await InsertGenerateTrialFlow(
+                                  $tab?.path?.collectionId ?? "",
+                                );
+                              }}
+                            />
                           </div>
                         {/if}
                       </div>
