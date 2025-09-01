@@ -113,7 +113,7 @@ const makeRequest = async (
     const duration = endTime - startTime; // Calculate duration in milliseconds
 
     if (response.status === 201 || response.status === 200) {
-      appInsights.trackDependencyData({
+      appInsights?.trackDependencyData({
         id: uuidv4(),
         target: url,
         name: `${method} ${url}`,
@@ -132,7 +132,7 @@ const makeRequest = async (
         return success(response.data, "");
       }
     } else {
-      appInsights.trackDependencyData({
+      appInsights?.trackDependencyData({
         id: uuidv4(),
         target: url,
         name: `${method} ${url}`,
@@ -150,7 +150,7 @@ const makeRequest = async (
   } catch (e) {
     const endTime = performance.now(); // End timing
     const duration = endTime - startTime; // Calculate duration in milliseconds
-    appInsights.trackDependencyData({
+    appInsights?.trackDependencyData({
       id: uuidv4(),
       target: url,
       name: `${method} ${url}`,
@@ -924,7 +924,7 @@ const makeHttpRequestV2 = async (
           type: "RPC_HTTP",
         },
       };
-      appInsights.trackDependencyData(appInsightData);
+      appInsights?.trackDependencyData(appInsightData);
       return success(apiResponse);
     } catch (e) {
       const responseBody = JSON.parse(data);
@@ -935,7 +935,7 @@ const makeHttpRequestV2 = async (
       throw new DOMException("Request was aborted", "AbortError");
     }
     console.error(e);
-    appInsights.trackDependencyData({
+    appInsights?.trackDependencyData({
       id: uuidv4(),
       name: "RPC Duration Metric",
       duration: performance.now() - startTime,
@@ -1083,11 +1083,11 @@ const makeGraphQLRequest = async (
         type: "RPC_GRAPHQL",
       },
     };
-    appInsights.trackDependencyData(appInsightData);
+    appInsights?.trackDependencyData(appInsightData);
   } catch (err) {
     const endTime = performance.now();
     const duration = endTime - startTime;
-    appInsights.trackDependencyData({
+    appInsights?.trackDependencyData({
       id: uuidv4(),
       name: "RPC Duration Metric",
       duration: duration,
