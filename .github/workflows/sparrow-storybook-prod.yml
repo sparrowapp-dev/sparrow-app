@@ -1,8 +1,6 @@
 name: Sparrow-storybook-prod
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
    build:
