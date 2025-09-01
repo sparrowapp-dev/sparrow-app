@@ -2,7 +2,7 @@ import { notifications } from "@sparrow/library/ui";
 import { EnvironmentRepository } from "../../../../repositories/environment.repository";
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import { EnvironmentService } from "../../../../services/environment.service";
-import { Events } from "@sparrow/common/enums";
+import { Events, WorkspaceType } from "@sparrow/common/enums";
 import { environmentType } from "@sparrow/common/enums/environment.enum";
 import { createDeepCopy, SetDataStructure, Sleep } from "@sparrow/common/utils";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
@@ -19,6 +19,7 @@ import { open } from "@tauri-apps/plugin-shell";
 import { getClientUser } from "@app/utils/jwt";
 import { UserService } from "@app/services/user.service";
 import { captureEvent } from "@app/utils/posthog/posthogConfig";
+import { generateVariableTourCompleted } from "@sparrow/workspaces/stores";
 
 export class EnvironmentExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -160,6 +161,16 @@ export class EnvironmentExplorerViewModel {
     this.compareEnvironmentWithServerDebounced,
     0,
   );
+
+  /**
+   * Get the guest user state
+   */
+  private getGuestUserState = async () => {
+    const response = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    return response?.getLatest().toMutableJSON().isGuestUser;
+  };
 
   /**
    *
@@ -735,9 +746,114 @@ export class EnvironmentExplorerViewModel {
     return;
   };
 
+  /**
+   * Fetch collections from services and insert to repository
+   * @param workspaceId - id of current workspace
+   */
+  public fetchCollections = async (
+    workspaceId: string,
+  ): Promise<{ collectionItemTabsToBeDeleted?: string[] }> => {
+    const isGuestUser = await this.getGuestUserState();
+    if (!workspaceId || isGuestUser) {
+      return {};
+    }
+
+    const getCollectionItemIds = (
+      collectionItem: any,
+      collectedIds: string[],
+    ): void => {
+      const stack = [collectionItem];
+      while (stack.length > 0) {
+        const item = stack.pop();
+        if (!item) continue;
+
+        if (!item.type) {
+          // Collection
+          collectedIds.push(item._id);
+        } else {
+          // Folder, Http Request, WebSocket Request
+          collectedIds.push(item.id);
+        }
+
+        if (Array.isArray(item.items)) {
+          stack.push(...item.items);
+        }
+      }
+    };
+
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const workspaceData =
+      await this.workspaceRepository.readWorkspace(workspaceId);
+
+    let res;
+    if (
+      workspaceData &&
+      workspaceData.workspaceType === WorkspaceType.PUBLIC &&
+      workspaceData.isShared
+    ) {
+      res = await this.collectionService.fetchPublicCollection(
+        workspaceId,
+        constants.API_URL,
+      );
+    } else {
+      res = await this.collectionService.fetchCollection(workspaceId, baseUrl);
+    }
+
+    if (!res?.isSuccessful || !res?.data?.data) {
+      return {};
+    }
+
+    const collections = res.data.data;
+    const processedCollections: any[] = [];
+    const collectionIds: string[] = [];
+
+    const chunkSize = 100;
+    for (let i = 0; i < collections.length; i += chunkSize) {
+      const chunk = collections.slice(i, i + chunkSize);
+      for (const col of chunk) {
+        const collection = createDeepCopy(col);
+        collection.workspaceId = workspaceId;
+        collection.id = col._id;
+        if (!collection.description) collection.description = "";
+        delete collection._id;
+
+        processedCollections.push(collection);
+        collectionIds.push(col._id);
+      }
+      await new Promise((res) => setTimeout(res));
+    }
+
+    await this.collectionRepository.bulkInsertData(
+      workspaceId,
+      processedCollections,
+    );
+    await this.collectionRepository.deleteOrphanCollections(
+      workspaceId,
+      collectionIds,
+    );
+
+    const collectionItemIds: string[] = [];
+    for (const collection of collections) {
+      getCollectionItemIds(collection, collectionItemIds);
+    }
+
+    const collectionItemTabsToBeDeleted =
+      await this.tabRepository.getIdOfTabsThatDoesntExistAtCollectionLevel(
+        workspaceId,
+        collectionItemIds,
+      );
+
+    return {
+      collectionItemTabsToBeDeleted,
+    };
+  };
+
   public generateVariableDemoCompleted = async () => {
+    generateVariableTourCompleted.set(true);
     const response = await this.userService.generateVariableDemoCompleted();
+    const progressiveTab = createDeepCopy(this._tab.getValue());
     if (response?.data?.data) {
+      await this.fetchCollections(progressiveTab?.path?.workspaceId);
       return response;
     }
   };
