@@ -269,4 +269,5 @@
   onGenerateAiResponse={_viewModel.generateAIResponseWS}
   onToggleLike={_viewModel.toggleChatMessageLike}
   onUpdateAiModel={_viewModel.updateAIModel}
+  generateMockData={_viewModel.generateMockData}
 />
