@@ -203,7 +203,7 @@ class RestExplorerViewModel {
         );
         const m = this._tab.getValue() as Tab;
 
-        if (collectionDoc?.isGenerateVariableTrial) {
+        if (collectionDoc) {
           await this.updateIsGeneratedVariable(
             collectionDoc?.isGenerateVariableTrial,
           );
@@ -3990,10 +3990,21 @@ class RestExplorerViewModel {
     try {
       const response =
         await this.userService.InsertGenerateTrialCollectionIds(collectionId);
-      const tab = this._tab;
       if (response?.data.data) {
         const progressiveTab = createDeepCopy(this._tab.getValue());
-        await this.fetchCollections(progressiveTab?.path?.workspaceId);
+        const baseUrl = await this.constructBaseUrl(
+          progressiveTab?.path?.workspaceId,
+        );
+        const response =
+          await this.collectionService.geCollectionByIdAndWorkspaceGenerateVariables(
+            progressiveTab?.path?.collectionId,
+            progressiveTab?.path?.workspaceId,
+            baseUrl,
+          );
+        await this.collectionRepository.updateCollection(
+          progressiveTab?.path?.collectionId,
+          response?.data?.data,
+        );
         return response?.data?.data ?? false;
       }
     } catch (error) {
