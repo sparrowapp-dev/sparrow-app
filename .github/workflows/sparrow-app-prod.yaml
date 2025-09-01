@@ -138,8 +138,47 @@ jobs:
       - name: Increase Yarn network timeout
         run: yarn config set network-timeout 600000
 
-      # - name: Sync version across all files
-      #   run: yarn sync-version
+      - name: Update @tauri-apps/* versions in desktop package.json from root
+        run: |
+          $rootPkg = Get-Content package.json | ConvertFrom-Json
+          $desktopPkgPath = "apps/@sparrow-desktop/package.json"
+          $desktopPkg = Get-Content $desktopPkgPath | ConvertFrom-Json
+          $tauriPackages = @(
+            "@tauri-apps/api",
+            "@tauri-apps/cli",
+            "@tauri-apps/plugin-deep-link",
+            "@tauri-apps/plugin-dialog",
+            "@tauri-apps/plugin-fs",
+            "@tauri-apps/plugin-os",
+            "@tauri-apps/plugin-process",
+            "@tauri-apps/plugin-shell",
+            "@tauri-apps/plugin-updater"
+          )
+          foreach ($pkg in $tauriPackages) {
+            if ($rootPkg.dependencies.PSObject.Properties.Name -contains $pkg) {
+              $desktopPkg.dependencies.$pkg = $rootPkg.dependencies.$pkg
+            }
+          }
+          $desktopPkg | ConvertTo-Json -Depth 20 | Set-Content $desktopPkgPath
+        shell: pwsh
+
+      - name: Add createUpdaterArtifacts to bundle in tauri.conf.json
+        run: |
+          $confPath = "apps/@sparrow-desktop/src-tauri/tauri.conf.json"
+          $json = Get-Content $confPath -Raw | ConvertFrom-Json
+
+          if ($null -ne $json.bundle) {
+            if (-not ($json.bundle.PSObject.Properties.Name -contains "createUpdaterArtifacts")) {
+              $json.bundle | Add-Member -NotePropertyName "createUpdaterArtifacts" -NotePropertyValue $true
+            }
+            elseif ($json.bundle.createUpdaterArtifacts -ne $true) {
+              # enforce correct value in case it exists but is false
+              $json.bundle.createUpdaterArtifacts = $true
+            }
+
+            $json | ConvertTo-Json -Depth 20 | Set-Content $confPath -Encoding UTF8
+          }
+        shell: pwsh
 
       - name: Build Tauri App
         run: |
@@ -151,9 +190,6 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
-
-      - name: msi zip sig
-        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.zip.sig
 
       # --- STAGE 3: SIGN MSIX and NSIS FILES ---
       - name: Find and Sign MSI files
@@ -197,7 +233,22 @@ jobs:
             
             Write-Host "✅ Successfully signed $($msiFile.Name)"
           }
-      
+
+      - name: Regenerate MSI updater signature after signing MSI
+        run: |
+          $msiPath = "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi"
+          $msiFile = Get-ChildItem "$msiPath\*.msi" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if (-not $msiFile) { throw "No MSI file found to sign" }
+          # Regenerate signature using Tauri updater CLI with key and password
+          yarn tauri signer sign -k "$env:TAURI_SIGNING_PRIVATE_KEY" -p "$env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD" "$($msiFile.FullName)"
+        shell: pwsh
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+
+      - name: Print MSI Updater Signature
+        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi.sig
+
       - name: Find and Sign EXE files  
         shell: pwsh
         run: |
@@ -446,19 +497,14 @@ jobs:
         
       - name: Post Windows Build Links to Teams
         run: |
-          # Get the MSI file to determine the naming pattern
           $msiFile = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
           $msiBaseName = [System.IO.Path]::GetFileNameWithoutExtension($msiFile.Name)
-
           $exeFile = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/nsis" -Filter "Sparrow_*_x64-setup.exe" | Select-Object -First 1
           $exeBaseName = [System.IO.Path]::GetFileNameWithoutExtension($exeFile.Name)
-          $exeUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$exeBaseName.exe"
-
-          # Construct URLs for all file types
           $msixUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$msiBaseName.msix"
           $msiUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$msiBaseName.msi"
           $exeUrl = "https://sparrow-release-assests-prod.s3.amazonaws.com/$exeBaseName.exe"
-
+          $buildDate = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
           $body = @{
             "type" = "message"
             "attachments" = @(
@@ -475,60 +521,30 @@ jobs:
                     }
                     @{
                       "type" = "TextBlock"
-                      "text" = "Download Links:"
-                      "weight" = "bolder"
-                      "spacing" = "medium"
+                      "text" = "Branch: main"
+                      "wrap" = $true
                     }
                     @{
-                      "type" = "ColumnSet"
-                      "columns" = @(
-                        @{
-                          "type" = "Column"
-                          "width" = "stretch"
-                          "items" = @(
-                            @{
-                              "type" = "TextBlock"
-                              "text" = "[MSIX Installer]($msixUrl)"
-                              "color" = "accent"
-                              "wrap" = $true
-                            }
-                          )
-                        }
-                      )
+                      "type" = "TextBlock"
+                      "text" = "Build Date: $buildDate"
+                      "wrap" = $true
                     }
+                  )
+                  "actions" = @(
                     @{
-                      "type" = "ColumnSet"
-                      "columns" = @(
-                        @{
-                          "type" = "Column"
-                          "width" = "stretch"
-                          "items" = @(
-                            @{
-                              "type" = "TextBlock"
-                              "text" = "[MSI Installer]($msiUrl)"
-                              "color" = "accent"
-                              "wrap" = $true
-                            }
-                          )
-                        }
-                      )
-                    }
+                      "type" = "Action.OpenUrl"
+                      "title" = "📥 Download MSIX Installer"
+                      "url" = $msixUrl
+                    },
                     @{
-                      "type" = "ColumnSet"
-                      "columns" = @(
-                        @{
-                          "type" = "Column"
-                          "width" = "stretch"
-                          "items" = @(
-                            @{
-                              "type" = "TextBlock"
-                              "text" = "[EXE Installer]($exeUrl)"
-                              "color" = "accent"
-                              "wrap" = $true
-                            }
-                          )
-                        }
-                      )
+                      "type" = "Action.OpenUrl"
+                      "title" = "📥 Download MSI Installer"
+                      "url" = $msiUrl
+                    },
+                    @{
+                      "type" = "Action.OpenUrl"
+                      "title" = "📥 Download EXE Installer"
+                      "url" = $exeUrl
                     }
                   )
                   "$schema" = "http://adaptivecards.io/schemas/adaptive-card.json"
@@ -537,9 +553,7 @@ jobs:
               }
             )
           }
-          
           $jsonBody = $body | ConvertTo-Json -Depth 10
-
           Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
         shell: pwsh
 
@@ -588,9 +602,6 @@ jobs:
 
       - name: Install project dependencies
         run: yarn
-
-      # - name: Sync version across all files
-      #   run: yarn sync-version
 
       - name: Update updater endpoint in tauri.conf.json file
         run: |
@@ -699,12 +710,11 @@ jobs:
           AWS_REGION: us-west-1
           TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
         run: |
-          # Find the latest .deb file in the local build output
           DEB_SRC_DIR="apps/@sparrow-desktop/src-tauri/target/release/bundle/deb"
           DEB_FILE=$(ls "$DEB_SRC_DIR"/*.deb | sort -V | tail -n 1)
           DEB_BASENAME=$(basename "$DEB_FILE")
           DEB_URL="https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/linux/pool/main/$DEB_BASENAME"
-
+          BUILD_DATE=$(date +'%Y-%m-%d %H:%M:%S')
           curl -H "Content-Type: application/json" -d "{
             \"type\": \"message\",
             \"attachments\": [
@@ -721,29 +731,29 @@ jobs:
                     },
                     {
                       \"type\": \"TextBlock\",
-                      \"text\": \"Branch: production\",
+                      \"text\": \"Branch: main\",
                       \"wrap\": true
                     },
                     {
                       \"type\": \"TextBlock\",
-                      \"text\": \"Direct Download:\",
+                      \"text\": \"Build Date: $BUILD_DATE\",
                       \"wrap\": true
                     }
                   ],
                   \"actions\": [
                     {
                       \"type\": \"Action.OpenUrl\",
-                      \"title\": \"Download .deb\",
+                      \"title\": \"📥 Download linux deb package\",
                       \"url\": \"$DEB_URL\"
                     }
                   ],
-                  \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
+                  \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
                   \"version\": \"1.2\"
                 }
               }
             ]
-          }" "$TEAMS_WEBHOOK_URL"   
-
+          }" "$TEAMS_WEBHOOK_URL"
+        shell: bash
   release_macos:
     runs-on: macos-latest
     environment: production
@@ -755,11 +765,19 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Install Rust 1.82.0
+      - name: Use latest stable Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Install Rust 1.82.0 and add macOS targets
+        shell: bash
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
           rustup install 1.82.0
           rustup default 1.82.0
+          rustup target add x86_64-apple-darwin
+          rustup target add aarch64-apple-darwin
 
       - name: Sync node version and setup cache
         uses: actions/setup-node@v3
@@ -768,9 +786,6 @@ jobs:
 
       - name: Install project dependencies
         run: yarn
-
-      # - name: Sync version across all files
-      #   run: yarn sync-version
 
       - name: Update updater endpoint in tauri.conf.json file
         run: |
@@ -788,16 +803,45 @@ jobs:
               /"files": {/,/      }/d
           }' apps/@sparrow-desktop/src-tauri/tauri.conf.json
         shell: bash
-        
+
       - name: Increase Yarn network timeout
         run: yarn config set network-timeout 600000
 
-      - name: Build Tauri App
+      - name: Configure Env Variables for Mac(Intel) Build
+        shell: bash
         run: |
-          yarn cache clean
-          yarn install
-          yarn desktop-build
-          # yarn tauri build --debug
+          # Resolve compilers and SDK path from the selected Xcode
+          SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
+          CLANG="$(xcrun --sdk macosx -f clang)"
+          CLANGXX="$(xcrun --sdk macosx -f clang++)"
+
+          echo "Using SDKROOT: $SDKROOT"
+          echo "Clang: $CLANG"
+          echo "Clang++: $CLANGXX"
+
+          # Make SDK available to all subsequent steps (incl. cc crate)
+          echo "SDKROOT=$SDKROOT" >> "$GITHUB_ENV"
+          echo "MACOSX_DEPLOYMENT_TARGET=10.13" >> "$GITHUB_ENV"
+
+          # Set BOTH underscore and hyphen forms (cc crate may read either)
+          echo "CC_x86_64_apple_darwin=$CLANG" >> "$GITHUB_ENV"
+          echo "CXX_x86_64_apple_darwin=$CLANGXX" >> "$GITHUB_ENV"
+          echo "CC_x86_64-apple-darwin=$CLANG" >> "$GITHUB_ENV"
+          echo "CXX_x86_64-apple-darwin=$CLANGXX" >> "$GITHUB_ENV"
+
+          # Ensure headers/libs are found when cross-compiling C/C++
+          COMMON_CFLAGS="-target x86_64-apple-macos10.13 -isysroot $SDKROOT -mmacosx-version-min=10.13"
+          COMMON_LDFLAGS="-isysroot $SDKROOT -mmacosx-version-min=10.13"
+
+          echo "CFLAGS_x86_64_apple_darwin=$COMMON_CFLAGS" >> "$GITHUB_ENV"
+          echo "CXXFLAGS_x86_64_apple_darwin=$COMMON_CFLAGS" >> "$GITHUB_ENV"
+          echo "CFLAGS_x86_64-apple-darwin=$COMMON_CFLAGS" >> "$GITHUB_ENV"
+          echo "CXXFLAGS_x86_64-apple-darwin=$COMMON_CFLAGS" >> "$GITHUB_ENV"
+          echo "LDFLAGS_x86_64_apple_darwin=$COMMON_LDFLAGS" >> "$GITHUB_ENV"
+          echo "LDFLAGS_x86_64-apple-darwin=$COMMON_LDFLAGS" >> "$GITHUB_ENV"
+
+      # ------- ARM64 (Apple Silicon) build -------
+      - name: Build & Sign Tauri App (Apple Silicon / arm64)
         env:
           APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
           APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
@@ -808,23 +852,101 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          CI: false
+          CI: "false"
+        run: |
+          yarn cache clean
+          yarn install
+          yarn desktop-build
 
-      - name: dmg sig
+      # ------- Intel (x86_64) build -------
+      - name: Build & Sign Tauri App (Intel / x86_64)
+        env:
+          APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
+          APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
+          APPLE_CERTIFICATE_PASSWORD: "${{ secrets.APPLE_CERTIFICATE_PASSWORD }}"
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          CI: "false"
+        run: |
+          yarn desktop-build-intel-mac
+
+      - name: Show DMG signatures for Apple(MX Build)
         run: cat /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/*.sig
+
+      - name: Show DMG signatures for Apple(Intel Build)
+        run: cat /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos/*.sig
 
       - name: Install AWS CLI
         run: |
           curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
           sudo installer -pkg AWSCLIV2.pkg -target /
           aws --version
-      - name: Upload & File to S3
-        run: |
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-prod --recursive --exclude "*" --include "*.gz"
 
+      - name: Upload macOS DMG(Both archs) to S3
+        run: |
+          # Upload DMG files
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg s3://sparrow-release-assests-prod --recursive --exclude "*" --include "*.dmg"
+
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/dmg s3://sparrow-release-assests-prod --recursive --exclude "*" --include "*.dmg"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Post macOS Build Links to Teams
+        run: |
+          ARM64_DMG=$(ls apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg | head -n 1)
+          INTEL_DMG=$(ls apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/dmg/*.dmg | head -n 1)
+          ARM64_URL="https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/macos/$(basename "$ARM64_DMG")"
+          INTEL_URL="https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/macos/$(basename "$INTEL_DMG")"
+          BUILD_DATE=$(date +'%Y-%m-%d %H:%M:%S')
+          curl -H "Content-Type: application/json" -d "{
+            \"type\": \"message\",
+            \"attachments\": [
+              {
+                \"contentType\": \"application/vnd.microsoft.card.adaptive\",
+                \"content\": {
+                  \"type\": \"AdaptiveCard\",
+                  \"body\": [
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"🍎 New macOS Builds Available\",
+                      \"weight\": \"bolder\",
+                      \"size\": \"large\"
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"Branch: main\",
+                      \"wrap\": true
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"Build Date: $BUILD_DATE\",
+                      \"wrap\": true
+                    }
+                  ],
+                  \"actions\": [
+                    {
+                      \"type\": \"Action.OpenUrl\",
+                      \"title\": \"📥 Download Apple Silicon (arm64)\",
+                      \"url\": \"$ARM64_URL\"
+                    },
+                    {
+                      \"type\": \"Action.OpenUrl\",
+                      \"title\": \"📥 Download Intel (x86_64)\",
+                      \"url\": \"$INTEL_URL\"
+                    }
+                  ],
+                  \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
+                  \"version\": \"1.2\"
+                }
+              }
+            ]
+          }" "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL}}"
+        shell: bash
 
       - name: Download Windows and Linux artifacts
         run: |

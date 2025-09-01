@@ -454,7 +454,7 @@
         <Input
           type={"text"}
           size={"medium"}
-          maxlength={500}
+          maxlength={100}
           width={"398px"}
           id={"renameInputFieldCollection"}
           value={$tab?.name || ""}
@@ -876,9 +876,7 @@ margin-right: 8px;
               disabled={!isCollectionEditable}
               id="updateCollectionDescField"
               value={$tab?.description || ""}
-              class=" border-0 text-fs-12 collection-area {!isSharedWorkspace
-                ? 'input-outline'
-                : ''} w-100 p-2"
+              class=" border-0 text-fs-12 collection-area w-100 p-2"
               placeholder={isSharedWorkspace
                 ? "No description added."
                 : "Add Description"}
@@ -1095,6 +1093,7 @@ margin-right: 8px;
           onUpdateAuthProfile={handleOnUpdateAuthProfile}
           onDeleteAuthProfile={handleOnDeleteAuthProfile}
           onUpdateRequestState={onUpdateCollectionState}
+          {userRole}
         />
       {/if}
     {/if}
@@ -1134,7 +1133,6 @@ margin-right: 8px;
     color: var(--text-secondary-550);
   }
 
-  .input-outline:focus,
   .input-outline:hover {
     outline: 1px solid var(--text-primary-600);
   }

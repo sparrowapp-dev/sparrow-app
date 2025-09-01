@@ -23,7 +23,6 @@
    * Role of user in active workspace
    */
   export let userRole;
-
   export let workspaceType: WorkspaceType = WorkspaceType.PRIVATE;
   export let onMakeWorkspacePublic;
   export let onShareWorkspace;
@@ -31,6 +30,14 @@
   export let onUpdateWorkspaceName;
   export let isShareModalOpen;
   let isWorkspaceUpdating = false;
+
+  let isWorkspaceNameTouched = false;
+  let isWorkspaceNameInvalid = false;
+
+  // Validation function (same as team name)
+  const isInvalidWorkspaceName = (name: string) => {
+    return !/^(?!.*[^A-Za-z0-9]{3,})(?=.*[A-Za-z0-9])[\x20-\x7E]+$/.test(name);
+  };
 
   const handleInputDescription = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -41,11 +48,18 @@
       workspaceDescription = target.value.slice(0, maxChars); // Trim the value to the limit
     }
   };
+
   const handleInputName = (event: Event) => {
-    onUpdateWorkspaceName(event.detail, "");
+    workspaceName = event.detail;
+    isWorkspaceNameInvalid = isInvalidWorkspaceName(workspaceName.trim());
+    onUpdateWorkspaceName(workspaceName, "");
   };
+
   const handleBlurName = (event: Event) => {
-    onUpdateWorkspaceName(event.detail, "blur");
+    isWorkspaceNameTouched = true;
+    workspaceName = event.detail.trim();
+    isWorkspaceNameInvalid = isInvalidWorkspaceName(workspaceName);
+    onUpdateWorkspaceName(workspaceName, "blur");
   };
 </script>
 
@@ -73,6 +87,12 @@
           on:input={handleInputName}
           on:blur={handleBlurName}
         />
+        {#if isWorkspaceNameInvalid && isWorkspaceNameTouched}
+          <span class="help-label-error text-ds-font-size-12">
+            Invalid workspace name. Please remove unsupported characters like
+            emojis or more than two special symbols.
+          </span>
+        {/if}
       </div>
       <div class="d-flex flex-column" style="gap:8px">
         <span class="textarea-header">Workspace Summary</span>
@@ -158,5 +178,9 @@
     font-size: 12px;
     color: var(--text-ds-neutral-400);
     font-weight: 400;
+  }
+  .help-label-error {
+    margin-top: 4px;
+    color: var(--text-ds-danger-300);
   }
 </style>

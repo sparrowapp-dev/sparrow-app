@@ -73,9 +73,95 @@
   let token = "";
   let isTokenFormEnabled = false;
   let isTokenErrorMessage = false;
+  let isTokenFieldEmpty = false;
+  let isTokenFieldValid = false;
   let isTokenValidationLoading = false;
 
   let isPressed = false;
+
+  let tokenErrorType = ""; // 'empty', 'invalid', 'format'
+  const tokenFormatRegex =
+    /^sparrow:\/\/\?accessToken=eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+&refreshToken=eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+(?:&response=.+?)?&event=login&method=[A-Za-z0-9_-]+\s*$/;
+  async function tokenValidationLogic() {
+    // Reset error states
+    isTokenErrorMessage = false;
+    tokenErrorType = "";
+
+    // Check if token is empty
+    if (!token || token.trim() === "") {
+      isTokenErrorMessage = true;
+      tokenErrorType = "empty";
+      return;
+    }
+
+    // Check token format using regex
+    if (!tokenFormatRegex.test(token.trim())) {
+      isTokenErrorMessage = true;
+      tokenErrorType = "format";
+      return;
+    }
+
+    // If format is valid, proceed with API validation
+    const params = new URLSearchParams(token.split("?")[1]);
+    const accessToken = params.get("accessToken");
+    const refreshToken = params.get("refreshToken");
+
+    // Additional format validation - check if tokens were extracted properly
+    if (!accessToken || !refreshToken) {
+      isTokenErrorMessage = true;
+      tokenErrorType = "format";
+      return;
+    }
+
+    const userDetails = jwtDecode(accessToken);
+
+    identifyUser(userDetails.email);
+    const apiUrl = constants.API_URL;
+    const userId = userDetails?._id;
+    const userEmail = userDetails?.email;
+
+    if (!userEmail || !userId || !accessToken || !refreshToken) {
+      isTokenErrorMessage = true;
+      tokenErrorType = "format";
+      return;
+    }
+
+    try {
+      isTokenValidationLoading = true;
+      await axios({
+        method: "GET",
+        url: `${apiUrl}/api/team/user/${userId}`,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      // Success - clear all errors
+      isTokenErrorMessage = false;
+      tokenErrorType = "";
+      _viewModel.handleAccountLogin(token);
+    } catch (e) {
+      // API call failed - invalid or expired token
+      isTokenErrorMessage = true;
+      tokenErrorType = "invalid";
+    } finally {
+      isTokenValidationLoading = false;
+    }
+  }
+
+  // Helper function to get error message based on type
+  const getErrorMessage = (errorType) => {
+    switch (errorType) {
+      case "empty":
+        return "Token Code is required";
+      case "format":
+        return "Invalid code format. Please check and re-enter the code.";
+      case "invalid":
+        return "Invalid or expired code.";
+      default:
+        return "";
+    }
+  };
 </script>
 
 <DefaultHeader />
@@ -202,7 +288,7 @@
         />
         {#if isTokenErrorMessage}
           <div class="text-danger-200 text-fs-12 text-ds-line-height-100">
-            The entered code is invalid or expired. Please enter a valid code.
+            {getErrorMessage(tokenErrorType)}
           </div>
         {/if}
       </div>
@@ -210,37 +296,7 @@
       <div class="d-flex" style="height:44px; width:100%; margin-top:15px;">
         <button
           class="btn d-flex justify-content-center align-items-center btn-primary w-100 text-blackColor border-0"
-          on:click={async () => {
-            const params = new URLSearchParams(token.split("?")[1]);
-            const accessToken = params.get("accessToken");
-            const refreshToken = params.get("refreshToken");
-            const userDetails = jwtDecode(accessToken);
-
-            identifyUser(userDetails.email);
-            const apiUrl = constants.API_URL;
-            const userId = userDetails?._id;
-            const userEmail = userDetails?.email;
-            if (!userEmail || !userId || !accessToken || !refreshToken) {
-              isTokenErrorMessage = true;
-              return;
-            }
-            try {
-              isTokenValidationLoading = true;
-              await axios({
-                method: "GET",
-                url: `${apiUrl}/api/team/user/${userId}`,
-                headers: {
-                  Authorization: `Bearer ${accessToken}`,
-                },
-              });
-              isTokenErrorMessage = false;
-              _viewModel.handleAccountLogin(token);
-            } catch (e) {
-              isTokenErrorMessage = true;
-            } finally {
-              isTokenValidationLoading = false;
-            }
-          }}
+          on:click={tokenValidationLogic}
           id="create_account_or_sign_in"
           disabled={!token || isTokenValidationLoading}
         >
@@ -284,7 +340,7 @@
     {#if os === "windows"}
       <a
         href={`mailto:${constants.SPARROW_SUPPORT_EMAIL}`}
-        class="px-2 sparrow-fs-12 text-secondary-250">Need Help?</a
+        class="px-2 sparrow-fs-12 link-button">Need Help?</a
       >
       <span class="px-2 text-secondary-250 fw-bold mb-1">|</span>
       <a
@@ -292,7 +348,7 @@
         on:click={async () => {
           await open(constants.CANNY_FEEDBACK_URL);
         }}
-        class="px-2 sparrow-fs-12 text-secondary-250">Report Issue</a
+        class="px-2 sparrow-fs-12 link-button">Report Issue</a
       >
     {:else}
       <a
@@ -393,14 +449,15 @@
   }
 
   .link-button {
-    color: #62636c;
-    font-weight: 400;
-    font-size: 14px;
-    cursor: pointer;
+    text-decoration: underline;
+    color: #b6b7b9;
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 12px;
   }
 
   .link-button:hover {
-    color: var(--text-primary-300);
+    color: var(--primary-btn-color);
   }
 
   .link-button:active {
