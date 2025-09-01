@@ -8,7 +8,7 @@ on:
   push:
     # Trigger on push to the <branch_name> branch. Make sure to remove the branch name from the branches list below, once you are done testing.
     branches:
-      - <branch_name>
+      - build/self-host-docker-build
 
   workflow_dispatch:
 
@@ -43,5 +43,32 @@ env:
   VITE_SPARROW_ADMIN_URL: ${{ vars.VITE_SPARROW_ADMIN_URL }}
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
   CI: false
+  DOCKER_IMAGE_VERSION: ${{ vars.SELF_HOST_DOCKER_IMAGE_VERSION }}
+
 
 jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    environment: development
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push multi-arch Docker image
+        run: |
+          docker buildx build --platform linux/amd64,linux/arm64 \
+            -t sparrowapi/sparrow-web:self-host-${DOCKER_IMAGE_VERSION} --push .
+
+      - name: Logout from Docker Hub
+        run: |
+          docker logout
