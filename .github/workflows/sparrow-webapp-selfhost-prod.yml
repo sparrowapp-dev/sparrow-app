@@ -1,0 +1,39 @@
+name: Build and Push Multi-Arch Sparrow Web Self Host Docker Image
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  DOCKER_IMAGE_VERSION: ${{ vars.SELF_HOST_DOCKER_IMAGE_VERSION }}
+
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push multi-arch Docker image
+        run: |
+          docker buildx build --platform linux/amd64,linux/arm64 \
+            -f SelfHost-Sparrow-Web.Dockerfile \
+            -t sparrowapi/sparrow-web:self-host-${DOCKER_IMAGE_VERSION} --push .
+
+      - name: Logout from Docker Hub
+        run: |
+          docker logout
