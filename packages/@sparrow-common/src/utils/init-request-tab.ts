@@ -11,6 +11,9 @@ import {
   type KeyValueChecked,
   FormDataTypeEnum,
   type StatePartial,
+  TestCaseModeEnum,
+  TestCaseConditionOperatorEnum,
+  TestCaseSelectionTypeEnum,
 } from "@sparrow/common/types/workspace";
 import {
   TabTypeEnum,
@@ -32,6 +35,7 @@ class InitRequestTab {
   constructor(_id: string, _workspaceId: string) {
     this._tab = {
       id: _id,
+      label:"",
       tabId: uuidv4(),
       name: "New " + RequestDefault.NAME,
       type: TabTypeEnum.REQUEST,
@@ -100,6 +104,40 @@ class InitRequestTab {
               checked: true,
             },
           ],
+           tests: {
+              testCaseMode: TestCaseModeEnum.NO_CODE,
+                noCode: [
+                  {
+                    id: "case-1",
+                    name: "Check status code equals 200",
+                    condition: TestCaseConditionOperatorEnum.EQUALS,
+                    expectedResult: "200",
+                    testPath: "$.status",
+                    testTarget: TestCaseSelectionTypeEnum.RESPONSE_JSON,
+                  },
+                  {
+                    id: "case-2",
+                    name: "Response body contains userId",
+                    condition: TestCaseConditionOperatorEnum.CONTAINS,
+                    expectedResult: "userId",
+                    testPath: "$.body",
+                    testTarget: TestCaseSelectionTypeEnum.RESPONSE_TEXT,
+                  },
+                  {
+                    id: "case-3",
+                    name: "Response header does not exist",
+                    condition: TestCaseConditionOperatorEnum.DOES_NOT_EXIST,
+                    expectedResult: "",
+                    testPath: "x-deprecated-header",
+                    testTarget: TestCaseSelectionTypeEnum.RESPONSE_HEADER,
+                  },
+                ],
+             
+              script: `// Custom test script
+          if (response.status === 200) {
+            console.log("Status is OK");
+          }`,
+            },
           state: {
             requestBodyLanguage: RequestDataTypeEnum.TEXT,
             requestBodyNavigation: RequestDatasetEnum.NONE,
