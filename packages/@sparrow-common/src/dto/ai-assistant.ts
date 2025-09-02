@@ -24,6 +24,7 @@ export interface StreamPromptDto {
   instructions: string;
 }
 export interface GenerateMockDataRequestDto {
+  teamId:string,
   text: string;
   requestType: RequestSectionEnum;
   properties?: {

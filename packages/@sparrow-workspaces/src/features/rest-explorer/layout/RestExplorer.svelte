@@ -537,6 +537,14 @@
       isMergeViewLoading = false;
       return;
     }
+    if (
+      $tab.property?.request?.state?.requestBodyNavigation ===
+      RequestDatasetEnum.NONE
+    ) {
+      notifications.warning("Please select the request body type to generate.");
+      isMergeViewLoading = false;
+      return;
+    }
     const response = await generateMockData();
     if (!response) {
       isMergeViewLoading = false;
