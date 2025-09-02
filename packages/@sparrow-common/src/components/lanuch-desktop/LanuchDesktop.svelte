@@ -1,5 +1,6 @@
 <script>
   import { MacIcon, WindowsIcon } from "@sparrow/library/icons";
+  import { sideNavbarAppleLogo } from "../../../../../../sparrow-app/apps/@sparrow-storybook/src/stories/assets/index";
   import { onMount } from "svelte";
   export let launchSparrowWebApp;
   let windowOs = true;
@@ -25,7 +26,11 @@
   >
     <div class="d-flex align-items-center justify-content-center">
       {#if windowOs}
-        <MacIcon height="12px" width="12px" color="white" />
+        <img
+          src={sideNavbarAppleLogo}
+          alt="sideNavbarappleLogo"
+          style="height: 20px; width:20px;"
+        />
       {:else}
         <WindowsIcon height="12px" width="12px" color="white" />
       {/if}
