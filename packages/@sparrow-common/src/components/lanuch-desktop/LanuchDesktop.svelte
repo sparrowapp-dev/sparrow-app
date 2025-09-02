@@ -1,6 +1,6 @@
 <script>
   import { MacIcon, WindowsIcon } from "@sparrow/library/icons";
-  import { sideNavbarAppleLogo } from "../../../../../../sparrow-app/apps/@sparrow-storybook/src/stories/assets/index";
+  import { sideNavbarAppleLogo } from "../../../../@sparrow-common/src/images/index";
   import { onMount } from "svelte";
   export let launchSparrowWebApp;
   let windowOs = true;
