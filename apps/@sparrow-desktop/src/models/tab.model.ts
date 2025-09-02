@@ -434,7 +434,7 @@ export const tabSchemaLiteral = {
                         condition: {
                           type: "string",
                         },
-                        exprectedResult: {
+                        expectedResult: {
                           type: "string",
                         },
                         testPath: {
