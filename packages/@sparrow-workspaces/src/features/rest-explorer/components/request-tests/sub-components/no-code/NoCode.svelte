@@ -3,6 +3,7 @@
     TestCaseConditionOperatorEnum,
     TestCaseSelectionTypeEnum,
   } from "@sparrow/common/types/workspace";
+  import TestListItem from "./sub-components/test-list-item/TestListItem.svelte";
 
   export let tests;
   export let onTestsChange;
@@ -47,6 +48,34 @@
     onTestsChange(localTest);
   };
 
+  // ✅ Duplicate test
+  const duplicateTest = (test) => {
+    const newTest = {
+      ...test,
+      id: `${test.id}-copy-${Date.now()}`,
+      name: `${test.name} (Copy)`,
+      isActive: false,
+    };
+    localTest.noCode = [...localTest.noCode, newTest];
+    selectTest(newTest);
+  };
+
+  // ✅ Delete test
+  const deleteTest = (test) => {
+    localTest.noCode = localTest.noCode.filter((t) => t.id !== test.id);
+    // If the deleted test was active, activate the first remaining test (if any)
+    if (
+      !localTest.noCode.some((t) => t.isActive) &&
+      localTest.noCode.length > 0
+    ) {
+      localTest.noCode = localTest.noCode.map((t, i) => ({
+        ...t,
+        isActive: i === 0,
+      }));
+    }
+    onTestsChange(localTest);
+  };
+
   const clearTests = () => {
     localTest.noCode = [];
     onTestsChange(localTest);
@@ -74,17 +103,7 @@
       <!-- Left Sidebar -->
       <div class="me-3" style="min-width: 220px;">
         {#each localTest.noCode as test}
-          <div
-            class="d-flex justify-content-between align-items-center p-2 mb-1 rounded"
-            class:selected={test.isActive}
-            on:click={() => selectTest(test)}
-            style="cursor: pointer; background: {test.isActive
-              ? '#333'
-              : '#222'};"
-          >
-            <span>{test.name}</span>
-            <span class="text-muted">⋮</span>
-          </div>
+          <TestListItem {test} {selectTest} {deleteTest} {duplicateTest} />
         {/each}
 
         <div class="mt-3">
@@ -100,7 +119,7 @@
       <!-- Right Form -->
       <div class="flex-grow-1 p-3 border-start">
         {#if localTest.noCode.some((t) => t.isActive)}
-          {#each localTest.noCode as test (test.id)}
+          {#each localTest.noCode as test}
             {#if test.isActive}
               <div class="mb-3">
                 <label class="form-label">Name *</label>
