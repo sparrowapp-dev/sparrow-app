@@ -70,6 +70,7 @@ import {
   type HttpRequestCollectionLevelAuthTabInterface,
   type HttpRequestCollectionLevelAuthProfileTabInterface,
   RequestDatasetEnum,
+  type Tests,
 } from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
 import { RequestTabAdapter } from "../../../../adapter/request-tab";
@@ -1431,6 +1432,19 @@ class RestExplorerViewModel {
   public updateHeaders = async (_headers: KeyValueChecked[]) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.headers = _headers;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
+  };
+
+
+  /**
+   *
+   * @param _headers - request headers
+   */
+  public updateRequestTests = async (_tests : Tests) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.tests = _tests;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();

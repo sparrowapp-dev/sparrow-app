@@ -19,6 +19,7 @@
     RestExtensionPanel,
     RequestParameters,
     ResponseStatus,
+    RequestTests,
   } from "../components";
   import { Loader } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";
@@ -151,6 +152,7 @@
   export let onUpdateCollectionGuide: (query, isActive) => void;
   export let onUpdateAiPrompt;
   export let onUpdateAiConversation;
+  export let onUpdateTests;
   export let onUpdateAiModel;
   export let onGenerateDocumentation;
   export let onStopGeneratingAIResponse;
@@ -762,6 +764,11 @@
                           {environmentVariables}
                           {collection}
                           {onOpenCollection}
+                        />
+                      {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.TESTS}
+                        <RequestTests
+                          tests={$tab?.property?.request.tests}
+                          onTestsChange={onUpdateTests}
                         />
                       {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
                         <RequestDoc
