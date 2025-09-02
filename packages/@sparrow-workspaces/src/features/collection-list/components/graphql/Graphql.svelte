@@ -269,7 +269,7 @@
   >
     <div
       class="api-method"
-      style="height: 24px; width:24px !important; margin-right:4px;"
+      style="width: 24px !important; height:24px !important; padding:0;"
     ></div>
     <span class="api-method">
       <GraphIcon
@@ -348,7 +348,7 @@
     border-radius: 8px;
     display: flex;
     align-items: center;
-    justify-content: end;
+    justify-content: start;
     padding: 4px;
   }
   .api-name {
