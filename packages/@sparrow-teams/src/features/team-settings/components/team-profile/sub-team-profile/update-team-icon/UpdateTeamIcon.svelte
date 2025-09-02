@@ -25,7 +25,7 @@
    * @param  maxSize - The maximum file size allowed in KB.
    * @param  supportedFileTypes - The list of supported file types.
    */
-  const handleLogoInputChange = (
+  const handleLogoInputChange = async (
     e: any,
     maxSize: number,
     supportedFileTypes: string[],
@@ -71,6 +71,25 @@
       uploadTeamIcon.file.invalid = true;
       return;
     }
+
+    // Validate image dimensions
+    if (targetFile && targetFile[0]) {
+      const isValid = await validateImageDimensions(
+        targetFile[0],
+        ICON_CONFIG.MAX_WIDTH_PX,
+        ICON_CONFIG.MAX_HEIGHT_PX,
+      );
+      if (!isValid) {
+        uploadTeamIcon.file.showFileTypeError = false;
+        uploadTeamIcon.file.showFileSizeError = false;
+        uploadTeamIcon.file.invalid = true;
+        uploadTeamIcon.file.dimensionFileSizeError = true;
+        return;
+      } else {
+        uploadTeamIcon.file.dimensionFileSizeError = false;
+      }
+    }
+
     /**
      * Uploading file.
      */
@@ -78,6 +97,7 @@
     uploadTeamIcon.file.showFileTypeError = false;
     uploadTeamIcon.file.invalid = false;
     uploadTeamIcon.file.value = targetFile && targetFile[0];
+    uploadTeamIcon.file.dimensionFileSizeError = false;
     onUpdateTeam(TeamPropertyEnum.IMAGE);
   };
 
@@ -92,6 +112,7 @@
       invalid: false,
       showFileSizeError: false,
       showFileTypeError: false,
+      dimensionFileSizeError: false,
     };
     onUpdateTeam(TeamPropertyEnum.IMAGE);
   };
@@ -107,6 +128,26 @@
     );
     uploadFileInput?.click();
   };
+  function validateImageDimensions(
+    file: File,
+    maxWidth: number,
+    maxHeight: number,
+  ): Promise<boolean> {
+    return new Promise((resolve) => {
+      const img = new window.Image();
+      img.onload = function () {
+        if (img.width > maxWidth || img.height > maxHeight) {
+          resolve(false);
+        } else {
+          resolve(true);
+        }
+      };
+      img.onerror = function () {
+        resolve(false);
+      };
+      img.src = URL.createObjectURL(file);
+    });
+  }
 </script>
 
 <div class="pb-3">
@@ -126,6 +167,7 @@
       supportedFileTypes={ICON_CONFIG.FILE_TYPES}
       showFileSizeError={uploadTeamIcon.file.showFileSizeError}
       showFileTypeError={uploadTeamIcon.file.showFileTypeError}
+      showDimensionExceedError={uploadTeamIcon.file.dimensionFileSizeError}
       width={"80px"}
       height={"80px"}
     />
@@ -146,6 +188,11 @@
     <!-- Error message for file size exceeding the limit -->
     <p class=" text-danger-200 mt-2 text-fs-12">
       {ICON_CONFIG.SIZE_EXCEED_ERROR_MESSAGE}
+    </p>
+  {:else if uploadTeamIcon.file.dimensionFileSizeError}
+    <!-- Error message for dimension size exceeding the limit -->
+    <p class=" text-danger-200 mt-2 text-fs-12">
+      {ICON_CONFIG.DIMENSION_EXCEED_ERROR_MESSAGE}
     </p>
   {/if}
 </div>

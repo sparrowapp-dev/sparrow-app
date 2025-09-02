@@ -122,7 +122,7 @@ class InitRequestTab {
             isChatbotGeneratingResponse: false,
             isDocGenerating: false,
             isDocAlreadyGenerated: false,
-            selectedRequestAuthProfileId: ""
+            selectedRequestAuthProfileId: "",
           },
           auth: {
             bearerToken: "",
@@ -140,7 +140,7 @@ class InitRequestTab {
             prompt: "",
             conversations: [],
             threadId: "",
-            aiModelName: ""
+            aiModelName: "",
           },
           response: {
             headers: [],
@@ -149,6 +149,7 @@ class InitRequestTab {
             time: 0,
             size: 0,
           },
+          isGeneratedVariable: false,
         },
       },
       path: {
@@ -232,6 +233,11 @@ class InitRequestTab {
   public updateChatbotState(_isActive: boolean) {
     if (this._tab.property.request?.state) {
       this._tab.property.request.state.isChatbotActive = _isActive;
+    }
+  }
+  public updateIsGeneratedVariable(_value: boolean) {
+    if (this._tab.property.request?.isGeneratedVariable) {
+      this._tab.property.request.isGeneratedVariable = _value;
     }
   }
 }

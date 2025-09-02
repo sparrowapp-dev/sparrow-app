@@ -270,4 +270,7 @@
   onToggleLike={_viewModel.toggleChatMessageLike}
   onUpdateAiModel={_viewModel.updateAIModel}
   generateMockData={_viewModel.generateMockData}
+  updateIsGeneratedVariable={_viewModel.updateIsGeneratedVariable}
+  handleGenerateVariableDemo={_viewModel.handleGenerateVariableTabForTrial}
+  InsertGenerateTrialFlow={_viewModel.InsertGenerateTrialFlow}
 />

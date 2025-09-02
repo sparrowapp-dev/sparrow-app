@@ -78,6 +78,7 @@
   export let handleDocsRedirect;
   export let handleFeaturesRedirect;
   export let recentVisitedWorkspaces;
+  export let appEdition = "MANAGED";
 
   let helpOptionsOpen = false;
 
@@ -547,40 +548,42 @@
           slot="post-select"
           class="post-dropdown d-flex justify-content-center align-items-center flex-column"
         >
-          <div class="lower-underline"></div>
-          <div class="download-area w-100">
-            <div
-              class="download-sparrow-button download-section d-flex align-items-center justify-content-between"
-              style="display: flex; gap: 12px; padding: 8px; border-radius: 6px; width: fit-content;"
-            >
-              <SparrowFilledLogo />
+          {#if appEdition !== "SELFHOSTED"}
+            <div class="lower-underline"></div>
+            <div class="download-area w-100">
+              <div
+                class="download-sparrow-button download-section d-flex align-items-center justify-content-between"
+                style="display: flex; gap: 12px; padding: 8px; border-radius: 6px; width: fit-content;"
+              >
+                <SparrowFilledLogo />
 
-              <div class="d-flex flex-column gap-1" style="line-height: 1;">
-                <p
-                  class="download-text"
-                  style="margin: 0; font-size: 12px; font-weight: 500; color: var(--text-ds-nuetral-50);"
-                >
-                  Sparrow Desktop
-                </p>
-                <span
-                  class="description text-fs-10"
-                  style="font-size: 12px; color: gray;"
-                >
-                  No agent needed.
-                </span>
+                <div class="d-flex flex-column gap-1" style="line-height: 1;">
+                  <p
+                    class="download-text"
+                    style="margin: 0; font-size: 12px; font-weight: 500; color: var(--text-ds-nuetral-50);"
+                  >
+                    Sparrow Desktop
+                  </p>
+                  <span
+                    class="description text-fs-10"
+                    style="font-size: 12px; color: gray;"
+                  >
+                    No agent needed.
+                  </span>
+                </div>
+
+                <!-- Download Button -->
+
+                <Button
+                  type="primary"
+                  title="Download Now"
+                  size="small"
+                  onClick={onMarketingRedirect}
+                  customWidth={"103px"}
+                />
               </div>
-
-              <!-- Download Button -->
-
-              <Button
-                type="primary"
-                title="Download Now"
-                size="small"
-                onClick={onMarketingRedirect}
-                customWidth={"103px"}
-              />
             </div>
-          </div>
+          {/if}
         </div>
       </Select>
     {/if}

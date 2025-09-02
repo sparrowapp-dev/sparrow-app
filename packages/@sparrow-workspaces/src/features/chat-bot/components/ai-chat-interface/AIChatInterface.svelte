@@ -210,7 +210,7 @@
               {:else}
                 <div class="h-100 w-100">
                   {#each conversations as chat, index}
-                    <div in:fade={{ duration: 200, delay: index * 50 }}>
+                    <div in:fade={{ duration: 200, delay:50 }}>
                       <ChatItem
                         message={chat.message}
                         messageId={chat.messageId}

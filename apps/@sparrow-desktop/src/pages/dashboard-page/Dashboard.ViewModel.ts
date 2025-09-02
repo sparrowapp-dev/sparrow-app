@@ -1003,7 +1003,7 @@ export class DashboardViewModel {
         ),
         collectionId: collectionId || node.id,
         path: this.createPath(path),
-        updatedAt: new Date(node.updatedAt || Date.now()),
+        updatedAt: new Date(node.updatedAt || ""),
         workspaceId,
         type: node.type,
         folderDetails: [

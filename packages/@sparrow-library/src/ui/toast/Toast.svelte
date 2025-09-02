@@ -12,13 +12,19 @@
         return ErrorIcon;
     }
   };
+  function getToastStyle(data) {
+    if (data?.description?.length > 60) {
+      return "max-height:120px;height:auto;";
+    }
+    return `height:${data?.title === undefined ? "68px" : "84px"};`;
+  }
 </script>
 
 <div class="custom-toast-container">
   <ToastContainer width={"fit-content"} let:data>
     <div
       class="d-flex position-relative custom-toast custom-toast-{data.type} toast"
-      style="height: {data.title === undefined ? '68px' : '84px'};"
+      style={getToastStyle(data)}
     >
       <div class="w-100 content-wrapper d-flex column gap-4">
         <div class="d-flex">
@@ -138,7 +144,7 @@
     color: var(--text-ds-neutral-100);
     width: 236px;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 5;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;

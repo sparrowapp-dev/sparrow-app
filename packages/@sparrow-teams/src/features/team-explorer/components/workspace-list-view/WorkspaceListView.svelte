@@ -24,6 +24,7 @@
   export let isGuestUser = false;
   export let onAddMember;
   export let selectedFilter;
+  export let appEdition = "MANAGED";
 
   let filterText = "";
   let currentSortField = "updatedAt";
@@ -100,6 +101,7 @@
                 {onDeleteWorkspace}
                 {openInDesktop}
                 {isWebEnvironment}
+                {appEdition}
               />
             {/each}
           {/if}

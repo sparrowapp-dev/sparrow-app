@@ -844,6 +844,21 @@ export class CollectionService {
     return response;
   };
 
+  public geCollectionByIdAndWorkspaceGenerateVariables = async (
+    collectionId: string,
+    workspaceId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "GET",
+      `${baseUrl}/api/collection/${collectionId}/workspace/${workspaceId}/variables`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
   public createMockCollectionFromExisting = async (
     collectionId: string,
     workspaceId: string,

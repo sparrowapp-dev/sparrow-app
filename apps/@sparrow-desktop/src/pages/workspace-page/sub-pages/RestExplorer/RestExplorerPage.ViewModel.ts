@@ -32,10 +32,12 @@ import { WorkspaceRepository } from "../../../../repositories/workspace.reposito
 import { EnvironmentRepository } from "../../../../repositories/environment.repository";
 import { BehaviorSubject, Observable } from "rxjs";
 import {
+  environmentType,
   Events,
   ItemType,
   ResponseStatusCode,
   UntrackedItems,
+  WorkspaceType,
 } from "@sparrow/common/enums";
 import type { CreateDirectoryPostBody } from "@sparrow/common/dto";
 
@@ -95,6 +97,11 @@ import {
   type TransformedRequest,
 } from "@sparrow/common/types/workspace/collection-base";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
+import {
+  generatedVariableDemo,
+  generateVariableStep,
+} from "@sparrow/workspaces/stores";
+import { UserService } from "@app/services/user.service";
 
 import { getClientUser } from "@app/utils/jwt";
 import constants from "@app/constants/constants";
@@ -112,9 +119,11 @@ class RestExplorerViewModel {
   private workspaceRepository = new WorkspaceRepository();
   private environmentRepository = new EnvironmentRepository();
   private tabRepository = new TabRepository();
+  private userService = new UserService();
   private guideRepository = new GuideRepository();
   private guestUserRepository = new GuestUserRepository();
   private compareArray = new CompareArray();
+  private initTab = new InitTab();
 
   /**
    * Service
@@ -195,6 +204,12 @@ class RestExplorerViewModel {
           t.path.collectionId as string,
         );
         const m = this._tab.getValue() as Tab;
+
+        if (collectionDoc) {
+          await this.updateIsGeneratedVariable(
+            collectionDoc?.isGenerateVariableTrial,
+          );
+        }
 
         //   "selectedRequestAuthProfileId:>> ",
         //   m.property.request?.state?.selectedRequestAuthProfileId,
@@ -336,6 +351,16 @@ class RestExplorerViewModel {
   private set authParameter(value: { key: string; value: string }) {
     this._authParameter.next(value);
   }
+
+  /**
+   * Get the guest user state
+   */
+  private getGuestUserState = async () => {
+    const response = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    return response?.getLatest().toMutableJSON().isGuestUser;
+  };
 
   /**
    * Compares the current request tab with the server version and updates the saved status accordingly.
@@ -3795,6 +3820,100 @@ class RestExplorerViewModel {
   };
 
   /**
+   * updates the property of isGeneratedVariable in all .
+   */
+  public updateIsGeneratedVariable = async (value: boolean) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.isGeneratedVariable = value;
+    this.tab = progressiveTab;
+  };
+
+  private onOpenGlobalEnvironmentToGenerate = async (
+    environment: any,
+    collectionId: string,
+    collectionName: string | undefined,
+  ) => {
+    const environmentTabRxDoc = await this.tabRepository.getTabById(
+      environment?.id,
+    );
+    let environmentTabJson = environmentTabRxDoc?.toMutableJSON();
+    if (environmentTabJson) {
+      environmentTabJson.property.environment.generateProperty = {
+        collectionId: collectionId,
+        collectionName: collectionName,
+      };
+      environmentTabJson.property.environment.generateVariable = true;
+      environmentTabJson.property.environment.aiGenerationStatus = "";
+      environmentTabJson.persistence = TabPersistenceTypeEnum.PERMANENT;
+    }
+    await this.tabRepository.updateTabByMongoId(
+      environment?.id,
+      environmentTabJson,
+    );
+
+    const initEnvironmentTab = this.initTab.environment(
+      environment?.id,
+      environment.workspaceId,
+    );
+    initEnvironmentTab
+      .setName(environment?.name)
+      .setType(environmentType.GLOBAL)
+      .setVariable(environment?.variable)
+      .setGenerativeVariables(true)
+      .setGenerativeProperties(collectionId, collectionName)
+      .setTabType(TabPersistenceTypeEnum.PERMANENT);
+    this.tabRepository.createTab(initEnvironmentTab.getValue());
+    scrollToTab(initEnvironmentTab.getValue().id);
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    generatedVariableDemo.set(true);
+    generateVariableStep.set(1);
+    this.InsertGenerateTrialFlow(collectionId);
+  };
+
+  public handleGenerateVariableTabForTrial = async (
+    collectionId: string,
+    workspaceId: string,
+  ) => {
+    const collectionData =
+      await this.collectionRepository.readCollection(collectionId);
+    const globalEnvironment =
+      await this.environmentRepository.getGlobalEnvironment(workspaceId);
+    this.onOpenGlobalEnvironmentToGenerate(
+      globalEnvironment?.toMutableJSON(),
+      collectionId,
+      collectionData.toMutableJSON()?.name,
+    );
+    return;
+  };
+
+  public InsertGenerateTrialFlow = async (collectionId: string) => {
+    try {
+      const response =
+        await this.userService.InsertGenerateTrialCollectionIds(collectionId);
+      if (response?.data.data) {
+        const progressiveTab = createDeepCopy(this._tab.getValue());
+        const baseUrl = await this.constructBaseUrl(
+          progressiveTab?.path?.workspaceId,
+        );
+        const response =
+          await this.collectionService.geCollectionByIdAndWorkspaceGenerateVariables(
+            progressiveTab?.path?.collectionId,
+            progressiveTab?.path?.workspaceId,
+            baseUrl,
+          );
+        await this.collectionRepository.updateCollection(
+          progressiveTab?.path?.collectionId,
+          response?.data?.data,
+        );
+        return response?.data?.data ?? false;
+      }
+    } catch (error) {
+      console.error("Error fetching trial exhausted status:", error);
+      return false;
+    }
+  };
+
+  /**
    * Generates mock data for a specific API request.
    * @param requestType - The type of request data required (e.g., headers, params, or body).
    * @returns The mock data generated by the AI assistant service.
@@ -3802,7 +3921,7 @@ class RestExplorerViewModel {
   public generateMockData = async (): Promise<any> => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     captureEvent("gen_mock_data", {
-      event_source: "desktop_app",
+      event_source: "web_app",
       feat_location: "rest_api",
       type: progressiveTab.property?.request?.state
         ?.requestNavigation as RequestSectionEnum,
