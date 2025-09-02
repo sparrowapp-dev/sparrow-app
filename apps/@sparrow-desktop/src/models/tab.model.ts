@@ -432,16 +432,16 @@ export const tabSchemaLiteral = {
                           type: "string",
                         },
                         condition: {
-                          type: "boolean",
+                          type: "string",
                         },
                         exprectedResult: {
-                          type: "boolean",
+                          type: "string",
                         },
                         testPath: {
-                          type: "boolean",
+                          type: "string",
                         },
                         testTarget: {
-                          type: "boolean",
+                          type: "string",
                         },
                       },
                     },
