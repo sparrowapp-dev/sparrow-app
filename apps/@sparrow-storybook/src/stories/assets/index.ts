@@ -13,4 +13,3 @@ export { default as selectedSettings } from "./settings-selected.svg";
 export { default as help } from "./help.svg";
 export { default as hoveredHelp } from "./help-hovered.svg";
 export { default as selectedHelp } from "./help-selected.svg";
-export { default as sideNavbarAppleLogo } from "./sideNavAppleLogo.png";
