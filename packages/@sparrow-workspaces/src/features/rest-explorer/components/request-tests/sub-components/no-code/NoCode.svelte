@@ -19,7 +19,7 @@
       ...t,
       isActive: i === 0,
     }));
-    onTestsChange(localTest);
+    // onTestsChange(localTest);
   }
 
   const selectTest = (test) => {
@@ -27,7 +27,7 @@
       ...t,
       isActive: t.id === test.id,
     }));
-    onTestsChange(localTest);
+    // onTestsChange(localTest);
   };
 
   const addTest = () => {
@@ -45,7 +45,7 @@
       ...localTest.noCode.map((t) => ({ ...t, isActive: false })),
       newTest,
     ];
-    onTestsChange(localTest);
+    // onTestsChange(localTest);
   };
 
   // ✅ Duplicate test
@@ -60,6 +60,10 @@
     selectTest(newTest);
   };
 
+  $: {
+    onTestsChange(localTest);
+  }
+
   // ✅ Delete test
   const deleteTest = (test) => {
     localTest.noCode = localTest.noCode.filter((t) => t.id !== test.id);
@@ -73,12 +77,12 @@
         isActive: i === 0,
       }));
     }
-    onTestsChange(localTest);
+    // onTestsChange(localTest);
   };
 
   const clearTests = () => {
     localTest.noCode = [];
-    onTestsChange(localTest);
+    // onTestsChange(localTest);
   };
 </script>
 
