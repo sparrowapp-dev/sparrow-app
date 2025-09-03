@@ -1,9 +1,11 @@
-<script>
+<script lang="ts">
   import {
     TestCaseConditionOperatorEnum,
     TestCaseSelectionTypeEnum,
   } from "@sparrow/common/types/workspace";
   import TestListItem from "./sub-components/test-list-item/TestListItem.svelte";
+  import { WithSelectV4 } from "../../../../../../hoc";
+  import { Button } from "@sparrow/library/ui";
 
   export let tests;
   export let onTestsChange;
@@ -84,109 +86,246 @@
     localTest.noCode = [];
     // onTestsChange(localTest);
   };
+
+  const handleConditionDropdown = (
+    conditionItem: TestCaseConditionOperatorEnum,
+    test,
+  ) => {
+    localTest.noCode = localTest.noCode.map((t) => ({
+      ...t,
+      condition: t.id === test.id ? conditionItem : t.condition,
+    }));
+  };
+
+  const handleTestTargetDropdown = (
+    testTargetItem: TestCaseSelectionTypeEnum,
+    test,
+  ) => {
+    localTest.noCode = localTest.noCode.map((t) => ({
+      ...t,
+      testTarget: t.id === test.id ? testTargetItem : t.testTarget,
+    }));
+  };
 </script>
 
 <!-- Container -->
-<div class="border bg-dark text-light p-3 rounded">
+<div class="border border-top-0 text-light p-2 h-100 rounded-bottom">
   {#if localTest.noCode.length === 0}
     <!-- Empty state -->
     <div
       class="d-flex flex-column align-items-center justify-content-center py-5"
     >
-      <p class="text-muted text-center mb-3">
-        No test Added. Please click <b>‘+ Add Test’</b> to create one. You can test
+      <p class="w-50 text-muted text-center text-fs-14 mb-3">
+        No test Added. Please click ‘+ Add Test’ to create one. You can test
         status code, response time, body content, and more.
       </p>
-      <button class="btn btn-primary btn-sm" on:click={addTest}
-        >+ Add Tests</button
-      >
+      <Button
+        title={"+ Add Tests"}
+        type="primary"
+        size="md"
+        onClick={addTest}
+      />
     </div>
   {:else}
     <!-- Main layout -->
-    <div class="d-flex">
+    <div class="d-flex h-100">
       <!-- Left Sidebar -->
-      <div class="me-3" style="min-width: 220px;">
-        {#each localTest.noCode as test}
-          <TestListItem {test} {selectTest} {deleteTest} {duplicateTest} />
-        {/each}
+      <div class="h-100" style="width: 25%; overflow: auto;">
+        <div class="pb-2">
+          {#each localTest.noCode as test, index}
+            <TestListItem
+              {test}
+              {selectTest}
+              {deleteTest}
+              {duplicateTest}
+              {index}
+            />
+          {/each}
+        </div>
 
-        <div class="mt-3">
-          <button class="btn btn-primary btn-sm me-2" on:click={addTest}
-            >+ Add Tests</button
-          >
-          <button class="btn btn-outline-light btn-sm" on:click={clearTests}
-            >Clear All</button
-          >
+        <div class="d-flex gap-2" style="flex-wrap:wrap;">
+          <div class="">
+            <Button
+              title={"+ Add Tests"}
+              type="primary"
+              size="md"
+              onClick={addTest}
+            />
+          </div>
+          <div class="">
+            <Button
+              title={"Clear All"}
+              type="secondary"
+              size="md"
+              onClick={clearTests}
+            />
+          </div>
         </div>
       </div>
 
       <!-- Right Form -->
-      <div class="flex-grow-1 p-3 border-start">
+      <div
+        class="h-100 d-flex border-start ms-2 ps-2"
+        style="width: 75%; overflow: auto; flex-flow:wrap; align-content:flex-start;"
+      >
         {#if localTest.noCode.some((t) => t.isActive)}
           {#each localTest.noCode as test}
             {#if test.isActive}
-              <div class="mb-3">
-                <label class="form-label">Name *</label>
+              <div class="px-2 pb-2 w-50">
+                <label class="form-label text-fs-12"
+                  >Name <span style="color: var(--text-ds-danger-300)">*</span
+                  ></label
+                >
                 <input
                   type="text"
-                  class="form-control bg-dark text-light"
+                  class="form-control text-light"
                   bind:value={test.name}
                 />
               </div>
 
-              <div class="mb-3">
-                <label class="form-label">Test Target *</label>
-                <select
-                  class="form-select bg-dark text-light"
-                  bind:value={test.testTarget}
+              <div class="px-2 pb-2 w-50">
+                <label class="form-label text-fs-12"
+                  >Test Target <span style="color: var(--text-ds-danger-300)"
+                    >*</span
+                  ></label
                 >
-                  <option value={TestCaseSelectionTypeEnum.RESPONSE_JSON}
-                    >Response JSON</option
-                  >
-                  <option value={TestCaseSelectionTypeEnum.RESPONSE_TEXT}
-                    >Response Text</option
-                  >
-                  <option value={TestCaseSelectionTypeEnum.RESPONSE_HEADER}
-                    >Response Header</option
-                  >
-                </select>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">Condition *</label>
-                <select
-                  class="form-select bg-dark text-light"
-                  bind:value={test.condition}
-                >
-                  <option value={TestCaseConditionOperatorEnum.EQUALS}
-                    >Equals</option
-                  >
-                  <option value={TestCaseConditionOperatorEnum.CONTAINS}
-                    >Contains</option
-                  >
-                  <option value={TestCaseConditionOperatorEnum.DOES_NOT_EXIST}
-                    >Does Not Exist</option
-                  >
-                </select>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label">JSON Path *</label>
-                <input
-                  type="text"
-                  class="form-control bg-dark text-light"
-                  bind:value={test.testPath}
+                <WithSelectV4
+                  id={"hdre89fhrbej"}
+                  data={[
+                    {
+                      name: "Response Header",
+                      id: TestCaseSelectionTypeEnum.RESPONSE_HEADER,
+                    },
+                    {
+                      name: "Response JSON",
+                      id: TestCaseSelectionTypeEnum.RESPONSE_JSON,
+                    },
+                    {
+                      name: "Response Text",
+                      id: TestCaseSelectionTypeEnum.RESPONSE_TEXT,
+                    },
+                    {
+                      name: "Response XML",
+                      id: TestCaseSelectionTypeEnum.RESPONSE_XML,
+                    },
+                    {
+                      name: "Time Consuming",
+                      id: TestCaseSelectionTypeEnum.TIME_CONSUMING,
+                    },
+                  ]}
+                  titleId={test?.testTarget}
+                  onclick={(testTargetItem) => {
+                    handleTestTargetDropdown(testTargetItem, test);
+                  }}
+                  zIndex={499}
+                  disabled={false}
                 />
-                <small class="text-success"
-                  >✔ Path valid. Example: {test.testPath}</small
-                >
               </div>
 
-              <div class="mb-3">
-                <label class="form-label">Expected Value *</label>
+              <div class="px-2 pb-2 w-50">
+                <label class="form-label text-fs-12"
+                  >Condition <span style="color: var(--text-ds-danger-300)"
+                    >*</span
+                  ></label
+                >
+
+                <WithSelectV4
+                  id={"hdregtrgt89fhrbej"}
+                  data={[
+                    {
+                      name: "Equals",
+                      id: TestCaseConditionOperatorEnum.EQUALS,
+                    },
+                    {
+                      name: "Not Equal",
+                      id: TestCaseConditionOperatorEnum.NOT_EQUAL,
+                    },
+                    {
+                      name: "Exists",
+                      id: TestCaseConditionOperatorEnum.EXISTS,
+                    },
+                    {
+                      name: "Does Not Exist",
+                      id: TestCaseConditionOperatorEnum.DOES_NOT_EXIST,
+                    },
+                    {
+                      name: "Less Than",
+                      id: TestCaseConditionOperatorEnum.LESS_THAN,
+                    },
+                    {
+                      name: "Greater Than",
+                      id: TestCaseConditionOperatorEnum.GREATER_THAN,
+                    },
+                    {
+                      name: "Contains",
+                      id: TestCaseConditionOperatorEnum.CONTAINS,
+                    },
+                    {
+                      name: "Does Not Contain",
+                      id: TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN,
+                    },
+                    {
+                      name: "Is Empty",
+                      id: TestCaseConditionOperatorEnum.IS_EMPTY,
+                    },
+                    {
+                      name: "Is Not Empty",
+                      id: TestCaseConditionOperatorEnum.IS_NOT_EMPTY,
+                    },
+                    {
+                      name: "In List",
+                      id: TestCaseConditionOperatorEnum.IN_LIST,
+                    },
+                    {
+                      name: "Not In List",
+                      id: TestCaseConditionOperatorEnum.NOT_IN_LIST,
+                    },
+                  ]}
+                  titleId={test?.condition}
+                  onclick={(conditionItem) => {
+                    handleConditionDropdown(conditionItem, test);
+                  }}
+                  zIndex={499}
+                  disabled={false}
+                />
+              </div>
+
+              {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER || test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON || test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
+                <div class="px-2 pb-2 w-50">
+                  <label class="form-label text-fs-12">
+                    {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
+                      Header
+                    {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON}
+                      JSON
+                    {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
+                      XML
+                    {/if}
+
+                    Path
+
+                    <span style="color: var(--text-ds-danger-300)">*</span
+                    ></label
+                  >
+                  <input
+                    type="text"
+                    class="form-control text-light"
+                    bind:value={test.testPath}
+                  />
+                  <small class="text-success"
+                    >✔ Path valid. Example: {test.testPath}</small
+                  >
+                </div>
+              {/if}
+
+              <div class="px-2 pb-2 w-50">
+                <label class="form-label text-fs-12"
+                  >Expected Value <span style="color: var(--text-ds-danger-300)"
+                    >*</span
+                  ></label
+                >
                 <input
                   type="text"
-                  class="form-control bg-dark text-light"
+                  class="form-control text-light"
                   bind:value={test.expectedResult}
                 />
               </div>
@@ -201,8 +340,7 @@
 </div>
 
 <style>
-  .selected {
-    border: 1px solid #0d6efd;
-    background-color: #2a2a2a !important;
+  input {
+    font-size: 12px;
   }
 </style>

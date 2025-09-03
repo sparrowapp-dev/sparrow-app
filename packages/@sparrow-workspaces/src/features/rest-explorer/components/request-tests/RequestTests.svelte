@@ -1,6 +1,7 @@
 <script lang="ts">
   import { TestCaseModeEnum } from "@sparrow/common/types/workspace";
   import { NoCode } from "./sub-components";
+  import { Tooltip } from "@sparrow/library/ui";
 
   export let tests;
   export let onTestsChange;
@@ -27,29 +28,45 @@
               //   onTestsChange();
             }}
             class="rounded text-fs-12 border-radius-2 px-2 py-1 btn-formatter"
-            style="position: relative; z-index: 2;"
+            style="position: relative; z-index: 2; background-color: var(--bg-ds-surface-400)"
           >
             No Code
           </span>
 
-          <span
-            role="button"
-            on:click={() => {
-              //   onTestsChange();
-            }}
-            class="rounded px-2 text-fs-12 py-1 btn-formatter"
-            style="position: relative; z-index: 2;"
+          <Tooltip
+            title={"This feature will be available soon."}
+            placement="top-center"
           >
-            Script Mode
-          </span>
+            <span
+              role="button"
+              on:click={() => {
+                //   onTestsChange();
+              }}
+              class="rounded px-2 text-fs-12 py-1 btn-formatter"
+              style="position: relative; z-index: 2; opacity:.5;"
+            >
+              Script Mode
+            </span>
+          </Tooltip>
         </div>
       </div>
     </div>
   </div>
 
-  {#if tests?.testCaseMode === TestCaseModeEnum.SCRIPT}
-    <div class="d-flex align-items-center gap-2">SCRIPT</div>
-  {:else if tests?.testCaseMode === TestCaseModeEnum.NO_CODE}
-    <NoCode {tests} {onTestsChange} />
-  {/if}
+  <div class="border rounded-top">
+    {#if tests?.testCaseMode === TestCaseModeEnum.SCRIPT}
+      <div class="px-3 py-2"><p class="text-fs-12 mb-0">JavaScript</p></div>
+    {:else if tests?.testCaseMode === TestCaseModeEnum.NO_CODE}
+      <div class="px-3 py-2">
+        <p class="text-fs-12 mb-0">Build tests using form fields</p>
+      </div>
+    {/if}
+  </div>
+  <div style="flex:1; overflow:auto;">
+    {#if tests?.testCaseMode === TestCaseModeEnum.SCRIPT}
+      <div class="d-flex align-items-center gap-2">SCRIPT</div>
+    {:else if tests?.testCaseMode === TestCaseModeEnum.NO_CODE}
+      <NoCode {tests} {onTestsChange} />
+    {/if}
+  </div>
 </div>
