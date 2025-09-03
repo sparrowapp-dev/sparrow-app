@@ -9,6 +9,7 @@
 
   export let tests;
   export let onTestsChange;
+  export let tabSplitDirection;
 
   const localTest = tests;
 
@@ -128,9 +129,18 @@
     </div>
   {:else}
     <!-- Main layout -->
-    <div class="d-flex h-100">
+    <div
+      class="d-flex h-100 {tabSplitDirection === 'vertical'
+        ? 'flex-column'
+        : 'flex-row'}"
+    >
       <!-- Left Sidebar -->
-      <div class="h-100" style="width: 25%; overflow: auto;">
+      <div
+        class="h-100"
+        style="width: {tabSplitDirection === 'vertical'
+          ? '100%'
+          : '25%'}; overflow: auto;"
+      >
         <div class="pb-2">
           {#each localTest.noCode as test, index}
             <TestListItem
@@ -143,7 +153,7 @@
           {/each}
         </div>
 
-        <div class="d-flex gap-2" style="flex-wrap:wrap;">
+        <div class="d-flex gap-2 pb-2" style="flex-wrap:wrap;">
           <div class="">
             <Button
               title={"+ Add Tests"}
@@ -165,13 +175,17 @@
 
       <!-- Right Form -->
       <div
-        class="h-100 d-flex border-start ms-2 ps-2"
-        style="width: 75%; overflow: auto; flex-flow:wrap; align-content:flex-start;"
+        class="h-100 gap-2 d-flex {tabSplitDirection === 'vertical'
+          ? 'border-top pt-2'
+          : 'border-start ms-2 ps-2'}"
+        style="width: {tabSplitDirection === 'vertical'
+          ? '100%'
+          : '75%'}; overflow: auto; flex-flow:wrap; align-content:flex-start;"
       >
         {#if localTest.noCode.some((t) => t.isActive)}
           {#each localTest.noCode as test}
             {#if test.isActive}
-              <div class="px-2 pb-2 w-50">
+              <div class="pb-2" style="width: 48%;">
                 <label class="form-label text-fs-12"
                   >Name <span style="color: var(--text-ds-danger-300)">*</span
                   ></label
@@ -183,7 +197,7 @@
                 />
               </div>
 
-              <div class="px-2 pb-2 w-50">
+              <div class="pb-2" style="width: 48%;">
                 <label class="form-label text-fs-12"
                   >Test Target <span style="color: var(--text-ds-danger-300)"
                     >*</span
@@ -222,7 +236,7 @@
                 />
               </div>
 
-              <div class="px-2 pb-2 w-50">
+              <div class="pb-2 w-50">
                 <label class="form-label text-fs-12"
                   >Condition <span style="color: var(--text-ds-danger-300)"
                     >*</span
@@ -291,7 +305,7 @@
               </div>
 
               {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER || test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON || test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
-                <div class="px-2 pb-2 w-50">
+                <div class="pb-2 w-50">
                   <label class="form-label text-fs-12">
                     {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
                       Header
@@ -317,7 +331,7 @@
                 </div>
               {/if}
 
-              <div class="px-2 pb-2 w-50">
+              <div class="pb-2 w-50">
                 <label class="form-label text-fs-12"
                   >Expected Value <span style="color: var(--text-ds-danger-300)"
                     >*</span

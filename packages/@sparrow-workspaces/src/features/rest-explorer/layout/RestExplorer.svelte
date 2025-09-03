@@ -769,6 +769,7 @@
                         <RequestTests
                           tests={$tab?.property?.request.tests}
                           onTestsChange={onUpdateTests}
+                          tabSplitDirection={$tabsSplitterDirection}
                         />
                       {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
                         <RequestDoc

@@ -39,8 +39,8 @@
   borderActiveType={"none"}
   borderHighlight={"hover-active"}
   headerHighlight={"hover-active"}
-  minBodyWidth={"150px"}
+  minBodyWidth={"100px"}
   variant={"secondary"}
   menuItem={"v2"}
-  minHeaderWidth={"160px"}
+  minHeaderWidth={"100px"}
 />
