@@ -107,6 +107,14 @@ class InitRequestTab {
            tests: {
               testCaseMode: TestCaseModeEnum.NO_CODE,
                 noCode: [
+                  {
+                    id: "case-1",
+                    name: "Check status code equals 200",
+                    condition: TestCaseConditionOperatorEnum.EQUALS,
+                    expectedResult: "200",
+                    testPath: "$.status",
+                    testTarget: TestCaseSelectionTypeEnum.RESPONSE_JSON,
+                  },
                 ],
              
               script: `// Custom test script
