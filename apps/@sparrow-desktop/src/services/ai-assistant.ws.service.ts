@@ -1,3 +1,6 @@
+/**
+ * Tracks reconnection state for retry logic
+ */
 import { getAuthHeaders } from "@app/containers/api/api.common";
 import constants from "@app/constants/constants";
 import type {
@@ -6,7 +9,12 @@ import type {
 } from "@sparrow/common/dto/ai-assistant";
 import { socketStore } from "../store/ws.store";
 import * as Sentry from "@sentry/svelte";
-import { AiModelProviderEnum, type AIModelVariant, type modelsConfigType, type PromptFileAttachment } from "@sparrow/common/types/workspace/ai-request-base";
+import {
+  AiModelProviderEnum,
+  type AIModelVariant,
+  type modelsConfigType,
+  type PromptFileAttachment,
+} from "@sparrow/common/types/workspace/ai-request-base";
 
 /**
  * Service for managing WebSocket connections and communication
@@ -34,6 +42,12 @@ export class AiAssistantWebSocketService {
   private static instance: AiAssistantWebSocketService;
 
   private baseUrl: string = constants.SPARROW_AI_WEBSOCKET_URL;
+
+  /**
+   * Stores the last message and tabId sent by the user for automatic retry after reconnect
+   */
+  private lastMessage: { message: any; tabId: string } | null = null;
+  private wsReconnectRetries: number = 0;
 
   /**
    * WebSocket instance for communication.
@@ -90,7 +104,6 @@ export class AiAssistantWebSocketService {
       );
     }
     AiAssistantWebSocketService.instance = this;
-
   }
 
   /**
@@ -111,7 +124,6 @@ export class AiAssistantWebSocketService {
     return AiAssistantWebSocketService.instance;
   }
 
-
   /////////////////////////////////////////////////////////////////////////////////////////////////
   //                         **** Connection Management Methods ****
   /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -121,22 +133,23 @@ export class AiAssistantWebSocketService {
    * Initializes the WebSocket connection and sets up event handlers.
    */
   public connectWebSocket = () => {
-
     try {
-
       // If already connected or connecting, no need to create a new connection
       if (
         this.webSocket &&
         (this.webSocket.readyState === WebSocket.OPEN ||
           this.webSocket.readyState === WebSocket.CONNECTING)
-      ) { return true; }
+      ) {
+        return true;
+      }
 
       // Clean up any existing connection
       this.cleanup();
 
       // Create new WebSocket connection
-      // ToDo: Need to add autentication to avoid absure of ai socket url
-      this.webSocket = new WebSocket(this.baseUrl,
+      // ToDo: Need to add autentication to avoid abuse of ai socket url
+      this.webSocket = new WebSocket(
+        this.baseUrl,
         // {
         // transports: ["websocket"],
         // auth: getAuthHeaders(),
@@ -158,7 +171,7 @@ export class AiAssistantWebSocketService {
   };
 
   /**
-   * Returns the current connection status 
+   * Returns the current connection status
    * @returns {boolean} - Whether the WebSocket is currently connected or not
    */
   private isWsConnected = (): boolean => {
@@ -179,18 +192,66 @@ export class AiAssistantWebSocketService {
   };
 
   /**
+   * Retries the last message sent over the WebSocket after a successful reconnect
+   * @private
+   */
+  private retryLastMessage = () => {
+    if (this.lastMessage && this.webSocket) {
+      try {
+        this.webSocket.send(JSON.stringify(this.lastMessage.message));
+        // Optionally, stream a UI event that the message was retried
+        this.triggerEvent(`assistant-response_${this.lastMessage.tabId}`, {
+          info: true,
+          message:
+            "Your last message was automatically retried after reconnect.",
+          retried: true,
+        });
+      } catch (err) {
+        Sentry.captureException(
+          "Failed to resend last message after reconnect: " + err,
+        );
+      }
+    }
+  };
+
+  /**
    * Handles WebSocket close event
    * @private
    */
   private handleClose = (event: CloseEvent) => {
-
     this._isConnected = false;
     this.triggerEvent("disconnect", { code: event.code, reason: event.reason });
 
     // Attempt to reconnect if the connection wasn't closed intentionally
-    if (event.code !== 1000) {
-      this.scheduleReconnect();
-    }
+    // Stream message to all listeners: something went wrong, retrying
+    this.triggerEvent("assistant-reconnect", {
+      error: true,
+      message: "Something went wrong, retrying please wait...",
+      retry: true,
+    });
+    const tryReconnect = async () => {
+      while (this.wsReconnectRetries < 3 && !this._isConnected) {
+        this.connectWebSocket();
+        await new Promise((resolve) => setTimeout(resolve, 700));
+        if (this.webSocket && this.isWsConnected()) {
+          this.wsReconnectRetries = 0;
+          this._isConnected = false;
+          this.retryLastMessage();
+          break;
+        }
+        this.wsReconnectRetries++;
+      }
+      if (!this._isConnected) {
+        Sentry.captureException(
+          "WebSocket not connected after 3 retries, cannot reconnect ai-assistant.ws.service(desktop)",
+        );
+        console.error(
+          "WebSocket not connected after 3 retries, cannot reconnect",
+        );
+      }
+    };
+    // Fire and forget, don't block close handler
+    tryReconnect();
   };
 
   /**
@@ -225,7 +286,6 @@ export class AiAssistantWebSocketService {
    * @private
    */
   private scheduleReconnect = () => {
-
     // Clear any existing reconnect timer
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
@@ -239,7 +299,8 @@ export class AiAssistantWebSocketService {
       this.reconnectTimer = setTimeout(() => {
         // Adding this console info, to debug in deployed environments
         console.debug(
-          `Attempting to reconnect (${this.reconnectAttempts + 1}/${this.maxReconnectAttempts
+          `Attempting to reconnect (${this.reconnectAttempts + 1}/${
+            this.maxReconnectAttempts
           })...`,
         );
         this.reconnectAttempts++;
@@ -281,16 +342,16 @@ export class AiAssistantWebSocketService {
       this.webSocket.onclose = null;
 
       // Close the connection if it's not already closed
-      if (this.webSocket.readyState === WebSocket.OPEN ||
-        this.webSocket.readyState === WebSocket.CONNECTING) {
+      if (
+        this.webSocket.readyState === WebSocket.OPEN ||
+        this.webSocket.readyState === WebSocket.CONNECTING
+      ) {
         this.webSocket.close(1000, "Closed by client");
       }
 
       this.webSocket = null;
     }
   }
-
-
 
   /////////////////////////////////////////////////////////////////////////////////////////////////
   //                         **** Service Application Methods ****
@@ -333,7 +394,7 @@ export class AiAssistantWebSocketService {
     conversation,
     model,
     activity,
-    teamId
+    teamId,
   ): Promise<boolean> => {
     const message = {
       tabId,
@@ -345,16 +406,13 @@ export class AiAssistantWebSocketService {
       model,
       activity,
       teamId,
-      "feature": "sparrow-ai"
+      feature: "sparrow-ai",
     };
 
+    // Store the last message and tabId for retry after reconnect
+    this.lastMessage = { message, tabId };
+
     if (!this.webSocket || !this.isWsConnected()) {
-      Sentry.withScope((scope) => {
-          scope.setTag("emailId", userEmail);
-          scope.setExtra("userPrompt", prompt);
-          scope.setTag("errorType", "AI");
-          Sentry.captureException("WebSocket not connected, cannot send message ai-assistant.ws.service(desktop)");
-      });
       console.error("WebSocket not connected, cannot send message");
       return false;
     }
@@ -364,10 +422,12 @@ export class AiAssistantWebSocketService {
       return true;
     } catch (error) {
       Sentry.withScope((scope) => {
-          scope.setTag("emailId", userEmail);
-          scope.setExtra("userPrompt", prompt);
-          scope.setTag("errorType", "AI");
-          Sentry.captureException(`Error sending message:${error} ai-assistant.ws.service(desktop)`);
+        scope.setTag("emailId", userEmail);
+        scope.setExtra("userPrompt", prompt);
+        scope.setTag("errorType", "AI");
+        Sentry.captureException(
+          `Error sending message:${error} ai-assistant.ws.service(desktop)`,
+        );
       });
       console.error("Error sending message:", error);
       return false;
@@ -379,18 +439,21 @@ export class AiAssistantWebSocketService {
     modelVersion: AIModelVariant;
     authKey: string;
     systemPrompt?: string;
-    userInput: { role: 'user' | 'assistant' | 'system'; content: string; }[] | string;
-    conversation?: "",
-    configs: modelsConfigType,
+    userInput:
+      | { role: "user" | "assistant" | "system"; content: string }[]
+      | string;
+    conversation?: "";
+    configs: modelsConfigType;
     emailId?: string;
   }): Promise<boolean> => {
-
     if (!this.webSocket || !this.isWsConnected()) {
       Sentry.withScope((scope) => {
-          scope.setTag("emailId", data.emailId);
-          scope.setExtra("userPrompt", data.userInput);
-          scope.setTag("errorType", "AI");
-          Sentry.captureException("WebSocket not connected, cannot send message ai-assistant.ws.service(desktop)-LLM");
+        scope.setTag("emailId", data.emailId);
+        scope.setExtra("userPrompt", data.userInput);
+        scope.setTag("errorType", "AI");
+        Sentry.captureException(
+          "WebSocket not connected, cannot send message ai-assistant.ws.service(desktop)-LLM",
+        );
       });
       console.error("WebSocket not connected, cannot send message");
       return false;
@@ -404,10 +467,12 @@ export class AiAssistantWebSocketService {
       return true;
     } catch (error) {
       Sentry.withScope((scope) => {
-          scope.setTag("emailId", data.emailId);
-          scope.setExtra("userPrompt", data.userInput);
-          scope.setTag("errorType", "AI");
-          Sentry.captureException(`Error sending message:${error} ai-assistant.ws.service(desktop)`);
+        scope.setTag("emailId", data.emailId);
+        scope.setExtra("userPrompt", data.userInput);
+        scope.setTag("errorType", "AI");
+        Sentry.captureException(
+          `Error sending message:${error} ai-assistant.ws.service(desktop)`,
+        );
       });
       console.error("Error sending message:", error);
       return false;
@@ -422,59 +487,106 @@ export class AiAssistantWebSocketService {
     // conversations: { role: 'user' | 'assistant' | 'system'; content: string; }[]
     conversations: any[],
     isJsonFormatEnabled: boolean = false,
-    attachedFiles: PromptFileAttachment[]
+    attachedFiles: PromptFileAttachment[],
   ) => {
-
     switch (modelProvider) {
       case AiModelProviderEnum.OpenAI:
-        return this.prepareOpenAIConversation(isContextOn, userPrompt, systemPrompt, conversations, isJsonFormatEnabled, attachedFiles);
+        return this.prepareOpenAIConversation(
+          isContextOn,
+          userPrompt,
+          systemPrompt,
+          conversations,
+          isJsonFormatEnabled,
+          attachedFiles,
+        );
       case AiModelProviderEnum.DeepSeek:
-        return this.prepareDeepSeekConversation(isContextOn, userPrompt, systemPrompt, conversations, isJsonFormatEnabled);
+        return this.prepareDeepSeekConversation(
+          isContextOn,
+          userPrompt,
+          systemPrompt,
+          conversations,
+          isJsonFormatEnabled,
+        );
       case AiModelProviderEnum.Anthropic:
-        return this.prepareAnthropicConversation(isContextOn, userPrompt, systemPrompt, conversations, isJsonFormatEnabled, attachedFiles);
+        return this.prepareAnthropicConversation(
+          isContextOn,
+          userPrompt,
+          systemPrompt,
+          conversations,
+          isJsonFormatEnabled,
+          attachedFiles,
+        );
       case AiModelProviderEnum.Google:
-        return this.prepareGeminiConversation(isContextOn, userPrompt, systemPrompt, conversations, isJsonFormatEnabled);
+        return this.prepareGeminiConversation(
+          isContextOn,
+          userPrompt,
+          systemPrompt,
+          conversations,
+          isJsonFormatEnabled,
+        );
       default:
         console.error("Unsupported model provider:", modelProvider);
         return;
     }
+  };
 
-  }
-
-  private formatConversations = (rawConversations: any[], isJsonFormatEnabled: boolean): { role: 'user' | 'assistant'; content: string; }[] => {
+  private formatConversations = (
+    rawConversations: any[],
+    isJsonFormatEnabled: boolean,
+  ): { role: "user" | "assistant"; content: string }[] => {
     return rawConversations
       .filter(({ status }) => status !== false) // Exclude error messsages
       .map(({ type, message }) => ({
-        role: type === 'Sender' ? 'user' : 'assistant',
-        content: isJsonFormatEnabled ? `${message} (Give Response In JSON Format)` : message,
+        role: type === "Sender" ? "user" : "assistant",
+        content: isJsonFormatEnabled
+          ? `${message} (Give Response In JSON Format)`
+          : message,
       }));
-  }
+  };
 
   /////////////////////////////////////////////////////////////////////////////
   //                      OpenAI Conversation Formatting
   /////////////////////////////////////////////////////////////////////////////
-  private prepareOpenAIConversation = (isContextOn: boolean, userPrompt: string, systemPrompt: string, conversations: { role: 'user' | 'assistant' | 'system'; content: string; }[], isJsonFormatEnabled: boolean, currentAttachedFiles: PromptFileAttachment[]) => {
-    const systemPromptContext = { role: 'system', content: systemPrompt };
+  private prepareOpenAIConversation = (
+    isContextOn: boolean,
+    userPrompt: string,
+    systemPrompt: string,
+    conversations: { role: "user" | "assistant" | "system"; content: string }[],
+    isJsonFormatEnabled: boolean,
+    currentAttachedFiles: PromptFileAttachment[],
+  ) => {
+    const systemPromptContext = { role: "system", content: systemPrompt };
     if (isContextOn && conversations.length > 0) {
-      const formattedConversations = this.formatOpenAIConversations(conversations, isJsonFormatEnabled);
+      const formattedConversations = this.formatOpenAIConversations(
+        conversations,
+        isJsonFormatEnabled,
+      );
       return [systemPromptContext, ...formattedConversations];
     }
     // When context is off, only include system prompt and current user message
-    const currentUserMessage = this.createOpenAIUserMessage(userPrompt, currentAttachedFiles, isJsonFormatEnabled);
+    const currentUserMessage = this.createOpenAIUserMessage(
+      userPrompt,
+      currentAttachedFiles,
+      isJsonFormatEnabled,
+    );
     return [systemPromptContext, currentUserMessage];
-  }
+  };
 
-  private createOpenAIUserMessage = (userPrompt: string, attachedFiles: any[] = [], isJsonFormatEnabled: boolean) => {
+  private createOpenAIUserMessage = (
+    userPrompt: string,
+    attachedFiles: any[] = [],
+    isJsonFormatEnabled: boolean,
+  ) => {
     const content: any[] = [];
 
     // Add files first if they exist
     if (attachedFiles && attachedFiles.length > 0) {
-      attachedFiles.forEach(file => {
+      attachedFiles.forEach((file) => {
         content.push({
           type: "file",
           file: {
-            file_id: file.fileId
-          }
+            file_id: file.fileId,
+          },
         });
       });
     }
@@ -484,22 +596,25 @@ export class AiAssistantWebSocketService {
     content.push({
       type: "text",
       // text: textContent
-      text: userPrompt
+      text: userPrompt,
     });
 
     return {
       role: "user",
-      content: content
+      content: content,
     };
-  }
+  };
 
-  private formatOpenAIConversations = (rawConversations: any[], isJsonFormatEnabled: boolean): any[] => {
+  private formatOpenAIConversations = (
+    rawConversations: any[],
+    isJsonFormatEnabled: boolean,
+  ): any[] => {
     return rawConversations
       .filter(({ status }) => status !== false) // Exclude error messages
       .map(({ type, message, attachedFiles }) => {
-        const role = type === 'Sender' ? 'user' : 'assistant';
+        const role = type === "Sender" ? "user" : "assistant";
 
-        if (role === 'user' && attachedFiles && attachedFiles.length > 0) {
+        if (role === "user" && attachedFiles && attachedFiles.length > 0) {
           // User message with files
           const content: any[] = [];
 
@@ -508,95 +623,125 @@ export class AiAssistantWebSocketService {
             content.push({
               type: "file",
               file: {
-                file_id: file.fileId
-              }
+                file_id: file.fileId,
+              },
             });
           });
 
           // Add text content
-          const textContent = isJsonFormatEnabled ? `${message} (Give Response In JSON Format)` : message;
+          const textContent = isJsonFormatEnabled
+            ? `${message} (Give Response In JSON Format)`
+            : message;
           content.push({
             type: "text",
-            text: textContent
+            text: textContent,
           });
 
           return {
             role: role,
-            content: content
+            content: content,
           };
         } else {
           // Assistant message or user message without files (simple text)
-          const textContent = isJsonFormatEnabled && role === 'user' ? `${message} (Give Response In JSON Format)` : message;
+          const textContent =
+            isJsonFormatEnabled && role === "user"
+              ? `${message} (Give Response In JSON Format)`
+              : message;
           return {
             role: role,
-            content: textContent
+            content: textContent,
           };
         }
       });
-  }
-
+  };
 
   /////////////////////////////////////////////////////////////////////////////
   //                      Anthropic Conversation Formatting
   /////////////////////////////////////////////////////////////////////////////
-  private prepareAnthropicConversation = (isContextOn: boolean, userPrompt: string, systemPrompt: string, conversations: { role: 'user' | 'assistant' | 'system'; content: string; }[], isJsonFormatEnabled: boolean, attachedFiles: PromptFileAttachment[]) => {
-    const systemPromptContext = { role: 'user', content: `${systemPrompt} + ${userPrompt}` };
+  private prepareAnthropicConversation = (
+    isContextOn: boolean,
+    userPrompt: string,
+    systemPrompt: string,
+    conversations: { role: "user" | "assistant" | "system"; content: string }[],
+    isJsonFormatEnabled: boolean,
+    attachedFiles: PromptFileAttachment[],
+  ) => {
+    const systemPromptContext = {
+      role: "user",
+      content: `${systemPrompt} + ${userPrompt}`,
+    };
 
     if (isContextOn && conversations.length > 0) {
-      const formattedConversations = this.formatAnthropicConversations(conversations, isJsonFormatEnabled);
+      const formattedConversations = this.formatAnthropicConversations(
+        conversations,
+        isJsonFormatEnabled,
+      );
       return [systemPromptContext, ...formattedConversations];
     }
 
     // When context is off, check if there are files
     if (attachedFiles && attachedFiles.length > 0) {
-      const currentUserMessage = this.createAnthropicUserMessage(systemPrompt, userPrompt, attachedFiles);
+      const currentUserMessage = this.createAnthropicUserMessage(
+        systemPrompt,
+        userPrompt,
+        attachedFiles,
+      );
       return [currentUserMessage];
     }
 
-    return [systemPromptContext];  // If context is off and no files
-  }
+    return [systemPromptContext]; // If context is off and no files
+  };
 
-  private createAnthropicUserMessage = (systemPrompt: string, userPrompt: string, attachedFiles: PromptFileAttachment[]) => {
+  private createAnthropicUserMessage = (
+    systemPrompt: string,
+    userPrompt: string,
+    attachedFiles: PromptFileAttachment[],
+  ) => {
     const content: any[] = [];
 
     // Add combined system + user prompt
     content.push({
       type: "text",
-      text: `${systemPrompt} + ${userPrompt}`
+      text: `${systemPrompt} + ${userPrompt}`,
     });
 
     // Add files
-    attachedFiles.forEach(file => {
+    attachedFiles.forEach((file) => {
       content.push({
         type: "text",
         source: {
           type: "file",
-          file_id: file.fileId
-        }
+          file_id: file.fileId,
+        },
       });
     });
 
     return {
       role: "user",
-      content: content
+      content: content,
     };
-  }
+  };
 
-  private formatAnthropicConversations = (rawConversations: any[], isJsonFormatEnabled: boolean): any[] => {
+  private formatAnthropicConversations = (
+    rawConversations: any[],
+    isJsonFormatEnabled: boolean,
+  ): any[] => {
     return rawConversations
       .filter(({ status }) => status !== false)
       .map(({ type, message, attachedFiles }) => {
-        const role = type === 'Sender' ? 'user' : 'assistant';
+        const role = type === "Sender" ? "user" : "assistant";
 
-        if (role === 'user' && attachedFiles && attachedFiles.length > 0) {
+        if (role === "user" && attachedFiles && attachedFiles.length > 0) {
           // User message with files
           const content: any[] = [];
 
           // Add text content first
-          const textContent = isJsonFormatEnabled ? `${message} (Give Response In JSON Format)` : message;
+          const textContent = isJsonFormatEnabled
+            ? `${message} (Give Response In JSON Format)`
+            : message;
           content.push({
             type: "text",
-            text: textContent
+            text: textContent,
           });
 
           // Add files
@@ -605,68 +750,89 @@ export class AiAssistantWebSocketService {
               type: "text",
               source: {
                 type: "file",
-                file_id: file.fileId
-              }
+                file_id: file.fileId,
+              },
             });
           });
 
           return {
             role: role,
-            content: content
+            content: content,
           };
         } else {
           // Assistant message or user message without files
-          const textContent = isJsonFormatEnabled && role === 'user' ? `${message} (Give Response In JSON Format)` : message;
+          const textContent =
+            isJsonFormatEnabled && role === "user"
+              ? `${message} (Give Response In JSON Format)`
+              : message;
           return {
             role: role,
-            content: textContent
+            content: textContent,
           };
         }
       });
-  }
-
+  };
 
   /////////////////////////////////////////////////////////////////////////////
   //                      DeepSeek Conversation Formatting
   /////////////////////////////////////////////////////////////////////////////
-  private prepareDeepSeekConversation = (isContextOn: boolean, userPrompt: string, systemPrompt: string, conversations: { role: 'user' | 'assistant' | 'system'; content: string; }[], isJsonFormatEnabled: boolean) => {
-    const systemPromptContext = { role: 'system', content: systemPrompt };
+  private prepareDeepSeekConversation = (
+    isContextOn: boolean,
+    userPrompt: string,
+    systemPrompt: string,
+    conversations: { role: "user" | "assistant" | "system"; content: string }[],
+    isJsonFormatEnabled: boolean,
+  ) => {
+    const systemPromptContext = { role: "system", content: systemPrompt };
     if (isContextOn && conversations.length > 0) {
-      const formattedConversations = this.formatConversations(conversations, isJsonFormatEnabled);
+      const formattedConversations = this.formatConversations(
+        conversations,
+        isJsonFormatEnabled,
+      );
       return [systemPromptContext, ...formattedConversations]; // If context is on, prepend the system prompt to the conversation
     }
-    return [systemPromptContext, { "role": "user", "content": userPrompt }]; // If context is off, return the conversation as is
-  }
-
+    return [systemPromptContext, { role: "user", content: userPrompt }]; // If context is off, return the conversation as is
+  };
 
   /////////////////////////////////////////////////////////////////////////////
   //                      Gemini Conversation Formatting
   /////////////////////////////////////////////////////////////////////////////
-  private prepareGeminiConversation = (isContextOn: boolean, userPrompt: string, systemPrompt: string, conversations: { role: 'user' | 'assistant' | 'system'; content: string; }[], isJsonFormatEnabled: boolean) => {
+  private prepareGeminiConversation = (
+    isContextOn: boolean,
+    userPrompt: string,
+    systemPrompt: string,
+    conversations: { role: "user" | "assistant" | "system"; content: string }[],
+    isJsonFormatEnabled: boolean,
+  ) => {
     if (isContextOn && conversations.length > 0) {
-      const formattedConversations = this.formatConversations(conversations, isJsonFormatEnabled);
+      const formattedConversations = this.formatConversations(
+        conversations,
+        isJsonFormatEnabled,
+      );
 
       // Convert conversations to Gemini format
-      const geminiConversations = formattedConversations.map(conv => {
-        if (conv.role === 'user') {
-          return {
-            role: 'user',
-            parts: [{ text: conv.content }]
-          };
-        } else if (conv.role === 'assistant') {
-          return {
-            role: 'model',
-            parts: [{ text: conv.content }]
-          };
-        }
-        // Skip system messages as they're handled separately in Gemini
-        return null;
-      }).filter(conv => conv !== null);
+      const geminiConversations = formattedConversations
+        .map((conv) => {
+          if (conv.role === "user") {
+            return {
+              role: "user",
+              parts: [{ text: conv.content }],
+            };
+          } else if (conv.role === "assistant") {
+            return {
+              role: "model",
+              parts: [{ text: conv.content }],
+            };
+          }
+          // Skip system messages as they're handled separately in Gemini
+          return null;
+        })
+        .filter((conv) => conv !== null);
 
       // Add current user prompt to the conversation
       geminiConversations.push({
-        role: 'user',
-        parts: [{ text: userPrompt }]
+        role: "user",
+        parts: [{ text: userPrompt }],
       });
 
       // Return as JSON string as expected by the API
@@ -676,7 +842,7 @@ export class AiAssistantWebSocketService {
       // The userInput will be sent separately
       return "";
     }
-  }
+  };
 
   /**
    * Adds an event listener for a specific event
@@ -722,14 +888,17 @@ export class AiAssistantWebSocketService {
    * @param tabId - The tab ID for which to stop generation
    * @returns {boolean} - Whether the signal was sent successfully
    */
-  public stopGeneration = async (tabId: string, threadId: string, userEmail: string): Promise<boolean> => {
+  public stopGeneration = async (
+    tabId: string,
+    threadId: string,
+    userEmail: string,
+  ): Promise<boolean> => {
     if (!this.webSocket || !this.isWsConnected()) {
       console.error("WebSocket not connected, cannot send stop signal");
       return false;
     }
 
     try {
-
       this.removeListener(`assistant-response_${tabId}`);
 
       // Server is not handling stop generation event, so disabling it now will add it later.
@@ -749,6 +918,4 @@ export class AiAssistantWebSocketService {
       return false;
     }
   };
-
-
 }
