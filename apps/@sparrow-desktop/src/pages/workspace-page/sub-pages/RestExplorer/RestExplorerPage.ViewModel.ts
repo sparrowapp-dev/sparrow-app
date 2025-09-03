@@ -3913,6 +3913,81 @@ class RestExplorerViewModel {
     }
   };
 
+  public insertGeneratedMockData = async (response: any): Promise<boolean> => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (
+      progressiveTab.property?.request?.state?.requestNavigation ===
+        RequestSectionEnum.HEADERS ||
+      progressiveTab.property?.request?.state?.requestNavigation ===
+        RequestSectionEnum.PARAMETERS
+    ) {
+      if (Array.isArray(response)) {
+        const newArray = [
+          ...response.map((item) => ({
+            key: item.key,
+            value: item.value,
+          })),
+          { key: "", value: "", checked: false },
+        ];
+        if (
+          progressiveTab.property?.request?.state?.requestNavigation ===
+          RequestSectionEnum.PARAMETERS
+        ) {
+          progressiveTab.property.request.queryParams = newArray;
+        } else {
+          progressiveTab.property.request.headers = newArray;
+        }
+        this.tab = progressiveTab;
+        return true;
+      }
+      return false;
+    }
+    if (
+      progressiveTab.property?.request?.state?.requestBodyNavigation ===
+        RequestDatasetEnum.RAW &&
+      progressiveTab.property?.request?.state?.requestBodyLanguage ===
+        RequestDataTypeEnum.JSON
+    ) {
+      const jsonResult = response;
+      if (typeof jsonResult === "object" && jsonResult !== null) {
+        progressiveTab.property.request.body.raw = JSON.stringify(jsonResult);
+        this.tab = progressiveTab;
+        return true;
+      }
+      return false;
+    }
+    if (
+      progressiveTab.property?.request?.state?.requestBodyNavigation ===
+        RequestDatasetEnum.FORMDATA ||
+      progressiveTab.property?.request?.state?.requestBodyNavigation ===
+        RequestDatasetEnum.URLENCODED
+    ) {
+      if (Array.isArray(response) && response.length > 0) {
+        const updatedContent = [
+          ...response,
+          { key: "", value: "", checked: false },
+        ];
+        if (
+          progressiveTab.property?.request?.state?.requestBodyNavigation ===
+          RequestDatasetEnum.FORMDATA
+        ) {
+          progressiveTab.property.request.body.formdata = updatedContent;
+        } else {
+          progressiveTab.property.request.body.urlencoded = updatedContent;
+        }
+        this.tab = progressiveTab;
+        return true;
+      }
+      return false;
+    }
+    if (typeof response === "string" && response.trim() !== "") {
+      progressiveTab.property.request.body.raw = response;
+      this.tab = progressiveTab;
+      return true;
+    }
+    return false;
+  };
+
   /**
    * Generates mock data for a specific API request.
    * @param requestType - The type of request data required (e.g., headers, params, or body).
@@ -3935,6 +4010,15 @@ class RestExplorerViewModel {
       | { type: RequestDatasetEnum; lang: RequestDataTypeEnum }
       | undefined;
     if (requestType === RequestSectionEnum.REQUEST_BODY) {
+      if (
+        progressiveTab.property?.request?.state?.requestBodyNavigation ===
+        RequestDatasetEnum.NONE
+      ) {
+        notifications.warning(
+          "Please select the request body type to generate mock data.",
+        );
+        return true;
+      }
       properties = {
         type: progressiveTab.property?.request?.state
           ?.requestBodyNavigation as RequestDatasetEnum,
@@ -3962,11 +4046,15 @@ class RestExplorerViewModel {
         : { teamId: teamId, text: prompt, requestType },
     );
     if (response.isSuccessful) {
-      return response?.data?.data;
+      const inserted = this.insertGeneratedMockData(
+        response?.data?.data.result,
+      );
+      return inserted;
     } else if (
       response?.data?.message === "Limit reached. Please try again later."
     ) {
       notifications.error("AI Limit has Reached.please upgrade plan.");
+      return true;
     }
   };
 }
