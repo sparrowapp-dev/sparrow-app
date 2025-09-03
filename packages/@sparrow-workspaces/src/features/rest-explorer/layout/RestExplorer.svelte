@@ -105,6 +105,7 @@
   import { policyConfig } from "@sparrow/common/store";
   import GenerateVariableCard from "../components/generate-variable-card/GenerateVariableCard.svelte";
   import { tick } from "svelte";
+  import ResponseTestResults from "../components/response-test-results/ResponseTestResults.svelte";
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
   export let requestAuthHeader: Observable<KeyValue>;
@@ -891,6 +892,13 @@
                                 <div style="overflow:auto;">
                                   <ResponseHeaders
                                     responseHeader={storeData.response?.headers}
+                                  />
+                                </div>
+                              {:else if storeData?.response.navigation === ResponseSectionEnum.TESTRESULT}
+                                <div style="overflow:auto;">
+                                  <ResponseTestResults
+                                    responseTestResults={storeData.response
+                                      ?.testResults}
                                   />
                                 </div>
                               {/if}

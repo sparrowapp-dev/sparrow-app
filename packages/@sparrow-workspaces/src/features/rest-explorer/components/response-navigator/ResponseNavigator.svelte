@@ -24,6 +24,11 @@
         id: ResponseSectionEnum.HEADERS,
         count: _responseHeadersLength,
       },
+      {
+        name: "Test Results",
+        id: ResponseSectionEnum.TESTRESULT,
+        count: 0,
+      },
     ];
   };
 
