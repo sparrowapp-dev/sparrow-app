@@ -12,7 +12,7 @@ services:
 
   # Sparrow Api Server
   sparrow-api:
-    image: sparrowapi/sparrow-api:${SPARROW_API_VERSION}
+    image: sparrowapi/sparrow-api:${SPARROW_API_VERSION:-latest}
     container_name: sparrow-api
     env_file:
       - .env.docker-setup
@@ -25,7 +25,7 @@ services:
 
   # Sparrow Auth Server
   sparrow-auth:
-    image: sparrowapi/sparrow-auth:${SPARROW_AUTH_VERSION}
+    image: sparrowapi/sparrow-auth:${SPARROW_AUTH_VERSION:-latest}
     container_name: sparrow-auth
     networks:
       - localnet
@@ -39,7 +39,7 @@ services:
 
   # Sparrow Proxy Service
   sparrow-proxy:
-    image: sparrowapi/sparrow-proxy:${SPARROW_PROXY_VERSION}
+    image: sparrowapi/sparrow-proxy:${SPARROW_PROXY_VERSION:-latest}
     container_name: sparrow-proxy
     networks:
       - localnet
@@ -48,7 +48,7 @@ services:
 
   # Sparrow Web App
   sparrow-web:
-    image: sparrowapi/sparrow-web:${SPARROW_WEB_VERSION}
+    image: sparrowapi/sparrow-web:${SPARROW_WEB_VERSION:-latest}
     container_name: sparrow-web
     networks:
       - localnet
@@ -64,7 +64,7 @@ services:
 
   # Sparrow Admin Service
   sparrow-admin:
-    image: sparrowapi/sparrow-admin:${SPARROW_ADMIN_VERSION}
+    image: sparrowapi/sparrow-admin:${SPARROW_ADMIN_VERSION:-latest}
     container_name: sparrow-admin
     networks:
       - localnet

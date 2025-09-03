@@ -1,20 +1,19 @@
 name: Build and Push Multi-Arch Sparrow Web Self Host Docker Image
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
-
-env:
-  DOCKER_IMAGE_VERSION: ${{ vars.SELF_HOST_DOCKER_IMAGE_VERSION }}
-
+    inputs:
+      image_version:
+        description: "Docker image version (e.g. 1.2.3)"
+        required: true
+        type: string
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     environment: production
-
+    env:
+      DOCKER_IMAGE_VERSION: ${{ inputs.image_version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
