@@ -31,7 +31,7 @@ jobs:
         run: |
           docker buildx build --platform linux/amd64,linux/arm64 \
           -f SelfHost-Sparrow-Web.Dockerfile \
-          -t sparrowapi/sparrow-web:self-host-${DOCKER_IMAGE_VERSION} \
+          -t sparrowapi/sparrow-web:${DOCKER_IMAGE_VERSION} \
           -t sparrowapi/sparrow-web:latest \
           --push .
 
