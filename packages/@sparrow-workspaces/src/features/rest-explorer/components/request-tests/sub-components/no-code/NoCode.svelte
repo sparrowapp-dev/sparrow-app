@@ -185,163 +185,161 @@
         {#if localTest.noCode.some((t) => t.isActive)}
           {#each localTest.noCode as test}
             {#if test.isActive}
-              <div class="pb-2" style="width: 48%;">
-                <label class="form-label text-fs-12"
-                  >Name <span style="color: var(--text-ds-danger-300)">*</span
-                  ></label
-                >
-                <input
-                  type="text"
-                  class="form-control text-light"
-                  bind:value={test.name}
-                />
-              </div>
-
-              <div class="pb-2" style="width: 48%;">
-                <label class="form-label text-fs-12"
-                  >Test Target <span style="color: var(--text-ds-danger-300)"
-                    >*</span
-                  ></label
-                >
-                <WithSelectV4
-                  id={"hdre89fhrbej"}
-                  data={[
-                    {
-                      name: "Response Header",
-                      id: TestCaseSelectionTypeEnum.RESPONSE_HEADER,
-                    },
-                    {
-                      name: "Response JSON",
-                      id: TestCaseSelectionTypeEnum.RESPONSE_JSON,
-                    },
-                    {
-                      name: "Response Text",
-                      id: TestCaseSelectionTypeEnum.RESPONSE_TEXT,
-                    },
-                    {
-                      name: "Response XML",
-                      id: TestCaseSelectionTypeEnum.RESPONSE_XML,
-                    },
-                    {
-                      name: "Time Consuming",
-                      id: TestCaseSelectionTypeEnum.TIME_CONSUMING,
-                    },
-                  ]}
-                  titleId={test?.testTarget}
-                  onclick={(testTargetItem) => {
-                    handleTestTargetDropdown(testTargetItem, test);
-                  }}
-                  zIndex={499}
-                  disabled={false}
-                />
-              </div>
-
-              <div class="pb-2 w-50">
-                <label class="form-label text-fs-12"
-                  >Condition <span style="color: var(--text-ds-danger-300)"
-                    >*</span
-                  ></label
-                >
-
-                <WithSelectV4
-                  id={"hdregtrgt89fhrbej"}
-                  data={[
-                    {
-                      name: "Equals",
-                      id: TestCaseConditionOperatorEnum.EQUALS,
-                    },
-                    {
-                      name: "Not Equal",
-                      id: TestCaseConditionOperatorEnum.NOT_EQUAL,
-                    },
-                    {
-                      name: "Exists",
-                      id: TestCaseConditionOperatorEnum.EXISTS,
-                    },
-                    {
-                      name: "Does Not Exist",
-                      id: TestCaseConditionOperatorEnum.DOES_NOT_EXIST,
-                    },
-                    {
-                      name: "Less Than",
-                      id: TestCaseConditionOperatorEnum.LESS_THAN,
-                    },
-                    {
-                      name: "Greater Than",
-                      id: TestCaseConditionOperatorEnum.GREATER_THAN,
-                    },
-                    {
-                      name: "Contains",
-                      id: TestCaseConditionOperatorEnum.CONTAINS,
-                    },
-                    {
-                      name: "Does Not Contain",
-                      id: TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN,
-                    },
-                    {
-                      name: "Is Empty",
-                      id: TestCaseConditionOperatorEnum.IS_EMPTY,
-                    },
-                    {
-                      name: "Is Not Empty",
-                      id: TestCaseConditionOperatorEnum.IS_NOT_EMPTY,
-                    },
-                    {
-                      name: "In List",
-                      id: TestCaseConditionOperatorEnum.IN_LIST,
-                    },
-                    {
-                      name: "Not In List",
-                      id: TestCaseConditionOperatorEnum.NOT_IN_LIST,
-                    },
-                  ]}
-                  titleId={test?.condition}
-                  onclick={(conditionItem) => {
-                    handleConditionDropdown(conditionItem, test);
-                  }}
-                  zIndex={499}
-                  disabled={false}
-                />
-              </div>
-
-              {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER || test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON || test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
-                <div class="pb-2 w-50">
-                  <label class="form-label text-fs-12">
-                    {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
-                      Header
-                    {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON}
-                      JSON
-                    {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
-                      XML
-                    {/if}
-
-                    Path
-
-                    <span style="color: var(--text-ds-danger-300)">*</span
+              <div
+                style="display: flex; flex-wrap: wrap; gap: 1rem; width: 100%;"
+              >
+                <div style="flex: 1 1 45%; min-width: 0;">
+                  <label class="form-label text-fs-12"
+                    >Name <span style="color: var(--text-ds-danger-300)">*</span
                     ></label
                   >
                   <input
                     type="text"
                     class="form-control text-light"
-                    bind:value={test.testPath}
+                    bind:value={test.name}
                   />
-                  <small class="text-success"
-                    >✔ Path valid. Example: {test.testPath}</small
-                  >
                 </div>
-              {/if}
-
-              <div class="pb-2 w-50">
-                <label class="form-label text-fs-12"
-                  >Expected Value <span style="color: var(--text-ds-danger-300)"
-                    >*</span
-                  ></label
-                >
-                <input
-                  type="text"
-                  class="form-control text-light"
-                  bind:value={test.expectedResult}
-                />
+                <div style="flex: 1 1 45%; min-width: 0;">
+                  <label class="form-label text-fs-12"
+                    >Test Target <span style="color: var(--text-ds-danger-300)"
+                      >*</span
+                    ></label
+                  >
+                  <WithSelectV4
+                    id={"hdre89fhrbej"}
+                    data={[
+                      {
+                        name: "Response Header",
+                        id: TestCaseSelectionTypeEnum.RESPONSE_HEADER,
+                      },
+                      {
+                        name: "Response JSON",
+                        id: TestCaseSelectionTypeEnum.RESPONSE_JSON,
+                      },
+                      {
+                        name: "Response Text",
+                        id: TestCaseSelectionTypeEnum.RESPONSE_TEXT,
+                      },
+                      {
+                        name: "Response XML",
+                        id: TestCaseSelectionTypeEnum.RESPONSE_XML,
+                      },
+                      {
+                        name: "Time Consuming",
+                        id: TestCaseSelectionTypeEnum.TIME_CONSUMING,
+                      },
+                    ]}
+                    titleId={test?.testTarget}
+                    onclick={(testTargetItem) => {
+                      handleTestTargetDropdown(testTargetItem, test);
+                    }}
+                    zIndex={499}
+                    disabled={false}
+                  />
+                </div>
+                <div style="flex: 1 1 45%; min-width: 0;">
+                  <label class="form-label text-fs-12"
+                    >Condition <span style="color: var(--text-ds-danger-300)"
+                      >*</span
+                    ></label
+                  >
+                  <WithSelectV4
+                    id={"hdregtrgt89fhrbej"}
+                    data={[
+                      {
+                        name: "Equals",
+                        id: TestCaseConditionOperatorEnum.EQUALS,
+                      },
+                      {
+                        name: "Not Equal",
+                        id: TestCaseConditionOperatorEnum.NOT_EQUAL,
+                      },
+                      {
+                        name: "Exists",
+                        id: TestCaseConditionOperatorEnum.EXISTS,
+                      },
+                      {
+                        name: "Does Not Exist",
+                        id: TestCaseConditionOperatorEnum.DOES_NOT_EXIST,
+                      },
+                      {
+                        name: "Less Than",
+                        id: TestCaseConditionOperatorEnum.LESS_THAN,
+                      },
+                      {
+                        name: "Greater Than",
+                        id: TestCaseConditionOperatorEnum.GREATER_THAN,
+                      },
+                      {
+                        name: "Contains",
+                        id: TestCaseConditionOperatorEnum.CONTAINS,
+                      },
+                      {
+                        name: "Does Not Contain",
+                        id: TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN,
+                      },
+                      {
+                        name: "Is Empty",
+                        id: TestCaseConditionOperatorEnum.IS_EMPTY,
+                      },
+                      {
+                        name: "Is Not Empty",
+                        id: TestCaseConditionOperatorEnum.IS_NOT_EMPTY,
+                      },
+                      {
+                        name: "In List",
+                        id: TestCaseConditionOperatorEnum.IN_LIST,
+                      },
+                      {
+                        name: "Not In List",
+                        id: TestCaseConditionOperatorEnum.NOT_IN_LIST,
+                      },
+                    ]}
+                    titleId={test?.condition}
+                    onclick={(conditionItem) => {
+                      handleConditionDropdown(conditionItem, test);
+                    }}
+                    zIndex={499}
+                    disabled={false}
+                  />
+                </div>
+                {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER || test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON || test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
+                  <div style="flex: 1 1 45%; min-width: 0;">
+                    <label class="form-label text-fs-12">
+                      {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
+                        Header
+                      {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON}
+                        JSON
+                      {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
+                        XML
+                      {/if}
+                      Path
+                      <span style="color: var(--text-ds-danger-300">*</span
+                      ></label
+                    >
+                    <input
+                      type="text"
+                      class="form-control text-light"
+                      bind:value={test.testPath}
+                    />
+                    <small class="text-success"
+                      >✔ Path valid. Example: {test.testPath}</small
+                    >
+                  </div>
+                {/if}
+                <div style="flex: 1 1 45%; min-width: 0;">
+                  <label class="form-label text-fs-12"
+                    >Expected Value <span
+                      style="color: var(--text-ds-danger-300)">*</span
+                    ></label
+                  >
+                  <input
+                    type="text"
+                    class="form-control text-light"
+                    bind:value={test.expectedResult}
+                  />
+                </div>
+                <div style="flex: 1 1 45%; min-width: 0;"></div>
               </div>
             {/if}
           {/each}
