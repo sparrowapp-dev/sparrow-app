@@ -402,6 +402,63 @@
       console.log("Error which inserting AI suggestions: ", err);
     }
   };
+  // Fixed implementation for the first file (REST Explorer)
+
+  let showLabel = true;
+  let leftPaneElement: HTMLElement | null = null;
+  let resizeObserver: ResizeObserver;
+
+  function checkZoom() {
+    if (!leftPaneElement) return;
+
+    const leftPaneWidth = leftPaneElement.offsetWidth;
+    console.log("Parent - Left pane width:", leftPaneWidth);
+
+    showLabel = window.innerWidth > 1250 || leftPaneWidth > 500;
+
+    // Custom event dispatch
+    window.dispatchEvent(
+      new CustomEvent("splitpane-resized", {
+        detail: { leftPaneWidth, showLabel },
+      }),
+    );
+  }
+
+  onMount(() => {
+    // First, set up window resize listener
+    window.addEventListener("resize", checkZoom);
+
+    // Then set up ResizeObserver with proper timing
+    const setupResizeObserver = () => {
+      const leftPane = document.querySelector(
+        ".rest-splitter .splitpanes__pane:first-child",
+      ) as HTMLElement;
+
+      if (leftPane) {
+        leftPaneElement = leftPane;
+        resizeObserver = new ResizeObserver(() => {
+          checkZoom();
+        });
+        resizeObserver.observe(leftPane);
+        checkZoom(); // initial check
+      } else {
+        // Retry if element not found
+        setTimeout(setupResizeObserver, 100);
+      }
+    };
+
+    // Delay to ensure DOM is ready
+    setTimeout(setupResizeObserver, 0);
+  });
+
+  onDestroy(() => {
+    // Proper cleanup
+    if (resizeObserver && leftPaneElement) {
+      resizeObserver.unobserve(leftPaneElement);
+      resizeObserver.disconnect();
+    }
+    window.removeEventListener("resize", checkZoom);
+  });
 
   /**
    * Converts an object (data A) to an array of KeyValuePair objects (data B)
@@ -672,6 +729,9 @@
                   onUpdateRequestState({
                     requestRightSplitterWidthPercentage: e.detail[1].size,
                   });
+                  setTimeout(() => {
+                    checkZoom();
+                  }, 50);
                 }}
               >
                 <Pane

@@ -42,7 +42,7 @@
   import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
   import { WarningIcon } from "@sparrow/library/icons";
   import RequestVariables from "../components/request-variables/RequestVariables.svelte";
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import { writable } from "svelte/store";
   import { loadingState } from "../../../../../@sparrow-common/src/store";
 
@@ -185,6 +185,63 @@
       loading.set(tabIdValue);
     }
   });
+
+  // Fixed implementation for the first file (REST Explorer)
+  let showLabel = true;
+  let leftPaneElement: HTMLElement | null = null;
+  let resizeObserver: ResizeObserver;
+
+  function checkZoom() {
+    if (!leftPaneElement) return;
+
+    const leftPaneWidth = leftPaneElement.offsetWidth;
+    console.log("Parent - Left pane width:", leftPaneWidth);
+
+    showLabel = window.innerWidth > 1250 || leftPaneWidth > 500;
+
+    // Custom event dispatch
+    window.dispatchEvent(
+      new CustomEvent("splitpane-resized", {
+        detail: { leftPaneWidth, showLabel },
+      }),
+    );
+  }
+
+  onMount(() => {
+    // First, set up window resize listener
+    window.addEventListener("resize", checkZoom);
+
+    // Then set up ResizeObserver with proper timing
+    const setupResizeObserver = () => {
+      const leftPane = document.querySelector(
+        ".graph-rest-splitter .splitpanes__pane:first-child",
+      ) as HTMLElement;
+
+      if (leftPane) {
+        leftPaneElement = leftPane;
+        resizeObserver = new ResizeObserver(() => {
+          checkZoom();
+        });
+        resizeObserver.observe(leftPane);
+        checkZoom(); // initial check
+      } else {
+        // Retry if element not found
+        setTimeout(setupResizeObserver, 100);
+      }
+    };
+
+    // Delay to ensure DOM is ready
+    setTimeout(setupResizeObserver, 0);
+  });
+
+  onDestroy(() => {
+    // Proper cleanup
+    if (resizeObserver && leftPaneElement) {
+      resizeObserver.unobserve(leftPaneElement);
+      resizeObserver.disconnect();
+    }
+    window.removeEventListener("resize", checkZoom);
+  });
 </script>
 
 <div class="d-flex rest-explorer-layout h-100">
@@ -283,6 +340,9 @@
                   onUpdateRequestState({
                     requestRightSplitterWidthPercentage: e.detail[1].size,
                   });
+                  setTimeout(() => {
+                    checkZoom();
+                  }, 50);
                 }}
               >
                 <Pane

@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import { TabularInputTheme } from "../../utils";
-  import { afterUpdate, onMount } from "svelte";
+  import { afterUpdate, onMount, onDestroy } from "svelte";
   import { Tooltip, Button, notifications } from "@sparrow/library/ui";
   import { Checkbox } from "@sparrow/library/forms";
   import {
@@ -222,7 +222,102 @@
 
     return [...result, lastEmptyRow];
   }
+  let showLabel = true;
+  let leftPaneElement: HTMLElement | null = null;
+  let resizeObserver: ResizeObserver;
+  let headerContainer: HTMLDivElement | null = null;
 
+  function checkZoom() {
+    // Try multiple selectors to find the left pane
+    const leftPane =
+      (document.querySelector(
+        ".web-socket-splitter .splitpanes__pane:first-child",
+      ) as HTMLElement) ||
+      (document.querySelector(
+        ".rest-splitter .splitpanes__pane:first-child",
+      ) as HTMLElement) ||
+      (document.querySelector(
+        ".socketio-splitter .splitpanes__pane:first-child",
+      ) as HTMLElement) ||
+      (document.querySelector(
+        ".graph-rest-splitter .splitpanes__pane:first-child",
+      ) as HTMLElement);
+
+    const leftPaneWidth = leftPane?.offsetWidth || 0;
+
+    console.log(
+      "TabularInput - Left pane width:",
+      leftPaneWidth,
+      "Window width:",
+      window.innerWidth,
+    );
+
+    // Update showLabel based on width
+    showLabel = window.innerWidth > 1250 || leftPaneWidth > 400;
+  }
+
+  onMount(() => {
+    // Set up window resize listener
+    window.addEventListener("resize", checkZoom);
+
+    // Set up custom event listener for splitpane resize
+    const handleSplitpaneResize = (event) => {
+      setTimeout(() => {
+        checkZoom();
+      }, 50);
+    };
+
+    window.addEventListener("splitpane-resized", handleSplitpaneResize);
+
+    // Set up ResizeObserver with retry mechanism
+    const setupResizeObserver = () => {
+      const leftPane =
+        (document.querySelector(
+          ".web-socket-splitter .splitpanes__pane:first-child",
+        ) as HTMLElement) ||
+        (document.querySelector(
+          ".rest-splitter .splitpanes__pane:first-child",
+        ) as HTMLElement) ||
+        (document.querySelector(
+          ".socketio-splitter .splitpanes__pane:first-child",
+        ) as HTMLElement) ||
+        (document.querySelector(
+          ".graph-rest-splitter .splitpanes__pane:first-child",
+        ) as HTMLElement);
+
+      if (leftPane) {
+        leftPaneElement = leftPane;
+        resizeObserver = new ResizeObserver(() => {
+          checkZoom();
+        });
+        resizeObserver.observe(leftPane);
+        checkZoom();
+      } else {
+        setTimeout(setupResizeObserver, 100);
+      }
+    };
+
+    // Initial setup with delay
+    setTimeout(setupResizeObserver, 0);
+  });
+
+  onDestroy(() => {
+    // Cleanup ResizeObserver
+    if (resizeObserver && leftPaneElement) {
+      resizeObserver.unobserve(leftPaneElement);
+      resizeObserver.disconnect();
+    }
+
+    // Cleanup event listeners
+    window.removeEventListener("resize", checkZoom);
+
+    const handleSplitpaneResize = () => {
+      setTimeout(() => {
+        checkZoom();
+      }, 50);
+    };
+    window.removeEventListener("splitpane-resized", handleSplitpaneResize);
+  });
   /**
    * Checks if there are any actual changes between the original data and the new data
    * Sets hasChanges to true if there are added, deleted, or modified items
@@ -828,10 +923,11 @@
   {#if !isBulkEditActive}
     <section class="mb-0 me-0 py-0 section-layout w-100" style="">
       <div
+        bind:this={headerContainer}
         class="d-flex align-items-center pair-header-row {!isTopHeaderRequired
           ? 'd-none'
           : ''}"
-        style="position:relative; padding-right:1rem; padding-left:4px; border-top-left-radius: 4px; border-top-right-radius: 4px;"
+        style="position:relative; padding-right:0.2rem; padding-left:2px; border-top-left-radius: 4px; border-top-right-radius: 4px;"
       >
         <div style="width:24px; margin-right:12px" class="">
           <Checkbox
@@ -854,24 +950,30 @@
           </div>
           <div
             class="w-50 position-relative header-text"
-            style="padding-left: 69px;"
+            style="padding-left: 60px;"
           >
             Value
           </div>
         </div>
-        <div style="width:140px;" class="ms-3 d-flex align-items-center">
+
+        <div style="width:140px;" class="ms-3 d-flex align-items-end">
           <div class="w-100 d-flex">
-            <div class="w-100 d-flex justify-content-end gap-2">
+            <div
+              class="w-100 d-flex position-relative justify-content-end gap-2"
+              style=""
+            >
               {#if isBulkEditRequired}
-                <Toggle
-                  bind:isActive={bulkToggle}
-                  label="Bulk Edit"
-                  fontSize="12px"
-                  textColor="var(--text-ds-neutral-200)"
-                  fontWeight="400"
-                  onClick={handleBulkTextUpdate}
-                  onChange={toggleBulkEdit}
-                />
+                <div class="bulk-edit-container">
+                  <Toggle
+                    bind:isActive={bulkToggle}
+                    label={showLabel ? "Bulk Edit" : ""}
+                    fontSize="12px"
+                    textColor="var(--text-ds-neutral-200)"
+                    fontWeight="400"
+                    onClick={handleBulkTextUpdate}
+                    onChange={toggleBulkEdit}
+                  />
+                </div>
               {/if}
               <!-- <Toggle
                 isActive={showMergeView}
