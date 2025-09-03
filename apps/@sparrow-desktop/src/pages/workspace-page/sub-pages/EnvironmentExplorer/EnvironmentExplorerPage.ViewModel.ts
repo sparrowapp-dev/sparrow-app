@@ -234,6 +234,13 @@ export class EnvironmentExplorerViewModel {
         if (foundIndex !== -1) {
           const foundObject =
             progressiveTab.property.environment.aiVariable[foundIndex];
+          // validation: key and value must not be empty
+          if (!foundObject?.key || !foundObject?.value) {
+            notifications.warning(
+              "Both key and value are required to accept a variable.",
+            );
+            return;
+          }
           const currentPairs =
             progressiveTab.property?.environment?.variable || [];
           const updatedPairs = [...currentPairs];
@@ -295,14 +302,16 @@ export class EnvironmentExplorerViewModel {
           (variable) => variable.undo === true,
         );
 
-      const sanitizedAiVariables =
+       const sanitizedAiVariables =
         progressiveTab.property.environment.aiVariable
           .filter((variable) => !variable.undo)
           .map((variable) => ({
             ...variable,
             type: "ai-generated",
             lifespan: "short",
-          }));
+          }))
+          // Skip variables with empty key or value
+          .filter((variable) => variable.key && variable.value);
       await this.updateVariables([
         ...progressiveTab.property.environment.variable,
         ...sanitizedAiVariables,
@@ -470,6 +479,13 @@ export class EnvironmentExplorerViewModel {
     const activeWorkspace = await this.workspaceRepository.readWorkspace(
       currentEnvironment.path.workspaceId,
     );
+    //validate collection existence
+    const collectionId =
+      currentEnvironment?.property?.environment?.generateProperty?.collectionId;
+    let collectionData: any = null;
+    collectionData =
+      await this.collectionRepository.readCollection(collectionId);
+    collectionData = collectionData?.toMutableJSON?.() ?? null;
     await this.updateEnvironmentState({ isSaveInProgress: true });
     const guestUser = await this.guestUserRepository.findOne({
       name: "guestUser",
@@ -547,7 +563,47 @@ export class EnvironmentExplorerViewModel {
           aiGeneratedVariables,
           "value",
         );
-
+      //If collection missing, skip AI variables entirely
+      if (
+        !collectionData &&
+        currentEnvironment?.property?.environment?.generateVariable
+      ) {
+        // Remove AI-generated variables (lifespan === "short")
+        const filteredVariables =
+          currentEnvironment?.property?.environment?.variable.filter(
+            (v) => v.lifespan !== "short",
+          ) || [];
+        await this.updateVariables(
+          filteredVariables.map((item) => ({
+            key: item.key,
+            value: item.value,
+            checked: item.checked,
+          })),
+        );
+        await this.updateGeneratedVariables([]);
+        // Update environment state in DB
+        await this.environmentRepository.updateEnvironment(
+          currentEnvironment.id,
+          {
+            name: currentEnvironment.name,
+            variable: filteredVariables,
+            updatedAt: new Date().toISOString(),
+          },
+        );
+        const progressiveTab = this._tab.getValue();
+        progressiveTab.isSaved = true;
+        progressiveTab.property.environment.generateVariable = false;
+        this.tab = progressiveTab;
+        await this.tabRepository.updateTab(
+          progressiveTab.tabId,
+          progressiveTab,
+        );
+        notifications.success(
+          `Changes saved for ${currentEnvironment.name} environment (AI variables removed because collection is missing).`,
+        );
+        return;
+      }
+      //If collection exists, proceed with AI variable insertion
       if (uniqueAiGeneratedVariables.length > 0) {
         await this.updateVariables(
           currentEnvironment?.property?.environment?.variable.map((item) => {

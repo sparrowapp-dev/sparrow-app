@@ -99,14 +99,16 @@
       (pairs[index].key !== "" || pairs[index].value !== "")
     ) {
       pairs[pairs.length - 1].checked = true;
-      pairs.push({
-        key: "",
-        value: "",
-        checked: false,
-        type: "user-generated",
-        id: crypto.randomUUID(),
-        undo: false,
-      });
+      if (!isGeneratedVariable) {
+        pairs.push({
+          key: "",
+          value: "",
+          checked: false,
+          type: "user-generated",
+          id: crypto.randomUUID(),
+          undo: false,
+        });
+      }
       pairs = pairs;
     }
     callback(pairs);
