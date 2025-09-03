@@ -6,6 +6,7 @@
   import TestListItem from "./sub-components/test-list-item/TestListItem.svelte";
   import { WithSelectV4 } from "../../../../../../hoc";
   import { Button } from "@sparrow/library/ui";
+  import { AddRegular, DeleteRegular } from "@sparrow/library/icons";
 
   export let tests;
   export let onTestsChange;
@@ -114,16 +115,18 @@
   {#if localTest.noCode.length === 0}
     <!-- Empty state -->
     <div
-      class="d-flex flex-column align-items-center justify-content-center py-5"
+      class="d-flex flex-column align-items-center justify-content-center h-100"
+      style="overflow: auto;"
     >
       <p class="w-50 text-muted text-center text-fs-14 mb-3">
         No test Added. Please click ‘+ Add Test’ to create one. You can test
         status code, response time, body content, and more.
       </p>
       <Button
-        title={"+ Add Tests"}
+        startIcon={AddRegular}
+        title={"Add Tests"}
         type="primary"
-        size="md"
+        size="small"
         onClick={addTest}
       />
     </div>
@@ -156,17 +159,19 @@
         <div class="d-flex gap-2 pb-2" style="flex-wrap:wrap;">
           <div class="">
             <Button
-              title={"+ Add Tests"}
+              startIcon={AddRegular}
+              title={"Add Tests"}
               type="primary"
-              size="md"
+              size="small"
               onClick={addTest}
             />
           </div>
           <div class="">
             <Button
               title={"Clear All"}
+              startIcon={DeleteRegular}
               type="secondary"
-              size="md"
+              size="small"
               onClick={clearTests}
             />
           </div>
