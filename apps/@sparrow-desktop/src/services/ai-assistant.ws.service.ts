@@ -44,12 +44,6 @@ export class AiAssistantWebSocketService {
   private baseUrl: string = constants.SPARROW_AI_WEBSOCKET_URL;
 
   /**
-   * Stores the last message and tabId sent by the user for automatic retry after reconnect
-   */
-  private lastMessage: { message: any; tabId: string } | null = null;
-  private wsReconnectRetries: number = 0;
-
-  /**
    * WebSocket instance for communication.
    * @private
    */
@@ -90,6 +84,12 @@ export class AiAssistantWebSocketService {
    * @private
    */
   private reconnectDelay: number = 2000;
+
+  /**
+   * Test connections delay in milliseconds
+   * @private
+   */
+  private testConnectionDelay: number = 500;
 
   /**
    * Private constructor to prevent direct instantiation.
@@ -164,8 +164,9 @@ export class AiAssistantWebSocketService {
 
       return this.webSocket;
     } catch (error) {
-      console.error("Failed to create WebSocket connection:", error);
-      this.scheduleReconnect();
+      Sentry.captureException(
+        `Failed to create WebSocket connection: ${error}`,
+      );
       return null;
     }
   };
@@ -182,7 +183,7 @@ export class AiAssistantWebSocketService {
    * Handles WebSocket open event
    * @private
    */
-  private handleOpen = (event: Event) => {
+  private handleOpen = () => {
     this._isConnected = true;
     this.reconnectAttempts = 0;
     socketStore.set(this.webSocket);
@@ -192,25 +193,40 @@ export class AiAssistantWebSocketService {
   };
 
   /**
-   * Retries the last message sent over the WebSocket after a successful reconnect
+   * Attempts to reconnect the WebSocket with retry logic
    * @private
    */
-  private retryLastMessage = () => {
-    if (this.lastMessage && this.webSocket) {
-      try {
-        this.webSocket.send(JSON.stringify(this.lastMessage.message));
-        // Optionally, stream a UI event that the message was retried
-        this.triggerEvent(`assistant-response_${this.lastMessage.tabId}`, {
-          info: true,
-          message:
-            "Your last message was automatically retried after reconnect.",
-          retried: true,
-        });
-      } catch (err) {
-        Sentry.captureException(
-          "Failed to resend last message after reconnect: " + err,
-        );
-      }
+  private reconnectWebSocket = async (): Promise<void> => {
+    // Clear any existing reconnect timer
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+    // Retry connection immediately if attempts are available
+    if (
+      this.reconnectAttempts < this.maxReconnectAttempts &&
+      !this._isConnected
+    ) {
+      this.reconnectAttempts++;
+
+      this.reconnectTimer = setTimeout(() => {
+        if (!this._isConnected) {
+          this.connectWebSocket();
+        }
+        // Check if connection was successful after a brief delay
+        setTimeout(() => {
+          if (this.isWsConnected()) {
+            this.reconnectAttempts = 0;
+            this._isConnected = true;
+            return; // Successfully reconnected
+          }
+        }, this.testConnectionDelay);
+        this.reconnectTimer = null;
+      }, this.reconnectDelay);
+    } else {
+      Sentry.captureException(
+        "WebSocket not connected after maximum retry attempts",
+      );
     }
   };
 
@@ -220,45 +236,17 @@ export class AiAssistantWebSocketService {
    */
   private handleClose = (event: CloseEvent) => {
     this._isConnected = false;
+    this.reconnectWebSocket();
     this.triggerEvent("disconnect", { code: event.code, reason: event.reason });
-
-    // Attempt to reconnect if the connection wasn't closed intentionally
-    // Stream message to all listeners: something went wrong, retrying
-    this.triggerEvent("assistant-reconnect", {
-      error: true,
-      message: "Something went wrong, retrying please wait...",
-      retry: true,
-    });
-    const tryReconnect = async () => {
-      while (this.wsReconnectRetries < 3 && !this._isConnected) {
-        this.connectWebSocket();
-        await new Promise((resolve) => setTimeout(resolve, 700));
-        if (this.webSocket && this.isWsConnected()) {
-          this.wsReconnectRetries = 0;
-          this._isConnected = false;
-          this.retryLastMessage();
-          break;
-        }
-        this.wsReconnectRetries++;
-      }
-      if (!this._isConnected) {
-        Sentry.captureException(
-          "WebSocket not connected after 3 retries, cannot reconnect ai-assistant.ws.service(desktop)",
-        );
-        console.error(
-          "WebSocket not connected after 3 retries, cannot reconnect",
-        );
-      }
-    };
-    // Fire and forget, don't block close handler
-    tryReconnect();
   };
 
   /**
    * Handles WebSocket error event
    * @private
    */
-  private handleError = (event: Event) => {
+  private handleError = () => {
+    this._isConnected = false;
+    this.reconnectWebSocket();
     this.triggerEvent("connect_error", {
       message: "WebSocket connection error",
     });
@@ -278,39 +266,6 @@ export class AiAssistantWebSocketService {
       }
     } catch (error) {
       console.error("Error in parsing response:", error);
-    }
-  };
-
-  /**
-   * Schedules a reconnection attempt
-   * @private
-   */
-  private scheduleReconnect = () => {
-    // Clear any existing reconnect timer
-    if (this.reconnectTimer) {
-      clearTimeout(this.reconnectTimer);
-      this.reconnectTimer = null;
-    }
-
-    if (
-      this.reconnectAttempts < this.maxReconnectAttempts &&
-      !this.reconnectTimer
-    ) {
-      this.reconnectTimer = setTimeout(() => {
-        // Adding this console info, to debug in deployed environments
-        console.debug(
-          `Attempting to reconnect (${this.reconnectAttempts + 1}/${
-            this.maxReconnectAttempts
-          })...`,
-        );
-        this.reconnectAttempts++;
-        this.connectWebSocket();
-        this.reconnectTimer = null;
-      }, this.reconnectDelay);
-    } else if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.error(
-        `Maximum reconnect attempts (${this.maxReconnectAttempts}) reached`,
-      );
     }
   };
 
@@ -408,9 +363,6 @@ export class AiAssistantWebSocketService {
       teamId,
       feature: "sparrow-ai",
     };
-
-    // Store the last message and tabId for retry after reconnect
-    this.lastMessage = { message, tabId };
 
     if (!this.webSocket || !this.isWsConnected()) {
       console.error("WebSocket not connected, cannot send message");
