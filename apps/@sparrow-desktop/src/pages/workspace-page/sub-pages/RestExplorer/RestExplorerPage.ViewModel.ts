@@ -501,7 +501,41 @@ class RestExplorerViewModel {
       )
     ) {
       result = false;
-    } else if (
+    }
+    else if (
+      !this.compareArray.init(
+        requestServer.request?.tests?.noCode?.map((test)=>{
+          return {
+            id: test.id,
+            name: test.name,
+            condition: test.condition,
+            expectedResult: test.expectedResult,
+            testPath: test.testPath,
+            testTarget: test.testTarget
+          }
+        }),
+        progressiveTab.property.request?.tests?.noCode?.map((test)=>{
+          return {
+            id: test.id,
+            name: test.name,
+            condition: test.condition,
+            expectedResult: test.expectedResult,
+            testPath: test.testPath,
+            testTarget: test.testTarget
+          }
+        }),
+      )
+    ) {
+      result = false;
+    }
+    else if (
+        requestServer.request.tests.testCaseMode !==
+        progressiveTab.property.request.tests.testCaseMode
+      
+    ) {
+      result = false;
+    }
+    else if (
       !this.compareArray.init(
         requestServer.request.queryParams,
         progressiveTab.property.request.queryParams,
