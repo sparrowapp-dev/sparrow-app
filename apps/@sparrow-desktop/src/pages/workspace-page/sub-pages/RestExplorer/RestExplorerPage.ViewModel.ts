@@ -506,7 +506,8 @@ class RestExplorerViewModel {
     }
     else if (
       !this.compareArray.init(
-        requestServer.request?.tests?.noCode?.map((test)=>{
+        requestServer.request?.tests?.noCode?.map((
+          test)=>{
           return {
             id: test.id,
             name: test.name,
