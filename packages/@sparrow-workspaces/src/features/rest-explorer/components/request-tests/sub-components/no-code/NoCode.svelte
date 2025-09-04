@@ -260,6 +260,7 @@
                         setByDefaultTestName(test);
                       }
                     }}
+                    placeholder="Enter Test Name"
                   />
                 </div>
                 <div style="flex: 1 1 45%; min-width: 0;">
@@ -296,6 +297,7 @@
                     onclick={(testTargetItem) => {
                       handleTestTargetDropdown(testTargetItem, test);
                     }}
+                    placeholder="Select Test Traget"
                     zIndex={499}
                     disabled={false}
                   />
@@ -362,6 +364,7 @@
                     onclick={(conditionItem) => {
                       handleConditionDropdown(conditionItem, test);
                     }}
+                    placeholder="Select Test Condition"
                     zIndex={499}
                     disabled={false}
                   />
@@ -384,24 +387,28 @@
                       type="text"
                       class="form-control text-light"
                       bind:value={test.testPath}
+                      placeholder="E.g. $.user.name"
                     />
-                    <small class="text-success"
+                    <!-- <small class="text-success"
                       >✔ Path valid. Example: {test.testPath}</small
-                    >
+                    > -->
                   </div>
                 {/if}
-                <div style="flex: 1 1 45%; min-width: 0;">
-                  <label class="form-label text-fs-12"
-                    >Expected Value <span
-                      style="color: var(--text-ds-danger-300)">*</span
-                    ></label
-                  >
-                  <input
-                    type="text"
-                    class="form-control text-light"
-                    bind:value={test.expectedResult}
-                  />
-                </div>
+                {#if test?.condition === TestCaseConditionOperatorEnum.EQUALS || test?.condition === TestCaseConditionOperatorEnum.NOT_EQUAL || test?.condition === TestCaseConditionOperatorEnum.EXISTS || test?.condition === TestCaseConditionOperatorEnum.DOES_NOT_EXIST || test?.condition === TestCaseConditionOperatorEnum.LESS_THAN || test?.condition === TestCaseConditionOperatorEnum.GREATER_THAN || test?.condition === TestCaseConditionOperatorEnum.CONTAINS || test?.condition === TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN || test?.condition === TestCaseConditionOperatorEnum.IN_LIST || test?.condition === TestCaseConditionOperatorEnum.NOT_IN_LIST}
+                  <div style="flex: 1 1 45%; min-width: 0;">
+                    <label class="form-label text-fs-12"
+                      >comparison value <span
+                        style="color: var(--text-ds-danger-300)">*</span
+                      ></label
+                    >
+                    <input
+                      type="text"
+                      class="form-control text-light"
+                      bind:value={test.expectedResult}
+                      placeholder="Enter Comparison Value"
+                    />
+                  </div>
+                {/if}
                 <div style="flex: 1 1 45%; min-width: 0;"></div>
               </div>
             {/if}
@@ -417,5 +424,13 @@
 <style>
   input {
     font-size: 12px;
+    height: 36px;
+    background-color: var(--bg-ds-surface-600);
+    border: 1px solid transparent;
+  }
+  input:hover,
+  input:focus {
+    background-color: var(--bg-ds-surface-600);
+    border: 1px solid var(--border-ds-primary-300);
   }
 </style>

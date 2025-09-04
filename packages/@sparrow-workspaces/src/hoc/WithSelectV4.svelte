@@ -25,7 +25,9 @@
    */
   export let disabled;
 
-  $: ({ id, data, titleId, onclick, zIndex, disabled } = $$props);
+  export let placeholder;
+
+  $: ({ id, data, titleId, onclick, zIndex, disabled, placeholder } = $$props);
 </script>
 
 <Select
@@ -43,4 +45,6 @@
   variant={"secondary"}
   menuItem={"v2"}
   minHeaderWidth={"100px"}
+  size={"medium"}
+  placeholderText={placeholder}
 />
