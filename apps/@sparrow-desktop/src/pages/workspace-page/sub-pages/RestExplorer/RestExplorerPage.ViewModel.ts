@@ -3938,6 +3938,11 @@ class RestExplorerViewModel {
           progressiveTab.property.request.headers = newArray;
         }
         this.tab = progressiveTab;
+        progressiveTab.isSaved = false;
+        this.tabRepository.updateTab(progressiveTab.tabId, {
+          isSaved: false,
+          persistence: TabPersistenceTypeEnum.PERMANENT,
+        });
         return true;
       }
       return false;
@@ -3952,6 +3957,11 @@ class RestExplorerViewModel {
       if (typeof jsonResult === "object" && jsonResult !== null) {
         progressiveTab.property.request.body.raw = JSON.stringify(jsonResult);
         this.tab = progressiveTab;
+        progressiveTab.isSaved = false;
+        this.tabRepository.updateTab(progressiveTab.tabId, {
+          isSaved: false,
+          persistence: TabPersistenceTypeEnum.PERMANENT,
+        });
         return true;
       }
       return false;
@@ -3976,6 +3986,11 @@ class RestExplorerViewModel {
           progressiveTab.property.request.body.urlencoded = updatedContent;
         }
         this.tab = progressiveTab;
+        progressiveTab.isSaved = false;
+        this.tabRepository.updateTab(progressiveTab.tabId, {
+          isSaved: false,
+          persistence: TabPersistenceTypeEnum.PERMANENT,
+        });
         return true;
       }
       return false;
@@ -3983,6 +3998,11 @@ class RestExplorerViewModel {
     if (typeof response === "string" && response.trim() !== "") {
       progressiveTab.property.request.body.raw = response;
       this.tab = progressiveTab;
+      progressiveTab.isSaved = false;
+      this.tabRepository.updateTab(progressiveTab.tabId, {
+        isSaved: false,
+        persistence: TabPersistenceTypeEnum.PERMANENT,
+      });
       return true;
     }
     return false;
