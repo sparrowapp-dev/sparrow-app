@@ -112,7 +112,9 @@ import * as curlconverter from "curlconverter";
 
 import * as Sentry from "@sentry/svelte";
 import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection-tab";
-
+import * as xpath from "xpath";
+import { DOMParser } from "xmldom";
+import { JSONPath } from "jsonpath-plus";
 class RestExplorerViewModel {
   /**
    * Repository
@@ -1744,7 +1746,7 @@ class RestExplorerViewModel {
         : this._collectionAuth.getValue(),
     );
     makeHttpRequestV2(...decodeData, signal)
-      .then((response) => {
+      .then(async (response) => {
         if (response.isSuccessful === false) {
           restExplorerDataStore.update((restApiDataMap) => {
             const data = restApiDataMap.get(progressiveTab?.tabId);
@@ -1759,6 +1761,7 @@ class RestExplorerViewModel {
             restApiDataMap.set(progressiveTab.tabId, data);
             return restApiDataMap;
           });
+          await this.executeTestcases();
         } else {
           const end = Date.now();
           const byteLength = new TextEncoder().encode(
@@ -1795,9 +1798,10 @@ class RestExplorerViewModel {
             restApiDataMap.set(progressiveTab.tabId, data);
             return restApiDataMap;
           });
+          await this.executeTestcases();
         }
       })
-      .catch((error) => {
+      .catch(async (error) => {
         // Handle cancellation or other errors
         if (error.name === "AbortError") {
           return;
@@ -1817,10 +1821,15 @@ class RestExplorerViewModel {
           restApiDataMap.set(progressiveTab.tabId, data);
           return restApiDataMap;
         });
+        await this.executeTestcases();
       });
-    await this.executeTestcases();
   };
 
+  /**
+   * Executes test cases for the current tab based on the selected test case mode.
+   * If the mode is NO_CODE, it delegates to executeNoCodeTestcases.
+   *
+   */
   private executeTestcases = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
 
@@ -1830,11 +1839,17 @@ class RestExplorerViewModel {
     }
   };
 
+  /**
+   * Executes all no-code test cases for the current tab's response.
+   * Updates the test results in the Response Store(restExplorerDataStore).
+   *
+   */
   private executeNoCodeTestcases = () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     restExplorerDataStore.update((restApiDataMap) => {
       const response = restApiDataMap.get(progressiveTab?.tabId);
       if (response) {
+        response.response.testResults = [];
         const testCases = progressiveTab.property.request.tests.noCode || [];
         testCases.map((test) => {
           let actual: any;
@@ -1856,22 +1871,40 @@ class RestExplorerViewModel {
             test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON
           ) {
             try {
-              // Parse response body as JSON
               const json = JSON.parse(response.response.body);
-              // Remove leading "$." and split by "."
-              const pathParts = test.testPath.replace(/^\$\./, "").split(".");
-              let value = json;
-              for (const part of pathParts) {
-                if (value && typeof value === "object" && part in value) {
-                  value = value[part];
-                } else {
-                  value = undefined;
-                  break;
-                }
-              }
-              actual = value;
+              // Use JSONPath to extract value, supports $[3].userId, $[0].address.city, etc.
+              const result = JSONPath({ path: test.testPath, json });
+              // If result is an array, take the first value
+              actual = Array.isArray(result) ? result[0] : result;
             } catch (e) {
               error = "Invalid JSON or path";
+              actual = undefined;
+            }
+          } else if (
+            test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML
+          ) {
+            try {
+              const xml = response.response.body;
+              const doc = new DOMParser().parseFromString(xml, "text/xml");
+              // test.testPath should be a valid XPath, e.g. "/root/country/city"
+              const nodes = xpath.select(test.testPath, doc);
+
+              if (Array.isArray(nodes) && nodes.length > 0) {
+                // If it's an attribute node
+                if (nodes[0].nodeType === 2) {
+                  actual = nodes[0].nodeValue;
+                } else if (nodes[0].firstChild) {
+                  actual = nodes[0].firstChild.nodeValue;
+                } else if ((nodes[0] as any).data) {
+                  actual = (nodes[0] as any).data;
+                } else {
+                  actual = nodes[0].toString();
+                }
+              } else {
+                actual = undefined;
+              }
+            } catch (e) {
+              error = "Invalid XML or XPath";
               actual = undefined;
             }
           } else {
@@ -1889,12 +1922,8 @@ class RestExplorerViewModel {
             testStatus: passed,
             testMessage: error || testMessage,
           };
-          if (!response.response.testResults) {
-            response.response.testResults = [];
-            response.response.testResults?.push(testResponse);
-          } else {
-            response.response.testResults?.push(testResponse);
-          }
+
+          response.response.testResults?.push(testResponse);
 
           restApiDataMap.set(progressiveTab.tabId, response);
         });
@@ -1903,6 +1932,14 @@ class RestExplorerViewModel {
     });
   };
 
+  /**
+   * Evaluates a test condition against the actual and expected values.
+   *
+   * @param actual - The actual value extracted from the response.
+   * @param expectedRaw - The expected value to compare against.
+   * @param condition - The test condition operator (e.g., EQUALS, NOT_EQUAL).
+   * @returns An object containing whether the test passed and an optional message.
+   */
   private evaluateCondition = (
     actual: any,
     expectedRaw: string,
@@ -1915,11 +1952,11 @@ class RestExplorerViewModel {
     try {
       switch (condition) {
         case TestCaseConditionOperatorEnum.EQUALS:
-          passed = actual === expected;
+          passed = actual == expected;
           message = passed ? "Passed" : "Failed";
           break;
         case TestCaseConditionOperatorEnum.NOT_EQUAL:
-          passed = actual !== expected;
+          passed = actual != expected;
           message = passed ? "Passed" : "Failed";
           break;
         case TestCaseConditionOperatorEnum.EXISTS:
