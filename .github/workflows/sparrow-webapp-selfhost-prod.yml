@@ -3,6 +3,11 @@ name: Build and Push Multi-Arch Sparrow Web Self Host Docker Image
 on:
   workflow_dispatch:
     inputs:
+      branch:
+        description: "Git branch to build"
+        required: true
+        default: main
+        type: string
       image_version:
         description: "Docker image version (e.g. 1.2.3)"
         required: true
@@ -14,9 +19,14 @@ jobs:
     environment: production
     env:
       DOCKER_IMAGE_VERSION: ${{ inputs.image_version }}
+      BUILD_BRANCH: ${{ inputs.branch }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ env.BUILD_BRANCH }}
+          fetch-depth: 0
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -29,6 +39,7 @@ jobs:
 
       - name: Build and push multi-arch Docker image
         run: |
+          set -euo pipefail
           docker buildx build --platform linux/amd64,linux/arm64 \
           -f SelfHost-Sparrow-Web.Dockerfile \
           -t sparrowapi/sparrow-web:${DOCKER_IMAGE_VERSION} \
