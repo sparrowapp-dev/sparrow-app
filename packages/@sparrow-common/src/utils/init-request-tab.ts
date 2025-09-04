@@ -14,6 +14,7 @@ import {
   TestCaseModeEnum,
   TestCaseConditionOperatorEnum,
   TestCaseSelectionTypeEnum,
+  type Tests,
 } from "@sparrow/common/types/workspace";
 import {
   TabTypeEnum,
@@ -117,10 +118,7 @@ class InitRequestTab {
                   },
                 ],
              
-              script: `// Custom test script
-          if (response.status === 200) {
-            console.log("Status is OK");
-          }`,
+              script: "",
             },
           state: {
             requestBodyLanguage: RequestDataTypeEnum.TEXT,
@@ -229,6 +227,11 @@ class InitRequestTab {
   public updateHeaders(_headers: KeyValueChecked[]) {
     if (_headers && this._tab.property.request) {
       this._tab.property.request.headers = _headers;
+    }
+  }
+  public updateTests(_tests: Tests) {
+    if (_tests && this._tab.property.request) {
+      this._tab.property.request.tests = _tests;
     }
   }
   public updateAuth(_auth: Auth) {

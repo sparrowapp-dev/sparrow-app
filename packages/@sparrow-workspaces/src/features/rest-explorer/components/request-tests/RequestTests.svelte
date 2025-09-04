@@ -56,10 +56,12 @@
 
   <div class="border rounded-top">
     {#if tests?.testCaseMode === TestCaseModeEnum.SCRIPT}
-      <div class="px-3 py-2"><p class="text-fs-12 mb-0">JavaScript</p></div>
+      <div class="px-3 py-2">
+        <p class="text-fs-12 mb-0 text-muted">JavaScript</p>
+      </div>
     {:else if tests?.testCaseMode === TestCaseModeEnum.NO_CODE}
       <div class="px-3 py-2">
-        <p class="text-fs-12 mb-0">Build tests using form fields</p>
+        <p class="text-fs-12 mb-0 text-muted">Build tests using form fields</p>
       </div>
     {/if}
   </div>

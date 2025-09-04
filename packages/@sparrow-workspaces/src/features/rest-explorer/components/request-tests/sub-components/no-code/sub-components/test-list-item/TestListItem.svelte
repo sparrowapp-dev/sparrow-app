@@ -4,7 +4,7 @@
     DeleteRegular,
     MoreHorizontalRegular,
   } from "@sparrow/library/icons";
-  import { Button, Options, Tooltip } from "@sparrow/library/ui";
+  import { Button, Modal, Options, Tooltip } from "@sparrow/library/ui";
 
   export let test;
   export let selectTest;
@@ -26,6 +26,7 @@
       showMenu = false;
     }
   };
+  let isDeletePopup = false;
 </script>
 
 <svelte:window
@@ -51,7 +52,7 @@
       },
       {
         onClick: () => {
-          deleteTest(test);
+          isDeletePopup = true;
         },
         icon: DeleteRegular,
         displayText: `Remove Test`,
@@ -59,6 +60,47 @@
     ]}
   />
 {/if}
+
+<Modal
+  title={"Remove Test?"}
+  type={"danger"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isDeletePopup}
+  handleModalState={() => (isDeletePopup = false)}
+>
+  <div
+    class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium"
+  >
+    <p>
+      Are you sure you want to remove <b
+        style="color: var(--text-ds-neutral-100)">"{test?.name}"</b
+      >?
+    </p>
+  </div>
+
+  <div
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100 text-ds-font-size-16"
+  >
+    <Button
+      title={"Cancel"}
+      type={"secondary"}
+      loader={false}
+      onClick={() => {
+        isDeletePopup = false;
+      }}
+    />
+
+    <Button
+      title={"Remove"}
+      type={"danger"}
+      onClick={() => {
+        deleteTest(test);
+        isDeletePopup = false;
+      }}
+    />
+  </div></Modal
+>
 
 <div class="d-flex gap-2 pb-1">
   <span

@@ -5,7 +5,8 @@
   } from "@sparrow/common/types/workspace";
   import TestListItem from "./sub-components/test-list-item/TestListItem.svelte";
   import { WithSelectV4 } from "../../../../../../hoc";
-  import { Button } from "@sparrow/library/ui";
+  import { Button, Modal, notifications } from "@sparrow/library/ui";
+  import { AddRegular, DeleteRegular } from "@sparrow/library/icons";
 
   export let tests;
   export let onTestsChange;
@@ -80,11 +81,15 @@
         isActive: i === 0,
       }));
     }
+    notifications.success(
+      `“${test.name}” is removed from your assertion list.`,
+    );
     // onTestsChange(localTest);
   };
 
   const clearTests = () => {
     localTest.noCode = [];
+    notifications.success("All tests are removed from your list.");
     // onTestsChange(localTest);
   };
 
@@ -107,23 +112,72 @@
       testTarget: t.id === test.id ? testTargetItem : t.testTarget,
     }));
   };
+
+  const setByDefaultTestName = (test) => {
+    localTest.noCode = localTest.noCode.map((t) => ({
+      ...t,
+      name: t.id === test.id ? `New Test` : t.name,
+    }));
+  };
+  let isDeletePopup = false;
 </script>
+
+<Modal
+  title={"Remove All Tests?"}
+  type={"danger"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isDeletePopup}
+  handleModalState={() => (isDeletePopup = false)}
+>
+  <div
+    class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium"
+  >
+    <p>
+      Are you sure you want to remove all {localTest?.noCode?.length} tests?
+    </p>
+  </div>
+
+  <div
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100 text-ds-font-size-16"
+  >
+    <Button
+      title={"Cancel"}
+      type={"secondary"}
+      loader={false}
+      onClick={() => {
+        isDeletePopup = false;
+      }}
+    />
+
+    <Button
+      title={"Remove All"}
+      type={"danger"}
+      onClick={() => {
+        clearTests();
+        isDeletePopup = false;
+      }}
+    />
+  </div></Modal
+>
 
 <!-- Container -->
 <div class="border border-top-0 text-light p-2 h-100 rounded-bottom">
   {#if localTest.noCode.length === 0}
     <!-- Empty state -->
     <div
-      class="d-flex flex-column align-items-center justify-content-center py-5"
+      class="d-flex flex-column align-items-center justify-content-center h-100"
+      style="overflow: auto;"
     >
       <p class="w-50 text-muted text-center text-fs-14 mb-3">
         No test Added. Please click ‘+ Add Test’ to create one. You can test
         status code, response time, body content, and more.
       </p>
       <Button
-        title={"+ Add Tests"}
+        startIcon={AddRegular}
+        title={"Add Tests"}
         type="primary"
-        size="md"
+        size="small"
         onClick={addTest}
       />
     </div>
@@ -156,18 +210,22 @@
         <div class="d-flex gap-2 pb-2" style="flex-wrap:wrap;">
           <div class="">
             <Button
-              title={"+ Add Tests"}
+              startIcon={AddRegular}
+              title={"Add Tests"}
               type="primary"
-              size="md"
+              size="small"
               onClick={addTest}
             />
           </div>
           <div class="">
             <Button
               title={"Clear All"}
+              startIcon={DeleteRegular}
               type="secondary"
-              size="md"
-              onClick={clearTests}
+              size="small"
+              onClick={() => {
+                isDeletePopup = true;
+              }}
             />
           </div>
         </div>
@@ -197,6 +255,11 @@
                     type="text"
                     class="form-control text-light"
                     bind:value={test.name}
+                    on:blur={() => {
+                      if (!test.name) {
+                        setByDefaultTestName(test);
+                      }
+                    }}
                   />
                 </div>
                 <div style="flex: 1 1 45%; min-width: 0;">
