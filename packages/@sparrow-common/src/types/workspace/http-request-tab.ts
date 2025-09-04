@@ -28,7 +28,7 @@ export enum RequestSectionEnum {
   HEADERS = "Headers",
   REQUEST_BODY = "Request Body",
   DOCUMENTATION = "Description",
-  TESTS = "Tests"
+  TESTS = "Tests",
 }
 
 export enum MessageTypeEnum {
@@ -45,6 +45,7 @@ export enum ResponseFormatterEnum {
 export enum ResponseSectionEnum {
   RESPONSE = "Response",
   HEADERS = "Headers",
+  TESTRESULT = "TESTRESULT",
 }
 
 export enum RequestDatasetEnum {
@@ -418,14 +419,14 @@ export interface AuthWrapper {
 }
 export interface Tests {
   testCaseMode: TestCaseModeEnum;
-    noCode: {
-        id: string;
-        name: string,
-        condition: TestCaseConditionOperatorEnum,
-        expectedResult: string,
-        testPath: string,
-        testTarget: TestCaseSelectionTypeEnum
-    }[];
+  noCode: {
+    id: string;
+    name: string;
+    condition: TestCaseConditionOperatorEnum;
+    expectedResult: string;
+    testPath: string;
+    testTarget: TestCaseSelectionTypeEnum;
+  }[];
   script: string;
 }
 
