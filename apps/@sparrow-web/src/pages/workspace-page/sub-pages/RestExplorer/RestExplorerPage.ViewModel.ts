@@ -3928,7 +3928,7 @@ class RestExplorerViewModel {
     }
   };
 
-  public insertGeneratedMockData = async (response: any): Promise<boolean> => {
+  private insertGeneratedMockData = async (response: any): Promise<boolean> => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     if (
       progressiveTab.property?.request?.state?.requestNavigation ===
