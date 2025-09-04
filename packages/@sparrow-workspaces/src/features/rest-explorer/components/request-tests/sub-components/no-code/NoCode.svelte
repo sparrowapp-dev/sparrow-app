@@ -5,7 +5,7 @@
   } from "@sparrow/common/types/workspace";
   import TestListItem from "./sub-components/test-list-item/TestListItem.svelte";
   import { WithSelectV4 } from "../../../../../../hoc";
-  import { Button, Modal } from "@sparrow/library/ui";
+  import { Button, Modal, notifications } from "@sparrow/library/ui";
   import { AddRegular, DeleteRegular } from "@sparrow/library/icons";
 
   export let tests;
@@ -81,11 +81,15 @@
         isActive: i === 0,
       }));
     }
+    notifications.success(
+      `“${test.name}” is removed from your assertion list.`,
+    );
     // onTestsChange(localTest);
   };
 
   const clearTests = () => {
     localTest.noCode = [];
+    notifications.success("All tests are removed from your list.");
     // onTestsChange(localTest);
   };
 
@@ -147,7 +151,7 @@
     />
 
     <Button
-      title={"Remove"}
+      title={"Remove All"}
       type={"danger"}
       onClick={() => {
         clearTests();
