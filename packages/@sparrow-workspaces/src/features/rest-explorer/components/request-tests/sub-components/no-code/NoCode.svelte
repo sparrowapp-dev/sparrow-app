@@ -5,7 +5,7 @@
   } from "@sparrow/common/types/workspace";
   import TestListItem from "./sub-components/test-list-item/TestListItem.svelte";
   import { WithSelectV4 } from "../../../../../../hoc";
-  import { Button } from "@sparrow/library/ui";
+  import { Button, Modal } from "@sparrow/library/ui";
   import { AddRegular, DeleteRegular } from "@sparrow/library/icons";
 
   export let tests;
@@ -115,7 +115,47 @@
       name: t.id === test.id ? `New Test` : t.name,
     }));
   };
+  let isDeletePopup = false;
 </script>
+
+<Modal
+  title={"Remove All Tests?"}
+  type={"danger"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isDeletePopup}
+  handleModalState={() => (isDeletePopup = false)}
+>
+  <div
+    class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium"
+  >
+    <p>
+      Are you sure you want to remove all {localTest?.noCode?.length} tests?
+    </p>
+  </div>
+
+  <div
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100 text-ds-font-size-16"
+  >
+    <Button
+      title={"Cancel"}
+      type={"secondary"}
+      loader={false}
+      onClick={() => {
+        isDeletePopup = false;
+      }}
+    />
+
+    <Button
+      title={"Remove"}
+      type={"danger"}
+      onClick={() => {
+        clearTests();
+        isDeletePopup = false;
+      }}
+    />
+  </div></Modal
+>
 
 <!-- Container -->
 <div class="border border-top-0 text-light p-2 h-100 rounded-bottom">
@@ -179,7 +219,9 @@
               startIcon={DeleteRegular}
               type="secondary"
               size="small"
-              onClick={clearTests}
+              onClick={() => {
+                isDeletePopup = true;
+              }}
             />
           </div>
         </div>
