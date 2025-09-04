@@ -108,6 +108,13 @@
       testTarget: t.id === test.id ? testTargetItem : t.testTarget,
     }));
   };
+
+  const setByDefaultTestName = (test) => {
+    localTest.noCode = localTest.noCode.map((t) => ({
+      ...t,
+      name: t.id === test.id ? `New Test` : t.name,
+    }));
+  };
 </script>
 
 <!-- Container -->
@@ -202,6 +209,11 @@
                     type="text"
                     class="form-control text-light"
                     bind:value={test.name}
+                    on:blur={() => {
+                      if (!test.name) {
+                        setByDefaultTestName(test);
+                      }
+                    }}
                   />
                 </div>
                 <div style="flex: 1 1 45%; min-width: 0;">
