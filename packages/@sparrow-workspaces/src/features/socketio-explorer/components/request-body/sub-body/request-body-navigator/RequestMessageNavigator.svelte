@@ -83,3 +83,9 @@
     type={"primary"}
   />
 </div>
+
+<style>
+  :global(input[placeholder="Event Name"]::placeholder) {
+    font-size: 12px !important;
+  }
+</style>

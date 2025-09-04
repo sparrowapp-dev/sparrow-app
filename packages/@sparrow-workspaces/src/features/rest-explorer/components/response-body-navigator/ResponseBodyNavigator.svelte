@@ -38,38 +38,112 @@
   export let onSaveResponse;
   export let path;
   export let userRole;
+
   onMount(async () => {
     await tick(); // wait for DOM to render
     sliderStyle = getSliderStyle(apiState.bodyFormatter); // set initial slider position
   });
+
   let fileExtension: string;
   let formatedBody: string;
   let fileNameWithExtension: string;
   let textBtn: HTMLSpanElement;
   let rawBtn: HTMLSpanElement;
   let previewBtn: HTMLSpanElement;
-  // travers array of object and get content-type value
+
+  // traverse array of object and get content-type value
   const contentType: string | undefined = response.headers.find(
     (header: { key: string; value: string }) => header.key === "content-type",
   )?.value;
 
   /**
-   * @description - formats the code
-   * @param _data - un-formatted data
+   * @description - detects the actual format of the response body content
+   * @param content - response body content
+   * @returns - detected file extension
    */
-  const formatCode = (_data: string) => {
-    return fileExtension === "json" || fileExtension === "js"
+  const detectActualFormat = (content: string): string => {
+    if (!content || typeof content !== "string") return "txt";
+
+    const trimmedContent = content.trim();
+
+    // JSON detection - more robust
+    if (trimmedContent.startsWith("{") || trimmedContent.startsWith("[")) {
+      try {
+        JSON.parse(trimmedContent);
+        return "json";
+      } catch (e) {
+        // Not valid JSON, continue checking
+      }
+    }
+
+    // XML/HTML detection
+    if (trimmedContent.startsWith("<")) {
+      // Check for HTML doctype or common HTML tags
+      const htmlPattern =
+        /<!doctype\s+html|<html|<head|<body|<div|<span|<p|<h[1-6]|<img|<a\s/i;
+      if (htmlPattern.test(trimmedContent)) {
+        return "html";
+      }
+
+      // Check for XML declaration or XML-like structure
+      const xmlPattern = /^<\?xml|^<[a-zA-Z][^>]*\/?>.*<\/[a-zA-Z]/s;
+      if (xmlPattern.test(trimmedContent)) {
+        return "xml";
+      }
+
+      // Default to HTML for any other XML-like content
+      return "html";
+    }
+
+    // JavaScript detection
+    const jsPatterns = [
+      /^(function|var|let|const|class|import|export)\s/,
+      /^\s*(\/\*|\/{2})/, // comments
+      /[{}];?\s*$/m, // JS-like syntax
+      /\b(console\.log|document\.|window\.)/,
+    ];
+
+    if (jsPatterns.some((pattern) => pattern.test(trimmedContent))) {
+      return "js";
+    }
+
+    // Content-Type header fallback
+    if (contentType) {
+      const lowerContentType = contentType.toLowerCase();
+      if (lowerContentType.includes("json")) return "json";
+      if (lowerContentType.includes("xml")) return "xml";
+      if (lowerContentType.includes("html")) return "html";
+      if (
+        lowerContentType.includes("javascript") ||
+        lowerContentType.includes("js")
+      )
+        return "js";
+    }
+
+    // Default to text
+    return "txt";
+  };
+
+  /**
+   * @description - formats the code based on detected format
+   * @param _data - un-formatted data
+   * @param detectedExt - detected file extension
+   */
+  const formatCode = (_data: string, detectedExt?: string) => {
+    const ext = detectedExt || fileExtension;
+    return ext === "json" || ext === "js"
       ? js_beautify(_data)
-      : fileExtension === "xml" || fileExtension === "html"
+      : ext === "xml" || ext === "html"
         ? html_beautify(_data)
         : removeIndentation(_data);
   };
+
   /**
    * @description Copy API response to users clipboard.
    */
-
   const handleCopy = async () => {
-    await copyToClipBoard(formatCode(response?.body));
+    const detectedExt = detectActualFormat(response?.body);
+    await copyToClipBoard(formatCode(response?.body, detectedExt));
     notifications.success("Copied to Clipboard.");
     MixpanelEvent(Events.COPY_API_RESPONSE);
   };
@@ -80,6 +154,7 @@
 
   $: {
     if (apiState) {
+      // Set extension based on user selection for display purposes
       if (apiState.bodyLanguage === RequestDataType.JSON) {
         fileExtension = "json";
       } else if (apiState.bodyLanguage === RequestDataType.XML) {
@@ -92,14 +167,20 @@
         fileExtension = "js";
       }
     }
-    // build complete file name with extension will be used for export in desttop-app and web-app;
-    fileNameWithExtension = `api_response_${response?.status || ""}_${response?.time || "0"}ms_${response?.size || "0"}kb.${fileExtension}`;
 
-    formatedBody = formatCode(response?.body); //pre formate body for exporting
+    // Detect actual format for download
+    const actualFormat = detectActualFormat(response?.body);
+
+    // Build complete file name with detected extension for download
+    fileNameWithExtension = `api_response_${response?.status || ""}_${response?.time || "0"}ms_${response?.size || "0"}kb.${actualFormat}`;
+
+    // Format body using detected format
+    formatedBody = formatCode(response?.body, actualFormat);
   }
+
   /**
    * @description - remove indentation from the string
-   * @param code - text that should be shown on code mirror view
+   * @param str - text that should be shown on code mirror view
    * @returns - plain text code without indentation
    */
   const removeIndentation = (str: string) => {
@@ -112,9 +193,13 @@
   };
 
   const handleDownloaded = async () => {
+    // Detect actual format for file dialog
+    const actualFormat = detectActualFormat(response?.body);
+    const actualFileName = `api_response_${response?.status || ""}_${response?.time || "0"}ms_${response?.size || "0"}kb.${actualFormat}`;
+
     // Open a save file dialog
     const path = await save({
-      defaultPath: fileNameWithExtension,
+      defaultPath: actualFileName,
       filters: [
         {
           name: "Text Files",
@@ -122,13 +207,16 @@
         },
       ],
     });
+
     // Check if a path was selected
     if (path) {
-      const contents = formatedBody;
+      const contents = formatCode(response?.body, actualFormat);
       await writeTextFile(path, contents, {
         baseDir: BaseDirectory.AppConfig,
       });
-      notifications.success("Exported successfully.");
+      notifications.success(
+        `Exported successfully as ${actualFormat.toUpperCase()} file.`,
+      );
     } else {
       console.error("Save dialog was canceled or no path was selected.");
     }
@@ -321,12 +409,15 @@
           <Tooltip title={"Export"} placement={"bottom-right"}>
             <WithButtonV6
               icon={ArrowDownloadRegular}
-              onClick={() =>
+              onClick={() => {
+                const actualFormat = detectActualFormat(response?.body);
+                const actualFileName = `api_response_${response?.status || ""}_${response?.time || "0"}ms_${response?.size || "0"}kb.${actualFormat}`;
                 handleDownloadResponse(
-                  formatedBody,
+                  formatCode(response?.body, actualFormat),
                   contentType,
-                  fileNameWithExtension,
-                )}
+                  actualFileName,
+                );
+              }}
               disable={false}
               loader={false}
             />
