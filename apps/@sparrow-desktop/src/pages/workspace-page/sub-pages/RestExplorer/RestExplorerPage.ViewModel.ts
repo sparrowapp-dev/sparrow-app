@@ -71,6 +71,9 @@ import {
   type HttpRequestCollectionLevelAuthProfileTabInterface,
   RequestDatasetEnum,
   type Tests,
+  TestCaseModeEnum,
+  TestCaseSelectionTypeEnum,
+  TestCaseConditionOperatorEnum,
 } from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
 import { RequestTabAdapter } from "../../../../adapter/request-tab";
@@ -1437,12 +1440,11 @@ class RestExplorerViewModel {
     this.compareRequestWithServer();
   };
 
-
   /**
    *
    * @param _headers - request headers
    */
-  public updateRequestTests = async (_tests : Tests) => {
+  public updateRequestTests = async (_tests: Tests) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.tests = _tests;
     this.tab = progressiveTab;
@@ -1816,6 +1818,174 @@ class RestExplorerViewModel {
           return restApiDataMap;
         });
       });
+    await this.executeTestcases();
+  };
+
+  private executeTestcases = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+
+    const testcaseMode = progressiveTab.property.request.tests.testCaseMode;
+    if (testcaseMode === TestCaseModeEnum.NO_CODE) {
+      await this.executeNoCodeTestcases();
+    }
+  };
+
+  private executeNoCodeTestcases = () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    restExplorerDataStore.update((restApiDataMap) => {
+      const response = restApiDataMap.get(progressiveTab?.tabId);
+      if (response) {
+        const testCases = progressiveTab.property.request.tests.noCode || [];
+        testCases.map((test) => {
+          let actual: any;
+          let error: string | undefined;
+
+          if (test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_TEXT) {
+            actual = response.response.body;
+          } else if (
+            test.testTarget === TestCaseSelectionTypeEnum.TIME_CONSUMING
+          ) {
+            actual = response.response.time;
+          } else if (
+            test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER
+          ) {
+            actual = response.response.headers.find(
+              (h) => h.key.toLowerCase() === test.testPath?.toLowerCase(),
+            )?.value;
+          } else if (
+            test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON
+          ) {
+            try {
+              // Parse response body as JSON
+              const json = JSON.parse(response.response.body);
+              // Remove leading "$." and split by "."
+              const pathParts = test.testPath.replace(/^\$\./, "").split(".");
+              let value = json;
+              for (const part of pathParts) {
+                if (value && typeof value === "object" && part in value) {
+                  value = value[part];
+                } else {
+                  value = undefined;
+                  break;
+                }
+              }
+              actual = value;
+            } catch (e) {
+              error = "Invalid JSON or path";
+              actual = undefined;
+            }
+          } else {
+            error = `Test target ${test.testTarget} not supported`;
+          }
+
+          const { passed, message: testMessage } = this.evaluateCondition(
+            actual,
+            test.expectedResult,
+            test.condition,
+          );
+          const testResponse = {
+            testId: test.id,
+            testName: test.name,
+            testStatus: passed,
+            testMessage: error || testMessage,
+          };
+          if (!response.response.testResults) {
+            response.response.testResults = [];
+            response.response.testResults?.push(testResponse);
+          } else {
+            response.response.testResults?.push(testResponse);
+          }
+
+          restApiDataMap.set(progressiveTab.tabId, response);
+        });
+      }
+      return restApiDataMap;
+    });
+  };
+
+  private evaluateCondition = (
+    actual: any,
+    expectedRaw: string,
+    condition: TestCaseConditionOperatorEnum,
+  ): { passed: boolean; message?: string } => {
+    let passed = false;
+    let message: string | undefined = "Failed";
+    const expected: any = expectedRaw;
+
+    try {
+      switch (condition) {
+        case TestCaseConditionOperatorEnum.EQUALS:
+          passed = actual === expected;
+          message = passed ? "Passed" : "Failed";
+          break;
+        case TestCaseConditionOperatorEnum.NOT_EQUAL:
+          passed = actual !== expected;
+          message = passed ? "Passed" : "Failed";
+          break;
+        case TestCaseConditionOperatorEnum.EXISTS:
+          passed = actual !== undefined && actual !== null;
+          message = passed ? "Passed" : "Failed";
+          break;
+        case TestCaseConditionOperatorEnum.DOES_NOT_EXIST:
+          passed = actual === undefined || actual === null;
+          message = passed ? "Passed" : "Failed";
+          break;
+        case TestCaseConditionOperatorEnum.LESS_THAN:
+          passed =
+            typeof actual === "number"
+              ? actual < Number(expected)
+              : actual.length < Number(expected);
+          message = passed ? "Passed" : "Failed";
+          break;
+        case TestCaseConditionOperatorEnum.GREATER_THAN:
+          passed =
+            typeof actual === "number"
+              ? actual > Number(expected)
+              : actual.length > Number(expected);
+          message = passed ? "Passed" : "Failed";
+          break;
+        case TestCaseConditionOperatorEnum.CONTAINS:
+          passed = typeof actual === "string" && actual.includes(expected);
+          message = passed ? "Passed" : "Failed";
+          break;
+        case TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN:
+          passed = typeof actual === "string" && !actual.includes(expected);
+          message = passed ? "Passed" : "Failed";
+          break;
+        case TestCaseConditionOperatorEnum.IS_EMPTY:
+          passed = actual === "" || actual === 0;
+          message = passed ? "Passed" : "Failed";
+          break;
+        case TestCaseConditionOperatorEnum.IS_NOT_EMPTY:
+          passed = actual !== "" && actual !== 0;
+          message = passed ? "Passed" : "Failed";
+          break;
+        case TestCaseConditionOperatorEnum.IN_LIST:
+          try {
+            const list = JSON.parse(actual);
+            passed = Array.isArray(list) && list.includes(expected);
+            message = passed ? "Passed" : "Failed";
+          } catch {
+            message = "Result for IN LIST must be a JSON array";
+          }
+          break;
+        case TestCaseConditionOperatorEnum.NOT_IN_LIST:
+          try {
+            const list = JSON.parse(actual);
+            passed = Array.isArray(list) && !list.includes(expected);
+            message = passed ? "Passed" : "Failed";
+          } catch {
+            message = "Result for NOT IN LIST must be a JSON array";
+          }
+          break;
+        default:
+          message = `Condition ${condition} not supported`;
+      }
+    } catch (e) {
+      message = (e as Error).message;
+    }
+
+    return { passed, message };
   };
 
   /**
