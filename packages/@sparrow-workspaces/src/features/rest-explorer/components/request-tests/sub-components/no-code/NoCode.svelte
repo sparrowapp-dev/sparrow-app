@@ -139,6 +139,32 @@
     }));
   };
   let isDeletePopup = false;
+
+  const isValidJsonPath = (path: string): boolean => {
+    // Starts with $ or @
+    if (!path.startsWith("$") && !path.startsWith("@")) return false;
+
+    // Basic regex for $.key, $.key[index], $.key.subkey
+    const regex = /^(\$|@)(\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+\])*$/;
+    return regex.test(path);
+  };
+
+  const isValidXPath = (path: string): boolean => {
+    // Must start with /, //, or .
+    if (!/^(\/{1,2}|\.)/.test(path)) return false;
+
+    // Allow node names, attributes, and common functions like text(), node()
+    const regex =
+      /^(\/{1,2}([a-zA-Z_][\w-]*|\*)(\[@?[a-zA-Z_][\w-]*=('|")[^'"]+('|")\])?|\(\))*(\/(text\(\)|node\(\)|\*|[a-zA-Z_][\w-]*))*$/;
+
+    return regex.test(path);
+  };
+
+  function isValidHeaderKey(key: string): boolean {
+    // Only allow identifiers like JavaScript variable names
+    const regex = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+    return regex.test(key);
+  }
 </script>
 
 <Modal
@@ -425,24 +451,69 @@
                       type="text"
                       class="form-control text-light"
                       bind:value={test.testPath}
-                      placeholder="E.g. $.user.name"
-                      style={errors && !test.testPath
+                      placeholder={test?.testTarget ===
+                      TestCaseSelectionTypeEnum.RESPONSE_JSON
+                        ? "E.g. $.user.name"
+                        : test?.testTarget ===
+                            TestCaseSelectionTypeEnum.RESPONSE_XML
+                          ? "E.g. /root/user/name"
+                          : test?.testTarget ===
+                              TestCaseSelectionTypeEnum.RESPONSE_HEADER
+                            ? "E.g. Content-Type"
+                            : "Enter path"}
+                      style={errors &&
+                      (!test.testPath ||
+                        (test.testPath &&
+                          test?.testTarget ===
+                            TestCaseSelectionTypeEnum.RESPONSE_JSON &&
+                          !isValidJsonPath(test.testPath)) ||
+                        (test.testPath &&
+                          test?.testTarget ===
+                            TestCaseSelectionTypeEnum.RESPONSE_XML &&
+                          !isValidXPath(test.testPath)) ||
+                        (test.testPath &&
+                          test?.testTarget ===
+                            TestCaseSelectionTypeEnum.RESPONSE_HEADER &&
+                          !isValidHeaderKey(test.testPath)))
                         ? "border: 1px solid var(--text-ds-danger-300)"
                         : ""}
                     />
-                    {#if errors && !test.testPath}
-                      <div
-                        class="text-fs-12 mt-1"
-                        style="color: var(--text-ds-danger-300)"
-                      >
-                        Please enter a {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
-                          Header
-                        {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON}
-                          JSON
-                        {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
-                          XML
-                        {/if} Path
-                      </div>
+                    {#if errors}
+                      {#if !test.testPath}
+                        <div
+                          class="text-fs-12 mt-1"
+                          style="color: var(--text-ds-danger-300)"
+                        >
+                          Please enter a {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
+                            Header
+                          {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON}
+                            JSON
+                          {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
+                            XML
+                          {/if} Path
+                        </div>
+                      {:else if test.testPath && !isValidJsonPath(test.testPath) && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON}
+                        <div
+                          class="text-fs-12 mt-1"
+                          style="color: var(--text-ds-danger-300)"
+                        >
+                          Please enter a valid JSON Path
+                        </div>
+                      {:else if test.testPath && !isValidXPath(test.testPath) && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
+                        <div
+                          class="text-fs-12 mt-1"
+                          style="color: var(--text-ds-danger-300)"
+                        >
+                          Please enter a valid XML Path
+                        </div>
+                      {:else if test.testPath && !isValidHeaderKey(test.testPath) && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
+                        <div
+                          class="text-fs-12 mt-1"
+                          style="color: var(--text-ds-danger-300)"
+                        >
+                          Please enter a valid Header path
+                        </div>
+                      {/if}
                     {/if}
                   </div>
                 {/if}
