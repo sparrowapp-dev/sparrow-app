@@ -6,10 +6,14 @@
   import TestListItem from "./sub-components/test-list-item/TestListItem.svelte";
   import { WithSelectV4 } from "../../../../../../hoc";
   import { Button, Modal, notifications } from "@sparrow/library/ui";
-  import { AddRegular, DeleteRegular } from "@sparrow/library/icons";
+  import {
+    AddRegular,
+    CheckmarkCircleFilled,
+    DeleteRegular,
+    InfoFilled,
+    InfoRegular,
+  } from "@sparrow/library/icons";
   import { JSONPath } from "jsonpath-plus";
-  import { validate } from "uuid";
-  import { TickIcon, TickMarkRoundedIcon } from "@sparrow/library/assets";
   import * as xpath from "xpath";
   import { DOMParser } from "xmldom";
 
@@ -571,10 +575,27 @@
                         >
                           Invalid Path syntax. Please check your path format.
                         </div>
+                      {:else if !responseBody}
+                        <div
+                          class="text-fs-12 mt-1 d-flex"
+                          style="color: var(--text-ds-neutral-300)"
+                        >
+                          <span class="me-1">
+                            <InfoRegular
+                              size={"16px"}
+                              color={"var(--icon-ds-neutral-300)"}
+                            />
+                          </span>
+                          <span class="">
+                            Response not available. Path cannot be validated
+                            yet.
+                          </span>
+                        </div>
                       {:else if getJsonPathValue(test.testPath, responseBody)}
-                        <div class="text-fs-12 mt-1 ellipsis text-muted">
-                          <span class="mr-1">
-                            <TickMarkRoundedIcon
+                        <div class="text-fs-12 d-flex mt-1 ellipsis text-muted">
+                          <span class="me-1">
+                            <CheckmarkCircleFilled
+                              size={"16px"}
                               color={"var(--icon-ds-success-500)"}
                             />
                           </span>
@@ -595,10 +616,27 @@
                         >
                           Invalid Path syntax. Please check your path format.
                         </div>
+                      {:else if !responseBody}
+                        <div
+                          class="text-fs-12 mt-1 d-flex"
+                          style="color: var(--text-ds-neutral-300)"
+                        >
+                          <span class="me-1">
+                            <InfoRegular
+                              size={"16px"}
+                              color={"var(--icon-ds-neutral-300)"}
+                            />
+                          </span>
+                          <span>
+                            Response not available. Path cannot be validated
+                            yet.
+                          </span>
+                        </div>
                       {:else if getXPathValue(test.testPath, responseBody)}
-                        <div class="text-fs-12 mt-1 ellipsis text-muted">
-                          <span class="mr-1">
-                            <TickMarkRoundedIcon
+                        <div class="text-fs-12 d-flex mt-1 ellipsis text-muted">
+                          <span class="me-1">
+                            <CheckmarkCircleFilled
+                              size={"16px"}
                               color={"var(--icon-ds-success-500)"}
                             />
                           </span>
@@ -619,10 +657,27 @@
                         >
                           Invalid Path syntax. Please check your path format.
                         </div>
+                      {:else if !responseHeader}
+                        <div
+                          class="text-fs-12 mt-1 d-flex"
+                          style="color: var(--text-ds-neutral-300)"
+                        >
+                          <span class="me-1">
+                            <InfoRegular
+                              size={"16px"}
+                              color={"var(--icon-ds-neutral-300)"}
+                            />
+                          </span>
+                          <span>
+                            Response not available. Path cannot be validated
+                            yet.
+                          </span>
+                        </div>
                       {:else if getHeaderPathValue(test.testPath, responseHeader)}
-                        <div class="text-fs-12 mt-1 ellipsis text-muted">
-                          <span class="mr-1">
-                            <TickMarkRoundedIcon
+                        <div class="text-fs-12 d-flex mt-1 ellipsis text-muted">
+                          <span class="me-1">
+                            <CheckmarkCircleFilled
+                              size={"16px"}
                               color={"var(--icon-ds-success-500)"}
                             />
                           </span>
