@@ -104,4 +104,20 @@ export class UserService {
     );
     return response;
   };
+
+  /**
+   * If the user has completed Demo of RequestTests.
+   *
+   * @returns A promise that resolves to the server's response.
+   */
+  public requestTabNocodeTestsDemoCompleted = async () => {
+    const response = await makeRequest(
+      "POST",
+      `${apiUrl}/api/user/request-tests-nocode-demo`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }

@@ -170,6 +170,7 @@ class InitRequestTab {
             size: 0,
           },
           isGeneratedVariable: false,
+          isRequestTestsNoCodeDemoCompleted:false
         },
       },
       path: {
@@ -263,6 +264,11 @@ class InitRequestTab {
   public updateIsGeneratedVariable(_value: boolean) {
     if (this._tab.property.request?.isGeneratedVariable) {
       this._tab.property.request.isGeneratedVariable = _value;
+    }
+  }
+  public updateIsRequestTestGuide(_value: boolean) {
+    if (this._tab.property.request?.isRequestTestsNoCodeDemoCompleted) {
+      this._tab.property.request.isRequestTestsNoCodeDemoCompleted = _value;
     }
   }
 }

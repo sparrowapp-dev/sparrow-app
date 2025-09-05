@@ -8,6 +8,7 @@
     rightPanelWidth,
     leftPanelCollapse,
     updateActiveSyncStates,
+    requestTabTestbStep,
   } from "@sparrow/workspaces/stores";
 
   // ---- Animation
@@ -99,6 +100,14 @@
   import { planInfoByRole, planContentDisable } from "@sparrow/common/utils";
   import { ResponseMessage } from "@sparrow/common/enums";
   import { shouldRunThrottled } from "@sparrow/common/store";
+  import RequestTourGuideWrapper from "../../../../../packages/@sparrow-workspaces/src/features/request-no-code-tour-guide/layout/RequestTourGuideWrapper.svelte";
+  import { RequestTabTestsTourContent } from "../../../../../packages/@sparrow-workspaces/src/features/request-no-code-tour-guide/utils";
+  import { requestTabNocodeCardPosition } from "../../../../../packages/@sparrow-workspaces/src/features/request-no-code-tour-guide/utils/requestTabNocodeCardPosition";
+  import TourGuideCard from "../../../../../packages/@sparrow-workspaces/src/features/request-no-code-tour-guide/components/TourGuideCard.svelte";
+  import {
+    handleCloseTour,
+    handleNextStep,
+  } from "../../../../../packages/@sparrow-workspaces/src/features/request-no-code-tour-guide/utils/requestTabCardfunctions";
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
@@ -947,7 +956,7 @@
       >
         <section
           class="d-flex flex-column h-100"
-          style="background-color:var(--bg-ds-surface-900)"
+          style="position:relative; background-color:var(--bg-ds-surface-900)"
         >
           {#if isInitialDataLoading}
             <div class="h-100 d-flex align-items-center justify-content-center">
@@ -1101,6 +1110,24 @@
                 {/if}
               </Route>
             </div>
+          {/if}
+          {#if $requestTabTestbStep === 3}
+            <RequestTourGuideWrapper
+              targetId={RequestTabTestsTourContent[2].targetId}
+              isVisible={true}
+              cardPosition={requestTabNocodeCardPosition(3)}
+            >
+              <TourGuideCard
+                titleName={RequestTabTestsTourContent[2].Title}
+                descriptionContent={RequestTabTestsTourContent[2].description}
+                cardNumber={3}
+                totalsCards={RequestTabTestsTourContent.length}
+                rightButtonName=""
+                onNext={handleNextStep}
+                onClose={handleCloseTour}
+                width={352}
+              />
+            </RequestTourGuideWrapper>
           {/if}
         </section>
       </Pane>

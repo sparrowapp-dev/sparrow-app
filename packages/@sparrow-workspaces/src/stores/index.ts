@@ -32,3 +32,9 @@ export {
   generateVariableStep,
   generateVariableTourCompleted,
 } from "./generate-variable-demo";
+
+export {
+  requestTabTestDemo,
+  requestTabTestbStep,
+  requestTabTestTourCompleted,
+} from "./request-tab-test-tour-guide";
