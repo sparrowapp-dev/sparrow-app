@@ -506,42 +506,37 @@ class RestExplorerViewModel {
       )
     ) {
       result = false;
-    }
-    else if (
+    } else if (
       !this.compareArray.init(
-        requestServer.request?.tests?.noCode?.map((
-          test)=>{
+        requestServer.request?.tests?.noCode?.map((test) => {
           return {
             id: test.id,
             name: test.name,
             condition: test.condition,
             expectedResult: test.expectedResult,
             testPath: test.testPath,
-            testTarget: test.testTarget
-          }
+            testTarget: test.testTarget,
+          };
         }),
-        progressiveTab.property.request?.tests?.noCode?.map((test)=>{
+        progressiveTab.property.request?.tests?.noCode?.map((test) => {
           return {
             id: test.id,
             name: test.name,
             condition: test.condition,
             expectedResult: test.expectedResult,
             testPath: test.testPath,
-            testTarget: test.testTarget
-          }
+            testTarget: test.testTarget,
+          };
         }),
       )
     ) {
       result = false;
-    }
-    else if (
-        requestServer.request.tests.testCaseMode !==
-        progressiveTab.property.request.tests.testCaseMode
-      
+    } else if (
+      requestServer.request.tests.testCaseMode !==
+      progressiveTab.property.request.tests.testCaseMode
     ) {
       result = false;
-    }
-    else if (
+    } else if (
       !this.compareArray.init(
         requestServer.request.queryParams,
         progressiveTab.property.request.queryParams,
@@ -1892,6 +1887,8 @@ class RestExplorerViewModel {
         testCases.map((test) => {
           let actual: any;
           let error: string | undefined;
+          let testCasePassed = false;
+          let testCaseStatusMessage = "Failed";
 
           if (test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_TEXT) {
             actual = response.response.body;
@@ -1946,19 +1943,23 @@ class RestExplorerViewModel {
               actual = undefined;
             }
           } else {
-            error = `Test target ${test.testTarget} not supported`;
+            error = `Test target ${test.testTarget} not found`;
           }
 
-          const { passed, message: testMessage } = this.evaluateCondition(
-            actual,
-            test.expectedResult,
-            test.condition,
-          );
+          if (actual) {
+            const { passed, message: testMessage } = this.evaluateCondition(
+              actual,
+              test.expectedResult,
+              test.condition,
+            );
+            testCasePassed = passed;
+            testCaseStatusMessage = testMessage;
+          }
           const testResponse = {
             testId: test.id,
             testName: test.name,
-            testStatus: passed,
-            testMessage: error || testMessage,
+            testStatus: testCasePassed,
+            testMessage: error || testCaseStatusMessage,
           };
 
           response.response.testResults?.push(testResponse);
