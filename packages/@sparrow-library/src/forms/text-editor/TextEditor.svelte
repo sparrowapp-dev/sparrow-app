@@ -37,6 +37,9 @@
    */
   export let placeholder = "";
 
+  /** Threshold for "large" paste */
+  const LARGE_PASTE_THRESHOLD = 5000; // characters
+
   let editor: EditorJS;
 
   const parser = new edjsParser();
@@ -116,8 +119,15 @@
 
   /** Custom paste handler */
   async function handleCustomPaste(e: ClipboardEvent) {
-    e.preventDefault();
     const pastedText = e.clipboardData?.getData("text/plain") || "";
+
+    if (pastedText.length < LARGE_PASTE_THRESHOLD) {
+      // Let Editor.js handle small pastes normally
+      return;
+    }
+
+    // If large text, override default paste
+    e.preventDefault();
 
     const safeText = pastedText
       .replace(/&/g, "&amp;")
@@ -129,8 +139,10 @@
       data: { text: safeText.replace(/\n/g, "<br>") },
     };
 
+    // Persist immediately
     onInput(JSON.stringify([block]));
 
+    // Replace editor content with plain-text block
     await editor.render({ blocks: [block] });
   }
 
