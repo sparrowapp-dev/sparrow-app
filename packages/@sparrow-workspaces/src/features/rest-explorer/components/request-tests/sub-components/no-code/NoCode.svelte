@@ -333,7 +333,7 @@
           <div class="">
             <Button
               startIcon={AddRegular}
-              title={"Add Tests"}
+              title={"Add Test"}
               type="primary"
               size="small"
               onClick={addTest}
@@ -341,7 +341,7 @@
           </div>
           <div class="">
             <Button
-              title={"Clear All"}
+              title={"Remove All"}
               startIcon={DeleteRegular}
               type="secondary"
               size="small"
