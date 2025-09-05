@@ -27,6 +27,24 @@
     }
   };
   let isDeletePopup = false;
+  export let testResults;
+  let errors = false;
+
+  $: {
+    errors = false;
+    if (testResults) {
+      for (let testResult of testResults) {
+        if (
+          test &&
+          testResult.testId === test.id &&
+          testResult.testStatus === false
+        ) {
+          errors = true;
+          break;
+        }
+      }
+    }
+  }
 </script>
 
 <svelte:window
@@ -115,7 +133,7 @@
     class:selected={test.isActive}
     style="cursor: pointer; background: {test.isActive
       ? 'var(--bg-ds-surface-400)'
-      : ''};"
+      : ''}; border: {errors ? '1px solid var(--text-ds-danger-300)' : ''}"
   >
     <span
       class="ellipsis text-fs-12 h-100 w-100 pt-1"
