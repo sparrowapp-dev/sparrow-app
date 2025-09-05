@@ -252,7 +252,6 @@
     border-radius: 4px !important;
   }
 
-  // या अगर आप specific class चाहते हैं
   .sparrow-file-label:hover {
     border: 2px dashed var(--border-ds-primary-300) !important;
     border-radius: 4px !important;
