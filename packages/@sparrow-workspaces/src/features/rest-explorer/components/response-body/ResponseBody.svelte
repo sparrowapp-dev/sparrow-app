@@ -108,7 +108,8 @@
         on:change={() => {}}
         isEditable={false}
         isFormatted={true}
-      />{/if}
+      />
+    {/if}
   </div>
 </div>
 

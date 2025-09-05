@@ -1,28 +1,148 @@
 <!-- btoa stands for "binary to ASCII," and it's a JavaScript function for converting binary data into a base64-encoded ASCII string. The btoa function is commonly used to encode binary data, such as images or other file formats, into a format that can be safely included in text-based data formats like JSON or HTML. -->
 <script lang="ts">
+  import { Tag } from "@sparrow/library/ui";
+  import { onMount, tick } from "svelte";
+
   export let responseTestResults = [];
-  $: {
-    console.log("responseTestResults", responseTestResults);
+  let filter: "all" | "passed" | "failed" = "all";
+  let allBtn: HTMLSpanElement;
+  let passedBtn: HTMLSpanElement;
+  let failedBtn: HTMLSpanElement;
+
+  $: filteredResults = responseTestResults.filter((tc) => {
+    if (filter === "all") return true;
+    if (filter === "passed") return tc.testStatus === true;
+    if (filter === "failed") return tc.testStatus === false;
+    return true;
+  });
+  onMount(async () => {
+    await tick(); // wait for DOM to render
+    sliderStyle = getSliderStyle(filteredResults); // set initial slider position
+  });
+
+  $: sliderStyle = getSliderStyle(filteredResults);
+
+  function getSliderStyle(filter: any) {
+    if (!allBtn || !passedBtn || !failedBtn) return "";
+    const gap = 4; // or read from CSS
+    const prettyWidth = allBtn.offsetWidth;
+    const rawWidth = passedBtn?.offsetWidth || 0;
+    const previewWidth = failedBtn.offsetWidth;
+    let left = 0;
+    let width = prettyWidth;
+    if (filter === "all") {
+      left = prettyWidth / 2;
+      width = prettyWidth;
+    } else if (filter === "passed") {
+      left = prettyWidth + gap + rawWidth / 2;
+      width = rawWidth;
+    } else if (filter === "failed") {
+      left = prettyWidth + gap + rawWidth + gap + previewWidth / 2;
+      width = previewWidth;
+    }
+
+    return `left: ${left}px; width: ${width}px; transform: translateX(-50%);`;
   }
 </script>
 
-<div
-  class="d-flex flex-column align-items-center pt-0 w-100 h-100 response-header"
->
-  {#each responseTestResults as testCases}
-    <div
-      class="d-flex align-items-center justify-content-center ps-0 gap-1 mb-1 w-100"
-      style="min-width: 28px;"
+<div class="d-flex flex-column pt-0 w-100 h-100">
+  <div
+    class="position-relative d-flex align-items-center rounded mb-0 py-1"
+    style="position: relative;"
+  >
+    <!-- <div class="background-slider" style={sliderStyle}></div> -->
+    <span
+      bind:this={allBtn}
+      role="button"
+      on:click={() => {
+        filter = "all";
+      }}
+      class="rounded text-fs-12 border-radius-2 px-2 py-1 btn-formatter"
+      style={filter === "all"
+        ? "background: var(--bg-ds-surface-600); border-radius: 6px;"
+        : ""}
+      class:selected={filter === "all"}
     >
-      {testCases?.testName} | {testCases?.testMessage} | {testCases?.testStatus
-        ? "Passed"
-        : "Failed"}
-    </div>
-  {/each}
+      All
+    </span>
+    <span
+      bind:this={passedBtn}
+      role="button"
+      on:click={() => {
+        filter = "passed";
+      }}
+      class="rounded text-fs-12 border-radius-2 px-2 py-1 btn-formatter"
+      style={filter === "passed"
+        ? "background: var(--bg-ds-surface-600); border-radius: 6px;"
+        : ""}
+      class:selected={filter === "passed"}
+    >
+      Passed
+    </span>
+    <span
+      bind:this={failedBtn}
+      role="button"
+      on:click={() => {
+        filter = "failed";
+      }}
+      class="rounded text-fs-12 border-radius-2 px-2 py-1 btn-formatter"
+      style={filter === "failed"
+        ? "background: var(--bg-ds-surface-600); border-radius: 6px;"
+        : ""}
+      class:selected={filter === "failed"}
+    >
+      Failed
+    </span>
+  </div>
+  <div
+    style="flex:1; overflow:auto; border:1px solid var(--border-ds-surface-100); border-radius: 4px;"
+  >
+    {#each filteredResults as testCases}
+      <div
+        class="d-flex align-items-center ps-0 gap-1 w-100"
+        style="padding-left: 8px; padding: 6px;"
+      >
+        <div
+          style="width: 50px; align-items: center; display: flex; justify-content:flex-start; padding-left:8px;"
+        >
+          <Tag
+            type={testCases?.testStatus ? "green" : "orange"}
+            text={testCases?.testStatus ? "Pass" : "Fail"}
+            size="small"
+          />
+        </div>
+
+        <p
+          style="font-size: 12px; font-weight:400; color: var(--text-ds-neutral-400); padding-left: 4px; margin-bottom:0px;"
+        >
+          {testCases?.testName} |
+        </p>
+        <p
+          style="font-size: 12px; font-weight:400; color: var(--text-ds-neutral-400); margin-bottom:0px;"
+        >
+          {testCases?.testMessage}
+        </p>
+      </div>
+    {/each}
+  </div>
 </div>
 
 <style>
-  input::placeholder {
-    color: var(--white-color);
+  .btn-formatter {
+    position: relative;
+    z-index: 2;
+  }
+  .btn-formatter {
+    outline: none;
+    border: none;
+  }
+  .background-slider {
+    position: absolute;
+    top: 4px;
+    height: calc(100% - 8px);
+    background: var(--bg-ds-surface-600);
+    border-radius: 6px;
+    transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
   }
 </style>
