@@ -99,4 +99,9 @@
   .settings-team-description {
     background-color: var(--bg-ds-surface-600) !important;
   }
+  .team-title {
+    font-size: 12px;
+    color: var(--text-ds-neutral-200);
+    font-weight: 500;
+  }
 </style>

@@ -45,7 +45,10 @@
    * Flag to show file type error.
    */
   export let showFileTypeError: boolean = false;
-
+  /**
+   * Flag to dimension file type error.
+   */
+  export let showDimensionExceedError: boolean = false;
   /**
    * Flag to show file size error.
    */
@@ -117,7 +120,8 @@
     {#if value.length == 0 || value.size === 0}
       <!-- Icon Uploader only shows when no file uploaded -->
       <div
-        style="width:{width} !important; height:{height} !important;  border: 3px dashed {showFileTypeError ||
+        style="width:{width} !important; height:{height} !important;  border: 3px dashed {showDimensionExceedError ||
+        showFileTypeError ||
         showFileSizeError
           ? 'var(--border-danger-200)'
           : 'var(--border-secondary-300)'}; border-width: 2px;"

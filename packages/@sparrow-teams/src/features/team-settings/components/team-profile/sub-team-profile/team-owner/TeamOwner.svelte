@@ -34,4 +34,9 @@
     width: 398px;
     height: 34px;
   }
+  .team-title {
+    font-size: 12px;
+    color: var(--text-ds-neutral-200);
+    font-weight: 500;
+  }
 </style>
