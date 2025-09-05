@@ -5,6 +5,12 @@
     RightIcon,
     DoubleRightIcon,
   } from "@sparrow/library/assets";
+  import {
+    ChevronDoubleLeftRegular,
+    ChevronDoubleRightRegular,
+    ChevronLeftRegular,
+    ChevronRightRegular,
+  } from "@sparrow/library/icons";
   import type { TeamDocument } from "@app/database/database";
   import { calculateTimeDifferenceInDays } from "../../../../utils/workspacetimeUtils";
   import { Table } from "@sparrow/teams/components";
@@ -41,12 +47,14 @@
     "",
     "",
   ];
+
   $: {
     selectedFilter;
     searchQuery;
     filterText;
     currPage = 1;
   }
+
   function handleSortToggle(field) {
     if (currentSortField === field) {
       isAscending = !isAscending;
@@ -69,6 +77,26 @@
       item.name.toLowerCase().startsWith(filterText.toLowerCase()),
     )
     .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage);
+
+  // Calculate total pages with bounds checking
+  $: totalPages = (() => {
+    const total = sortedData.filter((item) =>
+      item.name.toLowerCase().startsWith(filterText.toLowerCase()),
+    ).length;
+    if (total === 0) return 1;
+    return Math.ceil(total / workspacePerPage);
+  })();
+
+  // Calculate filtered data length for pagination
+  $: filteredDataLength = sortedData.filter((item) =>
+    item.name.toLowerCase().startsWith(filterText.toLowerCase()),
+  ).length;
+
+  const setPageWithinBounds = (newPage: number) => {
+    const maxPages = totalPages;
+    const validPage = Math.max(1, Math.min(newPage, maxPages));
+    currPage = validPage;
+  };
 </script>
 
 <div class="h-100 d-flex flex-column">
@@ -193,92 +221,63 @@
         .toLowerCase()
         .startsWith(filterText.toLowerCase()))
     .slice((currPage - 1) * workspacePerPage, currPage * workspacePerPage).length > 0 && !isGuestUser}
-    <table class="bottom-0" style="width: 53%;">
-      <tfoot>
-        <tr class="d-flex justify-content-between">
-          <th class="tab-head" style=""
-            >Showing {(currPage - 1) * workspacePerPage + 1} - {Math.min(
-              currPage * workspacePerPage,
-              data?.filter((item) =>
-                item.name.toLowerCase().startsWith(filterText.toLowerCase()),
-              ).length,
-            )} of {data?.filter((item) =>
-              item.name.toLowerCase().startsWith(filterText.toLowerCase()),
-            ).length}
-          </th>
-          <th class="tab-head tab-change" style="">
-            <button
-              on:click={() => (currPage = 1)}
-              class="bg-transparent border-0"
-              ><DoubleLeftIcon
-                color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
-              /></button
-            >
-            <button
-              on:click={() => {
-                if (currPage > 1) currPage -= 1;
-              }}
-              class="bg-transparent border-0"
-              ><LeftIcon
-                color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
-              /></button
-            >
-            <button
-              on:click={() => {
-                if (
-                  currPage <
-                  Math.ceil(
-                    data?.filter((item) =>
-                      item.name
-                        .toLowerCase()
-                        .startsWith(filterText.toLowerCase()),
-                    ).length / workspacePerPage,
-                  )
-                )
-                  currPage += 1;
-              }}
-              class="bg-transparent border-0"
-              ><RightIcon
-                color={currPage ===
-                Math.ceil(
-                  data?.filter((item) =>
-                    item.name
-                      .toLowerCase()
-                      .startsWith(filterText.toLowerCase()),
-                  ).length / workspacePerPage,
-                )
-                  ? "var(--border-secondary-200)"
-                  : "white"}
-              /></button
-            >
-            <button
-              on:click={() =>
-                (currPage = Math.ceil(
-                  data?.filter((item) =>
-                    item.name
-                      .toLowerCase()
-                      .startsWith(filterText.toLowerCase()),
-                  ).length / workspacePerPage,
-                ))}
-              class="bg-transparent border-0"
-              ><DoubleRightIcon
-                color={currPage ===
-                Math.ceil(
-                  data?.filter((item) =>
-                    item.name
-                      .toLowerCase()
-                      .startsWith(filterText.toLowerCase()),
-                  ).length / workspacePerPage,
-                )
-                  ? "var(--border-secondary-200)"
-                  : "white"}
-              /></button
-            >
-          </th>
-          <!-- <th class="tab-head px-0 ms-0"></th> -->
-        </tr>
-      </tfoot>
-    </table>
+    <div class="bottom-0 d-flex justify-content-between" style="width: 53%;">
+      <div class="tab-head" style="width: 189.46px;">
+        Showing {(currPage - 1) * workspacePerPage + 1} - {Math.min(
+          currPage * workspacePerPage,
+          filteredDataLength,
+        )} of {filteredDataLength}
+      </div>
+      <div class="tab-head tab-change">
+        <button
+          on:click={() => setPageWithinBounds(1)}
+          class="bg-transparent border-0"
+          disabled={currPage === 1}
+        >
+          <ChevronDoubleLeftRegular
+            color={currPage === 1
+              ? "var(--bg-ds-neutral-500)"
+              : "var(--bg-ds-neutral-100)"}
+          />
+        </button>
+
+        <button
+          on:click={() => setPageWithinBounds(currPage - 1)}
+          class="bg-transparent border-0"
+          disabled={currPage === 1}
+        >
+          <ChevronLeftRegular
+            color={currPage === 1
+              ? "var(--bg-ds-neutral-500)"
+              : "var(--bg-ds-neutral-100)"}
+          />
+        </button>
+
+        <button
+          on:click={() => setPageWithinBounds(currPage + 1)}
+          class="bg-transparent border-0"
+          disabled={currPage === totalPages}
+        >
+          <ChevronRightRegular
+            color={currPage === totalPages
+              ? "var(--bg-ds-neutral-500)"
+              : "var(--bg-ds-neutral-100)"}
+          />
+        </button>
+
+        <button
+          on:click={() => setPageWithinBounds(totalPages)}
+          class="bg-transparent border-0"
+          disabled={currPage === totalPages}
+        >
+          <ChevronDoubleRightRegular
+            color={currPage === totalPages
+              ? "var(--bg-ds-neutral-500)"
+              : "var(--bg-ds-neutral-100)"}
+          />
+        </button>
+      </div>
+    </div>
   {/if}
 </div>
 
