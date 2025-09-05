@@ -284,7 +284,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 17,
+  version: 18,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -411,6 +411,43 @@ export const tabSchemaLiteral = {
                   checked: {
                     type: "boolean",
                   },
+                },
+              },
+            },
+            tests:{
+              type: "object",
+              properties: {
+                testCaseMode: {
+                  type: "string",
+                },
+                noCode: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        id: {
+                          type: "string",
+                        },
+                        name: {
+                          type: "string",
+                        },
+                        condition: {
+                          type: "string",
+                        },
+                        expectedResult: {
+                          type: "string",
+                        },
+                        testPath: {
+                          type: "string",
+                        },
+                        testTarget: {
+                          type: "string",
+                        },
+                      },
+                    },
+                },
+                script: {
+                  type: "string",
                 },
               },
             },

@@ -516,7 +516,43 @@ class RestExplorerViewModel {
       )
     ) {
       result = false;
-    } else if (
+    }
+     else if (
+      !this.compareArray.init(
+        requestServer.request?.tests?.noCode?.map((
+          test)=>{
+          return {
+            id: test.id,
+            name: test.name,
+            condition: test.condition,
+            expectedResult: test.expectedResult,
+            testPath: test.testPath,
+            testTarget: test.testTarget
+          }
+        }),
+        progressiveTab.property.request?.tests?.noCode?.map((test)=>{
+          return {
+            id: test.id,
+            name: test.name,
+            condition: test.condition,
+            expectedResult: test.expectedResult,
+            testPath: test.testPath,
+            testTarget: test.testTarget
+          }
+        }),
+      )
+    ) {
+      result = false;
+    }
+    else if (
+        requestServer.request.tests.testCaseMode !==
+        progressiveTab.property.request.tests.testCaseMode
+      
+    ) {
+      result = false;
+    }
+    
+    else if (
       !this.compareArray.init(
         requestServer.request.queryParams,
         progressiveTab.property.request.queryParams,
@@ -1453,6 +1489,18 @@ class RestExplorerViewModel {
   public updateHeaders = async (_headers: KeyValueChecked[]) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.headers = _headers;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
+  };
+
+    /**
+   *
+   * @param _tests - request tests
+   */
+  public updateRequestTests = async (_tests: Tests) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.tests = _tests;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
