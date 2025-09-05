@@ -19,6 +19,7 @@
     RestExtensionPanel,
     RequestParameters,
     ResponseStatus,
+    RequestTests,
   } from "../components";
   import { Loader } from "@sparrow/library/ui";
   import { notifications } from "@sparrow/library/ui";
@@ -104,6 +105,7 @@
   import { policyConfig } from "@sparrow/common/store";
   import GenerateVariableCard from "../components/generate-variable-card/GenerateVariableCard.svelte";
   import { tick } from "svelte";
+  import ResponseTestResults from "../components/response-test-results/ResponseTestResults.svelte";
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
   export let requestAuthHeader: Observable<KeyValue>;
@@ -151,6 +153,7 @@
   export let onUpdateCollectionGuide: (query, isActive) => void;
   export let onUpdateAiPrompt;
   export let onUpdateAiConversation;
+  export let onUpdateTests;
   export let onUpdateAiModel;
   export let onGenerateDocumentation;
   export let onStopGeneratingAIResponse;
@@ -774,6 +777,15 @@
                           {collection}
                           {onOpenCollection}
                         />
+                      {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.TESTS}
+                        <RequestTests
+                          tests={$tab?.property?.request.tests}
+                          onTestsChange={onUpdateTests}
+                          tabSplitDirection={$tabsSplitterDirection}
+                          testResults={storeData?.response?.testResults}
+                          responseBody={storeData?.response?.body}
+                          responseHeader={storeData?.response?.headers}
+                        />
                       {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
                         <RequestDoc
                           isDocGenerating={$tab.property?.request?.state
@@ -894,6 +906,13 @@
                                 <div style="overflow:auto;">
                                   <ResponseHeaders
                                     responseHeader={storeData.response?.headers}
+                                  />
+                                </div>
+                              {:else if storeData?.response.navigation === ResponseSectionEnum.TESTRESULT}
+                                <div style="overflow:auto;">
+                                  <ResponseTestResults
+                                    responseTestResults={storeData.response
+                                      ?.testResults}
                                   />
                                 </div>
                               {/if}
