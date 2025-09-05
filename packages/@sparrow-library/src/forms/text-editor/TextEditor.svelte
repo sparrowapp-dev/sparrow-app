@@ -51,6 +51,16 @@
         parsedValue = editorData?.blocks || [];
       }
     }
+
+    const editorElement = document.getElementById(id);
+    if (editorElement) {
+      // Attach custom paste handler
+      editorElement.addEventListener("paste", handleCustomPaste);
+
+      // Attach custom fast delete handler
+      editorElement.addEventListener("keydown", handleFastDelete);
+    }
+
     editor = new EditorJS({
       holder: id,
       tools: {
@@ -104,7 +114,44 @@
     }
   };
 
-  // Reactive statement to update the editor when certain conditions change - When doc is generating.
+  /** Custom paste handler */
+  async function handleCustomPaste(e: ClipboardEvent) {
+    e.preventDefault();
+    const pastedText = e.clipboardData?.getData("text/plain") || "";
+
+    const safeText = pastedText
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+
+    const block = {
+      type: "paragraph",
+      data: { text: safeText.replace(/\n/g, "<br>") },
+    };
+
+    onInput(JSON.stringify([block]));
+
+    await editor.render({ blocks: [block] });
+  }
+
+  /** Custom delete handler */
+  async function handleFastDelete(e: KeyboardEvent) {
+    if (e.key !== "Backspace" && e.key !== "Delete") return;
+
+    const selection = window.getSelection();
+    if (!selection) return;
+
+    const selectedLength = selection.toString().length;
+
+    // threshold: if selection is huge, reset editor
+    if (selectedLength > 5000) {
+      e.preventDefault();
+      await editor.clear();
+      await editor.render({ blocks: [] });
+      onInput(JSON.stringify([]));
+    }
+  }
+
   const docRerender = async () => {
     if (editor) {
       if (editor?.blocks) {
