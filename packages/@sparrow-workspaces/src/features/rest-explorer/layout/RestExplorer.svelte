@@ -872,7 +872,9 @@
                   >
                     <div class="h-100 d-flex flex-column">
                       <div style="flex:1; overflow:auto; position:relative;">
-                        {#if storeData?.isSendRequestInProgress}
+                        {#if $requestTabTestDemo}
+                          <ResponseDefaultScreen {isWebApp} />
+                        {:else if storeData?.isSendRequestInProgress}
                           <ResponseDefaultScreen {isWebApp} />
                           <div
                             style="top: 0px; left: 0; right: 0; bottom: 0; z-index:3; position:absolute;"
@@ -1015,6 +1017,7 @@
                                 isChatbotOpenInCurrTab.set(false);
                                 requestTabTestDemo.set(true);
                                 isCloseRequestTestDemo(false);
+                                onUpdateResponseState("Tests");
                                 requestTabTestbStep.set(1);
                               }}
                               onClose={() => {

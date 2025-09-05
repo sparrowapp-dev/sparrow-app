@@ -32,8 +32,8 @@ export const requestTabNocodeCardPosition = (currentStep: number) => {
       break;
     case 5:
       finalResult = {
-        top: 0,
-        left: 250,
+        top: 10,
+        left: 220,
         placement: "left" as const,
       };
       break;
