@@ -783,6 +783,8 @@
                           onTestsChange={onUpdateTests}
                           tabSplitDirection={$tabsSplitterDirection}
                           testResults={storeData?.response?.testResults}
+                          responseBody={storeData?.response?.body}
+                          responseHeader={storeData?.response?.headers}
                         />
                       {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
                         <RequestDoc

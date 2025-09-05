@@ -7,6 +7,8 @@
   export let onTestsChange;
   export let tabSplitDirection;
   export let testResults;
+  export let responseBody;
+  export let responseHeader;
 </script>
 
 <div class="d-flex flex-column w-100 h-100">
@@ -70,7 +72,14 @@
     {#if tests?.testCaseMode === TestCaseModeEnum.SCRIPT}
       <div class="d-flex align-items-center gap-2">SCRIPT</div>
     {:else if tests?.testCaseMode === TestCaseModeEnum.NO_CODE}
-      <NoCode {tests} {onTestsChange} {tabSplitDirection} {testResults} />
+      <NoCode
+        {tests}
+        {onTestsChange}
+        {tabSplitDirection}
+        {testResults}
+        {responseBody}
+        {responseHeader}
+      />
     {/if}
   </div>
 </div>
