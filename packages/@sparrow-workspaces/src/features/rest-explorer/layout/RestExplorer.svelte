@@ -909,12 +909,12 @@
                                   />
                                 </div>
                               {:else if storeData?.response.navigation === ResponseSectionEnum.TESTRESULT}
-                                <div style="overflow:auto;">
-                                  <ResponseTestResults
-                                    responseTestResults={storeData.response
-                                      ?.testResults}
-                                  />
-                                </div>
+                                <!-- <div style="overflow:auto;"> -->
+                                <ResponseTestResults
+                                  responseTestResults={storeData.response
+                                    ?.testResults}
+                                />
+                                <!-- </div> -->
                               {/if}
                             </div>
                           </div>
