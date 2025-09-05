@@ -329,6 +329,17 @@ export class RxDB {
           17: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          18: function (oldDoc: TabDocument) {
+            const test = {
+              testCaseMode: "no-code",
+              noCode: [],
+              script: "",
+            };
+            if (oldDoc?.property?.request) {
+              oldDoc.property.request.tests = test;
+            }
+            return oldDoc;
+          },
         },
       },
       collection: {

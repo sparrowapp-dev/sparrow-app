@@ -1482,7 +1482,7 @@ class RestExplorerViewModel {
 
   /**
    *
-   * @param _headers - request headers
+   * @param _tests - request tests
    */
   public updateRequestTests = async (_tests: Tests) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
