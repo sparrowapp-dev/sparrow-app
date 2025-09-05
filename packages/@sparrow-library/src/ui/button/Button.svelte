@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { plusWhiteIcon } from "../../assets";
   import Spinner from "../spinner/Spinner.svelte";
   import { onMount, onDestroy } from "svelte";
 
@@ -13,12 +12,9 @@
 
   export let startIcon;
   export let endIcon;
-
-  export let tabindex = "0";
-
-  export let iconSize = 16;
-
   export let customWidth = "auto";
+
+  let iconSize = 16;
 
   // export let buttonIcon;
   export let size: "small" | "medium" | "large" | "extra-small" = "medium";

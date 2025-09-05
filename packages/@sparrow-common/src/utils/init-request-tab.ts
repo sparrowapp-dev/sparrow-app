@@ -11,6 +11,10 @@ import {
   type KeyValueChecked,
   FormDataTypeEnum,
   type StatePartial,
+  TestCaseModeEnum,
+  TestCaseConditionOperatorEnum,
+  TestCaseSelectionTypeEnum,
+  type Tests,
 } from "@sparrow/common/types/workspace";
 import {
   TabTypeEnum,
@@ -32,6 +36,7 @@ class InitRequestTab {
   constructor(_id: string, _workspaceId: string) {
     this._tab = {
       id: _id,
+      label:"",
       tabId: uuidv4(),
       name: "New " + RequestDefault.NAME,
       type: TabTypeEnum.REQUEST,
@@ -100,6 +105,21 @@ class InitRequestTab {
               checked: true,
             },
           ],
+           tests: {
+              testCaseMode: TestCaseModeEnum.NO_CODE,
+                noCode: [
+                  {
+                    id: "case-1",
+                    name: "New Test",
+                    condition: "",
+                    expectedResult: "",
+                    testPath: "",
+                    testTarget: "",
+                  },
+                ],
+             
+              script: "",
+            },
           state: {
             requestBodyLanguage: RequestDataTypeEnum.TEXT,
             requestBodyNavigation: RequestDatasetEnum.NONE,
@@ -207,6 +227,11 @@ class InitRequestTab {
   public updateHeaders(_headers: KeyValueChecked[]) {
     if (_headers && this._tab.property.request) {
       this._tab.property.request.headers = _headers;
+    }
+  }
+  public updateTests(_tests: Tests) {
+    if (_tests && this._tab.property.request) {
+      this._tab.property.request.tests = _tests;
     }
   }
   public updateAuth(_auth: Auth) {
