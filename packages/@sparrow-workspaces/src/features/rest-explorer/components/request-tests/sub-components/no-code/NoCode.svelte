@@ -653,7 +653,7 @@
                       class="form-control text-light"
                       bind:value={test.expectedResult}
                       placeholder="Enter Comparison Value"
-                      style={errors && !test.testPath
+                      style={errors && !test.expectedResult
                         ? "border: 1px solid var(--text-ds-danger-300)"
                         : ""}
                     />
