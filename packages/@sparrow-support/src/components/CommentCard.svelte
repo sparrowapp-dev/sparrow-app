@@ -68,7 +68,7 @@
    * @returns  Formatted time string (e.g., "2 hours ago").
    */
   const timeAgo = (date) => {
-    const diffInSeconds = (new Date() - new Date(date)) / 1000;
+    const diffInSeconds = Math.max(0, (new Date() - new Date(date)) / 1000);
     const minutes = Math.floor(diffInSeconds / 60);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);

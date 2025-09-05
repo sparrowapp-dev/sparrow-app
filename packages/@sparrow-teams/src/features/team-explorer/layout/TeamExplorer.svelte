@@ -800,6 +800,9 @@
   }
   .team-title {
     width: calc(100% - 470px);
+    font-size: 12px;
+    color: var(--text-ds-neutral-200);
+    font-weight: 500;
   }
   .heading {
     max-width: calc(100% - 250px);
