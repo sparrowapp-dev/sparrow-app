@@ -1905,7 +1905,6 @@ class RestExplorerViewModel {
           } else if (
             test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON
           ) {
-            debugger;
             try {
               const json = JSON.parse(response.response.body);
               // Use JSONPath to extract value, supports $[3].userId, $[0].address.city, etc.
