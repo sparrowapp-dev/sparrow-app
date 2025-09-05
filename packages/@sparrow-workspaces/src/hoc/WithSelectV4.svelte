@@ -27,7 +27,10 @@
 
   export let placeholder;
 
-  $: ({ id, data, titleId, onclick, zIndex, disabled, placeholder } = $$props);
+  export let isError;
+
+  $: ({ id, data, titleId, onclick, zIndex, disabled, placeholder, isError } =
+    $$props);
 </script>
 
 <Select
@@ -47,4 +50,5 @@
   minHeaderWidth={"100px"}
   size={"medium"}
   placeholderText={placeholder}
+  {isError}
 />

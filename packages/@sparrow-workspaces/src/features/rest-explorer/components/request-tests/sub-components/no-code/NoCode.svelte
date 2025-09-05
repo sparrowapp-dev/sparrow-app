@@ -11,8 +11,27 @@
   export let tests;
   export let onTestsChange;
   export let tabSplitDirection;
+  export let testResults;
 
   const localTest = tests;
+  let errors = false;
+
+  $: {
+    const x = localTest.noCode.find((t) => t.isActive);
+    errors = false;
+    if (testResults) {
+      for (let testResult of testResults) {
+        if (
+          x &&
+          testResult.testId === x.id &&
+          testResult.testStatus === false
+        ) {
+          errors = true;
+          break;
+        }
+      }
+    }
+  }
 
   // Ensure at least one test is active on mount if tests exist
   if (
@@ -39,10 +58,10 @@
     const newTest = {
       id: newId,
       name: `New Test ${localTest.noCode.length + 1}`,
-      condition: TestCaseConditionOperatorEnum.EQUALS,
+      condition: "",
       expectedResult: "",
-      testPath: "$.path",
-      testTarget: TestCaseSelectionTypeEnum.RESPONSE_JSON,
+      testPath: "",
+      testTarget: "",
       isActive: true,
     };
     localTest.noCode = [
@@ -120,6 +139,32 @@
     }));
   };
   let isDeletePopup = false;
+
+  const isValidJsonPath = (path: string): boolean => {
+    // Starts with $ or @
+    if (!path.startsWith("$") && !path.startsWith("@")) return false;
+
+    // Basic regex for $.key, $.key[index], $.key.subkey
+    const regex = /^(\$|@)(\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+\])*$/;
+    return regex.test(path);
+  };
+
+  const isValidXPath = (path: string): boolean => {
+    // Must start with /, //, or .
+    if (!/^(\/{1,2}|\.)/.test(path)) return false;
+
+    // Allow node names, attributes, and common functions like text(), node()
+    const regex =
+      /^(\/{1,2}([a-zA-Z_][\w-]*|\*)(\[@?[a-zA-Z_][\w-]*=('|")[^'"]+('|")\])?|\(\))*(\/(text\(\)|node\(\)|\*|[a-zA-Z_][\w-]*))*$/;
+
+    return regex.test(path);
+  };
+
+  function isValidHeaderKey(key: string): boolean {
+    // Only allow identifiers like JavaScript variable names
+    const regex = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+    return regex.test(key);
+  }
 </script>
 
 <Modal
@@ -203,6 +248,7 @@
               {deleteTest}
               {duplicateTest}
               {index}
+              {testResults}
             />
           {/each}
         </div>
@@ -297,10 +343,19 @@
                     onclick={(testTargetItem) => {
                       handleTestTargetDropdown(testTargetItem, test);
                     }}
-                    placeholder="Select Test Traget"
+                    placeholder="Select Test Target"
                     zIndex={499}
                     disabled={false}
+                    isError={errors && !test.testTarget}
                   />
+                  {#if errors && !test.testTarget}
+                    <div
+                      class="text-fs-12 mt-1"
+                      style="color: var(--text-ds-danger-300)"
+                    >
+                      Please select a test target
+                    </div>
+                  {/if}
                 </div>
                 <div style="flex: 1 1 45%; min-width: 0;">
                   <label class="form-label text-fs-12"
@@ -364,10 +419,19 @@
                     onclick={(conditionItem) => {
                       handleConditionDropdown(conditionItem, test);
                     }}
-                    placeholder="Select Test Condition"
+                    placeholder="Select Condition"
                     zIndex={499}
                     disabled={false}
+                    isError={errors && !test.condition}
                   />
+                  {#if errors && !test.condition}
+                    <div
+                      class="text-fs-12 mt-1"
+                      style="color: var(--text-ds-danger-300)"
+                    >
+                      Please select a condition
+                    </div>
+                  {/if}
                 </div>
                 {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER || test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON || test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
                   <div style="flex: 1 1 45%; min-width: 0;">
@@ -387,11 +451,70 @@
                       type="text"
                       class="form-control text-light"
                       bind:value={test.testPath}
-                      placeholder="E.g. $.user.name"
+                      placeholder={test?.testTarget ===
+                      TestCaseSelectionTypeEnum.RESPONSE_JSON
+                        ? "E.g. $.user.name"
+                        : test?.testTarget ===
+                            TestCaseSelectionTypeEnum.RESPONSE_XML
+                          ? "E.g. /root/user/name"
+                          : test?.testTarget ===
+                              TestCaseSelectionTypeEnum.RESPONSE_HEADER
+                            ? "E.g. Content-Type"
+                            : "Enter path"}
+                      style={errors &&
+                      (!test.testPath ||
+                        (test.testPath &&
+                          test?.testTarget ===
+                            TestCaseSelectionTypeEnum.RESPONSE_JSON &&
+                          !isValidJsonPath(test.testPath)) ||
+                        (test.testPath &&
+                          test?.testTarget ===
+                            TestCaseSelectionTypeEnum.RESPONSE_XML &&
+                          !isValidXPath(test.testPath)) ||
+                        (test.testPath &&
+                          test?.testTarget ===
+                            TestCaseSelectionTypeEnum.RESPONSE_HEADER &&
+                          !isValidHeaderKey(test.testPath)))
+                        ? "border: 1px solid var(--text-ds-danger-300)"
+                        : ""}
                     />
-                    <!-- <small class="text-success"
-                      >✔ Path valid. Example: {test.testPath}</small
-                    > -->
+                    {#if errors}
+                      {#if !test.testPath}
+                        <div
+                          class="text-fs-12 mt-1"
+                          style="color: var(--text-ds-danger-300)"
+                        >
+                          Please enter a {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
+                            Header
+                          {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON}
+                            JSON
+                          {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
+                            XML
+                          {/if} Path
+                        </div>
+                      {:else if test.testPath && !isValidJsonPath(test.testPath) && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON}
+                        <div
+                          class="text-fs-12 mt-1"
+                          style="color: var(--text-ds-danger-300)"
+                        >
+                          Please enter a valid JSON Path
+                        </div>
+                      {:else if test.testPath && !isValidXPath(test.testPath) && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
+                        <div
+                          class="text-fs-12 mt-1"
+                          style="color: var(--text-ds-danger-300)"
+                        >
+                          Please enter a valid XML Path
+                        </div>
+                      {:else if test.testPath && !isValidHeaderKey(test.testPath) && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
+                        <div
+                          class="text-fs-12 mt-1"
+                          style="color: var(--text-ds-danger-300)"
+                        >
+                          Please enter a valid Header path
+                        </div>
+                      {/if}
+                    {/if}
                   </div>
                 {/if}
                 {#if test?.condition === TestCaseConditionOperatorEnum.EQUALS || test?.condition === TestCaseConditionOperatorEnum.NOT_EQUAL || test?.condition === TestCaseConditionOperatorEnum.EXISTS || test?.condition === TestCaseConditionOperatorEnum.DOES_NOT_EXIST || test?.condition === TestCaseConditionOperatorEnum.LESS_THAN || test?.condition === TestCaseConditionOperatorEnum.GREATER_THAN || test?.condition === TestCaseConditionOperatorEnum.CONTAINS || test?.condition === TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN || test?.condition === TestCaseConditionOperatorEnum.IN_LIST || test?.condition === TestCaseConditionOperatorEnum.NOT_IN_LIST}
@@ -406,7 +529,18 @@
                       class="form-control text-light"
                       bind:value={test.expectedResult}
                       placeholder="Enter Comparison Value"
+                      style={errors && !test.testPath
+                        ? "border: 1px solid var(--text-ds-danger-300)"
+                        : ""}
                     />
+                    {#if errors && !test.expectedResult}
+                      <div
+                        class="text-fs-12 mt-1"
+                        style="color: var(--text-ds-danger-300)"
+                      >
+                        Please enter comparison value
+                      </div>
+                    {/if}
                   </div>
                 {/if}
                 <div style="flex: 1 1 45%; min-width: 0;"></div>
