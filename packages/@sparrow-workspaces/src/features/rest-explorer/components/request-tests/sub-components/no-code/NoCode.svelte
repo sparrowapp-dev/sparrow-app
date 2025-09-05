@@ -7,14 +7,85 @@
   import { WithSelectV4 } from "../../../../../../hoc";
   import { Button, Modal, notifications } from "@sparrow/library/ui";
   import { AddRegular, DeleteRegular } from "@sparrow/library/icons";
+  import { JSONPath } from "jsonpath-plus";
+  import { validate } from "uuid";
+  import { TickIcon, TickMarkRoundedIcon } from "@sparrow/library/assets";
+  import * as xpath from "xpath";
+  import { DOMParser } from "xmldom";
 
   export let tests;
   export let onTestsChange;
   export let tabSplitDirection;
   export let testResults;
-
+  export let responseBody;
+  export let responseHeader;
   const localTest = tests;
   let errors = false;
+
+  const getJsonPathValue = (_path, _response) => {
+    try {
+      const json = JSON.parse(_response);
+      // Use JSONPath to extract value, supports $[3].userId, $[0].address.city, etc.
+      const result = JSONPath({ path: _path, json });
+      // If result is an array, take the first value
+      const value = Array.isArray(result) ? result[0] : result;
+      if (
+        typeof value === "string" ||
+        typeof value === "number" ||
+        typeof value === "boolean"
+      ) {
+        return value;
+      } else return "";
+    } catch (e) {
+      return "";
+    }
+  };
+
+  const getXPathValue = (_path, _response) => {
+    try {
+      const xml = _response;
+      const doc = new DOMParser().parseFromString(xml, "text/xml");
+      // test.testPath should be a valid XPath, e.g. "/root/country/city"
+      const nodes = xpath.select(_path, doc);
+      let actual;
+      if (Array.isArray(nodes) && nodes.length > 0) {
+        // If it's an attribute node
+        if (nodes[0].nodeType === 2) {
+          actual = nodes[0].nodeValue;
+        } else if (nodes[0].firstChild) {
+          actual = nodes[0].firstChild.nodeValue;
+        } else if ((nodes[0] as any).data) {
+          actual = (nodes[0] as any).data;
+        } else {
+          actual = nodes[0].toString();
+        }
+      } else {
+        actual = undefined;
+      }
+      if (
+        typeof actual === "string" ||
+        typeof actual === "number" ||
+        typeof actual === "boolean"
+      ) {
+        return actual;
+      } else return "";
+    } catch (e) {
+      return "";
+    }
+  };
+
+  const getHeaderPathValue = (_path, _header) => {
+    let actual = _header.find(
+      (h) => h.key.toLowerCase() === _path?.toLowerCase(),
+    )?.value;
+    if (
+      typeof actual === "string" ||
+      typeof actual === "number" ||
+      typeof actual === "boolean"
+    ) {
+      return actual;
+    } else return "";
+  };
 
   $: {
     const x = localTest.noCode.find((t) => t.isActive);
@@ -129,6 +200,7 @@
     localTest.noCode = localTest.noCode.map((t) => ({
       ...t,
       testTarget: t.id === test.id ? testTargetItem : t.testTarget,
+      testPath: t.id === test.id ? "" : t.testPath,
     }));
   };
 
@@ -160,11 +232,11 @@
     return regex.test(path);
   };
 
-  function isValidHeaderKey(key: string): boolean {
+  const isValidHeaderKey = (key: string): boolean => {
     // Only allow identifiers like JavaScript variable names
-    const regex = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+    const regex = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
     return regex.test(key);
-  }
+  };
 </script>
 
 <Modal
@@ -478,40 +550,92 @@
                         ? "border: 1px solid var(--text-ds-danger-300)"
                         : ""}
                     />
-                    {#if errors}
-                      {#if !test.testPath}
+                    {#if errors && !test.testPath}
+                      <div
+                        class="text-fs-12 mt-1"
+                        style="color: var(--text-ds-danger-300)"
+                      >
+                        Please enter a {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
+                          Header
+                        {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON}
+                          JSON
+                        {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
+                          XML
+                        {/if} Path
+                      </div>
+                    {:else if test.testPath && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON}
+                      {#if !isValidJsonPath(test.testPath)}
                         <div
                           class="text-fs-12 mt-1"
                           style="color: var(--text-ds-danger-300)"
                         >
-                          Please enter a {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
-                            Header
-                          {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON}
-                            JSON
-                          {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
-                            XML
-                          {/if} Path
+                          Invalid Path syntax. Please check your path format.
                         </div>
-                      {:else if test.testPath && !isValidJsonPath(test.testPath) && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON}
-                        <div
-                          class="text-fs-12 mt-1"
-                          style="color: var(--text-ds-danger-300)"
-                        >
-                          Please enter a valid JSON Path
+                      {:else if getJsonPathValue(test.testPath, responseBody)}
+                        <div class="text-fs-12 mt-1 ellipsis text-muted">
+                          <span class="mr-1">
+                            <TickMarkRoundedIcon
+                              color={"var(--icon-ds-success-500)"}
+                            />
+                          </span>
+                          <span
+                            class="ellipsis"
+                            style="color: var(--text-ds-neutral-300);"
+                          >
+                            Path valid. Sample value: {test.testPath}
+                            = {getJsonPathValue(test.testPath, responseBody)}
+                          </span>
                         </div>
-                      {:else if test.testPath && !isValidXPath(test.testPath) && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
+                      {/if}
+                    {:else if test.testPath && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
+                      {#if !isValidXPath(test.testPath)}
                         <div
                           class="text-fs-12 mt-1"
                           style="color: var(--text-ds-danger-300)"
                         >
-                          Please enter a valid XML Path
+                          Invalid Path syntax. Please check your path format.
                         </div>
-                      {:else if test.testPath && !isValidHeaderKey(test.testPath) && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
+                      {:else if getXPathValue(test.testPath, responseBody)}
+                        <div class="text-fs-12 mt-1 ellipsis text-muted">
+                          <span class="mr-1">
+                            <TickMarkRoundedIcon
+                              color={"var(--icon-ds-success-500)"}
+                            />
+                          </span>
+                          <span
+                            class="ellipsis"
+                            style="color: var(--text-ds-neutral-300);"
+                          >
+                            Path valid. Sample value: {test.testPath}
+                            = {getXPathValue(test.testPath, responseBody)}
+                          </span>
+                        </div>
+                      {/if}
+                    {:else if test.testPath && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
+                      {#if !isValidHeaderKey(test.testPath)}
                         <div
                           class="text-fs-12 mt-1"
                           style="color: var(--text-ds-danger-300)"
                         >
-                          Please enter a valid Header path
+                          Invalid Path syntax. Please check your path format.
+                        </div>
+                      {:else if getHeaderPathValue(test.testPath, responseHeader)}
+                        <div class="text-fs-12 mt-1 ellipsis text-muted">
+                          <span class="mr-1">
+                            <TickMarkRoundedIcon
+                              color={"var(--icon-ds-success-500)"}
+                            />
+                          </span>
+                          <span
+                            class="ellipsis"
+                            style="color: var(--text-ds-neutral-300);"
+                          >
+                            Path valid. Sample value: {test.testPath}
+                            = {getHeaderPathValue(
+                              test.testPath,
+                              responseHeader,
+                            )}
+                          </span>
                         </div>
                       {/if}
                     {/if}
@@ -520,7 +644,7 @@
                 {#if test?.condition === TestCaseConditionOperatorEnum.EQUALS || test?.condition === TestCaseConditionOperatorEnum.NOT_EQUAL || test?.condition === TestCaseConditionOperatorEnum.EXISTS || test?.condition === TestCaseConditionOperatorEnum.DOES_NOT_EXIST || test?.condition === TestCaseConditionOperatorEnum.LESS_THAN || test?.condition === TestCaseConditionOperatorEnum.GREATER_THAN || test?.condition === TestCaseConditionOperatorEnum.CONTAINS || test?.condition === TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN || test?.condition === TestCaseConditionOperatorEnum.IN_LIST || test?.condition === TestCaseConditionOperatorEnum.NOT_IN_LIST}
                   <div style="flex: 1 1 45%; min-width: 0;">
                     <label class="form-label text-fs-12"
-                      >comparison value <span
+                      >Comparison Value <span
                         style="color: var(--text-ds-danger-300)">*</span
                       ></label
                     >
