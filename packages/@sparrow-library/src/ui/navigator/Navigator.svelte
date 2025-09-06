@@ -77,7 +77,13 @@
           <span class="text">{tab.name} </span>
           {#if tab?.count}
             <span class="ms-1" style="margin-right: -4px;">
-              <Badge count={tab.count} variant={"neutral"} size={"medium"} />
+              <Badge
+                count={tab.count}
+                variant={tab?.variant || "neutral"}
+                size={"medium"}
+                type={tab?.type || "count"}
+                secondaryCount={tab?.secondaryCount || 0}
+              />
             </span>
           {/if}
         </span>
