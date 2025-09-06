@@ -731,7 +731,29 @@
                       generateMockData={handleGenerateMockData}
                     />
                     <div style="flex:1; overflow:auto;" class="p-0">
-                      {#if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.PARAMETERS}
+                      {#if $requestTabTestDemo}
+                        <RequestTests
+                          tests={{
+                            testCaseMode: "no-code",
+                            noCode: [
+                              {
+                                id: "Test-1",
+                                name: "Test-1",
+                                condition: "",
+                                expectedResult: "",
+                                testPath: "",
+                                testTarget: "",
+                              },
+                            ],
+                            script: "",
+                          }}
+                          onTestsChange={() => {}}
+                          tabSplitDirection={$tabsSplitterDirection}
+                          testResults={[]}
+                          responseBody={""}
+                          responseHeader={[]}
+                        />
+                      {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.PARAMETERS}
                         <RequestParameters
                           isBulkEditActive={$tab?.property?.request.state
                             ?.isParameterBulkEditActive}
