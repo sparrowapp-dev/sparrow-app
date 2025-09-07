@@ -847,6 +847,11 @@
                                 {onUpdateResponseState}
                                 responseHeadersLength={storeData?.response
                                   .headers?.length || 0}
+                                responsePassedTestResultsLength={storeData?.response?.testResults?.filter(
+                                  (test) => test.testStatus === true,
+                                )?.length || 0}
+                                responseTestResultsLength={storeData?.response
+                                  ?.testResults?.length || 0}
                               />
 
                               <div class="d-flex">
