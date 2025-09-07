@@ -100,14 +100,14 @@
   import { TeamRole } from "@sparrow/common/enums/team.enum";
   import { ResponseMessage } from "@sparrow/common/enums";
   import { shouldRunThrottled } from "@sparrow/common/store";
-  import TourGuideCard from "../../../../../packages/@sparrow-workspaces/src/features/request-no-code-tour-guide/components/TourGuideCard.svelte";
-  import { requestTabNocodeCardPosition } from "../../../../../packages/@sparrow-workspaces/src/features/request-no-code-tour-guide/utils/requestTabNocodeCardPosition";
+  import { TourGuideCard } from "@sparrow/workspaces/features";
+  import { requestTabNocodeCardPosition } from "@sparrow/workspaces/features";
   import {
     handleNextStep,
     handleCloseTour,
-  } from "../../../../../packages/@sparrow-workspaces/src/features/request-no-code-tour-guide/utils/requestTabCardfunctions";
-  import RequestNoCodeTourGuide from "../../../../../packages/@sparrow-workspaces/src/features/request-no-code-tour-guide/layout/RequestNoCodeTourGuide.svelte";
-  import { RequestTabTestsTourContent } from "../../../../../packages/@sparrow-workspaces/src/features/request-no-code-tour-guide/utils";
+  } from "@sparrow/workspaces/features";
+  import { RequestNoCodeTourGuide } from "@sparrow/workspaces/features";
+  import { RequestTabTestsTourContent } from "@sparrow/workspaces/features";
 
   const _viewModel = new CollectionsViewModel();
 

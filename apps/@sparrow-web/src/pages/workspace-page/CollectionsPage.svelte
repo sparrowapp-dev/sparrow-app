@@ -100,14 +100,14 @@
   import { planInfoByRole, planContentDisable } from "@sparrow/common/utils";
   import { ResponseMessage } from "@sparrow/common/enums";
   import { shouldRunThrottled } from "@sparrow/common/store";
-  import RequestNoCodeTourGuide from "../../../../../packages/@sparrow-workspaces/src/features/request-no-code-tour-guide/layout/RequestNoCodeTourGuide.svelte";
-  import { RequestTabTestsTourContent } from "../../../../../packages/@sparrow-workspaces/src/features/request-no-code-tour-guide/utils";
-  import { requestTabNocodeCardPosition } from "../../../../../packages/@sparrow-workspaces/src/features/request-no-code-tour-guide/utils/requestTabNocodeCardPosition";
-  import TourGuideCard from "../../../../../packages/@sparrow-workspaces/src/features/request-no-code-tour-guide/components/TourGuideCard.svelte";
+  import { TourGuideCard } from "@sparrow/workspaces/features";
+  import { requestTabNocodeCardPosition } from "@sparrow/workspaces/features";
   import {
-    handleCloseTour,
     handleNextStep,
-  } from "../../../../../packages/@sparrow-workspaces/src/features/request-no-code-tour-guide/utils/requestTabCardfunctions";
+    handleCloseTour,
+  } from "@sparrow/workspaces/features";
+  import { RequestNoCodeTourGuide } from "@sparrow/workspaces/features";
+  import { RequestTabTestsTourContent } from "@sparrow/workspaces/features";
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
