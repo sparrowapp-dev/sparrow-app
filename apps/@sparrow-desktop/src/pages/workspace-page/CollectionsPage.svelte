@@ -11,7 +11,7 @@
     isDefaultTourGuideOpen,
     isDefaultTourGuideClose,
     updateActiveSyncStates,
-    requestTabTestbStep,
+    requestTabTestNoCodeStep,
   } from "@sparrow/workspaces/stores";
 
   // ---- Animation
@@ -106,7 +106,7 @@
     handleNextStep,
     handleCloseTour,
   } from "../../../../../packages/@sparrow-workspaces/src/features/request-no-code-tour-guide/utils/requestTabCardfunctions";
-  import RequestTourGuideWrapper from "../../../../../packages/@sparrow-workspaces/src/features/request-no-code-tour-guide/layout/RequestTourGuideWrapper.svelte";
+  import RequestNoCodeTourGuide from "../../../../../packages/@sparrow-workspaces/src/features/request-no-code-tour-guide/layout/RequestNoCodeTourGuide.svelte";
   import { RequestTabTestsTourContent } from "../../../../../packages/@sparrow-workspaces/src/features/request-no-code-tour-guide/utils";
 
   const _viewModel = new CollectionsViewModel();
@@ -1050,8 +1050,8 @@
               </Route>
             </div>
           {/if}
-          {#if $requestTabTestbStep === 3}
-            <RequestTourGuideWrapper
+          {#if $requestTabTestNoCodeStep === 3}
+            <RequestNoCodeTourGuide
               targetId={RequestTabTestsTourContent[2].targetId}
               isVisible={true}
               cardPosition={requestTabNocodeCardPosition(3)}
@@ -1066,7 +1066,7 @@
                 onClose={handleCloseTour}
                 width={352}
               />
-            </RequestTourGuideWrapper>
+            </RequestNoCodeTourGuide>
           {/if}
         </section>
       </Pane>

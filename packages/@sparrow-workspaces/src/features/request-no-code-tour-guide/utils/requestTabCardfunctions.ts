@@ -1,17 +1,17 @@
 import { get } from "svelte/store";
-import { requestTabTestDemo, requestTabTestbStep } from "../../../stores";
+import { requestTabTestDemo, requestTabTestNoCodeStep } from "../../../stores";
 
 const MAX_STEP = 5;
 
 const resetTour = () => {
-  requestTabTestbStep.set(0);
+  requestTabTestNoCodeStep.set(0);
   requestTabTestDemo.set(false);
 };
 
 export const handleNextStep = () => {
-  const currentStep = get(requestTabTestbStep);
+  const currentStep = get(requestTabTestNoCodeStep);
   if (currentStep < MAX_STEP) {
-    requestTabTestbStep.set(currentStep + 1);
+    requestTabTestNoCodeStep.set(currentStep + 1);
   } else {
     resetTour();
   }

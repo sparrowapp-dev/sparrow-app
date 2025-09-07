@@ -35,7 +35,7 @@
   } from "@sparrow/common/enums";
   import type { Observable } from "rxjs";
   import {
-    RequestTabGuideWrapper,
+    RequestNoCodeTourGuide,
     SaveAsCollectionItem,
   } from "@sparrow/workspaces/features";
   import type {
@@ -70,7 +70,7 @@
     tabsSplitterDirection,
     isChatbotOpenInCurrTab,
     requestTabTestDemo,
-    requestTabTestbStep,
+    requestTabTestNoCodeStep,
   } from "../../../stores";
   import { Popover } from "@sparrow/library/ui";
   import { onDestroy, onMount } from "svelte";
@@ -838,8 +838,8 @@
                         />
                       {/if}
                     </div>
-                    {#if $requestTabTestDemo && $requestTabTestbStep === 1}
-                      <RequestTabGuideWrapper
+                    {#if $requestTabTestDemo && $requestTabTestNoCodeStep === 1}
+                      <RequestNoCodeTourGuide
                         targetId={RequestTabTestsTourContent[0].targetId}
                         isVisible={true}
                         cardPosition={requestTabNocodeCardPosition(1)}
@@ -855,10 +855,10 @@
                           onClose={handleCloseTour}
                           width={352}
                         />
-                      </RequestTabGuideWrapper>
+                      </RequestNoCodeTourGuide>
                     {/if}
-                    {#if $requestTabTestDemo && $requestTabTestbStep === 4}
-                      <RequestTabGuideWrapper
+                    {#if $requestTabTestDemo && $requestTabTestNoCodeStep === 4}
+                      <RequestNoCodeTourGuide
                         targetId={RequestTabTestsTourContent[3].targetId}
                         isVisible={true}
                         cardPosition={requestTabNocodeCardPosition(4)}
@@ -874,7 +874,7 @@
                           onClose={handleCloseTour}
                           width={352}
                         />
-                      </RequestTabGuideWrapper>
+                      </RequestNoCodeTourGuide>
                     {/if}
                   </div>
                 </Pane>
@@ -1040,7 +1040,7 @@
                                 requestTabTestDemo.set(true);
                                 isCloseRequestTestDemo(false);
                                 onUpdateResponseState("Tests");
-                                requestTabTestbStep.set(1);
+                                requestTabTestNoCodeStep.set(1);
                               }}
                               onClose={() => {
                                 isCloseRequestTestDemo(false);
@@ -1051,8 +1051,8 @@
                         {/if}
                       </div>
                     </div>
-                    {#if $requestTabTestDemo && $requestTabTestbStep === 2}
-                      <RequestTabGuideWrapper
+                    {#if $requestTabTestDemo && $requestTabTestNoCodeStep === 2}
+                      <RequestNoCodeTourGuide
                         targetId={RequestTabTestsTourContent[1].targetId}
                         isVisible={true}
                         cardPosition={requestTabNocodeCardPosition(2)}
@@ -1068,10 +1068,10 @@
                           onClose={handleCloseTour}
                           width={352}
                         />
-                      </RequestTabGuideWrapper>
+                      </RequestNoCodeTourGuide>
                     {/if}
-                    {#if $requestTabTestDemo && $requestTabTestbStep === 5}
-                      <RequestTabGuideWrapper
+                    {#if $requestTabTestDemo && $requestTabTestNoCodeStep === 5}
+                      <RequestNoCodeTourGuide
                         targetId={RequestTabTestsTourContent[4].targetId}
                         isVisible={true}
                         cardPosition={requestTabNocodeCardPosition(5)}
@@ -1090,7 +1090,7 @@
                           onClose={handleCloseTour}
                           width={352}
                         />
-                      </RequestTabGuideWrapper>
+                      </RequestNoCodeTourGuide>
                     {/if}
                   </div>
                 </Pane>

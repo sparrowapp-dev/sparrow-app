@@ -35,6 +35,6 @@ export {
 
 export {
   requestTabTestDemo,
-  requestTabTestbStep,
+  requestTabTestNoCodeStep,
   requestTabTestTourCompleted,
 } from "./request-tab-test-tour-guide";
