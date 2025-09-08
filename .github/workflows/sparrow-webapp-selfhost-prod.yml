@@ -12,16 +12,11 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     environment: production
-    env:
-      DOCKER_IMAGE_VERSION: ${{ inputs.image_version }}
-      BUILD_BRANCH: ${{ inputs.branch }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ env.BUILD_BRANCH }}
-          fetch-depth: 0
+
 
       - name: Read version from package.json
         id: version
