@@ -2,7 +2,7 @@ name: Self-host Docker Image
 on:
   push:
     branches:
-      - prod
+      - main
   workflow_dispatch:
 
 permissions:
