@@ -48,6 +48,7 @@ mod urlencoded_handler;
 mod utils;
 
 // External Imports
+use once_cell::sync::Lazy;
 use base64;
 use formdata_handler::make_formdata_request;
 use group_policy_config::get_policy_config;
@@ -73,14 +74,9 @@ use utils::response_decoder::decode_response_body;
 
 // Web socket imports
 use futures_util::{SinkExt, StreamExt};
-use hyper::header::HeaderValue;
-use hyper::header::{CONNECTION, UPGRADE};
-use hyper::{Client as OtherClient, Request};
-use hyper_tls::HttpsConnector;
 use std::sync::Arc;
 use tokio::sync::mpsc::{self, UnboundedSender};
 use tokio::sync::Mutex;
-use tokio_tungstenite::connect_async;
 use tokio_tungstenite::tungstenite::protocol::Message;
 // --- Connect WebSocket with invalid certs allowed ---
 use tokio_tungstenite::tungstenite::client::IntoClientRequest;
@@ -197,6 +193,17 @@ impl<R: Runtime> WindowExt for WebviewWindow<R> {
         // No-op: Not supported on Windows
     }
 }
+
+// Static Variables
+
+// Create a single instance of reqwest Client to be used throughout the app
+static CLIENT: Lazy<Client> = Lazy::new(|| {
+    Client::builder()
+        .danger_accept_invalid_certs(true)
+        .pool_max_idle_per_host(10) // keep idle connections alive
+        .build()
+        .unwrap()
+});
 
 // Commands
 #[tauri::command]
@@ -402,11 +409,8 @@ async fn make_request_v2(
     body: &str,
     request: &str,
 ) -> Result<String, std::io::Error> {
-    // Create a client
-    let client = reqwest::Client::builder()
-        .danger_accept_invalid_certs(true)
-        .build()
-        .unwrap();
+    // Reuse the static client
+    let client = &*CLIENT;
 
     // Convert method string to reqwest::Method
     let reqwest_method = match method {
