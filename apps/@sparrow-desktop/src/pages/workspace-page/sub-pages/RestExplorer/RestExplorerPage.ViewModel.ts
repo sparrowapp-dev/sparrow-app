@@ -520,7 +520,7 @@ class RestExplorerViewModel {
             testPath: test.testPath,
             testTarget: test.testTarget,
           };
-        }),
+        }) || [],
         progressiveTab.property.request?.tests?.noCode?.map((test) => {
           return {
             id: test.id,
