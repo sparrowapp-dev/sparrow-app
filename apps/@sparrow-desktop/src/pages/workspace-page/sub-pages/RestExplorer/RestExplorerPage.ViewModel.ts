@@ -4201,10 +4201,18 @@ class RestExplorerViewModel {
           progressiveTab.property?.request?.state?.requestNavigation ===
           RequestSectionEnum.PARAMETERS
         ) {
-          this.updateParams(newArray, true);
+          progressiveTab.property.request.queryParams = newArray;
         } else {
-          this.updateHeaders(newArray);
+          progressiveTab.property.request.headers = newArray;
         }
+        this.tab = progressiveTab;
+        progressiveTab.isSaved = false;
+        progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
+        await this.tabRepository.updateTab(
+          progressiveTab.tabId,
+          progressiveTab,
+        );
+        this.compareRequestWithServer();
         return true;
       }
       return false;
