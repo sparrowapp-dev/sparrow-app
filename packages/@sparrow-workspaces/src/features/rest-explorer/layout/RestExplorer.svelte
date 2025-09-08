@@ -1004,7 +1004,7 @@
                             </div>
                           </div>
                         {/if}
-                        {#if $tab?.property?.request?.isGeneratedVariable}
+                        {#if $tab?.property?.request?.isGeneratedVariable && !$requestTabTestDemo}
                           <div
                             style="position:absolute; bottom:12px; right:{!$tab
                               ?.property?.request?.state?.isChatbotActive
