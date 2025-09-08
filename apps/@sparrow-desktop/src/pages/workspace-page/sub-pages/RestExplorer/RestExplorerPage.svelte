@@ -274,4 +274,6 @@
   updateIsGeneratedVariable={_viewModel.updateIsGeneratedVariable}
   handleGenerateVariableDemo={_viewModel.handleGenerateVariableTabForTrial}
   InsertGenerateTrialFlow={_viewModel.InsertGenerateTrialFlow}
+  isCloseRequestTestDemo={_viewModel.updateIsRequestTabDemo}
+  requestTabTestsDemoCompleted={_viewModel.handleRequestTestNoCodeDemoCompleted}
 />

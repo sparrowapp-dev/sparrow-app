@@ -5,6 +5,8 @@
   import { OSDetector } from "@sparrow/common/utils";
   import { Button } from "@sparrow/library/ui";
   import { fly } from "svelte/transition";
+  import { requestTabTestDemo } from "../../../../stores";
+  import ResponseNavigator from "../response-navigator/ResponseNavigator.svelte";
 
   export let isMainScreen = false;
   export let isWebApp;
@@ -87,23 +89,44 @@
   bind:this={shortcutEl}
   class="{isMainScreen
     ? 'pt-5 pb-3'
-    : ''} response-default h-100 d-flex flex-column justify-content-between align-items-center"
+    : ''} response-default h-100 d-flex flex-column"
 >
-  <div class="">
+  <!-- ResponseNavigator positioned at top-left when requestTabTestDemo is true -->
+  {#if $requestTabTestDemo}
+    <div class="d-flex justify-content-start">
+      <ResponseNavigator
+        requestStateSection={"TESTRESULT"}
+        onUpdateResponseState={() => {}}
+        responseHeadersLength={2}
+      />
+    </div>
+  {/if}
+
+  <!-- Main content area - centered vertically and horizontally -->
+  <div
+    class="flex-grow-1 d-flex flex-column justify-content-center align-items-center"
+  >
     <div class="d-flex align-items-center flex-column justify-content-center">
       <div class="my-4">
         <SparrowLogo />
       </div>
       <div class="d-flex flex-column align-items-center">
         <p class="text-fs-12 mb-5" style="color: var(--text-ds-neutral-400);">
-          Click Send To Get A Response
+          {#if !$requestTabTestDemo}
+            Click Send To Get A Response
+          {:else}
+            No test cases available. Start by adding your own test cases, select
+            from smart suggestions or generate them with AI.
+          {/if}
         </p>
       </div>
     </div>
   </div>
-  <div>
+
+  <!-- Shortcuts section at bottom -->
+  <div class="mt-auto">
     <div
-      class="shortcuts-container d-flex flex-wrap justify-content-center mt-auto"
+      class="shortcuts-container d-flex flex-wrap justify-content-center"
       style={isUpAnimation ? "max-width: 600px;" : ""}
       bind:this={shortcutEl}
     >

@@ -34,7 +34,10 @@
     RequestDataType,
   } from "@sparrow/common/enums";
   import type { Observable } from "rxjs";
-  import { SaveAsCollectionItem } from "@sparrow/workspaces/features";
+  import {
+    RequestNoCodeTourGuide,
+    SaveAsCollectionItem,
+  } from "@sparrow/workspaces/features";
   import type {
     ClearResponseType,
     CreateCollectionType,
@@ -66,6 +69,8 @@
   import {
     tabsSplitterDirection,
     isChatbotOpenInCurrTab,
+    requestTabTestDemo,
+    requestTabTestNoCodeStep,
   } from "../../../stores";
   import { Popover } from "@sparrow/library/ui";
   import { onDestroy, onMount } from "svelte";
@@ -103,9 +108,16 @@
   } from "../utils";
 
   import { policyConfig } from "@sparrow/common/store";
-  import GenerateVariableCard from "../components/generate-variable-card/GenerateVariableCard.svelte";
+  import RequestTourGuideCard from "../components/request-tour-guide-card/RequestTourGuideCard.svelte";
   import { tick } from "svelte";
   import ResponseTestResults from "../components/response-test-results/ResponseTestResults.svelte";
+  import TourGuideCard from "../../request-no-code-tour-guide/components/TourGuideCard.svelte";
+  import { RequestTabTestsTourContent } from "../../request-no-code-tour-guide/utils";
+  import { requestTabNocodeCardPosition } from "../../request-no-code-tour-guide/utils/requestTabNocodeCardPosition";
+  import {
+    handleCloseTour,
+    handleNextStep,
+  } from "../../request-no-code-tour-guide/utils/requestTabCardfunctions";
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
   export let requestAuthHeader: Observable<KeyValue>;
@@ -146,6 +158,8 @@
 
   export let onGenerateAiResponse;
   export let onToggleLike;
+  export let isCloseRequestTestDemo: (value: boolean) => void;
+  export let requestTabTestsDemoCompleted: () => void;
 
   // export let isLoginBannerActive = false;
   export let isPopoverContainer = true;
@@ -614,26 +628,28 @@
     </div>
 
     <!-- HTTP URL Section -->
-    <HttpUrlSection
-      class=""
-      isSaveLoad={$loading}
-      isSave={$tab.isSaved}
-      bind:userRole
-      requestUrl={$tab.property?.request?.url}
-      httpMethod={$tab.property?.request?.method}
-      isSendRequestInProgress={storeData?.isSendRequestInProgress}
-      onSendButtonClicked={onSendRequest}
-      onCancelButtonClicked={onCancelRequest}
-      {onUpdateEnvironment}
-      {environmentVariables}
-      {onUpdateRequestUrl}
-      {onUpdateRequestMethod}
-      {toggleSaveRequest}
-      {onSaveRequest}
-      {isGuestUser}
-    />
+    <div class="" id="request-tab-http-section">
+      <HttpUrlSection
+        class=""
+        isSaveLoad={$loading}
+        isSave={$tab.isSaved}
+        bind:userRole
+        requestUrl={$tab.property?.request?.url}
+        httpMethod={$tab.property?.request?.method}
+        isSendRequestInProgress={storeData?.isSendRequestInProgress}
+        onSendButtonClicked={onSendRequest}
+        onCancelButtonClicked={onCancelRequest}
+        {onUpdateEnvironment}
+        {environmentVariables}
+        {onUpdateRequestUrl}
+        {onUpdateRequestMethod}
+        {toggleSaveRequest}
+        {onSaveRequest}
+        {isGuestUser}
+      />
+    </div>
 
-    {#if isPopoverContainer}
+    {#if isPopoverContainer && !$requestTabTestDemo}
       <div class="pt-2"></div>
       <Popover onClose={closeCollectionHelpText} heading={`Welcome to Sparrow`}>
         <p class="mb-0 text-fs-12">
@@ -715,7 +731,29 @@
                       generateMockData={handleGenerateMockData}
                     />
                     <div style="flex:1; overflow:auto;" class="p-0">
-                      {#if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.PARAMETERS}
+                      {#if $requestTabTestDemo}
+                        <RequestTests
+                          tests={{
+                            testCaseMode: "no-code",
+                            noCode: [
+                              {
+                                id: "Test-1",
+                                name: "Test-1",
+                                condition: "",
+                                expectedResult: "",
+                                testPath: "",
+                                testTarget: "",
+                              },
+                            ],
+                            script: "",
+                          }}
+                          onTestsChange={() => {}}
+                          tabSplitDirection={$tabsSplitterDirection}
+                          testResults={[]}
+                          responseBody={""}
+                          responseHeader={[]}
+                        />
+                      {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.PARAMETERS}
                         <RequestParameters
                           isBulkEditActive={$tab?.property?.request.state
                             ?.isParameterBulkEditActive}
@@ -800,6 +838,44 @@
                         />
                       {/if}
                     </div>
+                    {#if $requestTabTestDemo && $requestTabTestNoCodeStep === 1}
+                      <RequestNoCodeTourGuide
+                        targetId={RequestTabTestsTourContent[0].targetId}
+                        isVisible={true}
+                        cardPosition={requestTabNocodeCardPosition(1)}
+                      >
+                        <TourGuideCard
+                          titleName={RequestTabTestsTourContent[0].Title}
+                          descriptionContent={RequestTabTestsTourContent[0]
+                            .description}
+                          cardNumber={1}
+                          totalsCards={RequestTabTestsTourContent.length}
+                          rightButtonName=""
+                          onNext={handleNextStep}
+                          onClose={handleCloseTour}
+                          width={352}
+                        />
+                      </RequestNoCodeTourGuide>
+                    {/if}
+                    {#if $requestTabTestDemo && $requestTabTestNoCodeStep === 4}
+                      <RequestNoCodeTourGuide
+                        targetId={RequestTabTestsTourContent[3].targetId}
+                        isVisible={true}
+                        cardPosition={requestTabNocodeCardPosition(4)}
+                      >
+                        <TourGuideCard
+                          titleName={RequestTabTestsTourContent[3].Title}
+                          descriptionContent={RequestTabTestsTourContent[3]
+                            .description}
+                          cardNumber={4}
+                          totalsCards={RequestTabTestsTourContent.length}
+                          rightButtonName=""
+                          onNext={handleNextStep}
+                          onClose={handleCloseTour}
+                          width={352}
+                        />
+                      </RequestNoCodeTourGuide>
+                    {/if}
                   </div>
                 </Pane>
                 <Pane
@@ -814,10 +890,13 @@
                     'horizontal'
                       ? 'pt-1'
                       : 'ps-2'}"
+                    id="request-tab-response-section"
                   >
                     <div class="h-100 d-flex flex-column">
                       <div style="flex:1; overflow:auto; position:relative;">
-                        {#if storeData?.isSendRequestInProgress}
+                        {#if $requestTabTestDemo}
+                          <ResponseDefaultScreen {isWebApp} />
+                        {:else if storeData?.isSendRequestInProgress}
                           <ResponseDefaultScreen {isWebApp} />
                           <div
                             style="top: 0px; left: 0; right: 0; bottom: 0; z-index:3; position:absolute;"
@@ -931,7 +1010,7 @@
                               ? '56px'
                               : '0px'}; z-index:10;"
                           >
-                            <GenerateVariableCard
+                            <RequestTourGuideCard
                               onAction={async () => {
                                 handleGenerateVariableClickEvent();
                                 await handleGenerateVariableDemo(
@@ -948,8 +1027,76 @@
                             />
                           </div>
                         {/if}
+                        {#if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.TESTS && $tab?.property?.request?.isRequestTestsNoCodeDemoCompleted}
+                          <div
+                            style="position:absolute; bottom:0px; right:{!$tab
+                              ?.property?.request?.state?.isChatbotActive
+                              ? '56px'
+                              : '0px'}; z-index:10;"
+                          >
+                            <RequestTourGuideCard
+                              title={"Make Your APIs Smarter!"}
+                              message={"Writing tests ensures your APIs do exactly what you expect. With our no-code and script options, you can easily check responses, validate data, and catch issues early, without extra effort."}
+                              onAction={() => {
+                                onUpdateRequestState({
+                                  isChatbotActive: false,
+                                });
+                                isChatbotOpenInCurrTab.set(false);
+                                requestTabTestDemo.set(true);
+                                isCloseRequestTestDemo(false);
+                                onUpdateResponseState("Tests");
+                                requestTabTestNoCodeStep.set(1);
+                              }}
+                              onClose={() => {
+                                isCloseRequestTestDemo(false);
+                                requestTabTestDemo.set(false);
+                              }}
+                            />
+                          </div>
+                        {/if}
                       </div>
                     </div>
+                    {#if $requestTabTestDemo && $requestTabTestNoCodeStep === 2}
+                      <RequestNoCodeTourGuide
+                        targetId={RequestTabTestsTourContent[1].targetId}
+                        isVisible={true}
+                        cardPosition={requestTabNocodeCardPosition(2)}
+                      >
+                        <TourGuideCard
+                          titleName={RequestTabTestsTourContent[1].Title}
+                          descriptionContent={RequestTabTestsTourContent[1]
+                            .description}
+                          cardNumber={2}
+                          totalsCards={RequestTabTestsTourContent.length}
+                          rightButtonName=""
+                          onNext={handleNextStep}
+                          onClose={handleCloseTour}
+                          width={352}
+                        />
+                      </RequestNoCodeTourGuide>
+                    {/if}
+                    {#if $requestTabTestDemo && $requestTabTestNoCodeStep === 5}
+                      <RequestNoCodeTourGuide
+                        targetId={RequestTabTestsTourContent[4].targetId}
+                        isVisible={true}
+                        cardPosition={requestTabNocodeCardPosition(5)}
+                      >
+                        <TourGuideCard
+                          titleName={RequestTabTestsTourContent[4].Title}
+                          descriptionContent={RequestTabTestsTourContent[4]
+                            .description}
+                          cardNumber={5}
+                          totalsCards={RequestTabTestsTourContent.length}
+                          rightButtonName="Finish"
+                          onNext={async () => {
+                            handleNextStep();
+                            await requestTabTestsDemoCompleted();
+                          }}
+                          onClose={handleCloseTour}
+                          width={352}
+                        />
+                      </RequestNoCodeTourGuide>
+                    {/if}
                   </div>
                 </Pane>
               </Splitpanes>

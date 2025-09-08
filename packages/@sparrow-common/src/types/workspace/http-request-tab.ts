@@ -224,6 +224,9 @@ export interface ResponseSizeWrapper {
 export interface isGeneratedVariable {
   isGeneratedVariable: boolean;
 }
+export interface isRequestTestsNoCodeDemoCompleted {
+  isRequestTestsNoCodeDemoCompleted: boolean;
+}
 
 export interface Response
   extends ResponseStatusWrapper,
@@ -464,4 +467,5 @@ export interface Request
     UrlWrapper,
     AiWrapper,
     isGeneratedVariable,
+    isRequestTestsNoCodeDemoCompleted,
     HeadersWrapper {}

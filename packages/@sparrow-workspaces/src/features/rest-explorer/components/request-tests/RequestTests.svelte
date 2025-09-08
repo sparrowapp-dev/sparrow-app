@@ -11,7 +11,7 @@
   export let responseHeader;
 </script>
 
-<div class="d-flex flex-column w-100 h-100">
+<div class="d-flex flex-column w-100 h-100" style="position: relative;" id="request-tab-test">
   <!-- <div class="pb-2" style="font-size: 12px; font-weight:500;">TESTS</div> -->
   <div
     class="d-flex flex-column align-items-center justify-content-between w-100"
@@ -33,6 +33,7 @@
             }}
             class="rounded text-fs-12 border-radius-2 px-2 py-1 btn-formatter"
             style="position: relative; z-index: 2; background-color: var(--bg-ds-surface-400)"
+            id="request-tab-nocode"
           >
             No Code
           </span>
