@@ -4193,6 +4193,7 @@ class RestExplorerViewModel {
           ...response.map((item) => ({
             key: item.key,
             value: item.value,
+            checked: false,
           })),
           { key: "", value: "", checked: false },
         ];
@@ -4206,10 +4207,12 @@ class RestExplorerViewModel {
         }
         this.tab = progressiveTab;
         progressiveTab.isSaved = false;
-        this.tabRepository.updateTab(progressiveTab.tabId, {
-          isSaved: false,
-          persistence: TabPersistenceTypeEnum.PERMANENT,
-        });
+        progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
+        await this.tabRepository.updateTab(
+          progressiveTab.tabId,
+          progressiveTab,
+        );
+        this.compareRequestWithServer();
         return true;
       }
       return false;
@@ -4225,10 +4228,12 @@ class RestExplorerViewModel {
         progressiveTab.property.request.body.raw = JSON.stringify(jsonResult);
         this.tab = progressiveTab;
         progressiveTab.isSaved = false;
-        this.tabRepository.updateTab(progressiveTab.tabId, {
-          isSaved: false,
-          persistence: TabPersistenceTypeEnum.PERMANENT,
-        });
+        progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
+        await this.tabRepository.updateTab(
+          progressiveTab.tabId,
+          progressiveTab,
+        );
+        this.compareRequestWithServer();
         return true;
       }
       return false;
@@ -4254,10 +4259,12 @@ class RestExplorerViewModel {
         }
         this.tab = progressiveTab;
         progressiveTab.isSaved = false;
-        this.tabRepository.updateTab(progressiveTab.tabId, {
-          isSaved: false,
-          persistence: TabPersistenceTypeEnum.PERMANENT,
-        });
+        progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
+        await this.tabRepository.updateTab(
+          progressiveTab.tabId,
+          progressiveTab,
+        );
+        this.compareRequestWithServer();
         return true;
       }
       return false;
@@ -4266,10 +4273,9 @@ class RestExplorerViewModel {
       progressiveTab.property.request.body.raw = response;
       this.tab = progressiveTab;
       progressiveTab.isSaved = false;
-      this.tabRepository.updateTab(progressiveTab.tabId, {
-        isSaved: false,
-        persistence: TabPersistenceTypeEnum.PERMANENT,
-      });
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      this.compareRequestWithServer();
       return true;
     }
     return false;
