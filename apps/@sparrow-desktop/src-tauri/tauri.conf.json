@@ -75,7 +75,7 @@
     },
     "macOS": {
       "entitlements": "./Entitlements.plist",
-      "minimumSystemVersion": "12.0",
+      "minimumSystemVersion": "10.15",
       "files": {
         "embedded.provisionprofile": "./assets/Sparrow_Desktop.provisionprofile"
       },

@@ -8,7 +8,7 @@ on:
   push:
     # Trigger on push to the <branch_name> branch. Make sure to remove the branch name from the branches list below, once you are done testing.
     branches:
-      - <branch_name>
+      - build/mac-intel-build
 
   workflow_dispatch:
 
@@ -45,3 +45,211 @@ env:
   CI: false
 
 jobs:
+  release_macos:
+    runs-on: macos-latest
+    environment: development
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Use latest stable Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Install Rust 1.82.0 and add macOS targets
+        shell: bash
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          rustup install 1.82.0
+          rustup default 1.82.0
+          rustup target add x86_64-apple-darwin
+          rustup target add aarch64-apple-darwin
+
+      - name: Sync node version and setup cache
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20.8"
+
+      - name: Install project dependencies
+        run: yarn
+
+      - name: Update updater endpoint in tauri.conf.json file
+        run: |
+          content=$(<apps/@sparrow-desktop/src-tauri/tauri.conf.json)
+          newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_DEV }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
+          echo "$newContent" > apps/@sparrow-desktop/src-tauri/tauri.conf.json
+        shell: bash
+
+      - name: Remove App Store specific properties
+        run: |
+          sed -i '' 's/dev.sparrowapp.desktop/com.sparrow.app/g' apps/@sparrow-desktop/src-tauri/Info.plist
+          sed -i '' '/"macOS": {/,/},/ {
+              /"entitlements":.*/d
+              /"files": {/,/      }/d
+          }' apps/@sparrow-desktop/src-tauri/tauri.conf.json
+        shell: bash
+
+      - name: Increase Yarn network timeout
+        run: yarn config set network-timeout 600000
+
+      - name: Configure Env Variables for Mac (Intel Build)
+        shell: bash
+        run: |
+          # Resolve compilers and SDK path from the selected Xcode
+          SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
+          CLANG="$(xcrun --sdk macosx -f clang)"
+          CLANGXX="$(xcrun --sdk macosx -f clang++)"
+
+          echo "Using SDKROOT: $SDKROOT"
+          echo "Clang: $CLANG"
+          echo "Clang++: $CLANGXX"
+
+          # Make SDK available to all subsequent steps (incl. cc crate)
+          echo "SDKROOT=$SDKROOT" >> "$GITHUB_ENV"
+          echo "MACOSX_DEPLOYMENT_TARGET=10.13" >> "$GITHUB_ENV"
+
+          # Set BOTH underscore and hyphen forms (cc crate may read either)
+          echo "CC_x86_64_apple_darwin=$CLANG" >> "$GITHUB_ENV"
+          echo "CXX_x86_64_apple_darwin=$CLANGXX" >> "$GITHUB_ENV"
+          echo "CC_x86_64-apple-darwin=$CLANG" >> "$GITHUB_ENV"
+          echo "CXX_x86_64-apple-darwin=$CLANGXX" >> "$GITHUB_ENV"
+
+          # Ensure headers/libs are found when cross-compiling C/C++
+          COMMON_CFLAGS="-target x86_64-apple-macos10.13 -isysroot $SDKROOT -mmacosx-version-min=10.13"
+          COMMON_LDFLAGS="-isysroot $SDKROOT -mmacosx-version-min=10.13"
+
+          echo "CFLAGS_x86_64_apple_darwin=$COMMON_CFLAGS" >> "$GITHUB_ENV"
+          echo "CXXFLAGS_x86_64_apple_darwin=$COMMON_CFLAGS" >> "$GITHUB_ENV"
+          echo "CFLAGS_x86_64-apple-darwin=$COMMON_CFLAGS" >> "$GITHUB_ENV"
+          echo "CXXFLAGS_x86_64-apple-darwin=$COMMON_CFLAGS" >> "$GITHUB_ENV"
+          echo "LDFLAGS_x86_64_apple_darwin=$COMMON_LDFLAGS" >> "$GITHUB_ENV"
+          echo "LDFLAGS_x86_64-apple-darwin=$COMMON_LDFLAGS" >> "$GITHUB_ENV"
+
+      # ------- ARM64 (Apple Silicon) build -------
+      - name: Build & Sign Tauri App (Apple Silicon / arm64)
+        env:
+          APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
+          APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
+          APPLE_CERTIFICATE_PASSWORD: "${{ secrets.APPLE_CERTIFICATE_PASSWORD }}"
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          CI: "false"
+        run: |
+          yarn cache clean
+          yarn install
+          yarn desktop-build
+
+      # ------- Intel (x86_64) build -------
+      - name: Build & Sign Tauri App (Intel / x86_64)
+        env:
+          APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
+          APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
+          APPLE_CERTIFICATE_PASSWORD: "${{ secrets.APPLE_CERTIFICATE_PASSWORD }}"
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          CI: "false"
+        run: |
+          yarn desktop-build-intel-mac
+
+      - name: Show DMG signatures for Apple(MX Build)
+        run: cat /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/*.sig
+
+      - name: Show DMG signatures for Apple(Intel Build)
+        run: cat /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos/*.sig
+
+      - name: Install AWS CLI
+        run: |
+          curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+          sudo installer -pkg AWSCLIV2.pkg -target /
+          aws --version
+
+      - name: Set build datetime
+        run: echo "BUILD_DATETIME=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+
+      - name: Upload macOS DMG(Both archs) to S3
+        run: |
+          # Upload macOS (ARM64) DMG
+          MX_DMG_SRC_DIR="/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg"
+          DMG_FILE=$(ls "$MX_DMG_SRC_DIR"/*.dmg | head -n 1)
+          DMG_BASENAME=$(basename "$DMG_FILE" .dmg)
+          DMG_SUFFIXED_FILE="$MX_DMG_SRC_DIR/${DMG_BASENAME}_${{ env.BUILD_DATETIME }}.dmg"
+          cp "$DMG_FILE" "$DMG_SUFFIXED_FILE"
+          aws s3 cp "$DMG_SUFFIXED_FILE" s3://sparrow-release-assests-dev/macos/
+
+          # Upload macOS (Intel) DMG
+          INTEL_DMG_SRC_DIR="/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/dmg"
+          DMG_FILE=$(ls "$INTEL_DMG_SRC_DIR"/*.dmg | head -n 1)
+          DMG_BASENAME=$(basename "$DMG_FILE" .dmg)
+          DMG_SUFFIXED_FILE="$INTEL_DMG_SRC_DIR/${DMG_BASENAME}_${{ env.BUILD_DATETIME }}.dmg"
+          cp "$DMG_FILE" "$DMG_SUFFIXED_FILE"
+          aws s3 cp "$DMG_SUFFIXED_FILE" s3://sparrow-release-assests-dev/macos/
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Post macOS Build Links to Teams
+        run: |
+          ARM64_DMG=$(ls apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg | head -n 1)
+          INTEL_DMG=$(ls apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/dmg/*.dmg | head -n 1)
+
+          # Get filenames with datetime suffix
+          ARM64_FILENAME="$(basename "${ARM64_DMG%.dmg}").dmg"
+          INTEL_FILENAME="$(basename "${INTEL_DMG%.dmg}").dmg"
+
+          ARM64_URL="https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/macos/$ARM64_FILENAME"
+          INTEL_URL="https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/macos/$INTEL_FILENAME"
+
+          curl -H "Content-Type: application/json" -d "{
+            \"type\": \"message\",
+            \"attachments\": [
+              {
+                \"contentType\": \"application/vnd.microsoft.card.adaptive\",
+                \"content\": {
+                  \"type\": \"AdaptiveCard\",
+                  \"body\": [
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"(Test - Dont Download)\",
+                      \"weight\": \"bolder\",
+                      \"size\": \"large\"
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"Branch: development\",
+                      \"wrap\": true
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"Build Date: $(date +'%Y-%m-%d %H:%M:%S')\",
+                      \"wrap\": true
+                    }
+                  ],
+                  \"actions\": [
+                    {
+                      \"type\": \"Action.OpenUrl\",
+                      \"title\": \"📥 Download Apple Silicon (arm64)\",
+                      \"url\": \"$ARM64_URL\"
+                    },
+                    {
+                      \"type\": \"Action.OpenUrl\",
+                      \"title\": \"📥 Download Intel (x86_64)\",
+                      \"url\": \"$INTEL_URL\"
+                    }
+                  ],
+                  \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
+                  \"version\": \"1.2\"
+                }
+              }
+            ]
+          }" "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL}}"
+        shell: bash
