@@ -245,13 +245,6 @@
 
     const leftPaneWidth = leftPane?.offsetWidth || 0;
 
-    console.log(
-      "TabularInput - Left pane width:",
-      leftPaneWidth,
-      "Window width:",
-      window.innerWidth,
-    );
-
     // Update showLabel based on width
     showLabel = window.innerWidth > 1250 || leftPaneWidth > 400;
   }
