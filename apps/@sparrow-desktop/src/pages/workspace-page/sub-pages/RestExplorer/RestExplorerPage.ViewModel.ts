@@ -4273,7 +4273,6 @@ class RestExplorerViewModel {
       progressiveTab.property.request.body.raw = response;
       this.tab = progressiveTab;
       progressiveTab.isSaved = false;
-      progressiveTab.isSaved = false;
       progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
       this.compareRequestWithServer();
