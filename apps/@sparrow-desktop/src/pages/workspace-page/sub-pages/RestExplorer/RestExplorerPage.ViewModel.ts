@@ -1466,13 +1466,70 @@ class RestExplorerViewModel {
     this.compareRequestWithServer();
   };
 
+  private comaparingItemsAndCheckTypeExist = (
+    originalArray: any[],
+    updatedArray: any[],
+  ): any[] => {
+    if (!Array.isArray(originalArray) || !Array.isArray(updatedArray)) {
+      return updatedArray;
+    }
+    // Helper function to create a unique identifier for an object based on index + key
+    const createObjectKey = (obj: any, index: number): string => {
+      if (!obj || typeof obj !== "object") {
+        return `${index}-${JSON.stringify(obj)}`;
+      }
+      return `${index}-${obj.key || JSON.stringify(obj)}`;
+    };
+    // Optimized: stable hash for object (ignores "type" property)
+    const getStableHash = (obj: any): string => {
+      if (!obj || typeof obj !== "object") return JSON.stringify(obj);
+
+      const { type, ...rest } = obj;
+      const sortedKeys = Object.keys(rest).sort();
+      let str = "";
+      for (const key of sortedKeys) {
+        str += `${key}:${JSON.stringify(rest[key])}|`;
+      }
+      return str;
+    };
+    // Precompute hashes for original array
+    const originalObjectsMap = new Map<string, { obj: any; hash: string }>();
+    originalArray.forEach((obj, index) => {
+      const key = createObjectKey(obj, index);
+      originalObjectsMap.set(key, { obj, hash: getStableHash(obj) });
+    });
+    // Process updated array
+    return updatedArray.map((updatedObj, index) => {
+      const objectKey = createObjectKey(updatedObj, index);
+      const originalEntry = originalObjectsMap.get(objectKey);
+      const updatedHash = getStableHash(updatedObj);
+      const isNewlyAdded = !originalEntry;
+      const isChanged = originalEntry && originalEntry.hash !== updatedHash;
+      if (
+        (isNewlyAdded || isChanged) &&
+        updatedObj &&
+        typeof updatedObj === "object" &&
+        updatedObj.hasOwnProperty("type")
+      ) {
+        const { type, ...objWithoutType } = updatedObj;
+        return objWithoutType;
+      }
+      return updatedObj;
+    });
+  };
+
   /**
    *
    * @param _headers - request headers
    */
   public updateHeaders = async (_headers: KeyValueChecked[]) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    progressiveTab.property.request.headers = _headers;
+    const processedHeaders = this.comaparingItemsAndCheckTypeExist(
+      progressiveTab.property.request.headers,
+      _headers,
+    );
+    // Update with processed headers
+    progressiveTab.property.request.headers = processedHeaders;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -1506,7 +1563,11 @@ class RestExplorerViewModel {
     ) {
       return;
     }
-    progressiveTab.property.request.queryParams = _params;
+    const processedParams = this.comaparingItemsAndCheckTypeExist(
+      progressiveTab.property.request.queryParams,
+      _params,
+    );
+    progressiveTab.property.request.queryParams = processedParams;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     if (_effectURL) {
@@ -4189,21 +4250,47 @@ class RestExplorerViewModel {
         RequestSectionEnum.PARAMETERS
     ) {
       if (Array.isArray(response)) {
-        const newArray = [
-          ...response.map((item) => ({
-            key: item.key,
-            value: item.value,
-            checked: false,
-          })),
-          { key: "", value: "", checked: false },
-        ];
+        const aiGeneratedArray = response.map((item) => ({
+          key: item.key,
+          value: item.value,
+          checked: false,
+          type: "ai-generated",
+        }));
         if (
           progressiveTab.property?.request?.state?.requestNavigation ===
           RequestSectionEnum.PARAMETERS
         ) {
-          progressiveTab.property.request.queryParams = newArray;
+          let currentDetails =
+            progressiveTab.property.request.queryParams || [];
+          if (currentDetails.length > 0) currentDetails.pop();
+          // Remove duplicates where AI has the same key
+          currentDetails = currentDetails.filter(
+            (existing: any) =>
+              !aiGeneratedArray.some((ai) => ai.key === existing.key),
+          );
+          const merged = [
+            ...currentDetails.map(({ type, ...rest }) => rest),
+            ...aiGeneratedArray,
+          ];
+          progressiveTab.property.request.queryParams = [
+            ...merged,
+            { key: "", value: "", checked: false },
+          ];
         } else {
-          progressiveTab.property.request.headers = newArray;
+          let currentDetails = progressiveTab.property.request.headers || [];
+          if (currentDetails.length > 0) currentDetails.pop();
+          currentDetails = currentDetails.filter(
+            (existing: any) =>
+              !aiGeneratedArray.some((ai) => ai.key === existing.key),
+          );
+          const merged = [
+            ...currentDetails.map(({ type, ...rest }) => rest),
+            ...aiGeneratedArray,
+          ];
+          progressiveTab.property.request.headers = [
+            ...merged,
+            { key: "", value: "", checked: false },
+          ];
         }
         this.tab = progressiveTab;
         progressiveTab.isSaved = false;
@@ -4225,7 +4312,27 @@ class RestExplorerViewModel {
     ) {
       const jsonResult = response;
       if (typeof jsonResult === "object" && jsonResult !== null) {
-        progressiveTab.property.request.body.raw = JSON.stringify(jsonResult);
+        let existingRaw = progressiveTab.property.request.body.raw || "";
+        let mergedObject: Record<string, any> = {};
+        try {
+          // Try to parse existing raw if it's valid JSON
+          if (existingRaw.trim()) {
+            mergedObject = JSON.parse(existingRaw);
+          }
+        } catch (e) {
+          // If not valid JSON, reset to empty object
+          mergedObject = {};
+        }
+        // Merge: update existing keys or insert new ones
+        Object.keys(jsonResult).forEach((key) => {
+          mergedObject[key] = jsonResult[key];
+        });
+        // Save the updated JSON
+        progressiveTab.property.request.body.raw = JSON.stringify(
+          mergedObject,
+          null,
+          2,
+        );
         this.tab = progressiveTab;
         progressiveTab.isSaved = false;
         progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
@@ -4245,17 +4352,46 @@ class RestExplorerViewModel {
         RequestDatasetEnum.URLENCODED
     ) {
       if (Array.isArray(response) && response.length > 0) {
-        const updatedContent = [
-          ...response,
-          { key: "", value: "", checked: false },
-        ];
+        const aiGeneratedArray = response.map((item) => ({
+          ...item,
+          checked: false,
+        }));
         if (
           progressiveTab.property?.request?.state?.requestBodyNavigation ===
           RequestDatasetEnum.FORMDATA
         ) {
-          progressiveTab.property.request.body.formdata = updatedContent;
+          let currentDetails =
+            progressiveTab.property.request.body.formdata || [];
+          if (currentDetails.length > 0) currentDetails.pop();
+          // Remove any items with the same key as AI-generated
+          currentDetails = currentDetails.filter(
+            (existing) =>
+              !aiGeneratedArray.some((ai) => ai.key === existing.key),
+          );
+          const merged = [
+            ...currentDetails.map(({ type, ...rest }) => rest),
+            ...aiGeneratedArray,
+          ];
+          progressiveTab.property.request.body.formdata = [
+            ...merged,
+            { key: "", value: "", checked: false },
+          ];
         } else {
-          progressiveTab.property.request.body.urlencoded = updatedContent;
+          let currentDetails =
+            progressiveTab.property.request.body.urlencoded || [];
+          if (currentDetails.length > 0) currentDetails.pop();
+          currentDetails = currentDetails.filter(
+            (existing: any) =>
+              !aiGeneratedArray.some((ai) => ai.key === existing.key),
+          );
+          const merged = [
+            ...currentDetails.map(({ type, ...rest }) => rest),
+            ...aiGeneratedArray,
+          ];
+          progressiveTab.property.request.body.urlencoded = [
+            ...merged,
+            { key: "", value: "", checked: false },
+          ];
         }
         this.tab = progressiveTab;
         progressiveTab.isSaved = false;
@@ -4270,7 +4406,7 @@ class RestExplorerViewModel {
       return false;
     }
     if (typeof response === "string" && response.trim() !== "") {
-      progressiveTab.property.request.body.raw = response;
+      progressiveTab.property.request.body.raw = response.trim();
       this.tab = progressiveTab;
       progressiveTab.isSaved = false;
       progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;

@@ -10,6 +10,7 @@
   import { Checkbox } from "@sparrow/library/forms";
   import { DeleteRegular, MathFormulaRegular } from "@sparrow/library/icons";
   import { handleEventOnClickDynamicExpressionButton } from "@sparrow/common/utils";
+  import { SparkleFilled } from "@sparrow/library/icons";
 
   export let element;
   export let dynamicExpression = false;
@@ -61,17 +62,38 @@
         startIcon={ReOrderDotsRegular}
       />
     </div> -->
-    <div style=" width: 24px;" class="me-2">
-      {#if pairs.length - 1 != index || !isInputBoxEditable}
-        <Checkbox
-          size={"small"}
-          checked={element.checked}
-          on:input={() => {
-            updateCheck(index);
-          }}
-          disabled={!isCheckBoxEditable}
-        />
-      {/if}
+    <div
+      class="d-flex justify-content-center align-items-center me-2"
+      style="width:50px;"
+    >
+      <span style="width: 25px;">
+        {#if element.type === "ai-generated"}
+          <Tooltip
+            title={"Generated Variable"}
+            placement={"top-right"}
+            distance={10}
+          >
+            <button
+              class="generate-action-button sparkle-icon-parent accept"
+              on:click|stopPropagation={() => {}}
+            >
+              <SparkleFilled size="12px" color="" />
+            </button>
+          </Tooltip>
+        {/if}
+      </span>
+      <span style="width: 25px;">
+        {#if pairs.length - 1 != index || !isInputBoxEditable}
+          <Checkbox
+            size={"small"}
+            checked={element.checked}
+            on:input={() => {
+              updateCheck(index);
+            }}
+            disabled={!isCheckBoxEditable}
+          />
+        {/if}
+      </span>
     </div>
 
     <div
@@ -230,5 +252,35 @@
   /* Diff/Merge View: Style for new row deleted */
   .diff-row.diff-deleted {
     background-color: var(--bg-ds-danger-800) !important;
+  }
+  .generate-action-button {
+    width: 24px;
+    height: 24px;
+    background-color: transparent;
+    color: var(--text-ds-neutral-100);
+    background-color: transparent;
+    border: 0px;
+    border-radius: 4px;
+  }
+  .generate-action-button:hover {
+    color: var(--text-ds-neutral-50);
+    background-color: var(--bg-ds-surface-300);
+    border: 0px;
+  }
+  .generate-action-button:focus-visible {
+    border: 2px solid var(--border-ds-primary-300);
+    color: var(--text-ds-neutral-100);
+    outline: none;
+  }
+  .generate-action-button:active {
+    color: var(--text-ds-primary-300);
+    background-color: var(--bg-ds-surface-400);
+    border: 0px;
+  }
+  .sparkle-icon-parent {
+    color: var(--text-ds-neutral-400);
+  }
+  .sparkle-icon-parent:hover {
+    color: var(--text-ds-neutral-100);
   }
 </style>
