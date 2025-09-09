@@ -2333,12 +2333,50 @@ class RestExplorerViewModel {
     }
   };
 
+  private removeTypeFromObjectArray = (objectArray: any[]): any[] => {
+    if (!Array.isArray(objectArray)) {
+      console.warn("Input is not an array");
+      return objectArray;
+    }
+    // Map through the array and remove 'type' property from each object
+    return objectArray.map((obj) => {
+      if (!obj || typeof obj !== "object") {
+        return obj;
+      }
+      // Create a new object without the 'type' property
+      const { type, ...objWithoutType } = obj;
+      return objWithoutType;
+    });
+  };
+
+  private updateTabToRemoveType = async () => {
+    const progressiveTab = this._tab.getValue();
+    const updatedHeaders = this.removeTypeFromObjectArray(
+      progressiveTab.property.request.headers,
+    );
+    const updatedParams = this.removeTypeFromObjectArray(
+      progressiveTab.property.request.queryParams,
+    );
+    const updateFormData = this.removeTypeFromObjectArray(
+      progressiveTab.property.request.body.formdata,
+    );
+    const updateUrlEncoded = this.removeTypeFromObjectArray(
+      progressiveTab.property.request.body.urlencoded,
+    );
+    progressiveTab.property.request.headers = updatedHeaders;
+    progressiveTab.property.request.queryParams = updatedParams;
+    progressiveTab.property.request.body.formdata = updateFormData;
+    progressiveTab.property.request.body.urlencoded = updateUrlEncoded;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  };
+
   /**
    * Save Request
    * @param saveDescriptionOnly - refers save overall request data or only description as a documentation purpose.
    * @returns save status
    */
   public saveRequest = async () => {
+    await this.updateTabToRemoveType();
     const componentData: RequestTab = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = componentData.path;
     const tabId = componentData?.tabId;
@@ -4203,21 +4241,47 @@ class RestExplorerViewModel {
         RequestSectionEnum.PARAMETERS
     ) {
       if (Array.isArray(response)) {
-        const newArray = [
-          ...response.map((item) => ({
-            key: item.key,
-            value: item.value,
-            checked: false,
-          })),
-          { key: "", value: "", checked: false },
-        ];
+        const aiGeneratedArray = response.map((item) => ({
+          key: item.key,
+          value: item.value,
+          checked: false,
+          type: "ai-generated",
+        }));
         if (
           progressiveTab.property?.request?.state?.requestNavigation ===
           RequestSectionEnum.PARAMETERS
         ) {
-          progressiveTab.property.request.queryParams = newArray;
+          let currentDetails =
+            progressiveTab.property.request.queryParams || [];
+          if (currentDetails.length > 0) currentDetails.pop();
+          // Remove duplicates where AI has the same key
+          currentDetails = currentDetails.filter(
+            (existing: any) =>
+              !aiGeneratedArray.some((ai) => ai.key === existing.key),
+          );
+          const merged = [
+            ...currentDetails.map(({ type, ...rest }) => rest),
+            ...aiGeneratedArray,
+          ];
+          progressiveTab.property.request.queryParams = [
+            ...merged,
+            { key: "", value: "", checked: false },
+          ];
         } else {
-          progressiveTab.property.request.headers = newArray;
+          let currentDetails = progressiveTab.property.request.headers || [];
+          if (currentDetails.length > 0) currentDetails.pop();
+          currentDetails = currentDetails.filter(
+            (existing: any) =>
+              !aiGeneratedArray.some((ai) => ai.key === existing.key),
+          );
+          const merged = [
+            ...currentDetails.map(({ type, ...rest }) => rest),
+            ...aiGeneratedArray,
+          ];
+          progressiveTab.property.request.headers = [
+            ...merged,
+            { key: "", value: "", checked: false },
+          ];
         }
         this.tab = progressiveTab;
         progressiveTab.isSaved = false;
@@ -4239,7 +4303,27 @@ class RestExplorerViewModel {
     ) {
       const jsonResult = response;
       if (typeof jsonResult === "object" && jsonResult !== null) {
-        progressiveTab.property.request.body.raw = JSON.stringify(jsonResult);
+        let existingRaw = progressiveTab.property.request.body.raw || "";
+        let mergedObject: Record<string, any> = {};
+        try {
+          // Try to parse existing raw if it's valid JSON
+          if (existingRaw.trim()) {
+            mergedObject = JSON.parse(existingRaw);
+          }
+        } catch (e) {
+          // If not valid JSON, reset to empty object
+          mergedObject = {};
+        }
+        // Merge: update existing keys or insert new ones
+        Object.keys(jsonResult).forEach((key) => {
+          mergedObject[key] = jsonResult[key];
+        });
+        // Save the updated JSON
+        progressiveTab.property.request.body.raw = JSON.stringify(
+          mergedObject,
+          null,
+          2,
+        );
         this.tab = progressiveTab;
         progressiveTab.isSaved = false;
         progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
@@ -4259,17 +4343,47 @@ class RestExplorerViewModel {
         RequestDatasetEnum.URLENCODED
     ) {
       if (Array.isArray(response) && response.length > 0) {
-        const updatedContent = [
-          ...response,
-          { key: "", value: "", checked: false },
-        ];
+        const aiGeneratedArray = response.map((item) => ({
+          ...item,
+          type: "ai-generated",
+          checked: false,
+        }));
         if (
           progressiveTab.property?.request?.state?.requestBodyNavigation ===
           RequestDatasetEnum.FORMDATA
         ) {
-          progressiveTab.property.request.body.formdata = updatedContent;
+          let currentDetails =
+            progressiveTab.property.request.body.formdata || [];
+          if (currentDetails.length > 0) currentDetails.pop();
+          // Remove any items with the same key as AI-generated
+          currentDetails = currentDetails.filter(
+            (existing) =>
+              !aiGeneratedArray.some((ai) => ai.key === existing.key),
+          );
+          const merged = [
+            ...currentDetails.map(({ type, ...rest }) => rest),
+            ...aiGeneratedArray,
+          ];
+          progressiveTab.property.request.body.formdata = [
+            ...merged,
+            { key: "", value: "", checked: false },
+          ];
         } else {
-          progressiveTab.property.request.body.urlencoded = updatedContent;
+          let currentDetails =
+            progressiveTab.property.request.body.urlencoded || [];
+          if (currentDetails.length > 0) currentDetails.pop();
+          currentDetails = currentDetails.filter(
+            (existing: any) =>
+              !aiGeneratedArray.some((ai) => ai.key === existing.key),
+          );
+          const merged = [
+            ...currentDetails.map(({ type, ...rest }) => rest),
+            ...aiGeneratedArray,
+          ];
+          progressiveTab.property.request.body.urlencoded = [
+            ...merged,
+            { key: "", value: "", checked: false },
+          ];
         }
         this.tab = progressiveTab;
         progressiveTab.isSaved = false;
@@ -4284,7 +4398,7 @@ class RestExplorerViewModel {
       return false;
     }
     if (typeof response === "string" && response.trim() !== "") {
-      progressiveTab.property.request.body.raw = response;
+      progressiveTab.property.request.body.raw = response.trim();
       this.tab = progressiveTab;
       progressiveTab.isSaved = false;
       progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
