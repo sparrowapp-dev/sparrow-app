@@ -288,8 +288,8 @@ jobs:
                   Uri="$msixUrl" />
 
               <UpdateSettings>
-                <OnLaunch HoursBetweenUpdateChecks="0" UpdateBlocksActivation="true" />
-                <AutomaticBackgroundTask />
+              <AutomaticBackgroundTask />
+              <ForceUpdateFromAnyVersion>true</ForceUpdateFromAnyVersion>
               </UpdateSettings>
             </AppInstaller>
             "@
