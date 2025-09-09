@@ -69,7 +69,7 @@
       <span style="width: 25px;">
         {#if element.type === "ai-generated"}
           <Tooltip
-            title={"Generated Variable"}
+            title={"Generated Mock Data"}
             placement={"top-right"}
             distance={10}
           >

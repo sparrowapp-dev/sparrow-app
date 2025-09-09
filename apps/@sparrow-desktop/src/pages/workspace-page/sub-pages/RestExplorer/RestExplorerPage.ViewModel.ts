@@ -2323,12 +2323,51 @@ class RestExplorerViewModel {
     }
   };
 
+  
+  private removeTypeFromObjectArray = (objectArray: any[]): any[] => {
+    if (!Array.isArray(objectArray)) {
+      console.warn("Input is not an array");
+      return objectArray;
+    }
+    // Map through the array and remove 'type' property from each object
+    return objectArray.map((obj) => {
+      if (!obj || typeof obj !== "object") {
+        return obj;
+      }
+      // Create a new object without the 'type' property
+      const { type, ...objWithoutType } = obj;
+      return objWithoutType;
+    });
+  };
+
+  private updateTabToRemoveType = async () => {
+    const progressiveTab = this._tab.getValue();
+    const updatedHeaders = this.removeTypeFromObjectArray(
+      progressiveTab.property.request.headers,
+    );
+    const updatedParams = this.removeTypeFromObjectArray(
+      progressiveTab.property.request.queryParams,
+    );
+    const updateFormData = this.removeTypeFromObjectArray(
+      progressiveTab.property.request.body.formdata,
+    );
+    const updateUrlEncoded = this.removeTypeFromObjectArray(
+      progressiveTab.property.request.body.urlencoded,
+    );
+    progressiveTab.property.request.headers = updatedHeaders;
+    progressiveTab.property.request.queryParams = updatedParams;
+    progressiveTab.property.request.body.formdata = updateFormData;
+    progressiveTab.property.request.body.urlencoded = updateUrlEncoded;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  };
+
   /**
    * Save Request
    * @param saveDescriptionOnly - refers save overall request data or only description as a documentation purpose.
    * @returns save status
    */
   public saveRequest = async () => {
+    await this.updateTabToRemoveType();
     const componentData: RequestTab = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = componentData.path;
     const tabId = componentData?.tabId;
