@@ -116,13 +116,15 @@
           <p
             style="font-size: 12px; font-weight:400; color: var(--text-ds-neutral-400); padding-left: 4px; margin-bottom:0px;"
           >
-            {testCases?.testName} |
+            {testCases?.testName}
           </p>
-          <p
-            style="font-size: 12px; font-weight:400; color: var(--text-ds-neutral-400); margin-bottom:0px;"
-          >
-            {testCases?.testMessage}
-          </p>
+          {#if testCases?.testMessage}
+            <p
+              style="font-size: 12px; font-weight:400; color: var(--text-ds-neutral-400); margin-bottom:0px;"
+            >
+              | Error: {testCases?.testMessage}
+            </p>
+          {/if}
         </div>
       {/each}
     </div>
