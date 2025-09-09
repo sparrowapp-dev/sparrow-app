@@ -151,7 +151,9 @@ jobs:
           yarn cache clean
           npm install -g pnpm
           yarn install
-          yarn desktop-build
+          # Release build (removed --debug)
+          yarn workspace @sparrow/desktop tauri build
+          echo "Built release artifacts (optimized)."
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
@@ -163,11 +165,15 @@ jobs:
       - name: Prepare App Folder for MakeAppx
         run: |
           New-Item -ItemType Directory -Force -Path "app-root/Assets"
-          $msiPath = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
+          # Use release MSI first (fallback to debug if not found)
+          $msiPath = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/release/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if (-not $msiPath) { $msiPath = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1 }
           $extractPath = "app-root"
           Start-Process msiexec.exe -ArgumentList "/a `"$msiPath`" /qn TARGETDIR=`"$extractPath`"" -Wait -NoNewWindow
 
-          $exeSource = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug" -Filter "Sparrow.exe" -Recurse | Select-Object -First 1
+          # Prefer release exe (fallback to debug)
+            $exeSource = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/release" -Filter "Sparrow.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+            if (-not $exeSource) { $exeSource = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug" -Filter "Sparrow.exe" -Recurse | Select-Object -First 1 }
           if ($exeSource) {
             Copy-Item $exeSource.FullName -Destination "app-root/Sparrow.exe"
           } else {
@@ -240,14 +246,15 @@ jobs:
       - name: Create MSIX Package using MakeAppx
         run: |
           New-Item -ItemType Directory -Force -Path "msix-output"
-          $msixPath = "msix-output\sparrow.msix"
+          $msixPath = "msix-output\\sparrow.msix"
 
           $makeAppx = Get-ChildItem -Path 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter MakeAppx.exe -ErrorAction SilentlyContinue |
                       Where-Object { $_.FullName -match '\\x64\\MakeAppx\.exe$' } |
                       Sort-Object LastWriteTime -Descending |
                       Select-Object -First 1
 
-          & "$($makeAppx.FullName)" pack /d "app-root" /p $msixPath
+          # Use /nc (no compression) to speed installation (larger download but faster apply)
+          & "$($makeAppx.FullName)" pack /d "app-root" /p $msixPath /nc
         shell: powershell
 
       - name: Generate App Installer File
@@ -332,26 +339,14 @@ jobs:
           Write-Host "📁 Contents of msix-output directory:"
           Get-ChildItem -Path "msix-output" -Force | ForEach-Object { Write-Host "  $($_.Name)" }
 
-          # Verify the MSIX file exists
-          if (-Not (Test-Path "msix-output\sparrow.msix")) {
-              Write-Host "❌ MSIX file not found at msix-output\sparrow.msix"
-              Write-Host "📁 Available files:"
+          if (-Not (Test-Path "msix-output\\sparrow.msix")) {
+              Write-Host "❌ MSIX file not found at msix-output\\sparrow.msix"
               Get-ChildItem -Path "msix-output" | ForEach-Object { Write-Host "  - $($_.Name)" }
               exit 1
           }
-
-          Write-Host "Verifying signature for: msix-output\sparrow.msix"
-
-          # Get the Authenticode signature
-          $sig = Get-AuthenticodeSignature -FilePath "msix-output\sparrow.msix"
-
-          # Check the signature status
-          if ($sig.Status -eq 'Valid') {
-              Write-Host "✅ Valid signature on msix-output\sparrow.msix"
-          } else {
-              Write-Host "❌ Invalid signature on msix-output\sparrow.msix: $($sig.Status)"
-              exit 1
-          }
+          Write-Host "Verifying signature for: msix-output\\sparrow.msix"
+          $sig = Get-AuthenticodeSignature -FilePath "msix-output\\sparrow.msix"
+          if ($sig.Status -eq 'Valid') { Write-Host "✅ Valid signature on msix-output\\sparrow.msix" } else { Write-Host "❌ Invalid signature: $($sig.Status)"; exit 1 }
             
 
       # --- STAGE 6: DEPLOY & NOTIFY ---
@@ -515,10 +510,9 @@ jobs:
           Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
         shell: pwsh
 
- 
 
 
 
-      
-    
-     
+
+
+
