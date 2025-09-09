@@ -1466,70 +1466,13 @@ class RestExplorerViewModel {
     this.compareRequestWithServer();
   };
 
-  private comaparingItemsAndCheckTypeExist = (
-    originalArray: any[],
-    updatedArray: any[],
-  ): any[] => {
-    if (!Array.isArray(originalArray) || !Array.isArray(updatedArray)) {
-      return updatedArray;
-    }
-    // Helper function to create a unique identifier for an object based on index + key
-    const createObjectKey = (obj: any, index: number): string => {
-      if (!obj || typeof obj !== "object") {
-        return `${index}-${JSON.stringify(obj)}`;
-      }
-      return `${index}-${obj.key || JSON.stringify(obj)}`;
-    };
-    // Optimized: stable hash for object (ignores "type" property)
-    const getStableHash = (obj: any): string => {
-      if (!obj || typeof obj !== "object") return JSON.stringify(obj);
-
-      const { type, ...rest } = obj;
-      const sortedKeys = Object.keys(rest).sort();
-      let str = "";
-      for (const key of sortedKeys) {
-        str += `${key}:${JSON.stringify(rest[key])}|`;
-      }
-      return str;
-    };
-    // Precompute hashes for original array
-    const originalObjectsMap = new Map<string, { obj: any; hash: string }>();
-    originalArray.forEach((obj, index) => {
-      const key = createObjectKey(obj, index);
-      originalObjectsMap.set(key, { obj, hash: getStableHash(obj) });
-    });
-    // Process updated array
-    return updatedArray.map((updatedObj, index) => {
-      const objectKey = createObjectKey(updatedObj, index);
-      const originalEntry = originalObjectsMap.get(objectKey);
-      const updatedHash = getStableHash(updatedObj);
-      const isNewlyAdded = !originalEntry;
-      const isChanged = originalEntry && originalEntry.hash !== updatedHash;
-      if (
-        (isNewlyAdded || isChanged) &&
-        updatedObj &&
-        typeof updatedObj === "object" &&
-        updatedObj.hasOwnProperty("type")
-      ) {
-        const { type, ...objWithoutType } = updatedObj;
-        return objWithoutType;
-      }
-      return updatedObj;
-    });
-  };
-
   /**
    *
    * @param _headers - request headers
    */
   public updateHeaders = async (_headers: KeyValueChecked[]) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    const processedHeaders = this.comaparingItemsAndCheckTypeExist(
-      progressiveTab.property.request.headers,
-      _headers,
-    );
-    // Update with processed headers
-    progressiveTab.property.request.headers = processedHeaders;
+    progressiveTab.property.request.headers = _headers;
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareRequestWithServer();
@@ -1563,11 +1506,7 @@ class RestExplorerViewModel {
     ) {
       return;
     }
-    const processedParams = this.comaparingItemsAndCheckTypeExist(
-      progressiveTab.property.request.queryParams,
-      _params,
-    );
-    progressiveTab.property.request.queryParams = processedParams;
+    progressiveTab.property.request.queryParams = _params;
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     if (_effectURL) {
@@ -4354,6 +4293,7 @@ class RestExplorerViewModel {
       if (Array.isArray(response) && response.length > 0) {
         const aiGeneratedArray = response.map((item) => ({
           ...item,
+          type: "ai-generated",
           checked: false,
         }));
         if (

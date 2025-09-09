@@ -115,7 +115,7 @@
   {#if (requestStateSection === RequestSectionEnum.HEADERS || requestStateSection === RequestSectionEnum.PARAMETERS || requestStateSection === RequestSectionEnum.REQUEST_BODY) && !isGuestUser}
     <div
       class="button-container"
-      style="position: absolute; top: 3px; right: 5px;"
+      style="position: absolute; top: 6px; right: 10px;"
     >
       <button
         class="generate-mock-button"
@@ -129,6 +129,9 @@
         </span>
         <span class="button-text">Generate Mock Data</span>
       </button>
+
+      <!-- Beta badge OUTSIDE button -->
+      <span class="beta-badge">BETA</span>
     </div>
   {/if}
   <Navigator {tabs} {onTabClick} currentTabId={requestStateSection} />
@@ -194,5 +197,28 @@
   .tab-active {
     color: var(--text-secondary-100);
     border-bottom: 2px solid var(--border-primary-300) !important;
+  }
+  .beta-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 29px;
+    height: 14px;
+    font-size: 8px;
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    color: var(--text-ds-neutral-50);
+    background-color: var(--bg-ds-primary-600);
+    border-radius: 2px;
+    padding: 2px 4px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+  .generate-mock-button {
+    position: relative;
   }
 </style>
