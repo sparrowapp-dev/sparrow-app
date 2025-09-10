@@ -4233,7 +4233,7 @@ class RestExplorerViewModel {
     }
   };
 
-  private insertGeneratedMockData = async (response: any): Promise<boolean> => {
+    private insertGeneratedMockData = async (response: any): Promise<boolean> => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     if (
       progressiveTab.property?.request?.state?.requestNavigation ===
@@ -4344,17 +4344,17 @@ class RestExplorerViewModel {
         RequestDatasetEnum.URLENCODED
     ) {
       if (Array.isArray(response) && response.length > 0) {
-        const aiGeneratedArray = response.map((item) => ({
-          ...item,
-          type: "text",
-          base: "",
-          generated: true,
-          checked: false,
-        }));
         if (
           progressiveTab.property?.request?.state?.requestBodyNavigation ===
           RequestDatasetEnum.FORMDATA
         ) {
+          const aiGeneratedArray = response.map((item) => ({
+            ...item,
+            type: "text",
+            base: "",
+            generated: true,
+            checked: false,
+          }));
           let currentDetails =
             progressiveTab.property.request.body.formdata || [];
           if (currentDetails.length > 0) currentDetails.pop();
@@ -4372,6 +4372,11 @@ class RestExplorerViewModel {
             { key: "", value: "", checked: false },
           ];
         } else {
+          const aiGeneratedArray = response.map((item) => ({
+            ...item,
+            type: "ai-generated",
+            checked: false,
+          }));
           let currentDetails =
             progressiveTab.property.request.body.urlencoded || [];
           if (currentDetails.length > 0) currentDetails.pop();
