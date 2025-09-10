@@ -4380,7 +4380,7 @@ class RestExplorerViewModel {
           ];
           progressiveTab.property.request.body.formdata = [
             ...merged,
-            { key: "", value: "", checked: false },
+            { key: "", value: "", checked: false, type: "text", base: "" },
           ];
         } else {
           const aiGeneratedArray = response.map((item) => ({

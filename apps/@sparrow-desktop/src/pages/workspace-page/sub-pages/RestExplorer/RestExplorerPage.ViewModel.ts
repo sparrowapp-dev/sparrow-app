@@ -4230,7 +4230,7 @@ class RestExplorerViewModel {
     }
   };
 
-    private insertGeneratedMockData = async (response: any): Promise<boolean> => {
+  private insertGeneratedMockData = async (response: any): Promise<boolean> => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     if (
       progressiveTab.property?.request?.state?.requestNavigation ===
@@ -4366,7 +4366,7 @@ class RestExplorerViewModel {
           ];
           progressiveTab.property.request.body.formdata = [
             ...merged,
-            { key: "", value: "", checked: false },
+            { key: "", value: "", checked: false, type: "text", base: "" },
           ];
         } else {
           const aiGeneratedArray = response.map((item) => ({
