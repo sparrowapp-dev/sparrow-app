@@ -2,6 +2,7 @@
   import { TestCaseModeEnum } from "@sparrow/common/types/workspace";
   import { NoCode } from "./sub-components";
   import { Tooltip } from "@sparrow/library/ui";
+  import Script from "./sub-components/script/Script.svelte";
 
   export let tests;
   export let onTestsChange;
@@ -72,7 +73,7 @@
   <div class="border rounded-top">
     {#if tests?.testCaseMode === TestCaseModeEnum.SCRIPT}
       <div class="px-3 py-2">
-        <p class="text-fs-12 mb-0 text-muted">JavaScript</p>
+        <p class="text-fs-12 mb-0 text-muted">JavaScript Code</p>
       </div>
     {:else if tests?.testCaseMode === TestCaseModeEnum.NO_CODE}
       <div class="px-3 py-2">
@@ -82,7 +83,7 @@
   </div>
   <div style="flex:1; overflow:auto;">
     {#if tests?.testCaseMode === TestCaseModeEnum.SCRIPT}
-      <div class="d-flex align-items-center gap-2">SCRIPT</div>
+      <Script {tabSplitDirection} />
     {:else if tests?.testCaseMode === TestCaseModeEnum.NO_CODE}
       <NoCode
         {tests}
