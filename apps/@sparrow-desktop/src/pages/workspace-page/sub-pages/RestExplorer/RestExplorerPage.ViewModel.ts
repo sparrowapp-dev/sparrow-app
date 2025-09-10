@@ -1873,6 +1873,9 @@ class RestExplorerViewModel {
     if (testcaseMode === TestCaseModeEnum.NO_CODE) {
       await this.executeNoCodeTestcases();
     }
+    else{
+      await this.executeScriptTestcases();
+    }
   };
 
   /**
@@ -1891,7 +1894,7 @@ class RestExplorerViewModel {
           let actual: any;
           let error: string | undefined;
           let testCasePassed = false;
-          let testCaseStatusMessage = "Failed";
+          let testCaseStatusMessage = "";
 
           if (test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_TEXT) {
             actual = response.response.body;
@@ -1974,6 +1977,112 @@ class RestExplorerViewModel {
     });
   };
 
+  private async executeScriptTestcases() {
+    const javaScriptTestCases = `
+        sp.test("Status code is 200", function () {
+        sp.expect(sp.response.code).to.equal(2900);
+    });
+
+    const response = sp.response.json();
+
+    // Validate response structure
+    sp.test("Response has userId, id, title, and completed properties", function () {
+        sp.expect(response).to.have.all.keys('userId', 'id', 'title', 'completed');
+    });
+
+    // Validate data types
+    sp.test("userId is a number", function () {
+        sp.expect(response.userId).to.be.a('number');
+    });
+
+    sp.test("id is a number", function () {
+        sp.expect(response.id).to.be.a('number');
+    });
+
+    sp.test("title is a string", function () {
+        sp.expect(response.title).to.be.a('string');
+    });
+
+    sp.test("completed is a boolean", function () {
+        sp.expect(response.completed).to.be.a('boolean');
+    });
+
+        `
+    const tests: { name: string; passed: boolean; error?: string }[] = [];
+
+    // minimal chai-like expect (you can replace with a real lib like chai)
+    const expect = (actual: any) => ({
+      to: {
+        equal: (expected: any) => {
+          // debugger;
+          if (actual !== expected) throw new Error(`Expected ${actual} to equal ${expected}`);
+        },
+        be: {
+          a: (type: string) => {
+            if (typeof actual !== type) throw new Error(`Expected type ${type} but got ${typeof actual}`);
+          },
+        },
+        have: {
+          all: {
+            keys: (...keys: string[]) => {
+              const missing = keys.filter((k) => !(k in actual));
+              if (missing.length > 0) throw new Error(`Missing keys: ${missing.join(", ")}`);
+            },
+          },
+        },
+      },
+    });
+
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+  
+
+    restExplorerDataStore.update((restApiDataMap) => {
+      const r = restApiDataMap.get(progressiveTab?.tabId);
+      if(r){
+        r.response.testResults = [];
+      // sp object similar to pm
+        const sp = {
+          response: {
+            code: Number(r?.response?.status.split(" ")[0]) ,
+            json: () => {
+              try {
+                return JSON.parse(r?.response?.body);
+              } catch {
+                return {};
+              }
+            },
+          },
+          test: (name: string, fn: Function) => {
+            try {
+              fn();
+              tests.push({ name, passed: true });
+            } catch (err: any) {
+              tests.push({ name, passed: false, error: err.message });
+            }
+          },
+          expect,
+        };
+
+        try {
+            const fn = new Function("sp", javaScriptTestCases);
+            fn(sp); // execute user script with "sp"
+          } catch (err: any) {
+            tests.push({ name: "Test script execution", passed: false, error: err.message });
+          }
+          console.log({ tests });
+          r.response.testResults = tests.map(t => ({
+            testId: '', // No ID in script mode
+            testName: t.name,
+            testStatus: t.passed,
+            testMessage: t.error || '',
+          }));
+          restApiDataMap.set(progressiveTab.tabId, r);
+        }
+        return restApiDataMap;
+      });
+    }
+  
+
   /**
    * Evaluates a test condition against the actual and expected values.
    *
@@ -1995,55 +2104,55 @@ class RestExplorerViewModel {
       switch (condition) {
         case TestCaseConditionOperatorEnum.EQUALS:
           passed = actual == expected;
-          message = passed ? "Passed" : "Failed";
+          message = passed ? "" : `Expected ${actual} to equal  ${expected}`;
           break;
         case TestCaseConditionOperatorEnum.NOT_EQUAL:
           passed = actual != expected;
-          message = passed ? "Passed" : "Failed";
+          message = passed ? "" : `Expected ${actual} not to equal ${expected}`;
           break;
         case TestCaseConditionOperatorEnum.EXISTS:
           passed = actual !== undefined && actual !== null;
-          message = passed ? "Passed" : "Failed";
+          message = passed ? "" : `Expected ${actual} to exist`;
           break;
         case TestCaseConditionOperatorEnum.DOES_NOT_EXIST:
           passed = actual === undefined || actual === null;
-          message = passed ? "Passed" : "Failed";
+          message = passed ? "" : `Expected ${actual} not to exist`;
           break;
         case TestCaseConditionOperatorEnum.LESS_THAN:
           passed =
             typeof actual === "number"
               ? actual < Number(expected)
               : actual.length < Number(expected);
-          message = passed ? "Passed" : "Failed";
+          message = passed ? "" : `Expected ${actual} to be less than ${expected}`;
           break;
         case TestCaseConditionOperatorEnum.GREATER_THAN:
           passed =
             typeof actual === "number"
               ? actual > Number(expected)
               : actual.length > Number(expected);
-          message = passed ? "Passed" : "Failed";
+          message = passed ? "" : `Expected ${actual} to be greater than ${expected}`;
           break;
         case TestCaseConditionOperatorEnum.CONTAINS:
           passed = typeof actual === "string" && actual.includes(expected);
-          message = passed ? "Passed" : "Failed";
+          message = passed ? "" : `Expected ${actual} to contain ${expected}`;
           break;
         case TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN:
           passed = typeof actual === "string" && !actual.includes(expected);
-          message = passed ? "Passed" : "Failed";
+          message = passed ? "" : `Expected ${actual} not to contain ${expected}`;
           break;
         case TestCaseConditionOperatorEnum.IS_EMPTY:
           passed = actual === "" || actual === 0;
-          message = passed ? "Passed" : "Failed";
+          message = passed ? "" : `Expected ${actual} to be empty`;
           break;
         case TestCaseConditionOperatorEnum.IS_NOT_EMPTY:
           passed = actual !== "" && actual !== 0;
-          message = passed ? "Passed" : "Failed";
+          message = passed ? "" : `Expected ${actual} not to be empty`;
           break;
         case TestCaseConditionOperatorEnum.IN_LIST:
           try {
             const list = JSON.parse(actual);
             passed = Array.isArray(list) && list.includes(expected);
-            message = passed ? "Passed" : "Failed";
+            message = passed ? "" : `Expected ${actual} to be in list ${expected}`;
           } catch {
             message = "Result for IN LIST must be a JSON array";
           }
@@ -2052,7 +2161,7 @@ class RestExplorerViewModel {
           try {
             const list = JSON.parse(actual);
             passed = Array.isArray(list) && !list.includes(expected);
-            message = passed ? "Passed" : "Failed";
+            message = passed ? "" : `Expected ${actual} not to be in list ${expected}`;
           } catch {
             message = "Result for NOT IN LIST must be a JSON array";
           }
