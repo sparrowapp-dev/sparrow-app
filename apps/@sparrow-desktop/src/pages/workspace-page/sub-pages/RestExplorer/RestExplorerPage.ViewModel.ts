@@ -117,6 +117,7 @@ import * as xpath from "xpath";
 import { DOMParser } from "xmldom";
 import { JSONPath } from "jsonpath-plus";
 import { captureEvent } from "@app/utils/posthog/posthogConfig";
+import { size } from "@tauri-apps/plugin-fs";
 
 class RestExplorerViewModel {
   /**
@@ -2007,16 +2008,24 @@ class RestExplorerViewModel {
 
   private async executeScriptTestcases() {
     const javaScriptTestCases = `
-        sp.test("Status code is 200", function () {
-        sp.expect(sp.response.code).to.equal(2900);
+        sps.test("Status code is 200", function () {
+        sp.expect(sp.response.statusCode).to.equal(200);
     });
 
-    const response = sp.response.json();
+    const response = sp.response.body.json();
 
     // Validate response structure
     sp.test("Response has userId, id, title, and completed properties", function () {
         sp.expect(response).to.have.all.keys('userId', 'id', 'title', 'completed');
     });
+
+    sp.test("Status code is between 200–300 or 400–500", function () {
+      sp.expect(
+        (sp.response.statusCode >= 100 && sp.response.statusCode <= 500) || 
+        (sp.response.statusCode >= 500 && sp.response.statusCode <= 600)
+      ).to.be.true();
+    });
+
 
     // Validate data types
     sp.test("userId is a number", function () {
@@ -2044,10 +2053,93 @@ class RestExplorerViewModel {
         equal: (expected: any) => {
           if (actual !== expected) throw new Error(`Expected ${actual} to equal ${expected}`);
         },
+        notEqual: (expected: any) => {
+          if (actual === expected) throw new Error(`Expected ${actual} to not equal ${expected}`);
+        },
+        exist: () => {
+          if (actual === undefined || actual === null)
+            throw new Error(`Expected value to exist but got ${actual}`);
+        },
+        notExist: () => {
+          if (actual !== undefined && actual !== null)
+            throw new Error(`Expected value to not exist but got ${actual}`);
+        },
         be: {
           a: (type: string) => {
             if (typeof actual !== type) throw new Error(`Expected type ${type} but got ${typeof actual}`);
           },
+          true: () => {
+            if (actual !== true)
+              throw new Error(`Expected value to be true but got ${actual}`);
+          },
+          false: () => {
+            if (actual !== false)
+              throw new Error(`Expected value to be false but got ${actual}`);
+          },
+          within: (min: number, max: number) => {
+            if (typeof actual !== "number")
+              throw new Error(`Expected a number but got ${typeof actual}`);
+            if (actual < min || actual > max)
+              throw new Error(`Expected ${actual} to be within ${min} and ${max}`);
+          },
+          lessThan: (expected: number) => {
+            if (!(typeof actual === "number" && typeof expected === "number"))
+              throw new Error(`Expected numbers for comparison`);
+            if (!(actual < expected))
+              throw new Error(`Expected ${actual} to be less than ${expected}`);
+          },
+          greaterThan: (expected: number) => {
+            if (!(typeof actual === "number" && typeof expected === "number"))
+              throw new Error(`Expected numbers for comparison`);
+            if (!(actual > expected))
+              throw new Error(`Expected ${actual} to be greater than ${expected}`);
+          },
+          empty: () => {
+            if (
+              (Array.isArray(actual) && actual.length > 0) ||
+              (typeof actual === "string" && actual.trim().length > 0) ||
+              (actual && typeof actual === "object" && Object.keys(actual).length > 0)
+            ) {
+              throw new Error(`Expected value to be empty but got ${JSON.stringify(actual)}`);
+            }
+          },
+          notEmpty: () => {
+            if (
+              (Array.isArray(actual) && actual.length === 0) ||
+              (typeof actual === "string" && actual.trim().length === 0) ||
+              (actual && typeof actual === "object" && Object.keys(actual).length === 0)
+            ) {
+              throw new Error(`Expected value to not be empty`);
+            }
+          },
+        },
+         contain: (expected: any) => {
+          if (
+            (typeof actual === "string" || Array.isArray(actual)) &&
+            !actual.includes(expected)
+          ) {
+            throw new Error(`Expected ${actual} to contain ${expected}`);
+          }
+        },
+        notContain: (expected: any) => {
+          if (
+            (typeof actual === "string" || Array.isArray(actual)) &&
+            actual.includes(expected)
+          ) {
+            throw new Error(`Expected ${actual} to not contain ${expected}`);
+          }
+        },
+        beInList: (list: any[]) => {
+          if (!Array.isArray(list))
+            throw new Error(`Expected a list but got ${typeof list}`);
+          if (!list.includes(actual))
+            throw new Error(`Expected ${actual} to be in list ${list}`);
+        },
+        notBeInList: (list: any[]) => {
+          if (!Array.isArray(list))
+            throw new Error(`Expected a list but got ${typeof list}`);
+          if (list.includes(actual))
+            throw new Error(`Expected ${actual} to not be in list ${list}`);
         },
         have: {
           all: {
@@ -2067,17 +2159,33 @@ class RestExplorerViewModel {
       const r = restApiDataMap.get(progressiveTab?.tabId);
       if(r){
         r.response.testResults = [];
+        r.response.testMessage = '';
       // sp object similar to pm
         const sp = {
           response: {
-            code: Number(r?.response?.status.split(" ")[0]) ,
-            json: () => {
-              try {
-                return JSON.parse(r?.response?.body);
-              } catch {
-                return {};
-              }
+            statusCode: Number(r?.response?.status.split(" ")[0]) ,
+            body: {
+              text: () => {
+                try {
+                  return r?.response?.body;
+                } catch {
+                  return {};
+                }
+              },  
+              json: () => {
+                try {
+                  return JSON.parse(r?.response?.body);
+                } catch {
+                  return {};
+                }
+              },  
             },
+            headers: r?.response?.headers.reduce((acc, h) => {
+              acc[h.key] = h.value;
+              return acc;
+            }, {}),
+            size: r?.response?.size,
+            time: r?.response?.time,
           },
           test: (name: string, fn: Function) => {
             try {
@@ -2093,16 +2201,16 @@ class RestExplorerViewModel {
         try {
             const fn = new Function("sp", javaScriptTestCases);
             fn(sp); // execute user script with "sp"
+            r.response.testResults = tests.map(t => ({
+              testId: '', // No ID in script mode
+              testName: t.name,
+              testStatus: t.passed,
+              testMessage: t.error || '',
+            }));
           } catch (err: any) {
-            tests.push({ name: "Test script execution", passed: false, error: err.message });
+            console.log(err)
+            r.response.testMessage = `${err.name} - ${err.message}`;
           }
-          console.log({ tests });
-          r.response.testResults = tests.map(t => ({
-            testId: '', // No ID in script mode
-            testName: t.name,
-            testStatus: t.passed,
-            testMessage: t.error || '',
-          }));
           restApiDataMap.set(progressiveTab.tabId, r);
         }
         return restApiDataMap;
