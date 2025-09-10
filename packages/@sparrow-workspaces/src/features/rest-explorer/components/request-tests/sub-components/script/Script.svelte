@@ -46,17 +46,21 @@
   >
     <!-- Left Sidebar -->
     <div
-      class="h-100 {isLeftPanelCollapsed ? 'collapsed-panel' : ''}"
-      style="width: {tabSplitDirection === 'vertical'
-        ? '100%'
-        : isLeftPanelCollapsed
-          ? 'auto'
-          : '25%'}; gap: 6px; overflow: hidden; transition: width 0.3s ease;"
+      class="h-100 d-flex flex-column {isLeftPanelCollapsed
+        ? 'collapsed-panel'
+        : ''}"
+      style="
+    width: {isLeftPanelCollapsed
+        ? '60px'
+        : `${tabSplitDirection === 'vertical' ? '40%' : '25%'}`};
+    gap: 6px;
+    overflow: hidden;
+    transition: width 0.3s ease;"
     >
       {#if isLeftPanelCollapsed}
         <!-- Collapsed state -->
         <div
-          class="collapsed-content d-flex flex-column align-items-center"
+          class="collapsed-content d-flex flex-column align-items-center h-100"
           style="padding: 8px 4px;"
         >
           <Button
@@ -71,62 +75,59 @@
         </div>
       {:else}
         <!-- Expanded state -->
+        <!-- Header -->
         <div
-          class="d-flex flex-row justify-content-between align-items-center"
+          class="d-flex flex-row justify-content-between align-items-center flex-shrink-0"
           style="margin: 8px 4px 8px 8px;"
         >
-          <div>
-            <p class="snippet-text" style="margin: 0px;">Snippets</p>
-          </div>
-          <div>
-            <Button
-              onClick={toggleLeftPanel}
-              size={"extra-small"}
-              startIcon={ChevronDoubleLeftRegular}
-              type="outline-secondary"
-            />
-          </div>
+          <p class="snippet-text" style="margin:0;">Snippets</p>
+          <Button
+            onClick={toggleLeftPanel}
+            size={"extra-small"}
+            startIcon={ChevronDoubleLeftRegular}
+            type="outline-secondary"
+          />
         </div>
-        <div class="d-flex justify-content-center" style="">
+
+        <!-- Search -->
+        <div
+          class="d-flex justify-content-center flex-shrink-0"
+          style="margin-bottom: 8px;"
+        >
           <Search
             id="script-snippet-search"
             customWidth={"100%"}
             variant="primary"
             size="small"
             bind:value={searchData}
-            on:input={(e) => {
-              onSearchSnippets(searchData);
-            }}
+            on:input={() => onSearchSnippets(searchData)}
             placeholder="Search"
           />
         </div>
-        <div class="h-100 mt-1" style="overflow: auto;">
+
+        <!-- Scrollable snippets list -->
+        <div class="flex-grow-1" style="overflow:auto; min-height:0;">
           {#each predefinedTestSnippets as snippet}
             <div
               class="mb-2 d-flex align-items-center snippet-suggestion-container"
+              tabindex="0"
             >
-              <p class="suggestion-text">
-                {snippet.title}
-              </p>
+              <p class="suggestion-text">{snippet.title}</p>
             </div>
           {/each}
         </div>
       {/if}
     </div>
 
-    <!-- Right Form -->
+    <!-- Right Panel -->
     <div
       class="h-100 gap-2 d-flex border-start ms-2 ps-2"
       style="
-        width: {tabSplitDirection === 'vertical'
-        ? '100%'
-        : isLeftPanelCollapsed
-          ? 'calc(100% - 60px)'
-          : '75%'};
-        overflow: auto;
-        flex-flow: wrap;
-        align-content: flex-start;
-        transition: width 0.3s ease;"
+    width: {isLeftPanelCollapsed ? 'calc(100% - 60px)' : '75%'};
+    overflow: auto;
+    flex-flow: wrap;
+    align-content: flex-start;
+    transition: width 0.3s ease;"
     >
       <Editor
         bind:lang
@@ -160,7 +161,15 @@
     text-overflow: ellipsis;
   }
   .snippet-suggestion-container:hover {
-    background-color: var(--bg-ds-surface-100);
+    background-color: var(--bg-ds-surface-400);
+  }
+  .snippet-suggestion-container:active {
+    background-color: var(--bg-ds-surface-700);
+  }
+  .snippet-suggestion-container:focus-visible {
+    outline: none;
+    background-color: var(--bg-ds-surface-600);
+    border: 2px solid var(--bg-ds-primary-300);
   }
   .suggestion-text {
     font-family: "Inter", sans-serif;
@@ -191,6 +200,13 @@
   .vertical-text {
     writing-mode: vertical-rl;
     text-orientation: mixed;
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--text-ds-neutral-50);
+  }
+
+  .horizontal-text {
     font-family: "Inter", sans-serif;
     font-weight: 500;
     font-size: 12px;
