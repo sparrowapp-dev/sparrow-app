@@ -1905,18 +1905,37 @@ class RestExplorerViewModel {
           } else if (
             test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER
           ) {
-            actual = response.response.headers.find(
-              (h) => h.key.toLowerCase() === test.testPath?.toLowerCase(),
-            )?.value;
+             if(!test.condition){
+                error = `Condition not found`;
+                actual = undefined;  
+              }
+              else if(!test.testPath){
+                error = `Test path not found`;
+                actual = undefined;
+              }else{
+                actual = response.response.headers.find(
+                  (h) => h.key.toLowerCase() === test.testPath?.toLowerCase(),
+                )?.value;
+              }
           } else if (
             test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON
           ) {
             try {
-              const json = JSON.parse(response.response.body);
-              // Use JSONPath to extract value, supports $[3].userId, $[0].address.city, etc.
-              const result = JSONPath({ path: test.testPath, json });
-              // If result is an array, take the first value
-              actual = Array.isArray(result) ? result[0] : result;
+              if(!test.condition){
+                error = `Condition not found`;
+                actual = undefined;  
+              }
+              else if(!test.testPath){
+                error = `Test path not found`;
+                actual = undefined;
+              }
+              else{
+                const json = JSON.parse(response.response.body);
+                // Use JSONPath to extract value, supports $[3].userId, $[0].address.city, etc.
+                const result = JSONPath({ path: test.testPath, json });
+                // If result is an array, take the first value
+                actual = Array.isArray(result) ? result[0] : result;
+              }
             } catch (e) {
               error = "Invalid JSON or path";
               actual = undefined;
@@ -1925,31 +1944,40 @@ class RestExplorerViewModel {
             test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML
           ) {
             try {
-              const xml = response.response.body;
-              const doc = new DOMParser().parseFromString(xml, "text/xml");
-              // test.testPath should be a valid XPath, e.g. "/root/country/city"
-              const nodes = xpath.select(test.testPath, doc);
-
-              if (Array.isArray(nodes) && nodes.length > 0) {
-                // If it's an attribute node
-                if (nodes[0].nodeType === 2) {
-                  actual = nodes[0].nodeValue;
-                } else if (nodes[0].firstChild) {
-                  actual = nodes[0].firstChild.nodeValue;
-                } else if ((nodes[0] as any).data) {
-                  actual = (nodes[0] as any).data;
-                } else {
-                  actual = nodes[0].toString();
-                }
-              } else {
+               if(!test.condition){
+                error = `Condition not found`;
+                actual = undefined;  
+              }
+              else if(!test.testPath){
+                error = `Test path not found`;
                 actual = undefined;
+              }else{
+                const xml = response.response.body;
+                const doc = new DOMParser().parseFromString(xml, "text/xml");
+                // test.testPath should be a valid XPath, e.g. "/root/country/city"
+                const nodes = xpath.select(test.testPath, doc);
+  
+                if (Array.isArray(nodes) && nodes.length > 0) {
+                  // If it's an attribute node
+                  if (nodes[0].nodeType === 2) {
+                    actual = nodes[0].nodeValue;
+                  } else if (nodes[0].firstChild) {
+                    actual = nodes[0].firstChild.nodeValue;
+                  } else if ((nodes[0] as any).data) {
+                    actual = (nodes[0] as any).data;
+                  } else {
+                    actual = nodes[0].toString();
+                  }
+                } else {
+                  actual = undefined;
+                }
               }
             } catch (e) {
               error = "Invalid XML or XPath";
               actual = undefined;
             }
           } else {
-            error = `Test target ${test.testTarget} not found`;
+            error = `Test target not found`;
           }
 
           if (actual) {
@@ -2014,7 +2042,6 @@ class RestExplorerViewModel {
     const expect = (actual: any) => ({
       to: {
         equal: (expected: any) => {
-          // debugger;
           if (actual !== expected) throw new Error(`Expected ${actual} to equal ${expected}`);
         },
         be: {
@@ -2097,18 +2124,18 @@ class RestExplorerViewModel {
     condition: TestCaseConditionOperatorEnum,
   ): { passed: boolean; message?: string } => {
     let passed = false;
-    let message: string | undefined = "Failed";
+    let message: string | undefined = "";
     const expected: any = expectedRaw;
 
     try {
       switch (condition) {
         case TestCaseConditionOperatorEnum.EQUALS:
           passed = actual == expected;
-          message = passed ? "" : `Expected ${actual} to equal  ${expected}`;
+          message = passed ? "" : `Expected ${actual} to equal  ${expected || "(empty)"}`;
           break;
         case TestCaseConditionOperatorEnum.NOT_EQUAL:
           passed = actual != expected;
-          message = passed ? "" : `Expected ${actual} not to equal ${expected}`;
+          message = passed ? "" : `Expected ${actual} not to equal ${expected || "(empty)"}`;
           break;
         case TestCaseConditionOperatorEnum.EXISTS:
           passed = actual !== undefined && actual !== null;
@@ -2123,22 +2150,22 @@ class RestExplorerViewModel {
             typeof actual === "number"
               ? actual < Number(expected)
               : actual.length < Number(expected);
-          message = passed ? "" : `Expected ${actual} to be less than ${expected}`;
+          message = passed ? "" : `Expected ${actual} to be less than ${expected || "(empty)"}`;
           break;
         case TestCaseConditionOperatorEnum.GREATER_THAN:
           passed =
             typeof actual === "number"
               ? actual > Number(expected)
               : actual.length > Number(expected);
-          message = passed ? "" : `Expected ${actual} to be greater than ${expected}`;
+          message = passed ? "" : `Expected ${actual} to be greater than ${expected || "(empty)"}`;
           break;
         case TestCaseConditionOperatorEnum.CONTAINS:
           passed = typeof actual === "string" && actual.includes(expected);
-          message = passed ? "" : `Expected ${actual} to contain ${expected}`;
+          message = passed ? "" : `Expected ${actual} to contain ${expected || "(empty)"}`;
           break;
         case TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN:
           passed = typeof actual === "string" && !actual.includes(expected);
-          message = passed ? "" : `Expected ${actual} not to contain ${expected}`;
+          message = passed ? "" : `Expected ${actual} not to contain ${expected || "(empty)"}`;
           break;
         case TestCaseConditionOperatorEnum.IS_EMPTY:
           passed = actual === "" || actual === 0;
@@ -2152,7 +2179,7 @@ class RestExplorerViewModel {
           try {
             const list = JSON.parse(actual);
             passed = Array.isArray(list) && list.includes(expected);
-            message = passed ? "" : `Expected ${actual} to be in list ${expected}`;
+            message = passed ? "" : `Expected ${actual} to be in list ${expected || "(empty)"}`;
           } catch {
             message = "Result for IN LIST must be a JSON array";
           }
@@ -2161,7 +2188,7 @@ class RestExplorerViewModel {
           try {
             const list = JSON.parse(actual);
             passed = Array.isArray(list) && !list.includes(expected);
-            message = passed ? "" : `Expected ${actual} not to be in list ${expected}`;
+            message = passed ? "" : `Expected ${actual} not to be in list ${expected || "(empty)"}`;
           } catch {
             message = "Result for NOT IN LIST must be a JSON array";
           }
