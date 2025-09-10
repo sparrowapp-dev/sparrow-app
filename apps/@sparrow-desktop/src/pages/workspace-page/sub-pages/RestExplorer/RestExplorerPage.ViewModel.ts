@@ -217,8 +217,8 @@ class RestExplorerViewModel {
             collectionDoc?.isGenerateVariableTrial,
           );
           await this.updateIsRequestTabDemo(
-            collectionDoc?.isRequestTestsNoCodeDemoCompleted
-          )
+            collectionDoc?.isRequestTestsNoCodeDemoCompleted,
+          );
         }
 
         //   "selectedRequestAuthProfileId:>> ",
@@ -2041,8 +2041,7 @@ class RestExplorerViewModel {
           break;
         case TestCaseConditionOperatorEnum.IN_LIST:
           try {
-            const list = JSON.parse(actual);
-            passed = Array.isArray(list) && list.includes(expected);
+            passed = Array.isArray(actual) && actual.includes(expected);
             message = passed ? "Passed" : "Failed";
           } catch {
             message = "Result for IN LIST must be a JSON array";
@@ -2050,8 +2049,7 @@ class RestExplorerViewModel {
           break;
         case TestCaseConditionOperatorEnum.NOT_IN_LIST:
           try {
-            const list = JSON.parse(actual);
-            passed = Array.isArray(list) && !list.includes(expected);
+            passed = Array.isArray(actual) && !actual.includes(expected);
             message = passed ? "Passed" : "Failed";
           } catch {
             message = "Result for NOT IN LIST must be a JSON array";
@@ -2137,11 +2135,11 @@ class RestExplorerViewModel {
     );
   };
 
-  public updateIsRequestTabDemo = async(value:boolean) =>{
+  public updateIsRequestTabDemo = async (value: boolean) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.isRequestTestsNoCodeDemoCompleted = value;
     this.tab = progressiveTab;
-  }
+  };
 
   /**
    *
@@ -2323,7 +2321,6 @@ class RestExplorerViewModel {
     }
   };
 
-  
   private removeTypeFromObjectArray = (objectArray: any[]): any[] => {
     if (!Array.isArray(objectArray)) {
       console.warn("Input is not an array");
@@ -4466,7 +4463,7 @@ class RestExplorerViewModel {
     }
   };
 
-    /**
+  /**
    * Fetch collections from services and insert to repository
    * @param workspaceId - id of current workspace
    */

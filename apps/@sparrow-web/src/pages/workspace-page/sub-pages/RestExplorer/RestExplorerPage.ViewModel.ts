@@ -2057,8 +2057,7 @@ class RestExplorerViewModel {
           break;
         case TestCaseConditionOperatorEnum.IN_LIST:
           try {
-            const list = JSON.parse(actual);
-            passed = Array.isArray(list) && list.includes(expected);
+            passed = Array.isArray(actual) && actual.includes(expected);
             message = passed ? "Passed" : "Failed";
           } catch {
             message = "Result for IN LIST must be a JSON array";
@@ -2066,8 +2065,7 @@ class RestExplorerViewModel {
           break;
         case TestCaseConditionOperatorEnum.NOT_IN_LIST:
           try {
-            const list = JSON.parse(actual);
-            passed = Array.isArray(list) && !list.includes(expected);
+            passed = Array.isArray(actual) && !actual.includes(expected);
             message = passed ? "Passed" : "Failed";
           } catch {
             message = "Result for NOT IN LIST must be a JSON array";
