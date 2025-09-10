@@ -40,7 +40,7 @@
     style="width:50px;"
   >
     <span style="width: 25px;">
-      {#if element.type === "ai-generated"}
+      {#if element.generated}
         <Tooltip
           title={"Generated Mock Data"}
           placement={"top-right"}
