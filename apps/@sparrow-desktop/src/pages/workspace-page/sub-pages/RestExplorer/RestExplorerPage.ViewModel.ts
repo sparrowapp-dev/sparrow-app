@@ -217,8 +217,8 @@ class RestExplorerViewModel {
             collectionDoc?.isGenerateVariableTrial,
           );
           await this.updateIsRequestTabDemo(
-            collectionDoc?.isRequestTestsNoCodeDemoCompleted
-          )
+            collectionDoc?.isRequestTestsNoCodeDemoCompleted,
+          );
         }
 
         //   "selectedRequestAuthProfileId:>> ",
@@ -2137,11 +2137,11 @@ class RestExplorerViewModel {
     );
   };
 
-  public updateIsRequestTabDemo = async(value:boolean) =>{
+  public updateIsRequestTabDemo = async (value: boolean) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.isRequestTestsNoCodeDemoCompleted = value;
     this.tab = progressiveTab;
-  }
+  };
 
   /**
    *
@@ -2340,6 +2340,20 @@ class RestExplorerViewModel {
     });
   };
 
+  private removeGeneratedFromObjectArray = (objectArray: any[]): any[] => {
+    if (!Array.isArray(objectArray)) {
+      console.warn("Input is not an array");
+      return objectArray;
+    }
+    return objectArray.map((obj) => {
+      if (!obj || typeof obj !== "object") {
+        return obj;
+      }
+      const { generated, ...objWithoutGenerated } = obj;
+      return objWithoutGenerated;
+    });
+  };
+
   private updateTabToRemoveType = async () => {
     const progressiveTab = this._tab.getValue();
     const updatedHeaders = this.removeTypeFromObjectArray(
@@ -2348,7 +2362,7 @@ class RestExplorerViewModel {
     const updatedParams = this.removeTypeFromObjectArray(
       progressiveTab.property.request.queryParams,
     );
-    const updateFormData = this.removeTypeFromObjectArray(
+    const updateFormData = this.removeGeneratedFromObjectArray(
       progressiveTab.property.request.body.formdata,
     );
     const updateUrlEncoded = this.removeTypeFromObjectArray(
@@ -4332,7 +4346,9 @@ class RestExplorerViewModel {
       if (Array.isArray(response) && response.length > 0) {
         const aiGeneratedArray = response.map((item) => ({
           ...item,
-          type: "ai-generated",
+          type: "text",
+          base: "",
+          generated: true,
           checked: false,
         }));
         if (
@@ -4466,7 +4482,7 @@ class RestExplorerViewModel {
     }
   };
 
-    /**
+  /**
    * Fetch collections from services and insert to repository
    * @param workspaceId - id of current workspace
    */
