@@ -114,7 +114,7 @@
 </script>
 
 <div style="padding-bottom: 12px; position:relative;">
-  {#if (requestStateSection === RequestSectionEnum.HEADERS || requestStateSection === RequestSectionEnum.PARAMETERS || requestStateSection === RequestSectionEnum.REQUEST_BODY) && !isGuestUser && (userRole === TeamRole.TEAM_ADMIN || userRole === WorkspaceRole.WORKSPACE_EDITOR || userRole === TeamRole.TEAM_OWNER)}
+  {#if (requestStateSection === RequestSectionEnum.HEADERS || requestStateSection === RequestSectionEnum.PARAMETERS || requestStateSection === RequestSectionEnum.REQUEST_BODY) && !isGuestUser && (userRole === WorkspaceRole.WORKSPACE_ADMIN || userRole === WorkspaceRole.WORKSPACE_EDITOR || userRole === TeamRole.TEAM_OWNER)}
     <div
       class="button-container"
       style="position: absolute; top: 6px; right: 10px;"
