@@ -544,6 +544,9 @@ export default class CollectionsViewModel {
       newRequestTab.updateHeaders(
         restOfData.property.request.headers as KeyValueChecked[],
       );
+      newRequestTab.updateTests(
+        restOfData.property.request.tests,
+      );
       newRequestTab.updateQueryParams(
         restOfData.property.request.queryParams as KeyValueChecked[],
       );
@@ -730,9 +733,10 @@ export default class CollectionsViewModel {
         restOfData.property.aiRequest?.systemPrompt as string,
       );
       newAiRequestTab.updateAuth(restOfData.property.aiRequest?.auth as Auth);
-      newAiRequestTab.updateState(
-        restOfData.property.aiRequest?.state as StatePartial,
-      );
+      newAiRequestTab.updateState({
+        ...restOfData.property.aiRequest?.state,
+        isChatbotGeneratingResponse: false,
+      } as StatePartial);
 
       const { collectionId, folderId, ...filteredPath } = restOfData.path; // Remove collecitonId and folderId
       newAiRequestTab.updatePath(filteredPath as TabPath);

@@ -556,8 +556,8 @@
 
           {#if expand}
             <div
-              style="height:24px; width:30px; padding:4px;"
-              class="d-flex align-items-center justify-content-end"
+              style="height:24px; width:30px; padding:4px;padding-left: 0px;"
+              class="d-flex align-items-center"
             >
               <FolderOpenRegular
                 size={"16px"}
@@ -566,8 +566,8 @@
             </div>
           {:else}
             <div
-              class="d-flex align-items-center justify-content-end"
-              style="height:24px; width:30px; padding:4px;"
+              class="d-flex align-items-center"
+              style="height:24px; width:30px; padding:4px; padding-left: 0px;"
             >
               <FolderRegular size={"16px"} color="var(--icon-ds-neutral-300)" />
             </div>

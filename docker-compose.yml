@@ -1,96 +1,55 @@
-version: "3"
-
 services:
   # MongoDB
   mongo:
     image: mongo:7.0
+    container_name: sparrow-mongo
     ports:
       - "27017:27017"
-    env_file:
-      - .env.docker-setup
     networks:
       - localnet
+    env_file:
+      - .env.docker-setup
 
   # Sparrow Api Server
   sparrow-api:
-    image: sparrowapi/sparrow-api:7
-    # Don't expose ports directly, as they'll be proxied through nginx
-    # ports:
-    #   - "9000:9000"
-    #   - "9001:9001"
-    #   - "9002:9002"
+    image: sparrowapi/sparrow-api:${SPARROW_API_VERSION:-latest}
+    container_name: sparrow-api
+    env_file:
+      - .env.docker-setup
     networks:
       - localnet
     depends_on:
       - mongo
-    env_file:
-      - .env.docker-setup
+    ports:
+      - "9000:9000"
 
   # Sparrow Auth Server
   sparrow-auth:
-    build:
-      context: https://github.com/sparrowapp-dev/sparrow-app-auth.git
-      dockerfile: Dockerfile
-    # Don't expose port directly
-    # ports:
-    #   - "1421:80"
+    image: sparrowapi/sparrow-auth:${SPARROW_AUTH_VERSION:-latest}
+    container_name: sparrow-auth
     networks:
       - localnet
     depends_on:
       - sparrow-api
       - mongo
+    ports:
+      - "1421:80"
     env_file:
       - .env.docker-setup
-    command: >-
-      sh -c "
-        echo 'window.runtimeConfig = {
-          VITE_API_URL: \"${VITE_API_URL}\",
-          VITE_SPARROW_SUPPORT_EMAIL: \"${VITE_SPARROW_SUPPORT_EMAIL}\",
-          VITE_SPARROW_OAUTH: \"${VITE_SPARROW_OAUTH}\",
-          VITE_ENABLE_MIX_PANEL: \"${VITE_ENABLE_MIX_PANEL}\",
-          VITE_MIX_PANEL_TOKEN: \"${VITE_MIX_PANEL_TOKEN}\",
-          VITE_TERMS_OF_SERVICE: \"${VITE_TERMS_OF_SERVICE}\",
-          VITE_SPARROW_WEB_URL: \"${VITE_SPARROW_WEB_URL}\",
-          VITE_SPARROW_PRIVACY_POLICY: \"${VITE_SPARROW_PRIVACY_POLICY}\"
-        }' > /usr/share/nginx/html/runtime-config.js && nginx -g 'daemon off;'
-      "
 
   # Sparrow Proxy Service
   sparrow-proxy:
-    build:
-      context: https://github.com/sparrowapp-dev/sparrow-proxy-service.git
-      dockerfile: Dockerfile
-    # Don't expose port directly
-    # ports:
-    #   - "3000:3000"
+    image: sparrowapi/sparrow-proxy:${SPARROW_PROXY_VERSION:-latest}
+    container_name: sparrow-proxy
     networks:
       - localnet
+    ports:
+      - 3000:3000
 
   # Sparrow Web App
   sparrow-web:
-    build:
-      context: .
-      dockerfile: Sparrow-Web.Dockerfile
-      args:
-        VITE_WEB_API_TIMEOUT: 5000
-        VITE_WEB_API_URL: ${VITE_WEB_API_URL}
-        VITE_WEB_AUTH_URL: ${VITE_WEB_AUTH_URL}
-        VITE_WEB_SOCKET_IO_API_URL: ${VITE_WEB_SOCKET_IO_API_URL}
-        VITE_WEB_SPARROW_OAUTH: ${VITE_WEB_SPARROW_OAUTH}
-        VITE_WEB_TERMS_OF_SERVICE: https://example.dev/termsandconditions
-        VITE_WEB_BASE_URL: ${VITE_WEB_BASE_URL}
-        VITE_WEB_SPARROW_GITHUB: https://github.com/sparrowapp-dev
-        VITE_WEB_SPARROW_LINKEDIN: https://www.linkedin.com/showcase/sparrow-app/
-        VITE_WEB_SPARROW_DOWNLOAD_LINK: https://github.com/sparrowapp-dev/sparrow-app/releases
-        VITE_WEB_RELEASE_NOTES_API: https://api.github.com/repos/sparrowapp-dev/sparrow-app/releases
-        VITE_WEB_SPARROW_DOCS: https://docs.sparrowapp.dev/docs/intro
-        VITE_WEB_PROXY_SERVICE: ${VITE_WEB_PROXY_SERVICE}
-        VITE_WEB_ENABLE_MIX_PANEL: false
-        VITE_WEB_MIX_PANEL_TOKEN:
-        VITE_WEB_SPARROW_AI_WEBSOCKET: ${VITE_WEB_SPARROW_AI_WEBSOCKET}
-    # Don't expose port directly
-    # ports:
-    #   - "1422:80"
+    image: sparrowapi/sparrow-web:${SPARROW_WEB_VERSION:-latest}
+    container_name: sparrow-web
     networks:
       - localnet
     depends_on:
@@ -98,29 +57,25 @@ services:
       - sparrow-api
       - sparrow-auth
       - mongo
-
-  # Nginx Reverse Proxy with SSL
-  nginx-proxy:
-    image: nginx:alpine
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/ssl:/etc/nginx/ssl
-      - ./nginx/html:/usr/share/nginx/html
-      - ./nginx/logs:/var/log/nginx
+      - 1422:80
+    env_file:
+      - .env.docker-setup
+
+  # Sparrow Admin Service
+  sparrow-admin:
+    image: sparrowapi/sparrow-admin:${SPARROW_ADMIN_VERSION:-latest}
+    container_name: sparrow-admin
     networks:
       - localnet
     depends_on:
       - sparrow-api
       - sparrow-auth
-      - sparrow-web
-    restart: always
-
-volumes:
-  kafka_data:
-    driver: local
+      - mongo
+    ports:
+      - 5173:80
+    env_file:
+      - .env.docker-setup
 
 networks:
   localnet:

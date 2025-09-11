@@ -248,7 +248,7 @@
             </div>
 
             <div class="p-2">
-              {#if !isGuestUser && isTrialExhausted == false}
+              {#if !isGuestUser && isTrialExhausted == false && constants.APP_EDITION !== "SELFHOSTED"}
                 <div class="d-flex flex-column" style="gap: 12px">
                   <div class="d-flex align-items-start" style="gap: 4px">
                     <div>
@@ -310,7 +310,9 @@
               </div>
             </section>
             <!-- Launch sparrow desktop -->
-            <LaunchDesktop {launchSparrowWebApp} />
+            {#if constants.APP_EDITION !== "SELFHOSTED"}
+              <LaunchDesktop {launchSparrowWebApp} />
+            {/if}
           </div>
         {/if}
       </Pane>

@@ -4,11 +4,15 @@
   import GenerateVariablesLoading from "../components/GenerateVariablesLoading.svelte";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import { ChevronDownRegular, ChevronUpRegular } from "@sparrow/library/icons";
+  import { generatedVariableDemo, generateVariableStep } from "../../../stores";
+  import GenerateVariableGuideCard from "../../generate-variables-tour-guide/components/GenerateVariableGuideCard.svelte";
+  import { GenerateVariableTourContent } from "../../generate-variables-tour-guide/utils";
   import { navigate } from "svelte-navigator";
   export let currentEnvironment: any;
   export let generatedVariables: KeyValuePair[] = [];
   export let updateGeneratedVariables;
   export let handleRedirectToDocs = () => {};
+  export let handleCloseTourGuide: () => void;
   export let isWebApp;
 
   export let onUpdateVariableSelection;
@@ -41,22 +45,115 @@
 </script>
 
 <div class="flex flex-column" style="margin-top: 12px;">
-  <div>
-    <p
-      class="d-flex justify-content-start align-items-center common-text title-text"
-    >
-      Generated Variables from "{currentEnvironment?.property?.environment
-        ?.generateProperty.collectionName}"
-    </p>
-    <p
-      class="d-flex justify-content-start align-items-center common-text description-text"
-    >
-      The data in your requests will be updated once you accept and save the
-      environment.
-    </p>
+  <div
+    class="flex flex-column"
+    id="generate-variable-bottom"
+    style="position: relative;"
+  >
+    <div>
+      <p
+        class="d-flex justify-content-start align-items-center common-text title-text"
+      >
+        Generated Variables from "{currentEnvironment?.property?.environment
+          ?.generateProperty.collectionName}"
+      </p>
+      <p
+        class="d-flex justify-content-start align-items-center common-text description-text"
+      >
+        The data in your requests will be updated once you accept and save the
+        environment.
+      </p>
+    </div>
+    {#if $generatedVariableDemo && $generateVariableStep === 2}
+      <div class="d-flex flex-column">
+        <div class="">
+          <TabularInputV2
+            disabled={false}
+            keyValue={[]}
+            callback={() => {}}
+            search={""}
+            isGeneratedVariable={true}
+            {onUpdateVariableSelection}
+            {isRevertEnabled}
+          />
+        </div>
+      </div>
+    {/if}
+    {#if $generatedVariableDemo && $generateVariableStep === 2}
+      <GenerateVariableGuideCard
+        titleName={GenerateVariableTourContent[1].Title}
+        descriptionContent={GenerateVariableTourContent[1].description}
+        cardNumber={$generateVariableStep}
+        totalsCards={5}
+        top={0}
+        left={400}
+        onNext={() => {
+          generateVariableStep.set(3);
+        }}
+        placement={"left"}
+        onClose={handleCloseTourGuide}
+      />
+    {/if}
   </div>
+  {#if $generatedVariableDemo && $generateVariableStep === 2}
+    <GenerateVariablesLoading />
+  {/if}
   <div>
-    {#if aiGenerationStatus === "generating"}
+    {#if $generatedVariableDemo && $generateVariableStep !== 2 && $generateVariableStep !== 3 && $generateVariableStep !== 4 && $generateVariableStep !== 5}
+      <div>
+        <div class="d-flex flex-column">
+          <div class="" style="margin-bottom:12px;">
+            <TabularInputV2
+              disabled={false}
+              keyValue={[]}
+              callback={() => {}}
+              search={""}
+              isGeneratedVariable={true}
+              {onUpdateVariableSelection}
+              {isRevertEnabled}
+            />
+          </div>
+          <div class="">
+            <GenerateVariablesLoading />
+          </div>
+        </div>
+      </div>
+    {:else if ($generatedVariableDemo && $generateVariableStep === 3) || $generateVariableStep === 4 || $generateVariableStep === 5}
+      <div class="d-flex">
+        <TabularInputV2
+          disabled={false}
+          keyValue={generatedVariables.length > 0
+            ? generatedVariables
+            : [
+                {
+                  key: "DEVs",
+                  checked: true,
+                  value: "isApr",
+                },
+                {
+                  key: "base_url",
+                  checked: true,
+                  value: "closed",
+                },
+                {
+                  key: "Cookie",
+                  value: "gzip, deflate, br",
+                  checked: false,
+                },
+                {
+                  key: "",
+                  checked: false,
+                  value: "",
+                },
+              ]}
+          callback={() => {}}
+          search={""}
+          isGeneratedVariable={true}
+          onUpdateVariableSelection={() => {}}
+          {isRevertEnabled}
+        />
+      </div>
+    {:else if aiGenerationStatus === "generating"}
       <div class="d-flex flex-column">
         <div class="" style="margin-bottom:12px;">
           <TabularInputV2
@@ -73,7 +170,7 @@
           <GenerateVariablesLoading />
         </div>
       </div>
-    {:else if aiGenerationStatus === "generated"}
+    {:else if aiGenerationStatus === "generated" && !$generatedVariableDemo}
       <div class="d-flex">
         <TabularInputV2
           disabled={false}

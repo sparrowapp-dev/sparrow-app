@@ -5,6 +5,7 @@
     EditRegular,
     MoreVerticalRegular,
   } from "@sparrow/library/icons";
+  import { WorkspaceRole } from "@sparrow/common/enums";
 
   export let list;
   export let listIndex: number = 1;
@@ -23,6 +24,7 @@
   export let isAdminOrOwner: boolean;
   export let openInDesktop: (workspaceID: string) => void;
   export let isWebEnvironment: boolean;
+  export let userRole: string;
 
   let showMenu = false;
   let noOfColumns = 180;
@@ -201,13 +203,15 @@
       class="threedot-icon-container"
       style="display: flex; justify-content: center; align-items: center;"
     >
-      <Button
-        type="teritiary-regular"
-        onClick={(e) => {
-          rightClickContextMenu(e);
-        }}
-        startIcon={MoreVerticalRegular}
-      />
+      {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+        <Button
+          type="teritiary-regular"
+          onClick={(e) => {
+            rightClickContextMenu(e);
+          }}
+          startIcon={MoreVerticalRegular}
+        />
+      {/if}
     </div>
   </td>
 </tr>

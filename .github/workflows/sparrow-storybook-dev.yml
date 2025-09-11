@@ -1,9 +1,6 @@
 name: Sparrow-storybook-dev
 on:
-  push:
-    branches:
-      - development
-      - design-system
+  workflow_dispatch:
 
 jobs:
    build:

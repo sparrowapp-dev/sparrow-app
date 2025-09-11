@@ -33,6 +33,7 @@
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
   import { CollectionTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+  import { AIRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/ai-request-base";
 
   export let onClick;
   export let onFinish = (id: string) => {};
@@ -801,7 +802,7 @@
           ><SocketIoIcon
             height={"12px"}
             width={"16px"}
-            color={"var(--icon-primary-300)"}
+            color={"var(--icon-ds-success-300)"}
           /></span
         >
       {:else if componentData?.property.request.method === TabTypeEnum.GRAPHQL}
@@ -978,7 +979,9 @@
                 componentData?.property.request.method ===
                 TabTypeEnum.AI_REQUEST
               ) {
-                notifications.success(`AI request request saved successfully.`);
+                notifications.success(
+                  `${AIRequestDefaultAliasBaseEnum.NAME} request saved successfully.`,
+                );
               } else {
                 notifications.success(`REST API request saved successfully.`);
               }

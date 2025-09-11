@@ -1089,17 +1089,23 @@ export class TeamExplorerPageViewModel {
     options?: { toWorkspace?: boolean },
   ) => {
     const [authToken] = getAuthJwt();
-    if (options?.toWorkspace) {
-      window.open(
-        `${constants.ADMIN_URL}/hubs/workspace/${teamId}?xid=${authToken}`,
-        "_blank",
-      );
+    if (constants.APP_EDITION !== "SELFHOSTED") {
+      if (options?.toWorkspace) {
+        window.open(
+          `${constants.ADMIN_URL}/hubs/workspace/${teamId}?xid=${authToken}`,
+          "_blank",
+        );
+      } else {
+        window.open(
+          `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+          "_blank",
+        );
+      }
     } else {
-      window.open(
-        `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
-        "_blank",
-      );
+      window.open(constants.ADMIN_URL, "_blank");
     }
+
+    return;
   };
 
   public handleContactSales = async () => {

@@ -3,7 +3,7 @@
   "private": true,
   "author": "Sparrow",
   "description": "The Sparrow App is your next go to API development buddy which can help you test, debug, distribute better APIs while collaborating with your colleagues and making you a better programmer.",
-  "version": "2.29.0",
+  "version": "2.31.0",
   "type": "module",
   "workspaces": [
     "./apps/@sparrow-web",
@@ -19,15 +19,17 @@
   "scripts": {
     "desktop-start": "yarn workspace @sparrow/desktop tauri dev",
     "desktop-build": "yarn workspace @sparrow/desktop tauri build --debug",
-    "desktop-build-mac-universal": "yarn workspace @sparrow/desktop tauri build --target universal-apple-darwin --debug --verbose",
+    "desktop-build-intel-mac": "yarn workspace @sparrow/desktop tauri build --target x86_64-apple-darwin --debug",
     "web-start": "yarn workspace @sparrow/web dev",
     "web-build": "yarn workspace @sparrow/web build",
-    "docker:up": "docker-compose build --no-cache && docker compose up -d --force-recreate",
-    "docker:down": "docker compose down -v",
-    "docker:up:mongo": "docker compose up mongo --build -d",
-    "docker:up:api": "docker compose up sparrow-api --build -d",
-    "docker:up:auth": "docker compose up sparrow-auth --build -d",
-    "docker:up:proxy": "docker compose up sparrow-proxy --build -d",
+    "docker:up": "docker compose --env-file .env.docker-setup build --no-cache && docker compose --env-file .env.docker-setup up -d --force-recreate",
+    "docker:down": "docker compose --env-file .env.docker-setup down -v",
+    "docker:up:mongo": "docker compose build mongo --no-cache && docker compose up mongo -d",
+    "docker:up:api": "docker compose build sparrow-api --no-cache && docker compose up sparrow-api -d",
+    "docker:up:auth": "docker compose build sparrow-auth --no-cache && docker compose up sparrow-auth -d",
+    "docker:up:proxy": "docker compose build sparrow-proxy --no-cache && docker compose up sparrow-proxy -d",
+    "docker:up:admin": "docker compose build sparrow-admin --no-cache && docker compose up sparrow-admin -d",
+    "docker:up:web": "docker compose build sparrow-web --no-cache && docker compose up sparrow-web -d",
     "storybook-start": "yarn workspace @sparrow/storybook storybook",
     "storybook-build": "yarn workspace @sparrow/storybook build-storybook",
     "desktop-lint": "yarn workspace @sparrow/desktop lint",
@@ -54,8 +56,6 @@
     "@codemirror/lang-html": "^6.4.7",
     "@codemirror/lang-javascript": "^6.2.1",
     "@codemirror/lang-json": "^6.0.1",
-    "codemirror-json5": "^1.0.3",
-    "json5": "^2.2.3",
     "@codemirror/lang-python": "6.0.4",
     "@codemirror/lang-xml": "^6.0.2",
     "@codemirror/language": "^6.10.0",
@@ -73,6 +73,7 @@
     "@lezer/highlight": "^1.2.0",
     "@microsoft/applicationinsights-web": "^3.3.1",
     "@sentry/svelte": "^9.14.0",
+    "@sveltejs/svelte-virtual-list": "^3.0.1",
     "@tauri-apps/api": "2.7.0",
     "@tauri-apps/cli": "2.7.1",
     "@tauri-apps/plugin-deep-link": "2.4.1",
@@ -89,6 +90,7 @@
     "btoa": "^1.2.1",
     "codemirror": "^6.0.1",
     "codemirror-json-schema": "^0.6.1",
+    "codemirror-json5": "^1.0.3",
     "curlconverter": "^4.12.0",
     "editorjs-parser": "^1.5.3",
     "font-awesome": "^4.7.0",
@@ -96,7 +98,9 @@
     "highlight.js": "^11.10.0",
     "js-beautify": "^1.15.1",
     "js-yaml": "^4.1.0",
+    "json5": "^2.2.3",
     "jsoneditor": "^9.10.3",
+    "jsonpath-plus": "^10.3.0",
     "marked": "^13.0.2",
     "mixpanel-browser": "^2.48.1",
     "monaco-editor": "^0.44.0",
@@ -114,11 +118,12 @@
     "svelte-split-pane": "^0.1.2",
     "svelte-splitpanes": "^8.0.9",
     "svelte-toasts": "^1.1.2",
-    "uuid": "^9.0.1",
-    "yup": "^1.2.0",
     "svelte-virtual-list": "^3.0.1",
-    "@sveltejs/svelte-virtual-list": "^3.0.1",
-    "svelte-virtual-scroll-list": "^1.3.0"
+    "svelte-virtual-scroll-list": "^1.3.0",
+    "uuid": "^9.0.1",
+    "xmldom": "^0.6.0",
+    "xpath": "^0.0.34",
+    "yup": "^1.2.0"
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",
@@ -151,7 +156,10 @@
     "typescript": "^5.0.2",
     "vite": "^4.4.4"
   },
-  "repository": "https://github.com/sparrowapp-dev/sparrow-app.git",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sparrowapp-dev/sparrow-app.git"
+  },
   "release": {
     "branches": [
       "main"
@@ -178,31 +186,27 @@
           "assets": [
             {
               "path": "/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg",
-              "label": "Sparrow_2.29.0.dmg"
+              "label": "Sparrow_2.31.0_arm64.dmg"
+            },
+            {
+              "path": "/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/dmg/*.dmg",
+              "label": "Sparrow_2.31.0_x64.dmg"
             },
             {
               "path": "msi_files/*.exe",
-              "label": "Sparrow_2.29.0.exe"
+              "label": "Sparrow_2.31.0.exe"
             },
             {
               "path": "msi_files/*.msi",
-              "label": "Sparrow_2.29.0.msi"
-            },
-            {
-              "path": "msi_files/*.zip",
-              "label": "Sparrow_2.29.0_x64_en-US.msi.zip"
-            },
-            {
-              "path": "/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/Sparrow.app.tar.gz",
-              "label": "Sparrow.app.tar.gz"
-            },
-            {
-              "path": "deb_files/*.deb",
-              "label": "sparrow_2.29.0_amd64.deb"
+              "label": "Sparrow_2.31.0.msi"
             },
             {
               "path": "msi_files/*.msix",
-              "label": "Sparrow_2.29.0.msix"
+              "label": "Sparrow_2.31.0.msix"
+            },
+            {
+              "path": "deb_files/*.deb",
+              "label": "sparrow_2.31.0_amd64.deb"
             }
           ]
         }

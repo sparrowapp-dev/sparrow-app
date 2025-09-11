@@ -1,4 +1,8 @@
-import type { CollectionAuthBaseInterface, CollectionAuthTypeBaseEnum, CollectionRequestAddToBaseEnum } from "./collection-base";
+import type {
+  CollectionAuthBaseInterface,
+  CollectionAuthTypeBaseEnum,
+  CollectionRequestAddToBaseEnum,
+} from "./collection-base";
 import type { HttpRequestAuthTypeBaseEnum } from "./http-request-base";
 
 export enum RequestMethodEnum {
@@ -24,6 +28,7 @@ export enum RequestSectionEnum {
   HEADERS = "Headers",
   REQUEST_BODY = "Request Body",
   DOCUMENTATION = "Description",
+  TESTS = "Tests",
 }
 
 export enum MessageTypeEnum {
@@ -40,6 +45,7 @@ export enum ResponseFormatterEnum {
 export enum ResponseSectionEnum {
   RESPONSE = "Response",
   HEADERS = "Headers",
+  TESTRESULT = "TESTRESULT",
 }
 
 export enum RequestDatasetEnum {
@@ -53,6 +59,34 @@ export enum RequestDatasetEnum {
 export enum FormDataTypeEnum {
   TEXT = "text",
   FILE = "file",
+}
+
+export enum TestCaseModeEnum {
+  NO_CODE = "no-code",
+  SCRIPT = "script",
+}
+
+export enum TestCaseConditionOperatorEnum {
+  EQUALS = "Equals",
+  NOT_EQUAL = "Is Not Equal",
+  EXISTS = "Exists",
+  DOES_NOT_EXIST = "Does Not Exist",
+  LESS_THAN = "Less Than",
+  GREATER_THAN = "Greater Than",
+  CONTAINS = "Contains",
+  DOES_NOT_CONTAIN = "Does Not Contain",
+  IS_EMPTY = "Is Empty",
+  IS_NOT_EMPTY = "Is Not Empty",
+  IN_LIST = "In List",
+  NOT_IN_LIST = "Not In List",
+}
+
+export enum TestCaseSelectionTypeEnum {
+  RESPONSE_TEXT = "Response Text",
+  RESPONSE_JSON = "Response JSON",
+  RESPONSE_HEADER = "Response Header",
+  RESPONSE_XML = "Response XML",
+  TIME_CONSUMING = "Time Consuming",
 }
 
 export enum UntrackedItemsEnum {
@@ -187,28 +221,34 @@ export interface ResponseTimeWrapper {
 export interface ResponseSizeWrapper {
   size: number;
 }
+export interface isGeneratedVariable {
+  isGeneratedVariable: boolean;
+}
+export interface isRequestTestsNoCodeDemoCompleted {
+  isRequestTestsNoCodeDemoCompleted: boolean;
+}
 
 export interface Response
   extends ResponseStatusWrapper,
-  ResponseHeadersWrapper,
-  ResponseBodyWrapper,
-  ResponseTimeWrapper,
-  ResponseSizeWrapper { }
+    ResponseHeadersWrapper,
+    ResponseBodyWrapper,
+    ResponseTimeWrapper,
+    ResponseSizeWrapper {}
 
 export interface ResponseWrapper {
   response: Response;
 }
 
-export interface KeyValue extends KeyWrapper, ValueWrapper { }
+export interface KeyValue extends KeyWrapper, ValueWrapper {}
 export interface KeyValueChecked
   extends KeyWrapper,
-  ValueWrapper,
-  CheckedWrapper { }
+    ValueWrapper,
+    CheckedWrapper {}
 export interface KeyValueCheckedWithBase
   extends KeyWrapper,
-  ValueWrapper,
-  CheckedWrapper,
-  BaseWrapper { }
+    ValueWrapper,
+    CheckedWrapper,
+    BaseWrapper {}
 
 export interface UrlEncodedWrapper {
   urlencoded: KeyValueChecked[];
@@ -222,88 +262,92 @@ export interface FileWrapper {
 }
 export interface FormData
   extends KeyWrapper,
-  ValueWrapper,
-  BaseWrapper,
-  CheckedWrapper,
-  TypeWrapper2 { }
+    ValueWrapper,
+    BaseWrapper,
+    CheckedWrapper,
+    TypeWrapper2 {}
 export interface FormDataWrapper {
   formdata: FormData[];
 }
-export interface Body extends RawWrapper, UrlEncodedWrapper, FormDataWrapper { }
+export interface Body extends RawWrapper, UrlEncodedWrapper, FormDataWrapper {}
 
 export interface BodyWrapper {
   body: Body;
 }
 
 export interface HttpRequestCollectionAuthTabInterface {
-  auth: CollectionAuthBaseInterface
+  auth: CollectionAuthBaseInterface;
 }
 
 export interface HttpRequestCollectionAuthNavigationTabInterface {
-  collectionAuthNavigation: CollectionAuthTypeBaseEnum
+  collectionAuthNavigation: CollectionAuthTypeBaseEnum;
 }
 
-export interface HttpRequestCollectionLevelAuthTabInterface extends HttpRequestCollectionAuthTabInterface, HttpRequestCollectionAuthNavigationTabInterface { }
+export interface HttpRequestCollectionLevelAuthTabInterface
+  extends HttpRequestCollectionAuthTabInterface,
+    HttpRequestCollectionAuthNavigationTabInterface {}
 
-export interface HttpRequestCollectionLevelAuthProfileTabInterface extends HttpRequestCollectionAuthProfileTabInterface, HttpRequestSlectedAuthTypeInProfileInterface, HttpRequestCollectionAuthProfileIdInterface { }
+export interface HttpRequestCollectionLevelAuthProfileTabInterface
+  extends HttpRequestCollectionAuthProfileTabInterface,
+    HttpRequestSlectedAuthTypeInProfileInterface,
+    HttpRequestCollectionAuthProfileIdInterface {}
 export interface HttpRequestCollectionAuthProfileTabInterface {
-  auth: CollectionAuthBaseInterface
+  auth: CollectionAuthBaseInterface;
 }
 export interface HttpRequestSlectedAuthTypeInProfileInterface {
-  authType: CollectionAuthTypeBaseEnum
+  authType: CollectionAuthTypeBaseEnum;
 }
 export interface HttpRequestCollectionAuthProfileIdInterface {
-  authId: string
+  authId: string;
 }
-
 
 export interface State
   extends RequestBodyLanguageWrapper,
-  RequestBodyNavigationWrapper,
-  RequestNavigationWrapper,
-  RequestAuthNavigationWrapper,
-  ResponseNavigationWrapper,
-  ResponseBodyLanguageWrapper,
-  ResponseBodyFormatterWrapper,
-  RequestExtensionNavigationWrapper,
-  IsExposeEditDescriptionWrapper,
-  RequestLeftSplitterWidthPercentageWrapper,
-  RequestRightSplitterWidthPercentageWrapper,
-  IsSendRequestInProgressWrapper,
-  IsSaveDescriptionInProgressWrapper,
-  IsSaveRequestInProgressWrapper,
-  IsBulkParameterWrapper,
-  IsBulkHeaderWrapper,
-  IsChatbotActive,
-  IsChatbotSuggestionsActive,
-  IsDocGenerating,
-  IsDocAlreadyGenerated,
-  IsChatbotGeneratingResponse,
-  RequestAuthProfileNavigationWrapper { }
+    RequestBodyNavigationWrapper,
+    RequestNavigationWrapper,
+    RequestAuthNavigationWrapper,
+    ResponseNavigationWrapper,
+    ResponseBodyLanguageWrapper,
+    ResponseBodyFormatterWrapper,
+    RequestExtensionNavigationWrapper,
+    IsExposeEditDescriptionWrapper,
+    RequestLeftSplitterWidthPercentageWrapper,
+    RequestRightSplitterWidthPercentageWrapper,
+    IsSendRequestInProgressWrapper,
+    IsSaveDescriptionInProgressWrapper,
+    IsSaveRequestInProgressWrapper,
+    IsBulkParameterWrapper,
+    IsBulkHeaderWrapper,
+    IsChatbotActive,
+    IsChatbotSuggestionsActive,
+    IsDocGenerating,
+    IsDocAlreadyGenerated,
+    IsChatbotGeneratingResponse,
+    RequestAuthProfileNavigationWrapper {}
 
 export interface StatePartial
   extends Partial<RequestBodyLanguageWrapper>,
-  Partial<RequestBodyNavigationWrapper>,
-  Partial<RequestNavigationWrapper>,
-  Partial<RequestAuthNavigationWrapper>,
-  Partial<ResponseNavigationWrapper>,
-  Partial<ResponseBodyLanguageWrapper>,
-  Partial<ResponseBodyFormatterWrapper>,
-  Partial<RequestExtensionNavigationWrapper>,
-  Partial<IsExposeEditDescriptionWrapper>,
-  Partial<RequestLeftSplitterWidthPercentageWrapper>,
-  Partial<RequestRightSplitterWidthPercentageWrapper>,
-  Partial<IsSendRequestInProgressWrapper>,
-  Partial<IsSaveDescriptionInProgressWrapper>,
-  Partial<IsSaveRequestInProgressWrapper>,
-  Partial<IsBulkParameterWrapper>,
-  Partial<IsBulkHeaderWrapper>,
-  Partial<IsChatbotActive>,
-  Partial<IsChatbotSuggestionsActive>,
-  Partial<IsChatbotGeneratingResponse>,
-  Partial<IsDocAlreadyGenerated>,
-  Partial<IsDocGenerating>,
-  Partial<RequestAuthProfileNavigationWrapper> { }
+    Partial<RequestBodyNavigationWrapper>,
+    Partial<RequestNavigationWrapper>,
+    Partial<RequestAuthNavigationWrapper>,
+    Partial<ResponseNavigationWrapper>,
+    Partial<ResponseBodyLanguageWrapper>,
+    Partial<ResponseBodyFormatterWrapper>,
+    Partial<RequestExtensionNavigationWrapper>,
+    Partial<IsExposeEditDescriptionWrapper>,
+    Partial<RequestLeftSplitterWidthPercentageWrapper>,
+    Partial<RequestRightSplitterWidthPercentageWrapper>,
+    Partial<IsSendRequestInProgressWrapper>,
+    Partial<IsSaveDescriptionInProgressWrapper>,
+    Partial<IsSaveRequestInProgressWrapper>,
+    Partial<IsBulkParameterWrapper>,
+    Partial<IsBulkHeaderWrapper>,
+    Partial<IsChatbotActive>,
+    Partial<IsChatbotSuggestionsActive>,
+    Partial<IsChatbotGeneratingResponse>,
+    Partial<IsDocAlreadyGenerated>,
+    Partial<IsDocGenerating>,
+    Partial<RequestAuthProfileNavigationWrapper> {}
 
 export interface StateWrapper {
   state: State;
@@ -334,11 +378,11 @@ export interface StatusWrapper2 {
 
 export interface Conversation
   extends TypeWrapper3,
-  MessageIdWrapper,
-  MessageWrapper,
-  IsLikedWrapper,
-  IsDislikedWrapper,
-  StatusWrapper2 { }
+    MessageIdWrapper,
+    MessageWrapper,
+    IsLikedWrapper,
+    IsDislikedWrapper,
+    StatusWrapper2 {}
 export interface ConversationsWrapper {
   conversations: Conversation[];
 }
@@ -351,39 +395,55 @@ export interface AIModelNameWrapper {
 
 export interface Ai
   extends PromptWrapper,
-  ConversationsWrapper,
-  ThreadIdWrapper,
-  AIModelNameWrapper { }
+    ConversationsWrapper,
+    ThreadIdWrapper,
+    AIModelNameWrapper {}
 export interface AiWrapper {
   ai: Ai;
 }
 
-export interface BasicAuth extends UsernameWrapper, PasswordWrapper { }
+export interface BasicAuth extends UsernameWrapper, PasswordWrapper {}
 export interface BasicAuthWrapper {
   basicAuth: BasicAuth;
 }
 export interface ApiKey
   extends AuthKeyWrapper,
-  AuthValueWrapper,
-  AddtoWrapper { }
+    AuthValueWrapper,
+    AddtoWrapper {}
 export interface ApiKeyWrapper {
   apiKey: ApiKey;
 }
 export interface Auth
   extends BearerTokenWrapper,
-  BasicAuthWrapper,
-  ApiKeyWrapper { }
+    BasicAuthWrapper,
+    ApiKeyWrapper {}
 export interface AuthWrapper {
   auth: Auth;
+}
+export interface Tests {
+  testCaseMode: TestCaseModeEnum;
+  noCode: {
+    id: string;
+    name: string;
+    condition: TestCaseConditionOperatorEnum;
+    expectedResult: string;
+    testPath: string;
+    testTarget: TestCaseSelectionTypeEnum;
+  }[];
+  script: string;
+}
+
+export interface TestsWrapper {
+  tests: Tests;
 }
 
 export interface HeadersWrapper {
   headers: KeyValueChecked[];
 }
-export interface UrlEncoded extends KeyValueChecked { }
-export interface Headers extends KeyValueChecked { }
-export interface QueryParams extends KeyValueChecked { }
-export interface AutoGeneratedHeaders extends KeyValueChecked { }
+export interface UrlEncoded extends KeyValueChecked {}
+export interface Headers extends KeyValueChecked {}
+export interface QueryParams extends KeyValueChecked {}
+export interface AutoGeneratedHeaders extends KeyValueChecked {}
 
 export interface QueryParamsWrapper {
   queryParams: KeyValueChecked[];
@@ -397,12 +457,15 @@ export interface RequestWrapper {
 }
 export interface Request
   extends MethodWrapper,
-  BodyWrapper,
-  QueryParamsWrapper,
-  AutoGeneratedHeadersWrapper,
-  StateWrapper,
-  ResponseWrapper,
-  AuthWrapper,
-  UrlWrapper,
-  AiWrapper,
-  HeadersWrapper { }
+    BodyWrapper,
+    QueryParamsWrapper,
+    AutoGeneratedHeadersWrapper,
+    StateWrapper,
+    ResponseWrapper,
+    AuthWrapper,
+    TestsWrapper,
+    UrlWrapper,
+    AiWrapper,
+    isGeneratedVariable,
+    isRequestTestsNoCodeDemoCompleted,
+    HeadersWrapper {}
