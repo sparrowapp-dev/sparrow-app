@@ -894,14 +894,14 @@ jobs:
       - name: Upload macOS DMG(Both archs) to S3
         run: |
           # Upload DMG files
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg s3://sparrow-release-assests-prod --recursive --exclude "*" --include "*.dmg" 
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg s3://sparrow-release-assests-prod/macos --recursive --exclude "*" --include "*.dmg" 
 
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/dmg s3://sparrow-release-assests-prod --recursive --exclude "*" --include "*.dmg"
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/dmg s3://sparrow-release-assests-prod/macos --recursive --exclude "*" --include "*.dmg"
 
           # Upload Updater files
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-prod --recursive --exclude "*" --include "*.gz" 
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-prod/macos --recursive --exclude "*" --include "*.gz" 
 
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos s3://sparrow-release-assests-prod --recursive --exclude "*" --include "*_intel_mac.tar.gz"
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos s3://sparrow-release-assests-prod/macos --recursive --exclude "*" --include "*_intel_mac.tar.gz"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
