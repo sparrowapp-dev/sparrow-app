@@ -493,6 +493,15 @@ jobs:
       - name: Set build datetime
         run: echo "BUILD_DATETIME=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
 
+      - name: Rename Intel Mac updater file
+        run: |
+          for file in /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos/*.gz; do
+            if [ -f "$file" ]; then
+              filename=$(basename "$file" .gz)
+              mv "$file" "/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos/${filename}_intel_mac.gz"
+            fi
+          done
+          
       - name: Upload macOS DMG(Both archs) to S3
         run: |
           # Upload macOS (ARM64) DMG
@@ -514,7 +523,7 @@ jobs:
           # Upload Updater files
           aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-dev/macos --recursive --exclude "*" --include "*.gz" 
 
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos s3://sparrow-release-assests-dev/macos/ --recursive --exclude "*" --include "*.gz"
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos s3://sparrow-release-assests-dev/macos/ --recursive --exclude "*" --include "*_intel_mac.gz"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
