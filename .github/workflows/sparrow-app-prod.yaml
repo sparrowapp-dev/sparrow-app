@@ -889,12 +889,7 @@ jobs:
 
       - name: Rename Intel Mac updater file
         run: |
-          for file in /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos/*.gz; do
-            if [ -f "$file" ]; then
-              filename=$(basename "$file" .gz)
-              mv "$file" "/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos/${filename}_intel_mac.gz"
-            fi
-          done
+          find /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos -name "*.tar.gz" -exec bash -c 'mv "$1" "$(dirname "$1")/$(basename "$1" .tar.gz)_intel_mac.tar.gz"' _ {} \;
 
       - name: Upload macOS DMG(Both archs) to S3
         run: |
@@ -988,7 +983,7 @@ jobs:
             apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg
             apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/dmg/*.dmg
             apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/*.gz
-            apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos/*_intel_mac.gz
+            apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos/*_intel_mac.tar.gz
             msi_files/*.exe
             msi_files/*.msi
             msi_files/*.msix
