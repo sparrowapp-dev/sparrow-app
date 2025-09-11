@@ -512,7 +512,7 @@ jobs:
           aws s3 cp "$DMG_SUFFIXED_FILE" s3://sparrow-release-assests-dev/macos/
 
           # Upload Updater files
-          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-dev/macos/ --recursive --exclude "*" --include "*.gz" 
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-dev/macos --recursive --exclude "*" --include "*.gz" 
 
           aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos s3://sparrow-release-assests-dev/macos/ --recursive --exclude "*" --include "*.gz"
         env:
