@@ -858,6 +858,7 @@ jobs:
           yarn install
           yarn desktop-build
 
+          
       # ------- Intel (x86_64) build -------
       - name: Build & Sign Tauri App (Intel / x86_64)
         env:
