@@ -959,12 +959,23 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           
+      - name: Read version from package.json
+        id: version
+        run: |
+          V=$(node -p "require('./package.json').version")
+          echo "version=$V" >> "$GITHUB_OUTPUT"
 
-      - name: Fetch Version from package.json
-        id: fetch-version
-        run: echo "::set-output name=version::$(jq -r .version package.json)"
-
-      - name: Semantic Release
-        run: npx semantic-release
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: ${{ steps.version.outputs.version }}
+          files: |
+            apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg
+            apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/dmg/*.dmg
+            msi_files/*.exe
+            msi_files/*.msi
+            msi_files/*.msix
+            deb_files/*.deb
         env:
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
