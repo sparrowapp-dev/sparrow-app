@@ -978,6 +978,8 @@ jobs:
           files: |
             apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg
             apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/dmg/*.dmg
+            apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/*.gz
+            apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos/*.gz
             msi_files/*.exe
             msi_files/*.msi
             msi_files/*.msix
