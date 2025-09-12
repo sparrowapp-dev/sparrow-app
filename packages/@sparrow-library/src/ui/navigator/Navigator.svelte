@@ -75,7 +75,7 @@
             </span>
           {/if}
           <span class="text">{tab.name} </span>
-          {#if tab?.count}
+          {#if tab?.count || (tab?.type === "fraction" && tab?.secondaryCount)}
             <span class="ms-1" style="margin-right: -4px;">
               <Badge
                 count={tab.count}

@@ -6,6 +6,8 @@
   } from "@sparrow/library/icons";
   import { Button } from "@sparrow/library/ui";
   import { predefinedTestSnippets } from "./utils/common-snippets";
+  export let onTestsChange;
+  export let tests;
 
   type SplitDirection = "vertical" | "horizontal";
   type EditorLanguage = "JavaScript";
@@ -20,6 +22,9 @@
   export let lang: EditorLanguage = "JavaScript";
   export let value: string = "";
   export let isBodyBeautified: boolean = false;
+ 
+  let value = tests?.script || "";
+
 
   let searchData: string = "";
   let isLeftPanelCollapsed: boolean = false;
@@ -38,8 +43,9 @@
     isBodyBeautified = val;
   };
 
-  const updateTestContent = (data: string): void => {
-    value = data;
+  const handleCodeMirrorChange = (e: any) => {
+    value = e.detail;
+    onTestsChange({ ...tests, script: value });
   };
 
   const toggleLeftPanel = (): void => {
@@ -171,7 +177,7 @@
       <Editor
         bind:lang
         bind:value
-        on:change={updateTestContent}
+        on:change={handleCodeMirrorChange}
         isEditable={true}
         autofocus={true}
         {isBodyBeautified}
