@@ -732,6 +732,10 @@
                       bind:isGenerateMockDataModal
                       {isGuestUser}
                       {userRole}
+                      bulkEditHeadersActive={$tab?.property?.request.state
+                        ?.isHeaderBulkEditActive}
+                      bulkEditParamsActive={$tab?.property?.request.state
+                        ?.isParameterBulkEditActive}
                     />
                     <div style="flex:1; overflow:auto;" class="p-0">
                       {#if $requestTabTestDemo}
