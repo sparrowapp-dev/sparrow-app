@@ -17,104 +17,140 @@
     | "Graphql"
     | "Python"
     | "Curl" = "JavaScript";
-  export let value: string = "";
-  export let isBodyBeautified: boolean = false;
-  let searchData: string;
+  export let value = "";
+  export let isBodyBeautified = false;
+  let searchData = "";
 
-  // State for panel collapse
   let isLeftPanelCollapsed = false;
 
-  const updateBeautifiedState = (val: boolean) => {
-    isBodyBeautified = val;
+  // Preprocess search string
+  $: trimmedSearch = searchData.trim().toLowerCase();
+
+  // Filtered snippets (only title considered)
+  $: filteredSnippets = !trimmedSearch
+    ? predefinedTestSnippets
+    : predefinedTestSnippets.filter((s) =>
+        s.title.toLowerCase().includes(trimmedSearch),
+      );
+
+  const updateBeautifiedState = (val: boolean) => (isBodyBeautified = val);
+
+  const updateTestContent = (data: any) => (value = data);
+
+  const toggleLeftPanel = () => (isLeftPanelCollapsed = !isLeftPanelCollapsed);
+
+  const selectSnippet = (data: string) => {
+    value += value ? `\n${data}` : data;
   };
 
-  const updateTestContent = (data: any) => {
-    value = data;
+  const highlightMatch = (text: string, searchTerm: string) => {
+    if (!searchTerm.trim()) return text;
+    const regex = new RegExp(
+      `(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
+      "gi",
+    );
+    return text.replace(regex, '<mark class="search-highlight">$1</mark>');
   };
 
-  const onSearchSnippets = (value: string) => {};
-
-  const toggleLeftPanel = () => {
-    isLeftPanelCollapsed = !isLeftPanelCollapsed;
-  };
+  // Panel widths
+  $: leftPanelWidth = isLeftPanelCollapsed
+    ? "60px"
+    : tabSplitDirection === "vertical"
+      ? "40%"
+      : "25%";
+  $: rightPanelWidth = isLeftPanelCollapsed ? "calc(100% - 60px)" : "75%";
 </script>
 
 <div class="border border-top-0 text-light p-2 h-100 rounded-bottom">
-  <!-- Main layout -->
-  <div
-    class={`d-flex h-100 ${tabSplitDirection === "vertical" ? "flex-row" : "flex-row"}`}
-  >
+  <div class="d-flex h-100 flex-row">
     <!-- Left Sidebar -->
     <div
       class="h-100 d-flex flex-column {isLeftPanelCollapsed
         ? 'collapsed-panel'
         : ''}"
-      style="
-    width: {isLeftPanelCollapsed
-        ? '60px'
-        : `${tabSplitDirection === 'vertical' ? '40%' : '25%'}`};
-    gap: 6px;
-    overflow: hidden;
-    transition: width 0.3s ease;"
+      style="width:{leftPanelWidth};gap:6px;overflow:hidden;transition:width 0.3s ease;"
     >
       {#if isLeftPanelCollapsed}
-        <!-- Collapsed state -->
+        <!-- Collapsed -->
         <div
           class="collapsed-content d-flex flex-column align-items-center h-100"
-          style="padding: 8px 4px;"
+          style="padding:8px 4px;"
         >
           <Button
             onClick={toggleLeftPanel}
-            size={"extra-small"}
+            size="extra-small"
             startIcon={ChevronDoubleRightRegular}
             type="outline-secondary"
           />
-          <div class="collapsed-text mt-2">
+          <div class="mt-2">
             <span class="vertical-text">Snippets</span>
           </div>
         </div>
       {:else}
-        <!-- Expanded state -->
-        <!-- Header -->
+        <!-- Expanded -->
         <div
           class="d-flex flex-row justify-content-between align-items-center flex-shrink-0"
-          style="margin: 8px 4px 8px 8px;"
+          style="margin:8px 4px 8px 8px;"
         >
-          <p class="snippet-text" style="margin:0;">Snippets</p>
+          <p class="snippet-text m-0">
+            Snippets
+            {#if trimmedSearch}
+              <span class="results-count"
+                >({filteredSnippets.length} found)</span
+              >
+            {/if}
+          </p>
           <Button
             onClick={toggleLeftPanel}
-            size={"extra-small"}
+            size="extra-small"
             startIcon={ChevronDoubleLeftRegular}
             type="outline-secondary"
           />
         </div>
 
         <!-- Search -->
-        <div
-          class="d-flex justify-content-center flex-shrink-0"
-          style="margin-bottom: 8px;"
-        >
+        <div class="d-flex justify-content-center flex-shrink-0 mb-2">
           <Search
             id="script-snippet-search"
-            customWidth={"100%"}
+            customWidth="100%"
             variant="primary"
             size="small"
             bind:value={searchData}
-            on:input={() => onSearchSnippets(searchData)}
-            placeholder="Search"
+            placeholder="Search snippets..."
           />
         </div>
 
-        <!-- Scrollable snippets list -->
-        <div class="flex-grow-1" style="overflow:auto; min-height:0;">
-          {#each predefinedTestSnippets as snippet}
-            <div
-              class="mb-2 d-flex align-items-center snippet-suggestion-container"
-              tabindex="0"
-            >
-              <p class="suggestion-text">{snippet.title}</p>
+        <!-- Snippets list -->
+        <div class="flex-grow-1" style="overflow:auto;min-height:0;">
+          {#if filteredSnippets.length > 0}
+            {#each filteredSnippets as snippet}
+              <div
+                class="mb-2 d-flex align-items-center snippet-suggestion-container"
+                tabindex="0"
+                role="button"
+                on:click={() => selectSnippet(snippet.function)}
+                on:keydown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    selectSnippet(snippet.function);
+                  }
+                }}
+              >
+                <p class="suggestion-text">
+                  {@html highlightMatch(snippet.title, searchData)}
+                </p>
+              </div>
+            {/each}
+          {:else if trimmedSearch}
+            <div class="no-results">
+              <p class="no-results-text">
+                No snippets found for "{searchData}"
+              </p>
+              <p class="no-results-suggestion">
+                Try searching with different keywords
+              </p>
             </div>
-          {/each}
+          {/if}
         </div>
       {/if}
     </div>
@@ -122,12 +158,7 @@
     <!-- Right Panel -->
     <div
       class="h-100 gap-2 d-flex border-start ms-2 ps-2"
-      style="
-    width: {isLeftPanelCollapsed ? 'calc(100% - 60px)' : '75%'};
-    overflow: auto;
-    flex-flow: wrap;
-    align-content: flex-start;
-    transition: width 0.3s ease;"
+      style="width:{rightPanelWidth};overflow:auto;flex-flow:wrap;align-content:flex-start;transition:width 0.3s ease;"
     >
       <Editor
         bind:lang
@@ -146,51 +177,73 @@
   .snippet-text {
     font-family: "Inter", sans-serif;
     font-weight: 500;
-    font-style: normal;
     font-size: 12px;
-    line-height: 1.3;
-    letter-spacing: 0;
     color: var(--text-ds-neutral-50);
   }
+
+  .results-count {
+    font-weight: 400;
+    color: var(--text-ds-neutral-400);
+    font-size: 11px;
+  }
+
   .snippet-suggestion-container {
-    padding: 6px 8px;
+    padding: 8px;
     cursor: pointer;
     border-radius: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    transition: all 0.2s ease;
   }
+
   .snippet-suggestion-container:hover {
     background-color: var(--bg-ds-surface-400);
   }
+
   .snippet-suggestion-container:active {
     background-color: var(--bg-ds-surface-700);
   }
+
   .snippet-suggestion-container:focus-visible {
     outline: none;
     background-color: var(--bg-ds-surface-600);
     border: 2px solid var(--bg-ds-primary-300);
   }
+
   .suggestion-text {
     font-family: "Inter", sans-serif;
     font-weight: 500;
-    font-style: normal;
     font-size: 12px;
-    line-height: 1.3;
-    letter-spacing: 0;
     color: var(--text-ds-primary-300);
-    align-items: start;
     margin: 0;
-    flex: 1;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  /* Left panel animation styles */
-  .left-panel {
-    transition: width 0.3s ease;
-    overflow: hidden;
+  .no-results {
+    padding: 24px 8px;
+    text-align: center;
+  }
+
+  .no-results-text {
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--text-ds-neutral-300);
+    margin: 0 0 8px 0;
+  }
+
+  .no-results-suggestion {
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--text-ds-neutral-400);
+    margin: 0;
+  }
+
+  :global(.search-highlight) {
+    background-color: var(--bg-ds-warning-300);
+    color: var(--text-ds-neutral-900);
+    padding: 1px 2px;
+    border-radius: 2px;
+    font-weight: 600;
   }
 
   .collapsed-content {
@@ -200,16 +253,9 @@
   .vertical-text {
     writing-mode: vertical-rl;
     text-orientation: mixed;
-    font-family: "Inter", sans-serif;
-    font-weight: 500;
     font-size: 12px;
     color: var(--text-ds-neutral-50);
-  }
-
-  .horizontal-text {
     font-family: "Inter", sans-serif;
     font-weight: 500;
-    font-size: 12px;
-    color: var(--text-ds-neutral-50);
   }
 </style>
