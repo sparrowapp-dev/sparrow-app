@@ -7,21 +7,22 @@
   import { Button } from "@sparrow/library/ui";
   import { predefinedTestSnippets } from "./utils/common-snippets";
 
-  export let tabSplitDirection: "vertical" | "horizontal" = "vertical";
-  export let lang:
-    | "HTML"
-    | "JSON"
-    | "XML"
-    | "JavaScript"
-    | "Text"
-    | "Graphql"
-    | "Python"
-    | "Curl" = "JavaScript";
-  export let value = "";
-  export let isBodyBeautified = false;
-  let searchData = "";
+  type SplitDirection = "vertical" | "horizontal";
+  type EditorLanguage = "JavaScript";
 
-  let isLeftPanelCollapsed = false;
+  // Snippet type (based on your utils/common-snippets.ts)
+  interface Snippet {
+    title: string;
+    function: string;
+  }
+
+  export let tabSplitDirection: SplitDirection = "vertical";
+  export let lang: EditorLanguage = "JavaScript";
+  export let value: string = "";
+  export let isBodyBeautified: boolean = false;
+
+  let searchData: string = "";
+  let isLeftPanelCollapsed: boolean = false;
 
   // Preprocess search string
   $: trimmedSearch = searchData.trim().toLowerCase();
@@ -29,21 +30,27 @@
   // Filtered snippets (only title considered)
   $: filteredSnippets = !trimmedSearch
     ? predefinedTestSnippets
-    : predefinedTestSnippets.filter((s) =>
+    : predefinedTestSnippets.filter((s: Snippet) =>
         s.title.toLowerCase().includes(trimmedSearch),
       );
 
-  const updateBeautifiedState = (val: boolean) => (isBodyBeautified = val);
+  const updateBeautifiedState = (val: boolean): void => {
+    isBodyBeautified = val;
+  };
 
-  const updateTestContent = (data: any) => (value = data);
+  const updateTestContent = (data: string): void => {
+    value = data;
+  };
 
-  const toggleLeftPanel = () => (isLeftPanelCollapsed = !isLeftPanelCollapsed);
+  const toggleLeftPanel = (): void => {
+    isLeftPanelCollapsed = !isLeftPanelCollapsed;
+  };
 
-  const selectSnippet = (data: string) => {
+  const selectSnippet = (data: string): void => {
     value += value ? `\n${data}` : data;
   };
 
-  const highlightMatch = (text: string, searchTerm: string) => {
+  const highlightMatch = (text: string, searchTerm: string): string => {
     if (!searchTerm.trim()) return text;
     const regex = new RegExp(
       `(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
@@ -58,6 +65,7 @@
     : tabSplitDirection === "vertical"
       ? "40%"
       : "25%";
+
   $: rightPanelWidth = isLeftPanelCollapsed ? "calc(100% - 60px)" : "75%";
 </script>
 
