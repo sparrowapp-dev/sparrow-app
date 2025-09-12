@@ -1000,6 +1000,8 @@
                                 <ResponseTestResults
                                   responseTestResults={storeData.response
                                     ?.testResults}
+                                  responseTestMessage={storeData.response
+                                    ?.testMessage}
                                 />
                                 <!-- </div> -->
                               {/if}
