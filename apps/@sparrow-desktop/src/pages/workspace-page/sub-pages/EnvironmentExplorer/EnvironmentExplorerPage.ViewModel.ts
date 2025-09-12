@@ -299,7 +299,8 @@ export class EnvironmentExplorerViewModel {
       // Split aiVariables into undo:true and undo:false
       const undoAiVariables =
         progressiveTab.property.environment.aiVariable.filter(
-          (variable) => variable.undo === true,
+          (variable) =>
+            variable.undo === true || (!variable.key || !variable.value),
         );
 
        const sanitizedAiVariables =
