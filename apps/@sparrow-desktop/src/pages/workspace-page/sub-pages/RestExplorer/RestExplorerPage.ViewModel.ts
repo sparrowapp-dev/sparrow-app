@@ -218,8 +218,8 @@ class RestExplorerViewModel {
             collectionDoc?.isGenerateVariableTrial,
           );
           await this.updateIsRequestTabDemo(
-            collectionDoc?.isRequestTestsNoCodeDemoCompleted
-          )
+            collectionDoc?.isRequestTestsNoCodeDemoCompleted,
+          );
         }
 
         //   "selectedRequestAuthProfileId:>> ",
@@ -2286,17 +2286,15 @@ class RestExplorerViewModel {
           break;
         case TestCaseConditionOperatorEnum.IN_LIST:
           try {
-            const list = JSON.parse(actual);
-            passed = Array.isArray(list) && list.includes(expected);
-            message = passed ? "" : `Expected ${actual} to be in list ${expected || "(empty)"}`;
+             passed = Array.isArray(actual) && actual.includes(expected);
+             message = passed ? "" : `Expected ${actual} to be in list ${expected || "(empty)"}`;
           } catch {
             message = "Result for IN LIST must be a JSON array";
           }
           break;
         case TestCaseConditionOperatorEnum.NOT_IN_LIST:
           try {
-            const list = JSON.parse(actual);
-            passed = Array.isArray(list) && !list.includes(expected);
+            passed = Array.isArray(actual) && !actual.includes(expected);
             message = passed ? "" : `Expected ${actual} not to be in list ${expected || "(empty)"}`;
           } catch {
             message = "Result for NOT IN LIST must be a JSON array";
@@ -2382,11 +2380,11 @@ class RestExplorerViewModel {
     );
   };
 
-  public updateIsRequestTabDemo = async(value:boolean) =>{
+  public updateIsRequestTabDemo = async (value: boolean) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.isRequestTestsNoCodeDemoCompleted = value;
     this.tab = progressiveTab;
-  }
+  };
 
   /**
    *
@@ -2568,7 +2566,6 @@ class RestExplorerViewModel {
     }
   };
 
-  
   private removeTypeFromObjectArray = (objectArray: any[]): any[] => {
     if (!Array.isArray(objectArray)) {
       console.warn("Input is not an array");
@@ -2585,6 +2582,20 @@ class RestExplorerViewModel {
     });
   };
 
+  private removeGeneratedFromObjectArray = (objectArray: any[]): any[] => {
+    if (!Array.isArray(objectArray)) {
+      console.warn("Input is not an array");
+      return objectArray;
+    }
+    return objectArray.map((obj) => {
+      if (!obj || typeof obj !== "object") {
+        return obj;
+      }
+      const { generated, ...objWithoutGenerated } = obj;
+      return objWithoutGenerated;
+    });
+  };
+
   private updateTabToRemoveType = async () => {
     const progressiveTab = this._tab.getValue();
     const updatedHeaders = this.removeTypeFromObjectArray(
@@ -2593,7 +2604,7 @@ class RestExplorerViewModel {
     const updatedParams = this.removeTypeFromObjectArray(
       progressiveTab.property.request.queryParams,
     );
-    const updateFormData = this.removeTypeFromObjectArray(
+    const updateFormData = this.removeGeneratedFromObjectArray(
       progressiveTab.property.request.body.formdata,
     );
     const updateUrlEncoded = this.removeTypeFromObjectArray(
@@ -4575,15 +4586,17 @@ class RestExplorerViewModel {
         RequestDatasetEnum.URLENCODED
     ) {
       if (Array.isArray(response) && response.length > 0) {
-        const aiGeneratedArray = response.map((item) => ({
-          ...item,
-          type: "ai-generated",
-          checked: false,
-        }));
         if (
           progressiveTab.property?.request?.state?.requestBodyNavigation ===
           RequestDatasetEnum.FORMDATA
         ) {
+          const aiGeneratedArray = response.map((item) => ({
+            ...item,
+            type: "text",
+            base: "",
+            generated: true,
+            checked: false,
+          }));
           let currentDetails =
             progressiveTab.property.request.body.formdata || [];
           if (currentDetails.length > 0) currentDetails.pop();
@@ -4598,9 +4611,14 @@ class RestExplorerViewModel {
           ];
           progressiveTab.property.request.body.formdata = [
             ...merged,
-            { key: "", value: "", checked: false },
+            { key: "", value: "", checked: false, type: "text", base: "" },
           ];
         } else {
+          const aiGeneratedArray = response.map((item) => ({
+            ...item,
+            type: "ai-generated",
+            checked: false,
+          }));
           let currentDetails =
             progressiveTab.property.request.body.urlencoded || [];
           if (currentDetails.length > 0) currentDetails.pop();
@@ -4711,7 +4729,7 @@ class RestExplorerViewModel {
     }
   };
 
-    /**
+  /**
    * Fetch collections from services and insert to repository
    * @param workspaceId - id of current workspace
    */
