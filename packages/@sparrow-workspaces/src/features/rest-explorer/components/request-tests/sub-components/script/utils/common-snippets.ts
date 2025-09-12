@@ -66,4 +66,78 @@ export const predefinedTestSnippets = [
   sp.expect(jsonData).to.have.all.keys("id", "name", "email");
 });`,
   },
+
+  // 🔥 Additional 10 useful snippets
+  {
+    title: "Response contains token field",
+    function: `sp.test("Response contains token field", function () {
+  let jsonData = sp.response.body.json();
+  sp.expect(jsonData).to.have.property("token");
+});`,
+  },
+  {
+    title: "Token is a non-empty string",
+    function: `sp.test("Token is a non-empty string", function () {
+  let jsonData = sp.response.body.json();
+  sp.expect(jsonData.token).to.be.a("string").that.is.not.empty;
+});`,
+  },
+  {
+    title: "Created resource returns 201",
+    function: `sp.test("Created resource returns 201", function () {
+  sp.expect(sp.response.statusCode).to.equal(201);
+});`,
+  },
+  {
+    title: "Response array contains specific field in objects",
+    function: `sp.test("Response array contains specific field in objects", function () {
+  let jsonData = sp.response.body.json();
+  jsonData.forEach(item => {
+    sp.expect(item).to.have.property("id");
+  });
+});`,
+  },
+  {
+    title: "Response has error field when status 400",
+    function: `sp.test("Response has error field when status 400", function () {
+  if (sp.response.statusCode === 400) {
+    let jsonData = sp.response.body.json();
+    sp.expect(jsonData).to.have.property("error");
+  }
+});`,
+  },
+  {
+    title: "Response contains pagination fields",
+    function: `sp.test("Response contains pagination fields", function () {
+  let jsonData = sp.response.body.json();
+  sp.expect(jsonData).to.include.keys("page", "limit", "total");
+});`,
+  },
+  {
+    title: "Date field is valid ISO string",
+    function: `sp.test("Date field is valid ISO string", function () {
+  let jsonData = sp.response.body.json();
+  let date = new Date(jsonData.createdAt);
+  sp.expect(isNaN(date.getTime())).to.equal(false);
+});`,
+  },
+  {
+    title: "Response includes expected message text",
+    function: `sp.test("Response includes expected message text", function () {
+  let jsonData = sp.response.body.json();
+  sp.expect(jsonData.message).to.contain("success");
+});`,
+  },
+  {
+    title: "Response has Content-Length header",
+    function: `sp.test("Response has Content-Length header", function () {
+  sp.expect(sp.response.headers).to.have.property("Content-Length");
+});`,
+  },
+  {
+    title: "Response cookie contains session id",
+    function: `sp.test("Response cookie contains session id", function () {
+  sp.expect(sp.response.cookies).to.have.property("sessionId");
+});`,
+  },
 ];

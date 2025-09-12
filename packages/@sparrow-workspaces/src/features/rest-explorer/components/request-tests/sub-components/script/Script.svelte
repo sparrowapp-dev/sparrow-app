@@ -73,6 +73,12 @@
       : "25%";
 
   $: rightPanelWidth = isLeftPanelCollapsed ? "calc(100% - 60px)" : "75%";
+
+  $: {
+    if (!value) {
+      value = `// What are the tests?\n// Tests are scripts that automatically check your API's response.\n// For example: Is the status code 200? Does the body contain an email field?\n// sp.test("Status code is 200", function () {\n//   sp.response.to.have.status(200);\n// });\n\n// You can:\n// - Use "Snippets" to insert common tests\n// - Or, write test cases manually using scripting or no code method`;
+    }
+  }
 </script>
 
 <div class="border border-top-0 text-light p-2 h-100 rounded-bottom">
