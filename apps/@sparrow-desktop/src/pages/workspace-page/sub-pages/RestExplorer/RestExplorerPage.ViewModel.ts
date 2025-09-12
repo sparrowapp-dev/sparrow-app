@@ -117,6 +117,7 @@ import * as xpath from "xpath";
 import { DOMParser } from "xmldom";
 import { JSONPath } from "jsonpath-plus";
 import { captureEvent } from "@app/utils/posthog/posthogConfig";
+import { size } from "@tauri-apps/plugin-fs";
 
 class RestExplorerViewModel {
   /**
@@ -217,8 +218,8 @@ class RestExplorerViewModel {
             collectionDoc?.isGenerateVariableTrial,
           );
           await this.updateIsRequestTabDemo(
-            collectionDoc?.isRequestTestsNoCodeDemoCompleted
-          )
+            collectionDoc?.isRequestTestsNoCodeDemoCompleted,
+          );
         }
 
         //   "selectedRequestAuthProfileId:>> ",
@@ -1905,18 +1906,37 @@ class RestExplorerViewModel {
           } else if (
             test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER
           ) {
-            actual = response.response.headers.find(
-              (h) => h.key.toLowerCase() === test.testPath?.toLowerCase(),
-            )?.value;
+             if(!test.condition){
+                error = `Condition not found`;
+                actual = undefined;  
+              }
+              else if(!test.testPath){
+                error = `Test path not found`;
+                actual = undefined;
+              }else{
+                actual = response.response.headers.find(
+                  (h) => h.key.toLowerCase() === test.testPath?.toLowerCase(),
+                )?.value;
+              }
           } else if (
             test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON
           ) {
             try {
-              const json = JSON.parse(response.response.body);
-              // Use JSONPath to extract value, supports $[3].userId, $[0].address.city, etc.
-              const result = JSONPath({ path: test.testPath, json });
-              // If result is an array, take the first value
-              actual = Array.isArray(result) ? result[0] : result;
+              if(!test.condition){
+                error = `Condition not found`;
+                actual = undefined;  
+              }
+              else if(!test.testPath){
+                error = `Test path not found`;
+                actual = undefined;
+              }
+              else{
+                const json = JSON.parse(response.response.body);
+                // Use JSONPath to extract value, supports $[3].userId, $[0].address.city, etc.
+                const result = JSONPath({ path: test.testPath, json });
+                // If result is an array, take the first value
+                actual = Array.isArray(result) ? result[0] : result;
+              }
             } catch (e) {
               error = "Invalid JSON or path";
               actual = undefined;
@@ -1925,31 +1945,40 @@ class RestExplorerViewModel {
             test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML
           ) {
             try {
-              const xml = response.response.body;
-              const doc = new DOMParser().parseFromString(xml, "text/xml");
-              // test.testPath should be a valid XPath, e.g. "/root/country/city"
-              const nodes = xpath.select(test.testPath, doc);
-
-              if (Array.isArray(nodes) && nodes.length > 0) {
-                // If it's an attribute node
-                if (nodes[0].nodeType === 2) {
-                  actual = nodes[0].nodeValue;
-                } else if (nodes[0].firstChild) {
-                  actual = nodes[0].firstChild.nodeValue;
-                } else if ((nodes[0] as any).data) {
-                  actual = (nodes[0] as any).data;
-                } else {
-                  actual = nodes[0].toString();
-                }
-              } else {
+               if(!test.condition){
+                error = `Condition not found`;
+                actual = undefined;  
+              }
+              else if(!test.testPath){
+                error = `Test path not found`;
                 actual = undefined;
+              }else{
+                const xml = response.response.body;
+                const doc = new DOMParser().parseFromString(xml, "text/xml");
+                // test.testPath should be a valid XPath, e.g. "/root/country/city"
+                const nodes = xpath.select(test.testPath, doc);
+  
+                if (Array.isArray(nodes) && nodes.length > 0) {
+                  // If it's an attribute node
+                  if (nodes[0].nodeType === 2) {
+                    actual = nodes[0].nodeValue;
+                  } else if (nodes[0].firstChild) {
+                    actual = nodes[0].firstChild.nodeValue;
+                  } else if ((nodes[0] as any).data) {
+                    actual = (nodes[0] as any).data;
+                  } else {
+                    actual = nodes[0].toString();
+                  }
+                } else {
+                  actual = undefined;
+                }
               }
             } catch (e) {
               error = "Invalid XML or XPath";
               actual = undefined;
             }
           } else {
-            error = `Test target ${test.testTarget} not found`;
+            error = `Test target not found`;
           }
 
           if (actual) {
@@ -1978,49 +2007,139 @@ class RestExplorerViewModel {
   };
 
   private async executeScriptTestcases() {
-    const javaScriptTestCases = `
-        sp.test("Status code is 200", function () {
-        sp.expect(sp.response.code).to.equal(2900);
-    });
+    // const javaScriptTestCases = `
+    //     sps.test("Status code is 200", function () {
+    //     sp.expect(sp.response.statusCode).to.equal(200);
+    // });
 
-    const response = sp.response.json();
+    // const response = sp.response.body.json();
 
-    // Validate response structure
-    sp.test("Response has userId, id, title, and completed properties", function () {
-        sp.expect(response).to.have.all.keys('userId', 'id', 'title', 'completed');
-    });
+    // // Validate response structure
+    // sp.test("Response has userId, id, title, and completed properties", function () {
+    //     sp.expect(response).to.have.all.keys('userId', 'id', 'title', 'completed');
+    // });
 
-    // Validate data types
-    sp.test("userId is a number", function () {
-        sp.expect(response.userId).to.be.a('number');
-    });
+    // sp.test("Status code is between 200–300 or 400–500", function () {
+    //   sp.expect(
+    //     (sp.response.statusCode >= 100 && sp.response.statusCode <= 500) || 
+    //     (sp.response.statusCode >= 500 && sp.response.statusCode <= 600)
+    //   ).to.be.true();
+    // });
 
-    sp.test("id is a number", function () {
-        sp.expect(response.id).to.be.a('number');
-    });
 
-    sp.test("title is a string", function () {
-        sp.expect(response.title).to.be.a('string');
-    });
+    // // Validate data types
+    // sp.test("userId is a number", function () {
+    //     sp.expect(response.userId).to.be.a('number');
+    // });
 
-    sp.test("completed is a boolean", function () {
-        sp.expect(response.completed).to.be.a('boolean');
-    });
+    // sp.test("id is a number", function () {
+    //     sp.expect(response.id).to.be.a('number');
+    // });
 
-        `
+    // sp.test("title is a string", function () {
+    //     sp.expect(response.title).to.be.a('string');
+    // });
+
+    // sp.test("completed is a boolean", function () {
+    //     sp.expect(response.completed).to.be.a('boolean');
+    // });
+
+    //     `
     const tests: { name: string; passed: boolean; error?: string }[] = [];
 
     // minimal chai-like expect (you can replace with a real lib like chai)
     const expect = (actual: any) => ({
       to: {
         equal: (expected: any) => {
-          // debugger;
           if (actual !== expected) throw new Error(`Expected ${actual} to equal ${expected}`);
+        },
+        notEqual: (expected: any) => {
+          if (actual === expected) throw new Error(`Expected ${actual} to not equal ${expected}`);
+        },
+        exist: () => {
+          if (actual === undefined || actual === null)
+            throw new Error(`Expected value to exist but got ${actual}`);
+        },
+        notExist: () => {
+          if (actual !== undefined && actual !== null)
+            throw new Error(`Expected value to not exist but got ${actual}`);
         },
         be: {
           a: (type: string) => {
             if (typeof actual !== type) throw new Error(`Expected type ${type} but got ${typeof actual}`);
           },
+          true: () => {
+            if (actual !== true)
+              throw new Error(`Expected value to be true but got ${actual}`);
+          },
+          false: () => {
+            if (actual !== false)
+              throw new Error(`Expected value to be false but got ${actual}`);
+          },
+          within: (min: number, max: number) => {
+            if (typeof actual !== "number")
+              throw new Error(`Expected a number but got ${typeof actual}`);
+            if (actual < min || actual > max)
+              throw new Error(`Expected ${actual} to be within ${min} and ${max}`);
+          },
+          lessThan: (expected: number) => {
+            if (!(typeof actual === "number" && typeof expected === "number"))
+              throw new Error(`Expected numbers for comparison`);
+            if (!(actual < expected))
+              throw new Error(`Expected ${actual} to be less than ${expected}`);
+          },
+          greaterThan: (expected: number) => {
+            if (!(typeof actual === "number" && typeof expected === "number"))
+              throw new Error(`Expected numbers for comparison`);
+            if (!(actual > expected))
+              throw new Error(`Expected ${actual} to be greater than ${expected}`);
+          },
+          empty: () => {
+            if (
+              (Array.isArray(actual) && actual.length > 0) ||
+              (typeof actual === "string" && actual.trim().length > 0) ||
+              (actual && typeof actual === "object" && Object.keys(actual).length > 0)
+            ) {
+              throw new Error(`Expected value to be empty but got ${JSON.stringify(actual)}`);
+            }
+          },
+          notEmpty: () => {
+            if (
+              (Array.isArray(actual) && actual.length === 0) ||
+              (typeof actual === "string" && actual.trim().length === 0) ||
+              (actual && typeof actual === "object" && Object.keys(actual).length === 0)
+            ) {
+              throw new Error(`Expected value to not be empty`);
+            }
+          },
+        },
+         contain: (expected: any) => {
+          if (
+            (typeof actual === "string" || Array.isArray(actual)) &&
+            !actual.includes(expected)
+          ) {
+            throw new Error(`Expected ${actual} to contain ${expected}`);
+          }
+        },
+        notContain: (expected: any) => {
+          if (
+            (typeof actual === "string" || Array.isArray(actual)) &&
+            actual.includes(expected)
+          ) {
+            throw new Error(`Expected ${actual} to not contain ${expected}`);
+          }
+        },
+        beInList: (list: any[]) => {
+          if (!Array.isArray(list))
+            throw new Error(`Expected a list but got ${typeof list}`);
+          if (!list.includes(actual))
+            throw new Error(`Expected ${actual} to be in list ${list}`);
+        },
+        notBeInList: (list: any[]) => {
+          if (!Array.isArray(list))
+            throw new Error(`Expected a list but got ${typeof list}`);
+          if (list.includes(actual))
+            throw new Error(`Expected ${actual} to not be in list ${list}`);
         },
         have: {
           all: {
@@ -2034,23 +2153,40 @@ class RestExplorerViewModel {
     });
 
     const progressiveTab = createDeepCopy(this._tab.getValue());
+    const javaScriptTestCases = progressiveTab.property.request.tests.script || ''; 
   
 
     restExplorerDataStore.update((restApiDataMap) => {
       const r = restApiDataMap.get(progressiveTab?.tabId);
       if(r){
         r.response.testResults = [];
+        r.response.testMessage = '';
       // sp object similar to pm
         const sp = {
           response: {
-            code: Number(r?.response?.status.split(" ")[0]) ,
-            json: () => {
-              try {
-                return JSON.parse(r?.response?.body);
-              } catch {
-                return {};
-              }
+            statusCode: Number(r?.response?.status.split(" ")[0]) ,
+            body: {
+              text: () => {
+                try {
+                  return r?.response?.body;
+                } catch {
+                  return {};
+                }
+              },  
+              json: () => {
+                try {
+                  return JSON.parse(r?.response?.body);
+                } catch {
+                  return {};
+                }
+              },  
             },
+            headers: r?.response?.headers.reduce((acc, h) => {
+              acc[h.key] = h.value;
+              return acc;
+            }, {}),
+            size: r?.response?.size,
+            time: r?.response?.time,
           },
           test: (name: string, fn: Function) => {
             try {
@@ -2066,16 +2202,16 @@ class RestExplorerViewModel {
         try {
             const fn = new Function("sp", javaScriptTestCases);
             fn(sp); // execute user script with "sp"
+            r.response.testResults = tests.map(t => ({
+              testId: '', // No ID in script mode
+              testName: t.name,
+              testStatus: t.passed,
+              testMessage: t.error || '',
+            }));
           } catch (err: any) {
-            tests.push({ name: "Test script execution", passed: false, error: err.message });
+            console.log(err)
+            r.response.testMessage = `${err.name} - ${err.message}`;
           }
-          console.log({ tests });
-          r.response.testResults = tests.map(t => ({
-            testId: '', // No ID in script mode
-            testName: t.name,
-            testStatus: t.passed,
-            testMessage: t.error || '',
-          }));
           restApiDataMap.set(progressiveTab.tabId, r);
         }
         return restApiDataMap;
@@ -2097,18 +2233,18 @@ class RestExplorerViewModel {
     condition: TestCaseConditionOperatorEnum,
   ): { passed: boolean; message?: string } => {
     let passed = false;
-    let message: string | undefined = "Failed";
+    let message: string | undefined = "";
     const expected: any = expectedRaw;
 
     try {
       switch (condition) {
         case TestCaseConditionOperatorEnum.EQUALS:
           passed = actual == expected;
-          message = passed ? "" : `Expected ${actual} to equal  ${expected}`;
+          message = passed ? "" : `Expected ${actual} to equal  ${expected || "(empty)"}`;
           break;
         case TestCaseConditionOperatorEnum.NOT_EQUAL:
           passed = actual != expected;
-          message = passed ? "" : `Expected ${actual} not to equal ${expected}`;
+          message = passed ? "" : `Expected ${actual} not to equal ${expected || "(empty)"}`;
           break;
         case TestCaseConditionOperatorEnum.EXISTS:
           passed = actual !== undefined && actual !== null;
@@ -2123,22 +2259,22 @@ class RestExplorerViewModel {
             typeof actual === "number"
               ? actual < Number(expected)
               : actual.length < Number(expected);
-          message = passed ? "" : `Expected ${actual} to be less than ${expected}`;
+          message = passed ? "" : `Expected ${actual} to be less than ${expected || "(empty)"}`;
           break;
         case TestCaseConditionOperatorEnum.GREATER_THAN:
           passed =
             typeof actual === "number"
               ? actual > Number(expected)
               : actual.length > Number(expected);
-          message = passed ? "" : `Expected ${actual} to be greater than ${expected}`;
+          message = passed ? "" : `Expected ${actual} to be greater than ${expected || "(empty)"}`;
           break;
         case TestCaseConditionOperatorEnum.CONTAINS:
           passed = typeof actual === "string" && actual.includes(expected);
-          message = passed ? "" : `Expected ${actual} to contain ${expected}`;
+          message = passed ? "" : `Expected ${actual} to contain ${expected || "(empty)"}`;
           break;
         case TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN:
           passed = typeof actual === "string" && !actual.includes(expected);
-          message = passed ? "" : `Expected ${actual} not to contain ${expected}`;
+          message = passed ? "" : `Expected ${actual} not to contain ${expected || "(empty)"}`;
           break;
         case TestCaseConditionOperatorEnum.IS_EMPTY:
           passed = actual === "" || actual === 0;
@@ -2150,18 +2286,16 @@ class RestExplorerViewModel {
           break;
         case TestCaseConditionOperatorEnum.IN_LIST:
           try {
-            const list = JSON.parse(actual);
-            passed = Array.isArray(list) && list.includes(expected);
-            message = passed ? "" : `Expected ${actual} to be in list ${expected}`;
+             passed = Array.isArray(actual) && actual.includes(expected);
+             message = passed ? "" : `Expected ${actual} to be in list ${expected || "(empty)"}`;
           } catch {
             message = "Result for IN LIST must be a JSON array";
           }
           break;
         case TestCaseConditionOperatorEnum.NOT_IN_LIST:
           try {
-            const list = JSON.parse(actual);
-            passed = Array.isArray(list) && !list.includes(expected);
-            message = passed ? "" : `Expected ${actual} not to be in list ${expected}`;
+            passed = Array.isArray(actual) && !actual.includes(expected);
+            message = passed ? "" : `Expected ${actual} not to be in list ${expected || "(empty)"}`;
           } catch {
             message = "Result for NOT IN LIST must be a JSON array";
           }
@@ -2246,11 +2380,11 @@ class RestExplorerViewModel {
     );
   };
 
-  public updateIsRequestTabDemo = async(value:boolean) =>{
+  public updateIsRequestTabDemo = async (value: boolean) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.isRequestTestsNoCodeDemoCompleted = value;
     this.tab = progressiveTab;
-  }
+  };
 
   /**
    *
@@ -2432,7 +2566,6 @@ class RestExplorerViewModel {
     }
   };
 
-  
   private removeTypeFromObjectArray = (objectArray: any[]): any[] => {
     if (!Array.isArray(objectArray)) {
       console.warn("Input is not an array");
@@ -2449,6 +2582,20 @@ class RestExplorerViewModel {
     });
   };
 
+  private removeGeneratedFromObjectArray = (objectArray: any[]): any[] => {
+    if (!Array.isArray(objectArray)) {
+      console.warn("Input is not an array");
+      return objectArray;
+    }
+    return objectArray.map((obj) => {
+      if (!obj || typeof obj !== "object") {
+        return obj;
+      }
+      const { generated, ...objWithoutGenerated } = obj;
+      return objWithoutGenerated;
+    });
+  };
+
   private updateTabToRemoveType = async () => {
     const progressiveTab = this._tab.getValue();
     const updatedHeaders = this.removeTypeFromObjectArray(
@@ -2457,7 +2604,7 @@ class RestExplorerViewModel {
     const updatedParams = this.removeTypeFromObjectArray(
       progressiveTab.property.request.queryParams,
     );
-    const updateFormData = this.removeTypeFromObjectArray(
+    const updateFormData = this.removeGeneratedFromObjectArray(
       progressiveTab.property.request.body.formdata,
     );
     const updateUrlEncoded = this.removeTypeFromObjectArray(
@@ -4439,15 +4586,17 @@ class RestExplorerViewModel {
         RequestDatasetEnum.URLENCODED
     ) {
       if (Array.isArray(response) && response.length > 0) {
-        const aiGeneratedArray = response.map((item) => ({
-          ...item,
-          type: "ai-generated",
-          checked: false,
-        }));
         if (
           progressiveTab.property?.request?.state?.requestBodyNavigation ===
           RequestDatasetEnum.FORMDATA
         ) {
+          const aiGeneratedArray = response.map((item) => ({
+            ...item,
+            type: "text",
+            base: "",
+            generated: true,
+            checked: false,
+          }));
           let currentDetails =
             progressiveTab.property.request.body.formdata || [];
           if (currentDetails.length > 0) currentDetails.pop();
@@ -4462,9 +4611,14 @@ class RestExplorerViewModel {
           ];
           progressiveTab.property.request.body.formdata = [
             ...merged,
-            { key: "", value: "", checked: false },
+            { key: "", value: "", checked: false, type: "text", base: "" },
           ];
         } else {
+          const aiGeneratedArray = response.map((item) => ({
+            ...item,
+            type: "ai-generated",
+            checked: false,
+          }));
           let currentDetails =
             progressiveTab.property.request.body.urlencoded || [];
           if (currentDetails.length > 0) currentDetails.pop();
@@ -4575,7 +4729,7 @@ class RestExplorerViewModel {
     }
   };
 
-    /**
+  /**
    * Fetch collections from services and insert to repository
    * @param workspaceId - id of current workspace
    */

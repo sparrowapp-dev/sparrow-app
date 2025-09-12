@@ -217,12 +217,13 @@
   let isDeletePopup = false;
 
   const isValidJsonPath = (path: string): boolean => {
-    // Starts with $ or @
-    if (!path.startsWith("$") && !path.startsWith("@")) return false;
-
-    // Basic regex for $.key, $.key[index], $.key.subkey
-    const regex = /^(\$|@)(\.[a-zA-Z_][a-zA-Z0-9_]*|\[\d+\])*$/;
-    return regex.test(path);
+    try {
+      if (!path.startsWith("$") && !path.startsWith("@")) return false;
+      JSONPath({ path, json: {} });
+      return true;
+    } catch {
+      return false;
+    }
   };
 
   const isValidXPath = (path: string): boolean => {

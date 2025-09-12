@@ -4,6 +4,7 @@
   import { onMount, tick } from "svelte";
 
   export let responseTestResults = [];
+  export let responseTestMessage = "";
   let filter: "all" | "passed" | "failed" = "all";
   let allBtn: HTMLSpanElement;
   let passedBtn: HTMLSpanElement;
@@ -135,9 +136,15 @@
       <SparrowLogo />
     </div>
     <div class="d-flex flex-column align-items-center text-center">
-      <p class="text-fs-12 mb-5" style="color: var(--text-ds-neutral-400);">
-        No test cases available. <br /> Start by adding your own test cases.
-      </p>
+      {#if responseTestMessage}
+        <p class="text-fs-12 mb-2" style="color: var(--text-ds-neutral-400);">
+          Couldn't evaluate the test script: {responseTestMessage}
+        </p>
+      {:else}
+        <p class="text-fs-12 mb-5" style="color: var(--text-ds-neutral-400);">
+          No test cases available. <br /> Start by adding your own test cases.
+        </p>
+      {/if}
     </div>
   </div>
 {/if}

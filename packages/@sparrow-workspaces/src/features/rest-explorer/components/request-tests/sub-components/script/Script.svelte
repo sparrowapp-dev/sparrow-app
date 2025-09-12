@@ -6,6 +6,8 @@
   } from "@sparrow/library/icons";
   import { Button } from "@sparrow/library/ui";
   import { predefinedTestSnippets } from "./utils/common-snippets";
+  export let onTestsChange;
+  export let tests;
 
   export let tabSplitDirection: "vertical" | "horizontal" = "vertical";
   export let lang:
@@ -17,8 +19,9 @@
     | "Graphql"
     | "Python"
     | "Curl" = "JavaScript";
-  export let value: string = "";
   export let isBodyBeautified: boolean = false;
+  let value = tests?.script || "";
+
   let searchData: string;
 
   // State for panel collapse
@@ -28,8 +31,9 @@
     isBodyBeautified = val;
   };
 
-  const updateTestContent = (data: any) => {
-    value = data;
+  const handleCodeMirrorChange = (e: any) => {
+    value = e.detail;
+    onTestsChange({ ...tests, script: value });
   };
 
   const onSearchSnippets = (value: string) => {};
@@ -131,7 +135,7 @@
       <Editor
         bind:lang
         bind:value
-        on:change={updateTestContent}
+        on:change={handleCodeMirrorChange}
         isEditable={true}
         autofocus={true}
         {isBodyBeautified}
