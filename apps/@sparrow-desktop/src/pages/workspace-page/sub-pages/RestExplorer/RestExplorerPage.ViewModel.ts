@@ -2007,44 +2007,44 @@ class RestExplorerViewModel {
   };
 
   private async executeScriptTestcases() {
-    const javaScriptTestCases = `
-        sps.test("Status code is 200", function () {
-        sp.expect(sp.response.statusCode).to.equal(200);
-    });
+    // const javaScriptTestCases = `
+    //     sps.test("Status code is 200", function () {
+    //     sp.expect(sp.response.statusCode).to.equal(200);
+    // });
 
-    const response = sp.response.body.json();
+    // const response = sp.response.body.json();
 
-    // Validate response structure
-    sp.test("Response has userId, id, title, and completed properties", function () {
-        sp.expect(response).to.have.all.keys('userId', 'id', 'title', 'completed');
-    });
+    // // Validate response structure
+    // sp.test("Response has userId, id, title, and completed properties", function () {
+    //     sp.expect(response).to.have.all.keys('userId', 'id', 'title', 'completed');
+    // });
 
-    sp.test("Status code is between 200–300 or 400–500", function () {
-      sp.expect(
-        (sp.response.statusCode >= 100 && sp.response.statusCode <= 500) || 
-        (sp.response.statusCode >= 500 && sp.response.statusCode <= 600)
-      ).to.be.true();
-    });
+    // sp.test("Status code is between 200–300 or 400–500", function () {
+    //   sp.expect(
+    //     (sp.response.statusCode >= 100 && sp.response.statusCode <= 500) || 
+    //     (sp.response.statusCode >= 500 && sp.response.statusCode <= 600)
+    //   ).to.be.true();
+    // });
 
 
-    // Validate data types
-    sp.test("userId is a number", function () {
-        sp.expect(response.userId).to.be.a('number');
-    });
+    // // Validate data types
+    // sp.test("userId is a number", function () {
+    //     sp.expect(response.userId).to.be.a('number');
+    // });
 
-    sp.test("id is a number", function () {
-        sp.expect(response.id).to.be.a('number');
-    });
+    // sp.test("id is a number", function () {
+    //     sp.expect(response.id).to.be.a('number');
+    // });
 
-    sp.test("title is a string", function () {
-        sp.expect(response.title).to.be.a('string');
-    });
+    // sp.test("title is a string", function () {
+    //     sp.expect(response.title).to.be.a('string');
+    // });
 
-    sp.test("completed is a boolean", function () {
-        sp.expect(response.completed).to.be.a('boolean');
-    });
+    // sp.test("completed is a boolean", function () {
+    //     sp.expect(response.completed).to.be.a('boolean');
+    // });
 
-        `
+    //     `
     const tests: { name: string; passed: boolean; error?: string }[] = [];
 
     // minimal chai-like expect (you can replace with a real lib like chai)
@@ -2153,6 +2153,7 @@ class RestExplorerViewModel {
     });
 
     const progressiveTab = createDeepCopy(this._tab.getValue());
+    const javaScriptTestCases = progressiveTab.property.request.tests.script || ''; 
   
 
     restExplorerDataStore.update((restApiDataMap) => {

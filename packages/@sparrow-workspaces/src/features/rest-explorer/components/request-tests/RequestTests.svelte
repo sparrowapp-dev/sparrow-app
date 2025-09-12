@@ -83,7 +83,7 @@
   </div>
   <div style="flex:1; overflow:auto;">
     {#if tests?.testCaseMode === TestCaseModeEnum.SCRIPT}
-      <Script {tabSplitDirection} />
+      <Script {tabSplitDirection} {tests} {onTestsChange} />
     {:else if tests?.testCaseMode === TestCaseModeEnum.NO_CODE}
       <NoCode
         {tests}
