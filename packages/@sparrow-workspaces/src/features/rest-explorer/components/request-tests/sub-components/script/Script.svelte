@@ -20,11 +20,10 @@
 
   export let tabSplitDirection: SplitDirection = "vertical";
   export let lang: EditorLanguage = "JavaScript";
-  export let value: string = "";
-  export let isBodyBeautified: boolean = false;
- 
-  let value = tests?.script || "";
 
+  export let isBodyBeautified: boolean = false;
+
+  let value = tests?.script || "";
 
   let searchData: string = "";
   let isLeftPanelCollapsed: boolean = false;
@@ -54,6 +53,7 @@
 
   const selectSnippet = (data: string): void => {
     value += value ? `\n${data}` : data;
+    onTestsChange({ ...tests, script: value });
   };
 
   const highlightMatch = (text: string, searchTerm: string): string => {
