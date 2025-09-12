@@ -70,6 +70,10 @@ import {
   type HttpRequestCollectionLevelAuthTabInterface,
   type HttpRequestCollectionLevelAuthProfileTabInterface,
   RequestDatasetEnum,
+  TestCaseConditionOperatorEnum,
+  TestCaseSelectionTypeEnum,
+  TestCaseModeEnum,
+  RequestSectionEnum,
 } from "@sparrow/common/types/workspace";
 import { notifications } from "@sparrow/library/ui";
 import { RequestTabAdapter } from "../../../../adapter/request-tab";
@@ -104,11 +108,15 @@ import constants from "src/constants/constants";
 import * as curlconverter from "curlconverter";
 import * as Sentry from "@sentry/svelte";
 import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection-tab";
+import { captureEvent } from "src/utils/posthog/posthogConfig";
 import {
   generatedVariableDemo,
   generateVariableStep,
 } from "../../../../../../../packages/@sparrow-workspaces/src/stores/generate-variable-demo";
 import { UserService } from "src/services/user.service";
+import * as xpath from "xpath";
+import { DOMParser } from "xmldom";
+import { JSONPath } from "jsonpath-plus";
 
 class RestExplorerViewModel {
   /**
@@ -207,6 +215,9 @@ class RestExplorerViewModel {
         if (collectionDoc) {
           await this.updateIsGeneratedVariable(
             collectionDoc?.isGenerateVariableTrial,
+          );
+          await this.updateIsRequestTabDemo(
+            collectionDoc?.isRequestTestsNoCodeDemoCompleted,
           );
         }
 
@@ -506,6 +517,36 @@ class RestExplorerViewModel {
         requestServer.request.headers,
         progressiveTab.property.request.headers,
       )
+    ) {
+      result = false;
+    } else if (
+      !this.compareArray.init(
+        requestServer.request?.tests?.noCode?.map((test) => {
+          return {
+            id: test.id,
+            name: test.name,
+            condition: test.condition,
+            expectedResult: test.expectedResult,
+            testPath: test.testPath,
+            testTarget: test.testTarget,
+          };
+        }) || [],
+        progressiveTab.property.request?.tests?.noCode?.map((test) => {
+          return {
+            id: test.id,
+            name: test.name,
+            condition: test.condition,
+            expectedResult: test.expectedResult,
+            testPath: test.testPath,
+            testTarget: test.testTarget,
+          };
+        }),
+      )
+    ) {
+      result = false;
+    } else if (
+      requestServer.request.tests.testCaseMode !==
+      progressiveTab.property.request.tests.testCaseMode
     ) {
       result = false;
     } else if (
@@ -1452,6 +1493,18 @@ class RestExplorerViewModel {
 
   /**
    *
+   * @param _tests - request tests
+   */
+  public updateRequestTests = async (_tests: Tests) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.tests = _tests;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareRequestWithServer();
+  };
+
+  /**
+   *
    * @param _params - request query parameters
    * @param _effectURL - lag that effect request url
    */
@@ -1745,7 +1798,7 @@ class RestExplorerViewModel {
       "selectedAgent",
     ) as WorkspaceUserAgentBaseEnum;
     makeHttpRequestV2(...decodeData, selectedAgent, signal)
-      .then((response) => {
+      .then(async (response) => {
         if (response.isSuccessful === false) {
           restExplorerDataStore.update((restApiDataMap) => {
             const data = restApiDataMap.get(progressiveTab?.tabId);
@@ -1760,6 +1813,7 @@ class RestExplorerViewModel {
             restApiDataMap.set(progressiveTab.tabId, data);
             return restApiDataMap;
           });
+          await this.executeTestcases();
         } else {
           const end = Date.now();
           const byteLength = new TextEncoder().encode(
@@ -1797,9 +1851,10 @@ class RestExplorerViewModel {
 
             return restApiDataMap;
           });
+          await this.executeTestcases();
         }
       })
-      .catch((error) => {
+      .catch(async (error) => {
         // Handle cancellation or other errors
         if (error.name === "AbortError") {
           return;
@@ -1818,7 +1873,212 @@ class RestExplorerViewModel {
           restApiDataMap.set(progressiveTab.tabId, data);
           return restApiDataMap;
         });
+        await this.executeTestcases();
       });
+  };
+
+  /**
+   * Executes test cases for the current tab based on the selected test case mode.
+   * If the mode is NO_CODE, it delegates to executeNoCodeTestcases.
+   *
+   */
+  private executeTestcases = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+
+    const testcaseMode = progressiveTab.property.request.tests.testCaseMode;
+    if (testcaseMode === TestCaseModeEnum.NO_CODE) {
+      await this.executeNoCodeTestcases();
+    }
+  };
+
+  /**
+   * Executes all no-code test cases for the current tab's response.
+   * Updates the test results in the Response Store(restExplorerDataStore).
+   *
+   */
+  private executeNoCodeTestcases = () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    restExplorerDataStore.update((restApiDataMap) => {
+      const response = restApiDataMap.get(progressiveTab?.tabId);
+      if (response) {
+        response.response.testResults = [];
+        const testCases = progressiveTab.property.request.tests.noCode || [];
+        testCases.map((test) => {
+          let actual: any;
+          let error: string | undefined;
+          let testCasePassed = false;
+          let testCaseStatusMessage = "Failed";
+
+          if (test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_TEXT) {
+            actual = response.response.body;
+          } else if (
+            test.testTarget === TestCaseSelectionTypeEnum.TIME_CONSUMING
+          ) {
+            actual = response.response.time;
+          } else if (
+            test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER
+          ) {
+            actual = response.response.headers.find(
+              (h) => h.key.toLowerCase() === test.testPath?.toLowerCase(),
+            )?.value;
+          } else if (
+            test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON
+          ) {
+            try {
+              const json = JSON.parse(response.response.body);
+              // Use JSONPath to extract value, supports $[3].userId, $[0].address.city, etc.
+              const result = JSONPath({ path: test.testPath, json });
+              // If result is an array, take the first value
+              actual = Array.isArray(result) ? result[0] : result;
+            } catch (e) {
+              error = "Invalid JSON or path";
+              actual = undefined;
+            }
+          } else if (
+            test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML
+          ) {
+            try {
+              const xml = response.response.body;
+              const doc = new DOMParser().parseFromString(xml, "text/xml");
+              // test.testPath should be a valid XPath, e.g. "/root/country/city"
+              const nodes = xpath.select(test.testPath, doc);
+
+              if (Array.isArray(nodes) && nodes.length > 0) {
+                // If it's an attribute node
+                if (nodes[0].nodeType === 2) {
+                  actual = nodes[0].nodeValue;
+                } else if (nodes[0].firstChild) {
+                  actual = nodes[0].firstChild.nodeValue;
+                } else if ((nodes[0] as any).data) {
+                  actual = (nodes[0] as any).data;
+                } else {
+                  actual = nodes[0].toString();
+                }
+              } else {
+                actual = undefined;
+              }
+            } catch (e) {
+              error = "Invalid XML or XPath";
+              actual = undefined;
+            }
+          } else {
+            error = `Test target ${test.testTarget} not found`;
+          }
+
+          if (actual) {
+            const { passed, message: testMessage } = this.evaluateCondition(
+              actual,
+              test.expectedResult,
+              test.condition,
+            );
+            testCasePassed = passed;
+            testCaseStatusMessage = testMessage;
+          }
+          const testResponse = {
+            testId: test.id,
+            testName: test.name,
+            testStatus: testCasePassed,
+            testMessage: error || testCaseStatusMessage,
+          };
+
+          response.response.testResults?.push(testResponse);
+
+          restApiDataMap.set(progressiveTab.tabId, response);
+        });
+      }
+      return restApiDataMap;
+    });
+  };
+
+  /**
+   * Evaluates a test condition against the actual and expected values.
+   *
+   * @param actual - The actual value extracted from the response.
+   * @param expectedRaw - The expected value to compare against.
+   * @param condition - The test condition operator (e.g., EQUALS, NOT_EQUAL).
+   * @returns An object containing whether the test passed and an optional message.
+   */
+  private evaluateCondition = (
+    actual: any,
+    expectedRaw: string,
+    condition: TestCaseConditionOperatorEnum,
+  ): { passed: boolean; message?: string } => {
+    let passed = false;
+    let message: string | undefined = "Failed";
+    const expected: any = expectedRaw;
+
+    try {
+      switch (condition) {
+        case TestCaseConditionOperatorEnum.EQUALS:
+          passed = actual == expected;
+          message = passed ? "Passed" : "Failed";
+          break;
+        case TestCaseConditionOperatorEnum.NOT_EQUAL:
+          passed = actual != expected;
+          message = passed ? "Passed" : "Failed";
+          break;
+        case TestCaseConditionOperatorEnum.EXISTS:
+          passed = actual !== undefined && actual !== null;
+          message = passed ? "Passed" : "Failed";
+          break;
+        case TestCaseConditionOperatorEnum.DOES_NOT_EXIST:
+          passed = actual === undefined || actual === null;
+          message = passed ? "Passed" : "Failed";
+          break;
+        case TestCaseConditionOperatorEnum.LESS_THAN:
+          passed =
+            typeof actual === "number"
+              ? actual < Number(expected)
+              : actual.length < Number(expected);
+          message = passed ? "Passed" : "Failed";
+          break;
+        case TestCaseConditionOperatorEnum.GREATER_THAN:
+          passed =
+            typeof actual === "number"
+              ? actual > Number(expected)
+              : actual.length > Number(expected);
+          message = passed ? "Passed" : "Failed";
+          break;
+        case TestCaseConditionOperatorEnum.CONTAINS:
+          passed = typeof actual === "string" && actual.includes(expected);
+          message = passed ? "Passed" : "Failed";
+          break;
+        case TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN:
+          passed = typeof actual === "string" && !actual.includes(expected);
+          message = passed ? "Passed" : "Failed";
+          break;
+        case TestCaseConditionOperatorEnum.IS_EMPTY:
+          passed = actual === "" || actual === 0;
+          message = passed ? "Passed" : "Failed";
+          break;
+        case TestCaseConditionOperatorEnum.IS_NOT_EMPTY:
+          passed = actual !== "" && actual !== 0;
+          message = passed ? "Passed" : "Failed";
+          break;
+        case TestCaseConditionOperatorEnum.IN_LIST:
+          try {
+            passed = Array.isArray(actual) && actual.includes(expected);
+            message = passed ? "Passed" : "Failed";
+          } catch {
+            message = "Result for IN LIST must be a JSON array";
+          }
+          break;
+        case TestCaseConditionOperatorEnum.NOT_IN_LIST:
+          try {
+            passed = Array.isArray(actual) && !actual.includes(expected);
+            message = passed ? "Passed" : "Failed";
+          } catch {
+            message = "Result for NOT IN LIST must be a JSON array";
+          }
+          break;
+        default:
+          message = `Condition ${condition} not supported`;
+      }
+    } catch (e) {
+      message = (e as Error).message;
+    }
+
+    return { passed, message };
   };
 
   /**
@@ -2071,12 +2331,64 @@ class RestExplorerViewModel {
     }
   };
 
+  private removeTypeFromObjectArray = (objectArray: any[]): any[] => {
+    if (!Array.isArray(objectArray)) {
+      console.warn("Input is not an array");
+      return objectArray;
+    }
+    // Map through the array and remove 'type' property from each object
+    return objectArray.map((obj) => {
+      if (!obj || typeof obj !== "object") {
+        return obj;
+      }
+      // Create a new object without the 'type' property
+      const { type, ...objWithoutType } = obj;
+      return objWithoutType;
+    });
+  };
+
+  private removeGeneratedFromObjectArray = (objectArray: any[]): any[] => {
+    if (!Array.isArray(objectArray)) {
+      console.warn("Input is not an array");
+      return objectArray;
+    }
+    return objectArray.map((obj) => {
+      if (!obj || typeof obj !== "object") {
+        return obj;
+      }
+      const { generated, ...objWithoutGenerated } = obj;
+      return objWithoutGenerated;
+    });
+  };
+
+  private updateTabToRemoveType = async () => {
+    const progressiveTab = this._tab.getValue();
+    const updatedHeaders = this.removeTypeFromObjectArray(
+      progressiveTab.property.request.headers,
+    );
+    const updatedParams = this.removeTypeFromObjectArray(
+      progressiveTab.property.request.queryParams,
+    );
+    const updateFormData = this.removeGeneratedFromObjectArray(
+      progressiveTab.property.request.body.formdata,
+    );
+    const updateUrlEncoded = this.removeTypeFromObjectArray(
+      progressiveTab.property.request.body.urlencoded,
+    );
+    progressiveTab.property.request.headers = updatedHeaders;
+    progressiveTab.property.request.queryParams = updatedParams;
+    progressiveTab.property.request.body.formdata = updateFormData;
+    progressiveTab.property.request.body.urlencoded = updateUrlEncoded;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  };
+
   /**
    * Save Request
    * @param saveDescriptionOnly - refers save overall request data or only description as a documentation purpose.
    * @returns save status
    */
   public saveRequest = async () => {
+    await this.updateTabToRemoveType();
     const componentData: RequestTab = this._tab.getValue();
     const { folderId, collectionId, workspaceId } = componentData.path;
     const tabId = componentData?.tabId;
@@ -3841,6 +4153,12 @@ class RestExplorerViewModel {
     this.tab = progressiveTab;
   };
 
+  public updateIsRequestTabDemo = async (value: boolean) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.isRequestTestsNoCodeDemoCompleted = value;
+    this.tab = progressiveTab;
+  };
+
   private onOpenGlobalEnvironmentToGenerate = async (
     environment: any,
     collectionId: string,
@@ -3923,6 +4241,361 @@ class RestExplorerViewModel {
     } catch (error) {
       console.error("Error fetching trial exhausted status:", error);
       return false;
+    }
+  };
+
+  private insertGeneratedMockData = async (response: any): Promise<boolean> => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (
+      progressiveTab.property?.request?.state?.requestNavigation ===
+        RequestSectionEnum.HEADERS ||
+      progressiveTab.property?.request?.state?.requestNavigation ===
+        RequestSectionEnum.PARAMETERS
+    ) {
+      if (Array.isArray(response)) {
+        const aiGeneratedArray = response.map((item) => ({
+          key: item.key,
+          value: item.value,
+          checked: false,
+          type: "ai-generated",
+        }));
+        if (
+          progressiveTab.property?.request?.state?.requestNavigation ===
+          RequestSectionEnum.PARAMETERS
+        ) {
+          let currentDetails =
+            progressiveTab.property.request.queryParams || [];
+          if (currentDetails.length > 0) currentDetails.pop();
+          // Remove duplicates where AI has the same key
+          currentDetails = currentDetails.filter(
+            (existing: any) =>
+              !aiGeneratedArray.some((ai) => ai.key === existing.key),
+          );
+          const merged = [
+            ...currentDetails.map(({ type, ...rest }) => rest),
+            ...aiGeneratedArray,
+          ];
+          progressiveTab.property.request.queryParams = [
+            ...merged,
+            { key: "", value: "", checked: false },
+          ];
+        } else {
+          let currentDetails = progressiveTab.property.request.headers || [];
+          if (currentDetails.length > 0) currentDetails.pop();
+          currentDetails = currentDetails.filter(
+            (existing: any) =>
+              !aiGeneratedArray.some((ai) => ai.key === existing.key),
+          );
+          const merged = [
+            ...currentDetails.map(({ type, ...rest }) => rest),
+            ...aiGeneratedArray,
+          ];
+          progressiveTab.property.request.headers = [
+            ...merged,
+            { key: "", value: "", checked: false },
+          ];
+        }
+        this.tab = progressiveTab;
+        progressiveTab.isSaved = false;
+        progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
+        await this.tabRepository.updateTab(
+          progressiveTab.tabId,
+          progressiveTab,
+        );
+        this.compareRequestWithServer();
+        return true;
+      }
+      return false;
+    }
+    if (
+      progressiveTab.property?.request?.state?.requestBodyNavigation ===
+        RequestDatasetEnum.RAW &&
+      progressiveTab.property?.request?.state?.requestBodyLanguage ===
+        RequestDataTypeEnum.JSON
+    ) {
+      const jsonResult = response;
+      if (typeof jsonResult === "object" && jsonResult !== null) {
+        let existingRaw = progressiveTab.property.request.body.raw || "";
+        let mergedObject: Record<string, any> = {};
+        try {
+          // Try to parse existing raw if it's valid JSON
+          if (existingRaw.trim()) {
+            mergedObject = JSON.parse(existingRaw);
+          }
+        } catch (e) {
+          // If not valid JSON, reset to empty object
+          mergedObject = {};
+        }
+        // Merge: update existing keys or insert new ones
+        Object.keys(jsonResult).forEach((key) => {
+          mergedObject[key] = jsonResult[key];
+        });
+        // Save the updated JSON
+        progressiveTab.property.request.body.raw = JSON.stringify(
+          mergedObject,
+          null,
+          2,
+        );
+        this.tab = progressiveTab;
+        progressiveTab.isSaved = false;
+        progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
+        await this.tabRepository.updateTab(
+          progressiveTab.tabId,
+          progressiveTab,
+        );
+        this.compareRequestWithServer();
+        return true;
+      }
+      return false;
+    }
+    if (
+      progressiveTab.property?.request?.state?.requestBodyNavigation ===
+        RequestDatasetEnum.FORMDATA ||
+      progressiveTab.property?.request?.state?.requestBodyNavigation ===
+        RequestDatasetEnum.URLENCODED
+    ) {
+      if (Array.isArray(response) && response.length > 0) {
+        if (
+          progressiveTab.property?.request?.state?.requestBodyNavigation ===
+          RequestDatasetEnum.FORMDATA
+        ) {
+          const aiGeneratedArray = response.map((item) => ({
+            ...item,
+            type: "text",
+            base: "",
+            generated: true,
+            checked: false,
+          }));
+          let currentDetails =
+            progressiveTab.property.request.body.formdata || [];
+          if (currentDetails.length > 0) currentDetails.pop();
+          // Remove any items with the same key as AI-generated
+          currentDetails = currentDetails.filter(
+            (existing) =>
+              !aiGeneratedArray.some((ai) => ai.key === existing.key),
+          );
+          const merged = [
+            ...currentDetails.map(({ type, ...rest }) => rest),
+            ...aiGeneratedArray,
+          ];
+          progressiveTab.property.request.body.formdata = [
+            ...merged,
+            { key: "", value: "", checked: false, type: "text", base: "" },
+          ];
+        } else {
+          const aiGeneratedArray = response.map((item) => ({
+            ...item,
+            type: "ai-generated",
+            checked: false,
+          }));
+          let currentDetails =
+            progressiveTab.property.request.body.urlencoded || [];
+          if (currentDetails.length > 0) currentDetails.pop();
+          currentDetails = currentDetails.filter(
+            (existing: any) =>
+              !aiGeneratedArray.some((ai) => ai.key === existing.key),
+          );
+          const merged = [
+            ...currentDetails.map(({ type, ...rest }) => rest),
+            ...aiGeneratedArray,
+          ];
+          progressiveTab.property.request.body.urlencoded = [
+            ...merged,
+            { key: "", value: "", checked: false },
+          ];
+        }
+        this.tab = progressiveTab;
+        progressiveTab.isSaved = false;
+        progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
+        await this.tabRepository.updateTab(
+          progressiveTab.tabId,
+          progressiveTab,
+        );
+        this.compareRequestWithServer();
+        return true;
+      }
+      return false;
+    }
+    if (typeof response === "string" && response.trim() !== "") {
+      progressiveTab.property.request.body.raw = response.trim();
+      this.tab = progressiveTab;
+      progressiveTab.isSaved = false;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      this.compareRequestWithServer();
+      return true;
+    }
+    return false;
+  };
+
+  /**
+   * Generates mock data for a specific API request.
+   * @param requestType - The type of request data required (e.g., headers, params, or body).
+   * @returns The mock data generated by the AI assistant service.
+   */
+  public generateMockData = async (): Promise<any> => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    captureEvent("gen_mock_data", {
+      event_source: "web_app",
+      feat_location: "rest_api",
+      type: progressiveTab.property?.request?.state
+        ?.requestNavigation as RequestSectionEnum,
+    });
+    const workspaceData =
+      await this.workspaceRepository.getActiveWorkspaceDoc();
+    const teamId = workspaceData.toMutableJSON().team?.teamId || "";
+    const requestType = progressiveTab.property?.request?.state
+      ?.requestNavigation as RequestSectionEnum;
+    let properties:
+      | { type: RequestDatasetEnum; lang: RequestDataTypeEnum }
+      | undefined;
+    if (requestType === RequestSectionEnum.REQUEST_BODY) {
+      if (
+        progressiveTab.property?.request?.state?.requestBodyNavigation ===
+        RequestDatasetEnum.NONE
+      ) {
+        notifications.warning(
+          "Please select the request body type to generate mock data.",
+        );
+        return true;
+      }
+      properties = {
+        type: progressiveTab.property?.request?.state
+          ?.requestBodyNavigation as RequestDatasetEnum,
+        lang:
+          (progressiveTab.property?.request?.state
+            ?.requestBodyLanguage as RequestDataTypeEnum) ??
+          RequestDataTypeEnum.JSON,
+      };
+    }
+    const apiData = {
+      body: progressiveTab.property.request.body,
+      headers: progressiveTab.property.request.headers,
+      method: progressiveTab.property.request.method,
+      queryParams: progressiveTab.property.request.queryParams,
+      url: progressiveTab.property.request.url,
+      auth: progressiveTab.property.request.auth,
+    };
+    // Build prompt including API data
+    const prompt = `Generate realistic mock ${requestType} data based on the following API details: ${JSON.stringify(
+      apiData,
+    )}`;
+    const response = await this.aiAssistentService.gereateMockData(
+      requestType === RequestSectionEnum.REQUEST_BODY
+        ? { teamId: teamId, text: prompt, requestType, properties }
+        : { teamId: teamId, text: prompt, requestType },
+    );
+    if (response.isSuccessful) {
+      const inserted = this.insertGeneratedMockData(
+        response?.data?.data.result,
+      );
+      return inserted;
+    } else if (
+      response?.data?.message === "Limit reached. Please try again later."
+    ) {
+      notifications.error("AI Limit has Reached.please upgrade plan.");
+      return true;
+    }
+  };
+
+  /**
+   * Fetch collections from services and insert to repository
+   * @param workspaceId - id of current workspace
+   */
+  public fetchCollections = async (
+    workspaceId: string,
+  ): Promise<{ collectionItemTabsToBeDeleted?: string[] }> => {
+    const isGuestUser = await this.getGuestUserState();
+    if (!workspaceId || isGuestUser) {
+      return {};
+    }
+    const getCollectionItemIds = (
+      collectionItem: any,
+      collectedIds: string[],
+    ): void => {
+      const stack = [collectionItem];
+      while (stack.length > 0) {
+        const item = stack.pop();
+        if (!item) continue;
+
+        if (!item.type) {
+          // Collection
+          collectedIds.push(item._id);
+        } else {
+          // Folder, Http Request, WebSocket Request
+          collectedIds.push(item.id);
+        }
+
+        if (Array.isArray(item.items)) {
+          stack.push(...item.items);
+        }
+      }
+    };
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+    const workspaceData =
+      await this.workspaceRepository.readWorkspace(workspaceId);
+    let res;
+    if (
+      workspaceData &&
+      workspaceData.workspaceType === WorkspaceType.PUBLIC &&
+      workspaceData.isShared
+    ) {
+      res = await this.collectionService.fetchPublicCollection(
+        workspaceId,
+        constants.API_URL,
+      );
+    } else {
+      res = await this.collectionService.fetchCollection(workspaceId, baseUrl);
+    }
+
+    if (!res?.isSuccessful || !res?.data?.data) {
+      return {};
+    }
+    const collections = res.data.data;
+    const processedCollections: any[] = [];
+    const collectionIds: string[] = [];
+    const chunkSize = 100;
+    for (let i = 0; i < collections.length; i += chunkSize) {
+      const chunk = collections.slice(i, i + chunkSize);
+      for (const col of chunk) {
+        const collection = createDeepCopy(col);
+        collection.workspaceId = workspaceId;
+        collection.id = col._id;
+        if (!collection.description) collection.description = "";
+        delete collection._id;
+        processedCollections.push(collection);
+        collectionIds.push(col._id);
+      }
+      await new Promise((res) => setTimeout(res));
+    }
+    await this.collectionRepository.bulkInsertData(
+      workspaceId,
+      processedCollections,
+    );
+    await this.collectionRepository.deleteOrphanCollections(
+      workspaceId,
+      collectionIds,
+    );
+    const collectionItemIds: string[] = [];
+    for (const collection of collections) {
+      getCollectionItemIds(collection, collectionItemIds);
+    }
+    const collectionItemTabsToBeDeleted =
+      await this.tabRepository.getIdOfTabsThatDoesntExistAtCollectionLevel(
+        workspaceId,
+        collectionItemIds,
+      );
+    return {
+      collectionItemTabsToBeDeleted,
+    };
+  };
+
+  public handleRequestTestNoCodeDemoCompleted = async () => {
+    const response =
+      await this.userService.requestTabNocodeTestsDemoCompleted();
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (response.isSuccessful) {
+      await this.fetchCollections(progressiveTab?.path?.workspaceId);
     }
   };
 }

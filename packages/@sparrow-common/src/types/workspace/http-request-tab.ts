@@ -28,6 +28,7 @@ export enum RequestSectionEnum {
   HEADERS = "Headers",
   REQUEST_BODY = "Request Body",
   DOCUMENTATION = "Description",
+  TESTS = "Tests",
 }
 
 export enum MessageTypeEnum {
@@ -44,6 +45,7 @@ export enum ResponseFormatterEnum {
 export enum ResponseSectionEnum {
   RESPONSE = "Response",
   HEADERS = "Headers",
+  TESTRESULT = "TESTRESULT",
 }
 
 export enum RequestDatasetEnum {
@@ -57,6 +59,34 @@ export enum RequestDatasetEnum {
 export enum FormDataTypeEnum {
   TEXT = "text",
   FILE = "file",
+}
+
+export enum TestCaseModeEnum {
+  NO_CODE = "no-code",
+  SCRIPT = "script",
+}
+
+export enum TestCaseConditionOperatorEnum {
+  EQUALS = "Equals",
+  NOT_EQUAL = "Is Not Equal",
+  EXISTS = "Exists",
+  DOES_NOT_EXIST = "Does Not Exist",
+  LESS_THAN = "Less Than",
+  GREATER_THAN = "Greater Than",
+  CONTAINS = "Contains",
+  DOES_NOT_CONTAIN = "Does Not Contain",
+  IS_EMPTY = "Is Empty",
+  IS_NOT_EMPTY = "Is Not Empty",
+  IN_LIST = "In List",
+  NOT_IN_LIST = "Not In List",
+}
+
+export enum TestCaseSelectionTypeEnum {
+  RESPONSE_TEXT = "Response Text",
+  RESPONSE_JSON = "Response JSON",
+  RESPONSE_HEADER = "Response Header",
+  RESPONSE_XML = "Response XML",
+  TIME_CONSUMING = "Time Consuming",
 }
 
 export enum UntrackedItemsEnum {
@@ -193,6 +223,9 @@ export interface ResponseSizeWrapper {
 }
 export interface isGeneratedVariable {
   isGeneratedVariable: boolean;
+}
+export interface isRequestTestsNoCodeDemoCompleted {
+  isRequestTestsNoCodeDemoCompleted: boolean;
 }
 
 export interface Response
@@ -387,6 +420,22 @@ export interface Auth
 export interface AuthWrapper {
   auth: Auth;
 }
+export interface Tests {
+  testCaseMode: TestCaseModeEnum;
+  noCode: {
+    id: string;
+    name: string;
+    condition: TestCaseConditionOperatorEnum;
+    expectedResult: string;
+    testPath: string;
+    testTarget: TestCaseSelectionTypeEnum;
+  }[];
+  script: string;
+}
+
+export interface TestsWrapper {
+  tests: Tests;
+}
 
 export interface HeadersWrapper {
   headers: KeyValueChecked[];
@@ -414,7 +463,9 @@ export interface Request
     StateWrapper,
     ResponseWrapper,
     AuthWrapper,
+    TestsWrapper,
     UrlWrapper,
     AiWrapper,
     isGeneratedVariable,
+    isRequestTestsNoCodeDemoCompleted,
     HeadersWrapper {}

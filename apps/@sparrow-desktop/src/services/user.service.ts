@@ -77,9 +77,7 @@ export class UserService {
    * @param collectionId - The collection Id which user has completed the trial.
    * @returns A promise that resolves to the server's response.
    */
-  public InsertGenerateTrialCollectionIds = async (
-    collectionId: string,
-  ) => {
+  public InsertGenerateTrialCollectionIds = async (collectionId: string) => {
     const response = await makeRequest(
       "POST",
       `${apiUrl}/api/user/${collectionId}/trial-generate-variable`,
@@ -100,6 +98,22 @@ export class UserService {
     const response = await makeRequest(
       "POST",
       `${apiUrl}/api/user/generate-variable-demo`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  /**
+   * If the user has completed Demo of RequestTests.
+   *
+   * @returns A promise that resolves to the server's response.
+   */
+  public requestTabNocodeTestsDemoCompleted = async () => {
+    const response = await makeRequest(
+      "POST",
+      `${apiUrl}/api/user/request-tests-nocode-demo`,
       {
         headers: getAuthHeaders(),
       },
