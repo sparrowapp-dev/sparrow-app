@@ -1002,6 +1002,7 @@
                                     ?.testResults}
                                   responseTestMessage={storeData.response
                                     ?.testMessage}
+                                  tests={$tab?.property?.request.tests}
                                 />
                                 <!-- </div> -->
                               {/if}
