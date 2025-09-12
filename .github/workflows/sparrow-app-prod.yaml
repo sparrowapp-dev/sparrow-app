@@ -986,7 +986,7 @@ jobs:
             apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos/*_intel_mac.tar.gz
             msi_files/*.exe
             msi_files/*.msi
-            msi_files/*.msix
+            msix-output/*.msix
             deb_files/*.deb
         env:
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
