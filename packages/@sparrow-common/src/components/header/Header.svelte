@@ -13,6 +13,7 @@
     CartRegular,
     GlobeRegular,
     LockClosedRegular,
+    Globle,
   } from "@sparrow/library/icons";
   import { getCurrentWindow } from "@tauri-apps/api/window";
   import { environmentType, WorkspaceType } from "@sparrow/common/enums";
@@ -28,6 +29,9 @@
   import { Button, Dropdown, Tag, Tooltip } from "@sparrow/library/ui";
   import { SparrowFilledLogo } from "./images/index";
   import { policyConfig } from "@sparrow/common/store";
+  import { UpgradePlanPopUp } from "@sparrow/common/components";
+  import { Modal } from "@sparrow/library/ui";
+  import { planBannerisOpen } from "@sparrow/common/store";
 
   // import { GlobalSearch } from "../../components/popup/global-search";
   /**
@@ -35,6 +39,14 @@
    */
   export let environments;
   export let onMarketingRedirect = () => {};
+  export let currentPlan = "";
+  export let currentWorkspacePlan = "";
+  export let onUpgradeClick = () => {};
+  export let isUpgradePlanModelOpen = false;
+
+  const handleUpgradeClick = () => {
+    isUpgradePlanModelOpen = true;
+  };
   /**
    * selected environment
    */
@@ -52,6 +64,7 @@
 
   export let isGuestUser = false;
   export let isLoginBannerActive = false;
+  let isUpgradePlanPopUpOpen = false;
 
   export let onLoginUser;
 
@@ -146,6 +159,12 @@
     return storedAgent || multipleAgentData[0]?.id;
   })();
 
+  //functions for handling the upgrade modal
+  const handleRedirectToAdmin = async () => {
+    planBannerisOpen.set(false);
+    isUpgradePlanModelOpen = false;
+  };
+
   const createSetFromArray = (arr, key) => {
     const seen = new Set();
     return arr.filter((obj) => {
@@ -219,6 +238,99 @@
     return;
   };
 
+  const getPlanBadgeStyle = (plan: string) => {
+    switch (plan?.toLowerCase()) {
+      case "standard":
+        return {
+          backgroundColor: "var(--bg-ds-info-900)",
+          background:
+            "linear-gradient(180deg, var(--text-ds-success-100), var(--text-ds-info-300))",
+          backgroundClip: "text",
+          WebkitBackgroundClip: "text",
+          borderColor: "var(--border-ds-info-700)",
+          color: "transparent",
+          text: "Standard",
+          IconComponent: StarNew,
+          iconColor:
+            "linear-gradient(180deg, var(--text-ds-success-100), var(--text-ds-info-300))",
+        };
+      case "enterprise":
+        return {
+          backgroundColor: "var(--bg-ds-warning-700)",
+          background:
+            "linear-gradient(180deg, var(--text-ds-warning-100), var(--text-ds-tertiary-300))",
+          backgroundClip: "text",
+          WebkitBackgroundClip: "text",
+          borderColor: "var(--border-ds-warning-700)",
+          color: "transparent",
+          text: "Enterprise",
+          IconComponent: Premium,
+          iconColor:
+            "linear-gradient(180deg, var(--text-ds-warning-100), var(--text-ds-tertiary-300))",
+        };
+      case "professional":
+        return {
+          backgroundColor: "var(--bg-ds-secondary-900)",
+          background:
+            "linear-gradient(180deg, var(--text-ds-accent-100), var(--text-ds-secondary-300))",
+          backgroundClip: "text",
+          WebkitBackgroundClip: "text",
+          borderColor: "var(--text-ds-secondary-700)",
+          color: "transparent",
+          text: "Professional",
+          IconComponent: Crown,
+          iconColor:
+            "linear-gradient(180deg, var(--text-ds-accent-100), var(--text-ds-secondary-300))",
+        };
+      case "community":
+      default:
+        return {
+          backgroundColor: "var(--bg-ds-surface-800)",
+          background:
+            "linear-gradient(180deg, var(--text-ds-neutral-100), var(--text-ds-neutral-300))",
+          backgroundClip: "text",
+          WebkitBackgroundClip: "text",
+          borderColor: "var(--border-ds-neutral-700)",
+          color: "transparent",
+          text: "Community",
+          IconComponent: Globle,
+          iconColor:
+            "linear-gradient(180deg, var(--text-ds-neutral-100), var(--text-ds-neutral-300))",
+        };
+    }
+  };
+  $: planBadgeStyle = getPlanBadgeStyle(currentWorkspacePlan);
+
+  const getGradientEllipseStyle = (plan: string) => {
+    switch (plan?.toLowerCase()) {
+      case "standard":
+        return "radial-gradient(ellipse 110% 150% at 37% 80%, var(--bg-ds-info-300) 0%, transparent 60%)";
+      case "enterprise":
+        return "radial-gradient(ellipse 110% 150% at 37% 80%, var(--bg-ds-warning-300) 0%, transparent 60%)";
+      case "professional":
+        return "radial-gradient(ellipse 110% 150% at 37% 80%, var(--bg-ds-secondary-300) 0%, transparent 60%)";
+      case "community":
+      default:
+        return "radial-gradient(ellipse 110% 150% at 37% 80%, var(--sparrow-blue) 0%, transparent 60%)";
+    }
+  };
+  $: gradientEllipseStyle = getGradientEllipseStyle(currentWorkspacePlan);
+
+  const getHeaderBorderStyle = (plan: string) => {
+    switch (plan?.toLowerCase()) {
+      case "standard":
+        return "var(--border-ds-info-700)";
+      case "enterprise":
+        return "var(--border-ds-warning-700)";
+      case "professional":
+        return "var(--text-ds-secondary-700)";
+      case "community":
+      default:
+        return "var(--border-secondary-900)";
+    }
+  };
+  $: headerBorderStyle = getHeaderBorderStyle(currentWorkspacePlan);
+
   $: {
     if (
       currentTeamName ||
@@ -251,6 +363,9 @@
   import WindowAction from "./window-action/WindowAction.svelte";
   import SearchBar from "../SearchBar/SearchBar.svelte";
   import { Platform } from "@sparrow/common/enums";
+  import Crown from "../../../../@sparrow-library/src/icons/Crown.svelte";
+  import Premium from "../../../../@sparrow-library/src/icons/Premium.svelte";
+  import StarNew from "../../../../@sparrow-library/src/icons/StarNew.svelte";
 
   let sidebarModalItem: UserProfileObj = {
     heading: "Profile",
@@ -308,11 +423,14 @@
 <header
   bind:this={titlebar}
   id="titlebar"
-  class=" titlebar app-header ps-1 d-flex align-items-center justify-content-between"
-  style="position:relative;"
+  class="titlebar app-header ps-1 d-flex align-items-center justify-content-between"
+  style="position:relative; border-bottom: 2px solid {headerBorderStyle};"
   on:mousedown={handleMouseDown}
 >
-  <div class="gradient-ellipse"></div>
+  <div
+    class="gradient-ellipse"
+    style="background: {gradientEllipseStyle};"
+  ></div>
 
   <div class="d-flex ms-2 justify-content-cdenter align-items-center no-drag">
     {#if isWebApp === false}
@@ -344,7 +462,7 @@
     </div> -->
     <div
       class="no-drag"
-      style="margin-left: 8px; margin-right:8px;"
+      style="margin-left: 8px; margin-right:8px; display:contents;"
       id="workspace-container"
     >
       {#if isGuestUser}
@@ -387,7 +505,7 @@
                     No Account Connected
                   </div>
                   <div
-                    style="font-size:12px;color:var(--text-ds-neutral-300);text-align:left"
+                    style="font-size:12px;color:var(--text-ds-neutral-300);texport interface HeaderPropsext-align:left"
                   >
                     Unlock the full experience by getting started.
                   </div>
@@ -478,6 +596,38 @@
             </div>
           </div>
         </Select>
+        {#if currentWorkspaceType === WorkspaceType.PRIVATE}
+          {#if currentWorkspacePlan}
+            <div
+              class="plan-badge plan-icon"
+              style="background-color: {planBadgeStyle.backgroundColor}; 
+           {planBadgeStyle.background
+                ? `background: ${planBadgeStyle.background};`
+                : ''}
+           {planBadgeStyle.backgroundClip
+                ? `background-clip: ${planBadgeStyle.backgroundClip};`
+                : ''}
+           {planBadgeStyle.WebkitBackgroundClip
+                ? `-webkit-background-clip: ${planBadgeStyle.WebkitBackgroundClip};`
+                : ''}
+           color: {planBadgeStyle.color};
+           border-color: {planBadgeStyle.borderColor || 'transparent'};"
+            >
+              {#if planBadgeStyle.IconComponent}
+                <svelte:component
+                  this={planBadgeStyle.IconComponent}
+                  width="12px"
+                  height="12px"
+                />
+              {/if}
+
+              {planBadgeStyle.text}
+            </div>
+          {/if}
+        {/if}
+        {#if currentWorkspacePlan?.toLowerCase() === "community"}
+          <div class="upgrade-link" on:click={handleUpgradeClick}>Upgrade</div>
+        {/if}
       {/if}
     </div>
     {#if currentWorkspaceType === WorkspaceType.PUBLIC}
@@ -507,6 +657,21 @@
         </div>
       </Tooltip>
     {/if}
+    <div>
+      {#if isGuestUser}
+        {#if $policyConfig.enableLogin}
+          <Button
+            type="secondary"
+            title="Sign in For Better Experience"
+            size="small"
+            onClick={onLoginUser}
+            customWidth={"100%"}
+            backgroundColor="var(--bg-ds-surface-300)"
+            textColor="var(--text-ds-neutral-50)"
+          />
+        {/if}
+      {/if}
+    </div>
 
     <div>
       <SearchBar
@@ -660,7 +825,7 @@
               },
             },
             {
-              name: "What’s New?",
+              name: "What's New?",
               color: "var(--text-ds-neutral-50)",
               startIcon: GiftReqular,
               iconSize: "16px",
@@ -695,6 +860,24 @@
     {/if}
   </div>
 </header>
+
+<!-- Add the Modal here in the Header component -->
+<Modal
+  title={"Time to Unlock More Features"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isUpgradePlanModelOpen}
+  handleModalState={(flag) => {
+    isUpgradePlanModelOpen = flag;
+    planBannerisOpen.set(false);
+  }}
+>
+  <UpgradePlanPopUp
+    bind:isUpgradePlanModelOpen
+    handleSubmit={handleRedirectToAdmin}
+  />
+</Modal>
 
 <style>
   .main-container {
@@ -740,6 +923,31 @@
     font-weight: 400;
     padding: 10px;
     text-align: center;
+  }
+
+  .plan-badge {
+    width: 73px;
+    height: 20px;
+    gap: 2px;
+    transform: rotate(0deg);
+    opacity: 1;
+    padding-top: 4px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    border-radius: 4px;
+    border-width: 1px;
+    border-style: solid;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    min-width: fit-content;
+    -webkit-background-clip: text;
+    background-clip: text;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .download-text {
@@ -817,16 +1025,30 @@
     bottom: 0;
     width: 327px;
     height: 77px;
-    background: radial-gradient(
+    /* background: radial-gradient(
       ellipse at 50% 80%,
       #3670f7 0%,
       transparent 60%
-    );
+    ); */
     opacity: 0.2;
     pointer-events: none;
     z-index: 1;
   }
   .question-option {
     position: absolute;
+  }
+
+  .upgrade-link-container {
+    margin-left: 8px;
+  }
+
+  .upgrade-link {
+    color: var(--text-ds-primary-300);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
   }
 </style>

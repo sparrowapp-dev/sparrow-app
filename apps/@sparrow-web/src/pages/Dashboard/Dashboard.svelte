@@ -118,17 +118,22 @@
   let currentTeamName = "";
   let currentTeamId = "";
   let currentWorkspaceType = "";
+  let currentWorkspacePlan = "";
+
   let currentWorkspaceCount = 1;
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       const activeWorkspaceRxDoc = value;
+      console.log("Active Workspace changed:", activeWorkspaceRxDoc);
       if (activeWorkspaceRxDoc) {
         currentWorkspaceId = activeWorkspaceRxDoc._id;
         currentWorkspaceName = activeWorkspaceRxDoc.name;
         currentTeamName = activeWorkspaceRxDoc.team?.teamName;
         currentTeamId = activeWorkspaceRxDoc.team?.teamId;
         currentWorkspaceType = activeWorkspaceRxDoc?.workspaceType;
-
+        if (currentTeamId) {
+          currentWorkspacePlan = await _viewModel.getTeamPlan(currentTeamId);
+        }
         const user = activeWorkspaceRxDoc?._data.users.find(
           (u) => u.id === userId,
         );
@@ -157,11 +162,13 @@
   );
 
   let openTeam;
+  let currentPlan = "";
 
   const activeTeamSubscriber = activeTeam.subscribe((value) => {
     if (value) {
       openTeam = value?.toMutableJSON();
     }
+    currentPlan = openTeam?.plan?.name;
   });
 
   let handlehideGlobalSearch = (val: boolean) => {
@@ -582,6 +589,14 @@
     isUpgradePlanModelOpen = false;
   };
 
+  // Header upgrade click handler function
+  const handleHeaderUpgradeClick = () => {
+    if (userRole) {
+      planContent = planInfoByRole(userRole);
+    }
+    upgradePlanModalWorkspace = true;
+  };
+
   $: {
     if (userRole) {
       planContent = planInfoByRole(userRole);
@@ -636,6 +651,8 @@
     {currentWorkspaceName}
     {currentTeamName}
     {currentTeamId}
+    {currentPlan}
+    {currentWorkspacePlan}
     {currentWorkspaceType}
     {isGuestUser}
     {isLoginBannerActive}
@@ -647,6 +664,7 @@
     onSwitchTeam={_viewModel.handleSwitchTeam}
     {user}
     onLogout={_viewModel.handleLogout}
+    bind:isUpgradePlanModelOpen
     isWebApp={true}
     bind:isCreateTeamModalOpen
     onMarketingRedirect={() => {
@@ -658,6 +676,7 @@
     handleFeaturesRedirect={_viewModel.redirectFeatureUpdates}
     onAdminRedirect={_viewModel.onAdminRedirect}
     recentVisitedWorkspaces={$recentVisitedWorkspaces}
+    onUpgradeClick={handleHeaderUpgradeClick}
     appEdition={constants.APP_EDITION}
   />
 

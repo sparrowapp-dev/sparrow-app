@@ -4,6 +4,11 @@
     MoreHorizontalRegular,
     PeopleFilled,
     PeopleRegular,
+    SideBarStar,
+    SideBarCrown,
+    SideBarGlobe,
+    SideBarPremium,
+    Daimond,
   } from "@sparrow/library/icons";
   import { Avatar, Button, PlanTag } from "@sparrow/library/ui";
 
@@ -13,6 +18,22 @@
   export let disableNewInviteTag;
   export let modifyTeam;
   export let threeDotIconDisable = false;
+
+  // Function to get plan icon based on plan name
+  function getPlanIcon(planName) {
+    const plan = (planName || "community").toLowerCase();
+    switch (plan) {
+      case "standard":
+        return SideBarStar;
+      case "professional":
+        return SideBarCrown;
+      case "enterprise":
+        return Daimond;
+      case "community":
+      default:
+        return SideBarGlobe;
+    }
+  }
 </script>
 
 <button
@@ -34,8 +55,8 @@
     }
   }}
 >
-  <div class=" d-flex w-100 overflow-hidden" style="gap: 4px;">
-    <div class="avatar-wrapper" style="margin-right: 4px;">
+  <div class=" d-flex w-100" style="gap: 4px;">
+    <div class="avatar-wrapper" style="margin-right: 4px; position: relative;">
       {#if base64ToURL(team.logo) == "" || base64ToURL(team.logo) == undefined}
         <div class="" style="height: 24px; width:24px;">
           <Avatar
@@ -52,6 +73,17 @@
           image={base64ToURL(team.logo)}
         />
       {/if}
+
+      <!-- Plan Icon Overlay -->
+      {#if team?.plan?.name}
+        <div class="plan-icon-overlay">
+          <svelte:component
+            this={getPlanIcon(team.plan.name)}
+            size="12"
+            color="var(--icon-ds-primary-300)"
+          />
+        </div>
+      {/if}
     </div>
     <div class="d-flex align-items-center team-row-content">
       <p
@@ -61,14 +93,14 @@
       </p>
     </div>
   </div>
-  {#if team?.plan?.name}
+  <!-- {#if team?.plan?.name}
     <span class="ps-2 team-plan-tag">
       <PlanTag
         plan={(team?.plan?.name || "community").toLowerCase()}
         text={team?.plan?.label || ""}
       />
     </span>
-  {/if}
+  {/if} -->
   {#if team.isNewInvite}
     <p class="mb-0 new-invite text-labelColor w-50 ellipsis">NEW INVITE</p>
   {:else if team?._data?.users?.length > 1}
@@ -194,5 +226,20 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+  }
+
+  .plan-icon-overlay {
+    position: absolute;
+    top: -3px;
+    right: -3.5px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 </style>
