@@ -87,7 +87,7 @@ export const predefinedTestSnippets = [
 });`,
   },
   {
-    title: "Response contains specific field in objects",
+    title: "Response array contains specific field",
     function: `sp.test("Response array contains specific field in objects", function () {
   let jsonData = sp.response.body.json();
   jsonData.forEach(item => {
@@ -132,10 +132,4 @@ export const predefinedTestSnippets = [
   sp.expect(sp.response.headers).to.have.property("Content-Length");
 });`,
   },
-//   {
-//     title: "Response cookie contains session id",
-//     function: `sp.test("Response cookie contains session id", function () {
-//   sp.expect(sp.response.cookies).to.have.property("sessionId");
-// });`,
-//   },
 ];
