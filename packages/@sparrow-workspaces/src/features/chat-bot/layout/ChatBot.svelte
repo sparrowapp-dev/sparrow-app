@@ -31,6 +31,7 @@
   export let onStopGeneratingAIResponse;
   export let onToggleLike;
   export let handleApplyChangeOnAISuggestion;
+  export let planName;
 
   let scrollList: ScrollList;
 
@@ -89,6 +90,7 @@
       {onUpdateRequestState}
       {onStopGeneratingAIResponse}
       {handleApplyChangeOnAISuggestion}
+      {planName}
       bind:scrollList
     />
   </div>

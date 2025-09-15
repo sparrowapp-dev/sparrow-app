@@ -102,6 +102,7 @@ import constants from "src/constants/constants";
 import * as curlconverter from "curlconverter";
 import * as Sentry from "@sentry/svelte";
 import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection-tab";
+import { TeamRepository } from "@app/repositories/team.repository";
 
 class RestExplorerViewModel {
   /**
@@ -114,6 +115,7 @@ class RestExplorerViewModel {
   private guideRepository = new GuideRepository();
   private guestUserRepository = new GuestUserRepository();
   private compareArray = new CompareArray();
+  private teamRepository = new TeamRepository();
 
   /**
    * Service
@@ -501,7 +503,7 @@ class RestExplorerViewModel {
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
-        persistence: TabPersistenceTypeEnum.PERMANENT
+        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = false;
       progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
@@ -3251,6 +3253,7 @@ class RestExplorerViewModel {
    * @param Prompt - Prompt from the user
    */
   public generateAIResponseWS = async (prompt = "") => {
+    debugger;
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
 
@@ -3294,7 +3297,7 @@ class RestExplorerViewModel {
         prompt,
         JSON.stringify(apiData),
         formattedConversations,
-        "deepseek",
+        componentData?.property?.request?.ai?.aiModelName || "deepseek",
         "chat",
         teamId,
       );
@@ -3515,6 +3518,7 @@ class RestExplorerViewModel {
    * @returns A promise that resolves to the response from the AI assistant service.
    */
   public generateAiResponse = async (prompt = "") => {
+    debugger;
     // Set the request state to indicate that a response is being generated
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
@@ -3804,6 +3808,18 @@ class RestExplorerViewModel {
         progressiveTab.description = tab.description;
         this.tab = progressiveTab;
       }
+    }
+  };
+  /**
+   * @description - This function will provide the plan Name for the hub.
+   */
+  public getPlanName = async () => {
+    const response = await this.workspaceRepository.getActiveWorkspaceDoc();
+    const teamId = response?._data?.team?.teamId || "";
+    const teamData = await this.teamRepository.getTeamDoc(teamId);
+    const teamDoc = teamData.toMutableJSON();
+    if (teamDoc) {
+      return teamDoc?.plan?.name;
     }
   };
 }

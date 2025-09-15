@@ -169,6 +169,11 @@
   export let newModifiedContent: string | KeyValuePair[];
   export let mergeViewRequestDatasetType: RequestDatasetEnum;
 
+  /**
+   * Plan name of hub
+   */
+  export let planName;
+
   // Reference to the splitpane container element
   let splitpaneContainer;
   let splitpaneContainerWidth = 0;
@@ -892,6 +897,7 @@
                     {onStopGeneratingAIResponse}
                     {onToggleLike}
                     {handleApplyChangeOnAISuggestion}
+                    {planName}
                   />
                 {/if}
               </div>

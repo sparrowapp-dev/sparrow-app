@@ -29,6 +29,7 @@
   export let onStopGeneratingAIResponse;
   export let handleApplyChangeOnAISuggestion;
   export let scrollList;
+  export let planName;
 
   let chatContainer: HTMLElement;
   let suggestionCount = 0;
@@ -253,6 +254,7 @@
           {onStopGeneratingAIResponse}
           placeholder={"How can I help you?"}
           {sendPrompt}
+          {planName}
         />
       </div>
     </div>

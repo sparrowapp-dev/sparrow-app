@@ -54,6 +54,7 @@
   let isMergeViewLoading = false;
   let newModifiedContent: string | KeyValuePair[];
   let mergeViewRequestDatasetType: RequestDatasetEnum;
+  let planName: string = "";
 
   const restExplorerDataStoreSubscriber = restExplorerDataStore.subscribe(
     (_webSocketMap) => {
@@ -87,6 +88,13 @@
         userRole = value.role as string;
       }
     });
+  };
+
+  /**
+   * Find the plan of the hub
+   */
+  const getPlanName = async () => {
+    planName = await _viewModel.getPlanName();
   };
 
   let activeWorkspaceSubscriber;
@@ -148,6 +156,7 @@
       }
       debouncedAPIUpdater(tab);
       findUserRole();
+      getPlanName();
       prevTabName = tab?.name || "";
       prevTabId = tab?.tabId || "";
     }
@@ -233,6 +242,7 @@
   {isGuestUser}
   {isSharedWorkspace}
   {isLoginBannerActive}
+  {planName}
   onOpenCollection={_viewModel.openCollection}
   onSendRequest={_viewModel.sendRequest}
   onCancelRequest={_viewModel.cancelRequest}
