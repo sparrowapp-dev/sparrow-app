@@ -659,7 +659,7 @@
       />
     </div>
 
-    {#if isPopoverContainer && (!$requestTabTestDemo || !$requestTabTestScriptDemo)}
+    {#if isPopoverContainer && !($requestTabTestDemo || $requestTabTestScriptDemo)}
       <div class="pt-2"></div>
       <Popover onClose={closeCollectionHelpText} heading={`Welcome to Sparrow`}>
         <p class="mb-0 text-fs-12">
