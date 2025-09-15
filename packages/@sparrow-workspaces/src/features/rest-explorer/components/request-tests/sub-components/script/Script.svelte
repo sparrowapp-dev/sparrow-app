@@ -23,8 +23,6 @@
 
   export let isBodyBeautified: boolean = false;
 
-  let value = tests?.script || "";
-
   let searchData: string = "";
   let isLeftPanelCollapsed: boolean = false;
 
@@ -43,8 +41,7 @@
   };
 
   const handleCodeMirrorChange = (e: any) => {
-    value = e.detail;
-    onTestsChange({ ...tests, script: value });
+    onTestsChange({ ...tests, script: e.detail });
   };
 
   const toggleLeftPanel = (): void => {
@@ -52,6 +49,7 @@
   };
 
   const selectSnippet = (data: string): void => {
+    let value = tests?.script || "";
     value += value ? `\n${data}` : data;
     onTestsChange({ ...tests, script: value });
   };
@@ -176,7 +174,7 @@
     >
       <Editor
         bind:lang
-        bind:value
+        value={tests?.script || ""}
         on:change={handleCodeMirrorChange}
         isEditable={true}
         autofocus={true}

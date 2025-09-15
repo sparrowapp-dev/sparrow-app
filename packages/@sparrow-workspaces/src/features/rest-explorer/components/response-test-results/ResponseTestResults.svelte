@@ -1,10 +1,18 @@
 <script lang="ts">
   import { SparrowLogo } from "@sparrow/common/images";
-  import { Tag } from "@sparrow/library/ui";
+  import { startLoading, stopLoading } from "@sparrow/common/store";
+  import { TestCaseModeEnum } from "@sparrow/common/types/workspace";
+  import { ErrorCircleRegular } from "@sparrow/library/icons";
+  import { Button, Tag } from "@sparrow/library/ui";
   import { onMount, tick } from "svelte";
+  import { loadingState } from "@sparrow/common/store";
 
   export let responseTestResults = [];
   export let responseTestMessage = "";
+  export let tests;
+  export let onFixTestScript;
+  export let tabId;
+
   let filter: "all" | "passed" | "failed" = "all";
   let allBtn: HTMLSpanElement;
   let passedBtn: HTMLSpanElement;
@@ -132,18 +140,42 @@
   </div>
 {:else}
   <div class="d-flex align-items-center flex-column justify-content-center">
-    <div class="my-4">
-      <SparrowLogo />
-    </div>
     <div class="d-flex flex-column align-items-center text-center">
       {#if responseTestMessage}
-        <p class="text-fs-12 mb-2" style="color: var(--text-ds-neutral-400);">
-          Couldn't evaluate the test script: {responseTestMessage}
+        <p
+          class="text-fs-12 mb-2 pt-4"
+          style="color: var(--text-ds-danger-400); max-width: 700px;"
+        >
+          <span class="d-inline-block">
+            <ErrorCircleRegular size={"12px"} />
+          </span>
+          <span>
+            Couldn't evaluate the test script: {responseTestMessage}
+          </span>
         </p>
+        <Button
+          title="Fix Script"
+          type="outline-secondary"
+          loader={$loadingState.get(tabId + "-fix-test-script")}
+          onClick={async () => {
+            startLoading(tabId + "-fix-test-script");
+            await onFixTestScript();
+            stopLoading(tabId + "-fix-test-script");
+          }}
+        />
       {:else}
-        <p class="text-fs-12 mb-5" style="color: var(--text-ds-neutral-400);">
-          No test cases available. <br /> Start by adding your own test cases.
-        </p>
+        <div class="my-4">
+          <SparrowLogo />
+        </div>
+        {#if tests.testCaseMode === TestCaseModeEnum.NO_CODE}
+          <p class="text-fs-12 mb-5" style="color: var(--text-ds-neutral-400);">
+            No test cases available. <br /> Start by adding your own test cases.
+          </p>
+        {:else if tests.testCaseMode === TestCaseModeEnum.SCRIPT}
+          <p class="text-fs-12 mb-5" style="color: var(--text-ds-neutral-400);">
+            No test cases available. <br /> Start by adding your own test cases,
+            select from smart suggestions or generate them with AI.
+          </p>{/if}
       {/if}
     </div>
   </div>

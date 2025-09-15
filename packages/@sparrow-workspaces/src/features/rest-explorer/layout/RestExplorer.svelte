@@ -185,8 +185,9 @@
   export let collectionAuth;
   export let collection;
   export let isSharedWorkspace = false;
-  const loading = writable<boolean>(false);
+  export let onFixTestScript;
 
+  const loading = writable<boolean>(false);
   // Props for showing merge/diff view in RequestBody, Headers and Params
   let isAIDebugBtnEnable = false;
   export let isMergeViewEnableForRequestBody = false;
@@ -1002,6 +1003,9 @@
                                     ?.testResults}
                                   responseTestMessage={storeData.response
                                     ?.testMessage}
+                                  tests={$tab?.property?.request.tests}
+                                  {onFixTestScript}
+                                  tabId={$tab?.tabId}
                                 />
                                 <!-- </div> -->
                               {/if}
