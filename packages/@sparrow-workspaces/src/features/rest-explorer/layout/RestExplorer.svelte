@@ -35,7 +35,7 @@
   } from "@sparrow/common/enums";
   import type { Observable } from "rxjs";
   import {
-    RequestNoCodeTourGuide,
+    RequestTabTourGuide,
     SaveAsCollectionItem,
   } from "@sparrow/workspaces/features";
   import type {
@@ -111,13 +111,13 @@
   import RequestTourGuideCard from "../components/request-tour-guide-card/RequestTourGuideCard.svelte";
   import { tick } from "svelte";
   import ResponseTestResults from "../components/response-test-results/ResponseTestResults.svelte";
-  import TourGuideCard from "../../request-no-code-tour-guide/components/TourGuideCard.svelte";
-  import { RequestTabTestsTourContent } from "../../request-no-code-tour-guide/utils";
-  import { requestTabNocodeCardPosition } from "../../request-no-code-tour-guide/utils/requestTabNocodeCardPosition";
+  import TourGuideCard from "../../request-tab-tour-guide/components/TourGuideCard.svelte";
+  import { RequestTabTestsTourContent } from "../../request-tab-tour-guide/utils";
+  import { requestTabNocodeCardPosition } from "../../request-tab-tour-guide/utils/requestTabNocodeCardPosition";
   import {
     handleCloseTour,
     handleNextStep,
-  } from "../../request-no-code-tour-guide/utils/requestTabCardfunctions";
+  } from "../../request-tab-tour-guide/utils/requestTabCardfunctions";
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
   export let requestAuthHeader: Observable<KeyValue>;
@@ -842,7 +842,7 @@
                       {/if}
                     </div>
                     {#if $requestTabTestDemo && $requestTabTestNoCodeStep === 1}
-                      <RequestNoCodeTourGuide
+                      <RequestTabTourGuide
                         targetId={RequestTabTestsTourContent[0].targetId}
                         isVisible={true}
                         cardPosition={requestTabNocodeCardPosition(1)}
@@ -858,10 +858,10 @@
                           onClose={handleCloseTour}
                           width={352}
                         />
-                      </RequestNoCodeTourGuide>
+                      </RequestTabTourGuide>
                     {/if}
                     {#if $requestTabTestDemo && $requestTabTestNoCodeStep === 4}
-                      <RequestNoCodeTourGuide
+                      <RequestTabTourGuide
                         targetId={RequestTabTestsTourContent[3].targetId}
                         isVisible={true}
                         cardPosition={requestTabNocodeCardPosition(4)}
@@ -877,7 +877,7 @@
                           onClose={handleCloseTour}
                           width={352}
                         />
-                      </RequestNoCodeTourGuide>
+                      </RequestTabTourGuide>
                     {/if}
                   </div>
                 </Pane>
@@ -1062,7 +1062,7 @@
                       </div>
                     </div>
                     {#if $requestTabTestDemo && $requestTabTestNoCodeStep === 2}
-                      <RequestNoCodeTourGuide
+                      <RequestTabTourGuide
                         targetId={RequestTabTestsTourContent[1].targetId}
                         isVisible={true}
                         cardPosition={requestTabNocodeCardPosition(2)}
@@ -1078,10 +1078,10 @@
                           onClose={handleCloseTour}
                           width={352}
                         />
-                      </RequestNoCodeTourGuide>
+                      </RequestTabTourGuide>
                     {/if}
                     {#if $requestTabTestDemo && $requestTabTestNoCodeStep === 5}
-                      <RequestNoCodeTourGuide
+                      <RequestTabTourGuide
                         targetId={RequestTabTestsTourContent[4].targetId}
                         isVisible={true}
                         cardPosition={requestTabNocodeCardPosition(5)}
@@ -1100,7 +1100,7 @@
                           onClose={handleCloseTour}
                           width={352}
                         />
-                      </RequestNoCodeTourGuide>
+                      </RequestTabTourGuide>
                     {/if}
                   </div>
                 </Pane>
