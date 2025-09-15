@@ -56,31 +56,36 @@
   }}
 >
   <div class=" d-flex w-100" style="gap: 4px;">
-    <div class="avatar-wrapper" style="margin-right: 4px; position: relative;">
-      {#if base64ToURL(team.logo) == "" || base64ToURL(team.logo) == undefined}
-        <div class="" style="height: 24px; width:24px;">
+    <Tooltip
+      placement="bottom-center"
+      title={team?.plan?.name
+        ? `${team.plan.name} Edition`
+        : "Community Edition"}
+      zIndex={600}
+    >
+      <div
+        class="avatar-wrapper"
+        style="margin-right: 4px; position: relative;"
+      >
+        {#if base64ToURL(team.logo) == "" || base64ToURL(team.logo) == undefined}
+          <div class="" style="height: 24px; width:24px;">
+            <Avatar
+              type={"letter"}
+              size={"extra-small"}
+              letter={team.name[0]}
+              bgColor={"var(--bg-ds-secondary-400)"}
+            />
+          </div>
+        {:else}
           <Avatar
-            type={"letter"}
+            type={"image"}
             size={"extra-small"}
-            letter={team.name[0]}
-            bgColor={"var(--bg-ds-secondary-400)"}
+            image={base64ToURL(team.logo)}
           />
-        </div>
-      {:else}
-        <Avatar
-          type={"image"}
-          size={"extra-small"}
-          image={base64ToURL(team.logo)}
-        />
-      {/if}
+        {/if}
 
-      <!-- Plan Icon Overlay -->
-      {#if team?.plan?.name}
-        <Tooltip
-          placement="bottom-center"
-          title={team.plan.name + " " + "Edition"}
-          zIndex={600}
-        >
+        <!-- Plan Icon Overlay -->
+        {#if team?.plan?.name}
           <div class="plan-icon-overlay">
             <svelte:component
               this={getPlanIcon(team.plan.name)}
@@ -88,9 +93,9 @@
               color="var(--icon-ds-primary-300)"
             />
           </div>
-        </Tooltip>
-      {/if}
-    </div>
+        {/if}
+      </div>
+    </Tooltip>
     <div class="d-flex align-items-center team-row-content">
       <p
         class="team-name-ellipsis ellipsis text-left teams-title overflow-hidden my-auto text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium"
