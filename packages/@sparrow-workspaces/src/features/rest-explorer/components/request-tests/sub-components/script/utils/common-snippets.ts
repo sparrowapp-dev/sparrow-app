@@ -66,8 +66,6 @@ export const predefinedTestSnippets = [
   sp.expect(jsonData).to.have.all.keys("id", "name", "email");
 });`,
   },
-
-  // 🔥 Additional 10 useful snippets
   {
     title: "Response contains token field",
     function: `sp.test("Response contains token field", function () {
