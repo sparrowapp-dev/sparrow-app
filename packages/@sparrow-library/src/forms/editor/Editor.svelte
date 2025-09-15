@@ -326,8 +326,8 @@
       EditorView.lineWrapping, // Enable line wrapping
       EditorState.readOnly.of(!isEditable ? true : false),
       CreatePlaceHolder(placeholder),
-      lintGutter(), // ✅ Add lint gutter support
-      // ✅ Enable JS linting only if language is JS
+      lintGutter(), // Add lint gutter support
+      // Enable JS linting only if language is JS
       ...(lang === "JavaScript" ? [linter(jsLinter())] : []),
     ];
 
