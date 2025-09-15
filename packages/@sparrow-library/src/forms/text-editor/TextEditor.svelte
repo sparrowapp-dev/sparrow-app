@@ -156,7 +156,7 @@
     const selectedLength = selection.toString().length;
 
     // threshold: if selection is huge, reset editor
-    if (selectedLength > 5000) {
+    if (selectedLength > LARGE_PASTE_THRESHOLD) {
       e.preventDefault();
       await editor.clear();
       await editor.render({ blocks: [] });
