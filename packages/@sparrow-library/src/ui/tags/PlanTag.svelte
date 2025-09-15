@@ -21,18 +21,28 @@
       border: "#214D5E",
       text: "#5EC5ED",
     },
+    "SelfHost(Community)": {
+      bg: "#0F2024",
+      border: "#214D5E",
+      text: "#5EC5ED",
+    },
   };
 
   // Capitalize first letter
   const formatPlan = (str: string) =>
+    str.charAt(0).toUpperCase() +
+    str.slice(1).toLowerCase().split("(")[0].trim();
+
+  // Capitalize first letter
+  const formatPlanTooltip = (str: string) =>
     str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 </script>
 
 <button
   style="
-    background-color: {planPalette[plan].bg};
-    color: {planPalette[plan].text};
-    border: 1px solid {planPalette[plan].border};
+    background-color: {planPalette?.[plan]?.bg || '#0F2024'};
+    color: {planPalette?.[plan]?.text || '#5EC5ED'};
+    border: 1px solid {planPalette?.[plan]?.border || '#214D5E'};
     border-radius: 2px;
     padding: 2px 4px;
     height: {height}px;
@@ -50,7 +60,7 @@
     align-items: center;
     justify-content: center;
   "
-  title={text || formatPlan(plan)}
+  title={text || formatPlanTooltip(plan)}
 >
   {text || formatPlan(plan)}
 </button>

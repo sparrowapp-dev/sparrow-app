@@ -24,6 +24,7 @@
   export let openInDesktop: (workspaceID: string) => void;
   export let isWebEnvironment: boolean;
   export let onCopyLink;
+  export let appEdition = "MANAGED";
 
   let pos = { x: 0, y: 0 };
   let showMenu: boolean = false;
@@ -294,7 +295,7 @@
           >
         </p>
 
-        {#if isWebEnvironment && !workspace?.isShared && cardType === "teams"}
+        {#if isWebEnvironment && !workspace?.isShared && cardType === "teams" && appEdition !== "SELFHOSTED"}
           <button
             class="me-2 open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
             on:click|stopPropagation={() => {

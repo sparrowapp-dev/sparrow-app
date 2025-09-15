@@ -1133,7 +1133,6 @@ margin-right: 8px;
     color: var(--text-secondary-550);
   }
 
-  .input-outline:focus,
   .input-outline:hover {
     outline: 1px solid var(--text-primary-600);
   }

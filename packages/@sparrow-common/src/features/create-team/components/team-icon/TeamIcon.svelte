@@ -70,7 +70,7 @@
    * @param maxSize - Maximum allowed file size in KB
    * @param supportedFileTypes - List of supported file extensions
    */
-  const handleLogoInputChange = (
+  const handleLogoInputChange = async (
     e: Event,
     maxSize: number,
     supportedFileTypes: string[],
@@ -100,7 +100,16 @@
     teamForm.file.invalid = size || type;
 
     if (!teamForm.file.invalid) {
-      teamForm.file.value = file;
+      const isValid = await validateImageDimensions(
+        file,
+        ICON_CONFIG.MAX_WIDTH_PX,
+        ICON_CONFIG.MAX_HEIGHT_PX,
+      );
+      teamForm.file.dimensionFileSizeError = !isValid;
+      teamForm.file.invalid = !isValid;
+      if (isValid) {
+        teamForm.file.value = file;
+      }
     }
   };
 
@@ -122,6 +131,26 @@
     ) as HTMLInputElement;
     fileInput?.click();
   };
+  function validateImageDimensions(
+    file: File,
+    maxWidth: number,
+    maxHeight: number,
+  ): Promise<boolean> {
+    return new Promise((resolve) => {
+      const img = new window.Image();
+      img.onload = function () {
+        if (img.width > maxWidth || img.height > maxHeight) {
+          resolve(false);
+        } else {
+          resolve(true);
+        }
+      };
+      img.onerror = function () {
+        resolve(false);
+      };
+      img.src = URL.createObjectURL(file);
+    });
+  }
 </script>
 
 <div class="pb-1">
@@ -138,7 +167,9 @@
     -- Description 
   -->
   {#if !(!Array.isArray(teamForm.file.value) && teamForm.file.value.size > 0)}
-    <p class="mb-2 text-ds-font-size-12 text-ds-font-weight-regular text-ds-line-height-150 text-secondary-200">
+    <p
+      class="mb-2 text-ds-font-size-12 text-ds-font-weight-regular text-ds-line-height-150 text-secondary-200"
+    >
       {ICON_CONFIG.DESCRIPTION}
     </p>
   {/if}
@@ -179,7 +210,10 @@
             <FileType {fileType} />
           </span>
         {/each}
-      </div>
+      </div>{:else if teamForm.file.dimensionFileSizeError}
+      <p class="mb-2 mt-1 text-ds-font-size-12 text-danger-200">
+        {ICON_CONFIG.DIMENSION_EXCEED_ERROR_MESSAGE}
+      </p>
     {/if}
   </div>
 </div>

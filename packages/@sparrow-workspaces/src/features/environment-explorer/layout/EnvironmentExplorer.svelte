@@ -30,6 +30,10 @@
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
   import { Loader } from "@sparrow/library/ui";
   import ApplyGeneratedVariables from "../components/apply-generated-variables/ApplyGeneratedVariables.svelte";
+  import { generatedVariableDemo, generateVariableStep } from "../../../stores";
+  import GenerateVariableTourGuide from "../../generate-variables-tour-guide/layout/GenerateVariableTourGuide.svelte";
+  import GenerateVariableGuideCard from "../../generate-variables-tour-guide/components/GenerateVariableGuideCard.svelte";
+  import { GenerateVariableTourContent } from "../../generate-variables-tour-guide/utils";
   export let azureBlobCDN;
   /**
    * selected environmet to be shown on API
@@ -57,6 +61,7 @@
   export let onUpdateVariableSelection;
   export let userRole;
   export let handleRedirectToDocs: () => {};
+  export let generateVariableDemoCompleted: () => void;
   export let isWebApp;
 
   let isPopoverContainer = false;
@@ -88,6 +93,38 @@
 
   let isGuidePopup = false;
   let isApplyAiVariablesModalOpen = false;
+  const dummyVariables = [
+    {
+      key: "API_BASE_URL",
+      value: "https://api.demoapp.com",
+      checked: true,
+    },
+    {
+      key: "AUTH_TOKEN",
+      value: "Bearer 12345abcdef",
+      checked: true,
+    },
+    {
+      key: "ENV",
+      value: "development",
+      checked: true,
+    },
+    {
+      key: "MAX_RETRIES",
+      value: "3",
+      checked: true,
+    },
+    {
+      key: "LOG_LEVEL",
+      value: "debug",
+      checked: true,
+    },
+    {
+      key: "",
+      value: "",
+      checked: false,
+    },
+  ];
 
   const handleKeyDown = (event: KeyboardEvent) => {
     if ((event.ctrlKey || event.metaKey) && event.key === "s") {
@@ -102,6 +139,11 @@
         onSaveEnvironment();
       }
     }
+  };
+
+  const handleCloseTourGuide = () => {
+    generatedVariableDemo.set(false);
+    generateVariableStep.set(0);
   };
 
   onMount(async () => {
@@ -132,7 +174,8 @@
         <!-- Top Section: Header + TabularInput -->
         <div
           class="var-value-container d-flex flex-column"
-          style="flex: 1; min-height: 0;"
+          style="flex: 1; min-height: 0; position:relative;"
+          id="environment-explorer-variable-section"
         >
           <header
             class="env-header align-items-start justify-content-between d-flex gap-4"
@@ -191,36 +234,47 @@
                     placement="bottom-center"
                     distance={10}
                   >
-                    <Button
-                      type="primary"
-                      startIcon={SaveRegular}
-                      onClick={() => {
-                        const aiGeneratedVariables =
-                          $currentEnvironment.property.environment.variable.filter(
-                            (variable) => variable.lifespan === "short",
-                          );
+                    {#if $generateVariableStep === 5}
+                      <Button
+                        type="primary"
+                        startIcon={SaveRegular}
+                        onClick={() => {}}
+                        title="Save"
+                        size="medium"
+                        disable={false}
+                      />
+                    {:else}
+                      <Button
+                        type="primary"
+                        startIcon={SaveRegular}
+                        onClick={() => {
+                          const aiGeneratedVariables =
+                            $currentEnvironment.property.environment.variable.filter(
+                              (variable) => variable.lifespan === "short",
+                            );
 
-                        const uniqueAiGeneratedVariables =
-                          new SetDataStructure().pushArrayOfObjects(
-                            aiGeneratedVariables,
-                            "value",
-                          );
+                          const uniqueAiGeneratedVariables =
+                            new SetDataStructure().pushArrayOfObjects(
+                              aiGeneratedVariables,
+                              "value",
+                            );
 
-                        if (uniqueAiGeneratedVariables.length > 0) {
-                          isApplyAiVariablesModalOpen = true;
-                        } else {
-                          onSaveEnvironment();
-                        }
-                      }}
-                      title="Save"
-                      size="medium"
-                      disable={$currentEnvironment?.property?.environment?.state
-                        ?.isSaveInProgress ||
-                        $currentEnvironment?.isSaved ||
-                        userRole === WorkspaceRole.WORKSPACE_VIEWER}
-                      loader={$currentEnvironment?.property?.environment?.state
-                        ?.isSaveInProgress}
-                    />
+                          if (uniqueAiGeneratedVariables.length > 0) {
+                            isApplyAiVariablesModalOpen = true;
+                          } else {
+                            onSaveEnvironment();
+                          }
+                        }}
+                        title="Save"
+                        size="medium"
+                        disable={$currentEnvironment?.property?.environment
+                          ?.state?.isSaveInProgress ||
+                          $currentEnvironment?.isSaved ||
+                          userRole === WorkspaceRole.WORKSPACE_VIEWER}
+                        loader={$currentEnvironment?.property?.environment
+                          ?.state?.isSaveInProgress}
+                      />
+                    {/if}
                   </Tooltip>
                 </div>
               {/if}
@@ -266,18 +320,64 @@
             {/if}
           </div>
 
-          <div
-            class="tabular-section"
-            style="flex: 1; min-height: 0; overflow: auto;"
-          >
-            <TabularInputV2
-              disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
-              keyValue={$currentEnvironment?.property?.environment?.variable}
-              callback={handleCurrentEnvironmentKeyValuePairChange}
-              {search}
-              {onUpdateVariableSelection}
+          {#if $generatedVariableDemo}
+            <div
+              class="tabular-section"
+              style="flex: 1; min-height: 0; overflow: auto;"
+            >
+              <TabularInputV2
+                disabled={false}
+                keyValue={dummyVariables}
+                callback={() => {}}
+                {search}
+              />
+            </div>
+          {:else}
+            <div
+              class="tabular-section"
+              style="flex: 1; min-height: 0; overflow: auto;"
+            >
+              <TabularInputV2
+                disabled={userRole === WorkspaceRole.WORKSPACE_VIEWER}
+                keyValue={$currentEnvironment?.property?.environment?.variable}
+                callback={handleCurrentEnvironmentKeyValuePairChange}
+                {search}
+                {onUpdateVariableSelection}
+              />
+            </div>
+          {/if}
+          {#if $generatedVariableDemo && $generateVariableStep === 1}
+            <GenerateVariableGuideCard
+              titleName={GenerateVariableTourContent[0].Title}
+              descriptionContent={GenerateVariableTourContent[0].description}
+              cardNumber={$generateVariableStep}
+              totalsCards={5}
+              top={15}
+              left={200}
+              onNext={() => {
+                generateVariableStep.set(2);
+              }}
+              placement="left"
+              onClose={handleCloseTourGuide}
             />
-          </div>
+          {/if}
+          {#if $generatedVariableDemo && $generateVariableStep === 5}
+            <GenerateVariableGuideCard
+              titleName={GenerateVariableTourContent[4].Title}
+              descriptionContent={GenerateVariableTourContent[4].description}
+              cardNumber={$generateVariableStep}
+              totalsCards={5}
+              top={40}
+              right={40}
+              rightButtonName={"Finish"}
+              onNext={async () => {
+                await generateVariableDemoCompleted();
+                handleCloseTourGuide();
+              }}
+              placement={"right"}
+              onClose={handleCloseTourGuide}
+            />
+          {/if}
         </div>
 
         <!-- Optional Bottom Section -->
@@ -291,7 +391,8 @@
           <!-- Generate Variable Section -->
           <div
             class="generate-variable-container"
-            style="flex: 1; min-height: 0; overflow: auto;"
+            style="flex: 1; min-height: 0; overflow: auto; position:relative;"
+            id="generate-variable-bottom-panel"
           >
             <GenerateVariables
               currentEnvironment={$currentEnvironment}
@@ -302,8 +403,52 @@
               {updateGeneratedVariables}
               {onUpdateVariableSelection}
               {handleRedirectToDocs}
+              {handleCloseTourGuide}
               {isWebApp}
             />
+            <div>
+              {#if $generatedVariableDemo && $generateVariableStep === 3}
+                <GenerateVariableGuideCard
+                  titleName={GenerateVariableTourContent[2].Title}
+                  descriptionContent={GenerateVariableTourContent[2]
+                    .description}
+                  cardNumber={$generateVariableStep}
+                  totalsCards={5}
+                  top={110}
+                  right={0}
+                  onNext={() => {
+                    generateVariableStep.set(4);
+                  }}
+                  placement={"right"}
+                  onClose={handleCloseTourGuide}
+                />
+              {/if}
+              {#if $generatedVariableDemo && $generateVariableStep === 4}
+                <GenerateVariableGuideCard
+                  titleName={GenerateVariableTourContent[3].Title}
+                  cardNumber={$generateVariableStep}
+                  totalsCards={5}
+                  top={150}
+                  right={0}
+                  onNext={() => {
+                    generateVariableStep.set(5);
+                  }}
+                  placement={"right"}
+                  onClose={handleCloseTourGuide}
+                >
+                  <div slot="description-content">
+                    You can also manage suggestions one-by-one. Use the <span
+                      class=""
+                      style="color: var(--icon-ds-success-300);">✓</span
+                    >
+                    icon to accept a single variable, or the
+                    <span class="" style="color: var(--icon-ds-danger-300);"
+                      >✗</span
+                    > icon to remove suggestion.
+                  </div>
+                </GenerateVariableGuideCard>
+              {/if}
+            </div>
           </div>
         {/if}
       </div>
@@ -320,6 +465,8 @@
     {/if}
   </div>
 {/if}
+
+<GenerateVariableTourGuide />
 
 <!--Disabling the Quick Help feature, will be taken up in next release-->
 <Modal

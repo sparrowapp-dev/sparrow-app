@@ -17,7 +17,7 @@
 
 <div class="d-flex flex-column pb-3">
   <div class="title-width">
-    <p class="team-title mt-p fs-12 text-textColor mb-1">
+    <p class="team-title mt-p fs-12 mb-1">
       {DESCRIPTION_CONFIG.TITLE}
     </p>
   </div>
@@ -98,5 +98,10 @@
   }
   .settings-team-description {
     background-color: var(--bg-ds-surface-600) !important;
+  }
+  .team-title {
+    font-size: 12px;
+    color: var(--text-ds-neutral-200);
+    font-weight: 500;
   }
 </style>

@@ -10,5 +10,6 @@ export interface UpdateTeamIcon {
     invalid: boolean;
     showFileSizeError: boolean;
     showFileTypeError: boolean;
+    dimensionFileSizeError: boolean;
   };
 }

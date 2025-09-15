@@ -833,7 +833,7 @@
           : ''}"
         style="position:relative; padding-right:1rem; padding-left:4px; border-top-left-radius: 4px; border-top-right-radius: 4px;"
       >
-        <div style="width:24px; margin-right:12px" class="">
+        <div style="width:50px; padding-left: 25px;" class="">
           <Checkbox
             size="small"
             disabled={pairs.length === 1 || !isCheckBoxEditable}
@@ -848,7 +848,7 @@
         >
           <div
             class="w-50 position-relative header-text"
-            style="padding-left: 6px;"
+            style="padding-left: 16px;"
           >
             Key
           </div>

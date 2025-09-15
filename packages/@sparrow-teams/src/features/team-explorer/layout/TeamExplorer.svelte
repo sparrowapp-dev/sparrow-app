@@ -134,6 +134,7 @@
   export let handleRedirectAdminPanel;
   export let handleContactSales;
   export let invitedCount;
+  export let appEdition = "MANAGED";
 
   let selectedView: string = "Grid";
   let userRole: string;
@@ -574,6 +575,7 @@
                     {onSwitchWorkspace}
                     {onDeleteWorkspace}
                     {selectedFilter}
+                    {appEdition}
                     isAdminOrOwner={userRole === TeamRole.TEAM_ADMIN ||
                       userRole === TeamRole.TEAM_OWNER}
                   />
@@ -586,6 +588,7 @@
                     {isWebEnvironment}
                     {searchQuery}
                     {onCopyLink}
+                    {appEdition}
                     workspaces={filteredWorkspaces.filter((elem) => {
                       return (
                         elem?.team?.teamId === openTeam?.teamId &&
@@ -797,6 +800,9 @@
   }
   .team-title {
     width: calc(100% - 470px);
+    font-size: 12px;
+    color: var(--text-ds-neutral-200);
+    font-weight: 500;
   }
   .heading {
     max-width: calc(100% - 250px);

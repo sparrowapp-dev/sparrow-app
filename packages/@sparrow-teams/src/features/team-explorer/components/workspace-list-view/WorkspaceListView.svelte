@@ -24,6 +24,7 @@
   export let isGuestUser = false;
   export let onAddMember;
   export let selectedFilter;
+  export let appEdition = "MANAGED";
 
   let filterText = "";
   let currentSortField = "updatedAt";
@@ -100,6 +101,7 @@
                 {onDeleteWorkspace}
                 {openInDesktop}
                 {isWebEnvironment}
+                {appEdition}
               />
             {/each}
           {/if}
@@ -209,7 +211,7 @@
               on:click={() => (currPage = 1)}
               class="bg-transparent border-0"
               ><DoubleLeftIcon
-                color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
+                color={currPage === 1 ? "var(--bg-ds-neutral-500)" : "white"}
               /></button
             >
             <button
@@ -218,7 +220,7 @@
               }}
               class="bg-transparent border-0"
               ><LeftIcon
-                color={currPage === 1 ? "var(--border-secondary-200)" : "white"}
+                color={currPage === 1 ? "var(--bg-ds-neutral-500)" : "white"}
               /></button
             >
             <button
@@ -245,7 +247,7 @@
                       .startsWith(filterText.toLowerCase()),
                   ).length / workspacePerPage,
                 )
-                  ? "var(--border-secondary-200)"
+                  ? "var(--bg-ds-neutral-500)"
                   : "white"}
               /></button
             >
@@ -268,7 +270,7 @@
                       .startsWith(filterText.toLowerCase()),
                   ).length / workspacePerPage,
                 )
-                  ? "var(--border-secondary-200)"
+                  ? "var(--bg-ds-neutral-500)"
                   : "white"}
               /></button
             >

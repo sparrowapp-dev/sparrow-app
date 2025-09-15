@@ -1367,11 +1367,11 @@ const makeGraphQLRequest = async (
         type: "PROXY_GRAPHQL",
       },
     };
-    appInsights.trackDependencyData(appInsightData);
+    appInsights?.trackDependencyData(appInsightData);
   } catch (err) {
     const endTime = performance.now();
     const duration = endTime - startTime;
-    appInsights.trackDependencyData({
+    appInsights?.trackDependencyData({
       id: uuidv4(),
       name: "Proxy Duration Metric",
       duration: duration,

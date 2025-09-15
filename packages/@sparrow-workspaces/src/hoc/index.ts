@@ -2,6 +2,8 @@
 export { default as WithSelect } from "./WithSelect.svelte";
 export { default as WithSelectV2 } from "./WithSelectV2.svelte";
 export { default as WithSelectV3 } from "./WithSelectV3.svelte";
+export { default as WithSelectV4 } from "./WithSelectV4.svelte";
+
 // Button
 export { default as WithButton } from "./WithButton.svelte";
 export { default as WithButtonV2 } from "./WithButtonV2.svelte";

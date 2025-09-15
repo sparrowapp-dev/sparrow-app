@@ -47,8 +47,8 @@
   <SparkleRotating />
 </p>
 <p class="text-fs-20 text-center" style="font-weight: 600;">
-  {freezeApplyingAiGeneratedVariablesCount}/{totalAiGeneratedVariablesCount} Applying
-  Your Variables
+  {freezeApplyingAiGeneratedVariablesCount}/{totalAiGeneratedVariablesCount - 1}
+  Applying Your Variables
 </p>
 <p class="text-fs-14 text-center">
   Applying variables to your "{collectionName}" collection. If you cancel now,

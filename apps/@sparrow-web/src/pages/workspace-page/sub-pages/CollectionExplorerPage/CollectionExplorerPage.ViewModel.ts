@@ -68,6 +68,7 @@ import * as Sentry from "@sentry/svelte";
 import { MockHistoryTabAdapter } from "src/adapter/mock-history-tab";
 import type { AiRequestBaseInterface } from "@sparrow/common/types/workspace/ai-request-base";
 import { environmentType } from "@sparrow/common/enums/environment.enum";
+import { captureEvent } from "src/utils/posthog/posthogConfig";
 
 class CollectionExplorerPage {
   // Private Repositories
@@ -2242,6 +2243,10 @@ class CollectionExplorerPage {
       environmentTabJson.persistence = TabPersistenceTypeEnum.PERMANENT;
     }
     await this.tabRepository.updateTabByMongoId(environment?.id, environmentTabJson);
+    captureEvent("generate_variables_tried", {
+      event_source: "web_app",
+      buttonName: "Generate Variables",
+    });
     
     const initEnvironmentTab = this.initTab.environment(
       environment?.id,

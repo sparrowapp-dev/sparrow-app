@@ -5,6 +5,8 @@
   import { CodeMirrorHandler } from "./sub-input";
   import { EnvironmentPicker, MissedEnvironment, ReviewEnvironment } from "../";
   import { WorkspaceRole } from "@sparrow/common/enums";
+  import GenerateVariableEnvironment from "../generate-variable-environment/generateVariableEnvironment.svelte";
+  import { generateVariableTourCompleted } from "../../stores/generate-variable-demo";
 
   /**
    * environment events
@@ -12,6 +14,7 @@
   export let environmentVariables;
   export let onUpdateEnvironment;
   export let onUpdateInput;
+  export let isHttpUrlSection: boolean = false;
   /**
    * input value to be rendered on codemirror
    */
@@ -108,6 +111,11 @@
     dialogType = change;
     localEnvKey = envKey;
   };
+
+  const handleGenerateVariable = () => {
+    dialogType = "";
+    generateVariableTourCompleted.set(false);
+  };
 </script>
 
 <CodeMirrorHandler
@@ -161,7 +169,7 @@
     {disabled}
     {id}
   />
-{:else if dialogType === "env-found"}
+{:else if dialogType === "env-found" && !$generateVariableTourCompleted && isHttpUrlSection}
   <ReviewEnvironment
     {environmentAxisX}
     {environmentAxisY}
@@ -169,6 +177,12 @@
     {environmentVariables}
     {handleEnvironmentBox}
     {id}
+  />
+{:else if dialogType === "env-found" && isHttpUrlSection && $generateVariableTourCompleted}
+  <GenerateVariableEnvironment
+    handleCloseMode={handleGenerateVariable}
+    environmentAxisX={5}
+    environmentAxisY={5}
   />
 {/if}
 

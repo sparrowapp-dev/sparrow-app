@@ -59,6 +59,8 @@ export class CollectionRepository {
       if (data.mockRequestHistory)
         value.mockRequestHistory = data.mockRequestHistory;
       if (data.authProfiles) value.authProfiles = data.authProfiles;
+      value.isGenerateVariableTrial = data.isGenerateVariableTrial;
+      value.isRequestTestsNoCodeDemoCompleted = data.isRequestTestsNoCodeDemoCompleted;
       if (data.defaultSelectedAuthProfile)
         value.defaultSelectedAuthProfile = data.defaultSelectedAuthProfile;
       return value;

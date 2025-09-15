@@ -1,0 +1,58 @@
+name: Self-host Docker Image
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read    
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+
+      - name: Read version from package.json
+        id: version
+        run: |
+          if ! command -v jq >/dev/null 2>&1; then
+            echo "jq not found"; exit 1
+          fi
+          V=$(jq -r '.version' package.json)
+          if [ -z "$V" ] || [ "$V" = "null" ]; then
+            echo "Version not found in package.json"; exit 1
+          fi
+          if ! [[ "$V" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Version $V is not valid semver (expected X.Y.Z)"; exit 1
+          fi
+          echo "full=$V" >> "$GITHUB_OUTPUT"          
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push multi-arch Docker image
+        run: |
+          set -euo pipefail
+          VERSION='${{ steps.version.outputs.full }}'
+          echo "Building image tag: ${{ steps.version.outputs.full }}"
+          docker buildx build --platform linux/amd64,linux/arm64 \
+          -f SelfHost-Sparrow-Web.Dockerfile \
+          -t sparrowapi/sparrow-web:$VERSION \
+          -t sparrowapi/sparrow-web:latest \
+          --push .
+
+      - name: Logout from Docker Hub
+        run: |
+          docker logout

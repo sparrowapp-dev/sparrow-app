@@ -81,8 +81,7 @@
 
   let tokenErrorType = ""; // 'empty', 'invalid', 'format'
   const tokenFormatRegex =
-    /^sparrow:\/\/\?accessToken=eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+&refreshToken=eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+&response=.+&event=login&method=email$/;
-
+    /^sparrow:\/\/\?accessToken=eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+&refreshToken=eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+(?:&response=.+?)?&event=login&method=[A-Za-z0-9_-]+\s*$/;
   async function tokenValidationLogic() {
     // Reset error states
     isTokenErrorMessage = false;

@@ -1,6 +1,10 @@
 import { getAuthHeaders, makeRequest } from "@app/containers/api/api.common";
 import constants from "@app/constants/constants";
-import type { PromptDto, GenerateUserAndSystemPromptsDto } from "@sparrow/common/dto/ai-assistant";
+import type {
+  PromptDto,
+  GenerateUserAndSystemPromptsDto,
+  GenerateMockDataRequestDto,
+} from "@sparrow/common/dto/ai-assistant";
 
 export class AiAssistantService {
   constructor() {}
@@ -20,7 +24,9 @@ export class AiAssistantService {
     return response;
   };
 
-    public generateUserOrSystemPrompts = async (_prompt: GenerateUserAndSystemPromptsDto) => {
+  public generateUserOrSystemPrompts = async (
+    _prompt: GenerateUserAndSystemPromptsDto,
+  ) => {
     const response = await makeRequest(
       "POST",
       `${this.apiUrl}/api/assistant/generate-prompt`,
@@ -51,6 +57,18 @@ export class AiAssistantService {
       },
     );
 
+    return response;
+  };
+
+  public gereateMockData = async (data: GenerateMockDataRequestDto) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/assistant/generate-mock-data`,
+      {
+        body: data,
+        headers: getAuthHeaders(),
+      },
+    );
     return response;
   };
 }

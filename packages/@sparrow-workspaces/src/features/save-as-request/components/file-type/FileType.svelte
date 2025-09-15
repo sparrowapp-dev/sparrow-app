@@ -55,7 +55,7 @@
         <SocketIoIcon
           height={"14px"}
           width={"18px"}
-          color={"var(--icon-primary-300)"}
+          color={"var(--icon-ds-success-300)"}
         />
       </div>
     {:else if type === ItemType.GRAPHQL}

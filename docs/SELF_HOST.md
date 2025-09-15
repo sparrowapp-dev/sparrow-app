@@ -1,17 +1,28 @@
 # Sparrow App Installation Guide
 
-This guide provides step-by-step instructions to set up the Sparrow app for different user personas.
+This guide provides minimal instructions to self host the Sparrow app.
 
-## User Personas
+---
 
-1. **Individual Users or Small Teams**  
-   Use Docker Compose for a simple one-click deployment with predefined environment variables.
+## Prerequisites
 
-2. **Enterprises**  
-   _(Currently not catered to by this guide.)_
+- Git
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
+- Node.js & Yarn
 
-3. **Individual Contributors**  
-   Run the app locally to contribute to the open-source codebase (API, proxy, auth, or the app itself).
+---
+
+## Ports Used
+
+- **1422** → Sparrow Web (UI)
+- **5173** → Sparrow Admin Server
+- **9000** → Sparrow API Server
+- **1421** → Sparrow Auth Server
+- **3000** → Sparrow Proxy Server
+- **27017** → MongoDB
+
+Make sure these ports are free.
 
 ---
 
@@ -20,40 +31,23 @@ This guide provides step-by-step instructions to set up the Sparrow app for diff
 ### 1. Clone the Repository
 
 ```bash
-# Clone the repo
 git clone https://github.com/sparrowapp-dev/sparrow-app
-
-# Move into the project root
 cd sparrow-app
 ```
 
+### 2. One-Click Deployment
+
+```bash
+yarn docker:up
+```
+
+This command starts all required services (Web, Admin, API, Auth, Proxy, MongoDB).
+
+Access Sparrow UI at: [http://localhost:1422](http://localhost:1422)
+
 ---
 
-## For Individual Users or Small Teams (Self-Hosting with Docker Compose)
-
-### One-Click Deployment
-
-1. Ensure you have [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) installed on your system.
-
-   > You can customize the environment variables in `.env.docker-setup` if required. Refer the [Environment Variable Guide](./ENVIRONMENT_VARIABLE_GUIDE.md) to understand more.
-
-2. Start all services using Docker Compose:
-
-   ```bash
-   yarn docker:up
-   ```
-
-   This will start the following services:
-
-   - Sparrow Web
-   - API Server
-   - Auth Server
-   - Proxy Server
-   - MongoDB
-
-3. Access the Sparrow app via the web browser at [http://localhost:1422](http://localhost:1422).
-
-### Stopping the Services
+## Stopping the Services
 
 ```bash
 yarn docker:down
@@ -61,4 +55,8 @@ yarn docker:down
 
 ---
 
-By following this guide, you can easily self-host Sparrow for your team. If you encounter issues or have feedback, please create an issue in the [GitHub repository](https://github.com/sparrowapp-dev/sparrow-app/issues).
+## Troubleshooting
+
+- Check `.env.docker-setup` for environment variable configuration. Refer the [Environment Variable Guide](./ENVIRONMENT_VARIABLE_GUIDE.md) to understand more.
+- If ports are already in use, modify the `docker-compose.yml` accordingly.
+- For issues, open a ticket here: [GitHub Issues](https://github.com/sparrowapp-dev/sparrow-app/issues)

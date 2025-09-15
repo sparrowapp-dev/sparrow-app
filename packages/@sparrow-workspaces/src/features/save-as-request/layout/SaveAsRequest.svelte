@@ -802,7 +802,7 @@
           ><SocketIoIcon
             height={"12px"}
             width={"16px"}
-            color={"var(--icon-primary-300)"}
+            color={"var(--icon-ds-success-300)"}
           /></span
         >
       {:else if componentData?.property.request.method === TabTypeEnum.GRAPHQL}

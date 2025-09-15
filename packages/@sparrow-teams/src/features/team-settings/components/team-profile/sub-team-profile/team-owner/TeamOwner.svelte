@@ -5,7 +5,7 @@
 
 <div class="d-flex flex-column pb-3">
   <div class="title-width">
-    <p class="team-title mb-0 fs-12 text-textColor">{OWNER_CONFIG.TITLE}</p>
+    <p class="team-title mb-0 fs-12">{OWNER_CONFIG.TITLE}</p>
   </div>
   <div
     class="container-width"
@@ -33,5 +33,10 @@
     border-radius: 4px;
     width: 398px;
     height: 34px;
+  }
+  .team-title {
+    font-size: 12px;
+    color: var(--text-ds-neutral-200);
+    font-weight: 500;
   }
 </style>

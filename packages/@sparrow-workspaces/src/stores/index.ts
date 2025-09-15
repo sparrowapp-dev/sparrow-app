@@ -27,3 +27,14 @@ export { tabsSplitterDirection } from "./tabs-view";
 export { isChatbotOpenInCurrTab } from "./chatbot-state";
 
 export { updateActiveSyncStates } from "./active-sync";
+export {
+  generatedVariableDemo,
+  generateVariableStep,
+  generateVariableTourCompleted,
+} from "./generate-variable-demo";
+
+export {
+  requestTabTestDemo,
+  requestTabTestNoCodeStep,
+  requestTabTestTourCompleted,
+} from "./request-tab-test-tour-guide";

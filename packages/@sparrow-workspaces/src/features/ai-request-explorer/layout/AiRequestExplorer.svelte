@@ -94,6 +94,8 @@
   export let collectionAuth;
   export let collection;
   export let onHandleInsertPrompt;
+  export let onCloseChatHistoryPanel;
+
   const loading = writable<boolean>(false);
   let isExposeSaveAsRequest = false;
 
@@ -148,11 +150,13 @@
     return result;
   };
   const onCloseConversationHistoryPanel = () => {
-    maxPx -= 230;
-    defaultPx -= 220;
-    minPx -= 300;
-    updateSplitpaneContSizes();
-    isConversationHistoryPanelOpen = false;
+    if (isConversationHistoryPanelOpen) {
+      maxPx -= 230;
+      defaultPx -= 220;
+      minPx -= 300;
+      updateSplitpaneContSizes();
+      isConversationHistoryPanelOpen = false;
+    }
   };
 
   const handleOnClickUpdateRequestAuth = async () => {
@@ -190,6 +194,11 @@
       return () => resizeObserver.disconnect(); // Cleanup on component unmount
     }, 0);
   });
+
+  /**
+   * @description - triggers child function from parent component
+   */
+  $: onCloseChatHistoryPanel = () => onCloseConversationHistoryPanel();
   onDestroy(() => {});
 </script>
 

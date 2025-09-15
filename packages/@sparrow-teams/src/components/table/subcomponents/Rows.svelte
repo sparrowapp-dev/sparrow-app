@@ -30,6 +30,8 @@
   export let onDeleteWorkspace: (workspace: any) => void;
   export let openInDesktop: (workspaceID: string) => void;
   export let isWebEnvironment: boolean;
+  export let appEdition = "MANAGED";
+
   let pos = { x: 0, y: 0 };
   let showMenu = false;
   let workspaceTabWrapper: HTMLElement;
@@ -188,7 +190,7 @@
   <td
     class="tab-data text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium py-2 position-relative"
   >
-    {#if isWebEnvironment && !list?.isShared}
+    {#if isWebEnvironment && !list?.isShared && appEdition !== "SELFHOSTED"}
       <button
         class="open-desktop-btn border-0 rounded d-flex justify-content-center align-items-center text-decoration-underline"
         on:click|stopPropagation={() => {

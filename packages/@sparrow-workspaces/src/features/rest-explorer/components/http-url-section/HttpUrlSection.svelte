@@ -142,6 +142,7 @@
         class={"input-url"}
         {userRole}
         isFocusedOnMount={false}
+        isHttpUrlSection={true}
       />
     </div>
   </div>

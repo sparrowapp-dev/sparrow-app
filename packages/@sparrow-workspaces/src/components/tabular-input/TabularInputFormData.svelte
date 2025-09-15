@@ -519,7 +519,7 @@
       : ''}"
     style="position:relative; "
   >
-    <div style=" width:24px; margin-right:12px;" class="">
+    <div style="width:50px; padding-left: 25px;" class="">
       <Checkbox
         disabled={pairs.length === 1 || !isCheckBoxEditable}
         checked={controller}
@@ -530,7 +530,7 @@
     <div class="d-flex gap-0" style="width: calc(100% - 180px);">
       <div
         class="w-50 position-relative header-text"
-        style="padding-left: 6px;"
+        style="padding-left: 16px;"
       >
         Key
       </div>

@@ -873,22 +873,25 @@
         title="More options"
         styleProp="bottom: -8px; {!collection?.activeSync ? 'left: -50%' : ''}"
         > -->
-        {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
-          {#if isMockCollection}
-            <Tooltip
-              title={"This mock collection is inactive. Run it to activate."}
-              placement={"top-center"}
-              distance={13}
-              show={!collection?.isMockCollectionRunning}
-              zIndex={701}
-            >
-              <div style="display: flex;">
-                <Tag
-                  type={collection?.isMockCollectionRunning ? "green" : "grey"}
-                  text={"Mock"}
-                />
-              </div>
-            </Tooltip>
+        {#if isMockCollection}
+          <!-- Mock Tag - shows to everyone -->
+          <Tooltip
+            title={"This mock collection is inactive. Run it to activate."}
+            placement={"top-center"}
+            distance={13}
+            show={!collection?.isMockCollectionRunning}
+            zIndex={701}
+          >
+            <div style="display: flex;">
+              <Tag
+                type={collection?.isMockCollectionRunning ? "green" : "grey"}
+                text={"Mock"}
+              />
+            </div>
+          </Tooltip>
+
+          <!-- Mock buttons - only for authorized users -->
+          {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
             <Tooltip
               title={collection?.isMockCollectionRunning
                 ? "Stop Mock"
@@ -933,7 +936,10 @@
                 />
               </span>
             </Tooltip>
-          {:else}
+          {/if}
+        {:else}
+          <!-- Regular collection buttons -->
+          {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER && !isSharedWorkspace}
             {#if !collection?.activeSync}
               <Tooltip
                 title={"Add Options"}

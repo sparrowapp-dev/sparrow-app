@@ -266,7 +266,7 @@
   >
     <div
       class="api-method"
-      style="height: 24px; width:24px !important; margin-right:4px;"
+      style="width: 24px !important; height:24px !important; padding:0;"
     ></div>
     <span class="api-method">
       <SocketIoIcon
@@ -345,8 +345,9 @@
     border-radius: 4px;
     display: flex;
     align-items: center;
-    justify-content: end;
+    justify-content: start;
     padding: 4px;
+    padding-left: 0;
   }
   .api-name {
     height: 24px;

@@ -24,7 +24,7 @@
 
 <div class="d-flex flex-column pb-3">
   <div class="title-width">
-    <p class="team-title mt-2 mb-1 fs-12 text-textColor">
+    <p class="team-title mt-2 mb-1 fs-12">
       {NAME_CONFIG.TITLE}
     </p>
   </div>
@@ -86,5 +86,10 @@
     margin-top: 0px;
     color: var(--text-ds-danger-300);
     font-family: "Inter", sans-serif;
+  }
+  .team-title {
+    font-size: 12px;
+    color: var(--text-ds-neutral-200);
+    font-weight: 500;
   }
 </style>

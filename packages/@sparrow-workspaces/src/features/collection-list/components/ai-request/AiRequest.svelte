@@ -265,7 +265,7 @@
   >
     <div
       class="api-method"
-      style="height: 24px; width:24px !important; margin-right:4px;"
+      style="width: 24px !important; height:24px !important; padding:0;"
     ></div>
     <span class="api-method">
       <BotRegular height={"14px"} width={"14px"} />
@@ -340,7 +340,7 @@
     border-radius: 4px;
     display: flex;
     align-items: center;
-    justify-content: end;
+    justify-content: start;
     padding: 2px;
     margin-bottom: 5px;
   }
@@ -354,6 +354,7 @@
     align-items: center;
     caret-color: var(--bg-ds-primary-300);
     padding: 2px 4px;
+    padding-left: 0px;
   }
   .api-name-deleted {
     color: var(--editor-angle-bracket) !important;
