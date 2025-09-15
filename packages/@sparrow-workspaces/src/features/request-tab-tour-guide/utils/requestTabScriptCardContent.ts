@@ -4,7 +4,7 @@ export const RequestTabTestsScriptTourContent = [
     description:
       "You can write tests your way, pick No-Code for a quick and easy setup, or Script Mode if you prefer full control. Switch anytime with just a click.",
     stepCount: 1,
-    targetId: "request-tab-nocode",
+    targetId: "request-tab-test-script",
   },
   {
     Title: "Write Your Own Tests!",
@@ -18,7 +18,7 @@ export const RequestTabTestsScriptTourContent = [
     description:
       "No need to start from scratch. Use ready-made snippets to add common tests in just one click.",
     stepCount: 3,
-    targetId: "request-tab-test",
+    targetId: "request-tab-test-script-leftpanel",
   },
   {
     Title: "See Your Tests in Action",

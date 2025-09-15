@@ -220,6 +220,9 @@ class RestExplorerViewModel {
           await this.updateIsRequestTabDemo(
             collectionDoc?.isRequestTestsNoCodeDemoCompleted,
           );
+          await this.updateIsRequestTabScriptDemo(
+            collectionDoc?.isRequestTestsScriptDemoCompleted,
+          );
         }
 
         //   "selectedRequestAuthProfileId:>> ",
@@ -2352,6 +2355,12 @@ class RestExplorerViewModel {
   public updateIsRequestTabDemo = async (value: boolean) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.isRequestTestsNoCodeDemoCompleted = value;
+    this.tab = progressiveTab;
+  };
+
+  public updateIsRequestTabScriptDemo = async (value: boolean) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.isRequestTestsScriptDemoCompleted = value;
     this.tab = progressiveTab;
   };
 
@@ -4837,6 +4846,14 @@ class RestExplorerViewModel {
       notifications.error("Failed to fix test script.");
     }
   }
+
+  public handleRequestTestScriptDemoCompleted = async () => {
+    const response = await this.userService.requestTabScriptTestsDemoCompleted();
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (response.isSuccessful) {
+      await this.fetchCollections(progressiveTab?.path?.workspaceId);
+    }
+  };
 }
 
 export default RestExplorerViewModel;

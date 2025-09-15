@@ -6,6 +6,15 @@
   } from "@sparrow/library/icons";
   import { Button } from "@sparrow/library/ui";
   import { predefinedTestSnippets } from "./utils/common-snippets";
+  import RequestTabTourGuide from "../../../../../request-tab-tour-guide/layout/RequestTabTourGuide.svelte";
+  import { requestTabTestScriptStep } from "../../../../../../stores";
+  import { RequestTabTestsScriptTourContent } from "../../../../../request-tab-tour-guide";
+  import TourGuideCard from "../../../../../request-tab-tour-guide/components/TourGuideCard.svelte";
+  import {
+    handleNextStep,
+    handleCloseTour,
+  } from "../../../../../request-tab-tour-guide/utils";
+  import { requestTabScriptCardPosition } from "../../../../../request-tab-tour-guide/utils";
   export let onTestsChange;
   export let tests;
 
@@ -81,6 +90,7 @@
         ? 'collapsed-panel'
         : ''}"
       style="width:{leftPanelWidth};gap:6px;overflow:hidden;transition:width 0.3s ease;"
+      id="request-tab-test-script-leftpanel"
     >
       {#if isLeftPanelCollapsed}
         <!-- Collapsed -->
@@ -183,6 +193,24 @@
       />
     </div>
   </div>
+  {#if $requestTabTestScriptStep === 3}
+    <RequestTabTourGuide
+      targetId={RequestTabTestsScriptTourContent[2].targetId}
+      isVisible={true}
+      cardPosition={requestTabScriptCardPosition(3)}
+    >
+      <TourGuideCard
+        titleName={RequestTabTestsScriptTourContent[2].Title}
+        descriptionContent={RequestTabTestsScriptTourContent[2].description}
+        cardNumber={3}
+        totalsCards={RequestTabTestsScriptTourContent.length}
+        rightButtonName=""
+        onNext={handleNextStep}
+        onClose={handleCloseTour}
+        width={352}
+      />
+    </RequestTabTourGuide>
+  {/if}
 </div>
 
 <style>
