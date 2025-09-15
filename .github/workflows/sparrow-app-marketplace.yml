@@ -105,7 +105,7 @@ jobs:
       - name: Upload Snap to Snap Store
         env:
           SNAP_CHANNEL: ${{ vars.SNAP_RELEASE_CHANNEL || 'edge' }}
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ vars.SNAPCRAFT_STORE_CREDENTIALS }}
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
           XDG_CONFIG_HOME: "$PWD/.config"
         run: |
           SNAP_FILE=$(ls *.snap | head -n1)
