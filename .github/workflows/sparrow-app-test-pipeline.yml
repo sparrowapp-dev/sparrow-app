@@ -13,12 +13,12 @@ on:
   workflow_dispatch:
 
 env:
-  VITE_API_URL: ${{vars.VITE_API_URL}}
-  VITE_MIX_PANEL_TOKEN: ${{vars.VITE_MIX_PANEL_TOKEN}}
-  VITE_ENABLE_MIX_PANEL: ${{vars.VITE_ENABLE_MIX_PANEL}}
-  VITE_API_TIMEOUT: ${{vars.VITE_API_TIMEOUT}}
+  VITE_API_URL: ${{ vars.VITE_API_URL_DEV }}
+  VITE_MIX_PANEL_TOKEN: ${{ vars.VITE_MIX_PANEL_TOKEN }}
+  VITE_ENABLE_MIX_PANEL: ${{ vars.VITE_ENABLE_MIX_PANEL_DEV }}
+  VITE_API_TIMEOUT: ${{ vars.VITE_API_TIMEOUT }}
   VITE_SPARROW_SUPPORT_EMAIL: ${{ vars.VITE_SPARROW_SUPPORT_EMAIL }}
-  VITE_AUTH_URL: ${{ vars.VITE_AUTH_URL }}
+  VITE_AUTH_URL: ${{ vars.VITE_AUTH_URL_DEV }}
   VITE_SPARROW_GITHUB: ${{ vars.VITE_SPARROW_GITHUB }}
   VITE_SPARROW_DOWNLOAD_LINK: ${{ vars.VITE_SPARROW_DOWNLOAD_LINK }}
   VITE_RELEASE_NOTES_PAT_TOKEN: ${{ secrets.VITE_RELEASE_NOTES_PAT_TOKEN }}
@@ -45,34 +45,5 @@ env:
   CI: false
   SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
 
-jobs:
-  test-build-snap:
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
 
-      - name: Validate SNAPCRAFT_STORE_CREDENTIALS
-        run: |
-          echo "Testing secret access..."
-          # Print first 10 chars safely to confirm secret is read
-          echo "${SNAPCRAFT_STORE_CREDENTIALS:0:10}..."
-          if [ -z "$SNAPCRAFT_STORE_CREDENTIALS" ]; then
-            echo "::error::SNAPCRAFT_STORE_CREDENTIALS is empty"
-            exit 1
-          fi
-
-      - name: Install Snapcraft (for testing)
-        run: sudo snap install snapcraft --classic
-
-      - name: Simulate Snap build
-        run: |
-          echo "Simulating snap build..."
-          mkdir -p snap-build-test
-          echo "dummy file" > snap-build-test/test.txt
-          tree snap-build-test
-
-      - name: Confirm env variables
-        run: |
-          echo "SNAP_CHANNEL=$SNAP_CHANNEL"
+  
