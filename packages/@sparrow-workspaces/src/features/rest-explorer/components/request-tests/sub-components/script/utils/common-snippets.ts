@@ -70,14 +70,15 @@ export const predefinedTestSnippets = [
     title: "Response contains token field",
     function: `sp.test("Response contains token field", function () {
   let jsonData = sp.response.body.json();
-  sp.expect(jsonData).to.have.property("token");
+  sp.expect(jsonData).to.exist("token");
 });`,
   },
   {
     title: "Token is a non-empty string",
     function: `sp.test("Token is a non-empty string", function () {
   let jsonData = sp.response.body.json();
-  sp.expect(jsonData.token).to.be.a("string").that.is.not.empty;
+  sp.expect(jsonData.token).to.be.a("string");
+  sp.expect(jsonData.token).to.be.notEmpty();
 });`,
   },
   {
@@ -91,7 +92,7 @@ export const predefinedTestSnippets = [
     function: `sp.test("Response array contains specific field in objects", function () {
   let jsonData = sp.response.body.json();
   jsonData.forEach(item => {
-    sp.expect(item).to.have.property("id");
+    sp.expect(item).to.exist("id");
   });
 });`,
   },
@@ -100,7 +101,7 @@ export const predefinedTestSnippets = [
     function: `sp.test("Response has error field when status 400", function () {
   if (sp.response.statusCode === 400) {
     let jsonData = sp.response.body.json();
-    sp.expect(jsonData).to.have.property("error");
+    sp.expect(jsonData).to.exist("error");
   }
 });`,
   },
@@ -129,7 +130,7 @@ export const predefinedTestSnippets = [
   {
     title: "Response has Content-Length header",
     function: `sp.test("Response has Content-Length header", function () {
-  sp.expect(sp.response.headers).to.have.property("Content-Length");
+  sp.expect(sp.response.headers).to.exist("Content-Length");
 });`,
   },
 ];

@@ -168,11 +168,11 @@
         <div class="my-4">
           <SparrowLogo />
         </div>
-        {#if tests.testCaseMode === TestCaseModeEnum.NO_CODE}
+        {#if tests?.testCaseMode === TestCaseModeEnum.NO_CODE}
           <p class="text-fs-12 mb-5" style="color: var(--text-ds-neutral-400);">
             No test cases available. <br /> Start by adding your own test cases.
           </p>
-        {:else if tests.testCaseMode === TestCaseModeEnum.SCRIPT}
+        {:else if tests?.testCaseMode === TestCaseModeEnum.SCRIPT}
           <p class="text-fs-12 mb-5" style="color: var(--text-ds-neutral-400);">
             No test cases available. <br /> Start by adding your own test cases,
             select from smart suggestions or generate them with AI.
