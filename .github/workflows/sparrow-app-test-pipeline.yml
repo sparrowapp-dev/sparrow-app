@@ -2,17 +2,14 @@
 # This file is used to test the Sparrow App build and release process. Change this file to trigger the test pipeline for Sparrow App.
 # It is triggered on push to the <branch_name> branch. Change the branch name to trigger the test pipeline.
 
-# File: .github/workflows/sparrow-app-test-pipeline.yml
-# This file is used to test Sparrow App build/release secrets and variables.
-# ⚠️ WARNING: This workflow reads values from production environment.
-# Do not commit unless you intend to validate production secrets/vars.
-
 name: Test release
 
 on:
   push:
+    # Trigger on push to the <branch_name> branch. Make sure to remove the branch name from the branches list below, once you are done testing.
     branches:
-      - <branch_name> # replace with your test branch
+      - <branch_name>
+
   workflow_dispatch:
 
 env:
@@ -44,58 +41,8 @@ env:
   VITE_POSTHOG_CONNECTION_API_KEY: ${{ vars.VITE_POSTHOG_CONNECTION_API_KEY }}
   VITE_POSTHOG_API_URL: ${{ vars.VITE_POSTHOG_API_URL }}
   VITE_SPARROW_ADMIN_URL: ${{ vars.VITE_SPARROW_ADMIN_URL }}
-  SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+  SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
   CI: false
 
 jobs:
-  validate-secrets-vars:
-    runs-on: ubuntu-latest
-    environment: production   # This ensures the job accesses secrets from the production environment
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
-      - name: Validate all secrets and variables
-        run: |
-          echo "🔍 Checking secrets and variables..."
-          for var in \
-            VITE_API_URL \
-            VITE_MIX_PANEL_TOKEN \
-            VITE_ENABLE_MIX_PANEL \
-            VITE_API_TIMEOUT \
-            VITE_SPARROW_SUPPORT_EMAIL \
-            VITE_AUTH_URL \
-            VITE_SPARROW_GITHUB \
-            VITE_SPARROW_DOWNLOAD_LINK \
-            VITE_RELEASE_NOTES_PAT_TOKEN \
-            VITE_RELEASE_NOTES_API \
-            VITE_AZURE_CDN_URL \
-            VITE_AZURE_INSIGHTS_CONNECTION_STRING \
-            VITE_CANNY_API \
-            VITE_CANNY_URL \
-            VITE_BASE_URL \
-            VITE_SPARROW_LINKEDIN \
-            VITE_WEB_SOCKET_IO_API_URL \
-            VITE_SPARROW_DOCS \
-            VITE_SPARROW_AI_WEBSOCKET \
-            VITE_APP_ENVIRONMENT_PATH \
-            VITE_CANNY_FEEDBACK_URL \
-            VITE_SPARROW_WEB_APP_URL \
-            VITE_MARKETING_URL \
-            VITE_SENTRY_DSN \
-            VITE_APP_ENVIRONMENT \
-            VITE_POSTHOG_CONNECTION_API_KEY \
-            VITE_POSTHOG_API_URL \
-            VITE_SPARROW_ADMIN_URL \
-            SNAPCRAFT_STORE_CREDENTIALS
-          do
-            value="${!var}"
-            if [ -z "$value" ]; then
-              echo "::error::$var is NOT set"
-            else
-              echo "✅ $var is set (starts with: ${value:0:8}...)"
-            fi
-          done
-
-  
