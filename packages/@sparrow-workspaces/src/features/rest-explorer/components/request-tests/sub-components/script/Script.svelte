@@ -126,7 +126,6 @@
         <div class="d-flex justify-content-center flex-shrink-0 mb-2">
           <Search
             id="script-snippet-search"
-            customWidth="100%"
             variant="primary"
             size="small"
             bind:value={searchData}
