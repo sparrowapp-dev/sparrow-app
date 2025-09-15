@@ -1,13 +1,18 @@
 <script lang="ts">
   import { SparrowLogo } from "@sparrow/common/images";
+  import { startLoading, stopLoading } from "@sparrow/common/store";
   import { TestCaseModeEnum } from "@sparrow/common/types/workspace";
   import { ErrorCircleRegular } from "@sparrow/library/icons";
   import { Button, Tag } from "@sparrow/library/ui";
   import { onMount, tick } from "svelte";
+  import { loadingState } from "@sparrow/common/store";
 
   export let responseTestResults = [];
   export let responseTestMessage = "";
   export let tests;
+  export let onFixTestScript;
+  export let tabId;
+
   let filter: "all" | "passed" | "failed" = "all";
   let allBtn: HTMLSpanElement;
   let passedBtn: HTMLSpanElement;
@@ -151,7 +156,12 @@
         <Button
           title="Fix Script"
           type="outline-secondary"
-          onClick={() => {}}
+          loader={$loadingState.get(tabId + "-fix-test-script")}
+          onClick={async () => {
+            startLoading(tabId + "-fix-test-script");
+            await onFixTestScript();
+            stopLoading(tabId + "-fix-test-script");
+          }}
         />
       {:else}
         <div class="my-4">

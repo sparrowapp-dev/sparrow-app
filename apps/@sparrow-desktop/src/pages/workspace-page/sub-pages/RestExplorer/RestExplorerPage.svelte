@@ -268,6 +268,7 @@
   onSaveResponse={_viewModel.saveResponse}
   onStopGeneratingAIResponse={_viewModel.stopGeneratingAIResponse}
   onGenerateAiResponse={_viewModel.generateAIResponseWS}
+  onFixTestScript={_viewModel.fixTestScript}
   onToggleLike={_viewModel.toggleChatMessageLike}
   onUpdateAiModel={_viewModel.updateAIModel}
   generateMockData={_viewModel.generateMockData}
