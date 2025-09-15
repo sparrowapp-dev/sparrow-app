@@ -239,7 +239,7 @@ export class EnvironmentExplorerViewModel {
           // validation: key and value must not be empty
           if (!foundObject?.key || !foundObject?.value) {
             notifications.warning(
-              "Both key and value are required to accept a variable.",
+              "Variables with missing keys or values cannot be added to Global Variables.",
             );
             return;
           }
@@ -301,7 +301,7 @@ export class EnvironmentExplorerViewModel {
       const undoAiVariables =
         progressiveTab.property.environment.aiVariable.filter(
           (variable) =>
-            variable.undo === true || (!variable.key || !variable.value),
+            variable.undo === true || !variable.key || !variable.value,
         );
 
       const sanitizedAiVariables =

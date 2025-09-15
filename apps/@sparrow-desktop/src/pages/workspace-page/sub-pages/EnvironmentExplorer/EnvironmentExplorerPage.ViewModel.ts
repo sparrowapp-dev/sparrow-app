@@ -237,7 +237,7 @@ export class EnvironmentExplorerViewModel {
           // validation: key and value must not be empty
           if (!foundObject?.key || !foundObject?.value) {
             notifications.warning(
-              "Both key and value are required to accept a variable.",
+              "Variables with missing keys or values cannot be added to Global Variables.",
             );
             return;
           }
