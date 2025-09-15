@@ -1,6 +1,6 @@
 # File: .github/workflows/sparrow-app-test-pipeline.yml
-# This file is used to test the Sparrow App build and release process. Change this file to trigger the test pipeline for Sparrow App.
-# It is triggered on push to the <branch_name> branch. Change the branch name to trigger the test pipeline.
+# This file is used to test the Sparrow App build and release process.
+# It verifies that the SNAPCRAFT_STORE_CREDENTIALS secret from the PRODUCTION environment is available.
 
 name: Test release
 
@@ -11,11 +11,13 @@ on:
   workflow_dispatch:
 
 env:
+  # Using the secret from the production environment
   SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
 
 jobs:
   test-snap-secret:
     runs-on: ubuntu-latest
+    environment: production   # This ensures the job accesses secrets from the production environment
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -27,7 +29,3 @@ jobs:
             exit 1
           fi
           echo "Secret is set. First 10 chars: ${SNAPCRAFT_STORE_CREDENTIALS:0:10}..."
-
-
-
-  
