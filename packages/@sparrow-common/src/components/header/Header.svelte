@@ -657,7 +657,7 @@
         </div>
       </Tooltip>
     {/if}
-    <div>
+    <!-- <div>
       {#if isGuestUser}
         {#if $policyConfig.enableLogin}
           <Button
@@ -671,7 +671,7 @@
           />
         {/if}
       {/if}
-    </div>
+    </div> -->
 
     <div>
       <SearchBar

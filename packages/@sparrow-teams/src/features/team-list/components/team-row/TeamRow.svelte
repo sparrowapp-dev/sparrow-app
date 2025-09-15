@@ -10,7 +10,7 @@
     SideBarPremium,
     Daimond,
   } from "@sparrow/library/icons";
-  import { Avatar, Button, PlanTag } from "@sparrow/library/ui";
+  import { Avatar, Button, PlanTag, Tooltip } from "@sparrow/library/ui";
 
   export let team;
   export let isGuestUser;
@@ -76,13 +76,19 @@
 
       <!-- Plan Icon Overlay -->
       {#if team?.plan?.name}
-        <div class="plan-icon-overlay">
-          <svelte:component
-            this={getPlanIcon(team.plan.name)}
-            size="12"
-            color="var(--icon-ds-primary-300)"
-          />
-        </div>
+        <Tooltip
+          placement="bottom-center"
+          title={team.plan.name + " " + "Edition"}
+          zIndex={600}
+        >
+          <div class="plan-icon-overlay">
+            <svelte:component
+              this={getPlanIcon(team.plan.name)}
+              size="12"
+              color="var(--icon-ds-primary-300)"
+            />
+          </div>
+        </Tooltip>
       {/if}
     </div>
     <div class="d-flex align-items-center team-row-content">
