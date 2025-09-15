@@ -46,6 +46,33 @@ env:
   SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
 
 jobs:
-  build-snap:
+  test-build-snap:
     runs-on: ubuntu-latest
     environment: production
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Validate SNAPCRAFT_STORE_CREDENTIALS
+        run: |
+          echo "Testing secret access..."
+          # Print first 10 chars safely to confirm secret is read
+          echo "${SNAPCRAFT_STORE_CREDENTIALS:0:10}..."
+          if [ -z "$SNAPCRAFT_STORE_CREDENTIALS" ]; then
+            echo "::error::SNAPCRAFT_STORE_CREDENTIALS is empty"
+            exit 1
+          fi
+
+      - name: Install Snapcraft (for testing)
+        run: sudo snap install snapcraft --classic
+
+      - name: Simulate Snap build
+        run: |
+          echo "Simulating snap build..."
+          mkdir -p snap-build-test
+          echo "dummy file" > snap-build-test/test.txt
+          tree snap-build-test
+
+      - name: Confirm env variables
+        run: |
+          echo "SNAP_CHANNEL=$SNAP_CHANNEL"
