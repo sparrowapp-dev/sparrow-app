@@ -2,7 +2,7 @@
   import { SparrowLogo } from "@sparrow/common/images";
   import { startLoading, stopLoading } from "@sparrow/common/store";
   import { TestCaseModeEnum } from "@sparrow/common/types/workspace";
-  import { ErrorCircleRegular } from "@sparrow/library/icons";
+  import { ErrorCircleRegular, SparkleRegular } from "@sparrow/library/icons";
   import { Button, Tag } from "@sparrow/library/ui";
   import { onMount, tick } from "svelte";
   import { loadingState } from "@sparrow/common/store";
@@ -155,6 +155,7 @@
         </p>
         <Button
           title="Fix Script"
+          startIcon={SparkleRegular}
           type="outline-secondary"
           loader={$loadingState.get(tabId + "-fix-test-script")}
           onClick={async () => {
