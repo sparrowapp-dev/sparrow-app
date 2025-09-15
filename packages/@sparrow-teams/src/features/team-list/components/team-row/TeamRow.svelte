@@ -142,7 +142,7 @@
   .new-team-btn {
     height: 20px;
     width: 20px;
-    background-color: transparent;
+    background-color: transparent !important;
     border: none;
   }
   .new-team-btn:hover {
