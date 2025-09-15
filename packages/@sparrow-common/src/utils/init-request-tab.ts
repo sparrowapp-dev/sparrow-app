@@ -118,7 +118,7 @@ class InitRequestTab {
                   },
                 ],
              
-              script: "",
+              script: "asif",
             },
           state: {
             requestBodyLanguage: RequestDataTypeEnum.TEXT,

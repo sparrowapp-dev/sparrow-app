@@ -540,6 +540,12 @@ class RestExplorerViewModel {
       progressiveTab.property.request.tests.testCaseMode
     ) {
       result = false;
+    }
+    else if (
+      requestServer.request.tests.script !==
+      progressiveTab.property.request.tests.script
+    ) {
+      result = false;
     } else if (
       !this.compareArray.init(
         requestServer.request.queryParams,
