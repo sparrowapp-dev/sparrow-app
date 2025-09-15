@@ -323,12 +323,12 @@ jobs:
           Start-Process msiexec.exe -ArgumentList "/a `"$msiPath`" /qn TARGETDIR=`"$extractPath`"" -Wait -NoNewWindow
 
           #Copy app executable (MakeAppx requires it)
-          $exeSource = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug" -Filter "Sparrow.exe" -Recurse | Select-Object -First 1
+          $exeSource = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug" -Filter "sparrow-app.exe" -Recurse | Select-Object -First 1
           if ($exeSource) {
             Copy-Item $exeSource.FullName -Destination "app-root/Sparrow.exe"
           } else {
-            Write-Host "::warning::Real Sparrow.exe not found. Inserting dummy executable."
-            Set-Content -Path "app-root/Sparrow.exe" -Value "placeholder"
+            Write-Host "::error::Sparrow.exe not found! Expected path: apps/@sparrow-desktop/src-tauri/target/debug/sparrow-app.exe"
+            exit 1
           }
 
            # Copy actual StoreLogo from known path

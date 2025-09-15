@@ -50,6 +50,7 @@ tauri-plugin-shell = "2.3.0"
 tauri-plugin-dialog = "2.3.2"
 tauri-plugin-fs = "2.4.1"
 tauri-plugin-deep-link = "2.4.1"
+once_cell = "1.21.3"
 
 # Windows Specific Dependencies
 [target.'cfg(windows)'.dependencies]
