@@ -540,6 +540,12 @@ class RestExplorerViewModel {
       progressiveTab.property.request.tests.testCaseMode
     ) {
       result = false;
+    }
+    else if (
+      requestServer.request.tests.script !==
+      progressiveTab.property.request.tests.script
+    ) {
+      result = false;
     } else if (
       !this.compareArray.init(
         requestServer.request.queryParams,
@@ -2007,44 +2013,7 @@ class RestExplorerViewModel {
   };
 
   private async executeScriptTestcases() {
-    // const javaScriptTestCases = `
-    //     sps.test("Status code is 200", function () {
-    //     sp.expect(sp.response.statusCode).to.equal(200);
-    // });
-
-    // const response = sp.response.body.json();
-
-    // // Validate response structure
-    // sp.test("Response has userId, id, title, and completed properties", function () {
-    //     sp.expect(response).to.have.all.keys('userId', 'id', 'title', 'completed');
-    // });
-
-    // sp.test("Status code is between 200–300 or 400–500", function () {
-    //   sp.expect(
-    //     (sp.response.statusCode >= 100 && sp.response.statusCode <= 500) || 
-    //     (sp.response.statusCode >= 500 && sp.response.statusCode <= 600)
-    //   ).to.be.true();
-    // });
-
-
-    // // Validate data types
-    // sp.test("userId is a number", function () {
-    //     sp.expect(response.userId).to.be.a('number');
-    // });
-
-    // sp.test("id is a number", function () {
-    //     sp.expect(response.id).to.be.a('number');
-    // });
-
-    // sp.test("title is a string", function () {
-    //     sp.expect(response.title).to.be.a('string');
-    // });
-
-    // sp.test("completed is a boolean", function () {
-    //     sp.expect(response.completed).to.be.a('boolean');
-    // });
-
-    //     `
+  
     const tests: { name: string; passed: boolean; error?: string }[] = [];
 
     // minimal chai-like expect (you can replace with a real lib like chai)
@@ -4829,6 +4798,45 @@ class RestExplorerViewModel {
       await this.fetchCollections(progressiveTab?.path?.workspaceId);
     }
   };
+
+  /**
+   * Fixes the test script for the current request tab using AI assistance.
+   * It retrieves the active workspace and team ID, then sends the current test script to the AI service for fixing.
+   */
+  public fixTestScript = async (): Promise<void> => {
+    const workspaceData =
+      await this.workspaceRepository.getActiveWorkspaceDoc();
+    const teamId = workspaceData.toMutableJSON().team?.teamId || "";
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const testCases = progressiveTab.property.request.tests; 
+    const response = await this.aiAssistentService.fixTestScript(
+        {
+          teamId: teamId,
+          testScript: testCases.script,
+        }  );
+    if (response.isSuccessful) {
+      this.updateRequestTests({
+        ...testCases,
+        script: response?.data?.data.result,
+      });
+      restExplorerDataStore.update((restApiDataMap) => {
+        const r = restApiDataMap.get(progressiveTab?.tabId);
+        if(r){
+          r.response.testMessage = '';
+        }
+        return restApiDataMap;
+      });
+      notifications.success("Test script fixed successfully.");
+
+    } else if (
+      response?.data?.message === "Limit reached. Please try again later."
+    ) {
+      notifications.error("AI Limit has Reached.please upgrade plan.");
+    }
+    else{
+      notifications.error("Failed to fix test script.");
+    }
+  }
 }
 
 export default RestExplorerViewModel;

@@ -23,8 +23,6 @@
 
   export let isBodyBeautified: boolean = false;
 
-  let value = tests?.script || "";
-
   let searchData: string = "";
   let isLeftPanelCollapsed: boolean = false;
 
@@ -43,8 +41,7 @@
   };
 
   const handleCodeMirrorChange = (e: any) => {
-    value = e.detail;
-    onTestsChange({ ...tests, script: value });
+    onTestsChange({ ...tests, script: e.detail });
   };
 
   const toggleLeftPanel = (): void => {
@@ -52,6 +49,7 @@
   };
 
   const selectSnippet = (data: string): void => {
+    let value = tests?.script || "";
     value += value ? `\n${data}` : data;
     onTestsChange({ ...tests, script: value });
   };
@@ -126,7 +124,6 @@
         <div class="d-flex justify-content-center flex-shrink-0 mb-2">
           <Search
             id="script-snippet-search"
-            customWidth="100%"
             variant="primary"
             size="small"
             bind:value={searchData}
@@ -176,10 +173,11 @@
     >
       <Editor
         bind:lang
-        bind:value
+        value={tests?.script || ""}
         on:change={handleCodeMirrorChange}
         isEditable={true}
         autofocus={true}
+        placeholder={`// What are the tests?\n// Tests are scripts that automatically check your API's response.\n// For example: Is the status code 200? Does the body contain an email field?\n// sp.test("Status code is 200", function () {\n//   sp.response.to.have.status(200);\n// });\n\n// You can:\n// - Use "Snippets" to insert common tests\n// - Or, write test cases manually using scripting or no code method`}
         {isBodyBeautified}
         beautifySyntaxCallback={updateBeautifiedState}
       />
