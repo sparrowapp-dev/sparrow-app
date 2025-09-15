@@ -44,4 +44,8 @@ env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
   CI: false
   SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+
 jobs:
+  build-snap:
+    runs-on: ubuntu-latest
+    environment: production
