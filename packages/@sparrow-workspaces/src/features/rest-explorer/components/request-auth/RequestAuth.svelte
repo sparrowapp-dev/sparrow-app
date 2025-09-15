@@ -122,7 +122,7 @@
       The auth header will be automatically generated when you send the request.
     </p>
   </div>
-  <section class="w-100" style="flex:1; overflow:hidden;">
+  <section class="w-100" style="flex:1; overflow-y: auto; overflow-x: hidden;">
     {#if requestStateAuth === HttpRequestAuthTypeBaseEnum.NO_AUTH}
       <NoAuth />
     {:else if requestStateAuth === HttpRequestAuthTypeBaseEnum.API_KEY}
