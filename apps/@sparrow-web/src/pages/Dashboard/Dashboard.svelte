@@ -124,7 +124,6 @@
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
       const activeWorkspaceRxDoc = value;
-      console.log("Active Workspace changed:", activeWorkspaceRxDoc);
       if (activeWorkspaceRxDoc) {
         currentWorkspaceId = activeWorkspaceRxDoc._id;
         currentWorkspaceName = activeWorkspaceRxDoc.name;
