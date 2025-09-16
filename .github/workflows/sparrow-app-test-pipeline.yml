@@ -204,6 +204,42 @@ jobs:
           $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
           $bundlePath = "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi"
           
+          # Dynamically find signtool.exe instead of hardcoding the path
+          Write-Host "🔍 Searching for signtool.exe..."
+          $signTool = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -Filter "signtool.exe" -ErrorAction SilentlyContinue |
+                      Where-Object { $_.FullName -match '\\x64\\signtool\.exe$' } |
+                      Sort-Object LastWriteTime -Descending |
+                      Select-Object -First 1
+          
+          if (-not $signTool) {
+            Write-Host "❌ signtool.exe not found in Windows SDK"
+            Write-Host "🔍 Attempting to find in alternative locations..."
+            
+            # Try alternative paths
+            $alternativePaths = @(
+              "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe",
+              "C:\Program Files\Windows Kits\10\bin\*\x64\signtool.exe"
+            )
+            
+            foreach ($altPath in $alternativePaths) {
+              $signTool = Get-ChildItem -Path $altPath -ErrorAction SilentlyContinue | Select-Object -First 1
+              if ($signTool) {
+                Write-Host "✅ Found signtool.exe at: $($signTool.FullName)"
+                break
+              }
+            }
+            
+            if (-not $signTool) {
+              Write-Host "❌ Could not find signtool.exe anywhere"
+              exit 1
+            }
+          } else {
+            Write-Host "✅ Found signtool.exe at: $($signTool.FullName)"
+          }
+          
+          # Store the signtool path for use
+          $signToolPath = $signTool.FullName
+          
           # List all files in the bundle directory for debugging
           Write-Host "🔍 Contents of bundle directory:"
           Get-ChildItem -Path $bundlePath -Recurse | Format-Table Name, FullName
@@ -224,7 +260,7 @@ jobs:
           foreach ($msiFile in $msiFiles) {
             Write-Host "🔐 Signing: $($msiFile.FullName)"
             
-            & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe" sign `
+            & "$signToolPath" sign `
               /sm /s My `
               /tr http://timestamp.digicert.com `
               /td sha256 `
@@ -261,6 +297,42 @@ jobs:
           $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
           $bundlePath = "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\nsis"
           
+          # Dynamically find signtool.exe instead of hardcoding the path
+          Write-Host "🔍 Searching for signtool.exe..."
+          $signTool = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -Filter "signtool.exe" -ErrorAction SilentlyContinue |
+                      Where-Object { $_.FullName -match '\\x64\\signtool\.exe$' } |
+                      Sort-Object LastWriteTime -Descending |
+                      Select-Object -First 1
+          
+          if (-not $signTool) {
+            Write-Host "❌ signtool.exe not found in Windows SDK"
+            Write-Host "🔍 Attempting to find in alternative locations..."
+            
+            # Try alternative paths
+            $alternativePaths = @(
+              "C:\Program Files (x86)\Windows Kits\10\bin\*\x64\signtool.exe",
+              "C:\Program Files\Windows Kits\10\bin\*\x64\signtool.exe"
+            )
+            
+            foreach ($altPath in $alternativePaths) {
+              $signTool = Get-ChildItem -Path $altPath -ErrorAction SilentlyContinue | Select-Object -First 1
+              if ($signTool) {
+                Write-Host "✅ Found signtool.exe at: $($signTool.FullName)"
+                break
+              }
+            }
+            
+            if (-not $signTool) {
+              Write-Host "❌ Could not find signtool.exe anywhere"
+              exit 1
+            }
+          } else {
+            Write-Host "✅ Found signtool.exe at: $($signTool.FullName)"
+          }
+          
+          # Store the signtool path for use
+          $signToolPath = $signTool.FullName
+          
           # Find all EXE files in NSIS bundle
           $exeFiles = Get-ChildItem -Path $bundlePath -Filter "*.exe"
           
@@ -273,7 +345,7 @@ jobs:
           foreach ($exeFile in $exeFiles) {
             Write-Host "🔐 Signing: $($exeFile.FullName)"
             
-            & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe" sign `
+            & "$signToolPath" sign `
               /sm /s My `
               /tr http://timestamp.digicert.com `
               /td sha256 `
