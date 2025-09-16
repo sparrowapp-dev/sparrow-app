@@ -155,12 +155,6 @@
     return storedAgent || multipleAgentData[0]?.id;
   })();
 
-  // //functions for handling the upgrade modal
-  // const handleRedirectToAdmin = async () => {
-  //   planBannerisOpen.set(false);
-  //   isUpgradePlanModelOpen = false;
-  // };
-
   const createSetFromArray = (arr, key) => {
     const seen = new Set();
     return arr.filter((obj) => {
@@ -567,21 +561,6 @@
         </div>
       </Tooltip>
     {/if}
-    <!-- <div>
-      {#if isGuestUser}
-        {#if $policyConfig.enableLogin}
-          <Button
-            type="secondary"
-            title="Sign in For Better Experience"
-            size="small"
-            onClick={onLoginUser}
-            customWidth={"100%"}
-            backgroundColor="var(--bg-ds-surface-300)"
-            textColor="var(--text-ds-neutral-50)"
-          />
-        {/if}
-      {/if}
-    </div> -->
 
     <div>
       <SearchBar
