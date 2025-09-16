@@ -745,7 +745,7 @@
                       {userRole}
                     />
                     <div style="flex:1; overflow:auto;" class="p-0">
-                      {#if $requestTabTestDemo && $tab.property?.request?.tests?.testCaseMode === "no-code" && $tab.property?.request?.state?.requestNavigation === "Tests"}
+                      {#if $requestTabTestDemo && $tab.property?.request?.tests?.testCaseMode === "no-code"}
                         <RequestTests
                           tests={{
                             testCaseMode: "no-code",
@@ -767,7 +767,7 @@
                           responseBody={""}
                           responseHeader={[]}
                         />
-                      {:else if $requestTabTestScriptDemo && $tab.property?.request?.tests?.testCaseMode === "script" && $tab.property?.request?.state?.requestNavigation === "Tests"}
+                      {:else if $requestTabTestScriptDemo && $tab.property?.request?.tests?.testCaseMode === "script"}
                         <RequestTests
                           tests={{
                             testCaseMode: "script",
@@ -1106,7 +1106,7 @@
                             />
                           </div>
                         {/if}
-                        {#if $tab.property?.request?.tests?.testCaseMode === "no-code" && $tab?.property?.request?.isRequestTestsNoCodeDemoCompleted}
+                        {#if $tab.property?.request?.tests?.testCaseMode === "no-code" && $tab?.property?.request?.isRequestTestsNoCodeDemoCompleted && $tab.property?.request?.state?.requestNavigation === "Tests"}
                           <div
                             style="position:absolute; bottom:0px; right:{!$tab
                               ?.property?.request?.state?.isChatbotActive
@@ -1133,7 +1133,7 @@
                             />
                           </div>
                         {/if}
-                        {#if $tab.property?.request?.tests?.testCaseMode === "script" && $tab?.property?.request?.isRequestTestsScriptDemoCompleted}
+                        {#if $tab.property?.request?.tests?.testCaseMode === "script" && $tab?.property?.request?.isRequestTestsScriptDemoCompleted && $tab.property?.request?.state?.requestNavigation === "Tests"}
                           <div
                             style="position:absolute; bottom:0px; right:{!$tab
                               ?.property?.request?.state?.isChatbotActive
