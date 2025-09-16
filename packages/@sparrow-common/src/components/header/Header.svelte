@@ -43,7 +43,6 @@
   export let environments;
   export let onMarketingRedirect = () => {};
   export let currentWorkspacePlan = "";
-  export let onUpgradeClick = () => {};
   export let isUpgradePlanModelOpen = false;
 
   const handleUpgradeClick = () => {
