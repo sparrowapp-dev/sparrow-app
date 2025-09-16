@@ -54,12 +54,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Windows SDK
+      - name: Verify preinstalled Windows SDK tools
+        shell: pwsh
         run: |
-          # Download and install a specific Windows SDK version
-          Invoke-WebRequest -Uri https://go.microsoft.com/fwlink/?linkid=2196241 -OutFile $env:TEMP\winsdksetup.exe
-          Start-Process -FilePath $env:TEMP\winsdksetup.exe -ArgumentList "/quiet", "/norestart" -Wait
-        shell: powershell
+          Write-Host "🔎 Looking for signtool.exe and MakeAppx.exe..."
+          $signtool = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter signtool.exe | Where-Object FullName -Match '\\x64\\signtool\.exe$' | Select-Object -First 1
+          $makeappx = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter MakeAppx.exe | Where-Object FullName -Match '\\x64\\MakeAppx\.exe$' | Select-Object -First 1
+          
+          if (-not $signtool) { throw "❌ signtool.exe not found!" }
+          if (-not $makeappx) { throw "❌ MakeAppx.exe not found!" }
+          
+          Write-Host "✅ signtool.exe found at $($signtool.FullName)"
+          Write-Host "✅ MakeAppx.exe found at $($makeappx.FullName)"
+
+          # Export paths for later steps
+          "SIGNTOOL_PATH=$($signtool.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Encoding ascii
+          "MAKEAPPX_PATH=$($makeappx.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Encoding ascii
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
@@ -227,7 +237,7 @@ jobs:
           foreach ($msiFile in $msiFiles) {
             Write-Host "🔐 Signing: $($msiFile.FullName)"
             
-            & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe" sign `
+            & "$env:SIGNTOOL_PATH" sign `
               /sm /s My `
               /tr http://timestamp.digicert.com `
               /td sha256 `
@@ -276,7 +286,7 @@ jobs:
           foreach ($exeFile in $exeFiles) {
             Write-Host "🔐 Signing: $($exeFile.FullName)"
             
-            & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\signtool.exe" sign `
+            & "$env:SIGNTOOL_PATH" sign `
               /sm /s My `
               /tr http://timestamp.digicert.com `
               /td sha256 `
@@ -411,18 +421,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path "msix-output"
           $msixPath = "C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix"
 
-          $makeAppx = Get-ChildItem -Path 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter MakeAppx.exe -ErrorAction SilentlyContinue |
-                      Where-Object { $_.FullName -match '\\x64\\MakeAppx\.exe$' } |
-                      Sort-Object LastWriteTime -Descending |
-                      Select-Object -First 1
-
-          if (-not $makeAppx) {
-            Write-Host "::error::MakeAppx.exe not found. Please ensure Windows 10 SDK is available on this runner."
-            exit 1
-          }
-
-          Write-Host "✅ Found MakeAppx.exe at: $($makeAppx.FullName)"
-          & "$($makeAppx.FullName)" pack /d "app-root" /p $msixPath
+          & "$env:MAKEAPPX_PATH" pack /d "app-root" /p $msixPath
         shell: powershell
 
       # --- STAGE 5: SIGN AND VERIFY MSIX ---
@@ -432,19 +431,12 @@ jobs:
           # 1. Sync certificate into Windows store
           smctl windows certsync --keypair-alias="$env:KEYPAIR_ALIAS"
 
-          # Find SignTool
-          $signTool = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter signtool.exe |
-                      Where-Object FullName -Match '\\x64\\signtool\.exe$' |
-                      Sort-Object LastWriteTime -Descending |
-                      Select-Object -First 1 -ExpandProperty FullName
-          Write-Host "Using SignTool at: $signTool"
-
-          # 3. Sign all MSIX packages
+          # 2. Sign all MSIX packages
           $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
           Get-ChildItem -Path "C:\a\sparrow-app\sparrow-app\msix-output" -Filter "*.msix" | ForEach-Object {
             Write-Host "🔐 Signing: $($_.FullName)"
             
-            & "$signTool" sign /v /debug /sm /sha1 $certThumb /td SHA256 /fd sha256 /tr http://timestamp.digicert.com "$($_.FullName)"
+            & "$env:SIGNTOOL_PATH" sign /v /debug /sm /sha1 $certThumb /td SHA256 /fd sha256 /tr http://timestamp.digicert.com "$($_.FullName)"
             
             if ($LASTEXITCODE -ne 0) {
               Write-Host "❌ Failed to sign $($_.Name)"
