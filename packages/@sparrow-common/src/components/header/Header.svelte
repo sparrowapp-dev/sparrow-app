@@ -14,6 +14,9 @@
     GlobeRegular,
     LockClosedRegular,
     Globle,
+    Crown,
+    Premium,
+    StarNew,
   } from "@sparrow/library/icons";
   import { getCurrentWindow } from "@tauri-apps/api/window";
   import { environmentType, WorkspaceType } from "@sparrow/common/enums";
@@ -362,9 +365,6 @@
   import WindowAction from "./window-action/WindowAction.svelte";
   import SearchBar from "../SearchBar/SearchBar.svelte";
   import { Platform } from "@sparrow/common/enums";
-  import Crown from "../../../../@sparrow-library/src/icons/Crown.svelte";
-  import Premium from "../../../../@sparrow-library/src/icons/Premium.svelte";
-  import StarNew from "../../../../@sparrow-library/src/icons/StarNew.svelte";
 
   let sidebarModalItem: UserProfileObj = {
     heading: "Profile",
