@@ -39,7 +39,6 @@
     {requestState}
     {updateBeautifiedState}
   />
-
   {#if isMergeViewLoading}
     <div
       class=""

@@ -32,3 +32,8 @@ export interface GenerateMockDataRequestDto {
     lang: RequestDataTypeEnum;
   };
 }
+
+export interface fixTestScriptRequestDto {
+  testScript:string,
+  teamId: string;
+}
