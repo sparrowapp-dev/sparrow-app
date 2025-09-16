@@ -858,25 +858,6 @@
     {/if}
   </div>
 </header>
-
-<!-- Add the Modal here in the Header component -->
-<Modal
-  title={"Time to Unlock More Features"}
-  type={"dark"}
-  width={"35%"}
-  zIndex={1000}
-  isOpen={isUpgradePlanModelOpen}
-  handleModalState={(flag) => {
-    isUpgradePlanModelOpen = flag;
-    planBannerisOpen.set(false);
-  }}
->
-  <UpgradePlanPopUp
-    bind:isUpgradePlanModelOpen
-    handleSubmit={handleRedirectToAdmin}
-  />
-</Modal>
-
 <style>
   .main-container {
     min-height: 28px;
