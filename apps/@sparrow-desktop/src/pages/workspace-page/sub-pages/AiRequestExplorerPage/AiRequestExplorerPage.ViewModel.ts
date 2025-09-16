@@ -73,7 +73,6 @@ import {
   AiModelProviderEnum,
   OpenAIModelEnum,
   type modelsConfigType,
- 
   type PromptFileAttachment,
   AiRequestAuthTypeBaseEnum,
 } from "@sparrow/common/types/workspace/ai-request-base";
@@ -108,7 +107,10 @@ import type {
   AiRequestCollectionLevelAuthProfileTabInterface,
   AiRequestCollectionLevelAuthTabInterface,
 } from "@sparrow/common/types/workspace/ai-request-base";
-import type { ENVDocumentType, ENVExtractVariableType } from "@sparrow/common/types/workspace/environment";
+import type {
+  ENVDocumentType,
+  ENVExtractVariableType,
+} from "@sparrow/common/types/workspace/environment";
 
 class AiRequestExplorerViewModel {
   // Repository
@@ -448,7 +450,7 @@ class AiRequestExplorerViewModel {
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
-        persistence: TabPersistenceTypeEnum.PERMANENT
+        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = false;
       progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
@@ -472,10 +474,12 @@ class AiRequestExplorerViewModel {
 
     const componentData = this._tab.getValue();
     const provider = componentData.property.aiRequest.aiModelProvider;
-    const providerAuthKey = (await this.decodeAiRequestAuth(
-      componentData.property.aiRequest,
-      this._collectionAuthProfile.getValue(),
-    ))?.apiKey.authValue;
+    const providerAuthKey = (
+      await this.decodeAiRequestAuth(
+        componentData.property.aiRequest,
+        this._collectionAuthProfile.getValue(),
+      )
+    )?.apiKey.authValue;
 
     if (!providerAuthKey || !provider) {
       console.error(
@@ -511,13 +515,15 @@ class AiRequestExplorerViewModel {
    * Get list of conversations based on specific apikey
    * @returns :Observable<CollectionDocument[]> - the list of collection from current active workspace
    */
-  public getConversationsList = async() => {
+  public getConversationsList = async () => {
     const componentData = this._tab.getValue();
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
-    const providerAuthKey = (await this.decodeAiRequestAuth(
-      componentData.property.aiRequest,
-      this._collectionAuthProfile.getValue(),
-    ))?.apiKey.authValue;
+    const providerAuthKey = (
+      await this.decodeAiRequestAuth(
+        componentData.property.aiRequest,
+        this._collectionAuthProfile.getValue(),
+      )
+    )?.apiKey.authValue;
 
     if (!provider || !providerAuthKey) {
       console.error(
@@ -561,17 +567,18 @@ class AiRequestExplorerViewModel {
     const conversations =
       componentData?.property?.aiRequest?.ai?.conversations || [];
     const configurations =
-    componentData?.property?.aiRequest?.configurations || {};
-    const systemPrompt =
-    componentData?.property?.aiRequest?.systemPrompt || "";
+      componentData?.property?.aiRequest?.configurations || {};
+    const systemPrompt = componentData?.property?.aiRequest?.systemPrompt || "";
     const conversationId =
       componentData?.property?.aiRequest?.ai?.conversationId;
     const conversationTitle =
       componentData?.property?.aiRequest?.ai?.conversationTitle;
-    const providerAuthKey = (await this.decodeAiRequestAuth(
-      componentData.property.aiRequest,
-      this._collectionAuthProfile.getValue(),
-    ))?.apiKey.authValue;
+    const providerAuthKey = (
+      await this.decodeAiRequestAuth(
+        componentData.property.aiRequest,
+        this._collectionAuthProfile.getValue(),
+      )
+    )?.apiKey.authValue;
 
     // if (!conversations.length || !provider || !providerAuthKey) {
     if (!provider || !providerAuthKey) {
@@ -597,7 +604,7 @@ class AiRequestExplorerViewModel {
         date: this.getLocalDate(),
         time: this.getFormattedTime(),
         conversation: conversations,
-        configurations:  configurations ,
+        configurations: configurations,
         systemPrompt: systemPrompt,
         authoredBy: isGuestUser ? "Guest User" : user.name,
         updatedBy: isGuestUser
@@ -614,7 +621,7 @@ class AiRequestExplorerViewModel {
           provider,
           apiKey: providerAuthKey,
           data: {
-            ...commonFields,        
+            ...commonFields,
             createdBy: isGuestUser
               ? "Guest User"
               : {
@@ -739,10 +746,12 @@ class AiRequestExplorerViewModel {
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const currTabConversationId =
       componentData?.property?.aiRequest?.ai?.conversationId;
-    const providerAuthKey = (await this.decodeAiRequestAuth(
-      componentData.property.aiRequest,
-      this._collectionAuthProfile.getValue(),
-    ))?.apiKey.authValue;
+    const providerAuthKey = (
+      await this.decodeAiRequestAuth(
+        componentData.property.aiRequest,
+        this._collectionAuthProfile.getValue(),
+      )
+    )?.apiKey.authValue;
 
     if (!provider || !providerAuthKey) {
       console.error("Missing provider, conversations, or authKey.");
@@ -801,10 +810,12 @@ class AiRequestExplorerViewModel {
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const currTabConversationId =
       componentData?.property?.aiRequest?.ai?.conversationId;
-    const providerAuthKey = (await this.decodeAiRequestAuth(
-      componentData.property.aiRequest,
-      this._collectionAuthProfile.getValue(),
-    ))?.apiKey.authValue;
+    const providerAuthKey = (
+      await this.decodeAiRequestAuth(
+        componentData.property.aiRequest,
+        this._collectionAuthProfile.getValue(),
+      )
+    )?.apiKey.authValue;
 
     if (!conversationId || !provider || !providerAuthKey) {
       console.error("Missing provider or authKey.");
@@ -848,10 +859,12 @@ class AiRequestExplorerViewModel {
     const componentData = this._tab.getValue();
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const providerModel = componentData?.property?.aiRequest?.aiModelVariant;
-    const providerAuthKey = (await this.decodeAiRequestAuth(
-      componentData.property.aiRequest,
-      this._collectionAuthProfile.getValue(),
-    ))?.apiKey.authValue;
+    const providerAuthKey = (
+      await this.decodeAiRequestAuth(
+        componentData.property.aiRequest,
+        this._collectionAuthProfile.getValue(),
+      )
+    )?.apiKey.authValue;
 
     // Don't allow file uploads when auth key is not present.
     if (!provider || !providerAuthKey) {
@@ -2168,18 +2181,18 @@ class AiRequestExplorerViewModel {
     _conversationTitle: string,
     _conversations: Conversation[],
     _configurations = null,
-    _systemPrompt = null
+    _systemPrompt = null,
   ) => {
     this.updateRequestState({ isChatbotConversationLoading: true });
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.aiRequest.ai.conversationId = _conversationId;
     progressiveTab.property.aiRequest.ai.conversationTitle = _conversationTitle;
     progressiveTab.property.aiRequest.ai.conversations = _conversations;
-    if(_configurations){
+    if (_configurations) {
       progressiveTab.property.aiRequest.configurations = _configurations;
     }
-    if(_systemPrompt !== null){
-      progressiveTab.property.aiRequest.systemPrompt = _systemPrompt;   
+    if (_systemPrompt !== null) {
+      progressiveTab.property.aiRequest.systemPrompt = _systemPrompt;
     }
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
@@ -2365,7 +2378,7 @@ class AiRequestExplorerViewModel {
     // this.compareRequestWithServer();
   };
 
-  private decodeAiRequestAuth = async(
+  private decodeAiRequestAuth = async (
     aiRequest: AiRequestType,
     _collectionLevelAuth: Partial<AiRequestCollectionLevelAuthProfileTabInterface>,
   ): Auth | CollectionAuthBaseInterface => {
@@ -2402,9 +2415,14 @@ class AiRequestExplorerViewModel {
       }
     } else {
       const componentData = this._tab.getValue();
-      const environments =  await this.getActiveEnvironments(componentData?.path?.workspaceId);
+      const environments = await this.getActiveEnvironments(
+        componentData?.path?.workspaceId,
+      );
       const token = aiRequest.auth.apiKey.authValue;
-      const decryptToken = this.setEnvironmentVariables(token, environments.filtered)
+      const decryptToken = this.setEnvironmentVariables(
+        token,
+        environments.filtered,
+      );
       auth = createDeepCopy(aiRequest.auth);
       auth.apiKey.authValue = decryptToken;
     }
@@ -2421,14 +2439,18 @@ class AiRequestExplorerViewModel {
   ) => {
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
-    const environments = await this.getActiveEnvironments(componentData?.path?.workspaceId);
+    const environments = await this.getActiveEnvironments(
+      componentData?.path?.workspaceId,
+    );
     const tabId = componentData.tabId;
     const modelProvider = componentData.property.aiRequest.aiModelProvider;
     const modelVariant = componentData.property.aiRequest.aiModelVariant;
-    const authKey = (await this.decodeAiRequestAuth(
-      componentData.property.aiRequest,
-      this._collectionAuthProfile.getValue(),
-    ))?.apiKey;
+    const authKey = (
+      await this.decodeAiRequestAuth(
+        componentData.property.aiRequest,
+        this._collectionAuthProfile.getValue(),
+      )
+    )?.apiKey;
     const systemPrompt = componentData.property.aiRequest.systemPrompt;
     const currConfigurations = componentData.property.aiRequest.configurations;
     const isChatAutoClearActive =
@@ -2440,19 +2462,30 @@ class AiRequestExplorerViewModel {
       : false;
 
     let prompt = this.setEnvironmentVariables(_prompt, environments.filtered);
-    
+
     let finalSP = null;
     if (systemPrompt.length) {
-       finalSP = this.setEnvironmentVariables(systemPrompt, environments.filtered);
+      finalSP = this.setEnvironmentVariables(
+        systemPrompt,
+        environments.filtered,
+      );
       // const SPDatas = JSON.parse(systemPromptWithVariables);
       // if (SPDatas.length)
       //   finalSP = SPDatas.map((obj) => obj.data.text).join("");
     }
 
-    let stringifiedConversation = JSON.stringify(componentData?.property?.aiRequest?.ai?.conversations || []);
-    let decryptedConversationString = this.setEnvironmentVariables(stringifiedConversation, environments.filtered);
+    let stringifiedConversation = JSON.stringify(
+      componentData?.property?.aiRequest?.ai?.conversations || [],
+    );
+    let decryptedConversationString = this.setEnvironmentVariables(
+      stringifiedConversation,
+      environments.filtered,
+    );
     let decryptedConversationObject = JSON.parse(decryptedConversationString);
-    let decryptedAuth =  this.setEnvironmentVariables(authKey.authValue || "", environments.filtered);
+    let decryptedAuth = this.setEnvironmentVariables(
+      authKey.authValue || "",
+      environments.filtered,
+    );
 
     if (isJsonFormatEnabed) prompt = `${prompt} (Give Response In JSON Format)`;
     const userInputConvo = this.aiAssistentWebSocketService.prepareConversation(
@@ -2814,70 +2847,70 @@ class AiRequestExplorerViewModel {
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
 
-    private getActiveEnvironments = async (currentWorkspaceId: string) => {
-      let environmentId: string;
-      const activeWorkspace =
-        await this.workspaceRepository.getActiveWorkspaceDoc();
-  
-      if (activeWorkspace) {
-        currentWorkspaceId = activeWorkspace.get("_id");
-        environmentId = activeWorkspace.get("environmentId");
+  private getActiveEnvironments = async (currentWorkspaceId: string) => {
+    let environmentId: string;
+    const activeWorkspace =
+      await this.workspaceRepository.getActiveWorkspaceDoc();
+
+    if (activeWorkspace) {
+      currentWorkspaceId = activeWorkspace.get("_id");
+      environmentId = activeWorkspace.get("environmentId");
+    }
+
+    const environments = await this.environmentRepository.getEnvironment();
+    let environmentDocuments: EnvironmentDocument[] = [];
+
+    environments.subscribe((value) => {
+      if (value) {
+        environmentDocuments = value;
       }
-  
-      const environments = await this.environmentRepository.getEnvironment();
-      let environmentDocuments: EnvironmentDocument[] = [];
-  
-      environments.subscribe((value) => {
-        if (value) {
-          environmentDocuments = value;
-        }
-      });
-  
-      let environmentVariables: {
-        filtered: ENVExtractVariableType[];
-      } = {
-        filtered: [],
-      };
-  
-      if (environmentDocuments && currentWorkspaceId) {
-        if (environmentDocuments?.length > 0) {
-          const filteredEnv = environmentDocuments
-            .filter((elem) => {
-              return elem.workspaceId === currentWorkspaceId;
-            })
-            .filter((elem) => {
-              if (
-                elem.type === environmentType.GLOBAL ||
-                elem.id === environmentId
-              ) {
-                return true;
+    });
+
+    let environmentVariables: {
+      filtered: ENVExtractVariableType[];
+    } = {
+      filtered: [],
+    };
+
+    if (environmentDocuments && currentWorkspaceId) {
+      if (environmentDocuments?.length > 0) {
+        const filteredEnv = environmentDocuments
+          .filter((elem) => {
+            return elem.workspaceId === currentWorkspaceId;
+          })
+          .filter((elem) => {
+            if (
+              elem.type === environmentType.GLOBAL ||
+              elem.id === environmentId
+            ) {
+              return true;
+            }
+          });
+        if (filteredEnv?.length > 0) {
+          const envs: ENVExtractVariableType[] = [];
+          filteredEnv.forEach((elem) => {
+            environmentVariables = {
+              filtered: [],
+            };
+
+            const temp = elem.toMutableJSON() as ENVDocumentType;
+            temp.variable.forEach((variable) => {
+              if (variable.key && variable.checked) {
+                envs.unshift({
+                  key: variable.key,
+                  value: variable.value,
+                  type: temp.type === environmentType.GLOBAL ? "G" : "E",
+                  environment: temp.name,
+                });
               }
             });
-          if (filteredEnv?.length > 0) {
-            const envs: ENVExtractVariableType[] = [];
-            filteredEnv.forEach((elem) => {
-              environmentVariables = {
-                filtered: [],
-              };
-  
-              const temp = elem.toMutableJSON() as ENVDocumentType;
-              temp.variable.forEach((variable) => {
-                if (variable.key && variable.checked) {
-                  envs.unshift({
-                    key: variable.key,
-                    value: variable.value,
-                    type: temp.type === environmentType.GLOBAL ? "G" : "E",
-                    environment: temp.name,
-                  });
-                }
-              });
-              environmentVariables.filtered = envs;
-            });
-          }
+            environmentVariables.filtered = envs;
+          });
         }
       }
-      return environmentVariables;
-    };
+    }
+    return environmentVariables;
+  };
 
   public generateAiPrompt = async (
     target: "UserPrompt" | "SystemPrompt",
@@ -2891,7 +2924,7 @@ class AiRequestExplorerViewModel {
   }> => {
     const componentData = this._tab.getValue();
     let workspaceId = componentData.path.workspaceId;
-    const environments = await this.getActiveEnvironments(workspaceId)
+    const environments = await this.getActiveEnvironments(workspaceId);
     const prompt = this.setEnvironmentVariables(_prompt, environments.filtered);
     let workspaceVal = await this.readWorkspace(workspaceId);
     let teamId = workspaceVal.team?.teamId;

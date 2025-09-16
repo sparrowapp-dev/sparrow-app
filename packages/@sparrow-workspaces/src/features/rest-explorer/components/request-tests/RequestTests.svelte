@@ -2,6 +2,7 @@
   import { TestCaseModeEnum } from "@sparrow/common/types/workspace";
   import { NoCode } from "./sub-components";
   import { Tooltip } from "@sparrow/library/ui";
+  import Script from "./sub-components/script/Script.svelte";
 
   export let tests;
   export let onTestsChange;
@@ -11,7 +12,11 @@
   export let responseHeader;
 </script>
 
-<div class="d-flex flex-column w-100 h-100" style="position: relative;" id="request-tab-test">
+<div
+  class="d-flex flex-column w-100 h-100"
+  style="position: relative;"
+  id="request-tab-test"
+>
   <!-- <div class="pb-2" style="font-size: 12px; font-weight:500;">TESTS</div> -->
   <div
     class="d-flex flex-column align-items-center justify-content-between w-100"
@@ -28,31 +33,39 @@
           <!-- <div class="background-slider" style={sliderStyle}></div> -->
           <span
             role="button"
-            on:click={() => {
-              //   onTestsChange();
-            }}
             class="rounded text-fs-12 border-radius-2 px-2 py-1 btn-formatter"
-            style="position: relative; z-index: 2; background-color: var(--bg-ds-surface-400)"
+            style="position: relative; z-index: 2; background-color: {tests?.testCaseMode ===
+            TestCaseModeEnum.NO_CODE
+              ? 'var(--bg-ds-surface-400)'
+              : 'transparent'}"
             id="request-tab-nocode"
+            on:click={() => {
+              onTestsChange({
+                ...tests,
+                testCaseMode: TestCaseModeEnum.NO_CODE,
+              });
+            }}
           >
             No Code
           </span>
 
-          <Tooltip
-            title={"This feature will be available soon."}
-            placement="top-center"
+          <span
+            role="button"
+            on:click={() => {
+              onTestsChange({
+                ...tests,
+                testCaseMode: TestCaseModeEnum.SCRIPT,
+              });
+            }}
+            id="request-tab-test-script"
+            class="rounded px-2 text-fs-12 py-1 btn-formatter"
+            style="position: relative; z-index: 2;  background-color: {tests?.testCaseMode ===
+            TestCaseModeEnum.SCRIPT
+              ? 'var(--bg-ds-surface-400)'
+              : 'transparent'}"
           >
-            <span
-              role="button"
-              on:click={() => {
-                //   onTestsChange();
-              }}
-              class="rounded px-2 text-fs-12 py-1 btn-formatter"
-              style="position: relative; z-index: 2; opacity:.5;"
-            >
-              Script Mode
-            </span>
-          </Tooltip>
+            Script Mode
+          </span>
         </div>
       </div>
     </div>
@@ -61,7 +74,7 @@
   <div class="border rounded-top">
     {#if tests?.testCaseMode === TestCaseModeEnum.SCRIPT}
       <div class="px-3 py-2">
-        <p class="text-fs-12 mb-0 text-muted">JavaScript</p>
+        <p class="text-fs-12 mb-0 text-muted">JavaScript Code</p>
       </div>
     {:else if tests?.testCaseMode === TestCaseModeEnum.NO_CODE}
       <div class="px-3 py-2">
@@ -71,7 +84,7 @@
   </div>
   <div style="flex:1; overflow:auto;">
     {#if tests?.testCaseMode === TestCaseModeEnum.SCRIPT}
-      <div class="d-flex align-items-center gap-2">SCRIPT</div>
+      <Script {tabSplitDirection} {tests} {onTestsChange} />
     {:else if tests?.testCaseMode === TestCaseModeEnum.NO_CODE}
       <NoCode
         {tests}

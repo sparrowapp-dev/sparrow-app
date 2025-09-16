@@ -268,6 +268,7 @@
   azureBlobCDN={constants.AZURE_CDN_URL}
   onSaveResponse={_viewModel.saveResponse}
   onStopGeneratingAIResponse={_viewModel.stopGeneratingAIResponse}
+  onFixTestScript={_viewModel.fixTestScript}
   onGenerateAiResponse={_viewModel.generateAIResponseWS}
   onToggleLike={_viewModel.toggleChatMessageLike}
   onUpdateAiModel={_viewModel.updateAIModel}
@@ -277,4 +278,6 @@
   InsertGenerateTrialFlow={_viewModel.InsertGenerateTrialFlow}
   isCloseRequestTestDemo={_viewModel.updateIsRequestTabDemo}
   requestTabTestsDemoCompleted={_viewModel.handleRequestTestNoCodeDemoCompleted}
+  isCloseRequestTestScriptDemo={_viewModel.updateIsRequestTabScriptDemo}
+  requestTabTestScriptDemoCompleted={_viewModel.handleRequestTestScriptDemoCompleted}
 />

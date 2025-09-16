@@ -6,6 +6,7 @@
   import { Button } from "@sparrow/library/ui";
   import { fly } from "svelte/transition";
   import { requestTabTestDemo } from "../../../../stores";
+  import { requestTabTestScriptDemo } from "../../../../stores";
   import ResponseNavigator from "../response-navigator/ResponseNavigator.svelte";
 
   export let isMainScreen = false;
@@ -92,7 +93,7 @@
     : ''} response-default h-100 d-flex flex-column"
 >
   <!-- ResponseNavigator positioned at top-left when requestTabTestDemo is true -->
-  {#if $requestTabTestDemo}
+  {#if $requestTabTestDemo || $requestTabTestScriptDemo}
     <div class="d-flex justify-content-start">
       <ResponseNavigator
         requestStateSection={"TESTRESULT"}
