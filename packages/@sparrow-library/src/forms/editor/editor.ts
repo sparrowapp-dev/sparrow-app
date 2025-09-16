@@ -137,6 +137,7 @@ const customJsCompletions = (context: CompletionContext) => {
         { label: "text", type: "function", info: "Get response body as text", apply: "text()" },
         { label: "json", type: "function", info: "Get response body as JSON", apply: "json()" },
       ],
+      validFor: /^\w*$/,
     };
   }
 
@@ -150,9 +151,11 @@ const customJsCompletions = (context: CompletionContext) => {
         { label: "size", type: "variable", info: "Response size in KB" },
         { label: "time", type: "variable", info: "Response time in ms" },
       ],
+      validFor: /^\w*$/,
     };
   }
 
+  // Always show completions for 'sp.' and similar triggers, even if a word is present
   if (spDotMatch) {
     return {
       from: context.pos,
@@ -180,6 +183,7 @@ const customJsCompletions = (context: CompletionContext) => {
 });`
         },
       ],
+      validFor: /^\w*$/,
     };
   }
 
@@ -189,6 +193,7 @@ const customJsCompletions = (context: CompletionContext) => {
       options: [
         { label: "to", type: "variable", info: "Matcher object for assertions" },
       ],
+      validFor: /^\w*$/,
     };
   }
 
@@ -207,6 +212,7 @@ const customJsCompletions = (context: CompletionContext) => {
         { label: "notBeInList", type: "function", info: "Assert actual is not in list", apply: "notBeInList();" },
         { label: "have", type: "variable", info: "Object key matchers" },
       ],
+      validFor: /^\w*$/,
     };
   }
 
@@ -223,6 +229,7 @@ const customJsCompletions = (context: CompletionContext) => {
         { label: "empty", type: "function", info: "Assert actual does not contain expected", apply: "empty();" },
         { label: "notEmpty", type: "function", info: "Assert actual is in list", apply: "notEmpty();" },
       ],
+      validFor: /^\w*$/,
     };
   }
    if (expectToHaveDotMatch) {
@@ -231,6 +238,7 @@ const customJsCompletions = (context: CompletionContext) => {
       options: [
         { label: "all", type: "variable", info: "Assert actual equals expected", },
       ],
+      validFor: /^\w*$/,
     };
   }
 
@@ -240,21 +248,7 @@ const customJsCompletions = (context: CompletionContext) => {
       options: [
         { label: "keys", type: "function", info: "Assert actual is in list", apply: "keys();" },
       ],
-    };
-  }
-
-  // Always show completions if typing a word or explicitly triggered
-  if (!word && !context.explicit) {
-    return {
-      from: context.pos,
-      options: [
-        { label: "sp", type: "variable", info: "Sparrow testcase object 'sp'" },
-        { label: "log", type: "function", info: "Log output" },
-        { label: "document", type: "variable", info: "Document object" },
-        { label: "window", type: "variable", info: "Window object" },
-        { label: "setTimeout", type: "function", info: "Set a timer" },
-        { label: "setInterval", type: "function", info: "Set interval timer" },
-      ],
+      validFor: /^\w*$/,
     };
   }
 
@@ -268,6 +262,7 @@ const customJsCompletions = (context: CompletionContext) => {
       { label: "setTimeout", type: "function", info: "Set a timer" },
       { label: "setInterval", type: "function", info: "Set interval timer" },
     ],
+    validFor: /^\w*$/,
   };
 }
 
