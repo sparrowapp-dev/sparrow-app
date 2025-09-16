@@ -59,6 +59,7 @@
                 testCaseMode: TestCaseModeEnum.SCRIPT,
               });
             }}
+            id="request-tab-test-script"
             class="rounded px-2 text-fs-12 py-1 btn-formatter"
             style="position: relative; z-index: 2;  background-color: {tests?.testCaseMode ===
             TestCaseModeEnum.SCRIPT

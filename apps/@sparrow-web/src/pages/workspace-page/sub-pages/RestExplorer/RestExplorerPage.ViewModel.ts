@@ -7,6 +7,7 @@ import {
   ReduceAuthParameter,
 } from "@sparrow/workspaces/features/rest-explorer/utils";
 import { createDeepCopy, scrollToTab } from "@sparrow/common/utils";
+import { XMLParser, XMLBuilder } from "fast-xml-parser";
 import {
   startLoading,
   stopLoading,
@@ -218,6 +219,9 @@ class RestExplorerViewModel {
           );
           await this.updateIsRequestTabDemo(
             collectionDoc?.isRequestTestsNoCodeDemoCompleted,
+          );
+          await this.updateIsRequestTabScriptDemo(
+            collectionDoc?.isRequestTestsScriptDemoCompleted,
           );
         }
 
@@ -2186,6 +2190,11 @@ class RestExplorerViewModel {
             } catch (err: any) {
               tests.push({ name, passed: false, error: err.message });
             }
+          },
+          xmlToJSON: (xml: string) => {
+            const parser = new XMLParser();
+            const json = parser.parse(xml);
+            return json;
           },
           expect,
         };
@@ -4435,6 +4444,12 @@ class RestExplorerViewModel {
     this.tab = progressiveTab;
   };
 
+  public updateIsRequestTabScriptDemo = async (value: boolean) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.isRequestTestsScriptDemoCompleted = value;
+    this.tab = progressiveTab;
+  };
+
   private onOpenGlobalEnvironmentToGenerate = async (
     environment: any,
     collectionId: string,
@@ -4908,6 +4923,15 @@ class RestExplorerViewModel {
       notifications.error("AI Limit has Reached.please upgrade plan.");
     } else {
       notifications.error("Failed to fix test script.");
+    }
+  };
+
+  public handleRequestTestScriptDemoCompleted = async () => {
+    const response =
+      await this.userService.requestTabScriptTestsDemoCompleted();
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (response.isSuccessful) {
+      await this.fetchCollections(progressiveTab?.path?.workspaceId);
     }
   };
 }

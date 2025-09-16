@@ -24,6 +24,7 @@ import type {
   TabDocument,
   WorkspaceDocument,
 } from "../../../../database/database";
+import { XMLParser, XMLBuilder } from "fast-xml-parser";
 
 // ---- Repo
 import { TabRepository } from "../../../../repositories/tab.repository";
@@ -219,6 +220,9 @@ class RestExplorerViewModel {
           );
           await this.updateIsRequestTabDemo(
             collectionDoc?.isRequestTestsNoCodeDemoCompleted,
+          );
+          await this.updateIsRequestTabScriptDemo(
+            collectionDoc?.isRequestTestsScriptDemoCompleted,
           );
         }
 
@@ -2172,6 +2176,11 @@ class RestExplorerViewModel {
               tests.push({ name, passed: false, error: err.message });
             }
           },
+          xmlToJSON: (xml: string) => {
+            const parser = new XMLParser();
+            const json = parser.parse(xml);
+            return json;
+          },
           expect,
         };
 
@@ -2374,6 +2383,12 @@ class RestExplorerViewModel {
   public updateIsRequestTabDemo = async (value: boolean) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.isRequestTestsNoCodeDemoCompleted = value;
+    this.tab = progressiveTab;
+  };
+
+  public updateIsRequestTabScriptDemo = async (value: boolean) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.isRequestTestsScriptDemoCompleted = value;
     this.tab = progressiveTab;
   };
 
@@ -4901,6 +4916,15 @@ class RestExplorerViewModel {
       notifications.error("AI Limit has Reached.please upgrade plan.");
     } else {
       notifications.error("Failed to fix test script.");
+    }
+  };
+
+  public handleRequestTestScriptDemoCompleted = async () => {
+    const response =
+      await this.userService.requestTabScriptTestsDemoCompleted();
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (response.isSuccessful) {
+      await this.fetchCollections(progressiveTab?.path?.workspaceId);
     }
   };
 }

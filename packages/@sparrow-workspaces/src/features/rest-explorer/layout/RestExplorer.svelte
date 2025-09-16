@@ -35,7 +35,7 @@
   } from "@sparrow/common/enums";
   import type { Observable } from "rxjs";
   import {
-    RequestNoCodeTourGuide,
+    RequestTabTourGuide,
     SaveAsCollectionItem,
   } from "@sparrow/workspaces/features";
   import type {
@@ -71,6 +71,8 @@
     isChatbotOpenInCurrTab,
     requestTabTestDemo,
     requestTabTestNoCodeStep,
+    requestTabTestScriptDemo,
+    requestTabTestScriptStep,
   } from "../../../stores";
   import { Popover } from "@sparrow/library/ui";
   import { onDestroy, onMount } from "svelte";
@@ -111,13 +113,17 @@
   import RequestTourGuideCard from "../components/request-tour-guide-card/RequestTourGuideCard.svelte";
   import { tick } from "svelte";
   import ResponseTestResults from "../components/response-test-results/ResponseTestResults.svelte";
-  import TourGuideCard from "../../request-no-code-tour-guide/components/TourGuideCard.svelte";
-  import { RequestTabTestsTourContent } from "../../request-no-code-tour-guide/utils";
-  import { requestTabNocodeCardPosition } from "../../request-no-code-tour-guide/utils/requestTabNocodeCardPosition";
+  import TourGuideCard from "../../request-tab-tour-guide/components/TourGuideCard.svelte";
+  import {
+    requestTabScriptCardPosition,
+    RequestTabTestsScriptTourContent,
+    RequestTabTestsTourContent,
+  } from "../../request-tab-tour-guide/utils";
+  import { requestTabNocodeCardPosition } from "../../request-tab-tour-guide/utils";
   import {
     handleCloseTour,
     handleNextStep,
-  } from "../../request-no-code-tour-guide/utils/requestTabCardfunctions";
+  } from "../../request-tab-tour-guide/utils/requestTabCardfunctions";
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
   export let requestAuthHeader: Observable<KeyValue>;
@@ -160,6 +166,8 @@
   export let onToggleLike;
   export let isCloseRequestTestDemo: (value: boolean) => void;
   export let requestTabTestsDemoCompleted: () => void;
+  export let isCloseRequestTestScriptDemo: (value: boolean) => void;
+  export let requestTabTestScriptDemoCompleted: () => void;
 
   // export let isLoginBannerActive = false;
   export let isPopoverContainer = true;
@@ -661,7 +669,7 @@
       />
     </div>
 
-    {#if isPopoverContainer && !$requestTabTestDemo}
+    {#if isPopoverContainer && !($requestTabTestDemo || $requestTabTestScriptDemo)}
       <div class="pt-2"></div>
       <Popover onClose={closeCollectionHelpText} heading={`Welcome to Sparrow`}>
         <p class="mb-0 text-fs-12">
@@ -717,8 +725,10 @@
               >
                 <Pane
                   minSize={30}
-                  size={$tab.property?.request?.state
-                    ?.requestLeftSplitterWidthPercentage}
+                  size={$requestTabTestScriptStep
+                    ? 70
+                    : $tab.property?.request?.state
+                        ?.requestLeftSplitterWidthPercentage}
                   class="position-relative bg-transparent"
                 >
                   <!-- Request Pane -->
@@ -743,9 +753,13 @@
                       bind:isGenerateMockDataModal
                       {isGuestUser}
                       {userRole}
+                      bulkEditHeadersActive={$tab?.property?.request.state
+                        ?.isHeaderBulkEditActive}
+                      bulkEditParamsActive={$tab?.property?.request.state
+                        ?.isParameterBulkEditActive}
                     />
                     <div style="flex:1; overflow:auto;" class="p-0">
-                      {#if $requestTabTestDemo}
+                      {#if $requestTabTestDemo && $tab.property?.request?.tests?.testCaseMode === "no-code"}
                         <RequestTests
                           tests={{
                             testCaseMode: "no-code",
@@ -760,6 +774,28 @@
                               },
                             ],
                             script: "",
+                          }}
+                          onTestsChange={() => {}}
+                          tabSplitDirection={$tabsSplitterDirection}
+                          testResults={[]}
+                          responseBody={""}
+                          responseHeader={[]}
+                        />
+                      {:else if $requestTabTestScriptDemo && $tab.property?.request?.tests?.testCaseMode === "script"}
+                        <RequestTests
+                          tests={{
+                            testCaseMode: "script",
+                            noCode: [
+                              {
+                                id: "Test-1",
+                                name: "Test-1",
+                                condition: "",
+                                expectedResult: "",
+                                testPath: "",
+                                testTarget: "",
+                              },
+                            ],
+                            script: `// What are the tests?\n// Tests are scripts that automatically check your API's response.\n// For example: Is the status code 200? Does the body contain an email field?\n// sp.test("Status code is 200", function () {\n//   sp.expect(sp.response.statusCode).to.equal(200);\n// });\n\n// You can:\n// - Use "Snippets" to insert common tests\n// - Or, write test cases manually using scripting or no code method`,
                           }}
                           onTestsChange={() => {}}
                           tabSplitDirection={$tabsSplitterDirection}
@@ -855,7 +891,7 @@
                       {/if}
                     </div>
                     {#if $requestTabTestDemo && $requestTabTestNoCodeStep === 1}
-                      <RequestNoCodeTourGuide
+                      <RequestTabTourGuide
                         targetId={RequestTabTestsTourContent[0].targetId}
                         isVisible={true}
                         cardPosition={requestTabNocodeCardPosition(1)}
@@ -871,10 +907,10 @@
                           onClose={handleCloseTour}
                           width={352}
                         />
-                      </RequestNoCodeTourGuide>
+                      </RequestTabTourGuide>
                     {/if}
                     {#if $requestTabTestDemo && $requestTabTestNoCodeStep === 4}
-                      <RequestNoCodeTourGuide
+                      <RequestTabTourGuide
                         targetId={RequestTabTestsTourContent[3].targetId}
                         isVisible={true}
                         cardPosition={requestTabNocodeCardPosition(4)}
@@ -890,7 +926,45 @@
                           onClose={handleCloseTour}
                           width={352}
                         />
-                      </RequestNoCodeTourGuide>
+                      </RequestTabTourGuide>
+                    {/if}
+                    {#if $requestTabTestScriptDemo && $requestTabTestScriptStep === 1}
+                      <RequestTabTourGuide
+                        targetId={RequestTabTestsScriptTourContent[0].targetId}
+                        isVisible={true}
+                        cardPosition={requestTabScriptCardPosition(1)}
+                      >
+                        <TourGuideCard
+                          titleName={RequestTabTestsScriptTourContent[0].Title}
+                          descriptionContent={RequestTabTestsScriptTourContent[0]
+                            .description}
+                          cardNumber={1}
+                          totalsCards={RequestTabTestsScriptTourContent.length}
+                          rightButtonName=""
+                          onNext={handleNextStep}
+                          onClose={handleCloseTour}
+                          width={352}
+                        />
+                      </RequestTabTourGuide>
+                    {/if}
+                    {#if $requestTabTestScriptDemo && $requestTabTestScriptStep === 4}
+                      <RequestTabTourGuide
+                        targetId={RequestTabTestsScriptTourContent[3].targetId}
+                        isVisible={true}
+                        cardPosition={requestTabScriptCardPosition(4)}
+                      >
+                        <TourGuideCard
+                          titleName={RequestTabTestsScriptTourContent[3].Title}
+                          descriptionContent={RequestTabTestsScriptTourContent[3]
+                            .description}
+                          cardNumber={4}
+                          totalsCards={RequestTabTestsScriptTourContent.length}
+                          rightButtonName=""
+                          onNext={handleNextStep}
+                          onClose={handleCloseTour}
+                          width={352}
+                        />
+                      </RequestTabTourGuide>
                     {/if}
                   </div>
                 </Pane>
@@ -1048,7 +1122,7 @@
                             />
                           </div>
                         {/if}
-                        {#if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.TESTS && $tab?.property?.request?.isRequestTestsNoCodeDemoCompleted}
+                        {#if $tab.property?.request?.tests?.testCaseMode === "no-code" && $tab?.property?.request?.isRequestTestsNoCodeDemoCompleted}
                           <div
                             style="position:absolute; bottom:0px; right:{!$tab
                               ?.property?.request?.state?.isChatbotActive
@@ -1075,10 +1149,37 @@
                             />
                           </div>
                         {/if}
+                        {#if $tab.property?.request?.tests?.testCaseMode === "script" && $tab?.property?.request?.isRequestTestsScriptDemoCompleted}
+                          <div
+                            style="position:absolute; bottom:0px; right:{!$tab
+                              ?.property?.request?.state?.isChatbotActive
+                              ? '56px'
+                              : '0px'}; z-index:10;"
+                          >
+                            <RequestTourGuideCard
+                              title={"Make Your APIs Smarter!"}
+                              message={"Writing tests ensures your APIs do exactly what you expect. With our no-code and script options, you can easily check responses, validate data, and catch issues early, without extra effort."}
+                              onAction={() => {
+                                onUpdateRequestState({
+                                  isChatbotActive: false,
+                                });
+                                isChatbotOpenInCurrTab.set(false);
+                                onUpdateResponseState("Tests");
+                                isCloseRequestTestScriptDemo(false);
+                                requestTabTestScriptDemo.set(true);
+                                requestTabTestScriptStep.set(1);
+                              }}
+                              onClose={() => {
+                                isCloseRequestTestDemo(false);
+                                requestTabTestScriptDemo.set(false);
+                              }}
+                            />
+                          </div>
+                        {/if}
                       </div>
                     </div>
                     {#if $requestTabTestDemo && $requestTabTestNoCodeStep === 2}
-                      <RequestNoCodeTourGuide
+                      <RequestTabTourGuide
                         targetId={RequestTabTestsTourContent[1].targetId}
                         isVisible={true}
                         cardPosition={requestTabNocodeCardPosition(2)}
@@ -1094,10 +1195,10 @@
                           onClose={handleCloseTour}
                           width={352}
                         />
-                      </RequestNoCodeTourGuide>
+                      </RequestTabTourGuide>
                     {/if}
                     {#if $requestTabTestDemo && $requestTabTestNoCodeStep === 5}
-                      <RequestNoCodeTourGuide
+                      <RequestTabTourGuide
                         targetId={RequestTabTestsTourContent[4].targetId}
                         isVisible={true}
                         cardPosition={requestTabNocodeCardPosition(5)}
@@ -1116,7 +1217,48 @@
                           onClose={handleCloseTour}
                           width={352}
                         />
-                      </RequestNoCodeTourGuide>
+                      </RequestTabTourGuide>
+                    {/if}
+                    {#if $requestTabTestScriptDemo && $requestTabTestScriptStep === 2}
+                      <RequestTabTourGuide
+                        targetId={RequestTabTestsScriptTourContent[1].targetId}
+                        isVisible={true}
+                        cardPosition={requestTabScriptCardPosition(2)}
+                      >
+                        <TourGuideCard
+                          titleName={RequestTabTestsScriptTourContent[1].Title}
+                          descriptionContent={RequestTabTestsScriptTourContent[1]
+                            .description}
+                          cardNumber={2}
+                          totalsCards={RequestTabTestsScriptTourContent.length}
+                          rightButtonName=""
+                          onNext={handleNextStep}
+                          onClose={handleCloseTour}
+                          width={352}
+                        />
+                      </RequestTabTourGuide>
+                    {/if}
+                    {#if $requestTabTestScriptDemo && $requestTabTestScriptStep === 5}
+                      <RequestTabTourGuide
+                        targetId={RequestTabTestsScriptTourContent[4].targetId}
+                        isVisible={true}
+                        cardPosition={requestTabScriptCardPosition(5)}
+                      >
+                        <TourGuideCard
+                          titleName={RequestTabTestsScriptTourContent[4].Title}
+                          descriptionContent={RequestTabTestsScriptTourContent[4]
+                            .description}
+                          cardNumber={5}
+                          totalsCards={RequestTabTestsScriptTourContent.length}
+                          rightButtonName="Finish"
+                          onNext={async () => {
+                            handleCloseTour();
+                            await requestTabTestScriptDemoCompleted();
+                          }}
+                          onClose={handleCloseTour}
+                          width={352}
+                        />
+                      </RequestTabTourGuide>
                     {/if}
                   </div>
                 </Pane>

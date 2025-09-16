@@ -3,10 +3,20 @@
   import {
     ChevronDoubleLeftRegular,
     ChevronDoubleRightRegular,
+    SearchIcon2,
     StopFilledIcon,
   } from "@sparrow/library/icons";
   import { Button } from "@sparrow/library/ui";
   import { predefinedTestSnippets } from "./utils/common-snippets";
+  import RequestTabTourGuide from "../../../../../request-tab-tour-guide/layout/RequestTabTourGuide.svelte";
+  import { requestTabTestScriptStep } from "../../../../../../stores";
+  import { RequestTabTestsScriptTourContent } from "../../../../../request-tab-tour-guide";
+  import TourGuideCard from "../../../../../request-tab-tour-guide/components/TourGuideCard.svelte";
+  import {
+    handleNextStep,
+    handleCloseTour,
+  } from "../../../../../request-tab-tour-guide/utils";
+  import { requestTabScriptCardPosition } from "../../../../../request-tab-tour-guide/utils";
   import { SparkleColoredIcon } from "@sparrow/common/icons";
   import { generatingImage } from "@sparrow/common/images";
   import { fade } from "svelte/transition";
@@ -16,7 +26,7 @@
   export let isTestCasesGenerating;
 
   type SplitDirection = "vertical" | "horizontal";
-  type EditorLanguage = "JavaScript";
+  type EditorLanguage = "TestJavaScript";
 
   // Snippet type (based on your utils/common-snippets.ts)
   interface Snippet {
@@ -25,7 +35,7 @@
   }
 
   export let tabSplitDirection: SplitDirection = "vertical";
-  export let lang: EditorLanguage = "JavaScript";
+  export let lang: EditorLanguage = "TestJavaScript";
 
   export let isBodyBeautified: boolean = false;
 
@@ -75,7 +85,7 @@
 
   // Panel widths
   $: leftPanelWidth = isLeftPanelCollapsed
-    ? "60px"
+    ? "40px"
     : tabSplitDirection === "vertical"
       ? "40%"
       : "25%";
@@ -104,6 +114,7 @@
         ? 'collapsed-panel'
         : ''}"
       style="width:{leftPanelWidth};gap:6px;overflow:hidden;transition:width 0.3s ease;"
+      id="request-tab-test-script-leftpanel"
     >
       {#if isLeftPanelCollapsed}
         <!-- Collapsed -->
@@ -115,7 +126,7 @@
             onClick={toggleLeftPanel}
             size="extra-small"
             startIcon={ChevronDoubleRightRegular}
-            type="outline-secondary"
+            type="teritiary-regular"
           />
           <div class="mt-2">
             <span class="vertical-text">Snippets</span>
@@ -127,19 +138,12 @@
           class="d-flex flex-row justify-content-between align-items-center flex-shrink-0"
           style="margin:8px 4px 8px 8px;"
         >
-          <p class="snippet-text m-0">
-            Snippets
-            {#if trimmedSearch}
-              <span class="results-count"
-                >({filteredSnippets.length} found)</span
-              >
-            {/if}
-          </p>
+          <p class="snippet-text m-0">Snippets</p>
           <Button
             onClick={toggleLeftPanel}
             size="extra-small"
             startIcon={ChevronDoubleLeftRegular}
-            type="outline-secondary"
+            type="teritiary-regular"
           />
         </div>
 
@@ -150,7 +154,7 @@
             variant="primary"
             size="small"
             bind:value={searchData}
-            placeholder="Search snippets..."
+            placeholder="Search snippets"
           />
         </div>
 
@@ -177,11 +181,18 @@
             {/each}
           {:else if trimmedSearch}
             <div class="no-results">
+              <div
+                class="d-flex justify-content-center align-items-center"
+                style="margin-bottom: 16px;"
+              >
+                <SearchIcon2
+                  width={"20px"}
+                  height={"20px"}
+                  color={"var(--bg-ds-neutral-300)"}
+                />
+              </div>
               <p class="no-results-text">
-                No snippets found for "{searchData}"
-              </p>
-              <p class="no-results-suggestion">
-                Try searching with different keywords
+                No result found for "{searchData}"
               </p>
             </div>
           {/if}
@@ -203,7 +214,7 @@
           on:change={handleCodeMirrorChange}
           isEditable={true}
           autofocus={true}
-          placeholder={`// What are the tests?\n// Tests are scripts that automatically check your API's response.\n// For example: Is the status code 200? Does the body contain an email field?\n// sp.test("Status code is 200", function () {\n//   sp.response.to.have.status(200);\n// });\n\n// You can:\n// - Use "Snippets" to insert common tests\n// - Or, write test cases manually using scripting or no code method`}
+          placeholder={`// What are the tests?\n// Tests are scripts that automatically check your API's response.\n// For example: Is the status code 200? Does the body contain an email field?\n// sp.test("Status code is 200", function () {\n//   sp.expect(sp.response.statusCode).to.equal(200);\n// });\n\n// You can:\n// - Use "Snippets" to insert common tests\n// - Or, write test cases manually using scripting or no code method`}
           {isBodyBeautified}
           beautifySyntaxCallback={updateBeautifiedState}
         />
@@ -266,6 +277,24 @@
       </div>
     </div>
   </div>
+  {#if $requestTabTestScriptStep === 3}
+    <RequestTabTourGuide
+      targetId={RequestTabTestsScriptTourContent[2].targetId}
+      isVisible={true}
+      cardPosition={requestTabScriptCardPosition(3)}
+    >
+      <TourGuideCard
+        titleName={RequestTabTestsScriptTourContent[2].Title}
+        descriptionContent={RequestTabTestsScriptTourContent[2].description}
+        cardNumber={3}
+        totalsCards={RequestTabTestsScriptTourContent.length}
+        rightButtonName=""
+        onNext={handleNextStep}
+        onClose={handleCloseTour}
+        width={352}
+      />
+    </RequestTabTourGuide>
+  {/if}
 </div>
 
 <style>
@@ -321,7 +350,7 @@
   }
 
   .no-results {
-    padding: 24px 8px;
+    padding: 38px 8px 12px 8px;
     text-align: center;
   }
 
@@ -340,8 +369,8 @@
   }
 
   :global(.search-highlight) {
-    background-color: var(--bg-ds-warning-300);
-    color: var(--text-ds-neutral-900);
+    background-color: transparent;
+    color: var(--text-ds-neutral-50);
     padding: 1px 2px;
     border-radius: 2px;
     font-weight: 600;

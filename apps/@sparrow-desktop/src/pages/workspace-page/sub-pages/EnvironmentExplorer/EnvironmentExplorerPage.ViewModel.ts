@@ -234,6 +234,13 @@ export class EnvironmentExplorerViewModel {
         if (foundIndex !== -1) {
           const foundObject =
             progressiveTab.property.environment.aiVariable[foundIndex];
+          // validation: key and value must not be empty
+          if (!foundObject?.key || !foundObject?.value) {
+            notifications.warning(
+              "Variables with missing keys or values cannot be added to Global Variables.",
+            );
+            return;
+          }
           const currentPairs =
             progressiveTab.property?.environment?.variable || [];
           const updatedPairs = [...currentPairs];
@@ -292,17 +299,20 @@ export class EnvironmentExplorerViewModel {
       // Split aiVariables into undo:true and undo:false
       const undoAiVariables =
         progressiveTab.property.environment.aiVariable.filter(
-          (variable) => variable.undo === true,
+          (variable) =>
+            variable.undo === true || (!variable.key || !variable.value),
         );
 
-      const sanitizedAiVariables =
+       const sanitizedAiVariables =
         progressiveTab.property.environment.aiVariable
           .filter((variable) => !variable.undo)
           .map((variable) => ({
             ...variable,
             type: "ai-generated",
             lifespan: "short",
-          }));
+          }))
+          // Skip variables with empty key or value
+          .filter((variable) => variable.key && variable.value);
       await this.updateVariables([
         ...progressiveTab.property.environment.variable,
         ...sanitizedAiVariables,
@@ -547,7 +557,6 @@ export class EnvironmentExplorerViewModel {
           aiGeneratedVariables,
           "value",
         );
-
       if (uniqueAiGeneratedVariables.length > 0) {
         await this.updateVariables(
           currentEnvironment?.property?.environment?.variable.map((item) => {
