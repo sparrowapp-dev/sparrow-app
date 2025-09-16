@@ -157,17 +157,12 @@ const customJsCompletions = (context: CompletionContext) => {
     return {
       from: context.pos,
       options: [
-        {
-          label: "expect",
-          type: "function",
-          info: "Expect testcase function",
-          apply: "expect()"
-        },
+        { label: "expect", type: "function", info: "Expect testcase function", apply: "expect()" },
         {
           label: "xmlToJSON",
           type: "function",
           info: "Convert XML to JSON",
-          apply: "xmlToJSON()"
+          apply: "xmlToJSON();"
         },
         {
           label: "response",
@@ -201,15 +196,15 @@ const customJsCompletions = (context: CompletionContext) => {
     return {
       from: context.pos,
       options: [
-        { label: "equal", type: "function", info: "Assert actual equals expected", apply: "equal(expected)" },
-        { label: "notEqual", type: "function", info: "Assert actual not equals expected", apply: "notEqual(expected)" },
-        { label: "exist", type: "function", info: "Assert actual exists", apply: "exist()" },
-        { label: "notExist", type: "function", info: "Assert actual does not exist", apply: "notExist()" },
+        { label: "equal", type: "function", info: "Assert actual equals expected", apply: "equal();" },
+        { label: "notEqual", type: "function", info: "Assert actual not equals expected", apply: "notEqual();" },
+        { label: "exist", type: "function", info: "Assert actual exists", apply: "exist();" },
+        { label: "notExist", type: "function", info: "Assert actual does not exist", apply: "notExist();" },
         { label: "be", type: "variable", info: "Type and value matchers" },
-        { label: "contain", type: "function", info: "Assert actual contains expected", apply: "contain(expected)" },
-        { label: "notContain", type: "function", info: "Assert actual does not contain expected", apply: "notContain(expected)" },
-        { label: "beInList", type: "function", info: "Assert actual is in list", apply: "beInList(list)" },
-        { label: "notBeInList", type: "function", info: "Assert actual is not in list", apply: "notBeInList(list)" },
+        { label: "contain", type: "function", info: "Assert actual contains expected", apply: "contain();" },
+        { label: "notContain", type: "function", info: "Assert actual does not contain expected", apply: "notContain();" },
+        { label: "beInList", type: "function", info: "Assert actual is in list", apply: "beInList();" },
+        { label: "notBeInList", type: "function", info: "Assert actual is not in list", apply: "notBeInList();" },
         { label: "have", type: "variable", info: "Object key matchers" },
       ],
     };
@@ -230,7 +225,6 @@ const customJsCompletions = (context: CompletionContext) => {
       ],
     };
   }
-
    if (expectToHaveDotMatch) {
     return {
       from: context.pos,
