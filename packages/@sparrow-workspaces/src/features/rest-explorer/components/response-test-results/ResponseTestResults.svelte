@@ -109,7 +109,7 @@
     >
       {#each filteredResults as testCases}
         <div
-          class="d-flex align-items-center ps-0 gap-1 w-100"
+          class="d-flex ps-0 gap-1 w-100 align-items-start"
           style="padding-left: 8px; padding: 6px;"
         >
           <div
@@ -123,17 +123,11 @@
           </div>
 
           <p
-            style="font-size: 12px; font-weight:400; color: var(--text-ds-neutral-400); padding-left: 4px; margin-bottom:0px;"
+            style="word-break: break-word; font-size: 12px; font-weight:400; color: var(--text-ds-neutral-400); padding-left: 4px; margin-bottom:0px;"
           >
             {testCases?.testName}
+            {testCases?.testMessage ? `| Error: ${testCases?.testMessage}` : ``}
           </p>
-          {#if testCases?.testMessage}
-            <p
-              style="font-size: 12px; font-weight:400; color: var(--text-ds-neutral-400); margin-bottom:0px;"
-            >
-              | Error: {testCases?.testMessage}
-            </p>
-          {/if}
         </div>
       {/each}
     </div>

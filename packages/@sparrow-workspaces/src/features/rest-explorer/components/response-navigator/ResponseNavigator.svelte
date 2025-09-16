@@ -45,7 +45,11 @@
    * @description - re-calculates value when dependency changes
    */
   $: {
-    if (responseHeadersLength) {
+    if (
+      responseHeadersLength ||
+      responseTestResultsLength ||
+      responsePassedTestResultsLength
+    ) {
       tabs = refreshTabs(responseHeadersLength);
     }
   }
