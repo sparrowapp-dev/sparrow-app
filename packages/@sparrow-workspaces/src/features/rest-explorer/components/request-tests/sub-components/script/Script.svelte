@@ -93,7 +93,7 @@
             onClick={toggleLeftPanel}
             size="extra-small"
             startIcon={ChevronDoubleRightRegular}
-            type="outline-secondary"
+            type="teritiary-regular"
           />
           <div class="mt-2">
             <span class="vertical-text">Snippets</span>
@@ -110,7 +110,7 @@
             onClick={toggleLeftPanel}
             size="extra-small"
             startIcon={ChevronDoubleLeftRegular}
-            type="outline-secondary"
+            type="teritiary-regular"
           />
         </div>
 
