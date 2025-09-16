@@ -3,6 +3,7 @@
   import {
     ChevronDoubleLeftRegular,
     ChevronDoubleRightRegular,
+    SearchIcon2,
   } from "@sparrow/library/icons";
   import { Button } from "@sparrow/library/ui";
   import { predefinedTestSnippets } from "./utils/common-snippets";
@@ -65,7 +66,7 @@
 
   // Panel widths
   $: leftPanelWidth = isLeftPanelCollapsed
-    ? "60px"
+    ? "40px"
     : tabSplitDirection === "vertical"
       ? "40%"
       : "25%";
@@ -92,7 +93,7 @@
             onClick={toggleLeftPanel}
             size="extra-small"
             startIcon={ChevronDoubleRightRegular}
-            type="outline-secondary"
+            type="teritiary-regular"
           />
           <div class="mt-2">
             <span class="vertical-text">Snippets</span>
@@ -104,19 +105,12 @@
           class="d-flex flex-row justify-content-between align-items-center flex-shrink-0"
           style="margin:8px 4px 8px 8px;"
         >
-          <p class="snippet-text m-0">
-            Snippets
-            {#if trimmedSearch}
-              <span class="results-count"
-                >({filteredSnippets.length} found)</span
-              >
-            {/if}
-          </p>
+          <p class="snippet-text m-0">Snippets</p>
           <Button
             onClick={toggleLeftPanel}
             size="extra-small"
             startIcon={ChevronDoubleLeftRegular}
-            type="outline-secondary"
+            type="teritiary-regular"
           />
         </div>
 
@@ -127,7 +121,7 @@
             variant="primary"
             size="small"
             bind:value={searchData}
-            placeholder="Search snippets..."
+            placeholder="Search snippets"
           />
         </div>
 
@@ -154,11 +148,18 @@
             {/each}
           {:else if trimmedSearch}
             <div class="no-results">
+              <div
+                class="d-flex justify-content-center align-items-center"
+                style="margin-bottom: 16px;"
+              >
+                <SearchIcon2
+                  width={"20px"}
+                  height={"20px"}
+                  color={"var(--bg-ds-neutral-300)"}
+                />
+              </div>
               <p class="no-results-text">
-                No snippets found for "{searchData}"
-              </p>
-              <p class="no-results-suggestion">
-                Try searching with different keywords
+                No result found for "{searchData}"
               </p>
             </div>
           {/if}
@@ -232,7 +233,7 @@
   }
 
   .no-results {
-    padding: 24px 8px;
+    padding: 38px 8px 12px 8px;
     text-align: center;
   }
 
@@ -251,8 +252,8 @@
   }
 
   :global(.search-highlight) {
-    background-color: var(--bg-ds-warning-300);
-    color: var(--text-ds-neutral-900);
+    background-color: transparent;
+    color: var(--text-ds-neutral-50);
     padding: 1px 2px;
     border-radius: 2px;
     font-weight: 600;
