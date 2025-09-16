@@ -475,8 +475,8 @@ jobs:
           }
         shell: powershell
 
-      - name: Download MSIX Artifact
-        uses: actions/download-artifact@v4
+      - name: Upload MSIX Artifact
+        uses: actions/upload-artifact@v4
         with:
           name: sparrow.msix
-          path: msix-output/
+          path: C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix
