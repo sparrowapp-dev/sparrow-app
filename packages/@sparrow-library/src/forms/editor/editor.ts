@@ -10,6 +10,7 @@ import { jsonSetup } from "./theme";
 import { xml } from "@codemirror/lang-xml";
 import { html_beautify, js_beautify } from "js-beautify";
 import * as Sentry from "@sentry/svelte";
+import { autocompletion, CompletionContext } from "@codemirror/autocomplete";
 
 /**
  * @description - remove indentation from the string
@@ -114,6 +115,80 @@ function fixJsonBraces(jsonString: string, indentLevel: number = 4): string {
 }
 
 /**
+ * Custom JavaScript autocompletion source for CodeMirror
+ */
+const customJsCompletions = (context: CompletionContext) => {
+  // Always match the last word or after 'sp.'
+  const beforeCursor = context.state.sliceDoc(0, context.pos);
+  const spDotMatch = /sp\.$/.test(beforeCursor);
+  const word = context.matchBefore(/\w*/);
+
+  if (spDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        {
+          label: "expect",
+          type: "function",
+          info: "Expect testcase function",
+          apply: "expect()"
+        },
+        {
+          label: "xmlToJSON",
+          type: "function",
+          info: "Convert XML to JSON",
+          apply: "xmlToJSON()"
+        },
+        {
+          label: "response",
+          type: "variable",
+          info: "Get response object",
+          apply: "response"
+        },
+
+        {
+          label: "test",
+          type: "function",
+          info: "Test definition function",
+          apply: `test("", function () {
+
+});`
+        },
+      ],
+    };
+  }
+
+  // Always show completions if typing a word or explicitly triggered
+  if (!word && !context.explicit) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "sp", type: "variable", info: "Custom object 'sp'" },
+        { label: "log", type: "function", info: "Log output" },
+        { label: "document", type: "variable", info: "Document object" },
+        { label: "window", type: "variable", info: "Window object" },
+        { label: "setTimeout", type: "function", info: "Set a timer" },
+        { label: "setInterval", type: "function", info: "Set interval timer" },
+      ],
+    };
+  }
+
+  return {
+    from: word ? word.from : context.pos,
+    options: [
+      { label: "sp", type: "variable", info: "Custom object 'sp'" },
+      { label: "expect", type: "function", info: "sp.expect(): Custom expect function", apply: "expect()." },
+      { label: "asif", type: "variable", info: "Console object" },
+      { label: "log", type: "function", info: "Log output" },
+      { label: "document", type: "variable", info: "Document object" },
+      { label: "window", type: "variable", info: "Window object" },
+      { label: "setTimeout", type: "function", info: "Set a timer" },
+      { label: "setInterval", type: "function", info: "Set interval timer" },
+    ],
+  };
+}
+
+/**
  * @description - adds syntax highlighting and formatting to code mirror view
  * @param codeMirrorView - code mirror constructor object
  * @param languageConf - dynamic configuration for code mirror
@@ -171,9 +246,10 @@ const handleCodeMirrorSyntaxFormat = (
           };
         }
         codeMirrorView.dispatch({
-          effects: languageConf.reconfigure(
+          effects: languageConf.reconfigure([
             javascript({ jsx: true, typescript: true }),
-          ),
+            autocompletion({ override: [customJsCompletions] }),
+          ]),
           ...payload,
         });
         beautifySyntaxCallback(false);
