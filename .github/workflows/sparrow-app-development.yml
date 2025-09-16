@@ -204,9 +204,9 @@ jobs:
           $exeFiles = Get-ChildItem "$bundlePath\nsis\*.exe" -ErrorAction SilentlyContinue
           if ($exeFiles) {
               Write-Host "Found $($exeFiles.Count) EXE file(s) to sign"
+              $signtoolPath = $env:SIGNTOOL_PATH.Trim()
               foreach ($file in $exeFiles) {
                   Write-Host "Signing EXE: $($file.Name)"
-                  $signtoolPath = $env:SIGNTOOL_PATH.Trim()
                   $result = & "$signtoolPath" sign /f "$bundlePath\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "$($file.FullName)" 2>&1
                   if ($LASTEXITCODE -eq 0) {
                       Write-Host "Successfully signed: $($file.Name)" -ForegroundColor Green
