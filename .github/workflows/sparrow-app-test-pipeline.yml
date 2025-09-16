@@ -13,12 +13,12 @@ on:
   workflow_dispatch:
 
 env:
-  VITE_API_URL: ${{ vars.VITE_API_URL_DEV }}
-  VITE_MIX_PANEL_TOKEN: ${{ vars.VITE_MIX_PANEL_TOKEN }}
-  VITE_ENABLE_MIX_PANEL: ${{ vars.VITE_ENABLE_MIX_PANEL_DEV }}
-  VITE_API_TIMEOUT: ${{ vars.VITE_API_TIMEOUT }}
+  VITE_API_URL: ${{vars.VITE_API_URL}}
+  VITE_MIX_PANEL_TOKEN: ${{vars.VITE_MIX_PANEL_TOKEN}}
+  VITE_ENABLE_MIX_PANEL: ${{vars.VITE_ENABLE_MIX_PANEL}}
+  VITE_API_TIMEOUT: ${{vars.VITE_API_TIMEOUT}}
   VITE_SPARROW_SUPPORT_EMAIL: ${{ vars.VITE_SPARROW_SUPPORT_EMAIL }}
-  VITE_AUTH_URL: ${{ vars.VITE_AUTH_URL_DEV }}
+  VITE_AUTH_URL: ${{ vars.VITE_AUTH_URL }}
   VITE_SPARROW_GITHUB: ${{ vars.VITE_SPARROW_GITHUB }}
   VITE_SPARROW_DOWNLOAD_LINK: ${{ vars.VITE_SPARROW_DOWNLOAD_LINK }}
   VITE_RELEASE_NOTES_PAT_TOKEN: ${{ secrets.VITE_RELEASE_NOTES_PAT_TOKEN }}
@@ -473,7 +473,7 @@ jobs:
         shell: powershell
 
       - name: Download MSIX Artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: msix-output
           path: msix-output
