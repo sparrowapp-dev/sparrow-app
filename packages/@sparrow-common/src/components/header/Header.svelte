@@ -503,7 +503,7 @@
                     No Account Connected
                   </div>
                   <div
-                    style="font-size:12px;color:var(--text-ds-neutral-300);texport interface HeaderPropsext-align:left"
+                    style="font-size:12px;color:var(--text-ds-neutral-300);text-align:left"
                   >
                     Unlock the full experience by getting started.
                   </div>
