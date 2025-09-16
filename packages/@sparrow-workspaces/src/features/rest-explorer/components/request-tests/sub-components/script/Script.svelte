@@ -137,7 +137,7 @@
             variant="primary"
             size="small"
             bind:value={searchData}
-            placeholder="Search snippets..."
+            placeholder="Search snippets"
           />
         </div>
 
@@ -187,7 +187,7 @@
         on:change={handleCodeMirrorChange}
         isEditable={true}
         autofocus={true}
-        placeholder={`// What are the tests?\n// Tests are scripts that automatically check your API's response.\n// For example: Is the status code 200? Does the body contain an email field?\n// sp.test("Status code is 200", function () {\n//   sp.response.to.have.status(200);\n// });\n\n// You can:\n// - Use "Snippets" to insert common tests\n// - Or, write test cases manually using scripting or no code method`}
+        placeholder={`// What are the tests?\n// Tests are scripts that automatically check your API's response.\n// For example: Is the status code 200? Does the body contain an email field?\n// sp.test("Status code is 200", function () {\n//   sp.expect(sp.response.statusCode).to.equal(200);\n// });\n\n// You can:\n// - Use "Snippets" to insert common tests\n// - Or, write test cases manually using scripting or no code method`}
         {isBodyBeautified}
         beautifySyntaxCallback={updateBeautifiedState}
       />
