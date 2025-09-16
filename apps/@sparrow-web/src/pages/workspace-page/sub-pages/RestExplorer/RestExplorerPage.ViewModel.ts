@@ -220,6 +220,9 @@ class RestExplorerViewModel {
           await this.updateIsRequestTabDemo(
             collectionDoc?.isRequestTestsNoCodeDemoCompleted,
           );
+          await this.updateIsRequestTabScriptDemo(
+            collectionDoc?.isRequestTestsScriptDemoCompleted
+          );
         }
 
         // console.log(
@@ -4377,6 +4380,12 @@ class RestExplorerViewModel {
     this.tab = progressiveTab;
   };
 
+  public updateIsRequestTabScriptDemo = async (value: boolean) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.isRequestTestsScriptDemoCompleted = value;
+    this.tab = progressiveTab;
+  };
+
   private onOpenGlobalEnvironmentToGenerate = async (
     environment: any,
     collectionId: string,
@@ -4855,6 +4864,15 @@ class RestExplorerViewModel {
       notifications.error("Failed to fix test script.");
     }
   }
+
+  public handleRequestTestScriptDemoCompleted = async () => {
+    const response =
+      await this.userService.requestTabScriptTestsDemoCompleted();
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (response.isSuccessful) {
+      await this.fetchCollections(progressiveTab?.path?.workspaceId);
+    }
+  };
 }
 
 export default RestExplorerViewModel;

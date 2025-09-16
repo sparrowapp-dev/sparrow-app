@@ -7,6 +7,15 @@
   } from "@sparrow/library/icons";
   import { Button } from "@sparrow/library/ui";
   import { predefinedTestSnippets } from "./utils/common-snippets";
+  import RequestTabTourGuide from "../../../../../request-tab-tour-guide/layout/RequestTabTourGuide.svelte";
+  import { requestTabTestScriptStep } from "../../../../../../stores";
+  import { RequestTabTestsScriptTourContent } from "../../../../../request-tab-tour-guide";
+  import TourGuideCard from "../../../../../request-tab-tour-guide/components/TourGuideCard.svelte";
+  import {
+    handleNextStep,
+    handleCloseTour,
+  } from "../../../../../request-tab-tour-guide/utils";
+  import { requestTabScriptCardPosition } from "../../../../../request-tab-tour-guide/utils";
   export let onTestsChange;
   export let tests;
 
@@ -82,6 +91,7 @@
         ? 'collapsed-panel'
         : ''}"
       style="width:{leftPanelWidth};gap:6px;overflow:hidden;transition:width 0.3s ease;"
+      id="request-tab-test-script-leftpanel"
     >
       {#if isLeftPanelCollapsed}
         <!-- Collapsed -->
@@ -178,12 +188,30 @@
         on:change={handleCodeMirrorChange}
         isEditable={true}
         autofocus={true}
-        placeholder={`// What are the tests?\n// Tests are scripts that automatically check your API's response.\n// For example: Is the status code 200? Does the body contain an email field?\n// sp.test("Status code is 200", function () {\n//   sp.response.to.have.status(200);\n// });\n\n// You can:\n// - Use "Snippets" to insert common tests\n// - Or, write test cases manually using scripting or no code method`}
+        placeholder={`// What are the tests?\n// Tests are scripts that automatically check your API's response.\n// For example: Is the status code 200? Does the body contain an email field?\n// sp.test("Status code is 200", function () {\n//   sp.expect(sp.response.statusCode).to.equal(200);\n// });\n\n// You can:\n// - Use "Snippets" to insert common tests\n// - Or, write test cases manually using scripting or no code method`}
         {isBodyBeautified}
         beautifySyntaxCallback={updateBeautifiedState}
       />
     </div>
   </div>
+  {#if $requestTabTestScriptStep === 3}
+    <RequestTabTourGuide
+      targetId={RequestTabTestsScriptTourContent[2].targetId}
+      isVisible={true}
+      cardPosition={requestTabScriptCardPosition(3)}
+    >
+      <TourGuideCard
+        titleName={RequestTabTestsScriptTourContent[2].Title}
+        descriptionContent={RequestTabTestsScriptTourContent[2].description}
+        cardNumber={3}
+        totalsCards={RequestTabTestsScriptTourContent.length}
+        rightButtonName=""
+        onNext={handleNextStep}
+        onClose={handleCloseTour}
+        width={352}
+      />
+    </RequestTabTourGuide>
+  {/if}
 </div>
 
 <style>

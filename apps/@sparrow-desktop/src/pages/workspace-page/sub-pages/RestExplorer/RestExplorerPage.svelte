@@ -277,4 +277,6 @@
   InsertGenerateTrialFlow={_viewModel.InsertGenerateTrialFlow}
   isCloseRequestTestDemo={_viewModel.updateIsRequestTabDemo}
   requestTabTestsDemoCompleted={_viewModel.handleRequestTestNoCodeDemoCompleted}
+  isCloseRequestTestScriptDemo={_viewModel.updateIsRequestTabScriptDemo}
+  requestTabTestScriptDemoCompleted={_viewModel.handleRequestTestNoCodeDemoCompleted}
 />
