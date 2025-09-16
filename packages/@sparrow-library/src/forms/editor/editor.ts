@@ -118,7 +118,6 @@ function fixJsonBraces(jsonString: string, indentLevel: number = 4): string {
  * Custom JavaScript autocompletion source for CodeMirror
  */
 const testJsCompletions = (context: CompletionContext) => {
-  // Always match the last word or after 'sp.'
   const beforeCursor = context.state.sliceDoc(0, context.pos);
   const spDotMatch = /sp\.$/.test(beforeCursor);
   const spResponseDotMatch = /sp\.response\.$/.test(beforeCursor);
