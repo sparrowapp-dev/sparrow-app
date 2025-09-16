@@ -478,5 +478,5 @@ jobs:
       - name: Download MSIX Artifact
         uses: actions/download-artifact@v4
         with:
-          name: msix-output
+          name: sparrow.msix
           path: msix-output/
