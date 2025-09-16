@@ -4313,6 +4313,8 @@ class RestExplorerViewModel {
     let workspaceId = componentData.path.workspaceId;
     let workspaceVal = await this.readWorkspace(workspaceId);
     let teamId = workspaceVal.team?.teamId;
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const testCases = progressiveTab.property.request.tests;
 
     try {
       const response = await this.aiAssistentService.generateTestCases({
@@ -4320,6 +4322,10 @@ class RestExplorerViewModel {
         teamId: teamId,
       });
       if (response.isSuccessful) {
+        this.updateRequestTests({
+          ...testCases,
+          script: testCases.script + response?.data?.data.result,
+        });
         stopLoading(tabId + "generatingTestCases");
         notifications.success("Test is generated successfully.");
       } else if (
