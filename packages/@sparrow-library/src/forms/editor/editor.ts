@@ -123,6 +123,11 @@ const customJsCompletions = (context: CompletionContext) => {
   const spDotMatch = /sp\.$/.test(beforeCursor);
   const spResponseDotMatch = /sp\.response\.$/.test(beforeCursor);
   const spResponseBodyDotMatch = /sp\.response\.body\.$/.test(beforeCursor);
+  const expectDotMatch = /expect\([^)]*\)\.$/.test(beforeCursor);
+  const expectToDotMatch = /expect\([^)]*\)\.to\.$/.test(beforeCursor);  // expect().to.
+  const expectToBeDotMatch = /expect\([^)]*\)\.to\.be\.$/.test(beforeCursor);  // expect().to.be.
+  const expectToHaveDotMatch = /expect\([^)]*\)\.to\.have\.$/.test(beforeCursor);  // expect().to.have.
+  const expectToHaveAllDotMatch = /expect\([^)]*\)\.to\.have\.all\.$/.test(beforeCursor);  // expect().to.have.all.
   const word = context.matchBefore(/\w*/);
 
   if (spResponseBodyDotMatch) {
@@ -183,12 +188,73 @@ const customJsCompletions = (context: CompletionContext) => {
     };
   }
 
+  if (expectDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "to", type: "variable", info: "Matcher object for assertions" },
+      ],
+    };
+  }
+
+  if (expectToDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "equal", type: "function", info: "Assert actual equals expected", apply: "equal(expected)" },
+        { label: "notEqual", type: "function", info: "Assert actual not equals expected", apply: "notEqual(expected)" },
+        { label: "exist", type: "function", info: "Assert actual exists", apply: "exist()" },
+        { label: "notExist", type: "function", info: "Assert actual does not exist", apply: "notExist()" },
+        { label: "be", type: "variable", info: "Type and value matchers" },
+        { label: "contain", type: "function", info: "Assert actual contains expected", apply: "contain(expected)" },
+        { label: "notContain", type: "function", info: "Assert actual does not contain expected", apply: "notContain(expected)" },
+        { label: "beInList", type: "function", info: "Assert actual is in list", apply: "beInList(list)" },
+        { label: "notBeInList", type: "function", info: "Assert actual is not in list", apply: "notBeInList(list)" },
+        { label: "have", type: "variable", info: "Object key matchers" },
+      ],
+    };
+  }
+
+  if (expectToBeDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "a", type: "function", info: "Assert actual equals expected", apply: "a();" },
+        { label: "true", type: "function", info: "Assert actual not equals expected", apply: "true();" },
+        { label: "false", type: "function", info: "Assert actual exists", apply: "false();" },
+        { label: "within", type: "function", info: "Assert actual does not exist", apply: "within( , )" },
+        { label: "lessThan", type: "function", info: "Type and value matchers", apply: "lessThan();"},
+        { label: "greaterThan", type: "function", info: "Assert actual contains expected", apply: "greaterThan();" },
+        { label: "empty", type: "function", info: "Assert actual does not contain expected", apply: "empty();" },
+        { label: "notEmpty", type: "function", info: "Assert actual is in list", apply: "notEmpty();" },
+      ],
+    };
+  }
+
+   if (expectToHaveDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "all", type: "variable", info: "Assert actual equals expected", },
+      ],
+    };
+  }
+
+   if (expectToHaveAllDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "keys", type: "function", info: "Assert actual is in list", apply: "keys();" },
+      ],
+    };
+  }
+
   // Always show completions if typing a word or explicitly triggered
   if (!word && !context.explicit) {
     return {
       from: context.pos,
       options: [
-        { label: "sp", type: "variable", info: "Custom object 'sp'" },
+        { label: "sp", type: "variable", info: "Sparrow testcase object 'sp'" },
         { label: "log", type: "function", info: "Log output" },
         { label: "document", type: "variable", info: "Document object" },
         { label: "window", type: "variable", info: "Window object" },
@@ -202,8 +268,6 @@ const customJsCompletions = (context: CompletionContext) => {
     from: word ? word.from : context.pos,
     options: [
       { label: "sp", type: "variable", info: "Custom object 'sp'" },
-      { label: "expect", type: "function", info: "sp.expect(): Custom expect function", apply: "expect()." },
-      { label: "asif", type: "variable", info: "Console object" },
       { label: "log", type: "function", info: "Log output" },
       { label: "document", type: "variable", info: "Document object" },
       { label: "window", type: "variable", info: "Window object" },
