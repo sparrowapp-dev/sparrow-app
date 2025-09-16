@@ -121,7 +121,32 @@ const customJsCompletions = (context: CompletionContext) => {
   // Always match the last word or after 'sp.'
   const beforeCursor = context.state.sliceDoc(0, context.pos);
   const spDotMatch = /sp\.$/.test(beforeCursor);
+  const spResponseDotMatch = /sp\.response\.$/.test(beforeCursor);
+  const spResponseBodyDotMatch = /sp\.response\.body\.$/.test(beforeCursor);
   const word = context.matchBefore(/\w*/);
+
+  if (spResponseBodyDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "text", type: "function", info: "Get response body as text", apply: "text()" },
+        { label: "json", type: "function", info: "Get response body as JSON", apply: "json()" },
+      ],
+    };
+  }
+
+  if (spResponseDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "statusCode", type: "variable", info: "Response status code" },
+        { label: "body", type: "variable", info: "Response body object (text, json)" },
+        { label: "headers", type: "variable", info: "Response headers object" },
+        { label: "size", type: "variable", info: "Response size in KB" },
+        { label: "time", type: "variable", info: "Response time in ms" },
+      ],
+    };
+  }
 
   if (spDotMatch) {
     return {
