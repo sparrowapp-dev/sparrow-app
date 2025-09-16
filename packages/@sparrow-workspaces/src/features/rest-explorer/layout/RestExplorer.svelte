@@ -745,7 +745,7 @@
                       {userRole}
                     />
                     <div style="flex:1; overflow:auto;" class="p-0">
-                      {#if $requestTabTestDemo && $tab.property?.request?.tests?.testCaseMode === "no-code"}
+                      {#if $requestTabTestDemo && $tab.property?.request?.tests?.testCaseMode === "no-code" && $tab.property?.request?.state?.requestNavigation === "Tests"}
                         <RequestTests
                           tests={{
                             testCaseMode: "no-code",
@@ -767,7 +767,7 @@
                           responseBody={""}
                           responseHeader={[]}
                         />
-                      {:else if $requestTabTestScriptDemo && $tab.property?.request?.tests?.testCaseMode === "script"}
+                      {:else if $requestTabTestScriptDemo && $tab.property?.request?.tests?.testCaseMode === "script" && $tab.property?.request?.state?.requestNavigation === "Tests"}
                         <RequestTests
                           tests={{
                             testCaseMode: "script",
