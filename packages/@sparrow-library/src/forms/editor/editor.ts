@@ -117,7 +117,7 @@ function fixJsonBraces(jsonString: string, indentLevel: number = 4): string {
 /**
  * Custom JavaScript autocompletion source for CodeMirror
  */
-const customJsCompletions = (context: CompletionContext) => {
+const testJsCompletions = (context: CompletionContext) => {
   // Always match the last word or after 'sp.'
   const beforeCursor = context.state.sliceDoc(0, context.pos);
   const spDotMatch = /sp\.$/.test(beforeCursor);
@@ -326,7 +326,28 @@ const handleCodeMirrorSyntaxFormat = (
         codeMirrorView.dispatch({
           effects: languageConf.reconfigure([
             javascript({ jsx: true, typescript: true }),
-            autocompletion({ override: [customJsCompletions] }),
+          ]),
+          ...payload,
+        });
+        beautifySyntaxCallback(false);
+      }
+      break;
+    case RequestDataType.TESTJAVASCRIPT:
+      if (codeMirrorView) {
+        let payload = {};
+        if (isFormatted) {
+          payload = {
+            changes: {
+              from: 0,
+              to: codeMirrorView.state.doc.length,
+              insert: js_beautify(value),
+            },
+          };
+        }
+        codeMirrorView.dispatch({
+          effects: languageConf.reconfigure([
+            javascript({ jsx: true, typescript: true }),
+            autocompletion({ override: [testJsCompletions] }),
           ]),
           ...payload,
         });
