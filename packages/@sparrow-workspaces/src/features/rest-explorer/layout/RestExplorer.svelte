@@ -25,6 +25,7 @@
   import { notifications } from "@sparrow/library/ui";
   import { Splitpanes, Pane } from "svelte-splitpanes";
   import { Button } from "@sparrow/library/ui";
+  import { TestCaseModeEnum } from "@sparrow/common/types/workspace";
 
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import type { CollectionDocument } from "@app/database/database";
@@ -348,6 +349,88 @@
       component: "RestExplorer",
       suggestion_type: suggestion_type,
     });
+  };
+
+  let isModeChangeModalOpen = false;
+  let pendingMode = null;
+  $: currentMode =
+    $tab?.property?.request?.tests?.testCaseMode || TestCaseModeEnum.NO_CODE;
+
+  /**
+   * Check if there's existing data that would be lost when switching modes
+   */
+  const hasExistingData = (currentMode: TestCaseModeEnum) => {
+    const tabTests = $tab?.property?.request?.tests;
+
+    if (currentMode === TestCaseModeEnum.NO_CODE) {
+      return (
+        tabTests?.noCode &&
+        tabTests.noCode.length > 0 &&
+        tabTests.noCode.some(
+          (test) =>
+            test.name ||
+            test.condition ||
+            test.expectedResult ||
+            test.testPath ||
+            test.testTarget,
+        )
+      );
+    } else if (currentMode === TestCaseModeEnum.SCRIPT) {
+      return tabTests?.script && tabTests.script.trim().length > 0;
+    }
+    return false;
+  };
+
+  /**
+   * Handle mode change with confirmation if needed
+   */
+  const handleModeChange = (newMode: TestCaseModeEnum) => {
+    const currentTestMode =
+      $tab?.property?.request?.tests?.testCaseMode || TestCaseModeEnum.NO_CODE;
+
+    if (newMode === currentTestMode) return;
+
+    // Check if there's existing data that would be lost
+    if (hasExistingData(currentTestMode)) {
+      pendingMode = newMode;
+      isModeChangeModalOpen = true;
+    } else {
+      switchMode(newMode);
+    }
+  };
+
+  /**
+   * Actually perform the mode switch
+   */
+  const switchMode = (newMode: TestCaseModeEnum) => {
+    onUpdateTests({
+      ...$tab?.property?.request?.tests,
+      testCaseMode: newMode,
+    });
+  }; /**
+   * Confirm mode switch and proceed
+   */
+  const confirmModeSwitch = () => {
+    if (pendingMode) {
+      switchMode(pendingMode);
+    }
+    isModeChangeModalOpen = false;
+    pendingMode = null;
+  };
+
+  /**
+   * Cancel mode switch
+   */
+  const cancelModeSwitch = () => {
+    isModeChangeModalOpen = false;
+    pendingMode = null;
+  };
+
+  /**
+   * Get the display name for the mode
+   */
+  const getModeDisplayName = (mode: TestCaseModeEnum) => {
+    return mode === TestCaseModeEnum.NO_CODE ? "No Code" : "Script Mode";
   };
 
   /**
@@ -826,6 +909,7 @@
                           tabSplitDirection={$tabsSplitterDirection}
                           testResults={storeData?.response?.testResults}
                           responseBody={storeData?.response?.body}
+                          onShowModeChangeModal={handleModeChange}
                           responseHeader={storeData?.response?.headers}
                         />
                       {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
@@ -1169,6 +1253,43 @@
     /> -->
   </div>
 </div>
+
+<Modal
+  title={`Switching to ${getModeDisplayName(pendingMode)}`}
+  type={"dark"}
+  width={"40%"}
+  zIndex={10000}
+  isOpen={isModeChangeModalOpen}
+  handleModalState={(flag = false) => {
+    if (!flag) cancelModeSwitch();
+  }}
+>
+  <div class="d-flex flex-column">
+    <p
+      class="mode-change-modal-text mb-3"
+      style="padding-top: 20px; font-size:13px; padding-bottom:10px;"
+    >
+      {@html `The test cases you have created in ${getModeDisplayName(currentMode)} mode will not be carried over to  ${getModeDisplayName(pendingMode)}. If you switch, those test cases you have added will be lost. <br /> Do you still want to continue?`}
+    </p>
+    <div class="d-flex justify-content-end gap-2">
+      <!-- Cancel button -->
+      <Button
+        title="Cancel"
+        type="secondary"
+        size="medium"
+        onClick={cancelModeSwitch}
+      />
+      <!-- Confirm button -->
+      <Button
+        title={`Switch to ${getModeDisplayName(pendingMode)}`}
+        type="primary"
+        size="medium"
+        onClick={confirmModeSwitch}
+      />
+    </div>
+  </div>
+</Modal>
+
 <Modal
   title={"Save Request"}
   type={"dark"}
