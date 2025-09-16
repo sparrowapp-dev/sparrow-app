@@ -99,7 +99,6 @@
         isMergeViewEnableForParams = false;
         isMergeViewEnableForHeaders = false;
         isMergeViewLoading = false;
-        newModifiedContent = undefined;
         mergeViewRequestDatasetType = undefined;
         (async () => {
           /**
