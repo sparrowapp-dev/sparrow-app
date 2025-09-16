@@ -29,6 +29,7 @@
   import { Button, Dropdown, Tag, Tooltip } from "@sparrow/library/ui";
   import { SparrowFilledLogo } from "./images/index";
   import { policyConfig } from "@sparrow/common/store";
+  import { TeamRole } from "@sparrow/common/enums";
   // import { GlobalSearch } from "../../components/popup/global-search";
   /**
    * environment list
@@ -36,6 +37,7 @@
   export let environments;
   export let onMarketingRedirect = () => {};
   export let currentWorkspacePlan = "";
+  export let userRole: string = "";
   export let isUpgradePlanModelOpen = false;
 
   const handleUpgradeClick = () => {
@@ -533,7 +535,7 @@
             />
           {/if}
         {/if}
-        {#if currentWorkspacePlan?.toLowerCase() === "community"}
+        {#if currentWorkspacePlan?.toLowerCase() === "community" && (userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN)}
           <div class="upgrade-link" on:click={handleUpgradeClick}>Upgrade</div>
         {/if}
       {/if}

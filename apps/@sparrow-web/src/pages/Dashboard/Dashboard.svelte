@@ -651,6 +651,7 @@
     {currentTeamName}
     {currentTeamId}
     {currentPlan}
+    {userRole}
     {currentWorkspacePlan}
     {currentWorkspaceType}
     {isGuestUser}

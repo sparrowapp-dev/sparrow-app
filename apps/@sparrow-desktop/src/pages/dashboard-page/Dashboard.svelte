@@ -719,6 +719,7 @@
     {currentTeamId}
     {currentWorkspaceType}
     {currentPlan}
+    {userRole}
     {currentWorkspacePlan}
     {isGuestUser}
     {isLoginBannerActive}
