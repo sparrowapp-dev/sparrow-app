@@ -279,4 +279,5 @@
   requestTabTestsDemoCompleted={_viewModel.handleRequestTestNoCodeDemoCompleted}
   isCloseRequestTestScriptDemo={_viewModel.updateIsRequestTabScriptDemo}
   requestTabTestScriptDemoCompleted={_viewModel.handleRequestTestNoCodeDemoCompleted}
+  onGenerateTestCases={_viewModel.generateTestCases}
 />

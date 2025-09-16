@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { Editor, Search } from "@sparrow/library/forms";
+  import { Editor, Search, Input } from "@sparrow/library/forms";
   import {
     ChevronDoubleLeftRegular,
     ChevronDoubleRightRegular,
     SearchIcon2,
+    StopFilledIcon,
   } from "@sparrow/library/icons";
   import { Button } from "@sparrow/library/ui";
   import { predefinedTestSnippets } from "./utils/common-snippets";
@@ -16,8 +17,13 @@
     handleCloseTour,
   } from "../../../../../request-tab-tour-guide/utils";
   import { requestTabScriptCardPosition } from "../../../../../request-tab-tour-guide/utils";
+  import { SparkleColoredIcon } from "@sparrow/common/icons";
+  import { generatingImage } from "@sparrow/common/images";
+  import { fade } from "svelte/transition";
   export let onTestsChange;
   export let tests;
+  export let onGenerateTestCases;
+  export let isTestCasesGenerating;
 
   type SplitDirection = "vertical" | "horizontal";
   type EditorLanguage = "TestJavaScript";
@@ -35,6 +41,10 @@
 
   let searchData: string = "";
   let isLeftPanelCollapsed: boolean = false;
+
+  let testCasePrompt = "";
+  let errorMessage: string = "";
+  let isError: boolean = false;
 
   // Preprocess search string
   $: trimmedSearch = searchData.trim().toLowerCase();
@@ -81,6 +91,19 @@
       : "25%";
 
   $: rightPanelWidth = isLeftPanelCollapsed ? "calc(100% - 60px)" : "75%";
+
+  const handleGenerateTestCases = async () => {
+    const result = await onGenerateTestCases(testCasePrompt);
+    if (result?.error) {
+      isError = true;
+      errorMessage =
+        "This request is a bit tricky to turn into a test. Please try rephrasing it in a simpler way.";
+    } else {
+      isError = false;
+      errorMessage = "";
+      testCasePrompt = "";
+    }
+  };
 </script>
 
 <div class="border border-top-0 text-light p-2 h-100 rounded-bottom">
@@ -179,19 +202,79 @@
 
     <!-- Right Panel -->
     <div
-      class="h-100 gap-2 d-flex border-start ms-2 ps-2"
-      style="width:{rightPanelWidth};overflow:auto;flex-flow:wrap;align-content:flex-start;transition:width 0.3s ease;"
+      class="h-100 d-flex flex-column border-start ms-2 ps-2"
+      style="width:{rightPanelWidth}; transition:width 0.3s ease;"
     >
-      <Editor
-        bind:lang
-        value={tests?.script || ""}
-        on:change={handleCodeMirrorChange}
-        isEditable={true}
-        autofocus={true}
-        placeholder={`// What are the tests?\n// Tests are scripts that automatically check your API's response.\n// For example: Is the status code 200? Does the body contain an email field?\n// sp.test("Status code is 200", function () {\n//   sp.expect(sp.response.statusCode).to.equal(200);\n// });\n\n// You can:\n// - Use "Snippets" to insert common tests\n// - Or, write test cases manually using scripting or no code method`}
-        {isBodyBeautified}
-        beautifySyntaxCallback={updateBeautifiedState}
-      />
+      <div
+        style="flex:1 1 auto; overflow-y:auto; overflow-x:hidden; min-height:0;"
+      >
+        <Editor
+          bind:lang
+          value={tests?.script || ""}
+          on:change={handleCodeMirrorChange}
+          isEditable={true}
+          autofocus={true}
+          placeholder={`// What are the tests?\n// Tests are scripts that automatically check your API's response.\n// For example: Is the status code 200? Does the body contain an email field?\n// sp.test("Status code is 200", function () {\n//   sp.expect(sp.response.statusCode).to.equal(200);\n// });\n\n// You can:\n// - Use "Snippets" to insert common tests\n// - Or, write test cases manually using scripting or no code method`}
+          {isBodyBeautified}
+          beautifySyntaxCallback={updateBeautifiedState}
+        />
+      </div>
+      <div style="flex:0 0 auto; width:100%; margin-top:4px;">
+        <div style="position:relative;">
+          {#if errorMessage}
+            <div class="input-error">{errorMessage}</div>
+          {/if}
+          {#if isTestCasesGenerating}
+            <p
+              class="text-primary-300 generating-img d-flex justify-content-center align-items-center"
+              in:fade={{ duration: 200 }}
+            >
+              <img src={generatingImage} style="width: 118px;" alt="" />
+            </p>
+          {/if}
+          <Input
+            id="sparkle-input"
+            placeholder="Ask AI to generate a test"
+            startIcon={SparkleColoredIcon}
+            iconSize={16}
+            variant="primary"
+            size="medium"
+            bind:value={testCasePrompt}
+            {isError}
+            on:input={() => {
+              isError = false;
+              errorMessage = "";
+            }}
+          />
+
+          <div
+            style="position:absolute; right:4px; top:{isTestCasesGenerating
+              ? '75%'
+              : isError
+                ? '67%'
+                : '50%'}; transform:translateY(-50%);"
+          >
+            <Button
+              size="small"
+              type="outline-secondary"
+              startIcon={isTestCasesGenerating
+                ? StopFilledIcon
+                : SparkleColoredIcon}
+              title={isTestCasesGenerating ? "Stop Generating" : "Generate"}
+              onClick={() => {
+                if (isTestCasesGenerating) {
+                  // handleStopGeneratingTestCases();
+                  return;
+                }
+                if (!isTestCasesGenerating && testCasePrompt.trim()) {
+                  handleGenerateTestCases();
+                  return;
+                }
+              }}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   {#if $requestTabTestScriptStep === 3}
@@ -215,6 +298,12 @@
 </div>
 
 <style>
+  .input-error {
+    color: var(--text-ds-danger-300, #e74c3c);
+    font-size: 12px;
+    margin-bottom: 4px;
+    text-align: left;
+  }
   .snippet-text {
     font-family: "Inter", sans-serif;
     font-weight: 500;
@@ -298,5 +387,10 @@
     color: var(--text-ds-neutral-50);
     font-family: "Inter", sans-serif;
     font-weight: 500;
+  }
+
+  .generating-img {
+    width: 100%;
+    margin-bottom: 8px;
   }
 </style>

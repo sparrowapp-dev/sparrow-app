@@ -10,6 +10,8 @@
   export let testResults;
   export let responseBody;
   export let responseHeader;
+  export let onGenerateTestCases;
+  export let isTestCasesGenerating;
 </script>
 
 <div
@@ -84,7 +86,13 @@
   </div>
   <div style="flex:1; overflow:auto;">
     {#if tests?.testCaseMode === TestCaseModeEnum.SCRIPT}
-      <Script {tabSplitDirection} {tests} {onTestsChange} />
+      <Script
+        {tabSplitDirection}
+        {tests}
+        {onTestsChange}
+        {onGenerateTestCases}
+        {isTestCasesGenerating}
+      />
     {:else if tests?.testCaseMode === TestCaseModeEnum.NO_CODE}
       <NoCode
         {tests}

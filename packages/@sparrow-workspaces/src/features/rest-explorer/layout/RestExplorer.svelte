@@ -194,6 +194,7 @@
   export let collection;
   export let isSharedWorkspace = false;
   export let onFixTestScript;
+  const isTestCasesGenerating = writable<boolean>(false);
 
   const loading = writable<boolean>(false);
   // Props for showing merge/diff view in RequestBody, Headers and Params
@@ -204,6 +205,9 @@
   export let isMergeViewLoading = false;
   export let newModifiedContent: string | KeyValuePair[];
   export let mergeViewRequestDatasetType: RequestDatasetEnum;
+
+  //props for generating test cases function
+  export let onGenerateTestCases;
 
   // Reference to the splitpane container element
   let splitpaneContainer;
@@ -291,6 +295,12 @@
   $: {
     loadingState.subscribe((tab) => {
       loading.set(tab.get($tab.tabId));
+    });
+  }
+
+  $: {
+    loadingState.subscribe((tab) => {
+      isTestCasesGenerating.set(tab.get($tab.tabId + "generatingTestCases"));
     });
   }
   let isGuidePopup = false;
@@ -863,6 +873,8 @@
                           testResults={storeData?.response?.testResults}
                           responseBody={storeData?.response?.body}
                           responseHeader={storeData?.response?.headers}
+                          {onGenerateTestCases}
+                          isTestCasesGenerating={$isTestCasesGenerating}
                         />
                       {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
                         <RequestDoc

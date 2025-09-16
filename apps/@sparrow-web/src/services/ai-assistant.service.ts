@@ -5,6 +5,7 @@ import type {
   GenerateUserAndSystemPromptsDto,
   GenerateMockDataRequestDto,
   fixTestScriptRequestDto,
+  GenerateTestCasesRequestDto,
 } from "@sparrow/common/dto/ai-assistant";
 
 export class AiAssistantService {
@@ -25,7 +26,9 @@ export class AiAssistantService {
     return response;
   };
 
-  public generateUserOrSystemPrompts = async (_prompt: GenerateUserAndSystemPromptsDto) => {
+  public generateUserOrSystemPrompts = async (
+    _prompt: GenerateUserAndSystemPromptsDto,
+  ) => {
     const response = await makeRequest(
       "POST",
       `${this.apiUrl}/api/assistant/generate-prompt`,
@@ -71,10 +74,22 @@ export class AiAssistantService {
     return response;
   };
 
-    public fixTestScript = async (data: fixTestScriptRequestDto) => {
+  public fixTestScript = async (data: fixTestScriptRequestDto) => {
     const response = await makeRequest(
       "POST",
       `${this.apiUrl}/api/assistant/fix-test-script`,
+      {
+        body: data,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public generateTestCases = async (data: GenerateTestCasesRequestDto) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/assistant/generate-test-cases`,
       {
         body: data,
         headers: getAuthHeaders(),
