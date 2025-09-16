@@ -123,7 +123,8 @@
     "uuid": "^9.0.1",
     "xmldom": "^0.6.0",
     "xpath": "^0.0.34",
-    "yup": "^1.2.0"
+    "yup": "^1.2.0",
+    "fast-xml-parser": "^4.5.0"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.4.2",

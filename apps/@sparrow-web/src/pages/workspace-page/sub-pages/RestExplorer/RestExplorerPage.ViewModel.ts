@@ -7,6 +7,7 @@ import {
   ReduceAuthParameter,
 } from "@sparrow/workspaces/features/rest-explorer/utils";
 import { createDeepCopy, scrollToTab } from "@sparrow/common/utils";
+import { XMLParser, XMLBuilder } from "fast-xml-parser";
 import {
   startLoading,
   stopLoading,
@@ -2179,6 +2180,11 @@ class RestExplorerViewModel {
             } catch (err: any) {
               tests.push({ name, passed: false, error: err.message });
             }
+          },
+          xmlToJSON: (xml: string) => {
+            const parser = new XMLParser();
+            const json = parser.parse(xml);
+            return json;
           },
           expect,
         };
