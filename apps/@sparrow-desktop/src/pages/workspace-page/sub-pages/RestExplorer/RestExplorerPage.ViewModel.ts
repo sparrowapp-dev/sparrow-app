@@ -24,6 +24,7 @@ import type {
   TabDocument,
   WorkspaceDocument,
 } from "../../../../database/database";
+import { XMLParser, XMLBuilder } from "fast-xml-parser";
 
 // ---- Repo
 import { TabRepository } from "../../../../repositories/tab.repository";
@@ -2164,6 +2165,11 @@ class RestExplorerViewModel {
             } catch (err: any) {
               tests.push({ name, passed: false, error: err.message });
             }
+          },
+          xmlToJSON: (xml: string) => {
+            const parser = new XMLParser();
+            const json = parser.parse(xml);
+            return json;
           },
           expect,
         };
