@@ -329,9 +329,7 @@
       CreatePlaceHolder(placeholder),
       lintGutter(), // Add lint gutter support
       // Enable JS linting only if language is JS
-      ...(lang === "JavaScript" || "TestJavaScript"
-        ? [linter(jsLinter())]
-        : []),
+      ...(lang === "TestJavaScript" ? [linter(jsLinter())] : []),
     ];
 
     // Removing window style space(\r\n) to find correct cursor position
