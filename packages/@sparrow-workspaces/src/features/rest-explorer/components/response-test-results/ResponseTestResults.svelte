@@ -13,6 +13,7 @@
   export let onFixTestScript;
   export let tabId;
   export let isGuestUser;
+  export let isSharedWorkspace;
 
   let filter: "all" | "passed" | "failed" = "all";
   let allBtn: HTMLSpanElement;
@@ -148,7 +149,7 @@
             Couldn't evaluate the test script: {responseTestMessage}
           </span>
         </p>
-        {#if !isGuestUser}
+        {#if !isGuestUser && !isSharedWorkspace}
           <Button
             title="Fix Script"
             startIcon={SparkleRegular}

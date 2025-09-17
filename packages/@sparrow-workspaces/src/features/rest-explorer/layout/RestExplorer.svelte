@@ -1093,6 +1093,7 @@
                                   {onFixTestScript}
                                   tabId={$tab?.tabId}
                                   {isGuestUser}
+                                  {isSharedWorkspace}
                                 />
                                 <!-- </div> -->
                               {/if}
