@@ -206,6 +206,7 @@
       testTarget: t.id === test.id ? testTargetItem : t.testTarget,
       testPath: t.id === test.id ? "" : t.testPath,
     }));
+    $: console.log(localTest.noCode);
   };
 
   const setByDefaultTestName = (test) => {
@@ -441,56 +442,84 @@
                   >
                   <WithSelectV4
                     id={"hdregtrgt89fhrbej"}
-                    data={[
-                      {
-                        name: "Equals",
-                        id: TestCaseConditionOperatorEnum.EQUALS,
-                      },
-                      {
-                        name: "Not Equal",
-                        id: TestCaseConditionOperatorEnum.NOT_EQUAL,
-                      },
-                      {
-                        name: "Exists",
-                        id: TestCaseConditionOperatorEnum.EXISTS,
-                      },
-                      {
-                        name: "Does Not Exist",
-                        id: TestCaseConditionOperatorEnum.DOES_NOT_EXIST,
-                      },
-                      {
-                        name: "Less Than",
-                        id: TestCaseConditionOperatorEnum.LESS_THAN,
-                      },
-                      {
-                        name: "Greater Than",
-                        id: TestCaseConditionOperatorEnum.GREATER_THAN,
-                      },
-                      {
-                        name: "Contains",
-                        id: TestCaseConditionOperatorEnum.CONTAINS,
-                      },
-                      {
-                        name: "Does Not Contain",
-                        id: TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN,
-                      },
-                      {
-                        name: "Is Empty",
-                        id: TestCaseConditionOperatorEnum.IS_EMPTY,
-                      },
-                      {
-                        name: "Is Not Empty",
-                        id: TestCaseConditionOperatorEnum.IS_NOT_EMPTY,
-                      },
-                      {
-                        name: "In List",
-                        id: TestCaseConditionOperatorEnum.IN_LIST,
-                      },
-                      {
-                        name: "Not In List",
-                        id: TestCaseConditionOperatorEnum.NOT_IN_LIST,
-                      },
-                    ]}
+                    data={test.testTarget === "Time Consuming"
+                      ? [
+                          {
+                            name: "Equals",
+                            id: TestCaseConditionOperatorEnum.EQUALS,
+                          },
+                          {
+                            name: "Not Equal",
+                            id: TestCaseConditionOperatorEnum.NOT_EQUAL,
+                          },
+
+                          {
+                            name: "Less Than",
+                            id: TestCaseConditionOperatorEnum.LESS_THAN,
+                          },
+                          {
+                            name: "Less Than Or Equal",
+                            id: TestCaseConditionOperatorEnum.LESS_THAN_OR_EQUAL,
+                          },
+                          {
+                            name: "Greater Than",
+                            id: TestCaseConditionOperatorEnum.GREATER_THAN,
+                          },
+                          {
+                            name: "Greater Than Or Equal",
+                            id: TestCaseConditionOperatorEnum.GREATER_THAN_OR_EQUAL,
+                          },
+                        ]
+                      : [
+                          {
+                            name: "Equals",
+                            id: TestCaseConditionOperatorEnum.EQUALS,
+                          },
+                          {
+                            name: "Not Equal",
+                            id: TestCaseConditionOperatorEnum.NOT_EQUAL,
+                          },
+                          {
+                            name: "Exists",
+                            id: TestCaseConditionOperatorEnum.EXISTS,
+                          },
+                          {
+                            name: "Does Not Exist",
+                            id: TestCaseConditionOperatorEnum.DOES_NOT_EXIST,
+                          },
+                          {
+                            name: "Less Than",
+                            id: TestCaseConditionOperatorEnum.LESS_THAN,
+                          },
+                          {
+                            name: "Greater Than",
+                            id: TestCaseConditionOperatorEnum.GREATER_THAN,
+                          },
+                          {
+                            name: "Contains",
+                            id: TestCaseConditionOperatorEnum.CONTAINS,
+                          },
+                          {
+                            name: "Does Not Contain",
+                            id: TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN,
+                          },
+                          {
+                            name: "Is Empty",
+                            id: TestCaseConditionOperatorEnum.IS_EMPTY,
+                          },
+                          {
+                            name: "Is Not Empty",
+                            id: TestCaseConditionOperatorEnum.IS_NOT_EMPTY,
+                          },
+                          {
+                            name: "In List",
+                            id: TestCaseConditionOperatorEnum.IN_LIST,
+                          },
+                          {
+                            name: "Not In List",
+                            id: TestCaseConditionOperatorEnum.NOT_IN_LIST,
+                          },
+                        ]}
                     titleId={test?.condition}
                     onclick={(conditionItem) => {
                       handleConditionDropdown(conditionItem, test);

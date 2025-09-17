@@ -217,8 +217,8 @@ class RestExplorerViewModel {
             collectionDoc?.isGenerateVariableTrial,
           );
           await this.updateIsRequestTabDemo(
-            collectionDoc?.isRequestTestsNoCodeDemoCompleted
-          )
+            collectionDoc?.isRequestTestsNoCodeDemoCompleted,
+          );
         }
 
         //   "selectedRequestAuthProfileId:>> ",
@@ -2016,11 +2016,25 @@ class RestExplorerViewModel {
               : actual.length < Number(expected);
           message = passed ? "Passed" : "Failed";
           break;
+        case TestCaseConditionOperatorEnum.LESS_THAN_OR_EQUAL:
+          passed =
+            typeof actual === "number"
+              ? actual <= Number(expected)
+              : actual.length <= Number(expected);
+          message = passed ? "Passed" : "Failed";
+          break;
         case TestCaseConditionOperatorEnum.GREATER_THAN:
           passed =
             typeof actual === "number"
               ? actual > Number(expected)
               : actual.length > Number(expected);
+          message = passed ? "Passed" : "Failed";
+          break;
+        case TestCaseConditionOperatorEnum.GREATER_THAN_OR_EQUAL:
+          passed =
+            typeof actual === "number"
+              ? actual >= Number(expected)
+              : actual.length >= Number(expected);
           message = passed ? "Passed" : "Failed";
           break;
         case TestCaseConditionOperatorEnum.CONTAINS:
@@ -2137,11 +2151,11 @@ class RestExplorerViewModel {
     );
   };
 
-  public updateIsRequestTabDemo = async(value:boolean) =>{
+  public updateIsRequestTabDemo = async (value: boolean) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.isRequestTestsNoCodeDemoCompleted = value;
     this.tab = progressiveTab;
-  }
+  };
 
   /**
    *
@@ -2677,7 +2691,6 @@ class RestExplorerViewModel {
               id: req.id,
             },
           };
-          return;
         }
         const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
         const res = await insertCollectionRequest(
@@ -4345,7 +4358,7 @@ class RestExplorerViewModel {
     }
   };
 
-    /**
+  /**
    * Fetch collections from services and insert to repository
    * @param workspaceId - id of current workspace
    */

@@ -79,6 +79,8 @@ export enum TestCaseConditionOperatorEnum {
   IS_NOT_EMPTY = "Is Not Empty",
   IN_LIST = "In List",
   NOT_IN_LIST = "Not In List",
+  LESS_THAN_OR_EQUAL = "Less Than OR Equal",
+  GREATER_THAN_OR_EQUAL = "Greater Than OR Equal",
 }
 
 export enum TestCaseSelectionTypeEnum {

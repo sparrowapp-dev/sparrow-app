@@ -2032,11 +2032,25 @@ class RestExplorerViewModel {
               : actual.length < Number(expected);
           message = passed ? "Passed" : "Failed";
           break;
+        case TestCaseConditionOperatorEnum.LESS_THAN_OR_EQUAL:
+          passed =
+            typeof actual === "number"
+              ? actual <= Number(expected)
+              : actual.length <= Number(expected);
+          message = passed ? "Passed" : "Failed";
+          break;
         case TestCaseConditionOperatorEnum.GREATER_THAN:
           passed =
             typeof actual === "number"
               ? actual > Number(expected)
               : actual.length > Number(expected);
+          message = passed ? "Passed" : "Failed";
+          break;
+        case TestCaseConditionOperatorEnum.GREATER_THAN_OR_EQUAL:
+          passed =
+            typeof actual === "number"
+              ? actual >= Number(expected)
+              : actual.length >= Number(expected);
           message = passed ? "Passed" : "Failed";
           break;
         case TestCaseConditionOperatorEnum.CONTAINS:
