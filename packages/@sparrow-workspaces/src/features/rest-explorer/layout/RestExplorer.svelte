@@ -1092,6 +1092,8 @@
                                   tests={$tab?.property?.request.tests}
                                   {onFixTestScript}
                                   tabId={$tab?.tabId}
+                                  {isGuestUser}
+                                  {isSharedWorkspace}
                                 />
                                 <!-- </div> -->
                               {/if}

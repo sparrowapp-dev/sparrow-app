@@ -12,6 +12,8 @@
   export let tests;
   export let onFixTestScript;
   export let tabId;
+  export let isGuestUser;
+  export let isSharedWorkspace;
 
   let filter: "all" | "passed" | "failed" = "all";
   let allBtn: HTMLSpanElement;
@@ -147,17 +149,19 @@
             Couldn't evaluate the test script: {responseTestMessage}
           </span>
         </p>
-        <Button
-          title="Fix Script"
-          startIcon={SparkleRegular}
-          type="outline-secondary"
-          loader={$loadingState.get(tabId + "-fix-test-script")}
-          onClick={async () => {
-            startLoading(tabId + "-fix-test-script");
-            await onFixTestScript();
-            stopLoading(tabId + "-fix-test-script");
-          }}
-        />
+        {#if !isGuestUser && !isSharedWorkspace}
+          <Button
+            title="Fix Script"
+            startIcon={SparkleRegular}
+            type="outline-secondary"
+            loader={$loadingState.get(tabId + "-fix-test-script")}
+            onClick={async () => {
+              startLoading(tabId + "-fix-test-script");
+              await onFixTestScript();
+              stopLoading(tabId + "-fix-test-script");
+            }}
+          />
+        {/if}
       {:else}
         <div class="my-4">
           <SparrowLogo />
