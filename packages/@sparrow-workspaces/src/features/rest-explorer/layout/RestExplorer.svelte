@@ -1100,7 +1100,7 @@
                             </div>
                           </div>
                         {/if}
-                        {#if $tab?.property?.request?.isGeneratedVariable && !$requestTabTestDemo}
+                        {#if $tab?.property?.request?.isGeneratedVariable && !$requestTabTestDemo && !$requestTabTestScriptDemo}
                           <div
                             style="position:absolute; bottom:12px; right:{!$tab
                               ?.property?.request?.state?.isChatbotActive
@@ -1172,7 +1172,7 @@
                                 requestTabTestScriptStep.set(1);
                               }}
                               onClose={() => {
-                                isCloseRequestTestDemo(false);
+                                isCloseRequestTestScriptDemo(false);
                                 requestTabTestScriptDemo.set(false);
                               }}
                             />
