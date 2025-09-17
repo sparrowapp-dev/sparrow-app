@@ -52,10 +52,6 @@ jobs:
         with:
           node-version: "20.x"
 
-      - name: Install Windows SDK
-        run: Invoke-WebRequest -Uri https://aka.ms/winsdk/10/latest/SdkSetup.exe -OutFile $env:TEMP\SdkSetup.exe
-        shell: powershell
-
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
         with:
@@ -136,6 +132,19 @@ jobs:
         with:
           version: 'latest'    
 
+      - name: Verify preinstalled Windows SDK tools
+        shell: pwsh
+        run: |
+          Write-Host "🔎 Looking for signtool.exe"
+          $signtool = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter signtool.exe | Where-Object FullName -Match '\\x64\\signtool\.exe$' | Select-Object -First 1
+          
+          if (-not $signtool) { throw "❌ signtool.exe not found!" }
+          
+          Write-Host "✅ signtool.exe found at $($signtool.FullName)"
+
+          # Export paths for later steps
+          echo "SIGNTOOL_PATH=$($signtool.FullName)" >> $env:GITHUB_ENV
+
       - name: sign msi
         run: |
           # Create self-signed certificate
@@ -177,9 +186,10 @@ jobs:
           $msiFiles = Get-ChildItem "$bundlePath\msi\*.msi" -ErrorAction SilentlyContinue
           if ($msiFiles) {
               Write-Host "Found $($msiFiles.Count) MSI file(s) to sign"
+              $signtoolPath = $env:SIGNTOOL_PATH.Trim()
               foreach ($file in $msiFiles) {
                   Write-Host "Signing MSI: $($file.Name)"
-                  $result = & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "$bundlePath\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "$($file.FullName)" 2>&1
+                  $result = & "$signtoolPath" sign /f "$bundlePath\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "$($file.FullName)" 2>&1
                   if ($LASTEXITCODE -eq 0) {
                       Write-Host "Successfully signed: $($file.Name)" -ForegroundColor Green
                   } else {
@@ -194,9 +204,10 @@ jobs:
           $exeFiles = Get-ChildItem "$bundlePath\nsis\*.exe" -ErrorAction SilentlyContinue
           if ($exeFiles) {
               Write-Host "Found $($exeFiles.Count) EXE file(s) to sign"
+              $signtoolPath = $env:SIGNTOOL_PATH.Trim()
               foreach ($file in $exeFiles) {
                   Write-Host "Signing EXE: $($file.Name)"
-                  $result = & "C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86\SignTool.exe" sign /f "$bundlePath\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "$($file.FullName)" 2>&1
+                  $result = & "$signtoolPath" sign /f "$bundlePath\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "$($file.FullName)" 2>&1
                   if ($LASTEXITCODE -eq 0) {
                       Write-Host "Successfully signed: $($file.Name)" -ForegroundColor Green
                   } else {
@@ -493,6 +504,10 @@ jobs:
       - name: Set build datetime
         run: echo "BUILD_DATETIME=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
 
+      - name: Rename Intel Mac updater file
+        run: |
+          find /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos -name "*.tar.gz" -exec bash -c 'mv "$1" "$(dirname "$1")/$(basename "$1" .tar.gz)_intel_mac.tar.gz"' _ {} \;
+          
       - name: Upload macOS DMG(Both archs) to S3
         run: |
           # Upload macOS (ARM64) DMG
@@ -510,6 +525,11 @@ jobs:
           DMG_SUFFIXED_FILE="$INTEL_DMG_SRC_DIR/${DMG_BASENAME}_${{ env.BUILD_DATETIME }}.dmg"
           cp "$DMG_FILE" "$DMG_SUFFIXED_FILE"
           aws s3 cp "$DMG_SUFFIXED_FILE" s3://sparrow-release-assests-dev/macos/
+
+          # Upload Updater files
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos s3://sparrow-release-assests-dev/macos --recursive --exclude "*" --include "*.gz" 
+
+          aws s3 cp /Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/x86_64-apple-darwin/debug/bundle/macos s3://sparrow-release-assests-dev/macos/ --recursive --exclude "*" --include "*_intel_mac.tar.gz"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

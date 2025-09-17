@@ -118,50 +118,53 @@
 <div class="sparrow-text-input-container mb-2">
   <div class="d-flex align-items-center">
     {#if value.length == 0 || value.size === 0}
-      <!-- Icon Uploader only shows when no file uploaded -->
-      <div
-        style="width:{width} !important; height:{height} !important;  border: 3px dashed {showDimensionExceedError ||
+      <label
+        for={inputId}
+        class="w-100 sparrow-file-label"
+        role="button"
+        style="width:{width} !important; height:{height} !important; border: 3px dashed {showDimensionExceedError ||
         showFileTypeError ||
         showFileSizeError
           ? 'var(--border-danger-200)'
           : 'var(--border-secondary-300)'}; border-width: 2px;"
-        class="sparrow-file-input w-100 px-auto {isDragOver &&
-          'opacity-75 bg-lightBackground'}"
-        on:dragover={(e) => {
-          e.preventDefault();
-          isDragOver = true;
-        }}
-        on:dragleave={() => {
-          isDragOver = false;
-        }}
-        on:drop={(e) => {
-          e.preventDefault();
-          isDragOver = false;
-          handleDrop(e, maxFileSize, supportedFileTypes);
-        }}
       >
         <div
-          class="sparrow-choose-file-input-button d-flex justify-content-center my-4"
+          class="sparrow-file-input w-100 px-auto {isDragOver &&
+            'opacity-75 bg-lightBackground'}"
+          on:dragover={(e) => {
+            e.preventDefault();
+            isDragOver = true;
+          }}
+          on:dragleave={() => {
+            isDragOver = false;
+          }}
+          on:drop={(e) => {
+            e.preventDefault();
+            isDragOver = false;
+            handleDrop(e, maxFileSize, supportedFileTypes);
+          }}
         >
-          <label for={inputId} role="button">
+          <div
+            class="sparrow-choose-file-input-button d-flex justify-content-center my-4"
+          >
             <ArrowUploadFilled
               classProp="my-auto"
               size={"24px"}
               color={"var(--icon-primary-300)"}
             />
-          </label>
-          <input
-            class="sparrow-choose-file-input visually-hidden"
-            type="file"
-            {value}
-            id={inputId}
-            accept={generateAcceptString()}
-            on:change={(e) => {
-              onChange(e, maxFileSize, supportedFileTypes);
-            }}
-          />
+          </div>
         </div>
-      </div>
+      </label>
+      <input
+        class="sparrow-choose-file-input visually-hidden"
+        type="file"
+        {value}
+        id={inputId}
+        accept={generateAcceptString()}
+        on:change={(e) => {
+          onChange(e, maxFileSize, supportedFileTypes);
+        }}
+      />
     {/if}
     {#if value.length === 0 || value.size === 0}
       <!-- Icon Uploader description only shows when no file is uploaded -->
@@ -225,11 +228,6 @@
     border-radius: 4px;
     font-size: var(--base-text);
   }
-  .sparrow-file-input:hover {
-    cursor: pointer;
-    border: 2px dashed var(--border-ds-primary-300) !important;
-    border-radius: 6px !important;
-  }
   .sparrow-input-label-desc {
     color: var(--text-secondary-350);
     // font-size: var(--small-text);
@@ -247,6 +245,16 @@
 
   .sparrow-choose-file-label {
     color: var(--text-primary-300);
+  }
+
+  label[for]:hover {
+    border: 2px dashed var(--border-ds-primary-300) !important;
+    border-radius: 4px !important;
+  }
+
+  .sparrow-file-label:hover {
+    border: 2px dashed var(--border-ds-primary-300) !important;
+    border-radius: 4px !important;
   }
 
   .sparrow-input-image-preview > img {

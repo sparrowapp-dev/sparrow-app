@@ -6,6 +6,7 @@
     AttachRegular,
     DeleteRegular,
     MathFormulaRegular,
+    SparkleFilled,
   } from "@sparrow/library/icons";
   import { crossIcon as close } from "@sparrow/library/assets";
   import { handleEventOnClickDynamicExpressionButton } from "@sparrow/common/utils";
@@ -34,14 +35,35 @@
   class="pair-data-row w-100 d-flex align-items-center px-1 {customClass}"
   style="position:relative"
 >
-  <div style="width:24px;" class="me-2">
-    {#if pairs.length - 1 != index || !isInputBoxEditable}
-      <Checkbox
-        checked={element.checked}
-        on:input={() => updateCheck(index)}
-        disabled={!isCheckBoxEditable}
-      />
-    {/if}
+  <div
+    class="d-flex justify-content-center align-items-center me-2"
+    style="width:50px;"
+  >
+    <span style="width: 25px;">
+      {#if element.generated}
+        <Tooltip
+          title={"Generated Mock Data"}
+          placement={"top-right"}
+          distance={10}
+        >
+          <button
+            class="generate-action-button sparkle-icon-parent accept"
+            on:click|stopPropagation={() => {}}
+          >
+            <SparkleFilled size="12px" color="" />
+          </button>
+        </Tooltip>
+      {/if}
+    </span>
+    <span style="width: 25px;">
+      {#if pairs.length - 1 != index || !isInputBoxEditable}
+        <Checkbox
+          checked={element.checked}
+          on:input={() => updateCheck(index)}
+          disabled={!isCheckBoxEditable}
+        />
+      {/if}
+    </span>
   </div>
 
   <div
@@ -50,7 +72,10 @@
   >
     <div class="w-50 d-flex align-items-center">
       <!-- <div class="position-absolute top-0" style="width: calc(50% - 48px);"> -->
-      <div class="position-absolute top-0" style="width: calc(50% - 60px);">
+      <div
+        class="position-absolute top-0"
+        style="width: calc(50% - {isInputBoxEditable ? '90px' : '60px'});"
+      >
         <CodeMirrorInput
           bind:value={element.key}
           onUpdateInput={() => updateParam(index)}
@@ -235,5 +260,35 @@
   .diff-row.diff-deleted {
     /* background-color: #3d1514 !important; */
     background-color: var(--bg-ds-danger-800) !important;
+  }
+  .generate-action-button {
+    width: 24px;
+    height: 24px;
+    background-color: transparent;
+    color: var(--text-ds-neutral-100);
+    background-color: transparent;
+    border: 0px;
+    border-radius: 4px;
+  }
+  .generate-action-button:hover {
+    color: var(--text-ds-neutral-50);
+    background-color: var(--bg-ds-surface-300);
+    border: 0px;
+  }
+  .generate-action-button:focus-visible {
+    border: 2px solid var(--border-ds-primary-300);
+    color: var(--text-ds-neutral-100);
+    outline: none;
+  }
+  .generate-action-button:active {
+    color: var(--text-ds-primary-300);
+    background-color: var(--bg-ds-surface-400);
+    border: 0px;
+  }
+  .sparkle-icon-parent {
+    color: var(--text-ds-neutral-400);
+  }
+  .sparkle-icon-parent:hover {
+    color: var(--text-ds-neutral-100);
   }
 </style>
