@@ -11,6 +11,8 @@
   export let responseBody;
   export let responseHeader;
   export let onShowModeChangeModal: (newMode: TestCaseModeEnum) => void;
+  export let onGenerateTestCases;
+  export let isTestCasesGenerating;
 </script>
 
 <div
@@ -55,6 +57,7 @@
                 onShowModeChangeModal(TestCaseModeEnum.SCRIPT);
               }
             }}
+            id="request-tab-test-script"
             class="rounded px-2 text-fs-12 py-1 btn-formatter"
             style="position: relative; z-index: 2; background-color: {tests?.testCaseMode ===
             TestCaseModeEnum.SCRIPT
@@ -81,7 +84,13 @@
   </div>
   <div style="flex:1; overflow:auto;">
     {#if tests?.testCaseMode === TestCaseModeEnum.SCRIPT}
-      <Script {tabSplitDirection} {tests} {onTestsChange} />
+      <Script
+        {tabSplitDirection}
+        {tests}
+        {onTestsChange}
+        {onGenerateTestCases}
+        {isTestCasesGenerating}
+      />
     {:else if tests?.testCaseMode === TestCaseModeEnum.NO_CODE}
       <NoCode
         {tests}

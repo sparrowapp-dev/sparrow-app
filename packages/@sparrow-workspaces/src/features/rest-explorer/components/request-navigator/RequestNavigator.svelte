@@ -13,6 +13,8 @@
   export let isGuestUser: boolean = false;
   export let userRole: any;
   export let isGenerateMockDataModal: boolean = false;
+  export let bulkEditHeadersActive: boolean = false;
+  export let bulkEditParamsActive: boolean = false;
   import { ThreeDotIcon } from "@sparrow/library/assets";
   import { SparkleColoredIcon } from "@sparrow/common/icons";
   import { WorkspaceRole } from "@sparrow/common/enums";
@@ -114,7 +116,7 @@
 </script>
 
 <div style="padding-bottom: 12px; position:relative;">
-  {#if (requestStateSection === RequestSectionEnum.HEADERS || requestStateSection === RequestSectionEnum.PARAMETERS || requestStateSection === RequestSectionEnum.REQUEST_BODY) && !isGuestUser && (userRole === WorkspaceRole.WORKSPACE_ADMIN || userRole === WorkspaceRole.WORKSPACE_EDITOR)}
+  {#if ((requestStateSection === RequestSectionEnum.HEADERS && !bulkEditHeadersActive) || (requestStateSection === RequestSectionEnum.PARAMETERS && !bulkEditParamsActive) || requestStateSection === RequestSectionEnum.REQUEST_BODY) && !isGuestUser && (userRole === WorkspaceRole.WORKSPACE_ADMIN || userRole === WorkspaceRole.WORKSPACE_EDITOR)}
     <div
       class="button-container"
       style="position: absolute; top: 6px; right: 10px;"
