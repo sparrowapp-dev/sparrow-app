@@ -26,7 +26,7 @@
   export let isTestCasesGenerating;
 
   type SplitDirection = "vertical" | "horizontal";
-  type EditorLanguage = "JavaScript";
+  type EditorLanguage = "TestJavaScript";
 
   // Snippet type (based on your utils/common-snippets.ts)
   interface Snippet {
@@ -35,7 +35,7 @@
   }
 
   export let tabSplitDirection: SplitDirection = "vertical";
-  export let lang: EditorLanguage = "JavaScript";
+  export let lang: EditorLanguage = "TestJavaScript";
 
   export let isBodyBeautified: boolean = false;
 
