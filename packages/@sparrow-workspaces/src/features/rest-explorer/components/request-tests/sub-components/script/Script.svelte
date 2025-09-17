@@ -5,8 +5,11 @@
     ChevronDoubleRightRegular,
     SearchIcon2,
     StopFilledIcon,
+    ThumbDislikeRegular,
+    ThumbLikeRegular,
+    ArrowSyncRegular,
   } from "@sparrow/library/icons";
-  import { Button } from "@sparrow/library/ui";
+  import { Button, notifications } from "@sparrow/library/ui";
   import { predefinedTestSnippets } from "./utils/common-snippets";
   import RequestTabTourGuide from "../../../../../request-tab-tour-guide/layout/RequestTabTourGuide.svelte";
   import { requestTabTestScriptStep } from "../../../../../../stores";
@@ -19,7 +22,10 @@
   import { requestTabScriptCardPosition } from "../../../../../request-tab-tour-guide/utils";
   import { SparkleColoredIcon } from "@sparrow/common/icons";
   import { generatingImage } from "@sparrow/common/images";
-  import { fade } from "svelte/transition";
+  import { fade, fly } from "svelte/transition";
+  import { tick, onDestroy } from "svelte";
+  import { Tooltip } from "@sparrow/library/ui";
+
   export let onTestsChange;
   export let tests;
   export let onGenerateTestCases;
@@ -46,6 +52,18 @@
   let errorMessage: string = "";
   let isError: boolean = false;
 
+  // AI generation states
+  let showGeneratedTestActions = false;
+  let generatedTestContent = "";
+  let originalTestContent = "";
+  let currentPrompt = "";
+  let originalLineCount = 0;
+
+  // Persistent highlighting variables
+  let observer: MutationObserver | null = null;
+  let highlightInterval: number | null = null;
+  let rafId: number | null = null;
+
   // Preprocess search string
   $: trimmedSearch = searchData.trim().toLowerCase();
 
@@ -62,6 +80,16 @@
 
   const handleCodeMirrorChange = (e: any) => {
     onTestsChange({ ...tests, script: e.detail });
+
+    // Re-apply highlights immediately after any content change if we have generated content
+    if (showGeneratedTestActions) {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        highlightGeneratedContent();
+        // Double-check after a tiny delay
+        setTimeout(() => highlightGeneratedContent(), 1);
+      });
+    }
   };
 
   const toggleLeftPanel = (): void => {
@@ -93,17 +121,232 @@
   $: rightPanelWidth = isLeftPanelCollapsed ? "calc(100% - 60px)" : "75%";
 
   const handleGenerateTestCases = async () => {
+    // Store the original content and current prompt
+    originalTestContent = tests?.script || "";
+    originalLineCount = originalTestContent.trim()
+      ? originalTestContent.split("\n").length
+      : 0;
+    currentPrompt = testCasePrompt;
+
+    console.log(`Original line count: ${originalLineCount}`); // Debug log
+
     const result = await onGenerateTestCases(testCasePrompt);
     if (result?.error) {
       isError = true;
       errorMessage =
         "This request is a bit tricky to turn into a test. Please try rephrasing it in a simpler way.";
+    } else if (result?.generatedContent) {
+      isError = false;
+      errorMessage = "";
+      testCasePrompt = "";
+      generatedTestContent = result.generatedContent;
+
+      // Directly insert the generated content into the editor
+      await insertGeneratedContentDirectly();
+
+      // Show the action buttons
+      showGeneratedTestActions = true;
     } else {
       isError = false;
       errorMessage = "";
       testCasePrompt = "";
     }
   };
+
+  const insertGeneratedContentDirectly = async () => {
+    // Insert the generated test content into the current script
+    const currentScript = tests?.script || "";
+    const newScript =
+      currentScript + (currentScript ? "\n\n" : "") + generatedTestContent;
+
+    onTestsChange({
+      ...tests,
+      script: newScript,
+    });
+
+    await tick();
+
+    // Start persistent highlighting
+    setTimeout(() => {
+      startPersistentHighlighting();
+    }, 100);
+  };
+
+  const startPersistentHighlighting = () => {
+    console.log("Starting persistent highlighting..."); // Debug log
+
+    // Initial highlight
+    highlightGeneratedContent();
+
+    // Set up mutation observer to watch for DOM changes
+    setupHighlightObserver();
+
+    // Set up very frequent interval for continuous re-application
+    if (highlightInterval) clearInterval(highlightInterval);
+    highlightInterval = setInterval(() => {
+      if (showGeneratedTestActions) {
+        highlightGeneratedContent();
+      }
+    }, 10); // Very frequent re-application
+
+    // Add click event listener to re-highlight immediately on clicks
+  };
+
+  const setupHighlightObserver = () => {
+    if (observer) observer.disconnect();
+
+    const editorEl = document.querySelector(".cm-editor");
+    if (!editorEl) return;
+
+    observer = new MutationObserver((mutations) => {
+      if (showGeneratedTestActions) {
+        // Use requestAnimationFrame for immediate re-highlighting
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(() => {
+          highlightGeneratedContent();
+          // Multiple checks to ensure persistence
+          setTimeout(() => highlightGeneratedContent(), 0);
+          setTimeout(() => highlightGeneratedContent(), 1);
+          setTimeout(() => highlightGeneratedContent(), 5);
+        });
+      }
+    });
+
+    observer.observe(editorEl, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      characterData: true,
+    });
+  };
+
+  const highlightGeneratedContent = () => {
+    // Get all lines in the editor
+    const lines = document.querySelectorAll(".cm-line");
+
+    console.log(
+      `Highlighting: Found ${lines.length} lines, original count: ${originalLineCount}`,
+    ); // Debug log
+
+    if (lines.length === 0) {
+      return;
+    }
+
+    // Highlight only the newly added lines (generated content)
+    lines.forEach((line, index) => {
+      if (index >= originalLineCount) {
+        const element = line as HTMLElement;
+
+        console.log(`Highlighting line ${index + 1}`); // Debug log
+
+        // Add class for CSS targeting
+        if (!element.classList.contains("highlight-generated-line")) {
+          element.classList.add("highlight-generated-line");
+        }
+
+        // Force inline styles with !important for maximum persistence
+        element.style.setProperty(
+          "background-color",
+          "var(--bg-ds-surface-400)",
+          "important",
+        );
+      }
+    });
+  };
+
+  const removeHighlight = () => {
+    console.log("Removing highlights..."); // Debug log
+
+    // Stop all highlighting mechanisms
+    if (observer) {
+      observer.disconnect();
+      observer = null;
+    }
+    if (highlightInterval) {
+      clearInterval(highlightInterval);
+      highlightInterval = null;
+    }
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+
+    // Remove click event listeners
+
+    // Remove highlights from all lines
+    const highlightedLines = document.querySelectorAll(
+      ".highlight-generated-line",
+    );
+    highlightedLines.forEach((line) => {
+      const element = line as HTMLElement;
+      element.style.removeProperty("background-color");
+      element.classList.remove("highlight-generated-line");
+    });
+  };
+
+  const acceptGeneratedTest = () => {
+    // ONLY remove highlights when user accepts
+    removeHighlight();
+
+    // Keep the generated content that's already in the editor
+    showGeneratedTestActions = false;
+    generatedTestContent = "";
+    originalTestContent = "";
+    currentPrompt = "";
+    originalLineCount = 0;
+
+    notifications.success("AI-generated test case accepted!");
+  };
+
+  const rejectGeneratedTest = () => {
+    // Remove highlights and revert content
+    removeHighlight();
+
+    // Revert to original content
+    onTestsChange({ ...tests, script: originalTestContent });
+    showGeneratedTestActions = false;
+    generatedTestContent = "";
+    originalTestContent = "";
+    currentPrompt = "";
+    originalLineCount = 0;
+  };
+
+  const regenerateTest = async () => {
+    // Remove current highlights
+    removeHighlight();
+
+    // Hide the action buttons immediately when regeneration starts
+    showGeneratedTestActions = false;
+
+    // Revert to original content first
+    onTestsChange({ ...tests, script: originalTestContent });
+
+    // Use the same prompt to regenerate
+    const result = await onGenerateTestCases(currentPrompt);
+    if (result?.error) {
+      isError = true;
+      errorMessage =
+        "This request is a bit tricky to turn into a test. Please try rephrasing it in a simpler way.";
+    } else if (result?.generatedContent) {
+      isError = false;
+      errorMessage = "";
+      generatedTestContent = result.generatedContent;
+
+      // Insert the new generated content
+      await insertGeneratedContentDirectly();
+
+      // Show the action buttons again
+      showGeneratedTestActions = true;
+    }
+  };
+
+  // Clean up on component destroy
+  onDestroy(() => {
+    console.log("Component destroying, cleaning up..."); // Debug log
+    if (observer) observer.disconnect();
+    if (highlightInterval) clearInterval(highlightInterval);
+    if (rafId) cancelAnimationFrame(rafId);
+  });
 </script>
 
 <div class="border border-top-0 text-light p-2 h-100 rounded-bottom">
@@ -224,6 +467,48 @@
           {#if errorMessage}
             <div class="input-error">{errorMessage}</div>
           {/if}
+
+          {#if showGeneratedTestActions}
+            <div
+              class="d-flex align-items-center generated-test-actions"
+              style="gap: 12px;"
+              in:fly={{ y: 20, duration: 300 }}
+            >
+              <div
+                class="text-ds-font-size-12"
+                style="color: var(--text-ds-neutral-500);"
+              >
+                Do you want to use this generated test in your script?
+              </div>
+              <div class="actionable-button">
+                <Tooltip title="Yes" placement="top-center" size="small">
+                  <Button
+                    size="small"
+                    type="outline-primary"
+                    startIcon={ThumbLikeRegular}
+                    onClick={acceptGeneratedTest}
+                  />
+                </Tooltip>
+                <Tooltip title="No" placement="top-center" size="small">
+                  <Button
+                    size="small"
+                    type="outline-primary"
+                    startIcon={ThumbDislikeRegular}
+                    onClick={rejectGeneratedTest}
+                  />
+                </Tooltip>
+                <Tooltip title="Regenerate" placement="top-center" size="small">
+                  <Button
+                    size="small"
+                    type="outline-primary"
+                    startIcon={ArrowSyncRegular}
+                    onClick={regenerateTest}
+                  />
+                </Tooltip>
+              </div>
+            </div>
+          {/if}
+
           {#if isTestCasesGenerating}
             <p
               class="text-primary-300 generating-img d-flex justify-content-center align-items-center"
@@ -232,6 +517,7 @@
               <img src={generatingImage} style="width: 118px;" alt="" />
             </p>
           {/if}
+
           <Input
             id="sparkle-input"
             placeholder="Ask AI to generate a test"
@@ -241,6 +527,7 @@
             size="medium"
             bind:value={testCasePrompt}
             {isError}
+            disabled={showGeneratedTestActions}
             on:input={() => {
               isError = false;
               errorMessage = "";
@@ -252,7 +539,9 @@
               ? '75%'
               : isError
                 ? '67%'
-                : '50%'}; transform:translateY(-50%);"
+                : showGeneratedTestActions
+                  ? '80%'
+                  : '50%'}; transform:translateY(-50%);"
           >
             <Button
               size="small"
@@ -261,6 +550,7 @@
                 ? StopFilledIcon
                 : SparkleColoredIcon}
               title={isTestCasesGenerating ? "Stop Generating" : "Generate"}
+              disable={showGeneratedTestActions}
               onClick={() => {
                 if (isTestCasesGenerating) {
                   // handleStopGeneratingTestCases();
@@ -392,5 +682,24 @@
   .generating-img {
     width: 100%;
     margin-bottom: 8px;
+  }
+
+  /* AI Generated Test Case Action Styles */
+  .generated-test-actions {
+    padding: 12px;
+    margin-left: 40px;
+  }
+
+  .actionable-button {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .actionable-button :global(button) {
+    border: none !important;
+  }
+
+  :global(.highlight-generated-line) {
+    background-color: var(--bg-ds-surface-400) !important;
   }
 </style>
