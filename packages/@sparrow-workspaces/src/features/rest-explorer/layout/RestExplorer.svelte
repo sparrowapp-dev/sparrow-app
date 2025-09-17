@@ -1092,6 +1092,7 @@
                                   tests={$tab?.property?.request.tests}
                                   {onFixTestScript}
                                   tabId={$tab?.tabId}
+                                  {isGuestUser}
                                 />
                                 <!-- </div> -->
                               {/if}
