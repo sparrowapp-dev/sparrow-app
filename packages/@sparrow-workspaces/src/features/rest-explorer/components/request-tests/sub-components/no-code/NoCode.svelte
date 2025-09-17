@@ -206,7 +206,6 @@
       testTarget: t.id === test.id ? testTargetItem : t.testTarget,
       testPath: t.id === test.id ? "" : t.testPath,
     }));
-    $: console.log(localTest.noCode);
   };
 
   const setByDefaultTestName = (test) => {
