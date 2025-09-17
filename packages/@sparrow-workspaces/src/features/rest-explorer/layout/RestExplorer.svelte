@@ -1172,7 +1172,7 @@
                                 requestTabTestScriptStep.set(1);
                               }}
                               onClose={() => {
-                                isCloseRequestTestDemo(false);
+                                isCloseRequestTestScriptDemo(false);
                                 requestTabTestScriptDemo.set(false);
                               }}
                             />
