@@ -117,21 +117,24 @@
           style="padding-left: 8px; padding: 6px;"
         >
           <div
-            style="width: 50px; align-items: center; display: flex; justify-content:flex-start; padding-left:8px;"
+            style="width: 60px; align-items: center; display: flex; justify-content:flex-start; padding-left:8px;"
           >
             <Tag
               type={testCases?.testStatus ? "green" : "orange"}
-              text={testCases?.testStatus ? "Pass" : "Fail"}
+              text={testCases?.testStatus ? "Passed" : "Failed"}
               size="small"
             />
           </div>
-
-          <p
-            style="word-break: break-word; font-size: 12px; font-weight:400; color: var(--text-ds-neutral-400); padding-left: 4px; margin-bottom:0px;"
-          >
-            {testCases?.testName}
-            {testCases?.testMessage ? `| Error: ${testCases?.testMessage}` : ``}
-          </p>
+          <div style="calc(100% - 60px); flex:1;">
+            <p
+              style="word-break: break-word; font-size: 12px; font-weight:400; color: var(--text-ds-neutral-400); padding-left: 4px; margin-bottom:0px;"
+            >
+              {testCases?.testName}
+              {testCases?.testMessage
+                ? `| AssertionError: ${testCases?.testMessage}`
+                : ``}
+            </p>
+          </div>
         </div>
       {/each}
     </div>
