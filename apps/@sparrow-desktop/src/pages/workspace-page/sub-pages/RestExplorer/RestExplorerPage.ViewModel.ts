@@ -221,6 +221,7 @@ class RestExplorerViewModel {
           await this.updateIsRequestTabDemo(
             collectionDoc?.isRequestTestsNoCodeDemoCompleted,
           );
+
           await this.updateIsRequestTabScriptDemo(
             collectionDoc?.isRequestTestsScriptDemoCompleted,
           );
@@ -2012,7 +2013,7 @@ class RestExplorerViewModel {
 
   private async executeScriptTestcases() {
     const worker = new Worker(
-      new URL("../../../workers/test-script-worker.ts", import.meta.url),
+      new URL("../../../../workers/test-script-worker.ts", import.meta.url),
       {
         type: "module",
       },
@@ -2109,6 +2110,17 @@ class RestExplorerViewModel {
             ? ""
             : `Expected ${actual} to be less than ${expected || "(empty)"}`;
           break;
+        case TestCaseConditionOperatorEnum.LESS_THAN_OR_EQUAL:
+          passed =
+            typeof actual === "number"
+              ? actual <= Number(expected)
+              : actual.length <= Number(expected);
+          message = passed
+            ? ""
+            : `Expected ${actual} to be less than or equal to ${
+                expected || "(empty)"
+              }`;
+          break;
         case TestCaseConditionOperatorEnum.GREATER_THAN:
           passed =
             typeof actual === "number"
@@ -2117,6 +2129,17 @@ class RestExplorerViewModel {
           message = passed
             ? ""
             : `Expected ${actual} to be greater than ${expected || "(empty)"}`;
+          break;
+        case TestCaseConditionOperatorEnum.GREATER_THAN_OR_EQUAL:
+          passed =
+            typeof actual === "number"
+              ? actual >= Number(expected)
+              : actual.length >= Number(expected);
+          message = passed
+            ? ""
+            : `Expected ${actual} to be greater than or equal to ${
+                expected || "(empty)"
+              }`;
           break;
         case TestCaseConditionOperatorEnum.CONTAINS:
           passed = typeof actual === "string" && actual.includes(expected);
@@ -2836,7 +2859,6 @@ class RestExplorerViewModel {
               id: req.id,
             },
           };
-          return;
         }
         const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
         const res = await insertCollectionRequest(

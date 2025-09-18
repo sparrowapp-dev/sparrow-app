@@ -10,6 +10,7 @@
   export let testResults;
   export let responseBody;
   export let responseHeader;
+  export let onShowModeChangeModal: (newMode: TestCaseModeEnum) => void;
   export let onGenerateTestCases;
   export let isTestCasesGenerating;
   export let isGuestUser;
@@ -22,7 +23,6 @@
   style="position: relative;"
   id="request-tab-test"
 >
-  <!-- <div class="pb-2" style="font-size: 12px; font-weight:500;">TESTS</div> -->
   <div
     class="d-flex flex-column align-items-center justify-content-between w-100"
   >
@@ -34,8 +34,6 @@
           class="position-relative d-flex align-items-center rounded mb-0 py-1"
           style="position: relative;"
         >
-          <!-- ✅ Smooth background -->
-          <!-- <div class="background-slider" style={sliderStyle}></div> -->
           <span
             role="button"
             class="rounded text-fs-12 border-radius-2 px-2 py-1 btn-formatter"
@@ -45,10 +43,10 @@
               : 'transparent'}"
             id="request-tab-nocode"
             on:click={() => {
-              onTestsChange({
-                ...tests,
-                testCaseMode: TestCaseModeEnum.NO_CODE,
-              });
+              // Only show modal if we're switching FROM another mode TO No Code
+              if (tests?.testCaseMode !== TestCaseModeEnum.NO_CODE) {
+                onShowModeChangeModal(TestCaseModeEnum.NO_CODE);
+              }
             }}
           >
             No Code
@@ -57,14 +55,14 @@
           <span
             role="button"
             on:click={() => {
-              onTestsChange({
-                ...tests,
-                testCaseMode: TestCaseModeEnum.SCRIPT,
-              });
+              // Only show modal if we're switching FROM another mode TO Script
+              if (tests?.testCaseMode !== TestCaseModeEnum.SCRIPT) {
+                onShowModeChangeModal(TestCaseModeEnum.SCRIPT);
+              }
             }}
             id="request-tab-test-script"
             class="rounded px-2 text-fs-12 py-1 btn-formatter"
-            style="position: relative; z-index: 2;  background-color: {tests?.testCaseMode ===
+            style="position: relative; z-index: 2; background-color: {tests?.testCaseMode ===
             TestCaseModeEnum.SCRIPT
               ? 'var(--bg-ds-surface-400)'
               : 'transparent'}"
