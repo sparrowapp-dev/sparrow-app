@@ -67,7 +67,9 @@
   let observer: MutationObserver | null = null;
   let highlightInterval: number | null = null;
   let rafId: number | null = null;
+  let clickHandlers: (() => void)[] = [];
   let isUserLimitReached: boolean = false;
+
   // Preprocess search string
   $: trimmedSearch = searchData.trim().toLowerCase();
 
@@ -196,7 +198,53 @@
       if (showGeneratedTestActions) {
         highlightGeneratedContent();
       }
-    }, 10); // Very frequent re-application
+    }, 5); // Very frequent re-application
+    setupInteractionListeners();
+  };
+
+  const setupInteractionListeners = () => {
+    const editorEl = document.querySelector(".cm-editor");
+    if (!editorEl) return;
+
+    // Clear existing handlers
+    clickHandlers.forEach((handler, i) => {
+      const el = document.querySelector(".cm-editor");
+      if (el) {
+        el.removeEventListener("click", handler);
+        el.removeEventListener("mousedown", handler);
+        el.removeEventListener("mouseup", handler);
+        el.removeEventListener("keydown", handler);
+        el.removeEventListener("keyup", handler);
+        el.removeEventListener("focus", handler);
+      }
+    });
+    clickHandlers = [];
+
+    // Handler for all types of interactions
+    const interactionHandler = () => {
+      if (showGeneratedTestActions) {
+        // Immediate highlight
+        highlightGeneratedContent();
+      }
+    };
+
+    // Add to our list for cleanup
+    clickHandlers.push(interactionHandler);
+
+    // Add listeners for all possible interaction events
+    editorEl.addEventListener("click", interactionHandler);
+    editorEl.addEventListener("mousedown", interactionHandler);
+    editorEl.addEventListener("mouseup", interactionHandler);
+    editorEl.addEventListener("keydown", interactionHandler);
+    editorEl.addEventListener("keyup", interactionHandler);
+    editorEl.addEventListener("focus", interactionHandler);
+    editorEl.addEventListener("blur", interactionHandler);
+    editorEl.addEventListener("input", interactionHandler);
+
+    // Also add listeners to document to catch any clicks outside
+    document.addEventListener("click", interactionHandler);
+    document.addEventListener("mousedown", interactionHandler);
+    document.addEventListener("mouseup", interactionHandler);
   };
 
   const setupHighlightObserver = () => {
@@ -267,6 +315,25 @@
       cancelAnimationFrame(rafId);
       rafId = null;
     }
+
+    // Remove event listeners
+    clickHandlers.forEach((handler) => {
+      const editorEl = document.querySelector(".cm-editor");
+      if (editorEl) {
+        editorEl.removeEventListener("click", handler);
+        editorEl.removeEventListener("mousedown", handler);
+        editorEl.removeEventListener("mouseup", handler);
+        editorEl.removeEventListener("keydown", handler);
+        editorEl.removeEventListener("keyup", handler);
+        editorEl.removeEventListener("focus", handler);
+        editorEl.removeEventListener("blur", handler);
+        editorEl.removeEventListener("input", handler);
+      }
+      document.removeEventListener("click", handler);
+      document.removeEventListener("mousedown", handler);
+      document.removeEventListener("mouseup", handler);
+    });
+    clickHandlers = [];
 
     // Remove highlights from all lines
     const highlightedLines = document.querySelectorAll(
