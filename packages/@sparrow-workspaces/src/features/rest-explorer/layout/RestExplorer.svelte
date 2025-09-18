@@ -1434,7 +1434,7 @@
       class="mode-change-modal-text mb-3"
       style="padding-top: 20px; font-size:13px; padding-bottom:10px;"
     >
-      {@html `The test cases you have created in ${getModeDisplayName(currentMode)} mode will not be carried over to  ${getModeDisplayName(pendingMode)}. If you switch, those test cases you have added will be lost. <br /> Do you still want to continue?`}
+      {@html `The test cases you have created in ${getModeDisplayName(currentMode)} mode will not be carried over to  ${getModeDisplayName(pendingMode)}. Do you still want to continue?`}
     </p>
     <div class="d-flex justify-content-end gap-2">
       <!-- Cancel button -->
