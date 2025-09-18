@@ -2066,7 +2066,6 @@ class RestExplorerViewModel {
           }
   
           restApiDataMap.set(progressiveTab.tabId, r);
-
         }  
         return restApiDataMap;
       });
