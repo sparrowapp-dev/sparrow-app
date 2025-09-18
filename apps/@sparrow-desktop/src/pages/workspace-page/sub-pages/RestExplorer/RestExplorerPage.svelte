@@ -99,7 +99,6 @@
         isMergeViewEnableForParams = false;
         isMergeViewEnableForHeaders = false;
         isMergeViewLoading = false;
-        newModifiedContent = undefined;
         mergeViewRequestDatasetType = undefined;
         (async () => {
           /**
@@ -278,6 +277,6 @@
   isCloseRequestTestDemo={_viewModel.updateIsRequestTabDemo}
   requestTabTestsDemoCompleted={_viewModel.handleRequestTestNoCodeDemoCompleted}
   isCloseRequestTestScriptDemo={_viewModel.updateIsRequestTabScriptDemo}
-  requestTabTestScriptDemoCompleted={_viewModel.handleRequestTestNoCodeDemoCompleted}
+  requestTabTestScriptDemoCompleted={_viewModel.handleRequestTestScriptDemoCompleted}
   onGenerateTestCases={_viewModel.generateTestCases}
 />

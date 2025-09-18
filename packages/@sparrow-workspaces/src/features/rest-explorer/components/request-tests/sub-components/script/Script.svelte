@@ -23,6 +23,8 @@
   import { SparkleColoredIcon } from "@sparrow/common/icons";
   import { generatingImage } from "@sparrow/common/images";
   import { fade, fly } from "svelte/transition";
+  import { WorkspaceRole } from "@sparrow/common/enums";
+
   import { tick, onDestroy } from "svelte";
   import { Tooltip } from "@sparrow/library/ui";
 
@@ -30,6 +32,8 @@
   export let tests;
   export let onGenerateTestCases;
   export let isTestCasesGenerating;
+  export let isGuestUser;
+  export let userRole;
 
   type SplitDirection = "vertical" | "horizontal";
   type EditorLanguage = "TestJavaScript";
@@ -462,109 +466,115 @@
           beautifySyntaxCallback={updateBeautifiedState}
         />
       </div>
-      <div style="flex:0 0 auto; width:100%; margin-top:4px;">
-        <div style="position:relative;">
-          {#if errorMessage}
-            <div class="input-error">{errorMessage}</div>
-          {/if}
+      {#if !isGuestUser && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+        <div style="flex:0 0 auto; width:100%; margin-top:4px;">
+          <div style="position:relative;">
+            {#if errorMessage}
+              <div class="input-error">{errorMessage}</div>
+            {/if}
 
-          {#if showGeneratedTestActions}
-            <div
-              class="d-flex align-items-center generated-test-actions"
-              style="gap: 12px;"
-              in:fly={{ y: 20, duration: 300 }}
-            >
+            {#if showGeneratedTestActions}
               <div
-                class="text-ds-font-size-12"
-                style="color: var(--text-ds-neutral-500);"
+                class="d-flex align-items-center generated-test-actions"
+                style="gap: 12px;"
+                in:fly={{ y: 20, duration: 300 }}
               >
-                Do you want to use this generated test in your script?
+                <div
+                  class="text-ds-font-size-12"
+                  style="color: var(--text-ds-neutral-500);"
+                >
+                  Do you want to use this generated test in your script?
+                </div>
+                <div class="actionable-button">
+                  <Tooltip title="Yes" placement="top-center" size="small">
+                    <Button
+                      size="small"
+                      type="outline-primary"
+                      startIcon={ThumbLikeRegular}
+                      onClick={acceptGeneratedTest}
+                    />
+                  </Tooltip>
+                  <Tooltip title="No" placement="top-center" size="small">
+                    <Button
+                      size="small"
+                      type="outline-primary"
+                      startIcon={ThumbDislikeRegular}
+                      onClick={rejectGeneratedTest}
+                    />
+                  </Tooltip>
+                  <Tooltip
+                    title="Regenerate"
+                    placement="top-center"
+                    size="small"
+                  >
+                    <Button
+                      size="small"
+                      type="outline-primary"
+                      startIcon={ArrowSyncRegular}
+                      onClick={regenerateTest}
+                    />
+                  </Tooltip>
+                </div>
               </div>
-              <div class="actionable-button">
-                <Tooltip title="Yes" placement="top-center" size="small">
-                  <Button
-                    size="small"
-                    type="outline-primary"
-                    startIcon={ThumbLikeRegular}
-                    onClick={acceptGeneratedTest}
-                  />
-                </Tooltip>
-                <Tooltip title="No" placement="top-center" size="small">
-                  <Button
-                    size="small"
-                    type="outline-primary"
-                    startIcon={ThumbDislikeRegular}
-                    onClick={rejectGeneratedTest}
-                  />
-                </Tooltip>
-                <Tooltip title="Regenerate" placement="top-center" size="small">
-                  <Button
-                    size="small"
-                    type="outline-primary"
-                    startIcon={ArrowSyncRegular}
-                    onClick={regenerateTest}
-                  />
-                </Tooltip>
-              </div>
-            </div>
-          {/if}
+            {/if}
 
-          {#if isTestCasesGenerating}
-            <p
-              class="text-primary-300 generating-img d-flex justify-content-center align-items-center"
-              in:fade={{ duration: 200 }}
-            >
-              <img src={generatingImage} style="width: 118px;" alt="" />
-            </p>
-          {/if}
+            {#if isTestCasesGenerating}
+              <p
+                class="text-primary-300 generating-img d-flex justify-content-center align-items-center"
+                in:fade={{ duration: 200 }}
+              >
+                <img src={generatingImage} style="width: 118px;" alt="" />
+              </p>
+            {/if}
 
-          <Input
-            id="sparkle-input"
-            placeholder="Ask AI to generate a test"
-            startIcon={SparkleColoredIcon}
-            iconSize={16}
-            variant="primary"
-            size="medium"
-            bind:value={testCasePrompt}
-            {isError}
-            disabled={showGeneratedTestActions}
-            on:input={() => {
-              isError = false;
-              errorMessage = "";
-            }}
-          />
-
-          <div
-            style="position:absolute; right:4px; top:{isTestCasesGenerating
-              ? '75%'
-              : isError
-                ? '67%'
-                : showGeneratedTestActions
-                  ? '80%'
-                  : '50%'}; transform:translateY(-50%);"
-          >
-            <Button
-              size="small"
-              type="outline-secondary"
-              startIcon={isTestCasesGenerating
-                ? StopFilledIcon
-                : SparkleColoredIcon}
-              title={isTestCasesGenerating ? "Stop Generating" : "Generate"}
-              disable={showGeneratedTestActions}
-              onClick={() => {
-                if (isTestCasesGenerating) {
-                  // handleStopGeneratingTestCases();
-                  return;
-                }
-                if (!isTestCasesGenerating && testCasePrompt.trim()) {
-                  handleGenerateTestCases();
-                  return;
-                }
+            <Input
+              id="sparkle-input"
+              placeholder="Ask AI to generate a test"
+              startIcon={SparkleColoredIcon}
+              iconSize={16}
+              variant="primary"
+              size="medium"
+              bind:value={testCasePrompt}
+              {isError}
+              disabled={showGeneratedTestActions}
+              on:input={() => {
+                isError = false;
+                errorMessage = "";
               }}
             />
+
+            <div
+              style="position:absolute; right:4px; top:{isTestCasesGenerating
+                ? '75%'
+                : isError
+                  ? '67%'
+                  : showGeneratedTestActions
+                    ? '80%'
+                    : '50%'}; transform:translateY(-50%);"
+            >
+              <Button
+                size="small"
+                type="outline-secondary"
+                startIcon={isTestCasesGenerating
+                  ? StopFilledIcon
+                  : SparkleColoredIcon}
+                title={isTestCasesGenerating ? "Stop Generating" : "Generate"}
+                disable={showGeneratedTestActions}
+                onClick={() => {
+                  if (isTestCasesGenerating) {
+                    // handleStopGeneratingTestCases();
+                    return;
+                  }
+                  if (!isTestCasesGenerating && testCasePrompt.trim()) {
+                    handleGenerateTestCases();
+                    return;
+                  }
+                }}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      {/if}
     </div>
   </div>
   {#if $requestTabTestScriptStep === 3}

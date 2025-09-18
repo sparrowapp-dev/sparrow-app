@@ -875,6 +875,8 @@
                           responseHeader={storeData?.response?.headers}
                           {onGenerateTestCases}
                           isTestCasesGenerating={$isTestCasesGenerating}
+                          {isGuestUser}
+                          {userRole}
                         />
                       {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
                         <RequestDoc
@@ -1092,13 +1094,15 @@
                                   tests={$tab?.property?.request.tests}
                                   {onFixTestScript}
                                   tabId={$tab?.tabId}
+                                  {isGuestUser}
+                                  {isSharedWorkspace}
                                 />
                                 <!-- </div> -->
                               {/if}
                             </div>
                           </div>
                         {/if}
-                        {#if $tab?.property?.request?.isGeneratedVariable && !$requestTabTestDemo}
+                        {#if $tab?.property?.request?.isGeneratedVariable && !$requestTabTestDemo && !$requestTabTestScriptDemo}
                           <div
                             style="position:absolute; bottom:12px; right:{!$tab
                               ?.property?.request?.state?.isChatbotActive
@@ -1122,7 +1126,7 @@
                             />
                           </div>
                         {/if}
-                        {#if $tab.property?.request?.tests?.testCaseMode === "no-code" && $tab?.property?.request?.isRequestTestsNoCodeDemoCompleted}
+                        {#if $tab.property?.request?.tests?.testCaseMode === "no-code" && $tab?.property?.request?.isRequestTestsNoCodeDemoCompleted && $tab.property?.request?.state?.requestNavigation === "Tests"}
                           <div
                             style="position:absolute; bottom:0px; right:{!$tab
                               ?.property?.request?.state?.isChatbotActive
@@ -1149,7 +1153,7 @@
                             />
                           </div>
                         {/if}
-                        {#if $tab.property?.request?.tests?.testCaseMode === "script" && $tab?.property?.request?.isRequestTestsScriptDemoCompleted}
+                        {#if $tab.property?.request?.tests?.testCaseMode === "script" && $tab?.property?.request?.isRequestTestsScriptDemoCompleted && $tab.property?.request?.state?.requestNavigation === "Tests"}
                           <div
                             style="position:absolute; bottom:0px; right:{!$tab
                               ?.property?.request?.state?.isChatbotActive
@@ -1170,7 +1174,7 @@
                                 requestTabTestScriptStep.set(1);
                               }}
                               onClose={() => {
-                                isCloseRequestTestDemo(false);
+                                isCloseRequestTestScriptDemo(false);
                                 requestTabTestScriptDemo.set(false);
                               }}
                             />
