@@ -155,6 +155,7 @@
             startIcon={SparkleRegular}
             type="outline-secondary"
             loader={$loadingState.get(tabId + "-fix-test-script")}
+            disable={$loadingState.get(tabId + "-fix-test-script")}
             onClick={async () => {
               startLoading(tabId + "-fix-test-script");
               await onFixTestScript();
