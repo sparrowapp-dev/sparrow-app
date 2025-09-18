@@ -511,61 +511,57 @@
                 <img src={generatingImage} style="width: 118px;" alt="" />
               </p>
             {/if}
-            <Tooltip
-              title="You’ve reached your monthly AI request limit. Upgrade your plan to continue using AI feature."
-              placement="top-center"
-              size="small"
-              show={isUserLimitReached}
-              distance={5}
-            >
-              <Input
-                id="sparkle-input"
-                placeholder="Ask AI to generate a test"
-                startIcon={showGeneratedTestActions || isUserLimitReached
-                  ? SparkleFilledIcon
-                  : SparkleColoredIcon}
-                iconSize={16}
-                variant="secondary"
-                size="medium"
-                bind:value={testCasePrompt}
-                {isError}
-                disabled={showGeneratedTestActions || isUserLimitReached}
-                on:input={() => {
-                  isError = false;
-                  errorMessage = "";
-                }}
-              />
-            </Tooltip>
-
-            <div
-              style="position:absolute; right:4px; top:{isTestCasesGenerating
-                ? '75%'
-                : isError
-                  ? '67%'
-                  : showGeneratedTestActions
-                    ? '80%'
-                    : '50%'}; transform:translateY(-50%);"
-            >
-              <Button
+            <div style="position: relative;">
+              <Tooltip
+                title="You’ve reached your monthly AI request limit. Upgrade your plan to continue using AI feature."
+                placement="top-center"
                 size="small"
-                type="outline-secondary"
-                startIcon={isTestCasesGenerating ||
-                showGeneratedTestActions ||
-                isUserLimitReached ||
-                isError
-                  ? SparkleFilledIcon
-                  : SparkleColoredIcon}
-                title={"Generate"}
-                disable={showGeneratedTestActions ||
+                show={isUserLimitReached}
+                distance={5}
+              >
+                <Input
+                  id="sparkle-input"
+                  placeholder="Ask AI to generate a test"
+                  startIcon={showGeneratedTestActions || isUserLimitReached
+                    ? SparkleFilledIcon
+                    : SparkleColoredIcon}
+                  iconSize={16}
+                  variant="secondary"
+                  size="medium"
+                  bind:value={testCasePrompt}
+                  {isError}
+                  disabled={showGeneratedTestActions || isUserLimitReached}
+                  on:input={() => {
+                    isError = false;
+                    errorMessage = "";
+                  }}
+                />
+              </Tooltip>
+
+              <div
+                style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%);"
+              >
+                <Button
+                  size="small"
+                  type="outline-secondary"
+                  startIcon={isTestCasesGenerating ||
+                  showGeneratedTestActions ||
                   isUserLimitReached ||
-                  isError}
-                onClick={() => {
-                  if (!isTestCasesGenerating && testCasePrompt.trim()) {
-                    handleGenerateTestCases();
-                    return;
-                  }
-                }}
-              />
+                  isError
+                    ? SparkleFilledIcon
+                    : SparkleColoredIcon}
+                  title={"Generate"}
+                  disable={showGeneratedTestActions ||
+                    isUserLimitReached ||
+                    isError}
+                  onClick={() => {
+                    if (!isTestCasesGenerating && testCasePrompt.trim()) {
+                      handleGenerateTestCases();
+                      return;
+                    }
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
