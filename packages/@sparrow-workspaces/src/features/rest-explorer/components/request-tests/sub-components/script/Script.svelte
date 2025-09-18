@@ -219,7 +219,6 @@
       }
     });
     clickHandlers = [];
-
     // Handler for all types of interactions
     const interactionHandler = () => {
       if (showGeneratedTestActions) {
@@ -227,7 +226,6 @@
         highlightGeneratedContent();
       }
     };
-
     // Add to our list for cleanup
     clickHandlers.push(interactionHandler);
 
@@ -402,6 +400,24 @@
     if (observer) observer.disconnect();
     if (highlightInterval) clearInterval(highlightInterval);
     if (rafId) cancelAnimationFrame(rafId);
+
+    // Remove event listeners
+    clickHandlers.forEach((handler) => {
+      const editorEl = document.querySelector(".cm-editor");
+      if (editorEl) {
+        editorEl.removeEventListener("click", handler);
+        editorEl.removeEventListener("mousedown", handler);
+        editorEl.removeEventListener("mouseup", handler);
+        editorEl.removeEventListener("keydown", handler);
+        editorEl.removeEventListener("keyup", handler);
+        editorEl.removeEventListener("focus", handler);
+        editorEl.removeEventListener("blur", handler);
+        editorEl.removeEventListener("input", handler);
+      }
+      document.removeEventListener("click", handler);
+      document.removeEventListener("mousedown", handler);
+      document.removeEventListener("mouseup", handler);
+    });
   });
 </script>
 
