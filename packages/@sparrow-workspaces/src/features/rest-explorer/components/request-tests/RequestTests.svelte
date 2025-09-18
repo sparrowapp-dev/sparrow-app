@@ -12,6 +12,8 @@
   export let responseHeader;
   export let onGenerateTestCases;
   export let isTestCasesGenerating;
+  export let isGuestUser;
+  export let userRole;
 </script>
 
 <div
@@ -92,6 +94,8 @@
         {onTestsChange}
         {onGenerateTestCases}
         {isTestCasesGenerating}
+        {isGuestUser}
+        {userRole}
       />
     {:else if tests?.testCaseMode === TestCaseModeEnum.NO_CODE}
       <NoCode

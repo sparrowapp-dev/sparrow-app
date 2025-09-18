@@ -875,6 +875,8 @@
                           responseHeader={storeData?.response?.headers}
                           {onGenerateTestCases}
                           isTestCasesGenerating={$isTestCasesGenerating}
+                          {isGuestUser}
+                          {userRole}
                         />
                       {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
                         <RequestDoc
