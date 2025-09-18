@@ -1096,6 +1096,7 @@
                                   tabId={$tab?.tabId}
                                   {isGuestUser}
                                   {isSharedWorkspace}
+                                  {userRole}
                                 />
                                 <!-- </div> -->
                               {/if}

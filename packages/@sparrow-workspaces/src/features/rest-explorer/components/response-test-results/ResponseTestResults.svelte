@@ -6,6 +6,7 @@
   import { Button, Tag } from "@sparrow/library/ui";
   import { onMount, tick } from "svelte";
   import { loadingState } from "@sparrow/common/store";
+  import { WorkspaceRole } from "@sparrow/common/enums";
 
   export let responseTestResults = [];
   export let responseTestMessage = "";
@@ -14,6 +15,7 @@
   export let tabId;
   export let isGuestUser;
   export let isSharedWorkspace;
+  export let userRole;
 
   let filter: "all" | "passed" | "failed" = "all";
   let allBtn: HTMLSpanElement;
@@ -149,7 +151,7 @@
             Couldn't evaluate the test script: {responseTestMessage}
           </span>
         </p>
-        {#if !isGuestUser && !isSharedWorkspace}
+        {#if !isGuestUser && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
           <Button
             title="Fix Script"
             startIcon={SparkleRegular}
