@@ -209,6 +209,7 @@
 
   //props for generating test cases function
   export let onGenerateTestCases;
+  export let scriptComponent = null;
 
   // Reference to the splitpane container element
   let splitpaneContainer;
@@ -954,6 +955,7 @@
                         />
                       {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.TESTS}
                         <RequestTests
+                          bind:scriptComponent
                           tests={$tab?.property?.request.tests}
                           onTestsChange={onUpdateTests}
                           tabSplitDirection={$tabsSplitterDirection}
