@@ -475,6 +475,7 @@ jobs:
       - name: Generate App Installer File
         id: generate_appinstaller
         shell: pwsh
+        working-directory: C:\a\sparrow-app\sparrow-app
         run: |
             $manifestPath = "app-root\AppxManifest.xml"
             [xml]$manifest = Get-Content $manifestPath
@@ -483,15 +484,21 @@ jobs:
             $version = $manifest.Package.Identity.Version
             $architecture = $manifest.Package.Identity.ProcessorArchitecture
 
-            # Find the actual MSIX file that was generated
+            # Now relative path should work since we're in the correct working directory
+            Write-Host "🔍 Current working directory: $(Get-Location)"
+            Write-Host "📁 Contents of msix-output directory:"
+            Get-ChildItem -Path "msix-output" | ForEach-Object { Write-Host "  - $($_.Name)" }
+            
             $msixFile = Get-ChildItem -Path "msix-output" -Filter "*.msix" | Select-Object -First 1
             if (-not $msixFile) {
                 Write-Error "❌ No MSIX file found in msix-output folder!"
                 exit 1
             }
+            
             $msixBaseName = [System.IO.Path]::GetFileName($msixFile.Name)
+            Write-Host "✅ Found MSIX file: $msixBaseName"
 
-            # URLs for hosting on S3
+            # Rest of the script remains the same...
             $msixUrl = "https://sparrow-assest.s3.us-east-1.amazonaws.com/desktop/$msixBaseName"
             $appInstallerUrl = "https://sparrow-assest.s3.us-east-1.amazonaws.com/desktop/Sparrow.appinstaller"
 
@@ -515,10 +522,8 @@ jobs:
               </UpdateSettings>
             </AppInstaller>
             "@
-
             Set-Content -Path "Sparrow.appinstaller" -Value $appInstallerContent -Encoding UTF8
             echo "MSIX_FILE_NAME=$msixBaseName" >> $env:GITHUB_ENV
-
       - name: Upload app installer artifact
         uses: actions/upload-artifact@v4
         with:
