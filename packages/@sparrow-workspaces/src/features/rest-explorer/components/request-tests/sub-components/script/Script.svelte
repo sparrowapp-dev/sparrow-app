@@ -20,10 +20,14 @@
   import { SparkleColoredIcon } from "@sparrow/common/icons";
   import { generatingImage } from "@sparrow/common/images";
   import { fade } from "svelte/transition";
+  import { WorkspaceRole } from "@sparrow/common/enums";
+
   export let onTestsChange;
   export let tests;
   export let onGenerateTestCases;
   export let isTestCasesGenerating;
+  export let isGuestUser;
+  export let userRole;
 
   type SplitDirection = "vertical" | "horizontal";
   type EditorLanguage = "TestJavaScript";
@@ -219,62 +223,64 @@
           beautifySyntaxCallback={updateBeautifiedState}
         />
       </div>
-      <div style="flex:0 0 auto; width:100%; margin-top:4px;">
-        <div style="position:relative;">
-          {#if errorMessage}
-            <div class="input-error">{errorMessage}</div>
-          {/if}
-          {#if isTestCasesGenerating}
-            <p
-              class="text-primary-300 generating-img d-flex justify-content-center align-items-center"
-              in:fade={{ duration: 200 }}
-            >
-              <img src={generatingImage} style="width: 118px;" alt="" />
-            </p>
-          {/if}
-          <Input
-            id="sparkle-input"
-            placeholder="Ask AI to generate a test"
-            startIcon={SparkleColoredIcon}
-            iconSize={16}
-            variant="primary"
-            size="medium"
-            bind:value={testCasePrompt}
-            {isError}
-            on:input={() => {
-              isError = false;
-              errorMessage = "";
-            }}
-          />
-
-          <div
-            style="position:absolute; right:4px; top:{isTestCasesGenerating
-              ? '75%'
-              : isError
-                ? '67%'
-                : '50%'}; transform:translateY(-50%);"
-          >
-            <Button
-              size="small"
-              type="outline-secondary"
-              startIcon={isTestCasesGenerating
-                ? StopFilledIcon
-                : SparkleColoredIcon}
-              title={isTestCasesGenerating ? "Stop Generating" : "Generate"}
-              onClick={() => {
-                if (isTestCasesGenerating) {
-                  // handleStopGeneratingTestCases();
-                  return;
-                }
-                if (!isTestCasesGenerating && testCasePrompt.trim()) {
-                  handleGenerateTestCases();
-                  return;
-                }
+      {#if !isGuestUser || userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+        <div style="flex:0 0 auto; width:100%; margin-top:4px;">
+          <div style="position:relative;">
+            {#if errorMessage}
+              <div class="input-error">{errorMessage}</div>
+            {/if}
+            {#if isTestCasesGenerating}
+              <p
+                class="text-primary-300 generating-img d-flex justify-content-center align-items-center"
+                in:fade={{ duration: 200 }}
+              >
+                <img src={generatingImage} style="width: 118px;" alt="" />
+              </p>
+            {/if}
+            <Input
+              id="sparkle-input"
+              placeholder="Ask AI to generate a test"
+              startIcon={SparkleColoredIcon}
+              iconSize={16}
+              variant="primary"
+              size="medium"
+              bind:value={testCasePrompt}
+              {isError}
+              on:input={() => {
+                isError = false;
+                errorMessage = "";
               }}
             />
+
+            <div
+              style="position:absolute; right:4px; top:{isTestCasesGenerating
+                ? '75%'
+                : isError
+                  ? '67%'
+                  : '50%'}; transform:translateY(-50%);"
+            >
+              <Button
+                size="small"
+                type="outline-secondary"
+                startIcon={isTestCasesGenerating
+                  ? StopFilledIcon
+                  : SparkleColoredIcon}
+                title={isTestCasesGenerating ? "Stop Generating" : "Generate"}
+                onClick={() => {
+                  if (isTestCasesGenerating) {
+                    // handleStopGeneratingTestCases();
+                    return;
+                  }
+                  if (!isTestCasesGenerating && testCasePrompt.trim()) {
+                    handleGenerateTestCases();
+                    return;
+                  }
+                }}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      {/if}
     </div>
   </div>
   {#if $requestTabTestScriptStep === 3}
