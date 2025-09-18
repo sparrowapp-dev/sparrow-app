@@ -1228,6 +1228,7 @@
                                 requestTabTestDemo.set(true);
                                 isCloseRequestTestDemo(false);
                                 onUpdateResponseState("Tests");
+                                tabsSplitterDirection.set("horizontal");
                                 requestTabTestNoCodeStep.set(1);
                               }}
                               onClose={() => {
@@ -1255,6 +1256,7 @@
                                 onUpdateResponseState("Tests");
                                 isCloseRequestTestScriptDemo(false);
                                 requestTabTestScriptDemo.set(true);
+                                tabsSplitterDirection.set("horizontal");
                                 requestTabTestScriptStep.set(1);
                               }}
                               onClose={() => {
