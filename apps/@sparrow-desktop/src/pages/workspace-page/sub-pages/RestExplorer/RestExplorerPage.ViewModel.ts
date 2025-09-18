@@ -2012,7 +2012,7 @@ class RestExplorerViewModel {
   };
 
   private async executeScriptTestcases() {
-    const worker = new Worker(new URL("../../../workers/test-script-worker.ts", import.meta.url), {
+    const worker = new Worker(new URL("../../../../workers/test-script-worker.ts", import.meta.url), {
       type: "module",
     });
     // minimal chai-like expect (you can replace with a real lib like chai)
