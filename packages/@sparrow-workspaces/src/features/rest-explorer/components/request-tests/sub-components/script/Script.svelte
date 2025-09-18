@@ -687,7 +687,7 @@
 
   /* AI Generated Test Case Action Styles */
   .generated-test-actions {
-    padding: 12px;
+    padding: 0 12px 4px 12px;
     margin-left: 40px;
   }
 
