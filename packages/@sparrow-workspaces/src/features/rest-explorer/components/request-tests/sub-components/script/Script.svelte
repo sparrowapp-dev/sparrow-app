@@ -223,7 +223,7 @@
           beautifySyntaxCallback={updateBeautifiedState}
         />
       </div>
-      {#if !isGuestUser || userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+      {#if !isGuestUser && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
         <div style="flex:0 0 auto; width:100%; margin-top:4px;">
           <div style="position:relative;">
             {#if errorMessage}
