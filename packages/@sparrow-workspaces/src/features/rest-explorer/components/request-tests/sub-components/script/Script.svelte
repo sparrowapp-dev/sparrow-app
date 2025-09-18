@@ -9,7 +9,7 @@
     ThumbLikeRegular,
     ArrowSyncRegular,
   } from "@sparrow/library/icons";
-  import { Button, notifications } from "@sparrow/library/ui";
+  import { Button } from "@sparrow/library/ui";
   import { predefinedTestSnippets } from "./utils/common-snippets";
   import RequestTabTourGuide from "../../../../../request-tab-tour-guide/layout/RequestTabTourGuide.svelte";
   import { requestTabTestScriptStep } from "../../../../../../stores";
@@ -20,7 +20,7 @@
     handleCloseTour,
   } from "../../../../../request-tab-tour-guide/utils";
   import { requestTabScriptCardPosition } from "../../../../../request-tab-tour-guide/utils";
-  import { SparkleColoredIcon } from "@sparrow/common/icons";
+  import { SparkleColoredIcon, SparkleFilledIcon } from "@sparrow/common/icons";
   import { generatingImage } from "@sparrow/common/images";
   import { fade, fly } from "svelte/transition";
   import { WorkspaceRole } from "@sparrow/common/enums";
@@ -67,7 +67,7 @@
   let observer: MutationObserver | null = null;
   let highlightInterval: number | null = null;
   let rafId: number | null = null;
-
+  let isUserLimitReached: boolean = false;
   // Preprocess search string
   $: trimmedSearch = searchData.trim().toLowerCase();
 
@@ -80,6 +80,12 @@
 
   const updateBeautifiedState = (val: boolean): void => {
     isBodyBeautified = val;
+  };
+  //handler function to remove the changes on tab switch
+  export const handleTabChange = () => {
+    if (showGeneratedTestActions) {
+      rejectGeneratedTest();
+    }
   };
 
   const handleCodeMirrorChange = (e: any) => {
@@ -132,10 +138,11 @@
       : 0;
     currentPrompt = testCasePrompt;
 
-    console.log(`Original line count: ${originalLineCount}`); // Debug log
-
     const result = await onGenerateTestCases(testCasePrompt);
     if (result?.error) {
+      if (result?.message === "Limit reached. Please try again later.") {
+        isUserLimitReached = true;
+      }
       isError = true;
       errorMessage =
         "This request is a bit tricky to turn into a test. Please try rephrasing it in a simpler way.";
@@ -177,8 +184,6 @@
   };
 
   const startPersistentHighlighting = () => {
-    console.log("Starting persistent highlighting..."); // Debug log
-
     // Initial highlight
     highlightGeneratedContent();
 
@@ -192,8 +197,6 @@
         highlightGeneratedContent();
       }
     }, 10); // Very frequent re-application
-
-    // Add click event listener to re-highlight immediately on clicks
   };
 
   const setupHighlightObserver = () => {
@@ -228,10 +231,6 @@
     // Get all lines in the editor
     const lines = document.querySelectorAll(".cm-line");
 
-    console.log(
-      `Highlighting: Found ${lines.length} lines, original count: ${originalLineCount}`,
-    ); // Debug log
-
     if (lines.length === 0) {
       return;
     }
@@ -240,9 +239,6 @@
     lines.forEach((line, index) => {
       if (index >= originalLineCount) {
         const element = line as HTMLElement;
-
-        console.log(`Highlighting line ${index + 1}`); // Debug log
-
         // Add class for CSS targeting
         if (!element.classList.contains("highlight-generated-line")) {
           element.classList.add("highlight-generated-line");
@@ -259,9 +255,6 @@
   };
 
   const removeHighlight = () => {
-    console.log("Removing highlights..."); // Debug log
-
-    // Stop all highlighting mechanisms
     if (observer) {
       observer.disconnect();
       observer = null;
@@ -275,8 +268,6 @@
       rafId = null;
     }
 
-    // Remove click event listeners
-
     // Remove highlights from all lines
     const highlightedLines = document.querySelectorAll(
       ".highlight-generated-line",
@@ -289,7 +280,6 @@
   };
 
   const acceptGeneratedTest = () => {
-    // ONLY remove highlights when user accepts
     removeHighlight();
 
     // Keep the generated content that's already in the editor
@@ -298,12 +288,9 @@
     originalTestContent = "";
     currentPrompt = "";
     originalLineCount = 0;
-
-    notifications.success("AI-generated test case accepted!");
   };
 
   const rejectGeneratedTest = () => {
-    // Remove highlights and revert content
     removeHighlight();
 
     // Revert to original content
@@ -344,9 +331,7 @@
     }
   };
 
-  // Clean up on component destroy
   onDestroy(() => {
-    console.log("Component destroying, cleaning up..."); // Debug log
     if (observer) observer.disconnect();
     if (highlightInterval) clearInterval(highlightInterval);
     if (rafId) cancelAnimationFrame(rafId);
@@ -526,22 +511,31 @@
                 <img src={generatingImage} style="width: 118px;" alt="" />
               </p>
             {/if}
-
-            <Input
-              id="sparkle-input"
-              placeholder="Ask AI to generate a test"
-              startIcon={SparkleColoredIcon}
-              iconSize={16}
-              variant="primary"
-              size="medium"
-              bind:value={testCasePrompt}
-              {isError}
-              disabled={showGeneratedTestActions}
-              on:input={() => {
-                isError = false;
-                errorMessage = "";
-              }}
-            />
+            <Tooltip
+              title="You’ve reached your monthly AI request limit. Upgrade your plan to continue using AI feature."
+              placement="top-center"
+              size="small"
+              show={isUserLimitReached}
+              distance={5}
+            >
+              <Input
+                id="sparkle-input"
+                placeholder="Ask AI to generate a test"
+                startIcon={showGeneratedTestActions || isUserLimitReached
+                  ? SparkleFilledIcon
+                  : SparkleColoredIcon}
+                iconSize={16}
+                variant="secondary"
+                size="medium"
+                bind:value={testCasePrompt}
+                {isError}
+                disabled={showGeneratedTestActions || isUserLimitReached}
+                on:input={() => {
+                  isError = false;
+                  errorMessage = "";
+                }}
+              />
+            </Tooltip>
 
             <div
               style="position:absolute; right:4px; top:{isTestCasesGenerating
@@ -555,16 +549,17 @@
               <Button
                 size="small"
                 type="outline-secondary"
-                startIcon={isTestCasesGenerating
-                  ? StopFilledIcon
+                startIcon={isTestCasesGenerating ||
+                showGeneratedTestActions ||
+                isUserLimitReached ||
+                isError
+                  ? SparkleFilledIcon
                   : SparkleColoredIcon}
-                title={isTestCasesGenerating ? "Stop Generating" : "Generate"}
-                disable={showGeneratedTestActions}
+                title={"Generate"}
+                disable={showGeneratedTestActions ||
+                  isUserLimitReached ||
+                  isError}
                 onClick={() => {
-                  if (isTestCasesGenerating) {
-                    // handleStopGeneratingTestCases();
-                    return;
-                  }
                   if (!isTestCasesGenerating && testCasePrompt.trim()) {
                     handleGenerateTestCases();
                     return;

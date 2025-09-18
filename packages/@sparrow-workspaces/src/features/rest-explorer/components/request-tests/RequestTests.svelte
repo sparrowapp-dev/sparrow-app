@@ -14,6 +14,7 @@
   export let isTestCasesGenerating;
   export let isGuestUser;
   export let userRole;
+  export let scriptComponent = null;
 </script>
 
 <div
@@ -96,6 +97,7 @@
         {isTestCasesGenerating}
         {isGuestUser}
         {userRole}
+        bind:this={scriptComponent}
       />
     {:else if tests?.testCaseMode === TestCaseModeEnum.NO_CODE}
       <NoCode
