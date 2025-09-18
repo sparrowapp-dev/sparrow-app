@@ -638,5 +638,5 @@ jobs:
       - name: Upload app installer artifact
         uses: actions/upload-artifact@v4
         with:
-          name: appinstaller
+          name: Sparrow.appinstaller
           path: Sparrow.appinstaller
