@@ -7,6 +7,7 @@
     SwitchWorkspace,
     UpgradePlanBanner,
     UpgradePlanPopUp,
+    UpgradeCurrentTeamPlanModal,
   } from "@sparrow/common/components";
   import { Sidebar } from "@sparrow/common/features";
   import { Route, navigate, useLocation } from "svelte-navigator";
@@ -97,6 +98,7 @@
   let userLimits: any;
   let teamDetails: {};
   let isUpgradePlanModelOpen: boolean = false;
+  let isUpgradeCurrentTeamPlanModalOpen: boolean = false;
 
   const openDefaultBrowser = async () => {
     // await open(externalSparrowLink);
@@ -588,6 +590,11 @@
     isUpgradePlanModelOpen = false;
   };
 
+  const handleOpenAdminPanel = async () => {
+    await _viewModel.handleRedirectToAdminPanel(currentTeamId);
+    isUpgradeCurrentTeamPlanModalOpen = false;
+  };
+
   // Header upgrade click handler function
   const handleHeaderUpgradeClick = () => {
     if (userRole) {
@@ -664,7 +671,7 @@
     onSwitchTeam={_viewModel.handleSwitchTeam}
     {user}
     onLogout={_viewModel.handleLogout}
-    bind:isUpgradePlanModelOpen
+    bind:isUpgradeCurrentTeamPlanModalOpen
     isWebApp={true}
     bind:isCreateTeamModalOpen
     onMarketingRedirect={() => {
@@ -825,6 +832,22 @@
   <UpgradePlanPopUp
     bind:isUpgradePlanModelOpen
     handleSubmit={handleRedirectToAdmin}
+  />
+</Modal>
+
+<Modal
+  title={"Time to Unlock More Features"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isUpgradeCurrentTeamPlanModalOpen}
+  handleModalState={(flag) => {
+    isUpgradeCurrentTeamPlanModalOpen = flag;
+  }}
+>
+  <UpgradeCurrentTeamPlanModal
+    bind:isUpgradeCurrentTeamPlanModalOpen
+    handleSubmit={handleOpenAdminPanel}
   />
 </Modal>
 

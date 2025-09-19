@@ -38,10 +38,10 @@
   export let onMarketingRedirect = () => {};
   export let currentWorkspacePlan = "";
   export let userRole: string = "";
-  export let isUpgradePlanModelOpen = false;
+  export let isUpgradeCurrentTeamPlanModalOpen = false;
 
   const handleUpgradeClick = () => {
-    isUpgradePlanModelOpen = true;
+    isUpgradeCurrentTeamPlanModalOpen = true;
   };
   /**
    * selected environment
