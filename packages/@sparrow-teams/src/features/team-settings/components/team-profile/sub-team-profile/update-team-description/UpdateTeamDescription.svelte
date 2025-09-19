@@ -17,7 +17,7 @@
 
 <div class="d-flex flex-column pb-3">
   <div class="title-width">
-    <p class="team-title mt-p fs-12 text-textColor mb-1">
+    <p class="team-title mt-p fs-12 text-textColor mb-2">
       {DESCRIPTION_CONFIG.TITLE}
     </p>
   </div>

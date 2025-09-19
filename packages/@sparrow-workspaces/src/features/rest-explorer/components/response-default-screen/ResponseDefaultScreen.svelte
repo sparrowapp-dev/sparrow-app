@@ -5,6 +5,9 @@
   import { OSDetector } from "@sparrow/common/utils";
   import { Button } from "@sparrow/library/ui";
   import { fly } from "svelte/transition";
+  import { requestTabTestDemo } from "../../../../stores";
+  import { requestTabTestScriptDemo } from "../../../../stores";
+  import ResponseNavigator from "../response-navigator/ResponseNavigator.svelte";
 
   export let isMainScreen = false;
   export let isWebApp;
@@ -20,8 +23,16 @@
     return 1 - Math.pow(1 - t, 3);
   };
 
-  const animateExistingShortcuts = (expanding) => {
+  // Fixed animation function - reset transforms when width changes
+  const animateExistingShortcuts = (expanding, forceReset = false) => {
     const existingShortcuts = document.querySelectorAll(".existing-shortcut");
+    // Reset all transforms first if width changed or forced reset
+    if (forceReset) {
+      existingShortcuts.forEach((element) => {
+        element.style.transform = "";
+      });
+      return;
+    }
     existingShortcuts.forEach((element, index) => {
       const delay = expanding
         ? 0
@@ -43,12 +54,26 @@
     });
   };
 
-  $: if (typeof window !== "undefined") {
-    setTimeout(() => animateExistingShortcuts(isExpandShortcuts), 0);
-  }
   let width = 0;
   let isUpAnimation = false;
+  let prevIsUpAnimation = false; // Track previous state
   let observer: ResizeObserver;
+  let isExpandShortcuts = false;
+
+  // Watch for animation direction changes and reset transforms
+  $: if (isUpAnimation !== prevIsUpAnimation && typeof window !== "undefined") {
+    prevIsUpAnimation = isUpAnimation;
+    // Reset transforms when animation direction changes
+    setTimeout(() => animateExistingShortcuts(isExpandShortcuts, true), 0);
+    // Then apply the correct animation
+    setTimeout(() => animateExistingShortcuts(isExpandShortcuts), 50);
+  }
+
+  // Apply animations when expand state changes (but not on width change)
+  $: if (typeof window !== "undefined" && isUpAnimation === prevIsUpAnimation) {
+    setTimeout(() => animateExistingShortcuts(isExpandShortcuts), 0);
+  }
+
   onMount(async () => {
     platformName = osDetector.getOS();
 
@@ -79,7 +104,7 @@
   onDestroy(() => {
     observer?.disconnect();
   });
-  let isExpandShortcuts = false;
+
   $: isUpAnimation = width < 932;
 </script>
 
@@ -87,25 +112,45 @@
   bind:this={shortcutEl}
   class="{isMainScreen
     ? 'pt-5 pb-3'
-    : ''} response-default h-100 d-flex flex-column justify-content-between align-items-center"
+    : ''} response-default h-100 d-flex flex-column"
 >
-  <div class="">
+  <!-- ResponseNavigator positioned at top-left when requestTabTestDemo is true -->
+  {#if $requestTabTestDemo || $requestTabTestScriptDemo}
+    <div class="d-flex justify-content-start">
+      <ResponseNavigator
+        requestStateSection={"TESTRESULT"}
+        onUpdateResponseState={() => {}}
+        responseHeadersLength={2}
+      />
+    </div>
+  {/if}
+
+  <!-- Main content area - centered vertically and horizontally -->
+  <div
+    class="flex-grow-1 d-flex flex-column justify-content-center align-items-center"
+  >
     <div class="d-flex align-items-center flex-column justify-content-center">
       <div class="my-4">
         <SparrowLogo />
       </div>
       <div class="d-flex flex-column align-items-center">
         <p class="text-fs-12 mb-5" style="color: var(--text-ds-neutral-400);">
-          Click Send To Get A Response
+          {#if !$requestTabTestDemo}
+            Click Send To Get A Response
+          {:else}
+            No test cases available. Start by adding your own test cases, select
+            from smart suggestions or generate them with AI.
+          {/if}
         </p>
       </div>
     </div>
   </div>
-  <div>
+
+  <!-- Shortcuts section at bottom -->
+  <div class="mt-auto">
     <div
-      class="shortcuts-container d-flex flex-wrap justify-content-center mt-auto"
-      style={isUpAnimation ? "max-width: 600px;" : ""}
-      bind:this={shortcutEl}
+      class="shortcuts-container d-flex flex-wrap justify-content-center"
+      style={isUpAnimation ? "max-width: 600px;" : "max-width: 100%;"}
     >
       {#each Object.entries(ctrlCommands) as [key, value], index}
         {#if key === "Save Request" || key === "New Request" || key === "Send Request"}
@@ -191,6 +236,8 @@
   .shortcuts-container {
     position: relative;
     overflow: visible;
+    margin: 0 auto;
+    max-width: 100%;
   }
 
   .existing-shortcut {

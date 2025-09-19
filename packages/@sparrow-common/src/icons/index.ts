@@ -3,4 +3,6 @@ export { default as SparrowPrimaryIcon } from "./SparrowPrimaryIcon.svelte";
 export { default as SparrowSecondaryIcon } from "./SparrowSecondaryIcon.svelte";
 export { default as SparkleFilled } from "./SparkleFilled.svelte";
 export { default as SparrowLogo } from "./SparrowLogo.svelte";
-export { default as SparrowOutlineIcon} from "./SparrowOutlineIcon.svelte"
+export { default as SparrowOutlineIcon } from "./SparrowOutlineIcon.svelte";
+export { default as SparkleColoredIcon } from "./SparkleColoredIcon.svelte";
+export { default as SparkleFilledIcon } from "./SparkleFilledIcon.svelte";

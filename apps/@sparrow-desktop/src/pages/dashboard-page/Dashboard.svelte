@@ -102,6 +102,7 @@
   let userLimits: any;
   let teamDetails: {};
   let isUpgradePlanModelOpen: boolean = false;
+  let currentWorkspacePlan = "";
 
   const openDefaultBrowser = async () => {
     await open(externalSparrowLink);
@@ -148,6 +149,9 @@
         currentTeamName = activeWorkspaceRxDoc.team?.teamName;
         currentTeamId = activeWorkspaceRxDoc.team?.teamId;
         currentWorkspaceType = activeWorkspaceRxDoc?.workspaceType;
+        if (currentTeamId) {
+          currentWorkspacePlan = await _viewModel.getTeamPlan(currentTeamId);
+        }
 
         const user = activeWorkspaceRxDoc?._data.users.find(
           (u) => u.id === userId,
@@ -177,11 +181,13 @@
   );
 
   let openTeam;
+  let currentPlan = "";
 
   const activeTeamSubscriber = activeTeam.subscribe((value) => {
     if (value) {
       openTeam = value?.toMutableJSON();
     }
+    currentPlan = openTeam?.plan?.name;
   });
 
   const onModalStateChanged = (flag: boolean) => {
@@ -652,6 +658,14 @@
     isUpgradePlanModelOpen = false;
   };
 
+  // Header upgrade click handler function
+  const handleHeaderUpgradeClick = () => {
+    if (userRole) {
+      planContent = planInfoByRole(userRole);
+    }
+    upgradePlanModalWorkspace = true;
+  };
+
   $: {
     if (userRole) {
       planContent = planInfoByRole(userRole);
@@ -704,6 +718,9 @@
     {currentTeamName}
     {currentTeamId}
     {currentWorkspaceType}
+    {currentPlan}
+    {userRole}
+    {currentWorkspacePlan}
     {isGuestUser}
     {isLoginBannerActive}
     onLoginUser={handleGuestLogin}
@@ -712,9 +729,11 @@
     onSwitchWorkspace={_viewModel.handleSwitchWorkspace}
     {user}
     isWebApp={false}
+    bind:isUpgradePlanModelOpen
     onLogout={_viewModel.handleLogout}
     {isGlobalSearchOpen}
     onSearchClick={handleViewGlobalSearch}
+    onUpgradeClick={handleHeaderUpgradeClick}
     handleDocsRedirect={_viewModel.redirectDocs}
     handleFeaturesRedirect={_viewModel.redirectFeatureUpdates}
     onAdminRedirect={_viewModel.onAdminRedirect}
