@@ -201,7 +201,7 @@ impl<R: Runtime> WindowExt for WebviewWindow<R> {
 
 // Create a single instance of reqwest Client to be used throughout the app
 static CLIENT: Lazy<Client> = Lazy::new(|| {
-     let client = Client::builder()
+     Client::builder()
         .danger_accept_invalid_certs(true)
         .use_native_tls()
         .pool_max_idle_per_host(20)
@@ -212,24 +212,13 @@ static CLIENT: Lazy<Client> = Lazy::new(|| {
         .gzip(true)
         .deflate(true)
         .brotli(true)
-        .http1_only()
         .redirect(reqwest::redirect::Policy::limited(3))
-        .no_proxy()
         .tcp_nodelay(true)
         .build()
-        .expect("Failed to build HTTP client");
-    
-    // CRITICAL: Warm up the client and DNS cache
-    let warmup_client = client.clone();
-    std::thread::spawn(move || {
-        let rt = tokio::runtime::Runtime::new().unwrap();
-        rt.block_on(async {
-            // Warm up with actual domains you'll use
-            let _ = warmup_client.get("http://google.com").send().await;
-        });
-    });
-    
-    client
+        .unwrap_or_else(|e| {
+            eprintln!("Failed to build HTTP client: {}", e);
+            std::process::exit(1);
+            })
 });
 
 // Commands
@@ -464,6 +453,8 @@ async fn make_request_v2(
         }
     }
 
+    println!("Headers: {:?}", header_map);
+
     // Create request builder with request method and url
     let mut request_builder = client.request(reqwest_method, url).headers(header_map);
 
@@ -634,148 +625,6 @@ async fn make_request(
         "response": response_text,
     });
     return Ok(combined_json.to_string());
-}
-
-// Optimized response body decoder
-async fn decode_response_body_optimized(response: reqwest::Response) -> Result<String, std::io::Error> {
-    // Check for content encoding
-    let headers = response.headers();
-    let content_encoding = headers.get("content-encoding")
-        .and_then(|v| v.to_str().ok());
-    
-    match content_encoding {
-        Some("gzip") | Some("deflate") | Some("br") => {
-            // These are handled automatically by reqwest if we enabled them in the client
-            response.text().await
-                .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))
-        }
-        _ => {
-            // Regular text response
-            response.text().await
-                .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))
-        }
-    }
-}
-
-async fn make_request_v3(
-    url: &str,
-    method: &str,
-    headers: &str,
-    body: &str,
-    request: &str,
-) -> Result<String, std::io::Error> {
-    let client = &*CLIENT;
-    
-    // Profile method parsing
-    let method_start = Instant::now();
-    let reqwest_method = match method {
-        "GET" => reqwest::Method::GET,
-        "POST" => reqwest::Method::POST,
-        "PUT" => reqwest::Method::PUT,
-        "DELETE" => reqwest::Method::DELETE,
-        "PATCH" => reqwest::Method::PATCH,
-        "HEAD" => reqwest::Method::HEAD,
-        "OPTIONS" => reqwest::Method::OPTIONS,
-        _ => return Err(std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            format!("Unsupported method: {}", method),
-        )),
-    };
-    
-    // Profile header parsing
-    let headers_key_values: Vec<KeyValue> = serde_json::from_str(headers)
-        .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidInput, e))?;
-    
-    // Build Header Map
-    let mut header_map = HeaderMap::with_capacity(headers_key_values.len());
-    for kv in headers_key_values {
-        if let (Ok(name), Ok(value)) = (
-            HeaderName::from_bytes(kv.key.as_bytes()),
-            HeaderValue::from_str(&kv.value),
-        ) {
-            header_map.insert(name, value);
-        }
-    }
-    
-    // Request builder creation
-    let request_builder = client
-        .request(reqwest_method, url)
-        .headers(header_map);
-    
-    // Make actual HTTP request
-    let response = match request {
-        "application/json" => make_json_request_v2(request_builder, body).await?,
-        "application/x-www-form-urlencoded" => {
-            make_www_form_urlencoded_request_v2(request_builder, body).await?
-        }
-        "multipart/form-data" => make_formdata_request_v2(request_builder, body).await?,
-        "text/plain" => make_text_request(request_builder, body).await?,
-        _ => make_without_body_request(request_builder).await?,
-    };
-    
-    // Response metadata extraction
-    let status = response.status();
-    let response_headers = response.headers().clone();
-    
-    let content_type = response_headers
-        .get("content-type")
-        .and_then(|v| v.to_str().ok())
-        .unwrap_or("");
-    
-    // Response body processing
-    let response_body = if content_type.starts_with("image/") {
-        if content_type.contains("svg") {
-            let text = response.text().await
-                .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
-            let encoded = general_purpose::STANDARD.encode(text.as_bytes());
-            format!("data:image/svg+xml;base64,{}", encoded)
-        } else {
-            let bytes = response.bytes().await
-                .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
-            let encoded = general_purpose::STANDARD.encode(&bytes);
-            format!("data:{};base64,{}", content_type, encoded)
-        }
-    } else {
-        decode_response_body_optimized(response).await?
-    };
-    
-    // Profile header HashMap building
-    let mut response_headers_map = HashMap::with_capacity(response_headers.len());
-    for (name, value) in response_headers.iter() {
-        if let Ok(v) = value.to_str() {
-            response_headers_map.insert(name.to_string(), v.to_string());
-        }
-    }
-    
-    // JSON serialization
-    let combined_json = json!({
-        "headers": response_headers_map,
-        "status": status.to_string(),
-        "body": response_body
-    });
-    
-    let json_string = combined_json.to_string();
-    
-    Ok(json_string)
-}
-
-#[tauri::command]
-async fn make_http_request_v3(
-    url: &str,
-    method: &str,
-    headers: &str,
-    body: &str,
-    request: &str,
-) -> Result<String, String> {
-    // Call the optimized request function
-    match make_request_v3(url, method, headers, body, request).await {
-        Ok(response) => {
-            // Single serialization at the end
-            let wrapper = json!({ "body": response });
-            serde_json::to_string(&wrapper).map_err(|e| e.to_string())
-        }
-        Err(e) => Err(e.to_string()),
-    }
 }
 
 // Struct Types
@@ -1533,7 +1382,6 @@ fn main() {
             send_graphql_request,
             show_toolbar,
             hide_toolbar,
-            make_http_request_v3
         ])
         .on_page_load(|wry_window, _payload| {
             if let Ok(url) = wry_window.url() {

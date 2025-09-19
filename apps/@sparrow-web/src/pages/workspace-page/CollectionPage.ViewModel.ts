@@ -7503,11 +7503,10 @@ export default class CollectionsViewModel {
       agent = WorkspaceUserAgentBaseEnum.BROWSER_AGENT;
     }
     const headers = [
-      { key: "Accept-Encoding", value: "gzip, br", checked: true },
+      { key: "Accept-Encoding", value: "gzip, deflate, br", checked: true },
       {
         key: "User-Agent",
-        value:
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+        value: "SparrowAgent/v2",
         checked: true,
       },
       { key: "Connection", value: "keep-alive", checked: true },
