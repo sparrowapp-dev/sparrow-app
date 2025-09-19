@@ -352,6 +352,7 @@ export class AiAssistantWebSocketService {
       activity,
       teamId,
       feature: "sparrow-ai",
+      auth: getAuthHeaders().Authorization,
     };
 
     if (!this.webSocket || !this.isWsConnected()) {
