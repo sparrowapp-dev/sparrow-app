@@ -136,7 +136,12 @@ export class AiAssistantWebSocketService {
     } else if (parsed.protocol === "http:") {
       parsed.protocol = "ws:";
     }
-    return parsed.toString();
+    const result = parsed.toString();
+    // is string end with /, if yes remove it
+    if (result.endsWith("/")) {
+      return result.slice(0, -1);
+    }
+    return result;
   }
 
   /**
@@ -161,10 +166,10 @@ export class AiAssistantWebSocketService {
       // ToDo: Need to add autentication to avoid abuse of ai socket url
       const [selfhostBackendUrl] = getSelfhostUrls();
       if(selfhostBackendUrl){
-        this.baseUrl = this.toWebSocketUrl(selfhostBackendUrl) + "ai-assistant";
+        this.baseUrl = this.toWebSocketUrl(selfhostBackendUrl) + "/ai-assistant";
       }
       else{
-        this.baseUrl = this.toWebSocketUrl(constants.API_URL) + "ai-assistant";
+        this.baseUrl = this.toWebSocketUrl(constants.API_URL) + "/ai-assistant";
       }
       this.webSocket = new WebSocket(
         this.baseUrl,
