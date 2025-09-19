@@ -654,9 +654,13 @@ export default class WorkspaceExplorerViewModel {
     const [authToken] = getAuthJwt();
     const [,,selfhostAdminUrl] = getSelfhostUrls();
 
-    await open(
-      `${selfhostAdminUrl ? selfhostAdminUrl : constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
-    );
+    if(selfhostAdminUrl){
+       await open(selfhostAdminUrl);
+    }else{
+      await open(
+        `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+      );
+    }
   };
 
   public handleContactSales = async () => {

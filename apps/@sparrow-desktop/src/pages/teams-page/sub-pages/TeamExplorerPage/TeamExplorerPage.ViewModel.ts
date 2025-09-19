@@ -1067,9 +1067,13 @@ export class TeamExplorerPageViewModel {
         `${selfhostAdminUrl ? selfhostAdminUrl : constants.ADMIN_URL}/hubs/workspace/${teamId}?xid=${authToken}`,
       );
     } else {
-      await open(
-        `${selfhostAdminUrl ? selfhostAdminUrl : constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
-      );
+      if(selfhostAdminUrl){
+        await open(selfhostAdminUrl);
+      }else{
+        await open(
+          `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+        );
+      } 
     }
   };
 

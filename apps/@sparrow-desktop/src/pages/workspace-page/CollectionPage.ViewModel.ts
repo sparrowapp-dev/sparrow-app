@@ -8265,9 +8265,13 @@ export default class CollectionsViewModel {
   public handleRedirectToAdminPanel = async (teamId: string) => {
     const [authToken] = getAuthJwt();
     const [,,selfhostAdminUrl] = getSelfhostUrls();
-    await open(
-      `${selfhostAdminUrl ? selfhostAdminUrl : constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
-    );
+    if(selfhostAdminUrl){
+        await open(selfhostAdminUrl);
+    }else{
+      await open(
+        `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+      );
+    }
   };
 
   public handleContactSales = async () => {
