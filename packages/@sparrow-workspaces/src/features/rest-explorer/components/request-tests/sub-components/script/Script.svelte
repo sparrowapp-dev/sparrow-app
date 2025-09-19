@@ -602,23 +602,25 @@
                 show={isUserLimitReached}
                 distance={5}
               >
-                <Input
-                  id="sparkle-input"
-                  placeholder="Ask AI to generate a test"
-                  startIcon={showGeneratedTestActions || isUserLimitReached
-                    ? SparkleFilledIcon
-                    : SparkleColoredIcon}
-                  iconSize={16}
-                  variant="secondary"
-                  size="medium"
-                  bind:value={testCasePrompt}
-                  {isError}
-                  disabled={showGeneratedTestActions || isUserLimitReached}
-                  on:input={() => {
-                    isError = false;
-                    errorMessage = "";
-                  }}
-                />
+                <div class="input-with-button">
+                  <Input
+                    id="sparkle-input"
+                    placeholder="Ask AI to generate a test"
+                    startIcon={showGeneratedTestActions || isUserLimitReached
+                      ? SparkleFilledIcon
+                      : SparkleColoredIcon}
+                    iconSize={16}
+                    variant="secondary"
+                    size="medium"
+                    bind:value={testCasePrompt}
+                    {isError}
+                    disabled={showGeneratedTestActions || isUserLimitReached}
+                    on:input={() => {
+                      isError = false;
+                      errorMessage = "";
+                    }}
+                  />
+                </div>
               </Tooltip>
 
               <div
@@ -672,6 +674,9 @@
 </div>
 
 <style>
+  .input-with-button :global(input) {
+    padding-right: 120px !important;
+  }
   .input-error {
     color: var(--text-ds-danger-300, #e74c3c);
     font-size: 12px;
