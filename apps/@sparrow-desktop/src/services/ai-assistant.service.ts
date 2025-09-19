@@ -7,9 +7,18 @@ import type {
   fixTestScriptRequestDto,
   GenerateTestCasesRequestDto,
 } from "@sparrow/common/dto/ai-assistant";
+import { getSelfhostUrls } from "@app/utils/jwt";
 
 export class AiAssistantService {
-  constructor() {}
+  constructor() {
+     const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+      this.apiUrl = selfhostBackendUrl;
+    }
+    else{
+      this.apiUrl = constants.API_URL;
+    }
+  }
 
   private apiUrl: string = constants.API_URL;
 

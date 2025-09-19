@@ -57,6 +57,7 @@
     isExpandEnvironment,
     isExpandTestflow,
   } from "@sparrow/workspaces/stores";
+  import { getSelfhostUrls } from "@app/utils/jwt";
 
   const _viewModel = new DashboardViewModel();
   const osDetector = new OSDetector();
@@ -377,6 +378,8 @@
     isGuestUser = value;
   });
 
+  const [isSelfhost] = getSelfhostUrls();
+
   let sidebarItems: SidebarItemBaseInterface[] = [
     {
       id: SidebarItemIdEnum.HOME,
@@ -403,7 +406,7 @@
       id: SidebarItemIdEnum.COMMUNITY,
       route: "help",
       heading: "Community",
-      disabled: !isGuestUser ? false : true,
+      disabled: !isGuestUser && !isSelfhost ? false : true,
       position: SidebarItemPositionBaseEnum.SECONDARY,
     },
     {

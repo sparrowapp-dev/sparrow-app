@@ -7,7 +7,16 @@ import type {
 } from "@sparrow/common/dto";
 import { makeRequest, getRefHeaders } from "@app/containers/api/api.common";
 import constants from "@app/constants/constants";
-const apiUrl: string = constants.API_URL;
+import { getSelfhostUrls } from "@app/utils/jwt";
+let apiUrl: string = constants.API_URL;
+const [selfhostBackendUrl] = getSelfhostUrls();
+if (selfhostBackendUrl) {
+    apiUrl = selfhostBackendUrl;
+}
+else{
+    apiUrl = constants.API_URL;
+}
+    
 
 const registerUser = async (userInfo: registerUserPostBody) => {
   const response = await makeRequest("POST", `${apiUrl}/api/user`, {
