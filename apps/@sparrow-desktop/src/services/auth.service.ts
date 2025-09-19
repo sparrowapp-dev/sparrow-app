@@ -8,15 +8,7 @@ import type {
 import { makeRequest, getRefHeaders } from "@app/containers/api/api.common";
 import constants from "@app/constants/constants";
 import { getSelfhostUrls } from "@app/utils/jwt";
-let apiUrl: string = constants.API_URL;
-const [selfhostBackendUrl] = getSelfhostUrls();
-if (selfhostBackendUrl) {
-    apiUrl = selfhostBackendUrl;
-}
-else{
-    apiUrl = constants.API_URL;
-}
-    
+let apiUrl: string = constants.API_URL;    
 
 const registerUser = async (userInfo: registerUserPostBody) => {
   const response = await makeRequest("POST", `${apiUrl}/api/user`, {
@@ -76,6 +68,14 @@ const resetPassword = async (changePasswordBody: resetPasswordPostBody) => {
 };
 
 const userLogout = async () => {
+  const [selfhostBackendUrl] = getSelfhostUrls();
+  let apiUrl: string;
+  if (selfhostBackendUrl) {
+      apiUrl = selfhostBackendUrl;
+  }
+  else{
+      apiUrl = constants.API_URL;
+  }
   const response = await makeRequest("GET", `${apiUrl}/api/user/logout`, {
     headers: getRefHeaders(),
   });
@@ -83,6 +83,14 @@ const userLogout = async () => {
 };
 
 const refreshToken = async () => {
+  const [selfhostBackendUrl] = getSelfhostUrls();
+  let apiUrl: string;
+  if (selfhostBackendUrl) {
+      apiUrl = selfhostBackendUrl;
+  }
+  else{
+      apiUrl = constants.API_URL;
+  }
   const response = await makeRequest(
     "POST",
     `${apiUrl}/api/auth/refresh-token`,

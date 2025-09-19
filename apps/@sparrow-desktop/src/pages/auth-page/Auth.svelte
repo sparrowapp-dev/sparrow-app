@@ -81,7 +81,7 @@
 
   let tokenErrorType = ""; // 'empty', 'invalid', 'format'
   const tokenFormatRegex =
-    /^sparrow:\/\/\?(?:(?:selfhostBackendUrl=[^&]+&|selfhostAdminUrl=[^&]+&|selfhostWebUrl=[^&]+&){0,3})accessToken=eyJ[A-Za-z0-9._-]+\.[A-Za-z0-9._-]+\.[A-Za-z0-9._-]+&refreshToken=eyJ[A-Za-z0-9._-]+\.[A-Za-z0-9._-]+\.[A-Za-z0-9._-]+(?:&response=[^&]+)?&event=login&method=[A-Za-z0-9_-]+\s*$/;
+    /^sparrow:\/\/\?(?:(?:selfhostBackendUrl=[^&]*&|selfhostAdminUrl=[^&]*&|selfhostWebUrl=[^&]*&){0,3})accessToken=eyJ[A-Za-z0-9._-]+\.[A-Za-z0-9._-]+\.[A-Za-z0-9._-]+&refreshToken=eyJ[A-Za-z0-9._-]+\.[A-Za-z0-9._-]+\.[A-Za-z0-9._-]+(?:&response=.*?)?&event=login&method=[A-Za-z0-9_-]+\s*$/;
 
   async function tokenValidationLogic() {
     // Reset error states
@@ -274,7 +274,7 @@
         </label>
         <!-- <img src={starIcon} alt="" class="mb-3" style="width: 7px;" /> -->
         <input
-          type="email"
+          type="text"
           class="form-control py-2 text-fs-12-important"
           style={isTokenErrorMessage
             ? "border: 1px solid var(--border-danger-200)"
