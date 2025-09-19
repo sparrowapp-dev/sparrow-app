@@ -71,6 +71,7 @@ import { CollectionItemTypeBaseEnum } from "@sparrow/common/types/workspace/coll
 import { parse, GraphQLError } from "graphql";
 import constants from "@app/constants/constants";
 import * as Sentry from "@sentry/svelte";
+import { getSelfhostUrls } from "@app/utils/jwt";
 
 class GraphqlExplorerViewModel {
   /**
@@ -2535,6 +2536,11 @@ class GraphqlExplorerViewModel {
     const workspaceData = await this.workspaceRepository.readWorkspace(_id);
     const hubUrl = workspaceData?.team?.hubUrl;
 
+    const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+        return selfhostBackendUrl;
+    }
+    
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;

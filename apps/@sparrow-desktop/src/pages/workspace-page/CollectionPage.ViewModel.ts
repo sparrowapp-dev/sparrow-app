@@ -159,7 +159,7 @@ import { TeamService } from "@app/services/team.service";
 import { PlanRepository } from "@app/repositories/plan.repository";
 import { open } from "@tauri-apps/plugin-shell";
 import type { TransformedRequest } from "@sparrow/common/types/workspace/collection-base";
-import { getAuthJwt } from "@app/utils/jwt";
+import { getAuthJwt, getSelfhostUrls } from "@app/utils/jwt";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -7763,6 +7763,11 @@ export default class CollectionsViewModel {
     const workspaceData = await this.workspaceRepository.readWorkspace(_id);
     const hubUrl = workspaceData?.team?.hubUrl;
 
+    const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+        return selfhostBackendUrl;
+    }
+    
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;
@@ -8259,8 +8264,9 @@ export default class CollectionsViewModel {
 
   public handleRedirectToAdminPanel = async (teamId: string) => {
     const [authToken] = getAuthJwt();
+    const [,,selfhostAdminUrl] = getSelfhostUrls();
     await open(
-      `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+      `${selfhostAdminUrl ? selfhostAdminUrl : constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
     );
   };
 

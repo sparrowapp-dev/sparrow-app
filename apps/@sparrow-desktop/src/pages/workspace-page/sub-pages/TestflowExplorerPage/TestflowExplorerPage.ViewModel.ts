@@ -64,7 +64,7 @@ import { PlanRepository } from "@app/repositories/plan.repository";
 import { TeamService } from "@app/services/team.service";
 import { ReduceAuthHeader } from "@sparrow/workspaces/features/rest-explorer/utils";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
-import { getAuthJwt } from "@app/utils/jwt";
+import { getAuthJwt, getSelfhostUrls } from "@app/utils/jwt";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -1211,6 +1211,11 @@ export class TestflowExplorerPageViewModel {
     const workspaceData = await this.workspaceRepository.readWorkspace(_id);
     const hubUrl = workspaceData?.team?.hubUrl;
 
+    const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+        return selfhostBackendUrl;
+    }
+    
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;
@@ -1776,8 +1781,9 @@ export class TestflowExplorerPageViewModel {
    */
   public handleRedirectToAdminPanel = async (teamId: string) => {
     const [authToken] = getAuthJwt();
+    const [,,selfhostAdminUrl] = getSelfhostUrls();
     await open(
-      `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+      `${selfhostAdminUrl ? selfhostAdminUrl : constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
     );
   };
 
