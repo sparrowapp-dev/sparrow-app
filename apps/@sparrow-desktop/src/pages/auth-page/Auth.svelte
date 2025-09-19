@@ -81,7 +81,8 @@
 
   let tokenErrorType = ""; // 'empty', 'invalid', 'format'
   const tokenFormatRegex =
-    /^sparrow:\/\/\?accessToken=eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+&refreshToken=eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+(?:&response=.+?)?&event=login&method=[A-Za-z0-9_-]+\s*$/;
+    /^sparrow:\/\/\?(?:(?:selfhostBackendUrl=[^&]+&|selfhostAdminUrl=[^&]+&|selfhostWebUrl=[^&]+&){0,3})accessToken=eyJ[A-Za-z0-9._-]+\.[A-Za-z0-9._-]+\.[A-Za-z0-9._-]+&refreshToken=eyJ[A-Za-z0-9._-]+\.[A-Za-z0-9._-]+\.[A-Za-z0-9._-]+(?:&response=[^&]+)?&event=login&method=[A-Za-z0-9_-]+\s*$/;
+
   async function tokenValidationLogic() {
     // Reset error states
     isTokenErrorMessage = false;
@@ -105,7 +106,7 @@
     const params = new URLSearchParams(token.split("?")[1]);
     const accessToken = params.get("accessToken");
     const refreshToken = params.get("refreshToken");
-
+    const selfhostBackendUrl = params.get("selfhostBackendUrl");
     // Additional format validation - check if tokens were extracted properly
     if (!accessToken || !refreshToken) {
       isTokenErrorMessage = true;
@@ -130,7 +131,9 @@
       isTokenValidationLoading = true;
       await axios({
         method: "GET",
-        url: `${apiUrl}/api/team/user/${userId}`,
+        url: `${
+          selfhostBackendUrl ? selfhostBackendUrl : apiUrl
+        }/api/team/user/${userId}`,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },

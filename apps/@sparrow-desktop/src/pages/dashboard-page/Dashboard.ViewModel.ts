@@ -1253,7 +1253,6 @@ export class DashboardViewModel {
       await open(
         `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
       );
-
     }
   };
 
