@@ -339,10 +339,6 @@
     // window.open(featureUpdatesLink, "_blank");
     handleFeaturesRedirect();
   };
-
-  $: {
-    console.log("ff", workspaceData, currentWorkspaceName);
-  }
 </script>
 
 <header
