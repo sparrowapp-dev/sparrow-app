@@ -169,7 +169,7 @@ export class AiAssistantWebSocketService {
         this.baseUrl = this.toWebSocketUrl(selfhostBackendUrl) + "/ai-assistant";
       }
       else{
-        this.baseUrl = this.toWebSocketUrl(constants.API_URL) + "/ai-assistant";
+        this.baseUrl = constants.SPARROW_AI_WEBSOCKET_URL;
       }
       this.webSocket = new WebSocket(
         this.baseUrl,
