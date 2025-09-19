@@ -544,9 +544,7 @@ export default class CollectionsViewModel {
       newRequestTab.updateHeaders(
         restOfData.property.request.headers as KeyValueChecked[],
       );
-      newRequestTab.updateTests(
-        restOfData.property.request.tests,
-      );
+      newRequestTab.updateTests(restOfData.property.request.tests);
       newRequestTab.updateQueryParams(
         restOfData.property.request.queryParams as KeyValueChecked[],
       );
@@ -7509,7 +7507,7 @@ export default class CollectionsViewModel {
       {
         key: "User-Agent",
         value:
-          "SparrowAgent/v2",
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
         checked: true,
       },
       { key: "Connection", value: "keep-alive", checked: true },
