@@ -183,10 +183,6 @@
     generatedContentEndLine =
       generatedContentStartLine + generatedContentLines.length - 1;
 
-    console.log(
-      `Generated content will be from line ${generatedContentStartLine} to ${generatedContentEndLine}`,
-    );
-
     const newScript = currentScript + separator + generatedTestContent;
 
     onTestsChange({
@@ -314,7 +310,6 @@
 
         // Only highlight if line has content (skip empty lines within range)
         if (lineText) {
-          console.log(`Highlighting line ${index}: "${lineText}"`);
           element.classList.add("highlight-generated-line");
           element.style.setProperty(
             "background-color",
