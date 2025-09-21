@@ -72,9 +72,7 @@ use tauri::Manager;
 use url_fetch_handler::import_swagger_url;
 use urlencoded_handler::make_www_form_urlencoded_request;
 use utils::response_decoder::decode_response_body;
-use base64::engine::general_purpose;
 use base64::Engine;
-use std::time::Instant;
 
 // Web socket imports
 use futures_util::{SinkExt, StreamExt};
@@ -190,35 +188,32 @@ impl<R: Runtime> WindowExt for WebviewWindow<R> {
 
 #[cfg(target_os = "windows")]
 impl<R: Runtime> WindowExt for WebviewWindow<R> {
-    fn set_transparent_titlebar(&self, title_transparent: bool, remove_toolbar: bool) {
+    fn set_transparent_titlebar(&self, _title_transparent: bool, _remove_toolbar: bool) {
         // No-op: Not supported on Windows
     }
 
-    fn set_toolbar_visibility(&self, visible: bool) {
+    fn set_toolbar_visibility(&self, _visible: bool) {
         // No-op: Not supported on Windows
     }
 }
 
 // Create a single instance of reqwest Client to be used throughout the app
 static CLIENT: Lazy<Client> = Lazy::new(|| {
-     Client::builder()
+    Client::builder()
         .danger_accept_invalid_certs(true)
-        .use_native_tls()
-        .pool_max_idle_per_host(20)
-        .pool_idle_timeout(Some(Duration::from_secs(30)))
-        .tcp_keepalive(Some(Duration::from_secs(30)))
-        .connect_timeout(Duration::from_secs(10))
-        .timeout(Duration::from_secs(30))
+        .pool_max_idle_per_host(5)         
+        .pool_idle_timeout(Some(Duration::from_secs(30))) 
+        .connect_timeout(Duration::from_secs(30))       
         .gzip(true)
         .deflate(true)
         .brotli(true)
-        .redirect(reqwest::redirect::Policy::limited(3))
-        .tcp_nodelay(true)
+        .tcp_nodelay(true)                
+        .cookie_store(true)
         .build()
         .unwrap_or_else(|e| {
             eprintln!("Failed to build HTTP client: {}", e);
             std::process::exit(1);
-            })
+        })
 });
 
 // Commands
@@ -456,7 +451,7 @@ async fn make_request_v2(
     println!("Headers: {:?}", header_map);
 
     // Create request builder with request method and url
-    let mut request_builder = client.request(reqwest_method, url).headers(header_map);
+    let request_builder = client.request(reqwest_method, url).headers(header_map);
 
     // Make request call as per Body type
     let check = match request {
@@ -511,7 +506,7 @@ async fn make_request_v2(
 
             println!("{}", svg_string);
 
-            base64_string = base64::encode(svg_string);
+            base64_string = base64::engine::general_purpose::STANDARD.encode(svg_string);
         } else {
             //extract bytes from respose body for further conversion
             let bytes = response_value
@@ -519,7 +514,7 @@ async fn make_request_v2(
                 .await
                 .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
 
-            base64_string = base64::encode(bytes); // convert bytes to base64 string effiecient for transmission / no data willl not get currupted.
+            base64_string = base64::engine::general_purpose::STANDARD.encode(bytes); // convert bytes to base64 string effiecient for transmission / no data willl not get currupted.
         }
 
         //create src from content type and base64 string
@@ -668,7 +663,7 @@ struct WebSocketResponse {
 #[tauri::command]
 async fn connect_websocket(
     url: String,
-    httpurl: String,
+    _httpurl: String,
     tabid: String,
     headers: String, // Stringified JSON headers
     state: tauri::State<'_, Arc<AppState>>,
@@ -988,6 +983,7 @@ async fn connect_socket_io(
 
         async move {
             // Create a message JSON object
+            #[allow(deprecated)]
             let message_json = match payload {
                 SocketIoPayload::String(str) => {
                     json!({
@@ -1052,6 +1048,7 @@ async fn connect_socket_io(
 
             // If socket_io server is not connected, that means it was a abrupt socket.io server disconnection and we need to emit the disconnect event
             if !connected {
+                #[allow(deprecated)]
                 let error_message = match err {
                     SocketIoPayload::Binary(_) => "Binary data error".to_string(),
                     SocketIoPayload::Text(values) => values
@@ -1295,7 +1292,7 @@ fn main() {
             #[cfg(any(target_os = "linux", all(debug_assertions, windows)))]
             {
                 use tauri_plugin_deep_link::DeepLinkExt;
-                app.deep_link().register_all();
+                let _ = app.deep_link().register_all();
             }
             let window = if app.get_webview_window("main").is_some() {
                 app.get_webview_window("main").unwrap()

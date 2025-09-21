@@ -32,7 +32,8 @@ reqwest = { version = "0.12", features = [
     "gzip",
     "deflate",
     "brotli",
-    "http2"
+    "http2",
+    "cookies"
 ] }
 http = "0.2"
 hyper = { version = "0.14", features = ["client", "http1", "http2"] }
