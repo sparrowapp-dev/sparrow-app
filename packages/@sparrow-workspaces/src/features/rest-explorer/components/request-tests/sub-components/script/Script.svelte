@@ -62,6 +62,7 @@
   let originalTestContent = "";
   let currentPrompt = "";
   let originalLineCount = 0;
+  let temporaryDisplayContent = "";
 
   // Persistent highlighting variables
   let observer: MutationObserver | null = null;
@@ -82,38 +83,177 @@
         s.title.toLowerCase().includes(trimmedSearch),
       );
 
+  $: editorReadOnly = showGeneratedTestActions;
+
   const updateBeautifiedState = (val: boolean): void => {
     isBodyBeautified = val;
   };
+
   //handler function to remove the changes on tab switch
   export const handleTabChange = () => {
     if (showGeneratedTestActions) {
       rejectGeneratedTest();
     }
   };
-
   const handleCodeMirrorChange = (e: any) => {
-    onTestsChange({ ...tests, script: e.detail });
+    const newContent = e.detail;
 
-    // Re-apply highlights immediately after any content change if we have generated content
+    // If we have generated test actions showing, protect the generated content
+    if (showGeneratedTestActions) {
+      // Extract the actual generated content from both old and new content
+      const originalGeneratedContent = extractGeneratedContent(
+        temporaryDisplayContent,
+      );
+      const newGeneratedContent = extractGeneratedContent(newContent);
+
+      // Check if the generated content itself has been modified
+      if (originalGeneratedContent !== newGeneratedContent) {
+        // Generated content was modified - block the change
+        tick().then(() => {
+          // Force revert by not updating temporaryDisplayContent
+          temporaryDisplayContent = temporaryDisplayContent;
+          highlightGeneratedContent();
+        });
+        return;
+      }
+
+      // Generated content is intact - allow the change and recalculate positions
+      temporaryDisplayContent = newContent;
+
+      // Recalculate where the generated content is now located
+      recalculateGeneratedContentLines();
+
+      const nonGeneratedContent = extractNonGeneratedContent(newContent);
+      onTestsChange({ ...tests, script: nonGeneratedContent });
+    } else {
+      // Normal behavior when no generated content is protected
+      onTestsChange({ ...tests, script: newContent });
+    }
+
+    // Re-apply highlights if we have generated content
     if (showGeneratedTestActions) {
       if (rafId) cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
         highlightGeneratedContent();
-        // Double-check after a tiny delay
-        setTimeout(() => highlightGeneratedContent(), 1);
       });
     }
+  };
+
+  // Helper function to extract only the generated content
+  const extractGeneratedContent = (fullContent: string): string => {
+    if (!generatedTestContent) return "";
+
+    // Find the generated content by exact string matching
+    const generatedLines = generatedTestContent.split("\n");
+    const allLines = fullContent.split("\n");
+
+    // Look for consecutive lines that match the generated content
+    for (let i = 0; i <= allLines.length - generatedLines.length; i++) {
+      let matches = true;
+      for (let j = 0; j < generatedLines.length; j++) {
+        if (allLines[i + j] !== generatedLines[j]) {
+          matches = false;
+          break;
+        }
+      }
+      if (matches) {
+        return generatedLines.join("\n");
+      }
+    }
+
+    return ""; // Generated content not found (might have been deleted)
+  };
+
+  // Helper function to recalculate line positions after content changes
+  const recalculateGeneratedContentLines = () => {
+    if (!generatedTestContent || !temporaryDisplayContent) return;
+
+    const allLines = temporaryDisplayContent.split("\n");
+    const generatedLines = generatedTestContent.split("\n");
+
+    // Find the generated content by looking for the exact match
+    let foundStart = -1;
+
+    for (let i = 0; i <= allLines.length - generatedLines.length; i++) {
+      let matches = true;
+      for (let j = 0; j < generatedLines.length; j++) {
+        if (allLines[i + j] !== generatedLines[j]) {
+          matches = false;
+          break;
+        }
+      }
+      if (matches) {
+        foundStart = i;
+        break;
+      }
+    }
+
+    if (foundStart >= 0) {
+      generatedContentStartLine = foundStart;
+      generatedContentEndLine = foundStart + generatedLines.length - 1;
+    }
+  };
+
+  // Helper function to extract non-generated content
+  const extractNonGeneratedContent = (fullContent: string): string => {
+    if (!showGeneratedTestActions || !generatedTestContent) {
+      return fullContent;
+    }
+
+    // Remove the generated content by string replacement
+    const separator = originalTestContent ? "\n\n" : "";
+    const generatedPart = separator + generatedTestContent;
+
+    let result = fullContent.replace(generatedPart, "");
+
+    // If string replacement didn't work (content might be modified),
+    // fall back to line-by-line extraction
+    if (result === fullContent) {
+      const lines = fullContent.split("\n");
+      const nonGeneratedLines = [];
+
+      for (let i = 0; i < lines.length; i++) {
+        // Only include lines that are NOT in the generated range
+        if (i < generatedContentStartLine || i > generatedContentEndLine) {
+          nonGeneratedLines.push(lines[i]);
+        }
+      }
+
+      result = nonGeneratedLines.join("\n");
+    }
+
+    return result;
   };
 
   const toggleLeftPanel = (): void => {
     isLeftPanelCollapsed = !isLeftPanelCollapsed;
   };
 
+  // Update the selectSnippet function to handle bulk additions properly
   const selectSnippet = (data: string): void => {
-    let value = tests?.script || "";
-    value += value ? `\n${data}` : data;
-    onTestsChange({ ...tests, script: value });
+    let value = showGeneratedTestActions
+      ? temporaryDisplayContent
+      : tests?.script || "";
+
+    const newValue = value ? `${value}\n${data}` : data;
+
+    if (showGeneratedTestActions) {
+      temporaryDisplayContent = newValue;
+
+      // Recalculate line positions after adding snippet
+      recalculateGeneratedContentLines();
+
+      // Update only the non-generated part
+      const nonGeneratedContent = extractNonGeneratedContent(newValue);
+      onTestsChange({ ...tests, script: nonGeneratedContent });
+
+      // Reapply highlights with new line positions
+      setTimeout(() => {
+        highlightGeneratedContent();
+      }, 0);
+    } else {
+      onTestsChange({ ...tests, script: newValue });
+    }
   };
 
   const highlightMatch = (text: string, searchTerm: string): string => {
@@ -156,8 +296,8 @@
       testCasePrompt = "";
       generatedTestContent = result.generatedContent;
 
-      // Directly insert the generated content into the editor
-      await insertGeneratedContentDirectly();
+      // Show generated content temporarily (don't save to tests object)
+      await showGeneratedContentTemporarily();
 
       // Show the action buttons
       showGeneratedTestActions = true;
@@ -167,28 +307,23 @@
       testCasePrompt = "";
     }
   };
-  const insertGeneratedContentDirectly = async () => {
-    // Insert the generated test content into the current script
-    const currentScript = tests?.script || "";
 
-    // Calculate the exact line positions where generated content will be placed
-    const currentLines = currentScript ? currentScript.split("\n") : [];
+  const showGeneratedContentTemporarily = async () => {
+    // Calculate line positions for highlighting
+    const currentScript = originalTestContent;
     const separator = currentScript ? "\n\n" : "";
 
-    // Store where generated content starts
-    generatedContentStartLine = currentLines.length + (currentScript ? 2 : 0);
+    // Create the temporary display content first
+    temporaryDisplayContent = currentScript + separator + generatedTestContent;
 
-    // Store where generated content ends
-    const generatedContentLines = generatedTestContent.split("\n");
-    generatedContentEndLine =
-      generatedContentStartLine + generatedContentLines.length - 1;
+    // Now calculate line positions based on the actual combined content
+    const allLines = temporaryDisplayContent.split("\n");
+    const generatedLines = generatedTestContent.split("\n");
 
-    const newScript = currentScript + separator + generatedTestContent;
-
-    onTestsChange({
-      ...tests,
-      script: newScript,
-    });
+    // Find where generated content starts by working backwards
+    generatedContentEndLine = allLines.length - 1;
+    generatedContentStartLine =
+      generatedContentEndLine - generatedLines.length + 1;
 
     await tick();
 
@@ -320,6 +455,7 @@
       }
     });
   };
+
   const removeHighlight = () => {
     if (observer) {
       observer.disconnect();
@@ -369,10 +505,14 @@
   const acceptGeneratedTest = () => {
     removeHighlight();
 
-    // Keep the generated content that's already in the editor
+    // NOW save the generated content to the tests object
+    onTestsChange({ ...tests, script: temporaryDisplayContent });
+
+    // Clear temporary state
     showGeneratedTestActions = false;
     generatedTestContent = "";
     originalTestContent = "";
+    temporaryDisplayContent = "";
     currentPrompt = "";
     originalLineCount = 0;
     generatedContentStartLine = 0;
@@ -382,15 +522,43 @@
   const rejectGeneratedTest = () => {
     removeHighlight();
 
-    // Revert to original content
-    onTestsChange({ ...tests, script: originalTestContent });
+    // Remove the generated content by replacing it with empty string
+    const currentContent = temporaryDisplayContent;
+    const separator = originalTestContent ? "\n\n" : "";
+    const expectedGeneratedPart = separator + generatedTestContent;
+
+    // Remove the generated content from the current content
+    let preservedContent = currentContent.replace(expectedGeneratedPart, "");
+
+    // If that didn't work (content might have been modified), fall back to original + manual extraction
+    if (preservedContent === currentContent) {
+      // Fallback: manually extract non-generated content
+      const lines = currentContent.split("\n");
+      const preservedLines = [];
+
+      for (let i = 0; i < lines.length; i++) {
+        // Keep lines that are outside the generated range
+        if (i < generatedContentStartLine || i > generatedContentEndLine) {
+          preservedLines.push(lines[i]);
+        }
+      }
+
+      preservedContent = preservedLines.join("\n");
+    }
+
+    // Save the preserved content
+    onTestsChange({ ...tests, script: preservedContent });
+
+    // Clear temporary state
     showGeneratedTestActions = false;
     generatedTestContent = "";
     originalTestContent = "";
+    temporaryDisplayContent = "";
     currentPrompt = "";
     originalLineCount = 0;
+    generatedContentStartLine = 0;
+    generatedContentEndLine = 0;
   };
-
   const regenerateTest = async () => {
     // Remove current highlights
     removeHighlight();
@@ -399,7 +567,7 @@
     showGeneratedTestActions = false;
 
     // Revert to original content first
-    onTestsChange({ ...tests, script: originalTestContent });
+    temporaryDisplayContent = originalTestContent;
 
     // Use the same prompt to regenerate
     const result = await onGenerateTestCases(currentPrompt);
@@ -412,8 +580,8 @@
       errorMessage = "";
       generatedTestContent = result.generatedContent;
 
-      // Insert the new generated content
-      await insertGeneratedContentDirectly();
+      // Show the new generated content temporarily
+      await showGeneratedContentTemporarily();
 
       // Show the action buttons again
       showGeneratedTestActions = true;
@@ -549,7 +717,9 @@
       >
         <Editor
           bind:lang
-          value={tests?.script || ""}
+          value={showGeneratedTestActions
+            ? temporaryDisplayContent
+            : tests?.script || ""}
           on:change={handleCodeMirrorChange}
           isEditable={true}
           autofocus={true}
