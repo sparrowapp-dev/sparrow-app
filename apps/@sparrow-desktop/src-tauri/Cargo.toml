@@ -64,7 +64,6 @@ winreg = "0.11"
 # Mac Specific Dependencies
 [target.'cfg(target_os = "macos")'.dependencies]
 objc = "0.2"
-cocoa = "0.26.0"
 
 # Linux Specific Dependencies
 [target.'cfg(target_os = "linux")'.dependencies]

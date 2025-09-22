@@ -100,10 +100,7 @@ use tokio::sync::Mutex as SocketMutex;
 extern crate objc;
 
 #[cfg(target_os = "macos")]
-extern crate cocoa;
-
-#[cfg(target_os = "macos")]
-use cocoa::appkit::{NSWindow, NSWindowButton, NSWindowStyleMask, NSWindowTitleVisibility};
+use objc::runtime::{Object, YES, NO};
 use tauri::{Runtime, WebviewWindow};
 
 pub trait WindowExt {
@@ -116,53 +113,53 @@ pub trait WindowExt {
 impl<R: Runtime> WindowExt for WebviewWindow<R> {
     fn set_transparent_titlebar(&self, title_transparent: bool, remove_toolbar: bool) {
         unsafe {
-            let id = self.ns_window().unwrap() as cocoa::base::id;
+            let id = self.ns_window().unwrap() as *mut Object;
 
             // Set titlebar transparency
-            NSWindow::setTitlebarAppearsTransparent_(id, cocoa::base::YES);
-            let mut style_mask = id.styleMask();
-            style_mask.set(
-                NSWindowStyleMask::NSFullSizeContentViewWindowMask,
-                title_transparent,
-            );
-            id.setStyleMask_(style_mask);
+            let _: () = msg_send![id, setTitlebarAppearsTransparent: YES];
+            
+            // Get current style mask
+            let mut style_mask: u64 = msg_send![id, styleMask];
+            
+            // NSFullSizeContentViewWindowMask = 1 << 15 = 32768
+            const NS_FULL_SIZE_CONTENT_VIEW_WINDOW_MASK: u64 = 1 << 15;
+            
+            if title_transparent {
+                style_mask |= NS_FULL_SIZE_CONTENT_VIEW_WINDOW_MASK;
+            } else {
+                style_mask &= !NS_FULL_SIZE_CONTENT_VIEW_WINDOW_MASK;
+            }
+            
+            let _: () = msg_send![id, setStyleMask: style_mask];
 
             // Adjust toolbar visibility
             if remove_toolbar {
                 self.set_toolbar_visibility(false);
             }
 
-            id.setTitleVisibility_(if title_transparent {
-                NSWindowTitleVisibility::NSWindowTitleHidden
-            } else {
-                NSWindowTitleVisibility::NSWindowTitleVisible
-            });
+            // NSWindowTitleHidden = 1, NSWindowTitleVisible = 0
+            let title_visibility = if title_transparent { 1u32 } else { 0u32 };
+            let _: () = msg_send![id, setTitleVisibility: title_visibility];
 
-            id.setTitlebarAppearsTransparent_(if title_transparent {
-                cocoa::base::YES
-            } else {
-                cocoa::base::NO
-            });
+            let transparent = if title_transparent { YES } else { NO };
+            let _: () = msg_send![id, setTitlebarAppearsTransparent: transparent];
         }
     }
 
     fn set_toolbar_visibility(&self, visible: bool) {
         unsafe {
-            let id = self.ns_window().unwrap() as cocoa::base::id;
+            let id = self.ns_window().unwrap() as *mut Object;
 
-            let visibility = if visible {
-                cocoa::base::NO
-            } else {
-                cocoa::base::YES
-            };
-            let buttons = [
-                id.standardWindowButton_(NSWindowButton::NSWindowCloseButton),
-                id.standardWindowButton_(NSWindowButton::NSWindowMiniaturizeButton),
-                id.standardWindowButton_(NSWindowButton::NSWindowZoomButton),
-            ];
-
-            for button in buttons {
-                let _: () = msg_send![button, setHidden: visibility];
+            let visibility = if visible { NO } else { YES };
+            
+            // NSWindowCloseButton = 0, NSWindowMiniaturizeButton = 1, NSWindowZoomButton = 2
+            let button_types = [0u32, 1u32, 2u32];
+            
+            for button_type in button_types {
+                let button: *mut Object = msg_send![id, standardWindowButton: button_type];
+                if !button.is_null() {
+                    let _: () = msg_send![button, setHidden: visibility];
+                }
             }
         }
     }
@@ -448,8 +445,6 @@ async fn make_request_v2(
         }
     }
 
-    println!("Headers: {:?}", header_map);
-
     // Create request builder with request method and url
     let request_builder = client.request(reqwest_method, url).headers(header_map);
 
@@ -503,8 +498,6 @@ async fn make_request_v2(
                 Ok(value) => value,
                 Err(err) => format!("Error: {}", err),
             };
-
-            println!("{}", svg_string);
 
             base64_string = base64::engine::general_purpose::STANDARD.encode(svg_string);
         } else {
