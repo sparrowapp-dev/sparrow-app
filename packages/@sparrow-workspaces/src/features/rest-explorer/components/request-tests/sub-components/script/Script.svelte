@@ -83,8 +83,6 @@
         s.title.toLowerCase().includes(trimmedSearch),
       );
 
-  $: editorReadOnly = showGeneratedTestActions;
-
   const updateBeautifiedState = (val: boolean): void => {
     isBodyBeautified = val;
   };
