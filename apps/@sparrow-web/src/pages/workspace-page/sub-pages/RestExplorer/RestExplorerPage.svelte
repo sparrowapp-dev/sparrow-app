@@ -280,4 +280,5 @@
   isCloseRequestTestScriptDemo={_viewModel.updateIsRequestTabScriptDemo}
   requestTabTestScriptDemoCompleted={_viewModel.handleRequestTestScriptDemoCompleted}
   onGenerateTestCases={_viewModel.generateTestCases}
+  updateRequestStatAiChatBot={_viewModel.updateRequestStateAiChatBot}
 />

@@ -1643,6 +1643,37 @@ class RestExplorerViewModel {
   };
 
   /**
+   * This function will close all AI chatbot instances except the one currently in use.
+   */
+  public updateRequestStateAiChatBot = async () => {
+    // Current tab from BehaviorSubject
+    const currentTab = createDeepCopy(this._tab.getValue());
+    // Get all tabs from repository
+    const allTabs = await this.tabRepository.getTabLs();
+    if (!allTabs || allTabs.length === 0) return;
+    for (const tab of allTabs) {
+      if (tab.id !== currentTab.id) {
+        let progressiveTab = createDeepCopy(tab);
+        const conversationLength =
+          progressiveTab.property?.request?.ai?.conversations?.length ?? 0;
+        if (conversationLength === 0) {
+          progressiveTab.property.request.state.isChatbotActive = false;
+          await this.tabRepository.updateTab(
+            progressiveTab.tabId,
+            progressiveTab,
+          );
+        }
+      }
+    }
+    // Always deactivate current tab AI chatbot panel.
+    currentTab.property.request.state.isChatbotActive = false;
+    this.tab = currentTab;
+    await this.tabRepository.updateTab(currentTab.tabId, currentTab);
+    // Re-sync state with server
+    this.compareRequestWithServer();
+  };
+
+  /**
    *
    * @param  - response state
    */
@@ -2013,7 +2044,7 @@ class RestExplorerViewModel {
 
   private async executeScriptTestcases() {
     const worker = new Worker(new URL("../../../workers/test-script-worker.ts", import.meta.url), {
-      type: "module",
+        type: "module",
     });
     // minimal chai-like expect (you can replace with a real lib like chai)
 
@@ -2051,10 +2082,10 @@ class RestExplorerViewModel {
           } else {
             r.response.testMessage = error;
           }
-  
+
           restApiDataMap.set(progressiveTab.tabId, r);
 
-        }  
+        }
         return restApiDataMap;
       });
       worker.terminate(); // cleanup
