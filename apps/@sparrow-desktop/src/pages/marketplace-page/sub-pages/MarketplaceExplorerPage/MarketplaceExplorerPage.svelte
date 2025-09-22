@@ -9,6 +9,7 @@
   import { copyToClipBoard } from "@sparrow/common/utils";
   import constants from "@app/constants/constants";
   import type { Observable } from "rxjs";
+  import { getSelfhostUrls } from "@app/utils/jwt";
   const _viewModel = new MarketplaceExplorerViewModel();
 
   let currentPage = 1;
@@ -89,8 +90,11 @@
   });
 
   const handleCopyPublicWorkspaceLink = async (workspaceId: string) => {
+    const [, selfhostWebUrl] = getSelfhostUrls();
     await copyToClipBoard(
-      `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${workspaceId}`,
+      `${
+        selfhostWebUrl ? selfhostWebUrl : constants.SPARROW_WEB_APP_URL
+      }/app/collections?workspaceId=${workspaceId}`,
     );
   };
   const handleSwitchWorkspace = (workspaceId: string) => {

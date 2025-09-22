@@ -38,10 +38,10 @@
   export let onMarketingRedirect = () => {};
   export let currentWorkspacePlan = "";
   export let userRole: string = "";
-  export let isUpgradePlanModelOpen = false;
+  export let isUpgradeCurrentTeamPlanModalOpen = false;
 
   const handleUpgradeClick = () => {
-    isUpgradePlanModelOpen = true;
+    isUpgradeCurrentTeamPlanModalOpen = true;
   };
   /**
    * selected environment
@@ -198,9 +198,8 @@
   // };
 
   const calculateLimitedVisitedWorkspace = () => {
-    // debugger;
-    let workspaces = recentVisitedWorkspaces?.slice(0, 5)?.map((workspace) => {
-      const workspaceObj = {
+    let workspaces =
+      recentVisitedWorkspaces?.slice(0, 5)?.map((workspace) => ({
         id: workspace?._id,
         name: workspace?.name,
         description: workspace?.team?.teamName,
@@ -208,10 +207,11 @@
           workspace?.workspaceType === "PUBLIC"
             ? GlobeRegular
             : LockClosedRegular,
-      };
-      return workspaceObj;
-    });
-    workspaces?.push({
+      })) || [];
+    // Remove any existing entry for current workspace
+    workspaces = workspaces.filter((ws) => ws.id !== currentWorkspaceId);
+    // Add current workspace at the start
+    workspaces.unshift({
       id: currentWorkspaceId,
       name: currentWorkspaceName,
       description: currentTeamName,
@@ -220,12 +220,9 @@
           ? GlobeRegular
           : LockClosedRegular,
     });
-    const res = createSetFromArray(workspaces || [], "id");
-    if (res.length > 5) {
-      res.shift();
-    }
+    // Deduplicate and limit to 5
+    const res = createSetFromArray(workspaces, "id").slice(0, 5);
     workspaceData = res;
-    return;
   };
 
   const getGradientEllipseStyle = (plan: string) => {

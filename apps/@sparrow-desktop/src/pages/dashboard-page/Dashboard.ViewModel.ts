@@ -24,7 +24,7 @@ import {
   type TeamDocument,
   type WorkspaceDocument,
 } from "../../database/database";
-import { clearAuthJwt, getAuthJwt, getClientUser } from "@app/utils/jwt";
+import { clearAuthJwt, getAuthJwt, getClientUser, getSelfhostUrls } from "@app/utils/jwt";
 import { userLogout } from "../../services/auth.service";
 import { FeatureSwitchService } from "../../services/feature-switch.service";
 import { FeatureSwitchRepository } from "../../repositories/feature-switch.repository";
@@ -163,7 +163,8 @@ export class DashboardViewModel {
 
   public onAdminRedirect = async () => {
     const [authToken] = getAuthJwt();
-    await open(`${constants.ADMIN_URL}/hubs?xid=${authToken}`);
+    const [,,selfhostAdminUrl] = getSelfhostUrls();
+    await open(`${selfhostAdminUrl ? selfhostAdminUrl : constants.ADMIN_URL}/hubs?xid=${authToken}`);
     return;
   };
 
@@ -1244,9 +1245,15 @@ export class DashboardViewModel {
    */
   public handleRedirectToAdminPanel = async (teamId: string) => {
     const [authToken] = getAuthJwt();
-    await open(
-      `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
-    );
+    const [,,selfhostAdminUrl] = getSelfhostUrls();
+
+    if(selfhostAdminUrl){
+       await open(selfhostAdminUrl);
+    }else{
+      await open(
+        `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+      );
+    }
   };
 
   public handleContactSales = async () => {

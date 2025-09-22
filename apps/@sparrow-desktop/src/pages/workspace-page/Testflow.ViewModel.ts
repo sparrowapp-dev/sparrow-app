@@ -19,6 +19,7 @@ import {
 import constants from "@app/constants/constants";
 import { TestflowTabAdapter } from "@app/adapter";
 import { WorkspaceType } from "@sparrow/common/enums";
+import { getSelfhostUrls } from "@app/utils/jwt";
 
 export class TestflowViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -319,6 +320,11 @@ export class TestflowViewModel {
     const workspaceData = await this.workspaceRepository.readWorkspace(_id);
     const hubUrl = workspaceData?.team?.hubUrl;
 
+    const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+        return selfhostBackendUrl;
+    }
+    
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;

@@ -21,6 +21,7 @@
   import { open } from "@tauri-apps/plugin-shell";
   import { ResponseMessage } from "@sparrow/common/enums";
   import type { addUsersInWorkspacePayload } from "@sparrow/common/dto";
+  import { getSelfhostUrls } from "@app/utils/jwt";
 
   export let collectionList;
   export let tab;
@@ -119,7 +120,10 @@
   const handleWorkspaceUpdatesScroll = () => {
     _viewModel.refetchPreviousUpdates(workspaceID);
   };
-  const workspaceLink = `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${currentWorkspace.id}`;
+  const [, selfhostWebUrl] = getSelfhostUrls();
+  const workspaceLink = `${
+    selfhostWebUrl ? selfhostWebUrl : constants.SPARROW_WEB_APP_URL
+  }/app/collections?workspaceId=${currentWorkspace.id}`;
 
   const handleInviteWorkspace = async (
     workspaceId: string,

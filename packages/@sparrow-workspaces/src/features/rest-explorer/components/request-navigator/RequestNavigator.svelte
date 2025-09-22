@@ -115,30 +115,32 @@
   };
 </script>
 
-<div style="padding-bottom: 12px; position:relative;">
-  {#if ((requestStateSection === RequestSectionEnum.HEADERS && !bulkEditHeadersActive) || (requestStateSection === RequestSectionEnum.PARAMETERS && !bulkEditParamsActive) || requestStateSection === RequestSectionEnum.REQUEST_BODY) && !isGuestUser && (userRole === WorkspaceRole.WORKSPACE_ADMIN || userRole === WorkspaceRole.WORKSPACE_EDITOR)}
-    <div
-      class="button-container"
-      style="position: absolute; top: 6px; right: 10px;"
-    >
-      <button
-        class="generate-mock-button"
-        tabindex="0"
-        on:click={() => {
-          isGenerateMockDataModal = true;
-        }}
+<div style="padding-bottom: 12px; position:relative;" class="z-5">
+  <div class="d-flex justify-content-between">
+    <Navigator {tabs} {onTabClick} currentTabId={requestStateSection} />
+    {#if ((requestStateSection === RequestSectionEnum.HEADERS && !bulkEditHeadersActive) || (requestStateSection === RequestSectionEnum.PARAMETERS && !bulkEditParamsActive) || requestStateSection === RequestSectionEnum.REQUEST_BODY) && !isGuestUser && (userRole === WorkspaceRole.WORKSPACE_ADMIN || userRole === WorkspaceRole.WORKSPACE_EDITOR)}
+      <div
+        class="button-container ms-2 me-1 mt-1 z-4"
+        style="position: relative;"
       >
-        <span class="button-icon">
-          <SparkleColoredIcon />
-        </span>
-        <span class="button-text">Generate Mock Data</span>
-      </button>
+        <button
+          class="generate-mock-button"
+          tabindex="0"
+          on:click={() => {
+            isGenerateMockDataModal = true;
+          }}
+        >
+          <span class="button-icon">
+            <SparkleColoredIcon />
+          </span>
+          <span class="button-text">Generate Mock Data</span>
+        </button>
 
-      <!-- Beta badge OUTSIDE button -->
-      <span class="beta-badge">BETA</span>
-    </div>
-  {/if}
-  <Navigator {tabs} {onTabClick} currentTabId={requestStateSection} />
+        <!-- Beta badge OUTSIDE button -->
+        <span class="beta-badge">BETA</span>
+      </div>
+    {/if}
+  </div>
 </div>
 <svelte:window on:keydown={handleKeyPress} />
 
@@ -204,8 +206,8 @@
   }
   .beta-badge {
     position: absolute;
-    top: -6px;
-    right: -6px;
+    top: -5px;
+    right: -2px;
     width: 29px;
     height: 14px;
     font-size: 8px;

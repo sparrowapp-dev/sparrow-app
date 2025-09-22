@@ -8,11 +8,20 @@ import type {
 } from "@sparrow/common/dto";
 import type { WorkspaceRole } from "@sparrow/common/enums";
 import type { HttpClientResponseInterface } from "@app/types/http-client";
+import { getSelfhostUrls } from "@app/utils/jwt";
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const apiUrl: string = constants.API_URL;
+let apiUrl: string = constants.API_URL;
 
 export class WorkspaceService {
-  constructor() {}
+  constructor() {
+     const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+      apiUrl = selfhostBackendUrl;
+    }
+    else{
+      apiUrl = constants.API_URL;
+    }
+  }
   public fetchWorkspaces = async (userId: string) => {
     const response = await makeRequest(
       "GET",

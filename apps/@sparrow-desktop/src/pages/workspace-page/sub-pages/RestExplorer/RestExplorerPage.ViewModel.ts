@@ -108,7 +108,7 @@ import {
 } from "@sparrow/workspaces/stores";
 import { UserService } from "@app/services/user.service";
 
-import { getClientUser } from "@app/utils/jwt";
+import { getClientUser, getSelfhostUrls } from "@app/utils/jwt";
 import constants from "@app/constants/constants";
 import * as curlconverter from "curlconverter";
 
@@ -221,6 +221,7 @@ class RestExplorerViewModel {
           await this.updateIsRequestTabDemo(
             collectionDoc?.isRequestTestsNoCodeDemoCompleted,
           );
+
           await this.updateIsRequestTabScriptDemo(
             collectionDoc?.isRequestTestsScriptDemoCompleted,
           );
@@ -2011,126 +2012,13 @@ class RestExplorerViewModel {
   };
 
   private async executeScriptTestcases() {
-    const tests: { name: string; passed: boolean; error?: string }[] = [];
-
-    // minimal chai-like expect (you can replace with a real lib like chai)
-    const expect = (actual: any) => ({
-      to: {
-        equal: (expected: any) => {
-          if (actual !== expected)
-            throw new Error(`Expected ${actual} to equal ${expected}`);
-        },
-        notEqual: (expected: any) => {
-          if (actual === expected)
-            throw new Error(`Expected ${actual} to not equal ${expected}`);
-        },
-        exist: () => {
-          if (actual === undefined || actual === null)
-            throw new Error(`Expected value to exist but got ${actual}`);
-        },
-        notExist: () => {
-          if (actual !== undefined && actual !== null)
-            throw new Error(`Expected value to not exist but got ${actual}`);
-        },
-        be: {
-          a: (type: string) => {
-            if (typeof actual !== type)
-              throw new Error(`Expected type ${type} but got ${typeof actual}`);
-          },
-          true: () => {
-            if (actual !== true)
-              throw new Error(`Expected value to be true but got ${actual}`);
-          },
-          false: () => {
-            if (actual !== false)
-              throw new Error(`Expected value to be false but got ${actual}`);
-          },
-          within: (min: number, max: number) => {
-            if (typeof actual !== "number")
-              throw new Error(`Expected a number but got ${typeof actual}`);
-            if (actual < min || actual > max)
-              throw new Error(
-                `Expected ${actual} to be within ${min} and ${max}`,
-              );
-          },
-          lessThan: (expected: number) => {
-            if (!(typeof actual === "number" && typeof expected === "number"))
-              throw new Error(`Expected numbers for comparison`);
-            if (!(actual < expected))
-              throw new Error(`Expected ${actual} to be less than ${expected}`);
-          },
-          greaterThan: (expected: number) => {
-            if (!(typeof actual === "number" && typeof expected === "number"))
-              throw new Error(`Expected numbers for comparison`);
-            if (!(actual > expected))
-              throw new Error(
-                `Expected ${actual} to be greater than ${expected}`,
-              );
-          },
-          empty: () => {
-            if (
-              (Array.isArray(actual) && actual.length > 0) ||
-              (typeof actual === "string" && actual.trim().length > 0) ||
-              (actual &&
-                typeof actual === "object" &&
-                Object.keys(actual).length > 0)
-            ) {
-              throw new Error(
-                `Expected value to be empty but got ${JSON.stringify(actual)}`,
-              );
-            }
-          },
-          notEmpty: () => {
-            if (
-              (Array.isArray(actual) && actual.length === 0) ||
-              (typeof actual === "string" && actual.trim().length === 0) ||
-              (actual &&
-                typeof actual === "object" &&
-                Object.keys(actual).length === 0)
-            ) {
-              throw new Error(`Expected value to not be empty`);
-            }
-          },
-        },
-        contain: (expected: any) => {
-          if (
-            (typeof actual === "string" || Array.isArray(actual)) &&
-            !actual.includes(expected)
-          ) {
-            throw new Error(`Expected ${actual} to contain ${expected}`);
-          }
-        },
-        notContain: (expected: any) => {
-          if (
-            (typeof actual === "string" || Array.isArray(actual)) &&
-            actual.includes(expected)
-          ) {
-            throw new Error(`Expected ${actual} to not contain ${expected}`);
-          }
-        },
-        beInList: (list: any[]) => {
-          if (!Array.isArray(list))
-            throw new Error(`Expected a list but got ${typeof list}`);
-          if (!list.includes(actual))
-            throw new Error(`Expected ${actual} to be in list ${list}`);
-        },
-        notBeInList: (list: any[]) => {
-          if (!Array.isArray(list))
-            throw new Error(`Expected a list but got ${typeof list}`);
-          if (list.includes(actual))
-            throw new Error(`Expected ${actual} to not be in list ${list}`);
-        },
-        have: {
-          all: {
-            keys: (...keys: string[]) => {
-              const missing = keys.filter((k) => !(k in actual));
-              if (missing.length > 0)
-                throw new Error(`Missing keys: ${missing.join(", ")}`);
-            },
-          },
-        },
+    const worker = new Worker(
+      new URL("../../../../workers/test-script-worker.ts", import.meta.url),
+      {
+        type: "module",
       },
-    });
+    );
+    // minimal chai-like expect (you can replace with a real lib like chai)
 
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const javaScriptTestCases =
@@ -2141,66 +2029,37 @@ class RestExplorerViewModel {
       if (r) {
         r.response.testResults = [];
         r.response.testMessage = "";
-        // sp object similar to pm
-        const sp = {
-          response: {
-            statusCode: Number(r?.response?.status.split(" ")[0]),
-            body: {
-              text: () => {
-                try {
-                  return r?.response?.body;
-                } catch {
-                  return {};
-                }
-              },
-              json: () => {
-                try {
-                  return JSON.parse(r?.response?.body);
-                } catch {
-                  return {};
-                }
-              },
-            },
-            headers: r?.response?.headers.reduce((acc, h) => {
-              acc[h.key] = h.value;
-              return acc;
-            }, {}),
-            size: r?.response?.size,
-            time: r?.response?.time,
-          },
-          test: (name: string, fn: Function) => {
-            try {
-              fn();
-              tests.push({ name, passed: true });
-            } catch (err: any) {
-              tests.push({ name, passed: false, error: err.message });
-            }
-          },
-          xmlToJSON: (xml: string) => {
-            const parser = new XMLParser();
-            const json = parser.parse(xml);
-            return json;
-          },
-          expect,
-        };
-
-        try {
-          const fn = new Function("sp", javaScriptTestCases);
-          fn(sp); // execute user script with "sp"
-          r.response.testResults = tests.map((t) => ({
-            testId: "", // No ID in script mode
-            testName: t.name,
-            testStatus: t.passed,
-            testMessage: t.error || "",
-          }));
-        } catch (err: any) {
-          console.log(err);
-          r.response.testMessage = `${err.name} - ${err.message}`;
-        }
         restApiDataMap.set(progressiveTab.tabId, r);
+        worker.postMessage({
+          javaScriptTestCases,
+          response: r.response,
+        });
       }
       return restApiDataMap;
     });
+
+    worker.onmessage = (e) => {
+      const { success, tests, error } = e.data;
+      restExplorerDataStore.update((restApiDataMap) => {
+        const r = restApiDataMap.get(progressiveTab?.tabId);
+        if (r) {
+          if (success) {
+            r.response.testResults = tests.map((t) => ({
+              testId: "",
+              testName: t.name,
+              testStatus: t.passed,
+              testMessage: t.error || "",
+            }));
+          } else {
+            r.response.testMessage = error;
+          }
+
+          restApiDataMap.set(progressiveTab.tabId, r);
+        }
+        return restApiDataMap;
+      });
+      worker.terminate(); // cleanup
+    };
   }
 
   /**
@@ -2251,6 +2110,17 @@ class RestExplorerViewModel {
             ? ""
             : `Expected ${actual} to be less than ${expected || "(empty)"}`;
           break;
+        case TestCaseConditionOperatorEnum.LESS_THAN_OR_EQUAL:
+          passed =
+            typeof actual === "number"
+              ? actual <= Number(expected)
+              : actual.length <= Number(expected);
+          message = passed
+            ? ""
+            : `Expected ${actual} to be less than or equal to ${
+                expected || "(empty)"
+              }`;
+          break;
         case TestCaseConditionOperatorEnum.GREATER_THAN:
           passed =
             typeof actual === "number"
@@ -2259,6 +2129,17 @@ class RestExplorerViewModel {
           message = passed
             ? ""
             : `Expected ${actual} to be greater than ${expected || "(empty)"}`;
+          break;
+        case TestCaseConditionOperatorEnum.GREATER_THAN_OR_EQUAL:
+          passed =
+            typeof actual === "number"
+              ? actual >= Number(expected)
+              : actual.length >= Number(expected);
+          message = passed
+            ? ""
+            : `Expected ${actual} to be greater than or equal to ${
+                expected || "(empty)"
+              }`;
           break;
         case TestCaseConditionOperatorEnum.CONTAINS:
           passed = typeof actual === "string" && actual.includes(expected);
@@ -2978,7 +2859,6 @@ class RestExplorerViewModel {
               id: req.id,
             },
           };
-          return;
         }
         const baseUrl = await this.constructBaseUrl(_workspaceMeta.id);
         const res = await insertCollectionRequest(
@@ -3362,6 +3242,11 @@ class RestExplorerViewModel {
     const workspaceData = await this.workspaceRepository.readWorkspace(_id);
     const hubUrl = workspaceData?.team?.hubUrl;
 
+    const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+        return selfhostBackendUrl;
+    }
+    
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;
@@ -4318,6 +4203,7 @@ class RestExplorerViewModel {
     let teamId = workspaceVal.team?.teamId;
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const testCases = progressiveTab.property.request.tests;
+    const originalScript = testCases.script || "";
 
     try {
       const response = await this.aiAssistentService.generateTestCases({
@@ -4326,18 +4212,12 @@ class RestExplorerViewModel {
       });
       if (response.isSuccessful) {
         stopLoading(tabId + "generatingTestCases");
-        this.updateRequestTests({
-          ...testCases,
-          script: testCases.script + response?.data?.data.result,
-        });
+        const generatedContent = response?.data?.data.result;
         notifications.success("Test is generated successfully.");
-      } else if (
-        response?.message === "Limit reached. Please try again later."
-      ) {
-        notifications.error(
-          "Failed to generate test cases. Your monthly AI usage limit is reached.",
-        );
-        stopLoading(tabId + "generatingTestCases");
+        return {
+          generatedContent: generatedContent,
+          originalContent: originalScript,
+        };
       } else {
         stopLoading(tabId + "generatingTestCases");
         return response?.data;

@@ -1,5 +1,6 @@
 import constants from "@app/constants/constants";
 import { makeRequest, getAuthHeaders } from "@app/containers/api/api.common";
+import { getSelfhostUrls } from "@app/utils/jwt";
 
 import type {
   CreateApiRequestPostBody,
@@ -19,6 +20,14 @@ import type {
 const apiUrl: string = constants.API_URL;
 
 const fetchCollection = async (workspaceId: string) => {
+  const [selfhostBackendUrl] = getSelfhostUrls();
+  let apiUrl: string;
+  if (selfhostBackendUrl) {
+      apiUrl = selfhostBackendUrl;
+  }
+  else{
+      apiUrl = constants.API_URL;
+  }
   const response = await makeRequest(
     "GET",
     `${apiUrl}/api/collection/${workspaceId}`,
@@ -34,6 +43,14 @@ const insertCollectionDirectory = async (
   collectionId: string,
   directory: CreateDirectoryPostBody,
 ) => {
+  const [selfhostBackendUrl] = getSelfhostUrls();
+  let apiUrl: string;
+  if (selfhostBackendUrl) {
+      apiUrl = selfhostBackendUrl;
+  }
+  else{
+      apiUrl = constants.API_URL;
+  }
   const response = await makeRequest(
     "POST",
     `${apiUrl}/api/collection/${collectionId}/workspace/${workspaceId}/folder`,
@@ -49,6 +66,14 @@ const insertCollectionRequest = async (
   apiRequest: CreateApiRequestPostBody,
   _baseUrl: string,
 ) => {
+  const [selfhostBackendUrl] = getSelfhostUrls();
+  let apiUrl: string;
+  if (selfhostBackendUrl) {
+      apiUrl = selfhostBackendUrl;
+  }
+  else{
+      apiUrl = constants.API_URL;
+  }
   const response = await makeRequest(
     "POST",
     `${_baseUrl}/api/collection/request`,
@@ -66,6 +91,14 @@ const updateCollectionRequest = async (
   collectionId: string,
   apiRequest: CreateApiRequestPostBody,
 ) => {
+  const [selfhostBackendUrl] = getSelfhostUrls();
+  let apiUrl: string;
+  if (selfhostBackendUrl) {
+      apiUrl = selfhostBackendUrl;
+  }
+  else{
+      apiUrl = constants.API_URL;
+  }
   const response = await makeRequest(
     "PUT",
     `${apiUrl}/api/collection/request/${id}`,
@@ -81,6 +114,14 @@ const updateCollectionRequest = async (
 const insertCollection: (
   collection: CreateCollectionPostBody,
 ) => Promise<any> = async (collection) => {
+  const [selfhostBackendUrl] = getSelfhostUrls();
+  let apiUrl: string;
+  if (selfhostBackendUrl) {
+      apiUrl = selfhostBackendUrl;
+  }
+  else{
+      apiUrl = constants.API_URL;
+  }
   const response = await makeRequest("POST", `${apiUrl}/api/collection`, {
     body: collection,
     headers: getAuthHeaders(),
