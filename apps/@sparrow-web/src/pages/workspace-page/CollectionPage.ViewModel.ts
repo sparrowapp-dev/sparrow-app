@@ -544,7 +544,9 @@ export default class CollectionsViewModel {
       newRequestTab.updateHeaders(
         restOfData.property.request.headers as KeyValueChecked[],
       );
-      newRequestTab.updateTests(restOfData.property.request.tests);
+      newRequestTab.updateTests(
+        restOfData.property.request.tests,
+      );
       newRequestTab.updateQueryParams(
         restOfData.property.request.queryParams as KeyValueChecked[],
       );
