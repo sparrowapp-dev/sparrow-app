@@ -2,7 +2,7 @@
 
 import { WorkspaceService } from "@app/services/workspace.service";
 import constants from "@app/constants/constants";
-import { getClientUser } from "@app/utils/jwt";
+import { getClientUser, getSelfhostUrls } from "@app/utils/jwt";
 import { WorkspaceTabAdapter } from "@app/adapter";
 import { navigate } from "svelte-navigator";
 import { RecentWorkspaceRepository } from "@app/repositories/recent-workspace.repository";
@@ -28,6 +28,11 @@ class MarketplacePageViewModel {
   public constructBaseUrl = async (_id: string) => {
     const workspaceData = await this.workspaceRepository.readWorkspace(_id);
     const hubUrl = workspaceData?.team?.hubUrl;
+
+    const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+        return selfhostBackendUrl;
+    }
 
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
