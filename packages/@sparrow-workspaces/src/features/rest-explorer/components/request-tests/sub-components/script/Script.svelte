@@ -98,14 +98,27 @@
 
     // If we have generated test actions showing, protect the generated content
     if (showGeneratedTestActions) {
-      // Extract the actual generated content from both old and new content
-      const originalGeneratedContent = extractGeneratedContent(
-        temporaryDisplayContent,
-      );
-      const newGeneratedContent = extractGeneratedContent(newContent);
+      const newLines = newContent.split("\n");
 
-      // Check if the generated content itself has been modified
-      if (originalGeneratedContent !== newGeneratedContent) {
+      // Check if lines in the generated range have been modified
+      let generatedContentModified = false;
+      const originalGeneratedLines = generatedTestContent.split("\n");
+
+      for (let i = 0; i < originalGeneratedLines.length; i++) {
+        const lineIndex = generatedContentStartLine + i;
+        if (lineIndex < newLines.length) {
+          if (newLines[lineIndex] !== originalGeneratedLines[i]) {
+            generatedContentModified = true;
+            break;
+          }
+        } else {
+          // Generated content was deleted
+          generatedContentModified = true;
+          break;
+        }
+      }
+
+      if (generatedContentModified) {
         // Generated content was modified - block the change
         tick().then(() => {
           // Force revert by not updating temporaryDisplayContent
@@ -115,13 +128,21 @@
         return;
       }
 
-      // Generated content is intact - allow the change and recalculate positions
+      // Generated content is intact - allow the change
       temporaryDisplayContent = newContent;
 
-      // Recalculate where the generated content is now located
-      recalculateGeneratedContentLines();
+      // Extract only the non-generated content for saving
+      const nonGeneratedLines = [];
+      const allLines = newContent.split("\n");
 
-      const nonGeneratedContent = extractNonGeneratedContent(newContent);
+      for (let i = 0; i < allLines.length; i++) {
+        // Only include lines that are NOT in the generated range
+        if (i < generatedContentStartLine || i > generatedContentEndLine) {
+          nonGeneratedLines.push(allLines[i]);
+        }
+      }
+
+      const nonGeneratedContent = nonGeneratedLines.join("\n");
       onTestsChange({ ...tests, script: nonGeneratedContent });
     } else {
       // Normal behavior when no generated content is protected
@@ -136,30 +157,28 @@
       });
     }
   };
-
   // Helper function to extract only the generated content
   const extractGeneratedContent = (fullContent: string): string => {
-    if (!generatedTestContent) return "";
+    if (
+      !generatedTestContent ||
+      generatedContentStartLine < 0 ||
+      generatedContentEndLine < 0
+    )
+      return "";
 
-    // Find the generated content by exact string matching
-    const generatedLines = generatedTestContent.split("\n");
     const allLines = fullContent.split("\n");
 
-    // Look for consecutive lines that match the generated content
-    for (let i = 0; i <= allLines.length - generatedLines.length; i++) {
-      let matches = true;
-      for (let j = 0; j < generatedLines.length; j++) {
-        if (allLines[i + j] !== generatedLines[j]) {
-          matches = false;
-          break;
-        }
-      }
-      if (matches) {
-        return generatedLines.join("\n");
-      }
+    // Extract content only from the known generated range
+    const extractedLines = [];
+    for (
+      let i = generatedContentStartLine;
+      i <= generatedContentEndLine && i < allLines.length;
+      i++
+    ) {
+      extractedLines.push(allLines[i]);
     }
 
-    return ""; // Generated content not found (might have been deleted)
+    return extractedLines.join("\n");
   };
 
   // Helper function to recalculate line positions after content changes
@@ -311,17 +330,26 @@
     const currentScript = originalTestContent;
     const separator = currentScript ? "\n\n" : "";
 
-    // Create the temporary display content first
+    // Create the temporary display content
     temporaryDisplayContent = currentScript + separator + generatedTestContent;
 
-    // Now calculate line positions based on the actual combined content
-    const allLines = temporaryDisplayContent.split("\n");
-    const generatedLines = generatedTestContent.split("\n");
+    // Calculate exact line positions based on the original content length
+    const originalLines = currentScript ? currentScript.split("\n") : [];
+    const separatorLines = separator ? separator.split("\n") : [];
 
-    // Find where generated content starts by working backwards
-    generatedContentEndLine = allLines.length - 1;
+    // Calculate start position: original content + separator
     generatedContentStartLine =
-      generatedContentEndLine - generatedLines.length + 1;
+      originalLines.length + separatorLines.length - 1;
+    if (currentScript && separator) {
+      generatedContentStartLine = originalLines.length + 1; // +1 for the empty line from separator
+    } else if (!currentScript) {
+      generatedContentStartLine = 0;
+    }
+
+    // Calculate end position
+    const generatedLines = generatedTestContent.split("\n");
+    generatedContentEndLine =
+      generatedContentStartLine + generatedLines.length - 1;
 
     await tick();
 
