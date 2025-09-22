@@ -507,7 +507,7 @@ async fn make_request_v2(
                 .await
                 .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
 
-            base64_string = base64::engine::general_purpose::STANDARD.encode(bytes); // convert bytes to base64 string effiecient for transmission / no data willl not get currupted.
+            base64_string = base64::engine::general_purpose::STANDARD.encode(bytes); // convert bytes to base64 string for efficient transmission such that no data will get corrupted.
         }
 
         //create src from content type and base64 string
