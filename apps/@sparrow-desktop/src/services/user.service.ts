@@ -1,10 +1,19 @@
 import { getAuthHeaders, makeRequest } from "@app/containers/api/api.common";
 import constants from "@app/constants/constants";
 import type { HttpClientResponseInterface } from "@app/types/http-client";
+import { getSelfhostUrls } from "@app/utils/jwt";
 
-const apiUrl: string = constants.API_URL;
+let apiUrl: string = constants.API_URL;
 export class UserService {
-  constructor() {}
+  constructor() {
+     const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+      apiUrl = selfhostBackendUrl;
+    }
+    else{
+      apiUrl = constants.API_URL;
+    }
+  }
   public disableNewInviteTag = async (userId: string, teamId: string) => {
     const response: HttpClientResponseInterface = await makeRequest(
       "GET",

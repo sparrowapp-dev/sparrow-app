@@ -133,8 +133,8 @@ const testJsCompletions = (context: CompletionContext) => {
     return {
       from: context.pos,
       options: [
-        { label: "text", type: "function", info: "Get response body as text", apply: "text()" },
-        { label: "json", type: "function", info: "Get response body as JSON", apply: "json()" },
+        { label: "text", type: "function", info: "Get response body as text", apply: "text();" },
+        { label: "json", type: "function", info: "Get response body as JSON", apply: "json();" },
       ],
       validFor: /^\w*$/,
     };

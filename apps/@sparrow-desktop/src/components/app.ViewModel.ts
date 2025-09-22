@@ -2,7 +2,7 @@ import { Sleep, throttle as Throttle } from "@sparrow/common/utils";
 import { listen } from "@tauri-apps/api/event";
 import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { getAuthJwt, getClientUser, jwtDecode, setAuthJwt } from "../utils/jwt";
+import { getAuthJwt, getClientUser, jwtDecode, setAuthJwt, setSelfhostUrls } from "../utils/jwt";
 import constants from "@app/constants/constants";
 import { EnvironmentRepository } from "../repositories/environment.repository";
 import { WorkspaceRepository } from "../repositories/workspace.repository";
@@ -275,6 +275,9 @@ export class AppViewModel {
     const params = new URLSearchParams(url.split("?")[1]);
     const accessToken = params.get("accessToken");
     const refreshToken = params.get("refreshToken");
+    const selfhostBackendUrl = params.get("selfhostBackendUrl");
+    const selfhostWebAppUrl = params.get("selfhostWebUrl");
+    const selfhostAdminUrl = params.get("selfhostAdminUrl");
     const event = params.get("event");
     const method = params.get("method");
 
@@ -284,6 +287,7 @@ export class AppViewModel {
       identifyUser(userDetails.email);
       setAuthJwt(constants.AUTH_TOKEN, accessToken);
       setAuthJwt(constants.REF_TOKEN, refreshToken);
+      setSelfhostUrls(selfhostBackendUrl as string, selfhostWebAppUrl as string, selfhostAdminUrl as string);
       setUser(jwtDecode(accessToken));
       this.sendUserDataToMixpanel(userDetails);
 

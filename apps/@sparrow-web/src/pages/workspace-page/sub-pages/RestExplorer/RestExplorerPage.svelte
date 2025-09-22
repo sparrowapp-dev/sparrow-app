@@ -54,6 +54,7 @@
   let isMergeViewLoading = false;
   let newModifiedContent: string | KeyValuePair[];
   let mergeViewRequestDatasetType: RequestDatasetEnum;
+  let scriptComponent = null;
 
   const restExplorerDataStoreSubscriber = restExplorerDataStore.subscribe(
     (_webSocketMap) => {
@@ -95,6 +96,9 @@
   $: {
     if (tab) {
       if (prevTabId !== tab?.tabId) {
+        if (scriptComponent?.handleTabChange) {
+          scriptComponent.handleTabChange();
+        }
         isMergeViewEnableForRequestBody = false;
         isMergeViewEnableForParams = false;
         isMergeViewEnableForHeaders = false;
@@ -226,6 +230,7 @@
   bind:isMergeViewLoading
   bind:newModifiedContent
   bind:mergeViewRequestDatasetType
+  bind:scriptComponent
   {collection}
   storeData={restExplorerData}
   {environmentVariables}

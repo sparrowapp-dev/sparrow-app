@@ -108,7 +108,7 @@ import {
 } from "@sparrow/workspaces/stores";
 import { UserService } from "@app/services/user.service";
 
-import { getClientUser } from "@app/utils/jwt";
+import { getClientUser, getSelfhostUrls } from "@app/utils/jwt";
 import constants from "@app/constants/constants";
 import * as curlconverter from "curlconverter";
 
@@ -2043,9 +2043,12 @@ class RestExplorerViewModel {
   };
 
   private async executeScriptTestcases() {
-    const worker = new Worker(new URL("../../../workers/test-script-worker.ts", import.meta.url), {
+    const worker = new Worker(
+      new URL("../../../../workers/test-script-worker.ts", import.meta.url),
+      {
         type: "module",
-    });
+      },
+    );
     // minimal chai-like expect (you can replace with a real lib like chai)
 
     const progressiveTab = createDeepCopy(this._tab.getValue());
@@ -2070,9 +2073,8 @@ class RestExplorerViewModel {
       const { success, tests, error } = e.data;
       restExplorerDataStore.update((restApiDataMap) => {
         const r = restApiDataMap.get(progressiveTab?.tabId);
-        if(r){
+        if (r) {
           if (success) {
-            
             r.response.testResults = tests.map((t) => ({
               testId: "",
               testName: t.name,
@@ -2084,7 +2086,6 @@ class RestExplorerViewModel {
           }
 
           restApiDataMap.set(progressiveTab.tabId, r);
-
         }
         return restApiDataMap;
       });
@@ -3272,6 +3273,11 @@ class RestExplorerViewModel {
     const workspaceData = await this.workspaceRepository.readWorkspace(_id);
     const hubUrl = workspaceData?.team?.hubUrl;
 
+    const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+        return selfhostBackendUrl;
+    }
+    
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;
@@ -4228,6 +4234,7 @@ class RestExplorerViewModel {
     let teamId = workspaceVal.team?.teamId;
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const testCases = progressiveTab.property.request.tests;
+    const originalScript = testCases.script || "";
 
     try {
       const response = await this.aiAssistentService.generateTestCases({
@@ -4236,18 +4243,12 @@ class RestExplorerViewModel {
       });
       if (response.isSuccessful) {
         stopLoading(tabId + "generatingTestCases");
-        this.updateRequestTests({
-          ...testCases,
-          script: testCases.script + response?.data?.data.result,
-        });
+        const generatedContent = response?.data?.data.result;
         notifications.success("Test is generated successfully.");
-      } else if (
-        response?.message === "Limit reached. Please try again later."
-      ) {
-        notifications.error(
-          "Failed to generate test cases. Your monthly AI usage limit is reached.",
-        );
-        stopLoading(tabId + "generatingTestCases");
+        return {
+          generatedContent: generatedContent,
+          originalContent: originalScript,
+        };
       } else {
         stopLoading(tabId + "generatingTestCases");
         return response?.data;

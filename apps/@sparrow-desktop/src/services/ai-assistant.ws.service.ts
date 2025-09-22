@@ -15,6 +15,7 @@ import {
   type modelsConfigType,
   type PromptFileAttachment,
 } from "@sparrow/common/types/workspace/ai-request-base";
+import { getSelfhostUrls } from "@app/utils/jwt";
 
 /**
  * Service for managing WebSocket connections and communication
@@ -128,6 +129,21 @@ export class AiAssistantWebSocketService {
   //                         **** Connection Management Methods ****
   /////////////////////////////////////////////////////////////////////////////////////////////////
 
+  private toWebSocketUrl(_url: string) {
+    const parsed = new URL(_url);
+    if (parsed.protocol === "https:") {
+      parsed.protocol = "wss:";
+    } else if (parsed.protocol === "http:") {
+      parsed.protocol = "ws:";
+    }
+    const result = parsed.toString();
+    // is string end with /, if yes remove it
+    if (result.endsWith("/")) {
+      return result.slice(0, -1);
+    }
+    return result;
+  }
+
   /**
    * Connects to the AI Assistant WebSocket server.
    * Initializes the WebSocket connection and sets up event handlers.
@@ -148,6 +164,13 @@ export class AiAssistantWebSocketService {
 
       // Create new WebSocket connection
       // ToDo: Need to add autentication to avoid abuse of ai socket url
+      const [selfhostBackendUrl] = getSelfhostUrls();
+      if(selfhostBackendUrl){
+        this.baseUrl = this.toWebSocketUrl(selfhostBackendUrl) + "/ai-assistant";
+      }
+      else{
+        this.baseUrl = constants.SPARROW_AI_WEBSOCKET_URL;
+      }
       this.webSocket = new WebSocket(
         this.baseUrl,
         // {

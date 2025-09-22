@@ -14,7 +14,7 @@ export const RequestTabTestsScriptTourContent = [
     targetId: "request-tab-test",
   },
   {
-    Title: "Add Your First Test!",
+    Title: "Speed Up with Snippets",
     description:
       "No need to start from scratch. Use ready-made snippets to add common tests in just one click.",
     stepCount: 3,

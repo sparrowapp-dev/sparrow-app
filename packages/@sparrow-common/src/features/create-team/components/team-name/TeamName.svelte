@@ -43,16 +43,21 @@
     helpLabel={true}
     isError={(!teamForm.name.value && teamForm.name.isTouched) ||
       teamForm.name.invalid}
-    errorMessage={teamForm.name.invalid
-      ? NAME_CONFIG.INVALID_ERROR_MESSAGE
-      : NAME_CONFIG.REQUIRED_ERROR_MESSAGE}
+    errorMessage={!teamForm.name.value && teamForm.name.isTouched
+      ? NAME_CONFIG.REQUIRED_ERROR_MESSAGE
+      : teamForm.name.invalid
+        ? NAME_CONFIG.INVALID_ERROR_MESSAGE
+        : ""}
   >
     <Input
       bind:value={teamForm.name.value}
       on:blur={() => {
         teamForm.name.isTouched = true;
         teamForm.name.value = teamForm.name.value.trim(); // Trim the value on blur
-        if (isOnlySpecialCharacters(teamForm.name.value)) {
+        if (
+          teamForm.name.value &&
+          isOnlySpecialCharacters(teamForm.name.value)
+        ) {
           teamForm.name.invalid = true;
         } else {
           teamForm.name.invalid = false;
@@ -63,7 +68,8 @@
       placeholder={NAME_CONFIG.PLACEHOLDER}
       class="text-ds-font-size-14 bg-tertiary-300 px-2 border-radius-4 text-ds-font-weight-regular text-ds-line-height-143"
       style="outline:none;"
-      isError={!teamForm.name.value && teamForm.name.isTouched}
+      isError={(!teamForm.name.value && teamForm.name.isTouched) ||
+        teamForm.name.invalid}
       isEditIconRequired={false}
       type={"text"}
       maxlength={NAME_CONFIG.MAX_TEXT_SIZE}

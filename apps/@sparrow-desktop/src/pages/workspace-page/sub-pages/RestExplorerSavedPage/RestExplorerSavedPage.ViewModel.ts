@@ -69,6 +69,7 @@ import { InitTab } from "@sparrow/common/factory";
 import { HttpResponseSavedBodyModeBaseEnum } from "@sparrow/common/types/workspace/http-request-saved-base";
 import constants from "@app/constants/constants";
 import * as Sentry from "@sentry/svelte";
+import { getSelfhostUrls } from "@app/utils/jwt";
 
 export class RestExplorerSavedViewModel {
   /**
@@ -1023,6 +1024,11 @@ export class RestExplorerSavedViewModel {
     const workspaceData = await this.workspaceRepository.readWorkspace(_id);
     const hubUrl = workspaceData?.team?.hubUrl;
 
+    const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+        return selfhostBackendUrl;
+    }
+    
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;
