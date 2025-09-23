@@ -63,6 +63,7 @@
   let currentPrompt = "";
   let originalLineCount = 0;
   let temporaryDisplayContent = "";
+  let contentAddedDuringGeneration = "";
 
   // Persistent highlighting variables
   let observer: MutationObserver | null = null;
@@ -123,6 +124,7 @@
         tick().then(() => {
           // Force revert by not updating temporaryDisplayContent
           temporaryDisplayContent = temporaryDisplayContent;
+          recalculateGeneratedContentLines();
           highlightGeneratedContent();
         });
         return;
@@ -188,20 +190,41 @@
     const allLines = temporaryDisplayContent.split("\n");
     const generatedLines = generatedTestContent.split("\n");
 
-    // Find the generated content by looking for the exact match
+    // Only look for generated content in a very narrow range around the expected position
+    // This prevents matching similar content elsewhere
     let foundStart = -1;
 
-    for (let i = 0; i <= allLines.length - generatedLines.length; i++) {
+    // Search in a very small window around the current position
+    const searchStart = Math.max(0, generatedContentStartLine - 1);
+    const searchEnd = Math.min(
+      allLines.length - generatedLines.length + 1,
+      generatedContentStartLine + 3, // Very narrow search window
+    );
+
+    for (let i = searchStart; i < searchEnd; i++) {
       let matches = true;
+
+      // Check if ALL lines match exactly
       for (let j = 0; j < generatedLines.length; j++) {
-        if (allLines[i + j] !== generatedLines[j]) {
+        if (i + j >= allLines.length || allLines[i + j] !== generatedLines[j]) {
           matches = false;
           break;
         }
       }
+
+      // Additional check: make sure we're not matching content that was there before
       if (matches) {
-        foundStart = i;
-        break;
+        // Verify this is actually the generated content block by checking context
+        // The generated content should be preceded by original content + separator
+        const hasProperContext =
+          i === 0 || // At the beginning
+          (originalTestContent && i > 0) || // After original content
+          (!originalTestContent && i === 0); // No original content, starts at beginning
+
+        if (hasProperContext) {
+          foundStart = i;
+          break;
+        }
       }
     }
 
@@ -217,36 +240,25 @@
       return fullContent;
     }
 
-    // Remove the generated content by string replacement
-    const separator = originalTestContent ? "\n\n" : "";
-    const generatedPart = separator + generatedTestContent;
+    // Use line-by-line extraction based on known positions
+    const lines = fullContent.split("\n");
+    const nonGeneratedLines = [];
 
-    let result = fullContent.replace(generatedPart, "");
-
-    // If string replacement didn't work (content might be modified),
-    // fall back to line-by-line extraction
-    if (result === fullContent) {
-      const lines = fullContent.split("\n");
-      const nonGeneratedLines = [];
-
-      for (let i = 0; i < lines.length; i++) {
-        // Only include lines that are NOT in the generated range
-        if (i < generatedContentStartLine || i > generatedContentEndLine) {
-          nonGeneratedLines.push(lines[i]);
-        }
+    for (let i = 0; i < lines.length; i++) {
+      // Only include lines that are NOT in the generated range
+      if (i < generatedContentStartLine || i > generatedContentEndLine) {
+        nonGeneratedLines.push(lines[i]);
       }
-
-      result = nonGeneratedLines.join("\n");
     }
 
-    return result;
+    return nonGeneratedLines.join("\n");
   };
 
   const toggleLeftPanel = (): void => {
     isLeftPanelCollapsed = !isLeftPanelCollapsed;
   };
 
-  // Update the selectSnippet function to handle bulk additions properly
+  // Update the selectSnippet function to properly handle snippets without affecting generated content tracking
   const selectSnippet = (data: string): void => {
     let value = showGeneratedTestActions
       ? temporaryDisplayContent
@@ -255,20 +267,36 @@
     const newValue = value ? `${value}\n${data}` : data;
 
     if (showGeneratedTestActions) {
+      const snippetLines = data.split("\n").length;
+      const addedNewlines = value ? 1 : 0;
+
+      // Update the content first
       temporaryDisplayContent = newValue;
 
-      // Recalculate line positions after adding snippet
-      recalculateGeneratedContentLines();
+      // Calculate where the snippet was inserted
+      const oldLines = value.split("\n");
+      const insertionPoint = oldLines.length;
 
-      // Update only the non-generated part
-      const nonGeneratedContent = extractNonGeneratedContent(newValue);
-      onTestsChange({ ...tests, script: nonGeneratedContent });
+      // Only adjust if snippet was inserted before generated content
+      if (insertionPoint <= generatedContentStartLine) {
+        generatedContentStartLine += snippetLines + addedNewlines;
+        generatedContentEndLine += snippetLines + addedNewlines;
+      }
 
-      // Reapply highlights with new line positions
+      // Track the snippet added during generation
+      contentAddedDuringGeneration = contentAddedDuringGeneration
+        ? `${contentAddedDuringGeneration}\n${data}`
+        : data;
+
+      // DON'T update the stored tests.script during generation
+      // This preserves the original content for rejection
+
+      // Reapply highlights
       setTimeout(() => {
         highlightGeneratedContent();
       }, 0);
     } else {
+      // Normal behavior when no generated content is active
       onTestsChange({ ...tests, script: newValue });
     }
   };
@@ -294,6 +322,7 @@
   const handleGenerateTestCases = async () => {
     // Store the original content and current prompt
     originalTestContent = tests?.script || "";
+    contentAddedDuringGeneration = "";
     originalLineCount = originalTestContent.trim()
       ? originalTestContent.split("\n").length
       : 0;
@@ -531,7 +560,7 @@
   const acceptGeneratedTest = () => {
     removeHighlight();
 
-    // NOW save the generated content to the tests object
+    // Save the complete content (original + snippets + generated)
     onTestsChange({ ...tests, script: temporaryDisplayContent });
 
     // Clear temporary state
@@ -543,39 +572,26 @@
     originalLineCount = 0;
     generatedContentStartLine = 0;
     generatedContentEndLine = 0;
+    contentAddedDuringGeneration = ""; // Clear snippets tracker
   };
 
   const rejectGeneratedTest = () => {
     removeHighlight();
 
-    // Remove the generated content by replacing it with empty string
-    const currentContent = temporaryDisplayContent;
-    const separator = originalTestContent ? "\n\n" : "";
-    const expectedGeneratedPart = separator + generatedTestContent;
+    // Calculate what content to revert to:
+    // Original content + any snippets added during generation
+    let revertedContent = originalTestContent || "";
 
-    // Remove the generated content from the current content
-    let preservedContent = currentContent.replace(expectedGeneratedPart, "");
-
-    // If that didn't work (content might have been modified), fall back to original + manual extraction
-    if (preservedContent === currentContent) {
-      // Fallback: manually extract non-generated content
-      const lines = currentContent.split("\n");
-      const preservedLines = [];
-
-      for (let i = 0; i < lines.length; i++) {
-        // Keep lines that are outside the generated range
-        if (i < generatedContentStartLine || i > generatedContentEndLine) {
-          preservedLines.push(lines[i]);
-        }
-      }
-
-      preservedContent = preservedLines.join("\n");
+    if (contentAddedDuringGeneration) {
+      revertedContent = revertedContent
+        ? `${revertedContent}\n${contentAddedDuringGeneration}`
+        : contentAddedDuringGeneration;
     }
 
-    // Save the preserved content
-    onTestsChange({ ...tests, script: preservedContent });
+    // Save the reverted content (original + snippets, but no AI generation)
+    onTestsChange({ ...tests, script: revertedContent });
 
-    // Clear temporary state
+    // Clear all temporary state
     showGeneratedTestActions = false;
     generatedTestContent = "";
     originalTestContent = "";
@@ -584,7 +600,9 @@
     originalLineCount = 0;
     generatedContentStartLine = 0;
     generatedContentEndLine = 0;
+    contentAddedDuringGeneration = "";
   };
+
   const regenerateTest = async () => {
     // Remove current highlights
     removeHighlight();
