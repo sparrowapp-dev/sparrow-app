@@ -4,6 +4,7 @@ import { environmentType } from "@sparrow/common/enums";
 import {
   createDeepCopy,
   InitRequestTab,
+  InitTestflowScheduleTab,
   scrollToTab,
 } from "@sparrow/common/utils";
 import { RequestTabAdapter, TestflowTabAdapter } from "../../../../adapter";
@@ -1789,6 +1790,12 @@ export class TestflowExplorerPageViewModel {
         `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
       );
     }
+  };
+
+  public openTestflowScheduleTab = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const initTestflowScheduleTab = new InitTestflowScheduleTab("asif",progressiveTab.path.workspaceId).getValue();
+    await this.tabRepository.createTab(initTestflowScheduleTab);
   };
 
   public handleContactSales = async () => {
