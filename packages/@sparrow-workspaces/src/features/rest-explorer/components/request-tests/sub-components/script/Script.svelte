@@ -234,26 +234,6 @@
     }
   };
 
-  // Helper function to extract non-generated content
-  const extractNonGeneratedContent = (fullContent: string): string => {
-    if (!showGeneratedTestActions || !generatedTestContent) {
-      return fullContent;
-    }
-
-    // Use line-by-line extraction based on known positions
-    const lines = fullContent.split("\n");
-    const nonGeneratedLines = [];
-
-    for (let i = 0; i < lines.length; i++) {
-      // Only include lines that are NOT in the generated range
-      if (i < generatedContentStartLine || i > generatedContentEndLine) {
-        nonGeneratedLines.push(lines[i]);
-      }
-    }
-
-    return nonGeneratedLines.join("\n");
-  };
-
   const toggleLeftPanel = (): void => {
     isLeftPanelCollapsed = !isLeftPanelCollapsed;
   };
