@@ -442,56 +442,84 @@
                   >
                   <WithSelectV4
                     id={"hdregtrgt89fhrbej"}
-                    data={[
-                      {
-                        name: "Equals",
-                        id: TestCaseConditionOperatorEnum.EQUALS,
-                      },
-                      {
-                        name: "Not Equal",
-                        id: TestCaseConditionOperatorEnum.NOT_EQUAL,
-                      },
-                      {
-                        name: "Exists",
-                        id: TestCaseConditionOperatorEnum.EXISTS,
-                      },
-                      {
-                        name: "Does Not Exist",
-                        id: TestCaseConditionOperatorEnum.DOES_NOT_EXIST,
-                      },
-                      {
-                        name: "Less Than",
-                        id: TestCaseConditionOperatorEnum.LESS_THAN,
-                      },
-                      {
-                        name: "Greater Than",
-                        id: TestCaseConditionOperatorEnum.GREATER_THAN,
-                      },
-                      {
-                        name: "Contains",
-                        id: TestCaseConditionOperatorEnum.CONTAINS,
-                      },
-                      {
-                        name: "Does Not Contain",
-                        id: TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN,
-                      },
-                      {
-                        name: "Is Empty",
-                        id: TestCaseConditionOperatorEnum.IS_EMPTY,
-                      },
-                      {
-                        name: "Is Not Empty",
-                        id: TestCaseConditionOperatorEnum.IS_NOT_EMPTY,
-                      },
-                      {
-                        name: "In List",
-                        id: TestCaseConditionOperatorEnum.IN_LIST,
-                      },
-                      {
-                        name: "Not In List",
-                        id: TestCaseConditionOperatorEnum.NOT_IN_LIST,
-                      },
-                    ]}
+                    data={test.testTarget === "Time Consuming"
+                      ? [
+                          {
+                            name: "Equals",
+                            id: TestCaseConditionOperatorEnum.EQUALS,
+                          },
+                          {
+                            name: "Not Equal",
+                            id: TestCaseConditionOperatorEnum.NOT_EQUAL,
+                          },
+
+                          {
+                            name: "Less Than",
+                            id: TestCaseConditionOperatorEnum.LESS_THAN,
+                          },
+                          {
+                            name: "Less Than Or Equal",
+                            id: TestCaseConditionOperatorEnum.LESS_THAN_OR_EQUAL,
+                          },
+                          {
+                            name: "Greater Than",
+                            id: TestCaseConditionOperatorEnum.GREATER_THAN,
+                          },
+                          {
+                            name: "Greater Than Or Equal",
+                            id: TestCaseConditionOperatorEnum.GREATER_THAN_OR_EQUAL,
+                          },
+                        ]
+                      : [
+                          {
+                            name: "Equals",
+                            id: TestCaseConditionOperatorEnum.EQUALS,
+                          },
+                          {
+                            name: "Not Equal",
+                            id: TestCaseConditionOperatorEnum.NOT_EQUAL,
+                          },
+                          {
+                            name: "Exists",
+                            id: TestCaseConditionOperatorEnum.EXISTS,
+                          },
+                          {
+                            name: "Does Not Exist",
+                            id: TestCaseConditionOperatorEnum.DOES_NOT_EXIST,
+                          },
+                          {
+                            name: "Less Than",
+                            id: TestCaseConditionOperatorEnum.LESS_THAN,
+                          },
+                          {
+                            name: "Greater Than",
+                            id: TestCaseConditionOperatorEnum.GREATER_THAN,
+                          },
+                          {
+                            name: "Contains",
+                            id: TestCaseConditionOperatorEnum.CONTAINS,
+                          },
+                          {
+                            name: "Does Not Contain",
+                            id: TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN,
+                          },
+                          {
+                            name: "Is Empty",
+                            id: TestCaseConditionOperatorEnum.IS_EMPTY,
+                          },
+                          {
+                            name: "Is Not Empty",
+                            id: TestCaseConditionOperatorEnum.IS_NOT_EMPTY,
+                          },
+                          {
+                            name: "In List",
+                            id: TestCaseConditionOperatorEnum.IN_LIST,
+                          },
+                          {
+                            name: "Not In List",
+                            id: TestCaseConditionOperatorEnum.NOT_IN_LIST,
+                          },
+                        ]}
                     titleId={test?.condition}
                     onclick={(conditionItem) => {
                       handleConditionDropdown(conditionItem, test);
@@ -697,7 +725,7 @@
                     {/if}
                   </div>
                 {/if}
-                {#if test?.condition === TestCaseConditionOperatorEnum.EQUALS || test?.condition === TestCaseConditionOperatorEnum.NOT_EQUAL || test?.condition === TestCaseConditionOperatorEnum.EXISTS || test?.condition === TestCaseConditionOperatorEnum.DOES_NOT_EXIST || test?.condition === TestCaseConditionOperatorEnum.LESS_THAN || test?.condition === TestCaseConditionOperatorEnum.GREATER_THAN || test?.condition === TestCaseConditionOperatorEnum.CONTAINS || test?.condition === TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN || test?.condition === TestCaseConditionOperatorEnum.IN_LIST || test?.condition === TestCaseConditionOperatorEnum.NOT_IN_LIST}
+                {#if test?.condition === TestCaseConditionOperatorEnum.EQUALS || test?.condition === TestCaseConditionOperatorEnum.NOT_EQUAL || test?.condition === TestCaseConditionOperatorEnum.EXISTS || test?.condition === TestCaseConditionOperatorEnum.DOES_NOT_EXIST || test?.condition === TestCaseConditionOperatorEnum.LESS_THAN || test?.condition === TestCaseConditionOperatorEnum.GREATER_THAN || test?.condition === TestCaseConditionOperatorEnum.CONTAINS || test?.condition === TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN || test?.condition === TestCaseConditionOperatorEnum.IN_LIST || test?.condition === TestCaseConditionOperatorEnum.NOT_IN_LIST || test?.condition === TestCaseConditionOperatorEnum.GREATER_THAN_OR_EQUAL || test?.condition === TestCaseConditionOperatorEnum.LESS_THAN_OR_EQUAL}
                   <div style="flex: 1 1 45%; min-width: 0;">
                     <label class="form-label text-fs-12"
                       >Comparison Value <span

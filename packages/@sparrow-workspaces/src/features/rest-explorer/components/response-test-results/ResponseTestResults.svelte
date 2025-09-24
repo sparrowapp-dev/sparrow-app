@@ -1,9 +1,22 @@
 <script lang="ts">
   import { SparrowLogo } from "@sparrow/common/images";
-  import { Tag } from "@sparrow/library/ui";
+  import { startLoading, stopLoading } from "@sparrow/common/store";
+  import { TestCaseModeEnum } from "@sparrow/common/types/workspace";
+  import { ErrorCircleRegular, SparkleRegular } from "@sparrow/library/icons";
+  import { Button, Tag } from "@sparrow/library/ui";
   import { onMount, tick } from "svelte";
+  import { loadingState } from "@sparrow/common/store";
+  import { WorkspaceRole } from "@sparrow/common/enums";
 
   export let responseTestResults = [];
+  export let responseTestMessage = "";
+  export let tests;
+  export let onFixTestScript;
+  export let tabId;
+  export let isGuestUser;
+  export let isSharedWorkspace;
+  export let userRole;
+
   let filter: "all" | "passed" | "failed" = "all";
   let allBtn: HTMLSpanElement;
   let passedBtn: HTMLSpanElement;
@@ -100,42 +113,75 @@
     >
       {#each filteredResults as testCases}
         <div
-          class="d-flex align-items-center ps-0 gap-1 w-100"
+          class="d-flex ps-0 gap-1 w-100 align-items-start"
           style="padding-left: 8px; padding: 6px;"
         >
           <div
-            style="width: 50px; align-items: center; display: flex; justify-content:flex-start; padding-left:8px;"
+            style="width: 60px; align-items: center; display: flex; justify-content:flex-start; padding-left:8px;"
           >
             <Tag
               type={testCases?.testStatus ? "green" : "orange"}
-              text={testCases?.testStatus ? "Pass" : "Fail"}
+              text={testCases?.testStatus ? "Passed" : "Failed"}
               size="small"
             />
           </div>
-
-          <p
-            style="font-size: 12px; font-weight:400; color: var(--text-ds-neutral-400); padding-left: 4px; margin-bottom:0px;"
-          >
-            {testCases?.testName} |
-          </p>
-          <p
-            style="font-size: 12px; font-weight:400; color: var(--text-ds-neutral-400); margin-bottom:0px;"
-          >
-            {testCases?.testMessage}
-          </p>
+          <div style="calc(100% - 60px); flex:1;">
+            <p
+              style="word-break: break-word; font-size: 12px; font-weight:400; color: var(--text-ds-neutral-400); padding-left: 4px; margin-bottom:0px;"
+            >
+              {testCases?.testName}
+              {testCases?.testMessage
+                ? `| AssertionError: ${testCases?.testMessage}`
+                : ``}
+            </p>
+          </div>
         </div>
       {/each}
     </div>
   </div>
 {:else}
   <div class="d-flex align-items-center flex-column justify-content-center">
-    <div class="my-4">
-      <SparrowLogo />
-    </div>
     <div class="d-flex flex-column align-items-center text-center">
-      <p class="text-fs-12 mb-5" style="color: var(--text-ds-neutral-400);">
-        No test cases available. <br /> Start by adding your own test cases.
-      </p>
+      {#if responseTestMessage}
+        <p
+          class="text-fs-12 mb-2 pt-4"
+          style="color: var(--text-ds-danger-400); max-width: 700px;"
+        >
+          <span class="d-inline-block">
+            <ErrorCircleRegular size={"12px"} />
+          </span>
+          <span>
+            Couldn't evaluate the test script: {responseTestMessage}
+          </span>
+        </p>
+        {#if !isGuestUser && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+          <Button
+            title="Fix Script"
+            startIcon={SparkleRegular}
+            type="outline-secondary"
+            loader={$loadingState.get(tabId + "-fix-test-script")}
+            disable={$loadingState.get(tabId + "-fix-test-script")}
+            onClick={async () => {
+              startLoading(tabId + "-fix-test-script");
+              await onFixTestScript();
+              stopLoading(tabId + "-fix-test-script");
+            }}
+          />
+        {/if}
+      {:else}
+        <div class="my-4">
+          <SparrowLogo />
+        </div>
+        {#if tests?.testCaseMode === TestCaseModeEnum.NO_CODE}
+          <p class="text-fs-12 mb-5" style="color: var(--text-ds-neutral-400);">
+            No test cases available. <br /> Start by adding your own test cases.
+          </p>
+        {:else if tests?.testCaseMode === TestCaseModeEnum.SCRIPT}
+          <p class="text-fs-12 mb-5" style="color: var(--text-ds-neutral-400);">
+            No test cases available. <br /> Start by adding your own test cases,
+            select from smart suggestions or generate them with AI.
+          </p>{/if}
+      {/if}
     </div>
   </div>
 {/if}

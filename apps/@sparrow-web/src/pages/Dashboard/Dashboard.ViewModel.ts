@@ -95,6 +95,11 @@ export class DashboardViewModel {
     return this.environmentRepository.getEnvironment();
   }
 
+  public getTeamPlan = async (teamId: string) => {
+    const teamDoc = await this.teamRepository.getTeamDoc(teamId);
+    return teamDoc?.toMutableJSON()?.plan?.name || "Community";
+  };
+
   /**
    * @description - get open team from local db
    */

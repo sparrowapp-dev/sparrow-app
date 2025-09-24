@@ -106,7 +106,7 @@
     handleNextStep,
     handleCloseTour,
   } from "@sparrow/workspaces/features";
-  import { RequestNoCodeTourGuide } from "@sparrow/workspaces/features";
+  import { RequestTabTourGuide } from "@sparrow/workspaces/features";
   import { RequestTabTestsTourContent } from "@sparrow/workspaces/features";
   const _viewModel = new CollectionsViewModel();
 
@@ -1112,7 +1112,7 @@
             </div>
           {/if}
           {#if $requestTabTestNoCodeStep === 3}
-            <RequestNoCodeTourGuide
+            <RequestTabTourGuide
               targetId={RequestTabTestsTourContent[2].targetId}
               isVisible={true}
               cardPosition={requestTabNocodeCardPosition(3)}
@@ -1127,7 +1127,7 @@
                 onClose={handleCloseTour}
                 width={352}
               />
-            </RequestNoCodeTourGuide>
+            </RequestTabTourGuide>
           {/if}
         </section>
       </Pane>

@@ -99,8 +99,12 @@
     <div
       class="d-flex"
       style="width: calc(100% - {dynamicExpression
-        ? '62px'
-        : '64px'}); height:27px; margin-bottom:0px;"
+        ? isInputBoxEditable
+          ? '85px'
+          : '62px'
+        : isInputBoxEditable
+          ? '90px'
+          : '64px'}); height:27px; margin-bottom:0px;"
     >
       <div class="w-50 position-relative text-ds-font-weight-medium">
         <CodeMirrorInput

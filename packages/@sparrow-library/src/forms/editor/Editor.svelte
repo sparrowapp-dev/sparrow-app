@@ -12,7 +12,7 @@
     WidgetType,
     type DecorationSet,
   } from "@codemirror/view";
-  import { linter } from "@codemirror/lint";
+  import { linter, lintGutter } from "@codemirror/lint";
   import type { Diagnostic } from "@codemirror/lint";
   import { autocompletion, CompletionContext } from "@codemirror/autocomplete";
   import { Decoration, ViewPlugin, ViewUpdate } from "@codemirror/view";
@@ -33,7 +33,8 @@
     | "Text"
     | "Graphql"
     | "Python"
-    | "Curl" = "Text";
+    | "Curl"
+    | "TestJavaScript" = "Text";
   export let value = "";
   export let customSuggestions = false;
   export let isEnterKeyNotAllowed = false;
@@ -72,6 +73,24 @@
   const setupConf = new Compartment(); // Compartment for basic setup
   let codeMirrorEditorDiv: HTMLDivElement;
   let codeMirrorView: EditorView;
+
+  // ✅ Custom JS validator (from first code)
+  function jsLinter() {
+    return (view: EditorView) => {
+      const diagnostics: Diagnostic[] = [];
+      try {
+        new Function(view.state.doc.toString());
+      } catch (e: any) {
+        diagnostics.push({
+          from: 0,
+          to: view.state.doc.length,
+          severity: "error",
+          message: e.message || "Invalid JavaScript",
+        });
+      }
+      return diagnostics;
+    };
+  }
 
   // Function to update the editor view when changes occur
   const updateExtensionView = EditorView.updateListener.of((update) => {
@@ -308,6 +327,9 @@
       EditorView.lineWrapping, // Enable line wrapping
       EditorState.readOnly.of(!isEditable ? true : false),
       CreatePlaceHolder(placeholder),
+      lintGutter(), // Add lint gutter support
+      // Enable JS linting only if language is JS
+      ...(lang === "TestJavaScript" ? [linter(jsLinter())] : []),
     ];
 
     // Removing window style space(\r\n) to find correct cursor position

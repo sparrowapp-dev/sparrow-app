@@ -3,7 +3,7 @@
   "private": true,
   "author": "Sparrow",
   "description": "The Sparrow App is your next go to API development buddy which can help you test, debug, distribute better APIs while collaborating with your colleagues and making you a better programmer.",
-  "version": "2.31.0",
+  "version": "2.32.0",
   "type": "module",
   "workspaces": [
     "./apps/@sparrow-web",
@@ -123,7 +123,8 @@
     "uuid": "^9.0.1",
     "xmldom": "^0.6.0",
     "xpath": "^0.0.34",
-    "yup": "^1.2.0"
+    "yup": "^1.2.0",
+    "fast-xml-parser": "^4.5.0"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.4.2",

@@ -7,6 +7,7 @@
     SwitchWorkspace,
     UpgradePlanBanner,
     UpgradePlanPopUp,
+    UpgradeCurrentTeamPlanModal,
   } from "@sparrow/common/components";
   import { Sidebar } from "@sparrow/common/features";
   import { Route, navigate, useLocation } from "svelte-navigator";
@@ -56,6 +57,7 @@
     isExpandEnvironment,
     isExpandTestflow,
   } from "@sparrow/workspaces/stores";
+  import { getSelfhostUrls } from "@app/utils/jwt";
 
   const _viewModel = new DashboardViewModel();
   const osDetector = new OSDetector();
@@ -102,6 +104,8 @@
   let userLimits: any;
   let teamDetails: {};
   let isUpgradePlanModelOpen: boolean = false;
+  let currentWorkspacePlan = "";
+  let isUpgradeCurrentTeamPlanModalOpen: boolean = false;
 
   const openDefaultBrowser = async () => {
     await open(externalSparrowLink);
@@ -148,6 +152,9 @@
         currentTeamName = activeWorkspaceRxDoc.team?.teamName;
         currentTeamId = activeWorkspaceRxDoc.team?.teamId;
         currentWorkspaceType = activeWorkspaceRxDoc?.workspaceType;
+        if (currentTeamId) {
+          currentWorkspacePlan = await _viewModel.getTeamPlan(currentTeamId);
+        }
 
         const user = activeWorkspaceRxDoc?._data.users.find(
           (u) => u.id === userId,
@@ -177,11 +184,13 @@
   );
 
   let openTeam;
+  let currentPlan = "";
 
   const activeTeamSubscriber = activeTeam.subscribe((value) => {
     if (value) {
       openTeam = value?.toMutableJSON();
     }
+    currentPlan = openTeam?.plan?.name;
   });
 
   const onModalStateChanged = (flag: boolean) => {
@@ -369,6 +378,8 @@
     isGuestUser = value;
   });
 
+  const [isSelfhost] = getSelfhostUrls();
+
   let sidebarItems: SidebarItemBaseInterface[] = [
     {
       id: SidebarItemIdEnum.HOME,
@@ -395,7 +406,7 @@
       id: SidebarItemIdEnum.COMMUNITY,
       route: "help",
       heading: "Community",
-      disabled: !isGuestUser ? false : true,
+      disabled: !isGuestUser && !isSelfhost ? false : true,
       position: SidebarItemPositionBaseEnum.SECONDARY,
     },
     {
@@ -645,11 +656,23 @@
     await _viewModel.handleRedirectToAdminPanel(currentTeamId);
     upgradePlanModalWorkspace = true;
   };
+  const handleOpenAdminPanel = async () => {
+    await _viewModel.handleRedirectToAdminPanel(currentTeamId);
+    isUpgradeCurrentTeamPlanModalOpen = false;
+  };
 
   const handleRedirectToAdmin = async () => {
     await _viewModel.handleRedirectToAdminPanel(openTeam?.teamId);
     planBannerisOpen.set(false);
     isUpgradePlanModelOpen = false;
+  };
+
+  // Header upgrade click handler function
+  const handleHeaderUpgradeClick = () => {
+    if (userRole) {
+      planContent = planInfoByRole(userRole);
+    }
+    upgradePlanModalWorkspace = true;
   };
 
   $: {
@@ -704,6 +727,9 @@
     {currentTeamName}
     {currentTeamId}
     {currentWorkspaceType}
+    {currentPlan}
+    {userRole}
+    {currentWorkspacePlan}
     {isGuestUser}
     {isLoginBannerActive}
     onLoginUser={handleGuestLogin}
@@ -712,9 +738,11 @@
     onSwitchWorkspace={_viewModel.handleSwitchWorkspace}
     {user}
     isWebApp={false}
+    bind:isUpgradeCurrentTeamPlanModalOpen
     onLogout={_viewModel.handleLogout}
     {isGlobalSearchOpen}
     onSearchClick={handleViewGlobalSearch}
+    onUpgradeClick={handleHeaderUpgradeClick}
     handleDocsRedirect={_viewModel.redirectDocs}
     handleFeaturesRedirect={_viewModel.redirectFeatureUpdates}
     onAdminRedirect={_viewModel.onAdminRedirect}
@@ -866,6 +894,22 @@
   <UpgradePlanPopUp
     bind:isUpgradePlanModelOpen
     handleSubmit={handleRedirectToAdmin}
+  />
+</Modal>
+
+<Modal
+  title={"Time to Unlock More Features"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isUpgradeCurrentTeamPlanModalOpen}
+  handleModalState={(flag) => {
+    isUpgradeCurrentTeamPlanModalOpen = flag;
+  }}
+>
+  <UpgradeCurrentTeamPlanModal
+    bind:isUpgradeCurrentTeamPlanModalOpen
+    handleSubmit={handleOpenAdminPanel}
   />
 </Modal>
 

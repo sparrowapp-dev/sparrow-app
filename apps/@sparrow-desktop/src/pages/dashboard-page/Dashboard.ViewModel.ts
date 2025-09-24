@@ -24,7 +24,7 @@ import {
   type TeamDocument,
   type WorkspaceDocument,
 } from "../../database/database";
-import { clearAuthJwt, getAuthJwt, getClientUser } from "@app/utils/jwt";
+import { clearAuthJwt, getAuthJwt, getClientUser, getSelfhostUrls } from "@app/utils/jwt";
 import { userLogout } from "../../services/auth.service";
 import { FeatureSwitchService } from "../../services/feature-switch.service";
 import { FeatureSwitchRepository } from "../../repositories/feature-switch.repository";
@@ -96,6 +96,11 @@ export class DashboardViewModel {
     return this.environmentRepository.getEnvironment();
   }
 
+  public getTeamPlan = async (teamId: string) => {
+    const teamDoc = await this.teamRepository.getTeamDoc(teamId);
+    return teamDoc?.toMutableJSON()?.plan?.name || "Community";
+  };
+
   /**
    * @description - get open team from local db
    */
@@ -158,7 +163,8 @@ export class DashboardViewModel {
 
   public onAdminRedirect = async () => {
     const [authToken] = getAuthJwt();
-    await open(`${constants.ADMIN_URL}/hubs?xid=${authToken}`);
+    const [,,selfhostAdminUrl] = getSelfhostUrls();
+    await open(`${selfhostAdminUrl ? selfhostAdminUrl : constants.ADMIN_URL}/hubs?xid=${authToken}`);
     return;
   };
 
@@ -437,6 +443,11 @@ export class DashboardViewModel {
   public constructBaseUrl = async (_teamId: string) => {
     const teamData = await this.teamRepository.getTeamDoc(_teamId);
     const hubUrl = teamData?.hubUrl;
+
+    const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+        return selfhostBackendUrl;
+    }
 
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
@@ -1239,9 +1250,15 @@ export class DashboardViewModel {
    */
   public handleRedirectToAdminPanel = async (teamId: string) => {
     const [authToken] = getAuthJwt();
-    await open(
-      `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
-    );
+    const [,,selfhostAdminUrl] = getSelfhostUrls();
+
+    if(selfhostAdminUrl){
+       await open(selfhostAdminUrl);
+    }else{
+      await open(
+        `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+      );
+    }
   };
 
   public handleContactSales = async () => {

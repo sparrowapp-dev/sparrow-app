@@ -7,6 +7,7 @@
     SwitchWorkspace,
     UpgradePlanBanner,
     UpgradePlanPopUp,
+    UpgradeCurrentTeamPlanModal,
   } from "@sparrow/common/components";
   import { Sidebar } from "@sparrow/common/features";
   import { Route, navigate, useLocation } from "svelte-navigator";
@@ -97,6 +98,7 @@
   let userLimits: any;
   let teamDetails: {};
   let isUpgradePlanModelOpen: boolean = false;
+  let isUpgradeCurrentTeamPlanModalOpen: boolean = false;
 
   const openDefaultBrowser = async () => {
     // await open(externalSparrowLink);
@@ -118,6 +120,8 @@
   let currentTeamName = "";
   let currentTeamId = "";
   let currentWorkspaceType = "";
+  let currentWorkspacePlan = "";
+
   let currentWorkspaceCount = 1;
   const activeWorkspaceSubscribe = activeWorkspace.subscribe(
     async (value: WorkspaceDocument) => {
@@ -128,7 +132,9 @@
         currentTeamName = activeWorkspaceRxDoc.team?.teamName;
         currentTeamId = activeWorkspaceRxDoc.team?.teamId;
         currentWorkspaceType = activeWorkspaceRxDoc?.workspaceType;
-
+        if (currentTeamId) {
+          currentWorkspacePlan = await _viewModel.getTeamPlan(currentTeamId);
+        }
         const user = activeWorkspaceRxDoc?._data.users.find(
           (u) => u.id === userId,
         );
@@ -157,11 +163,13 @@
   );
 
   let openTeam;
+  let currentPlan = "";
 
   const activeTeamSubscriber = activeTeam.subscribe((value) => {
     if (value) {
       openTeam = value?.toMutableJSON();
     }
+    currentPlan = openTeam?.plan?.name;
   });
 
   let handlehideGlobalSearch = (val: boolean) => {
@@ -582,6 +590,19 @@
     isUpgradePlanModelOpen = false;
   };
 
+  const handleOpenAdminPanel = async () => {
+    await _viewModel.handleRedirectToAdminPanel(currentTeamId);
+    isUpgradeCurrentTeamPlanModalOpen = false;
+  };
+
+  // Header upgrade click handler function
+  const handleHeaderUpgradeClick = () => {
+    if (userRole) {
+      planContent = planInfoByRole(userRole);
+    }
+    upgradePlanModalWorkspace = true;
+  };
+
   $: {
     if (userRole) {
       planContent = planInfoByRole(userRole);
@@ -636,6 +657,9 @@
     {currentWorkspaceName}
     {currentTeamName}
     {currentTeamId}
+    {currentPlan}
+    {userRole}
+    {currentWorkspacePlan}
     {currentWorkspaceType}
     {isGuestUser}
     {isLoginBannerActive}
@@ -647,6 +671,7 @@
     onSwitchTeam={_viewModel.handleSwitchTeam}
     {user}
     onLogout={_viewModel.handleLogout}
+    bind:isUpgradeCurrentTeamPlanModalOpen
     isWebApp={true}
     bind:isCreateTeamModalOpen
     onMarketingRedirect={() => {
@@ -658,6 +683,7 @@
     handleFeaturesRedirect={_viewModel.redirectFeatureUpdates}
     onAdminRedirect={_viewModel.onAdminRedirect}
     recentVisitedWorkspaces={$recentVisitedWorkspaces}
+    onUpgradeClick={handleHeaderUpgradeClick}
     appEdition={constants.APP_EDITION}
   />
 
@@ -806,6 +832,22 @@
   <UpgradePlanPopUp
     bind:isUpgradePlanModelOpen
     handleSubmit={handleRedirectToAdmin}
+  />
+</Modal>
+
+<Modal
+  title={"Time to Unlock More Features"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isUpgradeCurrentTeamPlanModalOpen}
+  handleModalState={(flag) => {
+    isUpgradeCurrentTeamPlanModalOpen = flag;
+  }}
+>
+  <UpgradeCurrentTeamPlanModal
+    bind:isUpgradeCurrentTeamPlanModalOpen
+    handleSubmit={handleOpenAdminPanel}
   />
 </Modal>
 

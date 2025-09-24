@@ -25,6 +25,7 @@
   import { notifications } from "@sparrow/library/ui";
   import { Splitpanes, Pane } from "svelte-splitpanes";
   import { Button } from "@sparrow/library/ui";
+  import { TestCaseModeEnum } from "@sparrow/common/types/workspace";
 
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import type { CollectionDocument } from "@app/database/database";
@@ -35,7 +36,7 @@
   } from "@sparrow/common/enums";
   import type { Observable } from "rxjs";
   import {
-    RequestNoCodeTourGuide,
+    RequestTabTourGuide,
     SaveAsCollectionItem,
   } from "@sparrow/workspaces/features";
   import type {
@@ -71,6 +72,8 @@
     isChatbotOpenInCurrTab,
     requestTabTestDemo,
     requestTabTestNoCodeStep,
+    requestTabTestScriptDemo,
+    requestTabTestScriptStep,
   } from "../../../stores";
   import { Popover } from "@sparrow/library/ui";
   import { onDestroy, onMount } from "svelte";
@@ -111,13 +114,17 @@
   import RequestTourGuideCard from "../components/request-tour-guide-card/RequestTourGuideCard.svelte";
   import { tick } from "svelte";
   import ResponseTestResults from "../components/response-test-results/ResponseTestResults.svelte";
-  import TourGuideCard from "../../request-no-code-tour-guide/components/TourGuideCard.svelte";
-  import { RequestTabTestsTourContent } from "../../request-no-code-tour-guide/utils";
-  import { requestTabNocodeCardPosition } from "../../request-no-code-tour-guide/utils/requestTabNocodeCardPosition";
+  import TourGuideCard from "../../request-tab-tour-guide/components/TourGuideCard.svelte";
+  import {
+    requestTabScriptCardPosition,
+    RequestTabTestsScriptTourContent,
+    RequestTabTestsTourContent,
+  } from "../../request-tab-tour-guide/utils";
+  import { requestTabNocodeCardPosition } from "../../request-tab-tour-guide/utils";
   import {
     handleCloseTour,
     handleNextStep,
-  } from "../../request-no-code-tour-guide/utils/requestTabCardfunctions";
+  } from "../../request-tab-tour-guide/utils/requestTabCardfunctions";
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
   export let requestAuthHeader: Observable<KeyValue>;
@@ -160,6 +167,8 @@
   export let onToggleLike;
   export let isCloseRequestTestDemo: (value: boolean) => void;
   export let requestTabTestsDemoCompleted: () => void;
+  export let isCloseRequestTestScriptDemo: (value: boolean) => void;
+  export let requestTabTestScriptDemoCompleted: () => void;
 
   // export let isLoginBannerActive = false;
   export let isPopoverContainer = true;
@@ -185,8 +194,10 @@
   export let collectionAuth;
   export let collection;
   export let isSharedWorkspace = false;
-  const loading = writable<boolean>(false);
+  export let onFixTestScript;
+  const isTestCasesGenerating = writable<boolean>(false);
 
+  const loading = writable<boolean>(false);
   // Props for showing merge/diff view in RequestBody, Headers and Params
   let isAIDebugBtnEnable = false;
   export let isMergeViewEnableForRequestBody = false;
@@ -195,6 +206,10 @@
   export let isMergeViewLoading = false;
   export let newModifiedContent: string | KeyValuePair[];
   export let mergeViewRequestDatasetType: RequestDatasetEnum;
+
+  //props for generating test cases function
+  export let onGenerateTestCases;
+  export let scriptComponent = null;
 
   // Reference to the splitpane container element
   let splitpaneContainer;
@@ -284,6 +299,12 @@
       loading.set(tab.get($tab.tabId));
     });
   }
+
+  $: {
+    loadingState.subscribe((tab) => {
+      isTestCasesGenerating.set(tab.get($tab.tabId + "generatingTestCases"));
+    });
+  }
   let isGuidePopup = false;
 
   // Here we are closing the chatbot when user switches to vertical layout view.
@@ -347,6 +368,88 @@
       component: "RestExplorer",
       suggestion_type: suggestion_type,
     });
+  };
+
+  let isModeChangeModalOpen = false;
+  let pendingMode = null;
+  $: currentMode =
+    $tab?.property?.request?.tests?.testCaseMode || TestCaseModeEnum.NO_CODE;
+
+  /**
+   * Check if there's existing data that would be lost when switching modes
+   */
+  const hasExistingData = (currentMode: TestCaseModeEnum) => {
+    const tabTests = $tab?.property?.request?.tests;
+
+    if (currentMode === TestCaseModeEnum.NO_CODE) {
+      return (
+        tabTests?.noCode &&
+        tabTests.noCode.length > 0 &&
+        tabTests.noCode.some(
+          (test) =>
+            test.name ||
+            test.condition ||
+            test.expectedResult ||
+            test.testPath ||
+            test.testTarget,
+        )
+      );
+    } else if (currentMode === TestCaseModeEnum.SCRIPT) {
+      return tabTests?.script && tabTests.script.trim().length > 0;
+    }
+    return false;
+  };
+
+  /**
+   * Handle mode change with confirmation if needed
+   */
+  const handleModeChange = (newMode: TestCaseModeEnum) => {
+    const currentTestMode =
+      $tab?.property?.request?.tests?.testCaseMode || TestCaseModeEnum.NO_CODE;
+
+    if (newMode === currentTestMode) return;
+
+    // Check if there's existing data that would be lost
+    if (hasExistingData(currentTestMode)) {
+      pendingMode = newMode;
+      isModeChangeModalOpen = true;
+    } else {
+      switchMode(newMode);
+    }
+  };
+
+  /**
+   * Actually perform the mode switch
+   */
+  const switchMode = (newMode: TestCaseModeEnum) => {
+    onUpdateTests({
+      ...$tab?.property?.request?.tests,
+      testCaseMode: newMode,
+    });
+  }; /**
+   * Confirm mode switch and proceed
+   */
+  const confirmModeSwitch = () => {
+    if (pendingMode) {
+      switchMode(pendingMode);
+    }
+    isModeChangeModalOpen = false;
+    pendingMode = null;
+  };
+
+  /**
+   * Cancel mode switch
+   */
+  const cancelModeSwitch = () => {
+    isModeChangeModalOpen = false;
+    pendingMode = null;
+  };
+
+  /**
+   * Get the display name for the mode
+   */
+  const getModeDisplayName = (mode: TestCaseModeEnum) => {
+    return mode === TestCaseModeEnum.NO_CODE ? "No Code" : "Script Mode";
   };
 
   /**
@@ -650,7 +753,7 @@
       />
     </div>
 
-    {#if isPopoverContainer && !$requestTabTestDemo}
+    {#if isPopoverContainer && !($requestTabTestDemo || $requestTabTestScriptDemo)}
       <div class="pt-2"></div>
       <Popover onClose={closeCollectionHelpText} heading={`Welcome to Sparrow`}>
         <p class="mb-0 text-fs-12">
@@ -706,8 +809,10 @@
               >
                 <Pane
                   minSize={30}
-                  size={$tab.property?.request?.state
-                    ?.requestLeftSplitterWidthPercentage}
+                  size={$requestTabTestScriptStep
+                    ? 70
+                    : $tab.property?.request?.state
+                        ?.requestLeftSplitterWidthPercentage}
                   class="position-relative bg-transparent"
                 >
                   <!-- Request Pane -->
@@ -717,24 +822,32 @@
                       ? 'pb-1'
                       : 'pe-2'}"
                   >
-                    <RequestNavigator
-                      requestStateSection={$tab.property?.request?.state
-                        ?.requestNavigation}
-                      {onUpdateRequestState}
-                      authParameterLength={$requestAuthParameter.value ? 1 : 0}
-                      authHeaderLength={$requestAuthHeader.value ? 1 : 0}
-                      paramsLength={$tab.property?.request?.queryParams
-                        ?.length || 0}
-                      headersLength={$tab.property?.request?.headers?.length ||
-                        0}
-                      autoGeneratedHeadersLength={$tab.property?.request
-                        ?.autoGeneratedHeaders?.length || 0}
-                      bind:isGenerateMockDataModal
-                      {isGuestUser}
-                      {userRole}
-                    />
+                    <div class="hide-vertical-scroller" style="overflow:auto;">
+                      <RequestNavigator
+                        requestStateSection={$tab.property?.request?.state
+                          ?.requestNavigation}
+                        {onUpdateRequestState}
+                        authParameterLength={$requestAuthParameter.value
+                          ? 1
+                          : 0}
+                        authHeaderLength={$requestAuthHeader.value ? 1 : 0}
+                        paramsLength={$tab.property?.request?.queryParams
+                          ?.length || 0}
+                        headersLength={$tab.property?.request?.headers
+                          ?.length || 0}
+                        autoGeneratedHeadersLength={$tab.property?.request
+                          ?.autoGeneratedHeaders?.length || 0}
+                        bind:isGenerateMockDataModal
+                        {isGuestUser}
+                        {userRole}
+                        bulkEditHeadersActive={$tab?.property?.request.state
+                          ?.isHeaderBulkEditActive}
+                        bulkEditParamsActive={$tab?.property?.request.state
+                          ?.isParameterBulkEditActive}
+                      />
+                    </div>
                     <div style="flex:1; overflow:auto;" class="p-0">
-                      {#if $requestTabTestDemo}
+                      {#if $requestTabTestDemo && $tab.property?.request?.tests?.testCaseMode === "no-code"}
                         <RequestTests
                           tests={{
                             testCaseMode: "no-code",
@@ -749,6 +862,28 @@
                               },
                             ],
                             script: "",
+                          }}
+                          onTestsChange={() => {}}
+                          tabSplitDirection={$tabsSplitterDirection}
+                          testResults={[]}
+                          responseBody={""}
+                          responseHeader={[]}
+                        />
+                      {:else if $requestTabTestScriptDemo && $tab.property?.request?.tests?.testCaseMode === "script"}
+                        <RequestTests
+                          tests={{
+                            testCaseMode: "script",
+                            noCode: [
+                              {
+                                id: "Test-1",
+                                name: "Test-1",
+                                condition: "",
+                                expectedResult: "",
+                                testPath: "",
+                                testTarget: "",
+                              },
+                            ],
+                            script: `// What are the tests?\n// Tests are scripts that automatically check your API's response.\n// For example: Is the status code 200? Does the body contain an email field?\n// sp.test("Status code is 200", function () {\n//   sp.expect(sp.response.statusCode).to.equal(200);\n// });\n\n// You can:\n// - Use "Snippets" to insert common tests\n// - Or, write test cases manually using scripting or no code method`,
                           }}
                           onTestsChange={() => {}}
                           tabSplitDirection={$tabsSplitterDirection}
@@ -820,12 +955,18 @@
                         />
                       {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.TESTS}
                         <RequestTests
+                          bind:scriptComponent
                           tests={$tab?.property?.request.tests}
                           onTestsChange={onUpdateTests}
                           tabSplitDirection={$tabsSplitterDirection}
                           testResults={storeData?.response?.testResults}
                           responseBody={storeData?.response?.body}
+                          onShowModeChangeModal={handleModeChange}
                           responseHeader={storeData?.response?.headers}
+                          {onGenerateTestCases}
+                          isTestCasesGenerating={$isTestCasesGenerating}
+                          {isGuestUser}
+                          {userRole}
                         />
                       {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
                         <RequestDoc
@@ -842,7 +983,7 @@
                       {/if}
                     </div>
                     {#if $requestTabTestDemo && $requestTabTestNoCodeStep === 1}
-                      <RequestNoCodeTourGuide
+                      <RequestTabTourGuide
                         targetId={RequestTabTestsTourContent[0].targetId}
                         isVisible={true}
                         cardPosition={requestTabNocodeCardPosition(1)}
@@ -858,10 +999,10 @@
                           onClose={handleCloseTour}
                           width={352}
                         />
-                      </RequestNoCodeTourGuide>
+                      </RequestTabTourGuide>
                     {/if}
                     {#if $requestTabTestDemo && $requestTabTestNoCodeStep === 4}
-                      <RequestNoCodeTourGuide
+                      <RequestTabTourGuide
                         targetId={RequestTabTestsTourContent[3].targetId}
                         isVisible={true}
                         cardPosition={requestTabNocodeCardPosition(4)}
@@ -877,7 +1018,45 @@
                           onClose={handleCloseTour}
                           width={352}
                         />
-                      </RequestNoCodeTourGuide>
+                      </RequestTabTourGuide>
+                    {/if}
+                    {#if $requestTabTestScriptDemo && $requestTabTestScriptStep === 1}
+                      <RequestTabTourGuide
+                        targetId={RequestTabTestsScriptTourContent[0].targetId}
+                        isVisible={true}
+                        cardPosition={requestTabScriptCardPosition(1)}
+                      >
+                        <TourGuideCard
+                          titleName={RequestTabTestsScriptTourContent[0].Title}
+                          descriptionContent={RequestTabTestsScriptTourContent[0]
+                            .description}
+                          cardNumber={1}
+                          totalsCards={RequestTabTestsScriptTourContent.length}
+                          rightButtonName=""
+                          onNext={handleNextStep}
+                          onClose={handleCloseTour}
+                          width={352}
+                        />
+                      </RequestTabTourGuide>
+                    {/if}
+                    {#if $requestTabTestScriptDemo && $requestTabTestScriptStep === 4}
+                      <RequestTabTourGuide
+                        targetId={RequestTabTestsScriptTourContent[3].targetId}
+                        isVisible={true}
+                        cardPosition={requestTabScriptCardPosition(4)}
+                      >
+                        <TourGuideCard
+                          titleName={RequestTabTestsScriptTourContent[3].Title}
+                          descriptionContent={RequestTabTestsScriptTourContent[3]
+                            .description}
+                          cardNumber={4}
+                          totalsCards={RequestTabTestsScriptTourContent.length}
+                          rightButtonName=""
+                          onNext={handleNextStep}
+                          onClose={handleCloseTour}
+                          width={352}
+                        />
+                      </RequestTabTourGuide>
                     {/if}
                   </div>
                 </Pane>
@@ -920,8 +1099,8 @@
                             style="gap:12px"
                           >
                             <div
-                              class="d-flex justify-content-between"
-                              style="position:sticky; top:0; z-index:1; background-color:var(--bg-ds-surface-900)"
+                              class="hide-vertical-scroller d-flex justify-content-between"
+                              style=" z-index:1; background-color:var(--bg-ds-surface-900); overflow-y:auto;"
                             >
                               <ResponseNavigator
                                 requestStateSection={storeData?.response
@@ -941,7 +1120,7 @@
                                   <!-- AI debugging trigger button -->
                                   <!-- As chip component is not available,so using custom styleing to match, will replace it will chip component in later -->
                                   <div
-                                    class="d-flex ai-chip-button"
+                                    class="ms-5 d-flex ai-chip-button"
                                     class:enabled={isAIDebugBtnEnable}
                                     style="height: 32px; border: 1px solid {isAIDebugBtnEnable
                                       ? 'var(--border-ds-surface-100)'
@@ -964,8 +1143,8 @@
                               </div>
                             </div>
                             <div
-                              class="flex-grow-1 d-flex flex-column"
-                              style="overflow:auto; min-height:0;"
+                              class="d-flex flex-column"
+                              style="flex:1; overflow:auto; min-height:0;"
                             >
                               {#if storeData?.response.navigation === ResponseSectionEnum.RESPONSE}
                                 {#if storeData?.response.bodyLanguage !== "Image"}
@@ -1000,13 +1179,21 @@
                                 <ResponseTestResults
                                   responseTestResults={storeData.response
                                     ?.testResults}
+                                  responseTestMessage={storeData.response
+                                    ?.testMessage}
+                                  tests={$tab?.property?.request.tests}
+                                  {onFixTestScript}
+                                  tabId={$tab?.tabId}
+                                  {isGuestUser}
+                                  {isSharedWorkspace}
+                                  {userRole}
                                 />
                                 <!-- </div> -->
                               {/if}
                             </div>
                           </div>
                         {/if}
-                        {#if $tab?.property?.request?.isGeneratedVariable && !$requestTabTestDemo}
+                        {#if $tab?.property?.request?.isGeneratedVariable && !$requestTabTestDemo && !$requestTabTestScriptDemo}
                           <div
                             style="position:absolute; bottom:12px; right:{!$tab
                               ?.property?.request?.state?.isChatbotActive
@@ -1030,7 +1217,7 @@
                             />
                           </div>
                         {/if}
-                        {#if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.TESTS && $tab?.property?.request?.isRequestTestsNoCodeDemoCompleted}
+                        {#if $tab.property?.request?.tests?.testCaseMode === "no-code" && $tab?.property?.request?.isRequestTestsNoCodeDemoCompleted && $tab.property?.request?.state?.requestNavigation === "Tests"}
                           <div
                             style="position:absolute; bottom:0px; right:{!$tab
                               ?.property?.request?.state?.isChatbotActive
@@ -1048,6 +1235,7 @@
                                 requestTabTestDemo.set(true);
                                 isCloseRequestTestDemo(false);
                                 onUpdateResponseState("Tests");
+                                tabsSplitterDirection.set("horizontal");
                                 requestTabTestNoCodeStep.set(1);
                               }}
                               onClose={() => {
@@ -1057,10 +1245,38 @@
                             />
                           </div>
                         {/if}
+                        {#if $tab.property?.request?.tests?.testCaseMode === "script" && $tab?.property?.request?.isRequestTestsScriptDemoCompleted && $tab.property?.request?.state?.requestNavigation === "Tests"}
+                          <div
+                            style="position:absolute; bottom:0px; right:{!$tab
+                              ?.property?.request?.state?.isChatbotActive
+                              ? '56px'
+                              : '0px'}; z-index:10;"
+                          >
+                            <RequestTourGuideCard
+                              title={"Make Your APIs Smarter!"}
+                              message={"Writing tests ensures your APIs do exactly what you expect. With our no-code and script options, you can easily check responses, validate data, and catch issues early, without extra effort."}
+                              onAction={() => {
+                                onUpdateRequestState({
+                                  isChatbotActive: false,
+                                });
+                                isChatbotOpenInCurrTab.set(false);
+                                onUpdateResponseState("Tests");
+                                isCloseRequestTestScriptDemo(false);
+                                requestTabTestScriptDemo.set(true);
+                                tabsSplitterDirection.set("horizontal");
+                                requestTabTestScriptStep.set(1);
+                              }}
+                              onClose={() => {
+                                isCloseRequestTestScriptDemo(false);
+                                requestTabTestScriptDemo.set(false);
+                              }}
+                            />
+                          </div>
+                        {/if}
                       </div>
                     </div>
                     {#if $requestTabTestDemo && $requestTabTestNoCodeStep === 2}
-                      <RequestNoCodeTourGuide
+                      <RequestTabTourGuide
                         targetId={RequestTabTestsTourContent[1].targetId}
                         isVisible={true}
                         cardPosition={requestTabNocodeCardPosition(2)}
@@ -1076,10 +1292,10 @@
                           onClose={handleCloseTour}
                           width={352}
                         />
-                      </RequestNoCodeTourGuide>
+                      </RequestTabTourGuide>
                     {/if}
                     {#if $requestTabTestDemo && $requestTabTestNoCodeStep === 5}
-                      <RequestNoCodeTourGuide
+                      <RequestTabTourGuide
                         targetId={RequestTabTestsTourContent[4].targetId}
                         isVisible={true}
                         cardPosition={requestTabNocodeCardPosition(5)}
@@ -1098,7 +1314,48 @@
                           onClose={handleCloseTour}
                           width={352}
                         />
-                      </RequestNoCodeTourGuide>
+                      </RequestTabTourGuide>
+                    {/if}
+                    {#if $requestTabTestScriptDemo && $requestTabTestScriptStep === 2}
+                      <RequestTabTourGuide
+                        targetId={RequestTabTestsScriptTourContent[1].targetId}
+                        isVisible={true}
+                        cardPosition={requestTabScriptCardPosition(2)}
+                      >
+                        <TourGuideCard
+                          titleName={RequestTabTestsScriptTourContent[1].Title}
+                          descriptionContent={RequestTabTestsScriptTourContent[1]
+                            .description}
+                          cardNumber={2}
+                          totalsCards={RequestTabTestsScriptTourContent.length}
+                          rightButtonName=""
+                          onNext={handleNextStep}
+                          onClose={handleCloseTour}
+                          width={352}
+                        />
+                      </RequestTabTourGuide>
+                    {/if}
+                    {#if $requestTabTestScriptDemo && $requestTabTestScriptStep === 5}
+                      <RequestTabTourGuide
+                        targetId={RequestTabTestsScriptTourContent[4].targetId}
+                        isVisible={true}
+                        cardPosition={requestTabScriptCardPosition(5)}
+                      >
+                        <TourGuideCard
+                          titleName={RequestTabTestsScriptTourContent[4].Title}
+                          descriptionContent={RequestTabTestsScriptTourContent[4]
+                            .description}
+                          cardNumber={5}
+                          totalsCards={RequestTabTestsScriptTourContent.length}
+                          rightButtonName="Finish"
+                          onNext={async () => {
+                            handleCloseTour();
+                            await requestTabTestScriptDemoCompleted();
+                          }}
+                          onClose={handleCloseTour}
+                          width={352}
+                        />
+                      </RequestTabTourGuide>
                     {/if}
                   </div>
                 </Pane>
@@ -1163,6 +1420,43 @@
     /> -->
   </div>
 </div>
+
+<Modal
+  title={`Switching to ${getModeDisplayName(pendingMode)}`}
+  type={"dark"}
+  width={"40%"}
+  zIndex={10000}
+  isOpen={isModeChangeModalOpen}
+  handleModalState={(flag = false) => {
+    if (!flag) cancelModeSwitch();
+  }}
+>
+  <div class="d-flex flex-column">
+    <p
+      class="mode-change-modal-text mb-3"
+      style="padding-top: 20px; font-size:13px; padding-bottom:10px;"
+    >
+      {@html `The test cases you have created in ${getModeDisplayName(currentMode)} mode will not be carried over to  ${getModeDisplayName(pendingMode)}. Do you still want to continue?`}
+    </p>
+    <div class="d-flex justify-content-end gap-2">
+      <!-- Cancel button -->
+      <Button
+        title="Cancel"
+        type="secondary"
+        size="medium"
+        onClick={cancelModeSwitch}
+      />
+      <!-- Confirm button -->
+      <Button
+        title={`Switch to ${getModeDisplayName(pendingMode)}`}
+        type="primary"
+        size="medium"
+        onClick={confirmModeSwitch}
+      />
+    </div>
+  </div>
+</Modal>
+
 <Modal
   title={"Save Request"}
   type={"dark"}
@@ -1397,5 +1691,8 @@
     letter-spacing: 0;
     vertical-align: middle;
     color: var(--text-ds-neutral-200);
+  }
+  .hide-vertical-scroller::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
   }
 </style>

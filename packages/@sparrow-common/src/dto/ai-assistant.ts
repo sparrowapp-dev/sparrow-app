@@ -24,11 +24,21 @@ export interface StreamPromptDto {
   instructions: string;
 }
 export interface GenerateMockDataRequestDto {
-  teamId:string,
+  teamId: string;
   text: string;
   requestType: RequestSectionEnum;
   properties?: {
     type: RequestDatasetEnum;
     lang: RequestDataTypeEnum;
   };
+}
+
+export interface fixTestScriptRequestDto {
+  testScript: string;
+  teamId: string;
+}
+
+export interface GenerateTestCasesRequestDto {
+  text: string;
+  teamId: string;
 }

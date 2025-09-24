@@ -4422,7 +4422,7 @@ dependencies = [
 
 [[package]]
 name = "sparrow-app"
-version = "2.31.0"
+version = "2.32.0"
 dependencies = [
  "anyhow",
  "base64 0.21.7",
@@ -4440,6 +4440,7 @@ dependencies = [
  "native-tls",
  "nfd",
  "objc",
+ "once_cell",
  "regex",
  "reqwest 0.11.27",
  "rust_socketio",
