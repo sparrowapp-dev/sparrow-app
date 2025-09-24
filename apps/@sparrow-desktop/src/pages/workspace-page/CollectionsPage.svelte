@@ -95,7 +95,10 @@
   import RestExplorerMockPage from "./sub-pages/RestExplorerMockPage/RestExplorerMockPage.svelte";
   import MockHistoryExplorerPage from "./sub-pages/MockHistroyExplorerPage/MockHistoryExplorerPage.svelte";
   import HubExplorerPage from "./sub-pages/HubExplorerPage/HubExplorerPage.svelte";
-  import { PlanUpgradeModal } from "@sparrow/common/components";
+  import {
+    PlanUpgradeModal,
+    ScheduleRunPopUp,
+  } from "@sparrow/common/components";
   import { planInfoByRole, planContentDisable } from "@sparrow/common/utils";
   import { TeamRole } from "@sparrow/common/enums/team.enum";
   import { ResponseMessage } from "@sparrow/common/enums";
@@ -155,6 +158,8 @@
   let environmentsValues;
   let currentWOrkspaceValue: Observable<WorkspaceDocument>;
   const externalSparrowGithub = constants.SPARROW_GITHUB;
+
+  let isScheduleRunPopupOpen: boolean = false;
 
   const environmentsSubscriber = environments.subscribe((value) => {
     if (value) {
@@ -845,6 +850,7 @@
         <WorkspaceActions
           bind:scrollList
           bind:userRole
+          bind:isScheduleRunPopupOpen
           userCount={totalTeamCount}
           {refreshWorkspace}
           {refreshLoad}
@@ -1795,6 +1801,20 @@
     />
   </div>
 </Modal>
+
+<Modal
+  title="Set Schedule Run"
+  type="dark"
+  width="35%"
+  zIndex={1000}
+  isOpen={isScheduleRunPopupOpen}
+  handleModalState={() => {
+    isScheduleRunPopupOpen = false;
+  }}
+>
+  <ScheduleRunPopUp bind:isScheduleRunPopupOpen />
+</Modal>
+
 <PlanUpgradeModal
   bind:isOpen={upgradePlanModel}
   title={planContent?.title}
