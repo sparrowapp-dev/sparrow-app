@@ -300,4 +300,4 @@ export { default as ArrowHookRegular } from "./ArrowHookRegular.svelte";
 export { default as CopyAddRegular } from "./CopyAddRegular.svelte";
 export { default as StopFilledIcon } from "./StopFilledIcon.svelte";
 export { default as CalendarRegular } from "./CalendarRegular.svelte";
-export { default as ArrowLeftRegular } from "./ArrowLeftRegular.svelte";
+export { default as ArrowLeftRegular } from "./ArrowLeftRegularIcon.svelte";
