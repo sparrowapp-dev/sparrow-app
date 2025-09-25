@@ -113,6 +113,52 @@
   onDestroy(() => {
     window.removeEventListener("keydown", handleKeydown);
   });
+  let showLabel = true;
+  let leftPaneElement: HTMLElement | null = null;
+  let resizeObserver: ResizeObserver;
+
+  function checkZoom() {
+    if (!leftPaneElement) return;
+
+    const leftPaneWidth = leftPaneElement.offsetWidth;
+    console.log("Parent - Left pane width:", leftPaneWidth);
+
+    showLabel = window.innerWidth > 1250 || leftPaneWidth > 500;
+
+    // **MAIN FIX: Custom event dispatch करें ताकि child components को पता चल जाए**
+    window.dispatchEvent(
+      new CustomEvent("splitpane-resized", {
+        detail: { leftPaneWidth, showLabel },
+      }),
+    );
+  }
+
+  onMount(() => {
+    // ResizeObserver attach करो left pane पर
+    resizeObserver = new ResizeObserver(() => {
+      checkZoom();
+    });
+
+    const leftPane = document.querySelector(
+      ".web-socket-splitter .splitpanes__pane:first-child",
+    ) as HTMLElement;
+
+    if (leftPane) {
+      leftPaneElement = leftPane;
+      resizeObserver.observe(leftPane);
+      checkZoom(); // initial check
+    }
+
+    // साथ में window resize भी listen करो
+    window.addEventListener("resize", checkZoom);
+  });
+
+  onDestroy(() => {
+    if (resizeObserver && leftPaneElement) {
+      resizeObserver.unobserve(leftPaneElement);
+    }
+    window.removeEventListener("resize", checkZoom);
+  });
 </script>
 
 <div class="d-flex rest-explorer-layout h-100">
@@ -150,6 +196,9 @@
           onUpdateRequestState({
             socketRightSplitterWidthPercentage: e.detail[1].size,
           });
+          setTimeout(() => {
+            checkZoom();
+          }, 50); // Small delay to ensure DOM updates
         }}
       >
         <Pane
