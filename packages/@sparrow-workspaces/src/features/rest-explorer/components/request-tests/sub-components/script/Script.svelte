@@ -795,6 +795,10 @@
     color: var(--text-ds-neutral-50);
     font-family: "Inter", sans-serif;
     font-weight: 500;
+    display:flex;
+    align-items:center;
+    justify-content: center;
+    margin: 0 auto;
   }
 
   .generating-img {
