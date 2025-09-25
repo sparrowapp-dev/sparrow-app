@@ -5,6 +5,7 @@ import {
   TabPersistenceTypeEnum,
 } from "@sparrow/common/types/workspace/tab";
 import { v4 as uuidv4 } from "uuid";
+import { TestflowScheduleNavigatorEnum } from "../types/workspace/testflow-schedule-tab";
 
 class InitTestflowScheduleTab {
   private _tab: Tab;
@@ -28,7 +29,9 @@ class InitTestflowScheduleTab {
       property: {
         testflowSchedule: {
           scheduleId: "",
-          state: {}
+          state: {
+            scheduleNavigator: TestflowScheduleNavigatorEnum.TEST_RESULTS,
+          }
         },
       },
       path: {

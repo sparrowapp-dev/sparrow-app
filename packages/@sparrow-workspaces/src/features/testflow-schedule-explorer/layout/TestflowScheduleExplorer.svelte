@@ -1,126 +1,18 @@
 <script lang="ts">
-  import { Button, Tooltip } from "@sparrow/library/ui";
+  import { Button, Toggle, Tooltip } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
-  import {
-    ArrowClockWiseRegular,
-    HistoryRegular,
-  } from "@sparrow/library/icons";
+
   import { writable } from "svelte/store";
-  import { Search } from "@sparrow/library/forms";
-  import { HistoryTable } from "../components";
-  import { HttpStatusCodes } from "../../rest-explorer-mock/utils";
-  import type { ApiHistoryItem } from "../types";
+  import { ScheduleNavigator } from "../components";
+  import { TestflowScheduleNavigatorEnum } from "../../../../../@sparrow-common/src/types/workspace/testflow-schedule-tab";
+  import { Configurations } from "../components";
+  import TestResults from "../components/test-results/TestResults.svelte";
 
   export let tab: Observable<Tab>;
   export let collection;
-  export let fetchCollection;
-
-  let isRefreshing = false;
-  let searchTerm = "";
-  let sortDirection: "asc" | "desc" = "desc";
-
-  const COLUMNS = [
-    { key: "timestamp", label: "Time", sortable: true, width: "15%" },
-    { key: "name", label: "Name", sortable: false, width: "15%" },
-    { key: "url", label: "API Endpoint", sortable: false, width: "30%" },
-    {
-      key: "responseStatus",
-      label: "Status Code",
-      sortable: false,
-      width: "30%",
-    },
-    { key: "duration", label: "Duration", sortable: false, width: "10%" },
-  ];
-
-  const statusMessagesMap = new Map(
-    HttpStatusCodes.map((status) => [status.id, status.name]),
-  );
-
-  function getStatusMessage(responseStatus: string): string {
-    if (!responseStatus) return "No Response";
-    return statusMessagesMap.get(responseStatus) || `200 Ok`;
-  }
-
-  function formatRelativeTime(timestamp: string): string {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-    if (diffInSeconds < 60) {
-      return "Just Now";
-    } else if (diffInSeconds < 3600) {
-      const mins = Math.floor(diffInSeconds / 60);
-      return `${mins} min${mins > 1 ? "s" : ""} ago`;
-    } else if (diffInSeconds < 86400) {
-      const hours = Math.floor(diffInSeconds / 3600);
-      return `${hours} hr${hours > 1 ? "s" : ""} ago`;
-    } else {
-      const days = Math.floor(diffInSeconds / 86400);
-      return `${days} day${days > 1 ? "s" : ""} ago`;
-    }
-  }
-
-  const formatDuration = (ms: number): string => `${ms}ms`;
-
-  function getSortedItems(
-    items: ApiHistoryItem[],
-    direction: "asc" | "desc",
-  ): ApiHistoryItem[] {
-    return [...items].sort((a, b) => {
-      const comparison =
-        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
-      return direction === "asc" ? comparison : -comparison;
-    });
-  }
-
-  function getFilteredItems(
-    items: ApiHistoryItem[],
-    term: string,
-  ): ApiHistoryItem[] {
-    if (!term) return items;
-
-    const lowerTerm = term.toLowerCase();
-    return items.filter((item) => {
-      const nameMatch = item.name.toLowerCase().includes(lowerTerm);
-      const urlMatch = item.url.toLowerCase().includes(lowerTerm);
-      const methodMatch = item.method.toLowerCase().includes(lowerTerm);
-      const statusMatch = getStatusMessage(item.responseStatus)
-        .toLowerCase()
-        .includes(lowerTerm);
-      const durationMatch = formatDuration(item.duration)
-        .toLowerCase()
-        .includes(lowerTerm);
-      const methodUrlMatch = `${item.method} ${item.url}`
-        .toLowerCase()
-        .includes(lowerTerm);
-
-      return (
-        nameMatch ||
-        urlMatch ||
-        methodMatch ||
-        statusMatch ||
-        durationMatch ||
-        methodUrlMatch
-      );
-    });
-  }
-
-  function handleSort() {
-    sortDirection = sortDirection === "asc" ? "desc" : "asc";
-  }
-
-  const handleRefresh = async () => {
-    if (isRefreshing) return;
-    try {
-      isRefreshing = true;
-      await fetchCollection(collection.id, collection.workspaceId);
-    } catch (error) {
-      console.error("Failed to refresh collection:", error);
-    } finally {
-      isRefreshing = false;
-    }
-  };
+  export let scheduleNavigator;
+  export let onUpdateScheduleState;
 
   $: historyItems = writable(
     (collection?.mockRequestHistory || []).sort(
@@ -137,12 +29,6 @@
       ),
     );
   }
-
-  $: sortedItems = getSortedItems($historyItems, sortDirection);
-  $: filteredItems = getFilteredItems(sortedItems, searchTerm);
-  $: searchHasNoResults = searchTerm && filteredItems.length === 0;
-  $: hasHistoryData =
-    collection?.mockRequestHistory && collection.mockRequestHistory.length > 0;
 </script>
 
 {#if $tab.tabId}
@@ -157,6 +43,27 @@
         >
           Testflow Schedule
         </p>
+        <div class="d-flex gap-2">
+          <div class="d-flex align-items-center gap-2">
+            <span class="text-fs-12"> Active </span>
+            <Toggle />
+          </div>
+          <Button title={"Run Now"} type={"primary"} onClick={() => {}} />
+        </div>
+      </div>
+      <div>
+        <ScheduleNavigator
+          scheduleNavigator={$tab?.property?.testflowSchedule?.state
+            ?.scheduleNavigator}
+          {onUpdateScheduleState}
+        />
+      </div>
+      <div>
+        {#if $tab?.property?.testflowSchedule?.state?.scheduleNavigator === TestflowScheduleNavigatorEnum.TEST_RESULTS}
+          <TestResults />
+        {:else if $tab?.property?.testflowSchedule?.state?.scheduleNavigator === TestflowScheduleNavigatorEnum.CONFIGURATION}
+          <Configurations />
+        {/if}
       </div>
     </div>
   </div>

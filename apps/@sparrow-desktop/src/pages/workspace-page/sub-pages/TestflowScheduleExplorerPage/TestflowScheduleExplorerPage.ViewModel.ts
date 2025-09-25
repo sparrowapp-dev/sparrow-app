@@ -24,6 +24,7 @@ import { FolderTabAdapter } from "@app/adapter";
 import constants from "@app/constants/constants";
 import { notifications } from "@sparrow/library/ui";
 import { getSelfhostUrls } from "@app/utils/jwt";
+import type { TestflowScheduleStateDto } from "@sparrow/common/types/workspace/testflow-schedule-tab";
 // import { InitRequestTab } from "@sparrow/common/utils";
 
 class MockHistoryExplorerPage {
@@ -116,6 +117,20 @@ class MockHistoryExplorerPage {
     //   notifications.error("Failed to fetch collection. Please try again.");
     // }
   };
+
+   /**
+     *
+     * @param _state - request state
+     */
+    public updateScheduleState = async (_state: TestflowScheduleStateDto) => {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      progressiveTab.property.testflowSchedule.state = {
+        ...progressiveTab.property.testflowSchedule.state,
+        ..._state,
+      };
+      this.tab = progressiveTab;
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    };
 }
 
 export default MockHistoryExplorerPage;

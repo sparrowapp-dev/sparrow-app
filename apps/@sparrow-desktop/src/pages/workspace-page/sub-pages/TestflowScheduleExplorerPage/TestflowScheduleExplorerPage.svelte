@@ -65,4 +65,5 @@
   tab={_viewModel.tab}
   bind:collection
   fetchCollection={_viewModel.getCollectionByIdAndWorkspace}
+  onUpdateScheduleState={_viewModel.updateScheduleState}
 />
