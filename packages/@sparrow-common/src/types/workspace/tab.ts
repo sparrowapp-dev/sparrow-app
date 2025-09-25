@@ -11,6 +11,7 @@ import type { HttpRequestMockWrapperTabInterface } from "./http-request-mock-tab
 import type { AiRequestWrapper } from "./ai-request-tab";
 import type { MockHistoryWrapper } from "./mock-history-tab";
 import type { HubWrapper } from "./hub-tab";
+import type { TestflowScheduleWrapperTabInterface } from "./testflow-schedule-tab";
 
 export enum TabTypeEnum {
   FOLDER = "FOLDER",
@@ -27,6 +28,7 @@ export enum TabTypeEnum {
   AI_REQUEST = "AI_REQUEST",
   MOCK_REQUEST = "MOCK_REQUEST",
   MOCK_HISTORY = "MOCK_HISTORY",
+  TESTFLOW_SCHEDULE = "TESTFLOW_SCHEDULE",
   HUB = "HUB",
 }
 
@@ -114,6 +116,7 @@ export interface Property
     Partial<GraphqlRequestWrapperTabInterface>,
     Partial<HttpRequestMockWrapperTabInterface>,
     Partial<HttpRequestSavedWrapperTabInterface>,
+    Partial<TestflowScheduleWrapperTabInterface>,
     Partial<AiRequestWrapper>,
     Partial<HubWrapper> {}
 

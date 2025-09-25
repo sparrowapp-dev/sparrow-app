@@ -280,6 +280,7 @@
 </script>
 
 {#if render}
+  <button on:click={_viewModel.openTestflowScheduleTab}> Schedule </button>
   <TestflowExplorer
     tab={_viewModel.tab}
     {environmentVariables}
