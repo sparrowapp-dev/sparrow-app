@@ -69,6 +69,8 @@
   let rafId: number | null = null;
   let clickHandlers: (() => void)[] = [];
   let isUserLimitReached: boolean = false;
+  let generatedContentStartLine = 0;
+  let generatedContentEndLine = 0;
 
   // Preprocess search string
   $: trimmedSearch = searchData.trim().toLowerCase();
@@ -165,12 +167,23 @@
       testCasePrompt = "";
     }
   };
-
   const insertGeneratedContentDirectly = async () => {
     // Insert the generated test content into the current script
     const currentScript = tests?.script || "";
-    const newScript =
-      currentScript + (currentScript ? "\n\n" : "") + generatedTestContent;
+
+    // Calculate the exact line positions where generated content will be placed
+    const currentLines = currentScript ? currentScript.split("\n") : [];
+    const separator = currentScript ? "\n\n" : "";
+
+    // Store where generated content starts
+    generatedContentStartLine = currentLines.length + (currentScript ? 2 : 0);
+
+    // Store where generated content ends
+    const generatedContentLines = generatedTestContent.split("\n");
+    generatedContentEndLine =
+      generatedContentStartLine + generatedContentLines.length - 1;
+
+    const newScript = currentScript + separator + generatedTestContent;
 
     onTestsChange({
       ...tests,
@@ -179,7 +192,6 @@
 
     await tick();
 
-    // Start persistent highlighting
     setTimeout(() => {
       startPersistentHighlighting();
     }, 100);
@@ -274,32 +286,40 @@
   };
 
   const highlightGeneratedContent = () => {
-    // Get all lines in the editor
     const lines = document.querySelectorAll(".cm-line");
 
     if (lines.length === 0) {
       return;
     }
 
-    // Highlight only the newly added lines (generated content)
-    lines.forEach((line, index) => {
-      if (index >= originalLineCount) {
-        const element = line as HTMLElement;
-        // Add class for CSS targeting
-        if (!element.classList.contains("highlight-generated-line")) {
-          element.classList.add("highlight-generated-line");
-        }
+    // Clear all existing highlights first
+    lines.forEach((line) => {
+      const element = line as HTMLElement;
+      element.classList.remove("highlight-generated-line");
+      element.style.removeProperty("background-color");
+    });
 
-        // Force inline styles with !important for maximum persistence
-        element.style.setProperty(
-          "background-color",
-          "var(--bg-ds-surface-400)",
-          "important",
-        );
+    // Only highlight lines within the generated content range
+    lines.forEach((line, index) => {
+      if (
+        index >= generatedContentStartLine &&
+        index <= generatedContentEndLine
+      ) {
+        const element = line as HTMLElement;
+        const lineText = element.textContent?.trim() || "";
+
+        // Only highlight if line has content (skip empty lines within range)
+        if (lineText) {
+          element.classList.add("highlight-generated-line");
+          element.style.setProperty(
+            "background-color",
+            "var(--bg-ds-surface-400)",
+            "important",
+          );
+        }
       }
     });
   };
-
   const removeHighlight = () => {
     if (observer) {
       observer.disconnect();
@@ -342,6 +362,8 @@
       element.style.removeProperty("background-color");
       element.classList.remove("highlight-generated-line");
     });
+    generatedContentStartLine = 0;
+    generatedContentEndLine = 0;
   };
 
   const acceptGeneratedTest = () => {
@@ -353,6 +375,8 @@
     originalTestContent = "";
     currentPrompt = "";
     originalLineCount = 0;
+    generatedContentStartLine = 0;
+    generatedContentEndLine = 0;
   };
 
   const rejectGeneratedTest = () => {
@@ -602,23 +626,25 @@
                 show={isUserLimitReached}
                 distance={5}
               >
-                <Input
-                  id="sparkle-input"
-                  placeholder="Ask AI to generate a test"
-                  startIcon={showGeneratedTestActions || isUserLimitReached
-                    ? SparkleFilledIcon
-                    : SparkleColoredIcon}
-                  iconSize={16}
-                  variant="secondary"
-                  size="medium"
-                  bind:value={testCasePrompt}
-                  {isError}
-                  disabled={showGeneratedTestActions || isUserLimitReached}
-                  on:input={() => {
-                    isError = false;
-                    errorMessage = "";
-                  }}
-                />
+                <div class="input-with-button">
+                  <Input
+                    id="sparkle-input"
+                    placeholder="Ask AI to generate a test"
+                    startIcon={showGeneratedTestActions || isUserLimitReached
+                      ? SparkleFilledIcon
+                      : SparkleColoredIcon}
+                    iconSize={16}
+                    variant="secondary"
+                    size="medium"
+                    bind:value={testCasePrompt}
+                    {isError}
+                    disabled={showGeneratedTestActions || isUserLimitReached}
+                    on:input={() => {
+                      isError = false;
+                      errorMessage = "";
+                    }}
+                  />
+                </div>
               </Tooltip>
 
               <div
@@ -638,9 +664,14 @@
                     isUserLimitReached ||
                     isError}
                   onClick={() => {
-                    if (!isTestCasesGenerating && testCasePrompt.trim()) {
-                      handleGenerateTestCases();
-                      return;
+                    if (!isTestCasesGenerating) {
+                      if (testCasePrompt.trim()) {
+                        handleGenerateTestCases();
+                      } else {
+                        isError = true;
+                        errorMessage =
+                          "Please enter a prompt before generating.";
+                      }
                     }
                   }}
                 />
@@ -672,6 +703,9 @@
 </div>
 
 <style>
+  .input-with-button :global(input) {
+    padding-right: 120px !important;
+  }
   .input-error {
     color: var(--text-ds-danger-300, #e74c3c);
     font-size: 12px;
@@ -761,6 +795,10 @@
     color: var(--text-ds-neutral-50);
     font-family: "Inter", sans-serif;
     font-weight: 500;
+    display:flex;
+    align-items:center;
+    justify-content: center;
+    margin: 0 auto;
   }
 
   .generating-img {

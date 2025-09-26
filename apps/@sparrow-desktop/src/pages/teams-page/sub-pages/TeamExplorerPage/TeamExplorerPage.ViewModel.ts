@@ -25,7 +25,7 @@ import { notifications } from "@sparrow/library/ui";
 import { BehaviorSubject, Observable } from "rxjs";
 import { navigate } from "svelte-navigator";
 import { v4 as uuidv4 } from "uuid";
-import { getAuthJwt, getClientUser } from "../../../../utils/jwt";
+import { getAuthJwt, getClientUser, getSelfhostUrls } from "../../../../utils/jwt";
 import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
 import constants from "@app/constants/constants";
 import { RecentWorkspaceRepository } from "@app/repositories/recent-workspace.repository";
@@ -774,6 +774,11 @@ export class TeamExplorerPageViewModel {
     const teamData = await this.teamRepository.getTeamDoc(_teamId);
     const hubUrl = teamData?.hubUrl;
 
+    const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+        return selfhostBackendUrl;
+    }
+
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;
@@ -904,6 +909,11 @@ export class TeamExplorerPageViewModel {
   public workspaceConstructBaseUrl = async (_id: string) => {
     const workspaceData = await this.workspaceRepository.readWorkspace(_id);
     const hubUrl = workspaceData?.team?.hubUrl;
+
+    const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+        return selfhostBackendUrl;
+    }
 
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
@@ -1061,14 +1071,19 @@ export class TeamExplorerPageViewModel {
     options?: { toWorkspace?: boolean },
   ) => {
     const [authToken] = getAuthJwt();
+    const [,,selfhostAdminUrl] = getSelfhostUrls();
     if (options?.toWorkspace) {
       await open(
-        `${constants.ADMIN_URL}/hubs/workspace/${teamId}?xid=${authToken}`,
+        `${selfhostAdminUrl ? selfhostAdminUrl : constants.ADMIN_URL}/hubs/workspace/${teamId}?xid=${authToken}`,
       );
     } else {
-      await open(
-        `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
-      );
+      if(selfhostAdminUrl){
+        await open(selfhostAdminUrl);
+      }else{
+        await open(
+          `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+        );
+      } 
     }
   };
 

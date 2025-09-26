@@ -46,6 +46,7 @@ import type { GraphqlRequestCreateUpdateInFolderPayloadDtoInterface } from "@spa
 import { InitTab } from "@sparrow/common/factory";
 import type { SocketIORequestCreateUpdateInFolderPayloadDtoInterface } from "@sparrow/common/types/workspace/socket-io-request-dto";
 import constants from "@app/constants/constants";
+import { getSelfhostUrls } from "@app/utils/jwt";
 // import { InitRequestTab } from "@sparrow/common/utils";
 
 class FolderExplorerPage {
@@ -221,6 +222,11 @@ class FolderExplorerPage {
   public constructBaseUrl = async (_id: string) => {
     const workspaceData = await this.workspaceRepository.readWorkspace(_id);
     const hubUrl = workspaceData?.team?.hubUrl;
+
+    const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+        return selfhostBackendUrl;
+    }
 
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
