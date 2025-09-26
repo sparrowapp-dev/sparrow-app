@@ -242,6 +242,98 @@
     return response;
   };
 
+  let activeTab = "testflow"; // Default to test flow
+  let hasActiveSchedules = true; // This should come from your data
+  let searchQuery = "";
+  let filteredSchedules = [
+    {
+      id: 1,
+      name: "User account management APIs health",
+      description: "Run every 2 hours",
+      status: "Active",
+      environment: "Testing",
+      nextRun: "In 1h 20m",
+      lastResult: "No results yet",
+    },
+    {
+      id: 2,
+      name: "User management flow - Schedule Run 1",
+      description: "Run everyday at 4:00 PM",
+      status: "Inactive",
+      environment: "Development",
+      nextRun: "Paused",
+      lastResult: "Success",
+    },
+    {
+      id: 3,
+      name: "User management APIs health",
+      description: "Run every Mon, Wed, Fri at 9:00 AM",
+      status: "Active",
+      environment: "None",
+      nextRun: "Today, 9:00 AM",
+      lastResult: "Failed",
+    },
+    {
+      id: 4,
+      name: "Update user APIs health",
+      description: "Run once on Sep 8, 2025 at 4:00 PM",
+      status: "Expired",
+      environment: "None",
+      nextRun: "Completed",
+      lastResult: "Partially Failed",
+    },
+  ];
+
+  function setActiveTab(tab) {
+    activeTab = tab;
+  }
+
+  function handleLearnMore() {
+    // Handle learn more click
+    console.log("Learn more clicked");
+  }
+
+  let dismissed = false;
+
+  function dismissWarning() {
+    dismissed = true;
+  }
+
+  function handleSearchSchedules(event) {
+    searchQuery = event.target.value.toLowerCase();
+    filteredSchedules = filteredSchedules.filter(
+      (schedule) =>
+        schedule.name.toLowerCase().includes(searchQuery) ||
+        schedule.environment.toLowerCase().includes(searchQuery),
+    );
+  }
+
+  function handleScheduleAction(id, action) {
+    console.log(`Action ${action} for schedule ${id}`);
+    // Handle schedule actions
+  }
+
+  function handleToggleStatus(id, isActive) {
+    filteredSchedules = filteredSchedules.map((schedule) => {
+      if (schedule.id === id) {
+        return {
+          ...schedule,
+          status: isActive ? "Active" : "Inactive",
+        };
+      }
+      return schedule;
+    });
+  }
+
+  // Add these function stubs for the new functionality
+  function onClickScheduledRun() {
+    // Handle scheduled run logic
+  }
+
+  function onScheduleRun() {
+    // Handle schedule run button
+  }
+
   const createBlankRequestObject = (
     _url: string,
     _method: string,
@@ -516,6 +608,16 @@
     });
   };
 
+  let isSaveModalOpen = false;
+
+  const handleOpenSaveModal = () => {
+    isSaveModalOpen = true;
+  };
+
+  const handleSaveConfirm = () => {
+    onSaveTestflow(); // Your original save function
+    isSaveModalOpen = false;
+  };
   const handleUpdateRequestData = async (field: string, value: any) => {
     if (!selectedBlock) {
       console.warn("Invalid block data structure");
@@ -1532,15 +1634,15 @@
     e.preventDefault();
   }}
 >
-  <div class="p-3" style="position:absolute; z-index:3; top:0;">
+  <!-- Header Section with Name and Controls -->
+  <div class="p-3" style="position:absolute; z-index:3; top:0; left:0;">
     <!-- INSERT NAME COMPONENT HERE -->
     <TestFlowName {onUpdateTestFlowName} testFlowName={$tab?.name} />
   </div>
+
   <div
     class="d-flex justify-content-between position-absolute p-3"
-    style="top:0; ;
-  right:0;
-  z-index:3;"
+    style="top:0; right:0; z-index:3;"
   >
     <div class="d-flex">
       {#if testflowStore?.isTestFlowRunning}
@@ -1565,16 +1667,21 @@
                 type="primary"
                 size="medium"
                 startIcon={PlayFilled}
-                title="Run"
+                title={activeTab === "scheduled" ? "Run Now" : "Run"}
                 onClick={async () => {
-                  unselectNodes();
-                  await onClickRun();
-                  const startingNode = handleSelectFirstNode();
-                  if (startingNode) {
-                    selectNode(startingNode);
+                  if (activeTab === "scheduled") {
+                    // Handle scheduled run logic
+                    await onClickScheduledRun();
+                  } else {
+                    unselectNodes();
+                    await onClickRun();
+                    const startingNode = handleSelectFirstNode();
+                    if (startingNode) {
+                      selectNode(startingNode);
+                    }
+                    MixpanelEvent(Events.Run_TestFlows);
+                    handleEventOnRunBlocks();
                   }
-                  MixpanelEvent(Events.Run_TestFlows);
-                  handleEventOnRunBlocks();
                 }}
               />
             </div>
@@ -1586,7 +1693,7 @@
             <TestFlowTourGuide
               targetIds={["testflow-run-button"]}
               title="Run Your Test Flow"
-              description={`Almost there! With your blocks and API in place, go ahead and click ‘Run’ to execute your test flow.`}
+              description={`Almost there! With your blocks and API in place, go ahead and click 'Run' to execute your test flow.`}
               CardNumber={6}
               totalCards={7}
               onNext={async () => {
@@ -1599,6 +1706,18 @@
           </div>
         {/if}
       </div>
+
+      {#if activeTab === "scheduled"}
+        <div style="margin-right: 5px;">
+          <Button
+            type="secondary"
+            size="medium"
+            title="Schedule Run"
+            onClick={onScheduleRun}
+          />
+        </div>
+      {/if}
+
       <div style="margin-right: 5px;">
         <Tooltip title="Clear Response" placement="bottom-center" size="small">
           <Button
@@ -1615,7 +1734,7 @@
           <SaveTestflow
             isSave={$tab.isSaved}
             {isTestflowEditable}
-            {onSaveTestflow}
+            onSaveTestflow={handleOpenSaveModal}
             testFlowRunning={testflowStore?.isTestFlowRunning}
           />
         </div>
@@ -1633,199 +1752,415 @@
       </div>
     </div>
   </div>
-  <div
-    bind:this={divElement}
-    tabindex="0"
-    on:click={focusDiv}
-    style="flex:1; overflow:auto; outline: none; position:realtive;"
-    id="testflow-container-main"
-  >
-    <SvelteFlowProvider>
-      <SvelteFlow {nodes} {edges} {nodeTypes} {edgeTypes}>
-        <Background
-          bgColor={"var(--bg-ds-surface-900)"}
-          patternColor={"var(--bg-ds-surface-500)"}
-          size={4}
-          gap={20}
-        />
-      </SvelteFlow>
-    </SvelteFlowProvider>
 
-    {#if $isTestFlowTourGuideOpen && $currentStep == 3}
-      <div style="position:absolute; top:196px; left:370px; z-index:1000;">
-        <TestFlowTourGuide
-          targetIds={["add-block"]}
-          title="Add Your First Block"
-          CardNumber={3}
-          totalCards={7}
-          description={`Welcome to the canvas! Click ‘Add Block’ to start building your flow. You're just a few steps away.`}
-          onNext={() => {
-            currentStep.set(4);
-            createNewNode("1");
-          }}
-          shouldDelay={true}
-          onClose={() => {
-            isTestFlowTourGuideOpen.set(false);
-          }}
-        />
+  <!-- Tab Navigation and Warning Message -->
+  <div class="pt-5 px-3" style="margin-top: 10px;">
+    <!-- Tab Navigation -->
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <div class="d-flex">
+        <button
+          class="tab-button {activeTab === 'testflow' ? 'tab-active' : ''}"
+          on:click={() => setActiveTab("testflow")}
+        >
+          Test Flow
+        </button>
+        <button
+          class="tab-button {activeTab === 'scheduled' ? 'tab-active' : ''}"
+          on:click={() => setActiveTab("scheduled")}
+        >
+          Scheduled Run
+        </button>
       </div>
-    {/if}
-
-    {#if $isTestFlowTourGuideOpen && $currentStep == 4}
-      <div style="position:absolute; top:198px; left:685px; z-index:1000;">
-        <TestFlowTourGuide
-          targetIds={["request-block"]}
-          title="Select an API"
-          description={`Block added—nice! Now, click the dropdown to select an API. Don’t have one? No worries, a sample API is available for you to use.`}
-          CardNumber={4}
-          totalCards={7}
-          onNext={() => {
-            currentStep.set(5);
-          }}
-          onClose={() => {
-            isTestFlowTourGuideOpen.set(false);
-          }}
-        />
-      </div>
-    {/if}
-
-    {#if $isTestFlowTourGuideOpen && $currentStep == 5}
-      <div style="position:absolute; top:265px; left:680px; z-index:1000;">
-        <TestFlowTourGuide
-          targetIds={["request-block", "dropdown-request-items"]}
-          title="Sample API Ready"
-          description={`A ready-to-use sample API is available in the dropdown. Select it to move forward with your test flow setup.`}
-          CardNumber={5}
-          totalCards={7}
-          onNext={() => {
-            currentStep.set(6);
-          }}
-          onClose={() => {
-            isTestFlowTourGuideOpen.set(false);
-          }}
-        />
-      </div>
-    {/if}
-    {#if $isTestFlowTourGuideOpen && $currentStep == 7}
-      <div
-        style="position:absolute; top:200px; left:{isWebApp
-          ? '700px'
-          : '700px'};"
-      >
-        <TestFlowTourGuide
-          targetIds={["request-block", "testflow-bottom-panel"]}
-          isLastStep={true}
-          title="You Did It!"
-          description={`Congratulations! Your test flow is running successfully. You can re-run the API at any time to update values as needed.`}
-          rightButtonName="Finish"
-          CardNumber={7}
-          additionTopValue={isWebApp ? -140 : -280}
-          additionHeightValue={isWebApp ? 260 : 280}
-          totalCards={7}
-          onNext={() => {
-            currentStep.set(-1);
-            isTestFlowTourGuideOpen.set(false);
-          }}
-          onClose={() => {
-            isTestFlowTourGuideOpen.set(false);
-          }}
-        />
-      </div>
-    {/if}
-  </div>
-  <!-- Open the bottom panel when it contains the data -->
-  {#if selectedBlock && selectedBlock?.data?.requestId}
-    <div style=" background-color: transparent; margin: 0px 13px 12px 13px;">
-      <TestFlowBottomPanel
-        {selectedBlock}
-        {environmentVariables}
-        onClose={() => unselectNodes()}
-        onRedirect={onRedrectRequest}
-        {handleUpdateRequestData}
-        {isWebApp}
-        onClearResponse={() => {}}
-        {userRole}
-        {onUpdateEnvironment}
-        {runSingleNode}
-        {testflowStore}
-        {selectedAuthHeader}
-        bind:selectAuthHeader
-        {handleOpenCurrentDynamicExpression}
-      />
     </div>
-  {:else if $isTestFlowTourGuideOpen && $currentStep === 7}
+  </div>
+
+  <!-- Warning Message -->
+  {#if activeTab === "scheduled" && filteredSchedules.some((schedule) => schedule.status === "Active") && !dismissed}
     <div
-      style=" background-color: transparent; margin: 0px 13px 12px 13px;"
-      id="testflow-bottom-panel"
+      class="warning-banner d-flex align-items-center mb-3 p-2 position-relative"
     >
-      <!-- Request Response Nav -->
-      <TestFlowBottomPanel
-        selectedBlock={{
-          data: {
-            name: "Sample API",
-            method: "GET",
-            blockName: "Block 1",
-            requestData: {
-              name: "Sample API",
-              method: "GET",
-              state: {
-                requestBodyLanguage: RequestDataTypeEnum.TEXT,
-                requestBodyNavigation: RequestDatasetEnum.NONE,
-                requestAuthNavigation: HttpRequestAuthTypeBaseEnum.NO_AUTH,
-                requestNavigation: RequestSectionEnum.PARAMETERS,
-                responseNavigation: ResponseSectionEnum.RESPONSE,
-                responseBodyLanguage: RequestDataTypeEnum.TEXT,
-                responseBodyFormatter: ResponseFormatterEnum.PRETTY,
-                requestExtensionNavigation: "",
-                requestLeftSplitterWidthPercentage: 50,
-                requestRightSplitterWidthPercentage: 50,
-                isExposeEditDescription: true,
-                isSendRequestInProgress: false,
-                isSaveDescriptionInProgress: false,
-                isSaveRequestInProgress: false,
-                isParameterBulkEditActive: false,
-                isHeaderBulkEditActive: false,
-                isChatbotActive: false,
-                isChatbotSuggestionsActive: true,
-                isChatbotGeneratingResponse: false,
-                isDocGenerating: false,
-                isDocAlreadyGenerated: false,
-              },
-              url: "https://sparrowapp.dev/api/v1/docs",
-              queryParams: [
-                {
-                  key: "",
-                  value: "",
-                  checked: false,
-                },
-              ],
-              headers: [
-                {
-                  key: "",
-                  value: "",
-                  checked: false,
-                },
-              ],
-            },
-          },
-        }}
-        {environmentVariables}
-        onClose={() => unselectNodes()}
-        onRedirect={onRedrectRequest}
-        {handleUpdateRequestData}
-        {isWebApp}
-        onClearResponse={() => {}}
-        {userRole}
-        {onUpdateEnvironment}
-      />
+      <div class="warning-icon me-2">⚠️</div>
+      <div class="flex-grow-1">
+        <span class="text-fs-12">
+          This flow has active schedules. Any changes here will affect future
+          runs.
+        </span>
+        <span
+          class="cursor-pointer ms-2 text-fs-12"
+          on:click={handleLearnMore}
+          style="color: #60a5fa;"
+        >
+          Learn More
+        </span>
+      </div>
+      <button class="btn-close-warning" on:click={dismissWarning}> × </button>
     </div>
   {/if}
 
+  <style>
+    .warning-banner {
+      background-color: #1e1f26; /* dark bg */
+      border-radius: 6px;
+      padding-left: 12px;
+      color: #f3f4f6;
+      position: relative;
+      overflow: hidden; /* hide gradient overflow */
+    }
+
+    /* Gradient strip on the left */
+    .warning-banner::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(
+        to bottom,
+        #fde047 0%,
+        /* Light yellow */ #facc15 30%,
+        /* Yellow */ #eab308 70%,
+        /* Amber */ #ca8a04 100% /* Dark amber */
+      );
+      box-shadow:
+        0 0 15px rgba(253, 224, 71, 0.6),
+        0 0 30px rgba(251, 191, 36, 0.4),
+        0 0 45px rgba(245, 158, 11, 0.2);
+    }
+
+    .warning-banner::after {
+      content: "";
+      position: absolute;
+      left: 4px;
+      top: 0;
+      bottom: 0;
+      width: 20px;
+      background: linear-gradient(
+        to right,
+        rgba(253, 224, 71, 0.15) 0%,
+        rgba(251, 191, 36, 0.08) 50%,
+        transparent 100%
+      );
+      pointer-events: none;
+    }
+
+    .btn-close-warning {
+      background: none;
+      border: none;
+      color: #9ca3af;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+
+  <!-- Main Content Area -->
+  <div style="flex: 1; overflow: auto;" class="px-3">
+    {#if activeTab === "testflow"}
+      <!-- Test Flow Content -->
+      <div
+        bind:this={divElement}
+        tabindex="0"
+        on:click={focusDiv}
+        style="height: 100%; outline: none; position: relative;"
+        id="testflow-container-main"
+      >
+        <SvelteFlowProvider>
+          <SvelteFlow {nodes} {edges} {nodeTypes} {edgeTypes}>
+            <Background
+              bgColor={"var(--bg-ds-surface-900)"}
+              patternColor={"var(--bg-ds-surface-500)"}
+              size={4}
+              gap={20}
+            />
+          </SvelteFlow>
+        </SvelteFlowProvider>
+
+        {#if $isTestFlowTourGuideOpen && $currentStep == 3}
+          <div style="position:absolute; top:196px; left:370px; z-index:1000;">
+            <TestFlowTourGuide
+              targetIds={["add-block"]}
+              title="Add Your First Block"
+              CardNumber={3}
+              totalCards={7}
+              description={`Welcome to the canvas! Click 'Add Block' to start building your flow. You're just a few steps away.`}
+              onNext={() => {
+                currentStep.set(4);
+                createNewNode("1");
+              }}
+              shouldDelay={true}
+              onClose={() => {
+                isTestFlowTourGuideOpen.set(false);
+              }}
+            />
+          </div>
+        {/if}
+
+        {#if $isTestFlowTourGuideOpen && $currentStep == 4}
+          <div style="position:absolute; top:198px; left:685px; z-index:1000;">
+            <TestFlowTourGuide
+              targetIds={["request-block"]}
+              title="Select an API"
+              description={`Block added—nice! Now, click the dropdown to select an API. Don't have one? No worries, a sample API is available for you to use.`}
+              CardNumber={4}
+              totalCards={7}
+              onNext={() => {
+                currentStep.set(5);
+              }}
+              onClose={() => {
+                isTestFlowTourGuideOpen.set(false);
+              }}
+            />
+          </div>
+        {/if}
+
+        {#if $isTestFlowTourGuideOpen && $currentStep == 5}
+          <div style="position:absolute; top:265px; left:680px; z-index:1000;">
+            <TestFlowTourGuide
+              targetIds={["request-block", "dropdown-request-items"]}
+              title="Sample API Ready"
+              description={`A ready-to-use sample API is available in the dropdown. Select it to move forward with your test flow setup.`}
+              CardNumber={5}
+              totalCards={7}
+              onNext={() => {
+                currentStep.set(6);
+              }}
+              onClose={() => {
+                isTestFlowTourGuideOpen.set(false);
+              }}
+            />
+          </div>
+        {/if}
+
+        {#if $isTestFlowTourGuideOpen && $currentStep == 7}
+          <div
+            style="position:absolute; top:200px; left:{isWebApp
+              ? '700px'
+              : '700px'};"
+          >
+            <TestFlowTourGuide
+              targetIds={["request-block", "testflow-bottom-panel"]}
+              isLastStep={true}
+              title="You Did It!"
+              description={`Congratulations! Your test flow is running successfully. You can re-run the API at any time to update values as needed.`}
+              rightButtonName="Finish"
+              CardNumber={7}
+              additionTopValue={isWebApp ? -140 : -280}
+              additionHeightValue={isWebApp ? 260 : 280}
+              totalCards={7}
+              onNext={() => {
+                currentStep.set(-1);
+                isTestFlowTourGuideOpen.set(false);
+              }}
+              onClose={() => {
+                isTestFlowTourGuideOpen.set(false);
+              }}
+            />
+          </div>
+        {/if}
+      </div>
+    {:else if activeTab === "scheduled"}
+      <!-- Scheduled Run Content -->
+      <div class="scheduled-runs-container h-100">
+        <div class="d-flex flex-column h-100">
+          <!-- Search Bar -->
+          <div class="mb-3">
+            <div class="d-flex align-items-center">
+              <div class="search-container">
+                <input
+                  type="text"
+                  placeholder="Search schedules"
+                  class="form-control search-input"
+                  bind:value={searchQuery}
+                  on:input={handleSearchSchedules}
+                />
+              </div>
+            </div>
+          </div>
+          <!-- Scheduled Runs Table -->
+          <div
+            class="scheduled-table-container flex-grow-1"
+            style="overflow: auto;"
+          >
+            <table class="table scheduled-table">
+              <thead>
+                <tr>
+                  <th>Schedule Name</th>
+                  <th>Status</th>
+                  <th>Environment</th>
+                  <th>Next Run</th>
+                  <th>Last Run Result</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {#each filteredSchedules as schedule}
+                  <tr>
+                    <td>
+                      <div class="d-flex flex-column">
+                        <span class="schedule-name">{schedule.name}</span>
+                        <span class="schedule-description text-muted"
+                          >{schedule.description}</span
+                        >
+                      </div>
+                    </td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <label class="toggle-switch">
+                          <input
+                            type="checkbox"
+                            checked={schedule.status === "Active"}
+                            disabled={schedule.status === "Expired"}
+                            on:change={(e) =>
+                              handleToggleStatus(schedule.id, e.target.checked)}
+                          />
+                          <span
+                            class="toggle-slider {schedule.status === 'Expired'
+                              ? 'disabled'
+                              : ''}"
+                          ></span>
+                        </label>
+                        <span
+                          class="status-text ms-2 {schedule.status.toLowerCase()}"
+                        >
+                          {schedule.status}
+                        </span>
+                      </div>
+                    </td>
+                    <td>{schedule.environment}</td>
+                    <td>{schedule.nextRun}</td>
+                    <td>
+                      <span
+                        class="result-badge {schedule.lastResult?.toLowerCase()}"
+                      >
+                        {schedule.lastResult}
+                      </span>
+                    </td>
+                    <td>
+                      <div
+                        class="d-flex align-items-center gap-2"
+                        style="padding-left: 6px;"
+                      >
+                        <!-- <button
+                          class="btn btn-sm action-btn"
+                          on:click={() =>
+                            handleScheduleAction(schedule.id, "edit")}
+                        >
+                          <i class="icon-edit"></i>
+                        </button> -->
+                        <button
+                          class="btn btn-sm action-btn"
+                          on:click={() =>
+                            handleScheduleAction(schedule.id, "more")}
+                        >
+                          ⋮
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                {/each}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    {/if}
+  </div>
+
+  <!-- Bottom Panel (only show for Test Flow) -->
+  {#if activeTab === "testflow"}
+    {#if selectedBlock && selectedBlock?.data?.requestId}
+      <div style="background-color: transparent; margin: 0px 13px 12px 13px;">
+        <TestFlowBottomPanel
+          {selectedBlock}
+          {environmentVariables}
+          onClose={() => unselectNodes()}
+          onRedirect={onRedrectRequest}
+          {handleUpdateRequestData}
+          {isWebApp}
+          onClearResponse={() => {}}
+          {userRole}
+          {onUpdateEnvironment}
+          {runSingleNode}
+          {testflowStore}
+          {selectedAuthHeader}
+          bind:selectAuthHeader
+          {handleOpenCurrentDynamicExpression}
+        />
+      </div>
+    {:else if $isTestFlowTourGuideOpen && $currentStep === 7}
+      <div
+        style="background-color: transparent; margin: 0px 13px 12px 13px;"
+        id="testflow-bottom-panel"
+      >
+        <TestFlowBottomPanel
+          selectedBlock={{
+            data: {
+              name: "Sample API",
+              method: "GET",
+              blockName: "Block 1",
+              requestData: {
+                name: "Sample API",
+                method: "GET",
+                state: {
+                  requestBodyLanguage: RequestDataTypeEnum.TEXT,
+                  requestBodyNavigation: RequestDatasetEnum.NONE,
+                  requestAuthNavigation: HttpRequestAuthTypeBaseEnum.NO_AUTH,
+                  requestNavigation: RequestSectionEnum.PARAMETERS,
+                  responseNavigation: ResponseSectionEnum.RESPONSE,
+                  responseBodyLanguage: RequestDataTypeEnum.TEXT,
+                  responseBodyFormatter: ResponseFormatterEnum.PRETTY,
+                  requestExtensionNavigation: "",
+                  requestLeftSplitterWidthPercentage: 50,
+                  requestRightSplitterWidthPercentage: 50,
+                  isExposeEditDescription: true,
+                  isSendRequestInProgress: false,
+                  isSaveDescriptionInProgress: false,
+                  isSaveRequestInProgress: false,
+                  isParameterBulkEditActive: false,
+                  isHeaderBulkEditActive: false,
+                  isChatbotActive: false,
+                  isChatbotSuggestionsActive: true,
+                  isChatbotGeneratingResponse: false,
+                  isDocGenerating: false,
+                  isDocAlreadyGenerated: false,
+                },
+                url: "https://sparrowapp.dev/api/v1/docs",
+                queryParams: [
+                  {
+                    key: "",
+                    value: "",
+                    checked: false,
+                  },
+                ],
+                headers: [
+                  {
+                    key: "",
+                    value: "",
+                    checked: false,
+                  },
+                ],
+              },
+            },
+          }}
+          {environmentVariables}
+          onClose={() => unselectNodes()}
+          onRedirect={onRedrectRequest}
+          {handleUpdateRequestData}
+          {isWebApp}
+          onClearResponse={() => {}}
+          {userRole}
+          {onUpdateEnvironment}
+        />
+      </div>
+    {/if}
+  {/if}
+
+  <!-- Help Section -->
   <div class="p-3" style="position:absolute; z-index:3; bottom:0; right:0;">
     {#if testflowCount <= planLimitTestFlows || isGuestUser}
       <p
         class="mb-0 pb-0 text-fs-14"
-        style="color: var(--text-primary-300); font-weight:500; cursor:pointer;  "
+        style="color: var(--text-primary-300); font-weight:500; cursor:pointer;"
         on:click={() => {
           currentStep.set(1);
           isTestFlowTourGuideOpen.set(true);
@@ -1837,6 +2172,38 @@
   </div>
 </div>
 <!-- <svelte:window on:keydown={handleKeyPress} /> -->
+
+<Modal
+  title={"Apply Changes to Active Schedules?"}
+  type={"dark"}
+  width={"540px"}
+  zIndex={1000}
+  isOpen={isSaveModalOpen}
+  handleModalState={(flag = false) => {
+    isSaveModalOpen = flag;
+  }}
+>
+  <div class="modal-content">
+    <p class="mb-3" style="margin-top: 13px; padding-bottom:20px;">
+      "{$tab?.name}" flow has active schedules. Saving will update all upcoming
+      runs with your latest changes, which may impact their results.
+    </p>
+    <div class="d-flex justify-content-end gap-3">
+      <Button
+        type="secondary"
+        size="medium"
+        title="Cancel"
+        onClick={() => (isSaveModalOpen = false)}
+      />
+      <Button
+        type="primary"
+        size="medium"
+        title="Save"
+        onClick={handleSaveConfirm}
+      />
+    </div>
+  </div>
+</Modal>
 
 <Modal
   title={"Insert Dynamic Content"}
@@ -1998,6 +2365,224 @@
 <style>
   :global(.svelte-flow__attribution) {
     display: none;
+  }
+
+  .tab-button {
+    background: none;
+    border: none;
+    padding: 8px 16px;
+    margin-right: 16px;
+    color: var(--text-ds-neutral-300);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+  }
+
+  .tab-button:hover {
+    color: var(--text-ds-neutral-100);
+  }
+
+  .tab-button.tab-active {
+    color: var(--text-ds-neutral-50);
+    border-bottom-color: var(--border-primary-400);
+  }
+
+  .btn-close-warning {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: var(--text-ds-warning-700);
+    padding: 0;
+    margin-left: 8px;
+  }
+
+  .search-input {
+    background-color: var(--bg-ds-surface-400);
+    border: 1px solid var(--border-ds-neutral-400);
+    color: var(--text-ds-neutral-100);
+    font-size: 14px;
+    padding: 8px 12px;
+    width: 300px;
+  }
+
+  .search-input::placeholder {
+    color: var(--text-ds-neutral-400);
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: var(--border-primary-400);
+    background-color: var(--bg-ds-surface-300);
+  }
+
+  .scheduled-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--text-ds-neutral-100);
+    background-color: var(--bg-ds-neutral-900);
+  }
+
+  .scheduled-table th {
+    background-color: var(--bg-ds-neutral-900);
+    padding: 12px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--text-ds-neutral-300);
+    border-bottom: 1px solid var(--border-ds-neutral-400);
+  }
+
+  .scheduled-table td {
+    padding: 12px;
+    border-bottom: none;
+    font-size: 14px;
+    background-color: var(--bg-ds-neutral-900);
+  }
+
+  .scheduled-table tbody tr:hover {
+    background-color: var(--bg-ds-surface-600) !important;
+  }
+
+  .scheduled-table tbody tr:hover td {
+    background-color: var(--bg-ds-surface-600) !important;
+  }
+
+  .schedule-name {
+    font-weight: 500;
+    color: var(--text-ds-neutral-100);
+  }
+
+  .schedule-description {
+    font-size: 12px;
+    color: var(--text-ds-neutral-400);
+    margin-top: 2px;
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .status-badge.active {
+    background-color: var(--bg-ds-success-100);
+    color: var(--text-ds-success-700);
+  }
+
+  .status-badge.inactive {
+    background-color: var(--bg-ds-neutral-100);
+    color: var(--text-ds-neutral-700);
+  }
+
+  .status-badge.expired {
+    background-color: var(--bg-ds-warning-100);
+    color: var(--text-ds-warning-700);
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
+
+  .result-badge {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .result-badge.success {
+    background-color: var(--bg-ds-success-100);
+    color: var(--text-ds-success-700);
+  }
+
+  .result-badge.failed {
+    background-color: var(--bg-ds-danger-100);
+    color: var(--text-ds-danger-700);
+  }
+
+  .result-badge.partially.failed {
+    background-color: var(--bg-ds-warning-100);
+    color: var(--text-ds-warning-700);
+  }
+
+  .action-btn {
+    background: none;
+    color: var(--text-ds-neutral-300);
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+  }
+
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--bg-ds-neutral-400);
+    transition: 0.2s;
+    border-radius: 20px;
+  }
+
+  .toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: 0.2s;
+    border-radius: 50%;
+  }
+
+  input:checked + .toggle-slider {
+    background-color: var(--bg-primary-400);
+  }
+
+  input:checked + .toggle-slider:before {
+    transform: translateX(20px);
+  }
+
+  .status-text {
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .status-text.active {
+    color: var(--text-ds-neutral-200);
+  }
+
+  .status-text.inactive {
+    color: var(--text-ds-neutral-200);
+  }
+
+  .status-text.expired {
+    color: var(--text-ds-warning-400);
   }
 
   .loader {

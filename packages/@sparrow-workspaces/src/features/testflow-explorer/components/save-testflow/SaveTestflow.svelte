@@ -8,22 +8,28 @@
   export let onSaveTestflow;
   export let testFlowRunning = false;
 
+  $: isSaveDisabled = isSave || !isTestflowEditable || testFlowRunning;
+
   /**
    * @description - handles different key press
    * @param event - keyboard events
    */
   const handleKeyPress = (event: KeyboardEvent) => {
-    const isSaveDisabled =
-      isSave || !isTestflowEditable ? true : false || testFlowRunning;
     if (
       !isSaveDisabled &&
       (event.metaKey || event.ctrlKey) &&
       event.code === "KeyS"
     ) {
       event.preventDefault();
-      onSaveTestflow();
+      handleSaveClick();
     } else if ((event.metaKey || event.ctrlKey) && event.code === "KeyS") {
       event.preventDefault();
+    }
+  };
+
+  const handleSaveClick = () => {
+    if (!isSaveDisabled) {
+      onSaveTestflow();
     }
   };
 </script>
@@ -33,9 +39,9 @@
     <Button
       type="secondary"
       startIcon={SaveRegular}
-      disable={isSave || !isTestflowEditable ? true : false || testFlowRunning}
+      disable={isSaveDisabled}
       size="medium"
-      onClick={onSaveTestflow}
+      onClick={handleSaveClick}
       iconSize={20}
     />
   </Tooltip>
