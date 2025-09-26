@@ -1227,9 +1227,9 @@ export class TestflowExplorerPageViewModel {
 
     const [selfhostBackendUrl] = getSelfhostUrls();
     if (selfhostBackendUrl) {
-        return selfhostBackendUrl;
+      return selfhostBackendUrl;
     }
-    
+
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;
@@ -1795,10 +1795,10 @@ export class TestflowExplorerPageViewModel {
    */
   public handleRedirectToAdminPanel = async (teamId: string) => {
     const [authToken] = getAuthJwt();
-    const [,,selfhostAdminUrl] = getSelfhostUrls();
-    if(selfhostAdminUrl){
-        await open(selfhostAdminUrl);
-    }else{
+    const [, , selfhostAdminUrl] = getSelfhostUrls();
+    if (selfhostAdminUrl) {
+      await open(selfhostAdminUrl);
+    } else {
       await open(
         `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
       );
@@ -1825,6 +1825,73 @@ export class TestflowExplorerPageViewModel {
     if (selectAuthHeader) {
       const response = new ReduceAuthHeader(selectAuthHeader, authContent);
       return response.getValue();
+    }
+  };
+
+  /**
+   * Schedules a test flow run with the specified configuration
+   */
+  public scheduleTestFlowRun = async (
+    scheduleName: string,
+    environmentId: string,
+    runConfiguration: {
+      runCycle: "once" | "daily" | "weekly" | "hourly";
+      executeAt: string;
+      weekDays?: string[];
+      hourInterval?: number;
+    },
+    notification: {
+      emails: string[];
+      receiveNotifications: "failure" | "all";
+    },
+  ) => {
+    try {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const workspaceId = progressiveTab.path.workspaceId;
+      const testflowId = progressiveTab.id;
+
+      if (!workspaceId || !testflowId) {
+        notifications.error("Missing workspace or testflow information");
+        return { isSuccessful: false, message: "Missing required information" };
+      }
+
+      const payload = {
+        name: scheduleName,
+        environmentId: environmentId || "",
+        workspaceId,
+        testflowId,
+        runConfiguration,
+        notification,
+      };
+
+      const response = await this.testflowService.scheduleTestFlowRun(payload);
+
+      if (response.isSuccessful) {
+        notifications.success(
+          `Test flow "${scheduleName}" scheduled successfully`,
+        );
+        return {
+          isSuccessful: true,
+          data: response.data,
+        };
+      } else {
+        notifications.error(
+          `Failed to schedule test flow: ${
+            response.message || "Unknown error"
+          }`,
+        );
+        return {
+          isSuccessful: false,
+          message: response.message || "Failed to schedule test flow",
+        };
+      }
+    } catch (error) {
+      Sentry.captureException(error);
+      notifications.error("Error scheduling test flow run");
+      return {
+        isSuccessful: false,
+        message: error.message || "Error scheduling test flow run",
+      };
     }
   };
 }
