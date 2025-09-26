@@ -3,14 +3,14 @@ import constants from "@app/constants/constants";
 import { getSelfhostUrls } from "@app/utils/jwt";
 
 export class TestflowService {
-  constructor() {    const [selfhostBackendUrl] = getSelfhostUrls();
-        if (selfhostBackendUrl) {
-            this.apiUrl = selfhostBackendUrl;
-        }
-        else{
-            this.apiUrl = constants.API_URL;
-        }
+  constructor() {
+    const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+      this.apiUrl = selfhostBackendUrl;
+    } else {
+      this.apiUrl = constants.API_URL;
     }
+  }
 
   private apiUrl: string = constants.API_URL;
 
@@ -110,6 +110,33 @@ export class TestflowService {
       "DELETE",
       `${baseUrl}/api/workspace/${workspaceId}/testflow/${_testflowId}`,
       { headers: getAuthHeaders() },
+    );
+    return response;
+  };
+
+  public scheduleTestFlowRun = async (payload: {
+    name: string;
+    environmentId: string;
+    workspaceId: string;
+    testflowId: string;
+    runConfiguration: {
+      runCycle: string;
+      executeAt: string;
+      weekDays?: string[];
+      hourInterval?: number;
+    };
+    notification: {
+      emails: string[];
+      receiveNotifications: string;
+    };
+  }) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/workspace/create-testflow-schedule`,
+      {
+        body: payload,
+        headers: getAuthHeaders(),
+      },
     );
     return response;
   };
