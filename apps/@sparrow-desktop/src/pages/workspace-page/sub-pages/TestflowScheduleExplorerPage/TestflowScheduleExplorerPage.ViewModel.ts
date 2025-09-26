@@ -25,16 +25,14 @@ import constants from "@app/constants/constants";
 import { notifications } from "@sparrow/library/ui";
 import { getSelfhostUrls } from "@app/utils/jwt";
 import type { TestflowScheduleStateDto } from "@sparrow/common/types/workspace/testflow-schedule-tab";
+import { TestflowRepository } from "@app/repositories/testflow.repository";
 // import { InitRequestTab } from "@sparrow/common/utils";
 
 class MockHistoryExplorerPage {
-  // Private Repositories
-  private collectionRepository = new CollectionRepository();
   private tabRepository = new TabRepository();
   private workspaceRepository = new WorkspaceRepository();
+  private testflowRepository = new TestflowRepository();
 
-  // Private Services
-  private collectionService = new CollectionService();
 
   private _tab: BehaviorSubject<Tab> = new BehaviorSubject({});
 
@@ -54,22 +52,9 @@ class MockHistoryExplorerPage {
     this._tab.next(value);
   }
 
-  /**
-   *
-   * @param collectionId - Id of the collection to be fetched
-   * @returns - Requested collection
-   */
-  public getCollection = async (collectionId: string) => {
-    return await this.collectionRepository.readCollection(collectionId);
-  };
-
-  /**
-   *
-   * @returns Observable collection list
-   */
-  public getCollectionList = async () => {
-    return await this.collectionRepository.getCollection();
-  };
+  public getTestflowObserver = (_testflowId: string) => {
+    return this.testflowRepository.getTestflowObserver(_testflowId);
+  }
 
   public constructBaseUrl = async (_id: string) => {
     const workspaceData = await this.workspaceRepository.readWorkspace(_id);
@@ -96,41 +81,19 @@ class MockHistoryExplorerPage {
     return await this.workspaceRepository.readWorkspace(workspaceId);
   };
 
-  public getCollectionByIdAndWorkspace = async (
-    collectionId: string,
-    workspaceId: string,
-  ) => {
-    // const baseUrl = await this.constructBaseUrl(workspaceId);
-    // const response = await this.collectionService.geCollectionByIdAndWorkspace(
-    //   collectionId,
-    //   workspaceId,
-    //   baseUrl,
-    // );
-
-    // if (response?.isSuccessful) {
-    //   await this.collectionRepository.updateCollection(collectionId, {
-    //     ...response.data.data,
-    //     id: response.data.data._id,
-    //     workspaceId: workspaceId,
-    //   });
-    // } else {
-    //   notifications.error("Failed to fetch collection. Please try again.");
-    // }
-  };
-
-   /**
-     *
-     * @param _state - request state
-     */
-    public updateScheduleState = async (_state: TestflowScheduleStateDto) => {
-      const progressiveTab = createDeepCopy(this._tab.getValue());
-      progressiveTab.property.testflowSchedule.state = {
-        ...progressiveTab.property.testflowSchedule.state,
-        ..._state,
-      };
-      this.tab = progressiveTab;
-      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  /**
+   *
+   * @param _state - request state
+   */
+  public updateScheduleState = async (_state: TestflowScheduleStateDto) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.testflowSchedule.state = {
+      ...progressiveTab.property.testflowSchedule.state,
+      ..._state,
     };
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  };
 }
 
 export default MockHistoryExplorerPage;
