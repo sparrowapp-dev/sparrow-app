@@ -165,8 +165,10 @@ export class TestflowExplorerPageViewModel {
   private fetchTestflow = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const response = await this.testflowService.fetchTestflow(progressiveTab.id as string);
-    const schedules = response.data.data.schedules;
-    updateTestflowSchedules(progressiveTab.id as string, schedules);
+    if(response?.isSuccessful){
+      const schedules = response.data.data.schedules;
+      updateTestflowSchedules(progressiveTab.id as string, schedules);
+    }
   };
 
   /**
@@ -1870,6 +1872,8 @@ export class TestflowExplorerPageViewModel {
         notifications.success(
           `Test flow "${scheduleName}" scheduled successfully`,
         );
+        const schedules = response.data.data.schedules;
+        updateTestflowSchedules(progressiveTab.id as string, schedules);
         return {
           isSuccessful: true,
           data: response.data,

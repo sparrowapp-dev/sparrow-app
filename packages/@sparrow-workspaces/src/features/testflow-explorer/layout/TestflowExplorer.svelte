@@ -147,6 +147,15 @@
   export let isGuestUser = false;
   export let collectionListDocument: CollectionDocument[];
   export let isScheduleRunPopupOpen;
+  export let testflowScheduleStore;
+
+  $: {
+    console.log(
+      "testflowScheduleStore======================",
+      testflowScheduleStore,
+    );
+  }
+
   let planContent: any;
   let planContentNonActive: any;
   let selectedAuthHeader: any;
