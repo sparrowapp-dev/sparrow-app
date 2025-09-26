@@ -18,6 +18,8 @@
   import { Debounce } from "@sparrow/common/utils";
   import constants from "@app/constants/constants";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
+  import { ScheduleRunPopUp } from "@sparrow/common/features";
+  import { Modal } from "@sparrow/library/ui";
   export let tab;
   export let teamDetails;
   export let upgradePlanModel;
@@ -46,6 +48,9 @@
 
   let environments;
   let activeWorkspace;
+
+  //schedule run popup state
+  let isScheduleRunPopupOpen: boolean = false;
 
   isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
@@ -281,6 +286,7 @@
 
 {#if render}
   <TestflowExplorer
+    bind:isScheduleRunPopupOpen
     tab={_viewModel.tab}
     {environmentVariables}
     {isTestflowEditable}
@@ -325,3 +331,24 @@
     onChangeSeletedAuthValue={_viewModel.parseAuthHeader}
   />
 {/if}
+
+<Modal
+  title="Set Schedule Run"
+  type="dark"
+  width="35%"
+  zIndex={1000}
+  isOpen={isScheduleRunPopupOpen}
+  handleModalState={() => {
+    isScheduleRunPopupOpen = false;
+  }}
+>
+  <ScheduleRunPopUp
+    bind:isScheduleRunPopupOpen
+    testFlowName={tab?.name}
+    workspaceUsers={currentWorkspace?._data?.users || []}
+    environments={$environments?.filter(
+      (env) => env.workspaceId === currentWorkspaceId,
+    ) || []}
+    handleScheduleTestFlowRun={_viewModel.scheduleTestFlowRun}
+  />
+</Modal>

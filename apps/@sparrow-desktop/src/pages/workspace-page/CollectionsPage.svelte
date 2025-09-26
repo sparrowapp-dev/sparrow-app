@@ -95,10 +95,7 @@
   import RestExplorerMockPage from "./sub-pages/RestExplorerMockPage/RestExplorerMockPage.svelte";
   import MockHistoryExplorerPage from "./sub-pages/MockHistroyExplorerPage/MockHistoryExplorerPage.svelte";
   import HubExplorerPage from "./sub-pages/HubExplorerPage/HubExplorerPage.svelte";
-  import {
-    PlanUpgradeModal,
-    ScheduleRunPopUp,
-  } from "@sparrow/common/components";
+  import { PlanUpgradeModal } from "@sparrow/common/components";
   import { planInfoByRole, planContentDisable } from "@sparrow/common/utils";
   import { TeamRole } from "@sparrow/common/enums/team.enum";
   import { ResponseMessage } from "@sparrow/common/enums";
@@ -111,6 +108,7 @@
   } from "@sparrow/workspaces/features";
   import { RequestTabTourGuide } from "@sparrow/workspaces/features";
   import { RequestTabTestsTourContent } from "@sparrow/workspaces/features";
+  import { ScheduleRunPopUp } from "@sparrow/common/features";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -1812,7 +1810,14 @@
     isScheduleRunPopupOpen = false;
   }}
 >
-  <ScheduleRunPopUp bind:isScheduleRunPopupOpen />
+  <ScheduleRunPopUp
+    bind:isScheduleRunPopupOpen
+    testFlowName={$activeTab?.name}
+    workspaceUsers={currentWOrkspaceValue?._data?.users || []}
+    environments={environmentsValues?.filter(
+      (env) => env.workspaceId === currentWOrkspaceValue?._id,
+    ) || []}
+  />
 </Modal>
 
 <PlanUpgradeModal

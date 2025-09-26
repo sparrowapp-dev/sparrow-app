@@ -102,7 +102,6 @@
   import { planInfoByRole } from "@sparrow/common/utils";
   import { TeamRole } from "@sparrow/common/enums";
   import { planContentDisable } from "@sparrow/common/utils";
-  import ScheduleRunPopUp from "../../../../../@sparrow-common/src/components/schedule-run-pop-up/ScheduleRunPopUp.svelte";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -147,6 +146,7 @@
   export let onChangeSeletedAuthValue: () => any;
   export let isGuestUser = false;
   export let collectionListDocument: CollectionDocument[];
+  export let isScheduleRunPopupOpen;
   let planContent: any;
   let planContentNonActive: any;
   let selectedAuthHeader: any;
@@ -212,9 +212,6 @@
   let blockName = `Block ${nodesValue}`;
   // List to store collection documents and filtered collections
   let filteredCollections = writable<CollectionDto[]>([]);
-
-  //schedule run popup state
-  let isScheduleRunPopupOpen: boolean = false;
 
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
@@ -1950,19 +1947,6 @@
       isSwitchNodeRequestModalOpen = false;
     }}
   />
-</Modal>
-
-<Modal
-  title="Set Schedule Run"
-  type="dark"
-  width="35%"
-  zIndex={1000}
-  isOpen={isScheduleRunPopupOpen}
-  handleModalState={() => {
-    isScheduleRunPopupOpen = false;
-  }}
->
-  <ScheduleRunPopUp bind:isScheduleRunPopupOpen testFlowName={$tab?.name} />
 </Modal>
 
 <PlanUpgradeModal
