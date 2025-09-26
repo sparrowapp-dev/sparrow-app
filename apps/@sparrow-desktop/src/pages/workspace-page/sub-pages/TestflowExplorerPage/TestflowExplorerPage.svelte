@@ -18,6 +18,12 @@
   import { Debounce } from "@sparrow/common/utils";
   import constants from "@app/constants/constants";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
+
+  import { testflowSchedules } from "@sparrow/common/store";
+
+  import { ScheduleRunPopUp } from "@sparrow/common/features";
+  import { Modal } from "@sparrow/library/ui";
+
   export let tab;
   export let teamDetails;
   export let upgradePlanModel;
@@ -46,6 +52,9 @@
 
   let environments;
   let activeWorkspace;
+
+  //schedule run popup state
+  let isScheduleRunPopupOpen: boolean = false;
 
   isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
@@ -109,9 +118,13 @@
   };
 
   let testflowStoreMap;
+  let testflowScheduleStoreMap;
+
+  let testflowScheduleStore;
 
   $: {
     testflowStore = testflowStoreMap?.get(tab?.tabId) as TFDataStoreType;
+    testflowScheduleStore = testflowScheduleStoreMap?.get(tab?.id);
     const nodes = testflowStore?.nodes ?? [];
     const hasEmptyResponseStatus = nodes.some(
       (node) => !node.response?.status || node.response?.status === "",
@@ -127,6 +140,12 @@
   testFlowDataStore.subscribe((_testflowStoreMap) => {
     if (_testflowStoreMap) {
       testflowStoreMap = _testflowStoreMap;
+    }
+  });
+
+  testflowSchedules.subscribe((_testflowScheduleStoreMap) => {
+    if (_testflowScheduleStoreMap) {
+      testflowScheduleStoreMap = _testflowScheduleStoreMap;
     }
   });
 
@@ -280,11 +299,14 @@
 </script>
 
 {#if render}
+  <button on:click={_viewModel.openTestflowScheduleTab}> Schedule </button>
   <TestflowExplorer
+    bind:isScheduleRunPopupOpen
     tab={_viewModel.tab}
     {environmentVariables}
     {isTestflowEditable}
     {testflowStore}
+    {testflowScheduleStore}
     onUpdateNodes={_viewModel.updateNodes}
     onUpdateEdges={_viewModel.updateEdges}
     {collectionListDocument}
@@ -325,3 +347,24 @@
     onChangeSeletedAuthValue={_viewModel.parseAuthHeader}
   />
 {/if}
+
+<Modal
+  title="Set Schedule Run"
+  type="dark"
+  width="35%"
+  zIndex={1000}
+  isOpen={isScheduleRunPopupOpen}
+  handleModalState={() => {
+    isScheduleRunPopupOpen = false;
+  }}
+>
+  <ScheduleRunPopUp
+    bind:isScheduleRunPopupOpen
+    testFlowName={tab?.name}
+    workspaceUsers={currentWorkspace?._data?.users || []}
+    environments={$environments?.filter(
+      (env) => env.workspaceId === currentWorkspaceId,
+    ) || []}
+    handleScheduleTestFlowRun={_viewModel.scheduleTestFlowRun}
+  />
+</Modal>

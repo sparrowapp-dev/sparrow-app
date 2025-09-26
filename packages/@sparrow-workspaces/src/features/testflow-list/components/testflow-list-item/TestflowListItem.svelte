@@ -49,6 +49,9 @@
    */
   export let loggedUserRoleInWorkspace;
 
+  // open the schedule run popup
+  export let isScheduleRunPopupOpen;
+
   let showMenu: boolean = false;
   let isTestflowPopup: boolean = false;
   let newTestflowName: string = "";
@@ -134,6 +137,13 @@
         {
           onClick: openTestflow,
           displayText: `Open ${TFDefaultEnum.NAME}`,
+          disabled: false,
+        },
+        {
+          onClick: () => {
+            isScheduleRunPopupOpen = true;
+          },
+          displayText: "Schedule Run",
           disabled: false,
         },
         {

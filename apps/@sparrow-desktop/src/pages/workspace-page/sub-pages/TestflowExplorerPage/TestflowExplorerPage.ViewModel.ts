@@ -4,6 +4,7 @@ import { environmentType } from "@sparrow/common/enums";
 import {
   createDeepCopy,
   InitRequestTab,
+  InitTestflowScheduleTab,
   scrollToTab,
 } from "@sparrow/common/utils";
 import { RequestTabAdapter, TestflowTabAdapter } from "../../../../adapter";
@@ -65,6 +66,7 @@ import { TeamService } from "@app/services/team.service";
 import { ReduceAuthHeader } from "@sparrow/workspaces/features/rest-explorer/utils";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 import { getAuthJwt, getSelfhostUrls } from "@app/utils/jwt";
+import { updateTestflowSchedules } from "@sparrow/common/store";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -99,6 +101,7 @@ export class TestflowExplorerPageViewModel {
         delete t.isActive;
         delete t.index;
         this.tab = t;
+        this.fetchTestflow();
       }, 0);
     }
   }
@@ -153,6 +156,19 @@ export class TestflowExplorerPageViewModel {
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareTestflowWithServer();
+  };
+
+  /**
+   * Updates the nodes in the testflow with debounce to avoid frequent calls
+   * @param _nodes - nodes of the testflow
+   */
+  private fetchTestflow = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const response = await this.testflowService.fetchTestflow(progressiveTab.id as string);
+    if(response?.isSuccessful){
+      const schedules = response.data.data.schedules;
+      updateTestflowSchedules(progressiveTab.id as string, schedules);
+    }
   };
 
   /**
@@ -1213,9 +1229,9 @@ export class TestflowExplorerPageViewModel {
 
     const [selfhostBackendUrl] = getSelfhostUrls();
     if (selfhostBackendUrl) {
-        return selfhostBackendUrl;
+      return selfhostBackendUrl;
     }
-    
+
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;
@@ -1781,14 +1797,20 @@ export class TestflowExplorerPageViewModel {
    */
   public handleRedirectToAdminPanel = async (teamId: string) => {
     const [authToken] = getAuthJwt();
-    const [,,selfhostAdminUrl] = getSelfhostUrls();
-    if(selfhostAdminUrl){
-        await open(selfhostAdminUrl);
-    }else{
+    const [, , selfhostAdminUrl] = getSelfhostUrls();
+    if (selfhostAdminUrl) {
+      await open(selfhostAdminUrl);
+    } else {
       await open(
         `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
       );
     }
+  };
+
+  public openTestflowScheduleTab = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const initTestflowScheduleTab = new InitTestflowScheduleTab("asif",progressiveTab.path.workspaceId).updateTestflowId(progressiveTab.id).getValue();
+    await this.tabRepository.createTab(initTestflowScheduleTab);
   };
 
   public handleContactSales = async () => {
@@ -1805,6 +1827,75 @@ export class TestflowExplorerPageViewModel {
     if (selectAuthHeader) {
       const response = new ReduceAuthHeader(selectAuthHeader, authContent);
       return response.getValue();
+    }
+  };
+
+  /**
+   * Schedules a test flow run with the specified configuration
+   */
+  public scheduleTestFlowRun = async (
+    scheduleName: string,
+    environmentId: string,
+    runConfiguration: {
+      runCycle: "once" | "daily" | "weekly" | "hourly";
+      executeAt: string;
+      weekDays?: string[];
+      hourInterval?: number;
+    },
+    notification: {
+      emails: string[];
+      receiveNotifications: "failure" | "all";
+    },
+  ) => {
+    try {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const workspaceId = progressiveTab.path.workspaceId;
+      const testflowId = progressiveTab.id;
+
+      if (!workspaceId || !testflowId) {
+        notifications.error("Missing workspace or testflow information");
+        return { isSuccessful: false, message: "Missing required information" };
+      }
+
+      const payload = {
+        name: scheduleName,
+        environmentId: environmentId || "",
+        workspaceId,
+        testflowId,
+        runConfiguration,
+        notification,
+      };
+
+      const response = await this.testflowService.scheduleTestFlowRun(payload);
+
+      if (response.isSuccessful) {
+        notifications.success(
+          `Test flow "${scheduleName}" scheduled successfully`,
+        );
+        const schedules = response.data.data.schedules;
+        updateTestflowSchedules(progressiveTab.id as string, schedules);
+        return {
+          isSuccessful: true,
+          data: response.data,
+        };
+      } else {
+        notifications.error(
+          `Failed to schedule test flow: ${
+            response.message || "Unknown error"
+          }`,
+        );
+        return {
+          isSuccessful: false,
+          message: response.message || "Failed to schedule test flow",
+        };
+      }
+    } catch (error) {
+      Sentry.captureException(error);
+      notifications.error("Error scheduling test flow run");
+      return {
+        isSuccessful: false,
+        message: error.message || "Error scheduling test flow run",
+      };
     }
   };
 }

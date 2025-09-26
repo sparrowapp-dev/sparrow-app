@@ -108,6 +108,8 @@
   } from "@sparrow/workspaces/features";
   import { RequestTabTourGuide } from "@sparrow/workspaces/features";
   import { RequestTabTestsTourContent } from "@sparrow/workspaces/features";
+  import { ScheduleRunPopUp } from "@sparrow/common/features";
+  import TestflowScheduleExplorerPage from "./sub-pages/TestflowScheduleExplorerPage/TestflowScheduleExplorerPage.svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -155,6 +157,8 @@
   let environmentsValues;
   let currentWOrkspaceValue: Observable<WorkspaceDocument>;
   const externalSparrowGithub = constants.SPARROW_GITHUB;
+
+  let isScheduleRunPopupOpen: boolean = false;
 
   const environmentsSubscriber = environments.subscribe((value) => {
     if (value) {
@@ -845,6 +849,7 @@
         <WorkspaceActions
           bind:scrollList
           bind:userRole
+          bind:isScheduleRunPopupOpen
           userCount={totalTeamCount}
           {refreshWorkspace}
           {refreshLoad}
@@ -1019,6 +1024,12 @@
                     <Motion {...scaleMotionProps} let:motion>
                       <div class="h-100">
                         <MockHistoryExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.TESTFLOW_SCHEDULE}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100">
+                        <TestflowScheduleExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.HUB}
@@ -1795,6 +1806,27 @@
     />
   </div>
 </Modal>
+
+<Modal
+  title="Set Schedule Run"
+  type="dark"
+  width="35%"
+  zIndex={1000}
+  isOpen={isScheduleRunPopupOpen}
+  handleModalState={() => {
+    isScheduleRunPopupOpen = false;
+  }}
+>
+  <ScheduleRunPopUp
+    bind:isScheduleRunPopupOpen
+    testFlowName={$activeTab?.name}
+    workspaceUsers={currentWOrkspaceValue?._data?.users || []}
+    environments={environmentsValues?.filter(
+      (env) => env.workspaceId === currentWOrkspaceValue?._id,
+    ) || []}
+  />
+</Modal>
+
 <PlanUpgradeModal
   bind:isOpen={upgradePlanModel}
   title={planContent?.title}
