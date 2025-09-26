@@ -36,13 +36,13 @@
 
   // Week days data
   const weekDays = [
-    { label: "Mon", value: "monday" },
-    { label: "Tue", value: "tuesday" },
-    { label: "Wed", value: "wednesday" },
-    { label: "Thu", value: "thursday" },
-    { label: "Fri", value: "friday" },
-    { label: "Sat", value: "saturday" },
-    { label: "Sun", value: "sunday" },
+    { label: "Mon", value: "monday", dayNumber: 1 },
+    { label: "Tue", value: "tuesday", dayNumber: 2 },
+    { label: "Wed", value: "wednesday", dayNumber: 3 },
+    { label: "Thu", value: "thursday", dayNumber: 4 },
+    { label: "Fri", value: "friday", dayNumber: 5 },
+    { label: "Sat", value: "saturday", dayNumber: 6 },
+    { label: "Sun", value: "sunday", dayNumber: 0 },
   ];
 
   // Set default schedule name when component loads or testflow name changes
@@ -233,47 +233,45 @@
 
   // Add schedule run handler
   async function handleScheduleRun() {
-    // Format date and time according to cycle type
-    let executeAt = "";
-    let weekDays;
-    let hourInterval;
+    // Create runConfiguration object based on cycle type
+    let runConfiguration = {
+      runCycle: selectedCycle.toLowerCase(),
+    };
 
     switch (selectedCycle.toLowerCase()) {
       case "once":
-        executeAt = formatDateForAPI(formattedDate, selectedTime);
+        // For once, we only need executeAt
+        runConfiguration.executeAt = formatDateForAPI(
+          formattedDate,
+          selectedTime,
+        );
         break;
       case "daily":
-        // For daily, we use the time part with today's date
-        executeAt = formatDateForAPI(
-          formatDateString(new Date()),
-          selectedTime,
-        );
+        // For daily, we need time
+        runConfiguration.time = selectedTime;
         break;
       case "weekly":
-        // For weekly, we need weekDays and time
-        weekDays = selectedWeekDays;
-        executeAt = formatDateForAPI(
-          formatDateString(new Date()),
-          selectedTime,
-        );
+        // For weekly, we need days
+        runConfiguration.days = selectedWeekDays
+          .map((dayValue) => {
+            const day = weekDays.find((d) => d.value === dayValue);
+            return day ? day.dayNumber : undefined;
+          })
+          .filter((day) => day !== undefined);
+        runConfiguration.time = selectedTime;
+        break;
         break;
       case "hourly":
-        // For hourly, we need the hour interval
-        hourInterval = selectedHours;
-        executeAt = new Date().toISOString();
+        // For hourly, we need the interval hours
+        runConfiguration.intervalHours = selectedHours;
         break;
     }
 
-    // Call the viewModel method
+    // Call the handler with the properly formatted data
     const result = await handleScheduleTestFlowRun(
       scheduleName,
       selectedEnvironment,
-      {
-        runCycle: selectedCycle.toLowerCase(),
-        executeAt,
-        weekDays,
-        hourInterval,
-      },
+      runConfiguration,
       {
         emails: notificationEmails,
         receiveNotifications: notificationPreference,
