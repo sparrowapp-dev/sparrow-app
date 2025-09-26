@@ -66,6 +66,7 @@ import { TeamService } from "@app/services/team.service";
 import { ReduceAuthHeader } from "@sparrow/workspaces/features/rest-explorer/utils";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 import { getAuthJwt, getSelfhostUrls } from "@app/utils/jwt";
+import { updateTestflowSchedules } from "@sparrow/common/store";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -100,6 +101,7 @@ export class TestflowExplorerPageViewModel {
         delete t.isActive;
         delete t.index;
         this.tab = t;
+        this.fetchTestflow();
       }, 0);
     }
   }
@@ -154,6 +156,17 @@ export class TestflowExplorerPageViewModel {
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareTestflowWithServer();
+  };
+
+  /**
+   * Updates the nodes in the testflow with debounce to avoid frequent calls
+   * @param _nodes - nodes of the testflow
+   */
+  private fetchTestflow = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const response = await this.testflowService.fetchTestflow(progressiveTab.id as string);
+    const schedules = response.data.data.schedules;
+    updateTestflowSchedules(progressiveTab.id as string, schedules);
   };
 
   /**
@@ -1794,7 +1807,7 @@ export class TestflowExplorerPageViewModel {
 
   public openTestflowScheduleTab = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    const initTestflowScheduleTab = new InitTestflowScheduleTab("asif",progressiveTab.path.workspaceId).getValue();
+    const initTestflowScheduleTab = new InitTestflowScheduleTab("asif",progressiveTab.path.workspaceId).updateTestflowId(progressiveTab.id).getValue();
     await this.tabRepository.createTab(initTestflowScheduleTab);
   };
 

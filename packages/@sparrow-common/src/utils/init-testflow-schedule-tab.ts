@@ -38,6 +38,7 @@ class InitTestflowScheduleTab {
         workspaceId: _workspaceId,
         collectionId: "",
         folderId: "",
+        testflowId: "",
       },
       isSaved: true,
       index: 0,
@@ -53,31 +54,42 @@ class InitTestflowScheduleTab {
   }
   public updateId(_id: string) {
     this._tab.id = _id;
+    return this;
   }
   public updateTabType(type: TabPersistenceTypeEnum) {
     this._tab.persistence = type;
+    return this;
+  }
+  public updateTestflowId(_testflowId: string) {
+    this._tab.path.testflowId = _testflowId;
+    return this;
   }
   public updateName(_name: string) {
     this._tab.name = _name;
+    return this;
   }
   public updateDescription(_description: string) {
     this._tab.description = _description;
+    return this;
   }
   public updatePath(_path: Path) {
     this._tab.path = _path;
+    return this;
   }
   public updateTestflowScheduleId(_id: string) {
     if (_id && this._tab.property.testflowSchedule) {
       this._tab.property.testflowSchedule.scheduleId = _id;
     }
+    return this;
   }
-    public updateState(_state: any) {
+  public updateState(_state: any) {
     if (this._tab.property.testflowSchedule) {
       this._tab.property.testflowSchedule.state = {
         ...this._tab.property.testflowSchedule.state,
         ..._state,
       };
     }
+    return this;
   }
 }
 

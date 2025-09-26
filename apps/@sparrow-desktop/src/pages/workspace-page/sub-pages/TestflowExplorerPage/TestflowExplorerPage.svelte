@@ -18,6 +18,7 @@
   import { Debounce } from "@sparrow/common/utils";
   import constants from "@app/constants/constants";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
+  import { testflowSchedules } from "@sparrow/common/store";
   export let tab;
   export let teamDetails;
   export let upgradePlanModel;
@@ -109,9 +110,13 @@
   };
 
   let testflowStoreMap;
+  let testflowScheduleStoreMap;
+
+  let testflowScheduleStore;
 
   $: {
     testflowStore = testflowStoreMap?.get(tab?.tabId) as TFDataStoreType;
+    testflowScheduleStore = testflowScheduleStoreMap?.get(tab?.id);
     const nodes = testflowStore?.nodes ?? [];
     const hasEmptyResponseStatus = nodes.some(
       (node) => !node.response?.status || node.response?.status === "",
@@ -127,6 +132,12 @@
   testFlowDataStore.subscribe((_testflowStoreMap) => {
     if (_testflowStoreMap) {
       testflowStoreMap = _testflowStoreMap;
+    }
+  });
+
+  testflowSchedules.subscribe((_testflowScheduleStoreMap) => {
+    if (_testflowScheduleStoreMap) {
+      testflowScheduleStoreMap = _testflowScheduleStoreMap;
     }
   });
 
@@ -286,6 +297,7 @@
     {environmentVariables}
     {isTestflowEditable}
     {testflowStore}
+    {testflowScheduleStore}
     onUpdateNodes={_viewModel.updateNodes}
     onUpdateEdges={_viewModel.updateEdges}
     {collectionListDocument}
