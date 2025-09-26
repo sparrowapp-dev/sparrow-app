@@ -285,6 +285,7 @@
 </script>
 
 {#if render}
+  <button on:click={_viewModel.openTestflowScheduleTab}> Schedule </button>
   <TestflowExplorer
     bind:isScheduleRunPopupOpen
     tab={_viewModel.tab}
