@@ -1,5 +1,6 @@
 import { getAuthHeaders, makeRequest } from "@app/containers/api/api.common";
 import constants from "@app/constants/constants";
+import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
 
 export class TestflowService {
   constructor() {}
@@ -102,6 +103,21 @@ export class TestflowService {
       "DELETE",
       `${baseUrl}/api/workspace/${workspaceId}/testflow/${_testflowId}`,
       { headers: getAuthHeaders() },
+    );
+    return response;
+  };
+
+  public scheduleTestFlowRun = async (
+    payload: ScheduleTestFlowRunDto,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/workspace/create-testflow-schedule`,
+      {
+        body: payload,
+        headers: getAuthHeaders(),
+      },
     );
     return response;
   };

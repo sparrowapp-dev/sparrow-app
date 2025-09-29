@@ -31,6 +31,7 @@ import type {
   ENVDocumentType,
   ENVExtractVariableType,
 } from "@sparrow/common/types/workspace/environment";
+
 import type {
   TFAPIResponseType,
   TFDataStoreType,
@@ -66,6 +67,7 @@ import { TeamService } from "@app/services/team.service";
 import { ReduceAuthHeader } from "@sparrow/workspaces/features/rest-explorer/utils";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 import { getAuthJwt, getSelfhostUrls } from "@app/utils/jwt";
+import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -1794,7 +1796,10 @@ export class TestflowExplorerPageViewModel {
 
   public openTestflowScheduleTab = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    const initTestflowScheduleTab = new InitTestflowScheduleTab("asif",progressiveTab.path.workspaceId).getValue();
+    const initTestflowScheduleTab = new InitTestflowScheduleTab(
+      "asif",
+      progressiveTab.path.workspaceId,
+    ).getValue();
     await this.tabRepository.createTab(initTestflowScheduleTab);
   };
 
@@ -1821,18 +1826,13 @@ export class TestflowExplorerPageViewModel {
   public scheduleTestFlowRun = async (
     scheduleName: string,
     environmentId: string,
-    runConfiguration: {
-      runCycle: "once" | "daily" | "weekly" | "hourly";
-      executeAt: string;
-      weekDays?: string[];
-      hourInterval?: number;
-    },
-    notification: {
-      emails: string[];
-      receiveNotifications: "failure" | "all";
-    },
+    runConfiguration: ScheduleTestFlowRunDto["runConfiguration"],
+    notification: ScheduleTestFlowRunDto["notification"],
   ) => {
     try {
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path.workspaceId,
+      );
       const progressiveTab = createDeepCopy(this._tab.getValue());
       const workspaceId = progressiveTab.path.workspaceId;
       const testflowId = progressiveTab.id;
@@ -1842,7 +1842,7 @@ export class TestflowExplorerPageViewModel {
         return { isSuccessful: false, message: "Missing required information" };
       }
 
-      const payload = {
+      const payload: ScheduleTestFlowRunDto = {
         name: scheduleName,
         environmentId: environmentId || "",
         workspaceId,
@@ -1851,12 +1851,13 @@ export class TestflowExplorerPageViewModel {
         notification,
       };
 
-      const response = await this.testflowService.scheduleTestFlowRun(payload);
+      const response = await this.testflowService.scheduleTestFlowRun(
+        payload,
+        baseUrl,
+      );
 
       if (response.isSuccessful) {
-        notifications.success(
-          `Test flow "${scheduleName}" scheduled successfully`,
-        );
+        notifications.success(`New schedule created successfully.`);
         return {
           isSuccessful: true,
           data: response.data,

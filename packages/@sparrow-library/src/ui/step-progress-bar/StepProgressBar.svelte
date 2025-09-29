@@ -71,13 +71,6 @@
 
   <!-- Combined Labels Container - UPDATED -->
   <div class="labels-container">
-    <!-- Current Step Label (positioned below the handle) - ONLY SHOW IF NOT A REFERENCE VALUE -->
-    {#if !isReferenceValue}
-      <div class="current-value-label" style="left: {progressPercentage}%">
-        {currentValue}h
-      </div>
-    {/if}
-
     <!-- Reference Step Labels (positioned exactly where they should be) -->
     {#each steps as step, index}
       <button
@@ -150,24 +143,6 @@
     height: 28px; /* Single height for both current and reference labels */
   }
 
-  .current-value-label {
-    position: absolute;
-    top: 0;
-    transform: translateX(-50%);
-    color: white;
-    font-size: 14px;
-    font-weight: 600;
-    white-space: nowrap;
-    text-align: center;
-    transition: left 0.2s ease-out;
-    z-index: 4; /* Higher z-index to appear above reference labels */
-    /* ADDED: Match step-label padding and structure */
-    padding: 4px 8px;
-    border-radius: 4px;
-    line-height: 1; /* Match line height */
-    height: fit-content; /* Ensure consistent height */
-  }
-
   .step-label {
     position: absolute;
     top: 0; /* Same top position as current value label */
@@ -176,7 +151,7 @@
     transition: color 0.2s;
     background: none;
     border: none;
-    color: #64748b;
+    color: var(--text-ds-neutral-400);
     font-size: 14px;
     cursor: pointer;
     white-space: nowrap;

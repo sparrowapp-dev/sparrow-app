@@ -20,6 +20,7 @@ import constants from "@app/constants/constants";
 import { TestflowTabAdapter } from "@app/adapter";
 import { WorkspaceType } from "@sparrow/common/enums";
 import { getSelfhostUrls } from "@app/utils/jwt";
+import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
 
 export class TestflowViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -322,9 +323,9 @@ export class TestflowViewModel {
 
     const [selfhostBackendUrl] = getSelfhostUrls();
     if (selfhostBackendUrl) {
-        return selfhostBackendUrl;
+      return selfhostBackendUrl;
     }
-    
+
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;
@@ -472,5 +473,91 @@ export class TestflowViewModel {
     const testflowDetails =
       await this.testflowRepository.getTestflowByWorkspaceId(workspaceId);
     return testflowDetails?.length;
+  };
+
+  /**
+   * Schedules a test flow run with the specified configuration
+   *
+   * @param scheduleName - Name for the scheduled run
+   * @param environmentId - ID of the environment to use
+   * @param runConfiguration - Configuration for when/how the testflow should run
+   * @param notification - Email notification settings
+   * @returns A promise that resolves to the API response
+   */
+  public scheduleTestFlowRun = async (
+    scheduleName: string,
+    environmentId: string,
+    runConfiguration: ScheduleTestFlowRunDto["runConfiguration"],
+    notification: ScheduleTestFlowRunDto["notification"],
+  ) => {
+    try {
+      const activeTab = await this.tabRepository.getTabDocs();
+
+      if (!activeTab) {
+        notifications.error("No active testflow tab found");
+        return { isSuccessful: false, message: "No active testflow tab found" };
+      }
+
+      const workspaceId = activeTab.path?.workspaceId;
+      const testflowId = activeTab.id;
+
+      if (!workspaceId || !testflowId) {
+        notifications.error("Missing workspace or testflow information");
+        return { isSuccessful: false, message: "Missing required information" };
+      }
+
+      // Check for guest user mode
+      const guestUser = await this.guestUserRepository.findOne({
+        name: "guestUser",
+      });
+      const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+
+      if (isGuestUser) {
+        notifications.info("Scheduling is not available in guest mode");
+        return {
+          isSuccessful: false,
+          message: "Feature not available in guest mode",
+        };
+      }
+
+      // Prepare the payload
+      const payload: ScheduleTestFlowRunDto = {
+        name: scheduleName,
+        environmentId: environmentId || "",
+        workspaceId,
+        testflowId,
+        runConfiguration,
+        notification,
+      };
+
+      // Call the API
+      const baseUrl = await this.constructBaseUrl(workspaceId);
+      const response = await this.testflowService.scheduleTestFlowRun(
+        payload,
+        baseUrl,
+      );
+
+      // Handle response
+      if (response.isSuccessful) {
+        notifications.success(`New schedule created successfully.`);
+        return {
+          isSuccessful: true,
+          data: response.data,
+        };
+      } else {
+        const errorMsg = response.message || "Unknown error";
+        notifications.error(`Failed to create schedule. Please try again.`);
+        return {
+          isSuccessful: false,
+          message: errorMsg,
+        };
+      }
+    } catch (error) {
+      notifications.error("Error scheduling test flow run");
+      return {
+        isSuccessful: false,
+        message: error.message || "Error scheduling test flow run",
+      };
+    }
   };
 }
