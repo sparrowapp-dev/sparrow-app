@@ -28,7 +28,7 @@
   // Hourly specific variables
   const hourOptions = ["1h", "6h", "12h", "24h"];
   const hourValues = [1, 6, 12, 24];
-  let selectedHours = 2;
+  let selectedHours = 1;
   let hourlyProgressStep = 1; // Default to 2h (index 1)
 
   // Weekly specific variables
