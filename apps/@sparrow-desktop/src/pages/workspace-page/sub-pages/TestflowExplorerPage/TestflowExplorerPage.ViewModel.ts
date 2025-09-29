@@ -1877,6 +1877,8 @@ export class TestflowExplorerPageViewModel {
 
       if (response.isSuccessful) {
         notifications.success(`New schedule created successfully.`);
+        const schedules = response.data.data.schedules;
+        updateTestflowSchedules(progressiveTab.id as string, schedules);
         return {
           isSuccessful: true,
           data: response.data,

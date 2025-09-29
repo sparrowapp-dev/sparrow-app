@@ -19,6 +19,7 @@
   let scheduleName = "";
   let selectedEnvironment = "";
   let isError = false;
+  let isScheduling = false;
 
   // Run Configuration
   let selectedCycle = "Once"; // Once, Daily, Hourly, Weekly
@@ -243,6 +244,7 @@
 
   // Add schedule run handler
   async function handleScheduleRun() {
+    isScheduling = true;
     // Create runConfiguration object based on cycle type
     let runConfiguration = {
       runCycle: selectedCycle.toLowerCase(),
@@ -291,6 +293,7 @@
     if (result?.isSuccessful) {
       isScheduleRunPopupOpen = false;
     }
+    isScheduling = false;
   }
 </script>
 
@@ -620,7 +623,7 @@
       }}
     />
     <Button
-      title="Schedule Run"
+      title={isScheduling ? "Scheduling.." : "Schedule Run"}
       type="primary"
       onClick={handleScheduleRun}
       disable={!scheduleName.trim() ||
@@ -629,6 +632,7 @@
         (selectedCycle === "Hourly" && !selectedHours) ||
         (selectedCycle === "Weekly" &&
           (selectedWeekDays.length === 0 || !selectedTime))}
+      loader={isScheduling}
     />
   </div>
 </div>

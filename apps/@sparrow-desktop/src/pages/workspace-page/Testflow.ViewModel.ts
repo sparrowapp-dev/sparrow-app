@@ -21,6 +21,7 @@ import { TestflowTabAdapter } from "@app/adapter";
 import { WorkspaceType } from "@sparrow/common/enums";
 import { getSelfhostUrls } from "@app/utils/jwt";
 import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
+import { updateTestflowSchedules } from "@sparrow/common/store";
 
 export class TestflowViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -540,6 +541,8 @@ export class TestflowViewModel {
       // Handle response
       if (response.isSuccessful) {
         notifications.success(`New schedule created successfully.`);
+        const schedules = response.data.data.schedules;
+        updateTestflowSchedules(activeTab.id as string, schedules);
         return {
           isSuccessful: true,
           data: response.data,

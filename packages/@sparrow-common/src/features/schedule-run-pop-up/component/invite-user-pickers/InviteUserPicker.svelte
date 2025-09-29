@@ -255,7 +255,7 @@
         <input
           id="input"
           placeholder={!emailstoBeSentArr.length
-            ? "Enter email IDs of workspace members"
+            ? "Enter recipient emails (comma-separated)"
             : ""}
           autocomplete="off"
           autocapitalize="none"
