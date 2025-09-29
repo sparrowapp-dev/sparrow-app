@@ -12,6 +12,8 @@
   export let tab: Observable<Tab>;
   export let testflow;
   export let onUpdateScheduleState;
+  export let schedule;
+  export let onScheduleRun;
 </script>
 
 {#if $tab.tabId}
@@ -24,14 +26,20 @@
         <p
           class="text-ds-font-size-20 text-ds-line-height-120 text-ds-font-weight-semi-bold mb-0"
         >
-          Testflow Schedule
+          {schedule?.name || ""}
         </p>
         <div class="d-flex gap-2">
           <div class="d-flex align-items-center gap-2">
             <span class="text-fs-12"> Active </span>
             <Toggle />
           </div>
-          <Button title={"Run Now"} type={"primary"} onClick={() => {}} />
+          <Button
+            title={"Run Now"}
+            type={"primary"}
+            onClick={() => {
+              onScheduleRun();
+            }}
+          />
         </div>
       </div>
       <div class="d-flex">
@@ -48,7 +56,7 @@
       </div>
       <div>
         {#if $tab?.property?.testflowSchedule?.state?.scheduleNavigator === TestflowScheduleNavigatorEnum.TEST_RESULTS}
-          <TestResults />
+          <TestResults {schedule} />
         {:else if $tab?.property?.testflowSchedule?.state?.scheduleNavigator === TestflowScheduleNavigatorEnum.CONFIGURATION}
           <Configurations />
         {/if}

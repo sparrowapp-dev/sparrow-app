@@ -8,6 +8,7 @@
   // Component
   import { TestflowScheduleExplorer } from "@sparrow/workspaces/features";
   import { user } from "@app/store/auth.store";
+  import { testflowSchedules } from "@sparrow/common/store";
 
   /**
    * folder tab document
@@ -31,6 +32,30 @@
   let testflowObserver;
   let testflowSubscriber;
   let testflow;
+
+  let testflowScheduleStoreMap;
+
+  let testflowScheduleStore;
+
+  testflowSchedules.subscribe((_testflowScheduleStoreMap) => {
+    if (_testflowScheduleStoreMap) {
+      testflowScheduleStoreMap = _testflowScheduleStoreMap;
+    }
+  });
+
+  let schedule;
+
+  $: {
+    testflowScheduleStore = testflowScheduleStoreMap?.get(
+      tab?.path?.testflowId,
+    );
+    schedule = testflowScheduleStore?.find((schedule) => {
+      if (schedule.id === tab?.id) {
+        return true;
+      }
+    });
+  }
+
   $: {
     if (tab) {
       if (prevTabId !== tab?.tabId) {
@@ -39,6 +64,7 @@
            * @description - Initialize the view model for the new http request tab
            */
           _viewModel = new TestFlowScheduleExplorerPage(tab);
+          testflowScheduleStore = testflowScheduleStoreMap?.get(tab?.id);
           testflowObserver = _viewModel.getTestflowObserver(
             tab?.path?.testflowId as string,
           );
@@ -57,5 +83,7 @@
 <TestflowScheduleExplorer
   tab={_viewModel.tab}
   {testflow}
+  {schedule}
   onUpdateScheduleState={_viewModel.updateScheduleState}
+  onScheduleRun={_viewModel.runTestflowSchedule}
 />

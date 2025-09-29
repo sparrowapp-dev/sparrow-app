@@ -73,13 +73,10 @@ class InitTestflowScheduleTab {
     return this;
   }
   public updatePath(_path: Path) {
-    this._tab.path = _path;
-    return this;
-  }
-  public updateTestflowScheduleId(_id: string) {
-    if (_id && this._tab.property.testflowSchedule) {
-      this._tab.property.testflowSchedule.scheduleId = _id;
-    }
+    this._tab.path = {
+      ...this._tab.path,
+      ..._path
+    };
     return this;
   }
   public updateState(_state: any) {

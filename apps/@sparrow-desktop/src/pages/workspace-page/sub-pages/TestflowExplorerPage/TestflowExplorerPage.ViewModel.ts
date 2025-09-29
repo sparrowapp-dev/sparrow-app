@@ -1807,9 +1807,9 @@ export class TestflowExplorerPageViewModel {
     }
   };
 
-  public openTestflowScheduleTab = async () => {
+  public openTestflowScheduleTab = async (_schedule) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    const initTestflowScheduleTab = new InitTestflowScheduleTab("asif",progressiveTab.path.workspaceId).updateTestflowId(progressiveTab.id).getValue();
+    const initTestflowScheduleTab = new InitTestflowScheduleTab(_schedule.id,progressiveTab.path.workspaceId).updatePath({testflowId: progressiveTab.id}).getValue();
     await this.tabRepository.createTab(initTestflowScheduleTab);
   };
 
