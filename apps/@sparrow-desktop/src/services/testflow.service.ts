@@ -36,10 +36,10 @@ export class TestflowService {
     return response;
   };
 
-  public fetchTestflow = async (_workspaceId: string, _testflowId: string) => {
+  public fetchTestflow = async (_testflowId: string) => {
     const response = await makeRequest(
       "GET",
-      `${this.apiUrl}/api/workspace/${_workspaceId}/testflow/${_testflowId}`,
+      `${this.apiUrl}/api/workspace/testflow/${_testflowId}`,
       { headers: getAuthHeaders() },
     );
     return response;
@@ -110,6 +110,20 @@ export class TestflowService {
     const response = await makeRequest(
       "DELETE",
       `${baseUrl}/api/workspace/${workspaceId}/testflow/${_testflowId}`,
+      { headers: getAuthHeaders() },
+    );
+    return response;
+  };
+
+  public runTestflowSchedule = async (
+    workspaceId: string,
+    _testflowId: string,
+    _scheduleId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/workspace/${workspaceId}/testflow/${_testflowId}/schedule/${_scheduleId}/run`,
       { headers: getAuthHeaders() },
     );
     return response;

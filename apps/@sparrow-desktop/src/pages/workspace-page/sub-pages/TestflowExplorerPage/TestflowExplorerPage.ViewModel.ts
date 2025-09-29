@@ -68,6 +68,7 @@ import { ReduceAuthHeader } from "@sparrow/workspaces/features/rest-explorer/uti
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 import { getAuthJwt, getSelfhostUrls } from "@app/utils/jwt";
 import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
+import { updateTestflowSchedules } from "@sparrow/common/store";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -102,6 +103,7 @@ export class TestflowExplorerPageViewModel {
         delete t.isActive;
         delete t.index;
         this.tab = t;
+        this.fetchTestflow();
       }, 0);
     }
   }
@@ -156,6 +158,21 @@ export class TestflowExplorerPageViewModel {
     this.tab = progressiveTab;
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareTestflowWithServer();
+  };
+
+  /**
+   * Updates the nodes in the testflow with debounce to avoid frequent calls
+   * @param _nodes - nodes of the testflow
+   */
+  private fetchTestflow = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const response = await this.testflowService.fetchTestflow(
+      progressiveTab.id as string,
+    );
+    if (response?.isSuccessful) {
+      const schedules = response.data.data.schedules;
+      updateTestflowSchedules(progressiveTab.id as string, schedules);
+    }
   };
 
   /**
@@ -1794,12 +1811,14 @@ export class TestflowExplorerPageViewModel {
     }
   };
 
-  public openTestflowScheduleTab = async () => {
+  public openTestflowScheduleTab = async (_schedule) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const initTestflowScheduleTab = new InitTestflowScheduleTab(
-      "asif",
+      _schedule.id,
       progressiveTab.path.workspaceId,
-    ).getValue();
+    )
+      .updatePath({ testflowId: progressiveTab.id })
+      .getValue();
     await this.tabRepository.createTab(initTestflowScheduleTab);
   };
 
