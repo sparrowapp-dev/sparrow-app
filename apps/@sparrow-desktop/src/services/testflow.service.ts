@@ -114,6 +114,20 @@ export class TestflowService {
     return response;
   };
 
+  public runTestflowSchedule = async (
+    workspaceId: string,
+    _testflowId: string,
+    _scheduleId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/workspace/${workspaceId}/testflow/${_testflowId}/schedule/${_scheduleId}/run`,
+      { headers: getAuthHeaders() },
+    );
+    return response;
+  };
+
   public scheduleTestFlowRun = async (payload: {
     name: string;
     environmentId: string;

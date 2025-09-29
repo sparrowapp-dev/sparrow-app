@@ -26,12 +26,15 @@ import { notifications } from "@sparrow/library/ui";
 import { getSelfhostUrls } from "@app/utils/jwt";
 import type { TestflowScheduleStateDto } from "@sparrow/common/types/workspace/testflow-schedule-tab";
 import { TestflowRepository } from "@app/repositories/testflow.repository";
+import { TestflowService } from "@app/services/testflow.service";
+import { updateTestflowSchedules } from "@sparrow/common/store";
 // import { InitRequestTab } from "@sparrow/common/utils";
 
 class MockHistoryExplorerPage {
   private tabRepository = new TabRepository();
   private workspaceRepository = new WorkspaceRepository();
   private testflowRepository = new TestflowRepository();
+  private testflowService = new TestflowService();
 
 
   private _tab: BehaviorSubject<Tab> = new BehaviorSubject({});
@@ -42,6 +45,7 @@ class MockHistoryExplorerPage {
     delete t.index;
     t.persistence = TabPersistenceTypeEnum.PERMANENT;
     this.tab = t;
+    this.getTestflow();
   }
 
   public get tab(): Observable<Tab> {
@@ -82,6 +86,20 @@ class MockHistoryExplorerPage {
   };
 
   /**
+   * Get workspace data through workspace id
+   * @param workspaceId - id of workspace
+   * @returns - workspace document
+   */
+  public getTestflow = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const response =  await this.testflowService?.fetchTestflow(progressiveTab.path.testflowId);
+     if(response?.isSuccessful){
+      const schedules = response.data.data.schedules;
+      updateTestflowSchedules(progressiveTab?.path?.testflowId as string, schedules);
+    }
+  };
+
+  /**
    *
    * @param _state - request state
    */
@@ -94,6 +112,18 @@ class MockHistoryExplorerPage {
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
+
+  public runTestflowSchedule = async() => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+     const baseUrl = await this.constructBaseUrl(
+        progressiveTab.path.workspaceId,
+      );
+    const response = await this.testflowService.runTestflowSchedule(progressiveTab.path.workspaceId, progressiveTab.path.testflowId, progressiveTab.id, baseUrl);
+    if(response?.isSuccessful){
+      const schedules = response.data.data.schedules;
+      updateTestflowSchedules(progressiveTab?.path?.testflowId as string, schedules);
+    }
+  }
 }
 
 export default MockHistoryExplorerPage;
