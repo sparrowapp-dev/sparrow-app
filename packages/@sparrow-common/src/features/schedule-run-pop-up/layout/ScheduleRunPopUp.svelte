@@ -19,6 +19,7 @@
   let scheduleName = "";
   let selectedEnvironment = "";
   let isError = false;
+  let isScheduling = false;
 
   // Run Configuration
   let selectedCycle = "Once"; // Once, Daily, Hourly, Weekly
@@ -28,7 +29,7 @@
   // Hourly specific variables
   const hourOptions = ["1h", "6h", "12h", "24h"];
   const hourValues = [1, 6, 12, 24];
-  let selectedHours = 2;
+  let selectedHours = 1;
   let hourlyProgressStep = 1; // Default to 2h (index 1)
 
   // Weekly specific variables
@@ -36,13 +37,13 @@
 
   // Week days data
   const weekDays = [
-    { label: "Mon", value: "monday" },
-    { label: "Tue", value: "tuesday" },
-    { label: "Wed", value: "wednesday" },
-    { label: "Thu", value: "thursday" },
-    { label: "Fri", value: "friday" },
-    { label: "Sat", value: "saturday" },
-    { label: "Sun", value: "sunday" },
+    { label: "Mon", value: "monday", dayNumber: 1 },
+    { label: "Tue", value: "tuesday", dayNumber: 2 },
+    { label: "Wed", value: "wednesday", dayNumber: 3 },
+    { label: "Thu", value: "thursday", dayNumber: 4 },
+    { label: "Fri", value: "friday", dayNumber: 5 },
+    { label: "Sat", value: "saturday", dayNumber: 6 },
+    { label: "Sun", value: "sunday", dayNumber: 0 },
   ];
 
   // Set default schedule name when component loads or testflow name changes
@@ -52,7 +53,7 @@
 
   // Set default time
   $: if (!selectedTime) {
-    selectedTime = "16:00";
+    selectedTime = "12:00";
   }
 
   $: formattedEnvironments = environments.map((env) => ({
@@ -96,14 +97,16 @@
     return `${hour12}:${minute} ${period}`;
   }
 
-  const formatScheduleText = () => {
-    if (!formattedDate || !selectedTime) return "";
-
-    const date = parseDateString(formattedDate);
-    const [hours, minutes] = selectedTime.split(":");
-    date.setHours(parseInt(hours), parseInt(minutes));
-
-    const options = {
+  const formatScheduleText = (
+    dateStr: string,
+    timeStr: string,
+    cycle: string,
+  ) => {
+    if (!dateStr || !timeStr) return "";
+    const date = parseDateString(dateStr);
+    const [hours, minutes] = timeStr.split(":");
+    date.setHours(parseInt(hours, 10), parseInt(minutes, 10));
+    const options: Intl.DateTimeFormatOptions = {
       month: "short",
       day: "numeric",
       year: "numeric",
@@ -111,8 +114,16 @@
       minute: "2-digit",
       hour12: true,
     };
-    return `Run ${selectedCycle.toLowerCase()} on ${date.toLocaleDateString("en-US", options)}`;
+    return `${cycle.toLowerCase()} on ${date.toLocaleDateString("en-US", options)}`;
   };
+
+  // reactive declaration that uses the values explicitly so Svelte tracks them
+  $: schedulePreviewText = formatScheduleText(
+    formattedDate,
+    selectedTime,
+    selectedCycle,
+  );
+
   // Format date string for use with custom DatePicker
   function formatDateString(date: Date): string {
     if (!date) return "";
@@ -207,11 +218,11 @@
   }
 
   // Notification settings
-  let notificationPreference: "failure" | "all" = "failure";
+  let notificationPreference: "failure" | "every_time" = "failure";
 
   // Handle notification preference change
   function handleNotificationPrefChange(event: { target?: { value: string } }) {
-    notificationPreference = event.target.value as "failure" | "all";
+    notificationPreference = event.target.value as "failure" | "every_time";
   }
 
   // Add function to format date for API
@@ -233,47 +244,46 @@
 
   // Add schedule run handler
   async function handleScheduleRun() {
-    // Format date and time according to cycle type
-    let executeAt = "";
-    let weekDays;
-    let hourInterval;
+    isScheduling = true;
+    // Create runConfiguration object based on cycle type
+    let runConfiguration = {
+      runCycle: selectedCycle.toLowerCase(),
+    };
 
     switch (selectedCycle.toLowerCase()) {
       case "once":
-        executeAt = formatDateForAPI(formattedDate, selectedTime);
+        // For once, we only need executeAt
+        runConfiguration.executeAt = formatDateForAPI(
+          formattedDate,
+          selectedTime,
+        );
         break;
       case "daily":
-        // For daily, we use the time part with today's date
-        executeAt = formatDateForAPI(
-          formatDateString(new Date()),
-          selectedTime,
-        );
+        // For daily, we need time
+        runConfiguration.time = selectedTime;
         break;
       case "weekly":
-        // For weekly, we need weekDays and time
-        weekDays = selectedWeekDays;
-        executeAt = formatDateForAPI(
-          formatDateString(new Date()),
-          selectedTime,
-        );
+        // For weekly, we need days
+        runConfiguration.days = selectedWeekDays
+          .map((dayValue) => {
+            const day = weekDays.find((d) => d.value === dayValue);
+            return day ? day.dayNumber : undefined;
+          })
+          .filter((day) => day !== undefined);
+        runConfiguration.time = selectedTime;
+        break;
         break;
       case "hourly":
-        // For hourly, we need the hour interval
-        hourInterval = selectedHours;
-        executeAt = new Date().toISOString();
+        // For hourly, we need the interval hours
+        runConfiguration.intervalHours = selectedHours;
         break;
     }
 
-    // Call the viewModel method
+    // Call the handler with the properly formatted data
     const result = await handleScheduleTestFlowRun(
       scheduleName,
       selectedEnvironment,
-      {
-        runCycle: selectedCycle.toLowerCase(),
-        executeAt,
-        weekDays,
-        hourInterval,
-      },
+      runConfiguration,
       {
         emails: notificationEmails,
         receiveNotifications: notificationPreference,
@@ -283,6 +293,7 @@
     if (result?.isSuccessful) {
       isScheduleRunPopupOpen = false;
     }
+    isScheduling = false;
   }
 </script>
 
@@ -292,7 +303,7 @@
     <div class="form-group mb-3">
       <label
         class="form-label text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium mb-2"
-        style="color: var(--text-ds-neutral-100);"
+        style="color: var(--text-ds-neutral-200);"
       >
         Schedule Name <span style="color: var(--text-ds-danger-300);">*</span>
       </label>
@@ -318,8 +329,8 @@
     <!-- Environment Select -->
     <div class="form-group mb-4">
       <label
-        class="form-label text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium mb-2"
-        style="color: var(--text-ds-neutral-100);"
+        class="form-label text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-medium mb-2"
+        style="color: var(--text-ds-neutral-200);"
       >
         Select Environment
       </label>
@@ -335,20 +346,25 @@
         data={formattedEnvironments}
         titleId={selectedEnvironment}
         onclick={handleEnvironmentSelect}
-        variant="primary"
         size="medium"
         minHeaderWidth="100%"
         placeholderText="Select environment"
         menuItem="v2"
         showDescription={false}
+        bodyTheme={"violet"}
+        headerTheme={"violet2"}
+        variant={"tertiary"}
       />
     </div>
+    <div
+      style="height: 1px; background-color: var(--bg-ds-surface-100); margin: 20px 0;"
+    ></div>
 
     <!-- Run Configuration -->
     <div class="form-group mb-4">
       <label
-        class="form-label text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium mb-2"
-        style="color: var(--text-ds-neutral-100);"
+        class="form-label text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-medium mb-2"
+        style="color: var(--text-ds-neutral-300);"
       >
         Run Configuration
       </label>
@@ -357,7 +373,7 @@
       <div class="mb-3">
         <label
           class="form-label text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium mb-2"
-          style="color: var(--text-ds-neutral-100);"
+          style="color: var(--text-ds-neutral-200);"
         >
           Run Cycle <span style="color: var(--text-ds-danger-300);">*</span>
         </label>
@@ -386,6 +402,7 @@
                 bind:value={formattedDate}
                 placeholder="Select date"
                 disabled={false}
+                minDate={new Date()}
               />
             </div>
           </div>
@@ -404,15 +421,12 @@
         </div>
         <!-- Schedule Preview -->
         {#if selectedDate && selectedTime}
-          <div
-            class="schedule-preview p-2 mb-3"
-            style="background-color: var(--bg-ds-tertiary-500); border-radius: 4px; border: 1px solid var(--border-ds-default);"
-          >
-            <p
-              class="text-ds-font-size-12 mb-0"
-              style="color: var(--text-ds-neutral-200);"
-            >
-              {formatScheduleText()}
+          <div class="schedule-preview mb-3" style="">
+            <p class="text-ds-font-size-12 mb-0">
+              <span style="color: var(--text-ds-neutral-300);">Run</span>
+              <span style="color: var(--text-ds-neutral-50);">
+                {schedulePreviewText}</span
+              >
             </p>
           </div>
         {/if}
@@ -435,12 +449,12 @@
 
         <!-- Daily schedule preview -->
         {#if selectedTime}
-          <div class="schedule-preview p-2 mb-3">
-            <p
-              class="text-ds-font-size-12 mb-0"
-              style="color: var(--text-ds-neutral-200);"
-            >
-              Run everyday at {formatTimeDisplay(selectedTime)}
+          <div class="schedule-preview mb-3">
+            <p class="text-ds-font-size-12 mb-0">
+              <span style="color: var(--text-ds-neutral-300);">Run</span>
+              <span style="color: var(--text-ds-neutral-50);">
+                everyday at {formatTimeDisplay(selectedTime)}</span
+              >
             </p>
           </div>
         {/if}
@@ -476,12 +490,12 @@
 
         <!-- Hourly schedule preview -->
         {#if selectedHours}
-          <div class="schedule-preview p-2 mb-3">
-            <p
-              class="text-ds-font-size-12 mb-0"
-              style="color: var(--text-ds-neutral-200);"
-            >
-              Run every {selectedHours} hour{selectedHours > 1 ? "s" : ""}
+          <div class="schedule-preview mb-3">
+            <p class="text-ds-font-size-12 mb-0">
+              <span style="color: var(--text-ds-neutral-300);">Run</span>
+              <span style="color: var(--text-ds-neutral-50);">
+                every {selectedHours} hour{selectedHours > 1 ? "s" : ""}</span
+              >
             </p>
           </div>
         {/if}
@@ -529,24 +543,27 @@
 
         <!-- Weekly schedule preview -->
         {#if selectedWeekDays.length > 0 && selectedTime}
-          <div class="schedule-preview p-2 mb-3">
-            <p
-              class="text-ds-font-size-12 mb-0"
-              style="color: var(--text-ds-neutral-200);"
-            >
-              Run every {formatWeekDays(selectedWeekDays)} at {formatTimeDisplay(
-                selectedTime,
-              )}
+          <div class="schedule-preview mb-3">
+            <p class="text-ds-font-size-12 mb-0">
+              <span style="color: var(--text-ds-neutral-300);">Run</span>
+              <span style="color: var(--text-ds-neutral-50);">
+                every {formatWeekDays(selectedWeekDays)} at {formatTimeDisplay(
+                  selectedTime,
+                )}
+              </span>
             </p>
           </div>
         {/if}
       {/if}
     </div>
+    <div
+      style="height: 1px; background-color: var(--bg-ds-surface-100); margin: 20px 0;"
+    ></div>
     <!-- Notifications Section -->
     <div class="form-group mb-4">
       <label
         class="form-label text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium mb-2"
-        style="color: var(--text-ds-neutral-100);"
+        style="color: var(--text-ds-neutral-300);"
       >
         Notifications
       </label>
@@ -565,25 +582,26 @@
       </div>
     </div>
 
-    <label class="form-label text-ds-font-size-14 mb-3">
-      Receive Notifications
-    </label>
-    <div class="notification-preferences">
-      <RadioButton
-        id="notification-failure"
-        name="notification-preference"
-        value="failure"
-        group={notificationPreference}
-        labelText="On Failure Only"
-        handleChange={handleNotificationPrefChange}
-        buttonSize="medium"
-      />
+    <!-- Notification Preferences -->
+    <div class="form-group mb-4">
+      <label class="form-label text-ds-font-size-14 mb-2">
+        Receive Notifications
+      </label>
+      <div class="radio-options-row">
+        <RadioButton
+          id="notification-failure"
+          name="notification-preference"
+          value="failure"
+          group={notificationPreference}
+          labelText="On Failure Only"
+          handleChange={handleNotificationPrefChange}
+          buttonSize="medium"
+        />
 
-      <div class="mt-3">
         <RadioButton
           id="notification-all"
           name="notification-preference"
-          value="all"
+          value="every_time"
           group={notificationPreference}
           labelText="On Every Run (Success/Failure)"
           handleChange={handleNotificationPrefChange}
@@ -605,7 +623,7 @@
       }}
     />
     <Button
-      title="Schedule Run"
+      title={isScheduling ? "Scheduling.." : "Schedule Run"}
       type="primary"
       onClick={handleScheduleRun}
       disable={!scheduleName.trim() ||
@@ -614,24 +632,19 @@
         (selectedCycle === "Hourly" && !selectedHours) ||
         (selectedCycle === "Weekly" &&
           (selectedWeekDays.length === 0 || !selectedTime))}
+      loader={isScheduling}
     />
   </div>
 </div>
 
 <style lang="scss">
-  .notifications-section {
-    margin-top: 24px;
-
-    .form-label {
-      color: var(--text-ds-neutral-100);
-      font-weight: 500;
-    }
-
-    .notification-preferences {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
+  .radio-options-row {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    flex-direction: row;
+    width: 100%;
+    margin-top: 4px;
   }
 
   .hourly-selector {
@@ -648,7 +661,7 @@
   }
 
   .interval-label {
-    color: var(--text-ds-neutral-100);
+    color: var(--text-ds-neutral-200);
     font-size: 14px;
     white-space: nowrap;
   }
@@ -692,10 +705,10 @@
   .form-label {
     display: block;
     margin-bottom: 8px;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 500;
     line-height: 1.3;
-    color: var(--text-ds-neutral-100);
+    color: var(--text-ds-neutral-200);
   }
 
   .helper-text {
@@ -746,11 +759,7 @@
     }
   }
   .schedule-preview {
-    border-radius: 4px;
-    padding: 12px;
     margin-top: 16px;
-    background-color: rgba(29, 33, 43, 0.5);
-    border: 1px solid var(--border-ds-default);
   }
 
   .weekly-selector {

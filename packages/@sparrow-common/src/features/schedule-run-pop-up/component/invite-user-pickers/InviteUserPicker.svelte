@@ -255,7 +255,7 @@
         <input
           id="input"
           placeholder={!emailstoBeSentArr.length
-            ? "Enter email ID or name of hub member."
+            ? "Enter recipient emails (comma-separated)"
             : ""}
           autocomplete="off"
           autocapitalize="none"

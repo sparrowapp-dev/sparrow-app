@@ -110,6 +110,7 @@
   import { RequestTabTestsTourContent } from "@sparrow/workspaces/features";
   import { ScheduleRunPopUp } from "@sparrow/common/features";
   import TestflowScheduleExplorerPage from "./sub-pages/TestflowScheduleExplorerPage/TestflowScheduleExplorerPage.svelte";
+  import { WorkspaceEnvironmentTypeBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -1822,8 +1823,11 @@
     testFlowName={$activeTab?.name}
     workspaceUsers={currentWOrkspaceValue?._data?.users || []}
     environments={environmentsValues?.filter(
-      (env) => env.workspaceId === currentWOrkspaceValue?._id,
+      (env) =>
+        env.workspaceId === currentWOrkspaceValue?._id &&
+        env.type !== WorkspaceEnvironmentTypeBaseEnum.GLOBAL,
     ) || []}
+    handleScheduleTestFlowRun={_viewModel3.scheduleTestFlowRun}
   />
 </Modal>
 
