@@ -8,3 +8,4 @@ export * from "./workspace.enum";
 export * from "./platform.enum"
 export * from "./response.enum";
 export * from "./plan-type.enum";
+export * from "./testResults.enum"
