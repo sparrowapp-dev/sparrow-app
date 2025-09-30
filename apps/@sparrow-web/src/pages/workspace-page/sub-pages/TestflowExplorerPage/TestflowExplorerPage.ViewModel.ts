@@ -18,6 +18,7 @@ import { TabRepository } from "../../../../repositories/tab.repository";
 import { TestflowRepository } from "../../../../repositories/testflow.repository";
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import { TestflowService } from "../../../../services/testflow.service";
+import { v4 as uuidv4 } from "uuid";
 import {
   RequestDataTypeEnum,
   type HttpRequestCollectionLevelAuthTabInterface,
@@ -67,6 +68,7 @@ import { TeamService } from "src/services/team.service";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 import { getAuthJwt } from "src/utils/jwt";
 import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
+import { InitTab } from "@sparrow/common/factory";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -84,6 +86,7 @@ export class TestflowExplorerPageViewModel {
   private compareArray = new CompareArray();
   private environmentService = new EnvironmentService();
   private teamService = new TeamService();
+  private initTab = new InitTab();
   /**
    * Utils
    */
@@ -1854,7 +1857,18 @@ export class TestflowExplorerPageViewModel {
       if (response.isSuccessful) {
         notifications.success(`New schedule created successfully.`);
         const schedules = response.data.data.schedules;
+        const schedular = response.data.data.schedular;
+        const testflow = response.data.data.testflow;
         updateTestflowSchedules(progressiveTab.id as string, schedules);
+        const schedularData = {
+          scheduleId: schedular.id,
+          scheduleName: schedular.name,
+        };
+        this.handleCreateTestflowSingleScheduleTab(
+          schedularData,
+          workspaceId,
+          testflow._id,
+        );
         return {
           isSuccessful: true,
           data: response.data,
@@ -1878,5 +1892,25 @@ export class TestflowExplorerPageViewModel {
         message: error.message || "Error scheduling test flow run",
       };
     }
+  };
+
+  public handleCreateTestflowSingleScheduleTab = (
+    scheduleDetails: { scheduleId: string; scheduleName: string },
+    _workspaceId: string,
+    testflowId: string,
+  ) => {
+    const newTabId = uuidv4();
+    const initTestflowSingleScheduleTab = this.initTab.testflowScheduleRun(
+      newTabId,
+      _workspaceId,
+    );
+    initTestflowSingleScheduleTab.setName(scheduleDetails.scheduleName);
+    initTestflowSingleScheduleTab.updatePath({
+      workspaceId: _workspaceId,
+    });
+    initTestflowSingleScheduleTab.setScheduleId(scheduleDetails.scheduleId);
+    initTestflowSingleScheduleTab.setScheduleName(scheduleDetails.scheduleName);
+    initTestflowSingleScheduleTab.setScheduleTestflowId(testflowId);
+    this.tabRepository.createTab(initTestflowSingleScheduleTab.getValue());
   };
 }

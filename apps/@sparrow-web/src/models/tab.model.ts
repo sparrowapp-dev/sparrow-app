@@ -414,37 +414,37 @@ export const tabSchemaLiteral = {
                 },
               },
             },
-            tests:{
+            tests: {
               type: "object",
               properties: {
                 testCaseMode: {
                   type: "string",
                 },
                 noCode: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        id: {
-                          type: "string",
-                        },
-                        name: {
-                          type: "string",
-                        },
-                        condition: {
-                          type: "string",
-                        },
-                        expectedResult: {
-                          type: "string",
-                        },
-                        testPath: {
-                          type: "string",
-                        },
-                        testTarget: {
-                          type: "string",
-                        },
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: {
+                        type: "string",
+                      },
+                      name: {
+                        type: "string",
+                      },
+                      condition: {
+                        type: "string",
+                      },
+                      expectedResult: {
+                        type: "string",
+                      },
+                      testPath: {
+                        type: "string",
+                      },
+                      testTarget: {
+                        type: "string",
                       },
                     },
+                  },
                 },
                 script: {
                   type: "string",
@@ -634,11 +634,11 @@ export const tabSchemaLiteral = {
             isGeneratedVariable: {
               type: "boolean",
             },
-            isRequestTestsNoCodeDemoCompleted:{
-              type:"boolean"
+            isRequestTestsNoCodeDemoCompleted: {
+              type: "boolean",
             },
-            isRequestTestsScriptDemoCompleted: { 
-              type: "boolean" 
+            isRequestTestsScriptDemoCompleted: {
+              type: "boolean",
             },
           },
         },
@@ -1709,6 +1709,190 @@ export const tabSchemaLiteral = {
               type: "string",
             },
           },
+        },
+        testflowScheduleRun: {
+          type: "object",
+          properties: {
+            scheduleId: { type: "string" },
+            scheduleName: { type: "string" },
+            testflowId: { type: "string" },
+            state: {
+              type: "object",
+              properties: {
+                scheduleNavigator: {
+                  type: "string",
+                  enum: ["test_results", "configuration"],
+                  default: "test_results",
+                },
+              },
+              required: ["scheduleNavigator"],
+            },
+            testresult: {
+              type: "array",
+              default: [],
+              items: {
+                type: "object",
+                properties: {
+                  d: { type: "string" },
+                  nodes: {
+                    type: "array",
+                    default: [],
+                    items: {
+                      type: "object",
+                      properties: {
+                        id: { type: "string" },
+                        type: { type: "string" },
+                        data: {
+                          type: "object",
+                          properties: {
+                            blockName: { type: "string" },
+                            workspaceId: { type: "string" },
+                            collectionId: { type: "string" },
+                            folderId: { type: "string" },
+                            requestId: { type: "string" },
+                            requestData: {
+                              type: "object",
+                              properties: requestItems,
+                            },
+                            isDeleted: { type: "boolean" },
+                          },
+                        },
+                        position: {
+                          type: "object",
+                          properties: {
+                            x: { type: "number" },
+                            y: { type: "number" },
+                          },
+                          required: ["x", "y"],
+                        },
+                      },
+                    },
+                  },
+                  edges: {
+                    type: "array",
+                    default: [],
+                    items: {
+                      type: "object",
+                      properties: {
+                        id: { type: "string" },
+                        source: { type: "string" },
+                        target: { type: "string" },
+                      },
+                      required: ["id", "source", "target"],
+                    },
+                  },
+                  result: {
+                    type: "object",
+                    properties: {
+                      failedRequests: { type: "number" },
+                      requests: {
+                        type: "array",
+                        items: {
+                          type: "object",
+                          properties: {
+                            method: { type: "string" },
+                            name: { type: "string" },
+                            status: { type: "string" },
+                            time: { type: "string" },
+                            errorMessage: { type: "string" },
+                            error: { type: "string" },
+                          },
+                        },
+                      },
+                      status: { type: "string" },
+                      successRequests: { type: "number" },
+                      totalTime: { type: "string" },
+                    },
+                  },
+                },
+                required: ["nodes", "edges", "result"],
+              },
+            },
+          },
+          required: [
+            "scheduleId",
+            "scheduleName",
+            "testflowId",
+            "state",
+            "testresult",
+          ],
+        },
+        testflowScheduleRunView: {
+          type: "object",
+          properties: {
+            nodes: {
+              type: "array",
+              default: [],
+              items: {
+                type: "object",
+                properties: {
+                  id: { type: "string" },
+                  type: { type: "string" },
+                  data: {
+                    type: "object",
+                    properties: {
+                      blockName: { type: "string" },
+                      workspaceId: { type: "string" },
+                      collectionId: { type: "string" },
+                      folderId: { type: "string" },
+                      requestId: { type: "string" },
+                      requestData: {
+                        type: "object",
+                        properties: requestItems,
+                      },
+                      isDeleted: { type: "boolean" },
+                    },
+                  },
+                  position: {
+                    type: "object",
+                    properties: {
+                      x: { type: "number" },
+                      y: { type: "number" },
+                    },
+                    required: ["x", "y"],
+                  },
+                },
+                required: ["id", "type", "data", "position"],
+              },
+            },
+            edges: {
+              type: "array",
+              default: [],
+              items: {
+                type: "object",
+                properties: {
+                  id: { type: "string" },
+                  source: { type: "string" },
+                  target: { type: "string" },
+                },
+                required: ["id", "source", "target"],
+              },
+            },
+            result: {
+              type: "object",
+              properties: {
+                failedRequests: { type: "number" },
+                requests: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      method: { type: "string" },
+                      name: { type: "string" },
+                      status: { type: "string" },
+                      time: { type: "string" },
+                      errorMessage: { type: "string" },
+                      error: { type: "string" },
+                    },
+                  },
+                },
+                status: { type: "string" },
+                successRequests: { type: "number" },
+                totalTime: { type: "string" },
+              },
+            },
+          },
+          required: ["nodes", "edges", "testresult"],
         },
       },
     },

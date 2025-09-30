@@ -75,6 +75,7 @@
   import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
   import GraphqlExplorerPage from "./sub-pages/GraphqlExplorerPage/GraphqlExplorerPage.svelte";
   import { GraphqlRequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
+  import TestflowScheduleRunExplorePage from "./sub-pages/TestflowScheduleRunExplorerPage/TestflowScheduleRunExplorePage.svelte";
   import constants from "src/constants/constants";
   import {
     isExpandCollection,
@@ -1084,6 +1085,12 @@
                     <Motion {...scaleMotionProps} let:motion>
                       <div class="h-100">
                         <MockHistoryExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.TESTFLOW_SCHEDULE_RUN}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100">
+                        <TestflowScheduleRunExplorePage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.HUB}
