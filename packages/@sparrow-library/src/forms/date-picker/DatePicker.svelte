@@ -10,6 +10,9 @@
   export let value: string = "";
   export let placeholder: string = "Select date";
   export let disabled: boolean = false;
+  // New props for min/max dates
+  export let minDate: Date | string = null;
+  export let maxDate: Date | string = null;
 
   let showCalendar = false;
   let currentMonth = new Date();
@@ -21,6 +24,57 @@
   let showAbove = false;
   let isInvalid = false;
   let internalValue = value; // Track internal value for validation
+
+  // Process min/max dates
+  let minDateObj: Date | null = null;
+  let maxDateObj: Date | null = null;
+
+  // Process minDate/maxDate when they change
+  $: {
+    if (minDate) {
+      minDateObj =
+        minDate instanceof Date ? minDate : parseDate(minDate as string);
+    }
+
+    if (maxDate) {
+      maxDateObj =
+        maxDate instanceof Date ? maxDate : parseDate(maxDate as string);
+    }
+  }
+
+  // Function to check if a date is disabled (outside min/max range)
+  function isDateDisabled(date: Date): boolean {
+    if (!date) return false;
+
+    // Reset time components for consistent comparison
+    const dateToCheck = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+    );
+
+    // Check minDate constraint
+    if (minDateObj) {
+      const minToCompare = new Date(
+        minDateObj.getFullYear(),
+        minDateObj.getMonth(),
+        minDateObj.getDate(),
+      );
+      if (dateToCheck < minToCompare) return true;
+    }
+
+    // Check maxDate constraint
+    if (maxDateObj) {
+      const maxToCompare = new Date(
+        maxDateObj.getFullYear(),
+        maxDateObj.getMonth(),
+        maxDateObj.getDate(),
+      );
+      if (dateToCheck > maxToCompare) return true;
+    }
+
+    return false;
+  }
 
   const months = [
     "January",
@@ -48,6 +102,8 @@
 
   // Parse date from string in format "DD-MM-YYYY"
   function parseDate(dateStr: string): Date | null {
+    if (!dateStr) return null;
+
     // Validate format using regex (DD-MM-YYYY)
     const regex = /^(\d{2})-(\d{2})-(\d{4})$/;
     const match = dateStr.match(regex);
@@ -73,7 +129,7 @@
     return date;
   }
 
-  // Handle manual input
+  // Handle manual input - updated to check min/max
   function handleInput(event: Event) {
     const target = event.target as HTMLInputElement;
     internalValue = target.value;
@@ -88,6 +144,12 @@
     // Try to parse the date
     const date = parseDate(internalValue);
     if (date) {
+      // Check min/max constraints
+      if (isDateDisabled(date)) {
+        isInvalid = true;
+        return;
+      }
+
       // Valid date - update state
       isInvalid = false;
       value = internalValue;
@@ -101,7 +163,7 @@
     }
   }
 
-  // Handle blur event to format date
+  // Handle blur event to format date - updated for min/max
   function handleBlur() {
     if (!internalValue.trim()) {
       isInvalid = false;
@@ -137,6 +199,12 @@
       }
 
       if (date && !isNaN(date.getTime())) {
+        // Check if repaired date is within min/max range
+        if (isDateDisabled(date)) {
+          internalValue = value || ""; // Revert to last valid value
+          return;
+        }
+
         selectedDay = date.getDate();
         selectedMonth = date.getMonth();
         selectedYear = date.getFullYear();
@@ -183,15 +251,18 @@
         day: prevMonthDays - i,
         isCurrentMonth: false,
         isPrevMonth: true,
+        isDisabled: true,
       });
     }
 
     // Current month days
     for (let day = 1; day <= daysInMonth; day++) {
+      const currentDate = new Date(year, month, day);
       days.push({
         day,
         isCurrentMonth: true,
         isPrevMonth: false,
+        isDisabled: isDateDisabled(currentDate),
       });
     }
 
@@ -203,6 +274,7 @@
         day: nextMonthDay++,
         isCurrentMonth: false,
         isPrevMonth: false,
+        isDisabled: true,
       });
     }
 
@@ -212,15 +284,17 @@
   $: days = getDaysInMonth(currentMonth);
 
   function handleDateSelect(dayObj) {
-    if (dayObj.isCurrentMonth) {
-      selectedDay = dayObj.day;
-      selectedMonth = currentMonth.getMonth();
-      selectedYear = currentMonth.getFullYear();
-      value = formatDate(selectedDay, selectedMonth, selectedYear);
-      internalValue = value;
-      isInvalid = false;
-      showCalendar = false;
+    if (!dayObj.isCurrentMonth || dayObj.isDisabled) {
+      return; // Don't select disabled or non-current month days
     }
+
+    selectedDay = dayObj.day;
+    selectedMonth = currentMonth.getMonth();
+    selectedYear = currentMonth.getFullYear();
+    value = formatDate(selectedDay, selectedMonth, selectedYear);
+    internalValue = value;
+    isInvalid = false;
+    showCalendar = false;
   }
 
   function navigateMonth(direction: number) {
@@ -233,6 +307,12 @@
 
   function handleToday() {
     const today = new Date();
+
+    // Check if today is within min/max range
+    if (isDateDisabled(today)) {
+      return;
+    }
+
     currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     selectedDay = today.getDate();
     selectedMonth = today.getMonth();
@@ -254,14 +334,24 @@
     if (disabled) return;
 
     if (!showCalendar) {
-      const inputRect = inputRef.getBoundingClientRect();
-      const estimatedCalendarHeight = 350;
-      const windowHeight = window.innerHeight;
-      const spaceBelow = windowHeight - inputRect.bottom;
+      // Pre-calculate days for current month before showing calendar
+      if (!days || days.length === 0) {
+        days = getDaysInMonth(currentMonth);
+      }
 
-      showAbove = spaceBelow < estimatedCalendarHeight + 10;
       showCalendar = true;
-      setTimeout(checkPosition, 10);
+
+      // Use requestAnimationFrame instead of setTimeout for smoother transitions
+      requestAnimationFrame(() => {
+        if (inputRef) {
+          const inputRect = inputRef.getBoundingClientRect();
+          const windowHeight = window.innerHeight;
+          const spaceBelow = windowHeight - inputRect.bottom;
+          const estimatedCalendarHeight = 350;
+
+          showAbove = spaceBelow < estimatedCalendarHeight + 10;
+        }
+      });
     } else {
       showCalendar = false;
     }
@@ -371,17 +461,20 @@
           <button
             type="button"
             class="calendar-day
-              {dayObj.isCurrentMonth ? '' : 'calendar-day-other'}
-              {dayObj.isCurrentMonth &&
+        {dayObj.isCurrentMonth ? '' : 'calendar-day-hidden'} 
+        {dayObj.isCurrentMonth &&
             dayObj.day === selectedDay &&
             currentMonth.getMonth() === selectedMonth &&
             currentMonth.getFullYear() === selectedYear
               ? 'calendar-day-selected'
+              : ''}
+        {dayObj.isDisabled && dayObj.isCurrentMonth
+              ? 'calendar-day-disabled'
               : ''}"
             on:click={() => handleDateSelect(dayObj)}
-            disabled={!dayObj.isCurrentMonth}
+            disabled={!dayObj.isCurrentMonth || dayObj.isDisabled}
           >
-            {dayObj.day}
+            {dayObj.isCurrentMonth ? dayObj.day : ""}
           </button>
         {/each}
       </div>
@@ -410,6 +503,10 @@
 </div>
 
 <style lang="scss">
+  .calendar-day-hidden {
+    visibility: hidden;
+    pointer-events: none;
+  }
   .date-picker-container {
     position: relative;
     width: 100%;
@@ -591,6 +688,11 @@
   .calendar-day-other {
     color: #6b7280;
     cursor: default;
+  }
+
+  .calendar-day-disabled {
+    opacity: 0.4;
+    cursor: not-allowed !important;
   }
 
   .calendar-footer {

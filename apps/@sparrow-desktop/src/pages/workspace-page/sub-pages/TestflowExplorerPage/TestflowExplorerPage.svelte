@@ -299,7 +299,13 @@
 </script>
 
 {#if render}
-  <button on:click={_viewModel.openTestflowScheduleTab}> Schedule </button>
+  {#if testflowScheduleStore}
+    {#each testflowScheduleStore as schedule}
+      <div on:click={() => _viewModel.openTestflowScheduleTab(schedule)}>
+        {schedule.name}
+      </div>
+    {/each}
+  {/if}
   <TestflowExplorer
     bind:isScheduleRunPopupOpen
     tab={_viewModel.tab}
@@ -363,7 +369,9 @@
     testFlowName={tab?.name}
     workspaceUsers={currentWorkspace?._data?.users || []}
     environments={$environments?.filter(
-      (env) => env.workspaceId === currentWorkspaceId,
+      (env) =>
+        env.workspaceId === currentWorkspaceId &&
+        env.type !== environmentType.GLOBAL,
     ) || []}
     handleScheduleTestFlowRun={_viewModel.scheduleTestFlowRun}
   />

@@ -1,6 +1,7 @@
 import { getAuthHeaders, makeRequest } from "@app/containers/api/api.common";
 import constants from "@app/constants/constants";
 import { getSelfhostUrls } from "@app/utils/jwt";
+import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
 
 export class TestflowService {
   constructor() {
@@ -114,25 +115,27 @@ export class TestflowService {
     return response;
   };
 
-  public scheduleTestFlowRun = async (payload: {
-    name: string;
-    environmentId: string;
-    workspaceId: string;
-    testflowId: string;
-    runConfiguration: {
-      runCycle: string;
-      executeAt: string;
-      weekDays?: string[];
-      hourInterval?: number;
-    };
-    notification: {
-      emails: string[];
-      receiveNotifications: string;
-    };
-  }) => {
+  public runTestflowSchedule = async (
+    workspaceId: string,
+    _testflowId: string,
+    _scheduleId: string,
+    baseUrl: string,
+  ) => {
     const response = await makeRequest(
       "POST",
-      `${this.apiUrl}/api/workspace/create-testflow-schedule`,
+      `${baseUrl}/api/workspace/${workspaceId}/testflow/${_testflowId}/schedule/${_scheduleId}/run`,
+      { headers: getAuthHeaders() },
+    );
+    return response;
+  };
+
+  public scheduleTestFlowRun = async (
+    payload: ScheduleTestFlowRunDto,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/workspace/create-testflow-schedule`,
       {
         body: payload,
         headers: getAuthHeaders(),

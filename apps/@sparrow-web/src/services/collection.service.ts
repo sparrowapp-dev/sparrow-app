@@ -66,6 +66,7 @@ import type {
   HttpResponseRatiosMockUpdatePayloadDtoInterface,
 } from "@sparrow/common/types/workspace/http-response-mock-dto";
 import type { GeneratedVariable } from "@sparrow/common/dto";
+import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
 
 export class CollectionService {
   constructor() {}
@@ -1048,6 +1049,21 @@ export class CollectionService {
           workspaceId: `${workspaceId}`,
           generatedeVariables: generatedeVariables,
         },
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public scheduleTestFlowRun = async (
+    payload: ScheduleTestFlowRunDto,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/workspace/create-testflow-schedule`,
+      {
+        body: payload,
         headers: getAuthHeaders(),
       },
     );

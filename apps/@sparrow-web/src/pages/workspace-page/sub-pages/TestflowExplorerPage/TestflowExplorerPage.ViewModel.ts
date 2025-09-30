@@ -66,6 +66,7 @@ import { PlanRepository } from "@app/repositories/plan.repository";
 import { TeamService } from "src/services/team.service";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 import { getAuthJwt } from "src/utils/jwt";
+import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -1811,6 +1812,71 @@ export class TestflowExplorerPageViewModel {
     if (selectAuthHeader) {
       const response = new ReduceAuthHeader(selectAuthHeader, authContent);
       return response.getValue();
+    }
+  };
+
+  /**
+   * Schedules a test flow run with the specified configuration
+   */
+  public scheduleTestFlowRun = async (
+    scheduleName: string,
+    environmentId: string,
+    runConfiguration: ScheduleTestFlowRunDto["runConfiguration"],
+    notification: ScheduleTestFlowRunDto["notification"],
+  ) => {
+    try {
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path.workspaceId,
+      );
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const workspaceId = progressiveTab.path.workspaceId;
+      const testflowId = progressiveTab.id;
+
+      if (!workspaceId || !testflowId) {
+        notifications.error("Missing workspace or testflow information");
+        return { isSuccessful: false, message: "Missing required information" };
+      }
+
+      const payload: ScheduleTestFlowRunDto = {
+        name: scheduleName,
+        environmentId: environmentId || "",
+        workspaceId,
+        testflowId,
+        runConfiguration,
+        notification,
+      };
+
+      const response = await this.testflowService.scheduleTestFlowRun(
+        payload,
+        baseUrl,
+      );
+
+      if (response.isSuccessful) {
+        notifications.success(`New schedule created successfully.`);
+        const schedules = response.data.data.schedules;
+        updateTestflowSchedules(progressiveTab.id as string, schedules);
+        return {
+          isSuccessful: true,
+          data: response.data,
+        };
+      } else {
+        notifications.error(
+          `Failed to schedule test flow: ${
+            response.message || "Unknown error"
+          }`,
+        );
+        return {
+          isSuccessful: false,
+          message: response.message || "Failed to schedule test flow",
+        };
+      }
+    } catch (error) {
+      Sentry.captureException(error);
+      notifications.error("Error scheduling test flow run");
+      return {
+        isSuccessful: false,
+        message: error.message || "Error scheduling test flow run",
+      };
     }
   };
 }

@@ -347,7 +347,10 @@
     testFlowName={tab?.name}
     workspaceUsers={currentWorkspace?._data?.users || []}
     environments={$environments?.filter(
-      (env) => env.workspaceId === currentWorkspaceId,
+      (env) =>
+        env.workspaceId === currentWorkspaceId &&
+        env.type !== environmentType.GLOBAL,
     ) || []}
+    handleScheduleTestFlowRun={_viewModel.scheduleTestFlowRun}
   />
 </Modal>
