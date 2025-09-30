@@ -1,16 +1,17 @@
 import { getAuthHeaders, makeRequest } from "@app/containers/api/api.common";
 import constants from "@app/constants/constants";
 import { getSelfhostUrls } from "@app/utils/jwt";
+import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
 
 export class TestflowService {
-  constructor() {    const [selfhostBackendUrl] = getSelfhostUrls();
-        if (selfhostBackendUrl) {
-            this.apiUrl = selfhostBackendUrl;
-        }
-        else{
-            this.apiUrl = constants.API_URL;
-        }
+  constructor() {
+    const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+      this.apiUrl = selfhostBackendUrl;
+    } else {
+      this.apiUrl = constants.API_URL;
     }
+  }
 
   private apiUrl: string = constants.API_URL;
 
@@ -35,10 +36,10 @@ export class TestflowService {
     return response;
   };
 
-  public fetchTestflow = async (_workspaceId: string, _testflowId: string) => {
+  public fetchTestflow = async (_testflowId: string) => {
     const response = await makeRequest(
       "GET",
-      `${this.apiUrl}/api/workspace/${_workspaceId}/testflow/${_testflowId}`,
+      `${this.apiUrl}/api/workspace/testflow/${_testflowId}`,
       { headers: getAuthHeaders() },
     );
     return response;
@@ -110,6 +111,35 @@ export class TestflowService {
       "DELETE",
       `${baseUrl}/api/workspace/${workspaceId}/testflow/${_testflowId}`,
       { headers: getAuthHeaders() },
+    );
+    return response;
+  };
+
+  public runTestflowSchedule = async (
+    workspaceId: string,
+    _testflowId: string,
+    _scheduleId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/workspace/${workspaceId}/testflow/${_testflowId}/schedule/${_scheduleId}/run`,
+      { headers: getAuthHeaders() },
+    );
+    return response;
+  };
+
+  public scheduleTestFlowRun = async (
+    payload: ScheduleTestFlowRunDto,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/workspace/create-testflow-schedule`,
+      {
+        body: payload,
+        headers: getAuthHeaders(),
+      },
     );
     return response;
   };

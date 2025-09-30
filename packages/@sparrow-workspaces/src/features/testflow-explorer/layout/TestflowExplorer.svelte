@@ -146,6 +146,9 @@
   export let onChangeSeletedAuthValue: () => any;
   export let isGuestUser = false;
   export let collectionListDocument: CollectionDocument[];
+  export let isScheduleRunPopupOpen;
+  export let testflowScheduleStore;
+
   let planContent: any;
   let planContentNonActive: any;
   let selectedAuthHeader: any;
@@ -1550,36 +1553,48 @@
         </div>
       {/if}
       <div class="run-btn" style="margin-right: 5px; position:relative;">
-        {#if isRunButtonEnabled}
-          {#if testflowStore?.isTestFlowRunning}
-            <Button
-              type="secondary"
-              size="medium"
-              startIcon={StopFilled}
-              title={"Stop Flow"}
-              onClick={onClickStop}
-            />
-          {:else}
-            <div id="testflow-run-button">
+        <div class="d-flex" style="gap: 8px;">
+          {#if isRunButtonEnabled}
+            {#if testflowStore?.isTestFlowRunning}
               <Button
-                type="primary"
+                type="secondary"
                 size="medium"
-                startIcon={PlayFilled}
-                title="Run"
-                onClick={async () => {
-                  unselectNodes();
-                  await onClickRun();
-                  const startingNode = handleSelectFirstNode();
-                  if (startingNode) {
-                    selectNode(startingNode);
-                  }
-                  MixpanelEvent(Events.Run_TestFlows);
-                  handleEventOnRunBlocks();
-                }}
+                startIcon={StopFilled}
+                title={"Stop Flow"}
+                onClick={onClickStop}
               />
-            </div>
+            {:else}
+              <div id="testflow-run-button">
+                <Button
+                  type="primary"
+                  size="medium"
+                  startIcon={PlayFilled}
+                  title="Run Now"
+                  onClick={async () => {
+                    unselectNodes();
+                    await onClickRun();
+                    const startingNode = handleSelectFirstNode();
+                    if (startingNode) {
+                      selectNode(startingNode);
+                    }
+                    MixpanelEvent(Events.Run_TestFlows);
+                    handleEventOnRunBlocks();
+                  }}
+                />
+              </div>
+            {/if}
           {/if}
-        {/if}
+          <Button
+            type="secondary"
+            size="medium"
+            title="Schedule Run"
+            style="margin-left: 0;"
+            buttonType="button"
+            onClick={() => {
+              isScheduleRunPopupOpen = true;
+            }}
+          />
+        </div>
 
         {#if $isTestFlowTourGuideOpen && $currentStep == 6}
           <div style="position:absolute; top:50px; right:350px">

@@ -1,100 +1,100 @@
-<script>
+<script lang="ts">
   import { Tag } from "@sparrow/library/ui";
-  import { TestResults } from "@sparrow/common/enums";
   import { ArrowSortRegular } from "@sparrow/library/icons";
+  import { ThreeDotIcon } from "@sparrow/library/icons";
+  export let schedule;
 
-  let results = [
-    {
-      time: "Sep 19, 2025 at 10:00 PM",
-      type: "Schedule Run",
-      status: TestResults.COMPLETED,
-      total: "3 Requests",
-      result: { passed: 1, failed: 2, latency: "110 ms" },
-    },
-    {
-      time: "Sep 19, 2025 at 8:00 PM",
-      type: "Schedule Run",
-      status: TestResults.COMPLETED,
-      total: "3 Requests",
-      result: { passed: 0, failed: 3, latency: "110 ms" },
-    },
-    {
-      time: "Sep 19, 2025 at 6:00 PM",
-      type: "Schedule Run",
-      status: TestResults.COMPLETED,
-      total: "3 Requests",
-      result: { passed: 2, failed: 1, latency: "110 ms" },
-    },
-    {
-      time: "Sep 19, 2025 at 12:00 PM",
-      type: "Schedule Run",
-      status: TestResults.ERROR,
-    },
-  ];
+  function formatDate(dateStr: string) {
+  const date = new Date(dateStr);
+  const options: Intl.DateTimeFormatOptions = { 
+    month: "short", 
+    day: "numeric", 
+    year: "numeric" 
+  };
+  const datePart = date.toLocaleDateString("en-US", options);
+  let hours = date.getHours();
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const ampm = hours >= 12 ? "pm" : "am";
+  hours = hours % 12 || 12;
+
+  return `${datePart} at ${hours}:${minutes} ${ampm}`;
+}
 </script>
 
-<div class="content-wrapper">
-  <div class="table-container">
-    <table class="custom-table">
-      <thead>
-        <tr>
-          <th>Run Time</th>
-          <th class="icon-col">
-            <ArrowSortRegular size="20px" />
-          </th>
-          <th>Status</th>
-          <th>Total Requests</th>
-          <th>Result</th>
-        </tr>
-      </thead>
-      <tbody>
-        {#each results as r}
+<!-- {#each schedule?.schedularRunHistory as result}
+<div>
+  {result?.createdAt} - {result?.status} = success: {result?.successRequests}
+  , failed: {result?.failedRequests}
+</div>
+{/each} -->
+
+{#if schedule?.schedularRunHistory}
+  <div class="content-wrapper">
+    <div class="table-container">
+      <table class="custom-table">
+        <thead>
           <tr>
-            <td>
-              <div class="time-cell">
-                <span>{r.time}</span>
-                <span class="sub-text">{r.type}</span>
-              </div>
-            </td>
+            <th>Run Time</th>
+            <th class="icon-col">
+              <ArrowSortRegular size="20px" />
+            </th>
+            <th>Status</th>
+            <th>Total Requests</th>
+            <th>Result</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each schedule?.schedularRunHistory as r}
+            <tr>
+              <td>
+                <div class="time-cell">
+                  <span>{formatDate(r.createdAt)}</span>
+                  <span class="sub-text">{r.type}</span>
+                </div>
+              </td>
 
-            <!-- Empty cells for the icon column -->
-            <td></td>
+              <!-- Empty cells for the icon column -->
+              <td></td>
 
-            <td>
-              <div style="display: flex; justify-content: center;">
-                {#if r.status === TestResults.COMPLETED}
-                  <Tag text={r.status} type="green" endIcon={null} />
-                {:else if r.status === TestResults.ERROR}
-                  <Tag text={r.status} type="orange" endIcon={null} />
-                {/if}
-              </div>
-            </td>
-
-            <td>{r.total ? `${r.total}` : ""}</td>
-
-            <td>
-              <div style="display: flex; justify-content: center; gap:8px;">
-                {#if r.result}
+              <td>
+                <div style="display: flex; justify-content: center;">
                   <Tag
-                    text={`${r.result.passed} Passed`}
+                    text={r.status === "pass" ? "Completed" : "Error"}
                     type="green"
                     endIcon={null}
                   />
-                  <Tag
-                    text={`${r.result.failed} Failed`}
-                    type="orange"
-                    endIcon={null}
-                  />
-                  <span>{r.result.latency}</span>
-                {/if}
-              </div>
-            </td>
-          </tr>
-        {/each}
-      </tbody>
-    </table>
+                </div>
+              </td>
+
+              <td>{Number(r.successRequests) + Number(r.failedRequests)}</td>
+
+              <td>
+                <div style="display: flex; justify-content: center; gap:8px;">
+                  {#if r.result}
+                    <Tag
+                      text={`${r.successRequests} Passed`}
+                      type="green"
+                      endIcon={null}
+                    />
+                    <Tag
+                      text={`${r.failedRequests} Failed`}
+                      type="orange"
+                      endIcon={null}
+                    />
+                  {/if}
+                </div>
+              </td>
+              <td>
+                <ThreeDotIcon width="16px" height="16px"/>
+              </td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
+{/if}
 
 <style lang="scss">
   .content-wrapper {
@@ -121,7 +121,6 @@
 
     thead {
       color: var(--text-secondary-200);
-      text-transform: uppercase;
     }
 
     th,

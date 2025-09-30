@@ -108,7 +108,9 @@
   } from "@sparrow/workspaces/features";
   import { RequestTabTourGuide } from "@sparrow/workspaces/features";
   import { RequestTabTestsTourContent } from "@sparrow/workspaces/features";
+  import { ScheduleRunPopUp } from "@sparrow/common/features";
   import TestflowScheduleExplorerPage from "./sub-pages/TestflowScheduleExplorerPage/TestflowScheduleExplorerPage.svelte";
+  import { WorkspaceEnvironmentTypeBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -156,6 +158,8 @@
   let environmentsValues;
   let currentWOrkspaceValue: Observable<WorkspaceDocument>;
   const externalSparrowGithub = constants.SPARROW_GITHUB;
+
+  let isScheduleRunPopupOpen: boolean = false;
 
   const environmentsSubscriber = environments.subscribe((value) => {
     if (value) {
@@ -846,6 +850,7 @@
         <WorkspaceActions
           bind:scrollList
           bind:userRole
+          bind:isScheduleRunPopupOpen
           userCount={totalTeamCount}
           {refreshWorkspace}
           {refreshLoad}
@@ -1802,6 +1807,30 @@
     />
   </div>
 </Modal>
+
+<Modal
+  title="Set Schedule Run"
+  type="dark"
+  width="35%"
+  zIndex={1000}
+  isOpen={isScheduleRunPopupOpen}
+  handleModalState={() => {
+    isScheduleRunPopupOpen = false;
+  }}
+>
+  <ScheduleRunPopUp
+    bind:isScheduleRunPopupOpen
+    testFlowName={$activeTab?.name}
+    workspaceUsers={currentWOrkspaceValue?._data?.users || []}
+    environments={environmentsValues?.filter(
+      (env) =>
+        env.workspaceId === currentWOrkspaceValue?._id &&
+        env.type !== WorkspaceEnvironmentTypeBaseEnum.GLOBAL,
+    ) || []}
+    handleScheduleTestFlowRun={_viewModel3.scheduleTestFlowRun}
+  />
+</Modal>
+
 <PlanUpgradeModal
   bind:isOpen={upgradePlanModel}
   title={planContent?.title}
