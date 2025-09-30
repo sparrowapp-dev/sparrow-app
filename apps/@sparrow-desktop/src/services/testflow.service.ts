@@ -116,15 +116,61 @@ export class TestflowService {
   };
 
   public runTestflowSchedule = async (
-    workspaceId: string,
+    _workspaceId: string,
     _testflowId: string,
     _scheduleId: string,
     baseUrl: string,
   ) => {
     const response = await makeRequest(
       "POST",
-      `${baseUrl}/api/workspace/${workspaceId}/testflow/${_testflowId}/schedule/${_scheduleId}/run`,
+      `${baseUrl}/api/workspace/${_workspaceId}/testflow/${_testflowId}/schedule/${_scheduleId}/run`,
       { headers: getAuthHeaders() },
+    );
+    return response;
+  };
+
+  public deleteScheduleRunHistory = async (
+    _workspaceId: string,
+    _testflowId: string,
+    _scheduleId: string,
+    _runHistoryId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${baseUrl}/api/workspace/${_workspaceId}/testflow/${_testflowId}/schedule/${_scheduleId}/run-history/${_runHistoryId}`,
+      { headers: getAuthHeaders() },
+    );
+    return response;
+  };
+
+  public deleteTestflowSchedule = async (
+    workspaceId: string,
+    _testflowId: string,
+    _scheduleId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${baseUrl}/api/workspace/${workspaceId}/testflow/${_testflowId}/schedule/${_scheduleId}`,
+      { headers: getAuthHeaders() },
+    );
+    return response;
+  };
+
+  public updateTestflowSchedule = async (
+    workspaceId: string,
+    _testflowId: string,
+    _scheduleId: string,
+    _schedule: any,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "PUT",
+      `${baseUrl}/api/workspace/${workspaceId}/testflow/${_testflowId}/schedule/${_scheduleId}`,
+      {
+        body: _schedule,
+        headers: getAuthHeaders() },
     );
     return response;
   };
