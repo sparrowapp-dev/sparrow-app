@@ -27,3 +27,4 @@ export * from "./alert";
 export * from "./progress-bar";
 export * from "./border-animation";
 export * from "./step-progress-bar";
+export * from "./pagination";

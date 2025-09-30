@@ -299,7 +299,7 @@
 </script>
 
 {#if render}
-  {#if testflowScheduleStore}
+  <!-- {#if testflowScheduleStore}
     {#each testflowScheduleStore as schedule}
       <div>
         <button
@@ -334,7 +334,7 @@
         </button>
       </div>
     {/each}
-  {/if}
+  {/if} -->
   <TestflowExplorer
     bind:isScheduleRunPopupOpen
     tab={_viewModel.tab}
@@ -380,6 +380,7 @@
     {selectiveRunTestflow}
     handleContactSales={_viewModel.handleContactSales}
     onChangeSeletedAuthValue={_viewModel.parseAuthHeader}
+    onOpenTestflowScheduleTab={_viewModel.openTestflowScheduleTab}
   />
 {/if}
 
