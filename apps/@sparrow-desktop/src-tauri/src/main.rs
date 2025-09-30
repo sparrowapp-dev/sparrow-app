@@ -715,7 +715,7 @@ async fn connect_websocket(
     }
 
     // Split the WebSocket stream into read and write halves
-    let (write, mut read) = ws_stream.split();
+    let (mut write, mut read) = ws_stream.split();
 
     let (tx, mut rx) = mpsc::unbounded_channel::<String>();
 
@@ -732,81 +732,103 @@ async fn connect_websocket(
 
     let svelte_tabid = tabid.clone();
     let app_handle_clone = app_handle.clone();
-
-    // Clone write handle for ping task
-    let write_clone = Arc::new(Mutex::new(write));
-    let write_for_ping = write_clone.clone();
-
-    // Spawn ping task for keep-alive
-    let mut disconnect_rx_ping = disconnect_rx;
     tokio::spawn(async move {
-        let mut ping_interval = interval(TokioDuration::from_secs(30)); // Send ping every 30 seconds
-        
+        tokio::select! {
+            _ = disconnect_rx => {
+                // Handle manual disconnection
+                println!("WebSocket connection manually closed for tab: {}", svelte_tabid);
+            }
+            _ = async {
+                while let Some(message) = read.next().await {
+                    match message {
+                        Ok(msg) => {
+                            match msg {
+                                Message::Text(text) => {
+                                    let event = format!("ws_message_{}", svelte_tabid);
+                                    let payload = json!({
+                                        "type": "message",
+                                        "data": text,
+                                    });
+                                    app_handle_clone.emit(event.as_str(), payload).unwrap();
+                                }
+                                Message::Close(close_frame) => {
+                                    // Handle server disconnection
+                                    let event = format!("ws_message_{}", svelte_tabid);
+                                    let close_reason = close_frame
+                                        .as_ref()
+                                        .map(|frame| frame.reason.to_string())
+                                        .unwrap_or("No reason provided".to_string());
+
+                                    println!(
+                                        "Server closed WebSocket connection for tab: {}, reason: {}",
+                                        svelte_tabid,
+                                        close_reason
+                                    );
+
+                                    let payload = json!({
+                                        "type": "disconnect",
+                                        "data": close_reason,
+                                    });
+                                    app_handle_clone.emit(event.as_str(), payload).unwrap();
+                                    break;
+                                }
+                                _ => {}
+                            }
+                        }
+                        Err(err) => {
+                            // Handle errors (like connection reset, etc.)
+                            let event = format!("ws_message_{}", svelte_tabid);
+                            let error_message = format!("WebSocket error: {}", err);
+                            println!("Error for tab {}: {}", svelte_tabid, error_message);
+
+                            let payload = json!({
+                                "type": "disconnect",
+                                "data": error_message,
+                            });
+                            app_handle_clone.emit(event.as_str(), payload).unwrap();
+                            break;
+                        }
+                    }
+                }
+            } => {}
+        }
+    });
+
+    
+    // Create a channel for ping messages
+    let (ping_tx, mut ping_rx) = mpsc::unbounded_channel::<()>();
+    
+    // Spawn ping task
+    let ping_tx_clone = ping_tx.clone();
+    tokio::spawn(async move {
+        let mut ping_interval = interval(Duration::from_secs(30)); // Send ping every 30 seconds
+        loop {
+            ping_interval.tick().await;
+            if ping_tx_clone.send(()).is_err() {
+                // Channel closed, exit
+                break;
+            }
+        }
+    });
+
+    tokio::spawn(async move {
         loop {
             tokio::select! {
-                _ = ping_interval.tick() => {
-                    let mut write_guard = write_for_ping.lock().await;
-                    // Break out of PING Interval in case of server error
-                    if let Err(_e) = write_guard.send(Message::Ping(vec![])).await {
+                Some(msg) = rx.recv() => {
+                    if let Err(e) = write.send(Message::Text(msg)).await {
+                        eprintln!("Failed to send message: {}", e);
                         break;
                     }
                 }
-                _ = &mut disconnect_rx_ping => {
-                    break;
-                }
-            }
-        }
-    });
-
-    // Spawn a dedicated task to handle incoming messages from the WebSocket server
-    // This task continuously reads from the WebSocket stream and processes different message types:
-    // - Text messages: forwarded to the UI via Tauri events
-    // - Close messages: handles graceful server disconnections
-    // - Error conditions: handles connection failures and protocol errors
-    tokio::spawn(async move {
-        while let Some(message) = read.next().await {
-            match message {
-                Ok(msg) => {
-                    match msg {
-                        Message::Text(text) => {
-                            let event = format!("ws_message_{}", svelte_tabid);
-                            let payload = json!({
-                                "type": "message",
-                                "data": text,
-                            });
-                            app_handle_clone.emit(event.as_str(), payload).unwrap();
-                        }
-                        _ => {}
+                Some(_) = ping_rx.recv() => {
+                    // Send ping message
+                    if let Err(e) = write.send(Message::Ping(vec![])).await {
+                        eprintln!("Failed to send ping: {}", e);
+                        break;
                     }
                 }
-                Err(err) => {
-                    // Handle errors (like connection reset, etc.)
-                    let event = format!("ws_message_{}", svelte_tabid);
-                    let error_message = format!("WebSocket error: {}", err);
-                    println!("Error for tab {}: {}", svelte_tabid, error_message);
-
-                    let payload = json!({
-                        "type": "disconnect",
-                        "data": error_message,
-                    });
-                    app_handle_clone.emit(event.as_str(), payload).unwrap();
-                    break;
-                }
+                else => break,
             }
-        }
-    });
-
-    // Spawn a dedicated task to handle outgoing messages from the UI to the WebSocket server
-    // This task listens for messages sent via the `send_websocket_message` command and forwards them to the WebSocket
-    let write_for_send = write_clone.clone();
-    tokio::spawn(async move {
-        while let Some(msg) = rx.recv().await {
-            let mut write_guard = write_for_send.lock().await;
-            write_guard
-                .send(Message::Text(msg))
-                .await
-                .map_err(|e| format!("Failed to send message: {}", e))
-                .unwrap();
         }
     });
 
