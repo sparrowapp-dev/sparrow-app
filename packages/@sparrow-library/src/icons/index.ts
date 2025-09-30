@@ -59,6 +59,7 @@ export { default as CleanerIcon } from "./Cleaner.svelte";
 export { default as SocketIcon } from "./Socket.svelte";
 export { default as StackFilled } from "./StackFilled.svelte";
 export { default as Dropdown } from "./Dropdown.svelte";
+export { default as Clock } from "./ClockIcon.svelte";
 export { default as ArrowOutwardIcon } from "./ArrowOutward.svelte";
 export { default as ArrowInsertIcon } from "./ArrowInsert.svelte";
 export { default as SuccessInfoIcon } from "./SuccessInfo.svelte";

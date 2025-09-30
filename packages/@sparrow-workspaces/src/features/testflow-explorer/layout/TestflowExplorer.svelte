@@ -55,7 +55,7 @@
     PlayFilled,
     RunIcon,
     StopFilled,
-    Dropdown,
+    Clock,
   } from "@sparrow/library/icons";
   import { Button, Modal, notifications } from "@sparrow/library/ui";
   import { BroomRegular } from "@sparrow/library/icons";
@@ -384,13 +384,7 @@
     searchQuery = event.target.value;
   }
 
-  function handleScheduleAction(id, action) {
-    console.log(`Action ${action} for schedule ${id}`);
-    // Handle schedule actions
-  }
-
   function handleToggleStatus(id, isActive) {
-    // Update the store directly
     testflowScheduleStore = testflowScheduleStore.map((schedule) => {
       if (schedule.id === id) {
         return {
@@ -402,15 +396,6 @@
       return schedule;
     });
   }
-  // Add these function stubs for the new functionality
-  function onClickScheduledRun() {
-    // Handle scheduled run logic
-  }
-
-  function onScheduleRun() {
-    // Handle schedule run button
-  }
-
   const createBlankRequestObject = (
     _url: string,
     _method: string,
@@ -1418,33 +1403,6 @@
     }
   });
 
-  let openDropdownId = null;
-
-  function handleAction(scheduleId, action, event) {
-    event.stopPropagation();
-    openDropdownId = null;
-
-    switch (action) {
-      case "run":
-        console.log("Running schedule:", scheduleId);
-        // Add your run logic here
-        break;
-      case "edit":
-        console.log("Editing schedule:", scheduleId);
-        // Add your edit logic here
-        break;
-      case "delete":
-        console.log("Deleting schedule:", scheduleId);
-        // Add your delete logic here
-        break;
-    }
-  }
-
-  // Close dropdown when clicking outside
-  function handleClickOutside() {
-    openDropdownId = null;
-  }
-
   /**
    * Updates the active tab inside the Request Body section.
    * @param tab - The tab to update.
@@ -1720,8 +1678,6 @@
     }
   }
 
-  // let searchQuery = "";
-
   // Pagination state
   let currentPage = 1;
   let itemsPerPage = 10;
@@ -1754,8 +1710,6 @@
     currentPage = 1; // Reset to first page
   };
 </script>
-
-<svelte:window on:click={handleClickOutside} />
 
 <div
   class="h-100 d-flex flex-column position-relative"
@@ -1858,17 +1812,6 @@
           </div>
         {/if}
       </div>
-
-      <!-- {#if activeTab === "scheduled"}
-        <div style="margin-right: 5px;">
-          <Button
-            type="secondary"
-            size="medium"
-            title="Schedule Run"
-            onClick={onScheduleRun}
-          />
-        </div>
-      {/if} -->
 
       <div style="margin-right: 5px;">
         <Tooltip title="Clear Response" placement="bottom-center" size="small">
@@ -2162,7 +2105,8 @@
             <!-- Empty State -->
             {#if filteredSchedules.length === 0}
               <div class="empty-state text-center py-5">
-                <p class="text-muted">No schedules found</p>
+                <Clock />
+                <p class="text-costum">No results found</p>
               </div>
             {/if}
           </div>
@@ -2506,6 +2450,11 @@
   .tab-button.tab-active {
     color: var(--text-ds-neutral-50);
     border-bottom-color: var(--border-primary-400);
+  }
+
+  .text-costum {
+    font-weight: 400;
+    color: var(--text-ds-neutral-400);
   }
 
   .btn-close-warning {
