@@ -111,6 +111,7 @@
   import { ScheduleRunPopUp } from "@sparrow/common/features";
   import TestflowScheduleExplorerPage from "./sub-pages/TestflowScheduleExplorerPage/TestflowScheduleExplorerPage.svelte";
   import { WorkspaceEnvironmentTypeBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
+  import { getClientUser } from "@app/utils/jwt";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -121,6 +122,8 @@
     _viewModel.getActiveWorkspace();
   let collectionList: Observable<CollectionDocument[]> =
     _viewModel.getCollectionList();
+
+  const userEmail = getClientUser().email;
 
   let totalTeamCount: number | undefined = 0;
 
@@ -1828,6 +1831,7 @@
         env.type !== WorkspaceEnvironmentTypeBaseEnum.GLOBAL,
     ) || []}
     handleScheduleTestFlowRun={_viewModel3.scheduleTestFlowRun}
+    creatorEmail={userEmail}
   />
 </Modal>
 

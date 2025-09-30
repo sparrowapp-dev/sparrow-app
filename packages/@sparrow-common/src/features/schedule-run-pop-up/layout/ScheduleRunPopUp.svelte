@@ -14,6 +14,7 @@
   export let workspaceUsers = [];
   export let environments = [];
   export let handleScheduleTestFlowRun;
+  export let creatorEmail;
 
   // Form data
   let scheduleName = "";
@@ -577,6 +578,7 @@
             id="schedule-notification-emails"
             currentWorkspaceUsers={[]}
             onChange={handleNotificationEmailsChange}
+            defaultEmail={creatorEmail}
           />
         </div>
       </div>
