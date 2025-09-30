@@ -16,6 +16,7 @@ export interface TFScheduleRunTabItemType {
   scheduleId: string;
   scheduleName: string;
   testflowId: string;
+  testflowName:string;
   state: TestflowScheduleRunStateDto;
   testresult: TestFlowScheduleRunResultItem[];
 }

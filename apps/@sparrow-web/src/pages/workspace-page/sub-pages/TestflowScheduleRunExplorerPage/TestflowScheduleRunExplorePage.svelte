@@ -5,9 +5,37 @@
   import type { TabDocument } from "src/database/database";
 
   export let tab: TabDocument;
+  let _viewModel: any;
+  let prevTabId = "";
+  let prevTabName = "";
+  let userId = "";
 
+  user.subscribe((value) => {
+    if (value) {
+      userId = value._id;
+    }
+  });
+
+  $: {
+    if (tab) {
+      if (prevTabId !== tab?.tabId) {
+        // Initialize new view model
+        _viewModel = new TestflowScheduleRunExplorePage(tab);
+      } else if (tab?.name && prevTabName !== tab.name) {
+        // handle tab name change if needed
+      }
+      prevTabName = tab?.name || "";
+      prevTabId = tab?.tabId || "";
+    }
+  }
 </script>
 
 <div>
-  <p style="color: azure;">This is Single Schedular page.</p>
+  {#if _viewModel}
+    <TestflowScheduleRunExplorer
+      tab={_viewModel.tab}
+      onUpdateScheduleState={_viewModel.updateScheduleState}
+      onScheduleRun={_viewModel.runTestflowSingleSchedule}
+    />
+  {/if}
 </div>

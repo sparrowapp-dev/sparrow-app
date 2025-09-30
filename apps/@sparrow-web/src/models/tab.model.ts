@@ -1716,6 +1716,7 @@ export const tabSchemaLiteral = {
             scheduleId: { type: "string" },
             scheduleName: { type: "string" },
             testflowId: { type: "string" },
+            testflowName:{ type: "string" },
             state: {
               type: "object",
               properties: {

@@ -37,6 +37,7 @@ class InitTestflowScheduleRun {
           scheduleId: "",
           scheduleName: "",
           testflowId: "",
+          testflowName:"",
           state: {
             scheduleNavigator: TestflowScheduleRunNavigatorEnum.TEST_RESULTS,
           },
@@ -108,6 +109,13 @@ class InitTestflowScheduleRun {
       this._tab.property.testflowScheduleRun.testflowId = testflowId;
     }
   }
+
+  public setScheduleTestflowName(testflowName: string): void {
+    if (this._tab?.property?.testflowScheduleRun) {
+      this._tab.property.testflowScheduleRun.testflowName = testflowName;
+    }
+  }
+
   public setScheduleTestResult(
     testresult: TestFlowScheduleRunResultItem[],
   ): void {

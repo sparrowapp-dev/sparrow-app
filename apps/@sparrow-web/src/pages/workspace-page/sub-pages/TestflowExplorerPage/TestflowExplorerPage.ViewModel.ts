@@ -1859,7 +1859,7 @@ export class TestflowExplorerPageViewModel {
         const schedules = response.data.data.schedules;
         const schedular = response.data.data.schedular;
         const testflow = response.data.data.testflow;
-        updateTestflowSchedules(progressiveTab.id as string, schedules);
+        // updateTestflowSchedules(progressiveTab.id as string, schedules);
         const schedularData = {
           scheduleId: schedular.id,
           scheduleName: schedular.name,
@@ -1868,6 +1868,7 @@ export class TestflowExplorerPageViewModel {
           schedularData,
           workspaceId,
           testflow._id,
+          testflow.name
         );
         return {
           isSuccessful: true,
@@ -1898,6 +1899,7 @@ export class TestflowExplorerPageViewModel {
     scheduleDetails: { scheduleId: string; scheduleName: string },
     _workspaceId: string,
     testflowId: string,
+    testflowName:string,
   ) => {
     const newTabId = uuidv4();
     const initTestflowSingleScheduleTab = this.initTab.testflowScheduleRun(
@@ -1911,6 +1913,7 @@ export class TestflowExplorerPageViewModel {
     initTestflowSingleScheduleTab.setScheduleId(scheduleDetails.scheduleId);
     initTestflowSingleScheduleTab.setScheduleName(scheduleDetails.scheduleName);
     initTestflowSingleScheduleTab.setScheduleTestflowId(testflowId);
+    initTestflowSingleScheduleTab.setScheduleTestflowName(testflowName);
     this.tabRepository.createTab(initTestflowSingleScheduleTab.getValue());
   };
 }

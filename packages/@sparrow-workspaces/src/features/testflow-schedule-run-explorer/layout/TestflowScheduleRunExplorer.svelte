@@ -4,7 +4,6 @@
   import type { Tab } from "@sparrow/common/types/workspace/tab";
   import { Button, Toggle } from "@sparrow/library/ui";
   export let tab: Observable<Tab>;
-  export let testflow;
   export let onUpdateScheduleState;
   export let onScheduleRun: () => void;
 </script>
@@ -18,7 +17,7 @@
       <p
         class="text-ds-font-size-20 text-ds-line-height-120 text-ds-font-weight-semi-bold mb-0"
       >
-        {schedule?.name || ""}
+        {$tab?.property?.testflowScheduleRun?.scheduleName || ""}
       </p>
       <div class="d-flex gap-2">
         <div class="d-flex align-items-center gap-2">
@@ -36,12 +35,12 @@
     </div>
     <div class="d-flex">
       <span class="text-fs-10">
-        {testflow?.name}
+        {$tab?.property?.testflowScheduleRun?.testflowName}
       </span>
     </div>
     <div>
       <ScheduleRunNavigator
-        scheduleNavigator={$tab?.property?.testflowSchedule?.state
+        scheduleNavigator={$tab?.property?.testflowScheduleRun?.state
           ?.scheduleNavigator}
         {onUpdateScheduleState}
       />
