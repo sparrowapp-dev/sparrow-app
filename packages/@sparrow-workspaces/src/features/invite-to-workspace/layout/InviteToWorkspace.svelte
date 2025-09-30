@@ -44,6 +44,7 @@
       email: string;
     }[];
   };
+  export let isSelfHost;
 
   /**
    * state variables
@@ -224,10 +225,12 @@
   > workspace.
 </div>
 {#if plan?.name !== "Community"}
-  <p class="text-fs-12 mt-3" style="color: var(--text-ds-neutral-400)">
-    Note: Inviting a user reserves a license and may trigger a charge, unless an
-    unused license is available.
-  </p>
+  {#if !isSelfHost}
+    <p class="text-fs-12 mt-3" style="color: var(--text-ds-neutral-400)">
+      Note: Inviting a user reserves a license and may trigger a charge, unless
+      an unused license is available.
+    </p>
+  {/if}
 {/if}
 <div class="d-flex align-items-center justify-content-between pt-3">
   <div class="description sparrow-fs-12 ellipsis">

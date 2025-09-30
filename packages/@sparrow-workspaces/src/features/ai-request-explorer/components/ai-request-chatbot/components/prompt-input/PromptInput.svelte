@@ -43,6 +43,7 @@
   export let environmentVariables;
 
   export let onUpdateEnvironment;
+  export let isSelfHost;
 
   // Props
 
@@ -351,22 +352,24 @@
       style="display: none;"
     />
     <div class="d-flex">
-      <Tooltip
-        title={"Attach File:"}
-        subtext={fileUploadTooltip}
-        placement={"top-right"}
-        size={"medium"}
-        styleProp={"width: 220px;"}
-        zIndex={5}
-      >
-        <Button
-          type={"teritiary-regular"}
-          size={"small"}
-          startIcon={AttachRegular}
-          onClick={handleAttachClick}
-          disable={!isUploadSupported || filesToUpload.length >= MAX_FILES}
-        />
-      </Tooltip>
+      {#if !isSelfHost}
+        <Tooltip
+          title={"Attach File:"}
+          subtext={fileUploadTooltip}
+          placement={"top-right"}
+          size={"medium"}
+          styleProp={"width: 220px;"}
+          zIndex={5}
+        >
+          <Button
+            type={"teritiary-regular"}
+            size={"small"}
+            startIcon={AttachRegular}
+            onClick={handleAttachClick}
+            disable={!isUploadSupported || filesToUpload.length >= MAX_FILES}
+          />
+        </Tooltip>
+      {/if}
 
       <Tooltip
         title={isResponseGenerating ? "Stop" : "Send"}
