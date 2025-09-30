@@ -31,6 +31,8 @@
   const activeWorkspace: Observable<WorkspaceDocument> =
     _viewModel.activeWorkspace;
 
+  const [isSelfhost] = getSelfhostUrls();
+
   const onRemoveUserFromWorkspace = _viewModel.removeUserFromWorkspace;
   const onChangeUserRoleAtWorkspace = _viewModel.changeUserRoleAtWorkspace;
 
@@ -231,6 +233,7 @@
     teamName={currentTeam?.name}
     plan={currentTeam?.plan}
     onInviteUserToWorkspace={handleInviteWorkspace}
+    isSelfHost={isSelfhost ? true : false}
   />
 </Modal>
 

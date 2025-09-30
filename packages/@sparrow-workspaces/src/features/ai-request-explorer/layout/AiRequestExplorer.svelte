@@ -59,6 +59,7 @@
   export let onRenameFolder;
   export let onClearConversation;
   export let onUploadFiles;
+  export let isSelfHost;
 
   let isGeneratePromptModalOpen = false;
   let isConversationHistoryLoading = false;
@@ -383,6 +384,7 @@
             {onDeleteConversation}
             {onClearConversation}
             {onUploadFiles}
+            {isSelfHost}
             bind:isConversationHistoryPanelOpen
             bind:isConversationHistoryLoading
           />

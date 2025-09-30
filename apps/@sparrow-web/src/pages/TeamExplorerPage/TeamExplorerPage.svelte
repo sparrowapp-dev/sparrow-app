@@ -352,6 +352,7 @@
       isTeamInviteModalOpen = flag;
     }}
     onValidateEmail={_viewModel.validateUserEmail}
+    isSelfHost={constants.APP_EDITION === "SELFHOSTED" ? true : false}
   />
 </Modal>
 
@@ -420,5 +421,6 @@
     teamName={currentTeam?.name}
     plan={currentTeam?.plan}
     onInviteUserToWorkspace={handleAddWorkspace}
+    isSelfHost={constants.APP_EDITION === "SELFHOSTED" ? true : false}
   />
 </Modal>

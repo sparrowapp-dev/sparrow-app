@@ -18,6 +18,8 @@
 
   export let sparrowAdminUrl: string;
 
+  const [isSelfhost] = getSelfhostUrls();
+
   let isWebEnvironment = false;
 
   let isDeleteWorkspaceModalOpen = false;
@@ -225,6 +227,7 @@
       isTeamInviteModalOpen = flag;
     }}
     onValidateEmail={_viewModel.validateUserEmail}
+    isSelfHost={isSelfhost ? true : false}
   />
 </Modal>
 
@@ -292,5 +295,6 @@
     teamName={currentTeam?.name}
     plan={currentTeam?.plan}
     onInviteUserToWorkspace={handleAddWorkspace}
+    isSelfHost={isSelfhost ? true : false}
   />
 </Modal>
