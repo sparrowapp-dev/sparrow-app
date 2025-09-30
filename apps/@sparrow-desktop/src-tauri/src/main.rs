@@ -776,27 +776,6 @@ async fn connect_websocket(
                             });
                             app_handle_clone.emit(event.as_str(), payload).unwrap();
                         }
-                        Message::Close(close_frame) => {
-                            // Handle server disconnection
-                            let event = format!("ws_message_{}", svelte_tabid);
-                            let close_reason = close_frame
-                                .as_ref()
-                                .map(|frame| frame.reason.to_string())
-                                .unwrap_or("No reason provided".to_string());
-
-                            println!(
-                                "Server closed WebSocket connection for tab: {}, reason: {}",
-                                svelte_tabid,
-                                close_reason
-                            );
-
-                            let payload = json!({
-                                "type": "disconnect",
-                                "data": close_reason,
-                            });
-                            app_handle_clone.emit(event.as_str(), payload).unwrap();
-                            break;
-                        }
                         _ => {}
                     }
                 }
