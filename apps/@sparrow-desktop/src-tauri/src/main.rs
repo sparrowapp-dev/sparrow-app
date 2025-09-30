@@ -79,6 +79,7 @@ use std::sync::Arc;
 use tokio::sync::mpsc::{self, UnboundedSender};
 use tokio::sync::Mutex;
 use tokio_tungstenite::tungstenite::protocol::Message;
+use tokio::time::{interval, Duration as TokioDuration};
 // --- Connect WebSocket with invalid certs allowed ---
 use tokio_tungstenite::tungstenite::client::IntoClientRequest;
 use tokio_tungstenite::Connector as WsConnector;
@@ -653,7 +654,7 @@ struct WebSocketResponse {
 #[tauri::command]
 async fn connect_websocket(
     url: String,
-    httpurl: String,
+    _httpurl: String,
     tabid: String,
     headers: String, // Stringified JSON headers
     state: tauri::State<'_, Arc<AppState>>,
@@ -793,13 +794,41 @@ async fn connect_websocket(
         }
     });
 
+    
+    // Create a channel for ping messages
+    let (ping_tx, mut ping_rx) = mpsc::unbounded_channel::<()>();
+    
+    // Spawn ping task
+    let ping_tx_clone = ping_tx.clone();
     tokio::spawn(async move {
-        while let Some(msg) = rx.recv().await {
-            write
-                .send(Message::Text(msg))
-                .await
-                .map_err(|e| format!("Failed to send message: {}", e))
-                .unwrap();
+        let mut ping_interval = interval(Duration::from_secs(30)); // Send ping every 30 seconds
+        loop {
+            ping_interval.tick().await;
+            if ping_tx_clone.send(()).is_err() {
+                // Channel closed, exit
+                break;
+            }
+        }
+    });
+
+    tokio::spawn(async move {
+        loop {
+            tokio::select! {
+                Some(msg) = rx.recv() => {
+                    if let Err(e) = write.send(Message::Text(msg)).await {
+                        eprintln!("Failed to send message: {}", e);
+                        break;
+                    }
+                }
+                Some(_) = ping_rx.recv() => {
+                    // Send ping message
+                    if let Err(e) = write.send(Message::Ping(vec![])).await {
+                        eprintln!("Failed to send ping: {}", e);
+                        break;
+                    }
+                }
+                else => break,
+            }
         }
     });
 
