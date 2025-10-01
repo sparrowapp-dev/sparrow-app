@@ -32,10 +32,9 @@
    */
   export let currentWorkspaceUsers: { email: string }[] = [];
 
-  // Legacy support - single default email
-  export let defaultEmail: string = "";
-
-  // New prop - array of default emails
+  /**
+   * Array of default/pre-selected emails
+   */
   export let defaultEmails: string[] = [];
 
   // State variables
@@ -97,28 +96,12 @@
 
   /**
    * Initialize with default emails
-   * Processes both defaultEmails array and legacy defaultEmail string
    */
   const initializeDefaultEmails = () => {
-    if (initialized) return;
-
-    // Get emails to initialize from either defaultEmails array or single defaultEmail
-    const emailsToInit =
-      defaultEmails.length > 0
-        ? defaultEmails
-        : defaultEmail
-          ? [defaultEmail]
-          : [];
-
-    if (emailsToInit.length === 0) return;
-
-    console.log(
-      `Initializing ${emailsToInit.length} default emails:`,
-      emailsToInit,
-    );
+    if (initialized || !defaultEmails || defaultEmails.length === 0) return;
 
     // Process each email
-    emailsToInit.forEach((email) => {
+    defaultEmails.forEach((email) => {
       if (!email) return;
 
       // Check if the email exists in the list
@@ -152,6 +135,13 @@
       initializeDefaultEmails();
     }, 100);
   });
+
+  // Update when defaultEmails changes
+  $: if (!initialized && defaultEmails?.length > 0) {
+    setTimeout(() => {
+      initializeDefaultEmails();
+    }, 100);
+  }
 
   /**
    * Filters the user list based on the current input and already selected emails.
