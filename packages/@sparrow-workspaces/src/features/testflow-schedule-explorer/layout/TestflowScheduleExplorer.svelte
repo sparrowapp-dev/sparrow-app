@@ -14,6 +14,7 @@
   export let onUpdateScheduleState;
   export let schedule;
   export let onScheduleRun;
+  export let onScheduleRunview;
 </script>
 
 {#if $tab.tabId}
@@ -56,7 +57,7 @@
       </div>
       <div>
         {#if $tab?.property?.testflowSchedule?.state?.scheduleNavigator === TestflowScheduleNavigatorEnum.TEST_RESULTS}
-          <TestResults {schedule} />
+          <TestResults {schedule} {onScheduleRunview} />
         {:else if $tab?.property?.testflowSchedule?.state?.scheduleNavigator === TestflowScheduleNavigatorEnum.CONFIGURATION}
           <Configurations />
         {/if}
