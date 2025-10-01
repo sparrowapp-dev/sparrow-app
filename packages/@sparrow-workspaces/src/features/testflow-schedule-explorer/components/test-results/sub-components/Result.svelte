@@ -6,8 +6,14 @@
   export let schedule;
   export let formatDate: (date: string) => string;
   export let getRunType: (flowName: string) => string;
-  export let toggleMenu: (e: MouseEvent, rowId: string, wrapper: HTMLElement) => void;
+  export let toggleMenu: (
+    e: MouseEvent,
+    rowId: string,
+    wrapper: HTMLElement,
+  ) => void;
   export let openMenuFor: string | null;
+  export let onDeleteTestflowScheduleHistory;
+  export let onScheduleRunview;
 
   let collectionTabWrapper: HTMLElement;
 
@@ -17,7 +23,11 @@
   }
 </script>
 
-<tr>
+<tr
+  on:click={() => {
+    onScheduleRunview(r);
+  }}
+>
   <td>
     <div class="time-cell">
       <span>{formatDate(r.createdAt)}</span>
@@ -29,7 +39,11 @@
 
   <td>
     <div style="display: flex; justify-content: center;">
-      <Tag text={r.status === "pass" ? "Completed" : "Error"} type={r.status === "pass" ? "green" : "orange"} endIcon={null} />
+      <Tag
+        text={r.status === "pass" ? "Completed" : "Error"}
+        type={r.status === "pass" ? "green" : "orange"}
+        endIcon={null}
+      />
     </div>
   </td>
 
@@ -51,7 +65,7 @@
     <button
       class="menu-btn"
       bind:this={collectionTabWrapper}
-      on:click={(e) => toggleMenu(e, r.createdAt, collectionTabWrapper)}
+      on:click={(e) => toggleMenu(e, r.createdAt, collectionTabWrapper, r?.id)}
     >
       <ThreeDotIcon width="16px" height="16px" />
     </button>
@@ -59,24 +73,51 @@
 </tr>
 
 <style lang="scss">
-  tr { border-bottom: 1px solid var(--border-ds-surface-200); }
-  tr:last-child { border-bottom: none; }
-  tr:hover { background-color: var(--bg-ds-surface-400); cursor: pointer; }
+  tr {
+    border-bottom: 1px solid var(--border-ds-surface-200);
+  }
+  tr:last-child {
+    border-bottom: none;
+  }
+  tr:hover {
+    background-color: var(--bg-ds-surface-400);
+    cursor: pointer;
+  }
 
-  td { padding: 8px 12px; text-align: center; }
-  td:first-child { text-align: left; }
+  td {
+    padding: 8px 12px;
+    text-align: center;
+  }
+  td:first-child {
+    text-align: left;
+  }
 
   .time-cell {
-    display: flex; flex-direction: column;
-    .sub-text { font-size: 12px; color: var(--text-secondary-200); }
+    display: flex;
+    flex-direction: column;
+    .sub-text {
+      font-size: 12px;
+      color: var(--text-secondary-200);
+    }
   }
 
   .menu-btn {
-    background: none; border: none; padding: 0; cursor: pointer; transform: rotate(90deg);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transform: rotate(90deg);
   }
 
   .result-cell {
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    .duration { font-size: 12px; min-width: 60px; text-align: right; }
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    .duration {
+      font-size: 12px;
+      min-width: 60px;
+      text-align: right;
+    }
   }
 </style>

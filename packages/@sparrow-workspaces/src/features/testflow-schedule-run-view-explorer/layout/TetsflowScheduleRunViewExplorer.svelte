@@ -158,7 +158,6 @@
   export let collectionListDocument: CollectionDocument[];
   export let isScheduleRunPopupOpen;
   export let testflowScheduleStore;
-  export let onOpenTestflowScheduleTab;
 
   let planContent: any;
   let planContentNonActive: any;

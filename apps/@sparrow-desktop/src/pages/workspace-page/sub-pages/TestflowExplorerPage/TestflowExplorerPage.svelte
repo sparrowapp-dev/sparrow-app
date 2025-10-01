@@ -304,8 +304,37 @@
 {#if render}
   <!-- {#if testflowScheduleStore}
     {#each testflowScheduleStore as schedule}
-      <div on:click={() => _viewModel.openTestflowScheduleTab(schedule)}>
-        {schedule.name}
+      <div>
+        <button
+          on:click={() =>
+            _viewModel.performTestflowScheduleOperations("open", schedule.id)}
+        >
+          {schedule.name}
+        </button>
+        <button
+          on:click={() =>
+            _viewModel.performTestflowScheduleOperations("edit", schedule.id)}
+        >
+          edit
+        </button>
+        <button
+          on:click={() =>
+            _viewModel.performTestflowScheduleOperations("delete", schedule.id)}
+        >
+          delete
+        </button>
+        <button
+          on:click={() =>
+            _viewModel.performTestflowScheduleOperations("run", schedule.id)}
+        >
+          Run
+        </button>
+        <button
+          on:click={() =>
+            _viewModel.updateTestflowSchedule(schedule.id, { isActive: false })}
+        >
+          update
+        </button>
       </div>
     {/each}
   {/if} -->
@@ -354,7 +383,7 @@
     {selectiveRunTestflow}
     handleContactSales={_viewModel.handleContactSales}
     onChangeSeletedAuthValue={_viewModel.parseAuthHeader}
-    onOpenTestflowScheduleTab={_viewModel.openTestflowScheduleTab}
+    onPerformTestflowScheduleOperations={_viewModel.performTestflowScheduleOperations}
   />
 {/if}
 

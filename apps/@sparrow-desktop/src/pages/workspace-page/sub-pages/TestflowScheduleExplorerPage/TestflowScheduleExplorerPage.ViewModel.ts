@@ -128,6 +128,33 @@ class MockHistoryExplorerPage {
     }
   }
 
+  public deleteTestflowScheduleHistory = async(_scheduleHistoryId: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+     const baseUrl = await this.constructBaseUrl(
+        progressiveTab.path.workspaceId,
+      );
+    const response = await this.testflowService.deleteScheduleRunHistory(progressiveTab.path.workspaceId, progressiveTab.path.testflowId, progressiveTab.id, _scheduleHistoryId, baseUrl);
+    if(response?.isSuccessful){
+      const schedules = response.data.data.schedules;
+      updateTestflowSchedules(progressiveTab?.path?.testflowId as string, schedules);
+    }
+  }
+
+    public updateTestflowSchedule = async() => {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+       const baseUrl = await this.constructBaseUrl(
+          progressiveTab.path.workspaceId,
+        );
+      let payload={
+        isActive: true
+      }
+
+      const response = await this.testflowService.updateTestflowSchedule(progressiveTab.path.workspaceId, progressiveTab.path.testflowId, progressiveTab.id, payload, baseUrl);
+      if(response?.isSuccessful){
+        const schedules = response.data.data.schedules;
+        updateTestflowSchedules(progressiveTab?.id as string, schedules);
+      }
+    }
   public handleCreateTestflowSingleScheduleTab = (_scheduleResult) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const x = new TestflowScheduleRunViewTabAdapter().adapt(progressiveTab.path.workspaceId, _scheduleResult);

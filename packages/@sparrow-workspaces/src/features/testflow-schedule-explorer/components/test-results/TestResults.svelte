@@ -4,6 +4,7 @@
   import Result from "./sub-components/Result.svelte";
 
   export let schedule;
+  export let onDeleteTestflowScheduleHistory;
   export let onScheduleRunview;
 
   let openMenuFor: string | null = null;
@@ -29,9 +30,16 @@
     return parts.length > 1 ? parts[parts.length - 1].trim() : "";
   }
 
+  let deleteScheduleResultId;
 
-  function toggleMenu(e: MouseEvent, rowId: string, wrapper: HTMLElement) {
+  function toggleMenu(
+    e: MouseEvent,
+    rowId: string,
+    wrapper: HTMLElement,
+    scheduleResultId,
+  ) {
     e.stopPropagation();
+    deleteScheduleResultId = scheduleResultId;
     if (openMenuFor === rowId) {
       openMenuFor = null;
       activeWrapper = null;
@@ -73,7 +81,8 @@
         <tbody>
           {#each schedule?.schedularRunHistory as r}
             <Result
-              {onScheduleRunview}   
+              {onScheduleRunview}
+              {onDeleteTestflowScheduleHistory}
               {r}
               {schedule}
               {formatDate}
@@ -114,6 +123,7 @@
         menuItems={[
           {
             onClick: () => {
+              onDeleteTestflowScheduleHistory(deleteScheduleResultId);
               closeMenu();
             },
             displayText: "Delete",
