@@ -111,6 +111,7 @@
   import { ScheduleRunPopUp } from "@sparrow/common/features";
   import TestflowScheduleExplorerPage from "./sub-pages/TestflowScheduleExplorerPage/TestflowScheduleExplorerPage.svelte";
   import { WorkspaceEnvironmentTypeBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
+  import TestflowScheduleRVExplorerPage from "./sub-pages/TestflowScheduleRVExplorerPage.svelte/TestflowScheduleRVExplorerPage.svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -1025,6 +1026,12 @@
                     <Motion {...scaleMotionProps} let:motion>
                       <div class="h-100">
                         <MockHistoryExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.TESTFLOW_SCHEDULE_RUN_VIEW}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100">
+                        <TestflowScheduleRVExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.TESTFLOW_SCHEDULE}

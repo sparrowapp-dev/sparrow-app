@@ -28,6 +28,8 @@ import type { TestflowScheduleStateDto } from "@sparrow/common/types/workspace/t
 import { TestflowRepository } from "@app/repositories/testflow.repository";
 import { TestflowService } from "@app/services/testflow.service";
 import { updateTestflowSchedules } from "@sparrow/common/store";
+import { InitTab } from "@sparrow/common/factory";
+import { v4 as uuidv4 } from "uuid";
 // import { InitRequestTab } from "@sparrow/common/utils";
 
 class MockHistoryExplorerPage {
@@ -35,6 +37,7 @@ class MockHistoryExplorerPage {
   private workspaceRepository = new WorkspaceRepository();
   private testflowRepository = new TestflowRepository();
   private testflowService = new TestflowService();
+  private initTab = new InitTab();
 
 
   private _tab: BehaviorSubject<Tab> = new BehaviorSubject({});
@@ -124,6 +127,255 @@ class MockHistoryExplorerPage {
       updateTestflowSchedules(progressiveTab?.path?.testflowId as string, schedules);
     }
   }
+
+  public handleCreateTestflowSingleScheduleTab = () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const newTabId = uuidv4();
+    const initTestflowScheduleRunViewTab = this.initTab.testflowScheduleRunView(
+      newTabId,
+      progressiveTab.path.workspaceId,
+    );
+    initTestflowScheduleRunViewTab.updateName(
+      `Result - ${progressiveTab.name}`,
+    );
+    const nodes = [
+      {
+        id: "1",
+        type: "startBlock",
+        data: {
+          blockName: "startBlock",
+          requestId: "",
+          folderId: "",
+          collectionId: "",
+          requestData: null,
+          name: "",
+          method: "",
+        },
+        position: {
+          x: 100,
+          y: 200,
+        },
+      },
+      {
+        id: "2",
+        type: "requestBlock",
+        data: {
+          blockName: "Block 1",
+          requestId: "f2a01b62-b948-43e4-8978-c6072659f797",
+          folderId: "",
+          collectionId: "68651d6c137db413e71a3beb",
+          requestData: {
+            headers: [
+              {
+                key: "",
+                value: "",
+                checked: false,
+              },
+            ],
+            queryParams: [
+              {
+                key: "",
+                value: "",
+                checked: false,
+              },
+            ],
+            body: {
+              raw: "",
+              urlencoded: [
+                {
+                  key: "",
+                  value: "",
+                  checked: false,
+                },
+              ],
+              formdata: {
+                text: [
+                  {
+                    key: "",
+                    value: "",
+                    checked: false,
+                  },
+                ],
+                file: [],
+              },
+            },
+            auth: {
+              bearerToken: "",
+              basicAuth: {
+                username: "",
+                password: "",
+              },
+              apiKey: {
+                authKey: "",
+                authValue: "",
+                addTo: "Header",
+              },
+            },
+            url: "https://jsonplaceholder.typicode.com/todos/1",
+            method: "GET",
+            name: "Sample-API",
+            selectedRequestBodyType: "none",
+            selectedRequestAuthType: "No Auth",
+          },
+          name: "Sample-API",
+          method: "GET",
+        },
+        position: {
+          x: 186.74846911869878,
+          y: 7.416101248411689,
+        },
+      },
+      {
+        id: "3",
+        type: "requestBlock",
+        data: {
+          blockName: "Block 2",
+          requestId: "f447bc27-29cc-42ac-9bc5-5e5d5226dd77",
+          folderId: "7901a45d-db3d-4cbb-a26b-56db5495e896",
+          collectionId: "68ca9741f413f7c8814ea027",
+          requestData: {
+            headers: [
+              {
+                key: "",
+                value: "",
+                checked: false,
+              },
+            ],
+            queryParams: [
+              {
+                key: "",
+                value: "",
+                checked: false,
+              },
+            ],
+            body: {
+              raw: '{"email":"aakashpabbathi@gmail.com","password":"123456789@"}',
+              urlencoded: [
+                {
+                  key: "",
+                  value: "",
+                  checked: false,
+                },
+              ],
+              formdata: {
+                text: [
+                  {
+                    key: "",
+                    value: "",
+                    checked: false,
+                  },
+                ],
+                file: [],
+              },
+            },
+            auth: {
+              bearerToken: "",
+              basicAuth: {
+                username: "",
+                password: "",
+              },
+              apiKey: {
+                authKey: "",
+                authValue: "",
+                addTo: "Header",
+              },
+            },
+            url: "{{BASE_URL}}/api/auth/login",
+            method: "POST",
+            name: "/api/auth/login",
+            selectedRequestBodyType: "application/json",
+            selectedRequestAuthType: "No Auth",
+          },
+          name: "/api/auth/login",
+          method: "POST",
+        },
+        position: {
+          x: 437.0496088652046,
+          y: 191.35979967907298,
+        },
+      },
+    ];
+    const edges = [
+      {
+        id: "xy-edge__1-2",
+        source: "1",
+        target: "2",
+      },
+      {
+        id: "xy-edge__2-3",
+        source: "2",
+        target: "3",
+      },
+    ];
+    const result = {
+      status: "fail",
+      successRequests: 2,
+      failedRequests: 1,
+      totalTime: "3.52 sec",
+      request: [
+        {
+          method: "GET",
+          name: "Sample-API",
+          status: "200 OK",
+          time: "866 ms",
+        },
+        {
+          method: "POST",
+          name: "/api/auth/login",
+          status: "200 OK",
+          time: "952 ms",
+        },
+      ],
+      response: [
+        {
+          headers: [
+            { key: "Content-Type", value: "application/json" },
+            { key: "Cache-Control", value: "no-cache" },
+            { key: "X-Request-ID", value: "abc123xyz" },
+          ],
+          status: "200 OK",
+          body: JSON.stringify({
+            message: "Success",
+            data: {
+              id: 101,
+              name: "Sample Item",
+              active: true,
+            },
+          }),
+          time: 245,
+          size: 512,
+          responseContentType: "JSON",
+        },
+        {
+          headers: [
+            { key: "Content-Type", value: "application/json" },
+            { key: "Cache-Control", value: "no-cache" },
+            { key: "X-Request-ID", value: "abc123xyz" },
+          ],
+          status: "200 OK",
+          body: JSON.stringify({
+            message: "Success",
+            data: {
+              id: 101,
+              name: "Sample Item",
+              active: true,
+            },
+          }),
+          time: 245,
+          size: 512,
+          responseContentType: "JSON",
+        },
+      ],
+    };
+    initTestflowScheduleRunViewTab.setNodes(nodes);
+    initTestflowScheduleRunViewTab.setEdges(edges);
+    initTestflowScheduleRunViewTab.setResult(result);
+    initTestflowScheduleRunViewTab.updatePath({
+      workspaceId: progressiveTab.path.workspaceId,
+      testflowId: progressiveTab.path.testflowId,
+    });
+    this.tabRepository.createTab(initTestflowScheduleRunViewTab.getValue());
+  };
 }
 
 export default MockHistoryExplorerPage;

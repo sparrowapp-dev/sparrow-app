@@ -3,6 +3,7 @@
   import { ArrowSortRegular } from "@sparrow/library/icons";
   import { ThreeDotIcon } from "@sparrow/library/icons";
   export let schedule;
+  export let onScheduleRunview;
 
   function formatDate(dateStr: string) {
   const date = new Date(dateStr);
@@ -46,7 +47,9 @@
         </thead>
         <tbody>
           {#each schedule?.schedularRunHistory as r}
-            <tr>
+            <tr on:click={() => {
+                onScheduleRunview();
+              }}>
               <td>
                 <div class="time-cell">
                   <span>{formatDate(r.createdAt)}</span>
