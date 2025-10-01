@@ -14,6 +14,7 @@
   export let onUpdateScheduleState;
   export let schedule;
   export let onScheduleRun;
+  export let onScheduleRunview;
   export let environments = [];
   export let workspaceUsers = [];
   export let onUpdateSchedule = (updatedSchedule) => {};
@@ -57,7 +58,7 @@
     </div>
     <div class="explorer-content">
       {#if $tab?.property?.testflowSchedule?.state?.scheduleNavigator === TestflowScheduleNavigatorEnum.TEST_RESULTS}
-        <TestResults {schedule} />
+        <TestResults {schedule} {onScheduleRunview} />
       {:else if $tab?.property?.testflowSchedule?.state?.scheduleNavigator === TestflowScheduleNavigatorEnum.CONFIGURATION}
         <Configurations
           {schedule}

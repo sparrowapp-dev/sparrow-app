@@ -38,3 +38,4 @@ export * from "./environment.helper";
 export * from "./navigation";
 export * from "./team.helper";
 export { planInfoByRole,planContentDisable } from "./planUpgradeContent";
+export { InitTestflowScheduleRunViewTab } from "./init-testflow-schedule-run-view-tab";

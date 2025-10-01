@@ -1710,6 +1710,114 @@ export const tabSchemaLiteral = {
             },
           },
         },
+        testflowScheduleRunView: {
+          type: "object",
+          properties: {
+            nodes: {
+              type: "array",
+              default: [],
+              items: {
+                type: "object",
+                properties: {
+                  id: { type: "string" },
+                  type: { type: "string" },
+                  data: {
+                    type: "object",
+                    properties: {
+                      blockName: { type: "string" },
+                      workspaceId: { type: "string" },
+                      collectionId: { type: "string" },
+                      folderId: { type: "string" },
+                      requestId: { type: "string" },
+                      requestData: {
+                        type: "object",
+                        properties: requestItems,
+                      },
+                      isDeleted: { type: "boolean" },
+                    },
+                  },
+                  position: {
+                    type: "object",
+                    properties: {
+                      x: { type: "number" },
+                      y: { type: "number" },
+                    },
+                    required: ["x", "y"],
+                  },
+                },
+                required: ["id", "type", "data", "position"],
+              },
+            },
+            edges: {
+              type: "array",
+              default: [],
+              items: {
+                type: "object",
+                properties: {
+                  id: { type: "string" },
+                  source: { type: "string" },
+                  target: { type: "string" },
+                },
+                required: ["id", "source", "target"],
+              },
+            },
+            result: {
+              type: "object",
+              properties: {
+                failedRequests: { type: "number" },
+                requests: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      method: { type: "string" },
+                      name: { type: "string" },
+                      status: { type: "string" },
+                      time: { type: "string" },
+                      errorMessage: { type: "string" },
+                      error: { type: "string" },
+                    },
+                  },
+                },
+                status: { type: "string" },
+                successRequests: { type: "number" },
+                totalTime: { type: "string" },
+                response: {
+                  type: "object",
+                  properties: {
+                    headers: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          key: { type: "string" },
+                          value: { type: "string" },
+                        },
+                        required: ["key", "value"],
+                      },
+                    },
+                    status: { type: "string" },
+                    body: { type: "string" },
+                    time: { type: "number" },
+                    size: { type: "number" },
+                    responseContentType: {
+                      type: "string",
+                      enum: [
+                        "JSON",
+                        "XML",
+                        "HTML",
+                        "Text",
+                        "JavaScript",
+                        "Image",
+                      ],
+                    },
+                  },
+                },
+              },
+            },
+          },
+          required: ["nodes", "edges", "result"],
+        },
       },
     },
     isActive: {
