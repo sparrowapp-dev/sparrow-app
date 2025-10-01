@@ -168,6 +168,17 @@ class MockHistoryExplorerPage {
     // });
     this.tabRepository.createTab(x);
   };
+
+  /**
+   * Return active workspace of the user
+   */
+  public get activeWorkspace() {
+    return this.workspaceRepository.getActiveWorkspace();
+  }
+
+  public get environments() {
+    return this.environmentRepository.getEnvironment();
+  }
 }
 
 export default MockHistoryExplorerPage;
