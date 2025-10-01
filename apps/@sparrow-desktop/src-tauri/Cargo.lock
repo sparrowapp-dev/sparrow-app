@@ -4422,7 +4422,7 @@ dependencies = [
 
 [[package]]
 name = "sparrow-app"
-version = "2.32.0"
+version = "2.32.1"
 dependencies = [
  "anyhow",
  "base64 0.21.7",
