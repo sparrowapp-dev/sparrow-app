@@ -20,7 +20,7 @@ import {
   type Tab,
 } from "@sparrow/common/types/workspace/tab";
 import { BehaviorSubject, type Observable } from "rxjs";
-import { FolderTabAdapter } from "@app/adapter";
+import { FolderTabAdapter, TestflowScheduleRunViewTabAdapter } from "@app/adapter";
 import constants from "@app/constants/constants";
 import { notifications } from "@sparrow/library/ui";
 import { getSelfhostUrls } from "@app/utils/jwt";
@@ -28,6 +28,8 @@ import type { TestflowScheduleStateDto } from "@sparrow/common/types/workspace/t
 import { TestflowRepository } from "@app/repositories/testflow.repository";
 import { TestflowService } from "@app/services/testflow.service";
 import { updateTestflowSchedules } from "@sparrow/common/store";
+import { InitTab } from "@sparrow/common/factory";
+import { v4 as uuidv4 } from "uuid";
 // import { InitRequestTab } from "@sparrow/common/utils";
 
 class MockHistoryExplorerPage {
@@ -35,6 +37,7 @@ class MockHistoryExplorerPage {
   private workspaceRepository = new WorkspaceRepository();
   private testflowRepository = new TestflowRepository();
   private testflowService = new TestflowService();
+  private initTab = new InitTab();
 
 
   private _tab: BehaviorSubject<Tab> = new BehaviorSubject({});
@@ -152,6 +155,26 @@ class MockHistoryExplorerPage {
         updateTestflowSchedules(progressiveTab?.id as string, schedules);
       }
     }
+  public handleCreateTestflowSingleScheduleTab = (_scheduleResult) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const x = new TestflowScheduleRunViewTabAdapter().adapt(progressiveTab.path.workspaceId, _scheduleResult);
+
+    // const initTestflowScheduleRunViewTab = this.initTab.testflowScheduleRunView(
+    //   _scheduleResult.id,
+    //   progressiveTab.path.workspaceId,
+    // );
+    // initTestflowScheduleRunViewTab.updateName(
+    //   `Result - ${progressiveTab.name}`,
+    // );
+    // initTestflowScheduleRunViewTab.setNodes(_scheduleResult.nodes);
+    // initTestflowScheduleRunViewTab.setEdges(_scheduleResult.edges);
+    // // initTestflowScheduleRunViewTab.setResult(result);
+    // initTestflowScheduleRunViewTab.updatePath({
+    //   workspaceId: progressiveTab.path.workspaceId,
+    //   testflowId: progressiveTab.path.testflowId,
+    // });
+    this.tabRepository.createTab(x);
+  };
 }
 
 export default MockHistoryExplorerPage;

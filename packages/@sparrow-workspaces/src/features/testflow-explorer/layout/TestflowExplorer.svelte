@@ -158,7 +158,7 @@
   export let collectionListDocument: CollectionDocument[];
   export let isScheduleRunPopupOpen;
   export let testflowScheduleStore;
-  export let onOpenTestflowScheduleTab;
+  export let onPerformTestflowScheduleOperations;
 
   let planContent: any;
   let planContentNonActive: any;
@@ -1782,16 +1782,18 @@
               </div>
             {/if}
           {/if}
-          <Button
-            type="secondary"
-            size="medium"
-            title="Schedule Run"
-            style="margin-left: 0;"
-            buttonType="button"
-            onClick={() => {
-              isScheduleRunPopupOpen = true;
-            }}
-          />
+          {#if !isGuestUser && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+            <Button
+              type="secondary"
+              size="medium"
+              title="Schedule Run"
+              style="margin-left: 0;"
+              buttonType="button"
+              onClick={() => {
+                isScheduleRunPopupOpen = true;
+              }}
+            />
+          {/if}
         </div>
 
         {#if $isTestFlowTourGuideOpen && $currentStep == 6}
@@ -2034,7 +2036,10 @@
               </thead>
               <tbody>
                 {#each paginatedSchedules as schedule}
-                  <tr on:click={() => onOpenTestflowScheduleTab(schedule)}>
+                  <tr
+                    on:click={() =>
+                      onPerformTestflowScheduleOperations("open", schedule.id)}
+                  >
                     <td>
                       <div class="d-flex flex-column">
                         <span class="schedule-name">{schedule.name}</span>
