@@ -79,6 +79,7 @@
   export let ActiveTab;
   export let handleTabUpdate;
   export let isScheduleRunPopupOpen;
+  export let isGuestUser;
 
   $: {
     if (testflows.find((item) => item._data._id === activeTabId)) {
@@ -282,6 +283,7 @@
                 {onUpdateTestflow}
                 {onOpenTestflow}
                 {activeTabId}
+                {isGuestUser}
               />
             </VirtualScroll>
           </div>

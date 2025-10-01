@@ -4,6 +4,7 @@
   import Result from "./sub-components/Result.svelte";
 
   export let schedule;
+  export let onScheduleRunview;
 
   let openMenuFor: string | null = null;
   let activeWrapper: HTMLElement | null = null;
@@ -27,6 +28,7 @@
     const parts = flowName.split("-");
     return parts.length > 1 ? parts[parts.length - 1].trim() : "";
   }
+
 
   function toggleMenu(e: MouseEvent, rowId: string, wrapper: HTMLElement) {
     e.stopPropagation();
@@ -71,6 +73,7 @@
         <tbody>
           {#each schedule?.schedularRunHistory as r}
             <Result
+              {onScheduleRunview}   
               {r}
               {schedule}
               {formatDate}

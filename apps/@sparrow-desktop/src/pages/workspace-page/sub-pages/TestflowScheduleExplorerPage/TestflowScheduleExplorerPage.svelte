@@ -86,4 +86,5 @@
   {schedule}
   onUpdateScheduleState={_viewModel.updateScheduleState}
   onScheduleRun={_viewModel.runTestflowSchedule}
+  onScheduleRunview={_viewModel.handleCreateTestflowSingleScheduleTab}
 />
