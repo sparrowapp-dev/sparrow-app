@@ -98,29 +98,4 @@
     flex-direction: column;
     overflow: hidden;
   }
-
-  /* Utility classes */
-  .mb-2 {
-    margin-bottom: 0.5rem;
-  }
-
-  .mb-3 {
-    margin-bottom: 1rem;
-  }
-
-  .d-flex {
-    display: flex;
-  }
-
-  .justify-content-between {
-    justify-content: space-between;
-  }
-
-  .align-items-center {
-    align-items: center;
-  }
-
-  .gap-2 {
-    gap: 0.5rem;
-  }
 </style>
