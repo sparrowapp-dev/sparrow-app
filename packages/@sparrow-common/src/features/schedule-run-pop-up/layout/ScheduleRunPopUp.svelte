@@ -8,7 +8,7 @@
   } from "@sparrow/library/forms";
   import { StepProgressBar } from "@sparrow/library/ui";
   import { NumberInput } from "@sparrow/common/components";
-  import { InviteUserPicker } from "../component";
+  import { EmailReceipentsPicker } from "@sparrow/common/components";
   export let isScheduleRunPopupOpen = true;
   export let testFlowName;
   export let workspaceUsers = [];
@@ -573,12 +573,12 @@
         <label class="form-label"> Email Recipients </label>
 
         <div class="email-picker-container">
-          <InviteUserPicker
+          <EmailReceipentsPicker
             list={notificationSuggestions}
             id="schedule-notification-emails"
             currentWorkspaceUsers={[]}
             onChange={handleNotificationEmailsChange}
-            defaultEmail={creatorEmail}
+            defaultEmails={[creatorEmail]}
           />
         </div>
       </div>

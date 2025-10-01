@@ -9,6 +9,8 @@
   import { TestflowScheduleExplorer } from "@sparrow/workspaces/features";
   import { user } from "@app/store/auth.store";
   import { testflowSchedules } from "@sparrow/common/store";
+  import { environmentType } from "@sparrow/common/enums";
+  import { onDestroy } from "svelte";
 
   /**
    * folder tab document
@@ -18,7 +20,16 @@
   // ViewModel initialization
   let _viewModel;
 
+  let activeWorkspaceSubscriber;
+
   let userId = "";
+  let environments;
+  let activeWorkspace;
+  let currentWorkspaceId = "";
+  let currentWorkspace;
+  $: {
+    console.log("ff", $environments);
+  }
 
   user.subscribe((value) => {
     if (value) {
@@ -71,6 +82,18 @@
           testflowSubscriber = testflowObserver?.subscribe((data) => {
             testflow = data?.toMutableJSON();
           });
+          environments = _viewModel.environments;
+          activeWorkspace = _viewModel.activeWorkspace;
+          activeWorkspaceSubscriber = activeWorkspace.subscribe(
+            (_workspace) => {
+              const workspaceDoc = _workspace?.toMutableJSON();
+
+              if (workspaceDoc) {
+                currentWorkspace = _workspace;
+                currentWorkspaceId = _workspace.get("_id");
+              }
+            },
+          );
         })();
       } else if (tab?.name && prevTabName !== tab.name) {
       }
@@ -78,12 +101,21 @@
       prevTabId = tab?.tabId || "";
     }
   }
+  onDestroy(() => {
+    activeWorkspaceSubscriber.unsubscribe();
+  });
 </script>
 
 <TestflowScheduleExplorer
   tab={_viewModel.tab}
   {testflow}
   {schedule}
+  workspaceUsers={currentWorkspace?._data?.users || []}
+  environments={$environments?.filter(
+    (env) =>
+      env.workspaceId === currentWorkspaceId &&
+      env.type !== environmentType.GLOBAL,
+  ) || []}
   onUpdateScheduleState={_viewModel.updateScheduleState}
   onScheduleRun={_viewModel.runTestflowSchedule}
 />

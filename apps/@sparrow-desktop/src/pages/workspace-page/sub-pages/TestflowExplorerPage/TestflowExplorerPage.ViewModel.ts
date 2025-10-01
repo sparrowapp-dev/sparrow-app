@@ -1812,12 +1812,26 @@ export class TestflowExplorerPageViewModel {
   };
 
   public openTestflowScheduleTab = async (_schedule) => {
+    debugger;
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const initTestflowScheduleTab = new InitTestflowScheduleTab(
       _schedule.id,
       progressiveTab.path.workspaceId,
     )
       .updatePath({ testflowId: progressiveTab.id })
+      .updateName(_schedule.name)
+      .updateEnvironmentId(_schedule.environmentId)
+      .updateRunConfiguration({
+        runCycle: _schedule.runConfiguration.runCycle,
+        executeAt: _schedule.runConfiguration.executeAt,
+        time: _schedule.runConfiguration.time,
+        intervalHours: _schedule.runConfiguration.intervalHours,
+        days: _schedule.runConfiguration.days,
+      })
+      .updateNotification({
+        emails: _schedule.notification.emails,
+        receiveNotifications: _schedule.notification.receiveNotifications,
+      })
       .getValue();
     await this.tabRepository.createTab(initTestflowScheduleTab);
   };

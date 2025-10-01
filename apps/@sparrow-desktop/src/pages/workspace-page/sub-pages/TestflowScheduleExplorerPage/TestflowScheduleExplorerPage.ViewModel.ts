@@ -28,6 +28,7 @@ import type { TestflowScheduleStateDto } from "@sparrow/common/types/workspace/t
 import { TestflowRepository } from "@app/repositories/testflow.repository";
 import { TestflowService } from "@app/services/testflow.service";
 import { updateTestflowSchedules } from "@sparrow/common/store";
+import { EnvironmentRepository } from "../../../../repositories/environment.repository";
 // import { InitRequestTab } from "@sparrow/common/utils";
 
 class MockHistoryExplorerPage {
@@ -35,7 +36,7 @@ class MockHistoryExplorerPage {
   private workspaceRepository = new WorkspaceRepository();
   private testflowRepository = new TestflowRepository();
   private testflowService = new TestflowService();
-
+  private environmentRepository = new EnvironmentRepository();
 
   private _tab: BehaviorSubject<Tab> = new BehaviorSubject({});
 
@@ -58,7 +59,7 @@ class MockHistoryExplorerPage {
 
   public getTestflowObserver = (_testflowId: string) => {
     return this.testflowRepository.getTestflowObserver(_testflowId);
-  }
+  };
 
   public constructBaseUrl = async (_id: string) => {
     const workspaceData = await this.workspaceRepository.readWorkspace(_id);
@@ -66,7 +67,7 @@ class MockHistoryExplorerPage {
 
     const [selfhostBackendUrl] = getSelfhostUrls();
     if (selfhostBackendUrl) {
-        return selfhostBackendUrl;
+      return selfhostBackendUrl;
     }
 
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
@@ -92,10 +93,15 @@ class MockHistoryExplorerPage {
    */
   public getTestflow = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    const response =  await this.testflowService?.fetchTestflow(progressiveTab.path.testflowId);
-     if(response?.isSuccessful){
+    const response = await this.testflowService?.fetchTestflow(
+      progressiveTab.path.testflowId,
+    );
+    if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
-      updateTestflowSchedules(progressiveTab?.path?.testflowId as string, schedules);
+      updateTestflowSchedules(
+        progressiveTab?.path?.testflowId as string,
+        schedules,
+      );
     }
   };
 
@@ -113,16 +119,35 @@ class MockHistoryExplorerPage {
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
 
-  public runTestflowSchedule = async() => {
+  public runTestflowSchedule = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-     const baseUrl = await this.constructBaseUrl(
-        progressiveTab.path.workspaceId,
-      );
-    const response = await this.testflowService.runTestflowSchedule(progressiveTab.path.workspaceId, progressiveTab.path.testflowId, progressiveTab.id, baseUrl);
-    if(response?.isSuccessful){
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab.path.workspaceId,
+    );
+    const response = await this.testflowService.runTestflowSchedule(
+      progressiveTab.path.workspaceId,
+      progressiveTab.path.testflowId,
+      progressiveTab.id,
+      baseUrl,
+    );
+    if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
-      updateTestflowSchedules(progressiveTab?.path?.testflowId as string, schedules);
+      updateTestflowSchedules(
+        progressiveTab?.path?.testflowId as string,
+        schedules,
+      );
     }
+  };
+
+  /**
+   * Return active workspace of the user
+   */
+  public get activeWorkspace() {
+    return this.workspaceRepository.getActiveWorkspace();
+  }
+
+  public get environments() {
+    return this.environmentRepository.getEnvironment();
   }
 }
 
