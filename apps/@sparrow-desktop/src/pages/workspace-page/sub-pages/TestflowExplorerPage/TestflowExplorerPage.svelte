@@ -384,6 +384,7 @@
     handleContactSales={_viewModel.handleContactSales}
     onChangeSeletedAuthValue={_viewModel.parseAuthHeader}
     onPerformTestflowScheduleOperations={_viewModel.performTestflowScheduleOperations}
+    onOpenTestflowScheduleTab={_viewModel.openTestflowScheduleTab}
   />
 {/if}
 

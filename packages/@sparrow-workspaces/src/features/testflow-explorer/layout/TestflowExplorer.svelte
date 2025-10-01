@@ -158,7 +158,7 @@
   export let collectionListDocument: CollectionDocument[];
   export let isScheduleRunPopupOpen;
   export let testflowScheduleStore;
-  export let onPerformTestflowScheduleOperations;
+  export let onOpenTestflowScheduleTab;
 
   let planContent: any;
   let planContentNonActive: any;
@@ -230,6 +230,10 @@
   const nodes = writable<Node[]>([]);
   const edges = writable<TFEdgeHandlerType[]>([]);
   setTimeout(() => {}, 1000);
+
+  // $: {
+  //   console.log(testflowScheduleStore);
+  // }
 
   /**
    * Checks if edges exist for the given node ID.
@@ -2038,7 +2042,7 @@
                 {#each paginatedSchedules as schedule}
                   <tr
                     on:click={() =>
-                      onPerformTestflowScheduleOperations("open", schedule.id)}
+                      onOpenTestflowScheduleTab(schedule.originalData)}
                   >
                     <td>
                       <div class="d-flex flex-column">
