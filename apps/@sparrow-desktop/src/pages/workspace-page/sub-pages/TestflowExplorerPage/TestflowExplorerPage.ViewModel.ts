@@ -1812,7 +1812,6 @@ export class TestflowExplorerPageViewModel {
   };
 
   public openTestflowScheduleTab = async (_schedule: string) => {
-    debugger;
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const initTestflowScheduleTab = new InitTestflowScheduleTab(
       _schedule.id,

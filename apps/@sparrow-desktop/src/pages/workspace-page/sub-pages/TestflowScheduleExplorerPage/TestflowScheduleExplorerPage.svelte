@@ -27,9 +27,6 @@
   let activeWorkspace;
   let currentWorkspaceId = "";
   let currentWorkspace;
-  $: {
-    console.log("ff", $environments);
-  }
 
   user.subscribe((value) => {
     if (value) {
