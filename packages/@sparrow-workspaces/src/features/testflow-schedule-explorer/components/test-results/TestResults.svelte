@@ -6,20 +6,20 @@
   export let onScheduleRunview;
 
   function formatDate(dateStr: string) {
-  const date = new Date(dateStr);
-  const options: Intl.DateTimeFormatOptions = { 
-    month: "short", 
-    day: "numeric", 
-    year: "numeric" 
-  };
-  const datePart = date.toLocaleDateString("en-US", options);
-  let hours = date.getHours();
-  const minutes = date.getMinutes().toString().padStart(2, "0");
-  const ampm = hours >= 12 ? "pm" : "am";
-  hours = hours % 12 || 12;
+    const date = new Date(dateStr);
+    const options: Intl.DateTimeFormatOptions = {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    };
+    const datePart = date.toLocaleDateString("en-US", options);
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const ampm = hours >= 12 ? "pm" : "am";
+    hours = hours % 12 || 12;
 
-  return `${datePart} at ${hours}:${minutes} ${ampm}`;
-}
+    return `${datePart} at ${hours}:${minutes} ${ampm}`;
+  }
 </script>
 
 <!-- {#each schedule?.schedularRunHistory as result}
@@ -47,9 +47,11 @@
         </thead>
         <tbody>
           {#each schedule?.schedularRunHistory as r}
-            <tr on:click={() => {
-                onScheduleRunview();
-              }}>
+            <tr
+              on:click={() => {
+                onScheduleRunview(r);
+              }}
+            >
               <td>
                 <div class="time-cell">
                   <span>{formatDate(r.createdAt)}</span>
@@ -89,7 +91,7 @@
                 </div>
               </td>
               <td>
-                <ThreeDotIcon width="16px" height="16px"/>
+                <ThreeDotIcon width="16px" height="16px" />
               </td>
             </tr>
           {/each}
