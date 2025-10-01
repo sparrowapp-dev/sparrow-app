@@ -6,14 +6,14 @@
   import { writable } from "svelte/store";
   import { ScheduleNavigator } from "../components";
   import { TestflowScheduleNavigatorEnum } from "../../../../../@sparrow-common/src/types/workspace/testflow-schedule-tab";
-  import { Configurations } from "../components";
-  import TestResults from "../components/test-results/TestResults.svelte";
+  import { Configurations, TestResults } from "../components";
 
   export let tab: Observable<Tab>;
   export let testflow;
   export let onUpdateScheduleState;
   export let schedule;
   export let onScheduleRun;
+  export let onDeleteTestflowScheduleHistory;
   export let onScheduleRunview;
   export let environments = [];
   export let workspaceUsers = [];
@@ -58,7 +58,11 @@
     </div>
     <div class="explorer-content">
       {#if $tab?.property?.testflowSchedule?.state?.scheduleNavigator === TestflowScheduleNavigatorEnum.TEST_RESULTS}
-        <TestResults {schedule} {onScheduleRunview} />
+        <TestResults
+          {schedule}
+          {onScheduleRunview}
+          {onDeleteTestflowScheduleHistory}
+        />
       {:else if $tab?.property?.testflowSchedule?.state?.scheduleNavigator === TestflowScheduleNavigatorEnum.CONFIGURATION}
         <Configurations
           {schedule}
