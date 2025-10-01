@@ -1782,16 +1782,18 @@
               </div>
             {/if}
           {/if}
-          <Button
-            type="secondary"
-            size="medium"
-            title="Schedule Run"
-            style="margin-left: 0;"
-            buttonType="button"
-            onClick={() => {
-              isScheduleRunPopupOpen = true;
-            }}
-          />
+          {#if !isGuestUser && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+            <Button
+              type="secondary"
+              size="medium"
+              title="Schedule Run"
+              style="margin-left: 0;"
+              buttonType="button"
+              onClick={() => {
+                isScheduleRunPopupOpen = true;
+              }}
+            />
+          {/if}
         </div>
 
         {#if $isTestFlowTourGuideOpen && $currentStep == 6}

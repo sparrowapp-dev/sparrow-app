@@ -20,6 +20,7 @@
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
   import { ScheduleRunPopUp } from "@sparrow/common/features";
   import { Modal } from "@sparrow/library/ui";
+  import { getClientUser } from "src/utils/jwt";
   export let tab;
   export let teamDetails;
   export let upgradePlanModel;
@@ -58,6 +59,8 @@
 
   //schedule run popup state
   let isScheduleRunPopupOpen: boolean = false;
+
+  const userEmail = getClientUser().email;
 
   /**
    * @description - refreshes the environment everytime workspace changes
@@ -352,5 +355,6 @@
         env.type !== environmentType.GLOBAL,
     ) || []}
     handleScheduleTestFlowRun={_viewModel.scheduleTestFlowRun}
+    creatorEmail={userEmail}
   />
 </Modal>

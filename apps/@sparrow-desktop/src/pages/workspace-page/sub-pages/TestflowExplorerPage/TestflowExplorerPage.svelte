@@ -23,6 +23,7 @@
 
   import { ScheduleRunPopUp } from "@sparrow/common/features";
   import { Modal } from "@sparrow/library/ui";
+  import { getClientUser } from "@app/utils/jwt";
 
   export let tab;
   export let teamDetails;
@@ -55,6 +56,8 @@
 
   //schedule run popup state
   let isScheduleRunPopupOpen: boolean = false;
+
+  const userEmail = getClientUser().email;
 
   isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
@@ -375,5 +378,6 @@
         env.type !== environmentType.GLOBAL,
     ) || []}
     handleScheduleTestFlowRun={_viewModel.scheduleTestFlowRun}
+    creatorEmail={userEmail}
   />
 </Modal>

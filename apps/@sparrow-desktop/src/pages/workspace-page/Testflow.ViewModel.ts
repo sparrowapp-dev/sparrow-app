@@ -491,8 +491,13 @@ export class TestflowViewModel {
     runConfiguration: ScheduleTestFlowRunDto["runConfiguration"],
     notification: ScheduleTestFlowRunDto["notification"],
   ) => {
+    const wsRxDoc = await this.workspaceRepository.getActiveWorkspaceDoc();
+    const ws = wsRxDoc.toMutableJSON();
     try {
-      const activeTab = await this.tabRepository.getTabDocs();
+      const activeTabRxDoc = await this.tabRepository.getTabWithWorkspaceIdDoc(
+        ws._id,
+      );
+      const activeTab = activeTabRxDoc.toMutableJSON();
 
       if (!activeTab) {
         notifications.error("No active testflow tab found");

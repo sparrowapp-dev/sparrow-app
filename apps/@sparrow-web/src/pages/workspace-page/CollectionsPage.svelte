@@ -110,7 +110,11 @@
   import { RequestTabTestsTourContent } from "@sparrow/workspaces/features";
   import { ScheduleRunPopUp } from "@sparrow/common/features";
   import { WorkspaceEnvironmentTypeBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
+
+  import { getClientUser } from "src/utils/jwt";
+
   import TestflowScheduleRVExplorerPage from "./sub-pages/TestflowScheduleRVExplorerPage.svelte/TestflowScheduleRVExplorerPage.svelte";
+
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
@@ -120,6 +124,8 @@
     _viewModel.getActiveWorkspace();
   let collectionList: Observable<CollectionDocument[]> =
     _viewModel.getCollectionList();
+
+  const userEmail = getClientUser().email;
 
   let removeTab: Tab;
   let isPopupClosed: boolean = false;
@@ -1931,6 +1937,7 @@
         env.type !== WorkspaceEnvironmentTypeBaseEnum.GLOBAL,
     ) || []}
     handleScheduleTestFlowRun={_viewModel3.scheduleTestFlowRun}
+    creatorEmail={userEmail}
   />
 </Modal>
 

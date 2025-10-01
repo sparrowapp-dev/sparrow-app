@@ -415,7 +415,7 @@
       <CalendarRegular />
     </div>
     {#if isInvalid}
-      <div class="date-input-error">Please enter a valid date (DD-MM-YYYY)</div>
+      <div class="date-input-error">Please enter a valid date</div>
     {/if}
   </div>
 
@@ -569,11 +569,10 @@
     position: absolute;
     left: 0;
     top: 100%;
-    margin-top: 4px;
     font-size: 12px;
+    margin-bottom: 8px;
     color: var(--text-ds-danger-300);
-    background-color: rgba(220, 38, 38, 0.05);
-    padding: 2px 8px;
+    padding: 2px 0px;
     border-radius: 4px;
     z-index: 5;
     max-width: calc(100% - 16px);
