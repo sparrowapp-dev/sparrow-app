@@ -9,6 +9,8 @@
   import { TestflowScheduleExplorer } from "@sparrow/workspaces/features";
   import { user } from "@app/store/auth.store";
   import { testflowSchedules } from "@sparrow/common/store";
+  import { WorkspaceRole } from "@sparrow/common/enums";
+  import { onDestroy } from "svelte";
 
   /**
    * folder tab document
@@ -55,7 +57,10 @@
       }
     });
   }
-
+  let environments;
+  let activeWorkspace;
+  let activeWorkspaceSubscriber;
+  let isTestflowScheduleEditable;
   $: {
     if (tab) {
       if (prevTabId !== tab?.tabId) {
@@ -71,6 +76,26 @@
           testflowSubscriber = testflowObserver?.subscribe((data) => {
             testflow = data?.toMutableJSON();
           });
+          environments = _viewModel.environments;
+
+          activeWorkspace = _viewModel.activeWorkspace;
+          activeWorkspaceSubscriber = activeWorkspace.subscribe(
+            (_workspace) => {
+              const workspaceDoc = _workspace?.toMutableJSON();
+
+              if (workspaceDoc) {
+                workspaceDoc.users?.forEach((_user) => {
+                  if (_user.id === userId) {
+                    if (_user.role !== WorkspaceRole.WORKSPACE_VIEWER) {
+                      isTestflowScheduleEditable = true;
+                    } else {
+                      isTestflowScheduleEditable = false;
+                    }
+                  }
+                });
+              }
+            },
+          );
         })();
       } else if (tab?.name && prevTabName !== tab.name) {
       }
@@ -78,14 +103,24 @@
       prevTabId = tab?.tabId || "";
     }
   }
+
+  onDestroy(() => {
+    activeWorkspaceSubscriber.unsubscribe();
+  });
 </script>
 
 <TestflowScheduleExplorer
   tab={_viewModel.tab}
+  environments={$environments || []}
   {testflow}
   {schedule}
+  {isTestflowScheduleEditable}
   onUpdateScheduleState={_viewModel.updateScheduleState}
   onScheduleRun={_viewModel.runTestflowSchedule}
   onDeleteTestflowScheduleHistory={_viewModel.deleteTestflowScheduleHistory}
   onScheduleRunview={_viewModel.handleCreateTestflowSingleScheduleTab}
+  onRefreshSchedule={_viewModel.refreshTestflowSchedule}
+  onEditTestflowSchedule={_viewModel.editTestflowSchedule}
+  onOpenTestflow={_viewModel.handleOpenTestflow}
+  onOpenEnvironment={_viewModel.handleOpenEnvironment}
 />
