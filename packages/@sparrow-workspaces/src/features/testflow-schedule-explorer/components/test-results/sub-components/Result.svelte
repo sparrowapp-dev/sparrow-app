@@ -9,6 +9,7 @@
 
   export let onDeleteTestflowScheduleHistory;
   export let onScheduleRunview;
+  export let isTestflowScheduleEditable;
 
   let showMenu: boolean = false;
 
@@ -80,19 +81,21 @@
 
   <td bind:this={activeWrapper}>
     <span class="threedot-icon-container d-flex">
-      <Button
-        tabindex={-1}
-        id={`show-more-schedule-result-${r.id}`}
-        size="extra-small"
-        customWidth={"24px"}
-        type="teritiary-regular"
-        startIcon={MoreHorizontalRegular}
-        onClick={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          rightClickContextMenu(e);
-        }}
-      />
+      {#if isTestflowScheduleEditable}
+        <Button
+          tabindex={-1}
+          id={`show-more-schedule-result-${r.id}`}
+          size="extra-small"
+          customWidth={"24px"}
+          type="teritiary-regular"
+          startIcon={MoreHorizontalRegular}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            rightClickContextMenu(e);
+          }}
+        />
+      {/if}
     </span>
   </td>
 </tr>

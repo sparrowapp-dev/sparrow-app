@@ -5,9 +5,7 @@
   export let schedule;
   export let onDeleteTestflowScheduleHistory;
   export let onScheduleRunview;
-
-  let openMenuFor: string | null = null;
-  let activeWrapper: HTMLElement | null = null;
+  export let isTestflowScheduleEditable;
 
   function formatDate(dateStr: string) {
     const date = new Date(dateStr);
@@ -53,6 +51,7 @@
               {schedule}
               {formatDate}
               {getRunType}
+              {isTestflowScheduleEditable}
             />
           {/each}
         </tbody>
