@@ -160,6 +160,7 @@
   export let isGuestUser = false;
   export let collectionListDocument: CollectionDocument[];
   export let isScheduleRunPopupOpen;
+
   export let onOpenTestflowScheduleTab;
   export let testflowScheduleStore = [];
 
@@ -1292,7 +1293,8 @@
            */
           unselectNodes();
           nodes.update((_nodes: Node[]) => {
-            const dbNodes = $tab?.property?.testflow?.nodes as TFNodeType[];
+            const dbNodes =
+              ($tab?.property?.testflow?.nodes as TFNodeType[]) || [];
             let res = [];
             for (let i = 0; i < dbNodes.length; i++) {
               res.push({
@@ -1368,7 +1370,8 @@
             return res;
           });
           edges.update((_edges: TFEdgeHandlerType[]) => {
-            const dbEdges = $tab?.property?.testflow?.edges as TFEdgeType[];
+            const dbEdges =
+              ($tab?.property?.testflow?.edges as TFEdgeType[]) || [];
             let res = [];
             for (let i = 0; i < dbEdges.length; i++) {
               res.push({
@@ -2127,6 +2130,7 @@
                     {getNextRunTooltip}
                     {handleScheduleAction}
                     {getTagType}
+                    {onOpenTestflowScheduleTab}
                   />
                 {/each}
               </tbody>

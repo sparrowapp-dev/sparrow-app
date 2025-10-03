@@ -12,11 +12,12 @@
   export let getNextRunTooltip;
   export let handleScheduleAction;
   export let getTagType;
+  export let onOpenTestflowScheduleTab;
 </script>
 
 <tr
   class="custom-row"
-  on:click={() => onPerformTestflowScheduleOperations("open", schedule.id)}
+  on:click={() => onOpenTestflowScheduleTab(schedule?.originalData)}
 >
   <td>
     <div class="d-flex flex-column">
