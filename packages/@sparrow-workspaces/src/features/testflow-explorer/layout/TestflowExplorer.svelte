@@ -1961,7 +1961,7 @@
   <!-- Warning Message -->
   {#if activeTab === "scheduled" && filteredSchedules.some((schedule) => schedule.status === "Active") && !dismissed}
     <div
-      class="warning-banner d-flex align-items-center mb-3 p-2 position-relative"
+      class="warning-banner px-4 d-flex align-items-center mb-3 p-2 position-relative"
     >
       <div class="warning-icon me-2"><ToastIcon /></div>
       <div class="flex-grow-1">
@@ -1969,13 +1969,13 @@
           This flow has active schedules. Any changes here will affect future
           runs.
         </span>
-        <span
+        <!-- <span
           class="cursor-pointer ms-2 text-fs-12"
           on:click={handleLearnMore}
           style="color: #60a5fa;"
         >
           Learn More
-        </span>
+        </span> -->
       </div>
       <button class="btn-close-warning" on:click={dismissWarning}> × </button>
     </div>
@@ -2592,16 +2592,15 @@
 
   .scheduled-table th {
     background-color: var(--bg-ds-neutral-900);
-    padding: 12px;
+    padding-bottom: 12px;
     text-align: left;
     font-weight: 500;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--text-ds-neutral-300);
     border-bottom: 1px solid var(--border-ds-neutral-400);
   }
 
   .scheduled-table td {
-    padding: 12px;
     border-bottom: none;
     font-size: 14px;
     background-color: var(--bg-ds-neutral-900);
