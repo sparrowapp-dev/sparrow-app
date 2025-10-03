@@ -320,7 +320,7 @@
         <span>
           <BotRegular height={"17px"} width={"15px"} />
         </span>
-      {:else if tab.type === TabTypeEnum.MOCK_HISTORY}
+      {:else if tab.type === TabTypeEnum.MOCK_HISTORY  || tab.type === TabTypeEnum.TESTFLOW_SCHEDULE_RUN_VIEW}
         <span>
           <HistoryIcon2 height={"16px"} width={"16px"} />
         </span>

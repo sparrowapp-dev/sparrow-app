@@ -129,7 +129,13 @@
             {isTestflowScheduleEditable}
           />
         {:else if $tab?.property?.testflowSchedule?.state?.scheduleNavigator === TestflowScheduleNavigatorEnum.CONFIGURATION}
-          <Configurations />
+          <Configurations
+            {schedule}
+            {environments}
+            {workspaceUsers}
+            {onUpdateSchedule}
+            {onSaveSchedule}
+          />
         {/if}
       </div>
     </div>

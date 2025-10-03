@@ -1,11 +1,14 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, createEventDispatcher } from "svelte";
   import { Button } from "@sparrow/library/ui";
   import {
     CalendarRegular,
     ArrowLeftRegular,
     ArrowRightRegular,
   } from "@sparrow/library/icons";
+
+  // Event dispatcher to emit custom events
+  const dispatch = createEventDispatcher();
 
   export let value: string = "";
   export let placeholder: string = "Select date";
@@ -157,6 +160,9 @@
       selectedMonth = date.getMonth();
       selectedYear = date.getFullYear();
       currentMonth = new Date(selectedYear, selectedMonth, 1);
+
+      // Dispatch change event
+      dispatch("change", value);
     } else {
       // Invalid date - show error but keep the text
       isInvalid = true;
@@ -168,6 +174,9 @@
     if (!internalValue.trim()) {
       isInvalid = false;
       value = "";
+
+      // Dispatch change event for empty value
+      dispatch("change", value);
       return;
     }
 
@@ -212,6 +221,9 @@
         value = formatDate(selectedDay, selectedMonth, selectedYear);
         internalValue = value;
         isInvalid = false;
+
+        // Dispatch change event for repaired date
+        dispatch("change", value);
       } else {
         // Format could not be repaired
         internalValue = value || ""; // Revert to last valid value
@@ -295,6 +307,9 @@
     internalValue = value;
     isInvalid = false;
     showCalendar = false;
+
+    // Dispatch change event when date is selected
+    dispatch("change", value);
   }
 
   function navigateMonth(direction: number) {
@@ -307,7 +322,6 @@
 
   function handleToday() {
     const today = new Date();
-
     // Check if today is within min/max range
     if (isDateDisabled(today)) {
       return;
@@ -321,6 +335,8 @@
     internalValue = value;
     isInvalid = false;
     showCalendar = false;
+    // Dispatch change event when Today is clicked
+    dispatch("change", value);
   }
 
   function handleClear() {
@@ -328,6 +344,8 @@
     internalValue = "";
     isInvalid = false;
     showCalendar = false;
+    // Dispatch change event when Clear is clicked
+    dispatch("change", "");
   }
 
   const toggleCalendar = () => {

@@ -123,11 +123,19 @@
   let testflowStoreMap;
   let testflowScheduleStoreMap;
 
-  let testflowScheduleStore;
+  let testflowScheduleStore = [];
 
   $: {
     testflowStore = testflowStoreMap?.get(tab?.tabId) as TFDataStoreType;
-    testflowScheduleStore = testflowScheduleStoreMap?.get(tab?.id);
+
+    // Get schedules from map with fallback to empty array
+    const schedulesFromMap = testflowScheduleStoreMap?.get(tab?.id);
+    testflowScheduleStore = Array.isArray(schedulesFromMap)
+      ? [...schedulesFromMap]
+      : [];
+
+    console.log("testflowScheduleStore from map:", testflowScheduleStore);
+
     const nodes = testflowStore?.nodes ?? [];
     const hasEmptyResponseStatus = nodes.some(
       (node) => !node.response?.status || node.response?.status === "",
@@ -299,9 +307,40 @@
     handleBlockLimitTestflow();
     collectionsSubscriber.unsubscribe();
   });
+
+  async function refetchSchedules() {
+    console.log("Refetching schedules for tab:", tab?.id);
+    if (tab && _viewModel) {
+      const schedules = await _viewModel.getTestflowSchedules(tab.id);
+      const newSchedules = Array.isArray(schedules) ? schedules : [];
+
+      // Update the store
+      testflowSchedules.update((map) => {
+        const newMap = new Map(map);
+        newMap.set(tab.id, newSchedules);
+        return newMap;
+      });
+
+      // Force local update with new reference
+      testflowScheduleStore = [...newSchedules];
+      console.log("Updated testflowScheduleStore:", testflowScheduleStore);
+    }
+  }
+  $: {
+    testflowStore = testflowStoreMap?.get(tab?.tabId) as TFDataStoreType;
+
+    // Get schedules from map with fallback to empty array
+    const schedulesFromMap = testflowScheduleStoreMap?.get(tab?.id);
+    testflowScheduleStore = Array.isArray(schedulesFromMap)
+      ? [...schedulesFromMap]
+      : [];
+
+    console.log("testflowScheduleStore from map:", testflowScheduleStore);
+    // ... rest of your code
+  }
 </script>
 
-{#if render}
+{#if render && _viewModel}
   <!-- {#if testflowScheduleStore}
     {#each testflowScheduleStore as schedule}
       <div>
@@ -366,6 +405,7 @@
     checkRequestExistInNode={_viewModel.checkRequestExistInNode}
     onUpdateEnvironment={_viewModel.updateEnvironment}
     {userRole}
+    {currentWorkspaceId}
     runSingleNode={_viewModel.handleSingleTestFlowNodeRun}
     onPreviewExpression={_viewModel.handlePreviewExpression}
     redirectDocsTestflow={_viewModel.redirectDocsTestflow}
@@ -383,7 +423,11 @@
     {selectiveRunTestflow}
     handleContactSales={_viewModel.handleContactSales}
     onChangeSeletedAuthValue={_viewModel.parseAuthHeader}
+    onOpenTestflowScheduleTab={_viewModel.openTestflowScheduleTab}
+    onUpdateScheduleStatus={_viewModel.updateTestflowScheduleStatus}
+    onScheduleStatusUpdated={refetchSchedules}
     onPerformTestflowScheduleOperations={_viewModel.performTestflowScheduleOperations}
+    onOpenTestflowScheduleConfigurationsTab={_viewModel.openTestflowScheduleConfigurationsTab}
   />
 {/if}
 

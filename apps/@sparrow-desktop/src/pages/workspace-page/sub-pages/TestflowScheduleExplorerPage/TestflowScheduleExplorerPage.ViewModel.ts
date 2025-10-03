@@ -20,7 +20,11 @@ import {
   type Tab,
 } from "@sparrow/common/types/workspace/tab";
 import { BehaviorSubject, type Observable } from "rxjs";
-import { FolderTabAdapter, TestflowScheduleRunViewTabAdapter, TestflowTabAdapter } from "@app/adapter";
+import {
+  FolderTabAdapter,
+  TestflowScheduleRunViewTabAdapter,
+  TestflowTabAdapter,
+} from "@app/adapter";
 import constants from "@app/constants/constants";
 import { notifications } from "@sparrow/library/ui";
 import { getSelfhostUrls } from "@app/utils/jwt";
@@ -38,9 +42,8 @@ class MockHistoryExplorerPage {
   private workspaceRepository = new WorkspaceRepository();
   private testflowRepository = new TestflowRepository();
   private testflowService = new TestflowService();
-  private environmentRepository = new EnvironmentRepository();
   private initTab = new InitTab();
-
+  private environmentRepository = new EnvironmentRepository();
 
   private _tab: BehaviorSubject<Tab> = new BehaviorSubject({});
 
@@ -65,7 +68,7 @@ class MockHistoryExplorerPage {
     return this.environmentRepository.getEnvironment();
   }
 
-   /**
+  /**
    * Return active workspace of the user
    */
   public get activeWorkspace() {
@@ -74,7 +77,7 @@ class MockHistoryExplorerPage {
 
   public getTestflowObserver = (_testflowId: string) => {
     return this.testflowRepository.getTestflowObserver(_testflowId);
-  }
+  };
 
   public constructBaseUrl = async (_id: string) => {
     const workspaceData = await this.workspaceRepository.readWorkspace(_id);
@@ -82,7 +85,7 @@ class MockHistoryExplorerPage {
 
     const [selfhostBackendUrl] = getSelfhostUrls();
     if (selfhostBackendUrl) {
-        return selfhostBackendUrl;
+      return selfhostBackendUrl;
     }
 
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
@@ -108,19 +111,29 @@ class MockHistoryExplorerPage {
    */
   public getTestflow = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    const response =  await this.testflowService?.fetchTestflow(progressiveTab.path.testflowId);
-     if(response?.isSuccessful){
+    const response = await this.testflowService?.fetchTestflow(
+      progressiveTab.path.testflowId,
+    );
+    if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
-      updateTestflowSchedules(progressiveTab?.path?.testflowId as string, schedules);
+      updateTestflowSchedules(
+        progressiveTab?.path?.testflowId as string,
+        schedules,
+      );
     }
   };
 
   public refreshTestflowSchedule = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    const response =  await this.testflowService?.fetchTestflow(progressiveTab.path.testflowId);
-     if(response?.isSuccessful){
+    const response = await this.testflowService?.fetchTestflow(
+      progressiveTab.path.testflowId,
+    );
+    if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
-      updateTestflowSchedules(progressiveTab?.path?.testflowId as string, schedules);
+      updateTestflowSchedules(
+        progressiveTab?.path?.testflowId as string,
+        schedules,
+      );
     }
   };
 
@@ -138,48 +151,106 @@ class MockHistoryExplorerPage {
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
 
-  public runTestflowSchedule = async() => {
+  public runTestflowSchedule = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-     const baseUrl = await this.constructBaseUrl(
-        progressiveTab.path.workspaceId,
-      );
-    const response = await this.testflowService.runTestflowSchedule(progressiveTab.path.workspaceId, progressiveTab.path.testflowId, progressiveTab.id, baseUrl);
-    if(response?.isSuccessful){
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab.path.workspaceId,
+    );
+    const response = await this.testflowService.runTestflowSchedule(
+      progressiveTab.path.workspaceId,
+      progressiveTab.path.testflowId,
+      progressiveTab.id,
+      baseUrl,
+    );
+    if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
-      updateTestflowSchedules(progressiveTab?.path?.testflowId as string, schedules);
+      updateTestflowSchedules(
+        progressiveTab?.path?.testflowId as string,
+        schedules,
+      );
     }
-  }
+  };
 
-  public deleteTestflowScheduleHistory = async(_scheduleHistoryId: string) => {
+  public deleteTestflowScheduleHistory = async (_scheduleHistoryId: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-     const baseUrl = await this.constructBaseUrl(
-        progressiveTab.path.workspaceId,
-      );
-    const response = await this.testflowService.deleteScheduleRunHistory(progressiveTab.path.workspaceId, progressiveTab.path.testflowId, progressiveTab.id, _scheduleHistoryId, baseUrl);
-    if(response?.isSuccessful){
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab.path.workspaceId,
+    );
+    const response = await this.testflowService.deleteScheduleRunHistory(
+      progressiveTab.path.workspaceId,
+      progressiveTab.path.testflowId,
+      progressiveTab.id,
+      _scheduleHistoryId,
+      baseUrl,
+    );
+    if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
-      updateTestflowSchedules(progressiveTab?.path?.testflowId as string, schedules);
+      updateTestflowSchedules(
+        progressiveTab?.path?.testflowId as string,
+        schedules,
+      );
     }
-  }
+  };
 
-    public updateTestflowSchedule = async() => {
+  /**
+   * Updates the testflow schedule configuration and persists to database
+   * @param updatedSchedule - The updated schedule configuration data
+   * @returns Promise with operation result
+   */
+  public updateTestflowSchedule = async (updatedSchedule: any = {}) => {
+    try {
       const progressiveTab = createDeepCopy(this._tab.getValue());
-       const baseUrl = await this.constructBaseUrl(
-          progressiveTab.path.workspaceId,
-        );
-      let payload={
-        isActive: true
-      }
+      const baseUrl = await this.constructBaseUrl(
+        progressiveTab.path.workspaceId,
+      );
+      // Prepare payload for API
+      const payload = {
+        name: progressiveTab.name,
+        environmentId: progressiveTab.property.testflowSchedule.environmentId,
+        runConfiguration:
+          progressiveTab.property.testflowSchedule.runConfiguration,
+        notification: progressiveTab.property.testflowSchedule.notification,
+      };
 
-      const response = await this.testflowService.updateTestflowSchedule(progressiveTab.path.workspaceId, progressiveTab.path.testflowId, progressiveTab.id, payload, baseUrl);
-      if(response?.isSuccessful){
+      // Send to server
+      const response = await this.testflowService.updateTestflowSchedule(
+        progressiveTab.path.workspaceId,
+        progressiveTab.path.testflowId,
+        progressiveTab.id,
+        payload,
+        baseUrl,
+      );
+
+      if (response?.isSuccessful) {
         const schedules = response.data.data.schedules;
-        updateTestflowSchedules(progressiveTab?.path?.testflowId as string, schedules);
+        updateTestflowSchedules(
+          progressiveTab?.path?.testflowId as string,
+          schedules,
+        );
+        notifications.success(
+          `'${progressiveTab.name}' schedule saved successfully.`,
+        );
+        return { success: true };
+      } else {
+        notifications.error("Failed to save schedule. Please try again.");
+        return {
+          success: false,
+          error: response?.data?.message || "Failed to save schedule",
+        };
       }
+    } catch (error) {
+      notifications.error("Failed to save schedule. Please try again.");
+      console.error("Error saving schedule:", error);
+      return {
+        success: false,
+        error: "An unexpected error occurred while saving the schedule",
+      };
     }
-  public handleCreateTestflowSingleScheduleTab = (_scheduleResult) => {
+  }
+  
+  public handleCreateTestflowSingleScheduleTab = (_scheduleResult,scheduleName:string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    const x = new TestflowScheduleRunViewTabAdapter().adapt(progressiveTab.path.workspaceId, _scheduleResult);
+    const x = new TestflowScheduleRunViewTabAdapter().adapt(progressiveTab.path.workspaceId, _scheduleResult,scheduleName);
 
     // const initTestflowScheduleRunViewTab = this.initTab.testflowScheduleRunView(
     //   _scheduleResult.id,
@@ -198,68 +269,126 @@ class MockHistoryExplorerPage {
     this.tabRepository.createTab(x);
   };
 
-    public editTestflowSchedule = async(isActive: boolean) => {
-      const progressiveTab = createDeepCopy(this._tab.getValue());
-       const baseUrl = await this.constructBaseUrl(
-          progressiveTab.path.workspaceId,
-        );
-      let payload={
-        isActive: isActive
-      }
+  /**
+   * Updates the testflow schedule tab data with the provided configuration
+   * This only updates the local tab data and doesn't save to the server
+   * @param updatedSchedule - The updated schedule configuration
+   */
+  public updateScheduleTab = async (updatedSchedule) => {
+    // Get current tab state
+    const progressiveTab = createDeepCopy(this._tab.getValue());
 
-      const response = await this.testflowService.updateTestflowSchedule(progressiveTab.path.workspaceId, progressiveTab.path.testflowId, progressiveTab.id, payload, baseUrl);
-      if(response?.isSuccessful){
-        const schedules = response.data.data.schedules;
-        updateTestflowSchedules(progressiveTab?.path?.testflowId as string, schedules);
+    // Update tab name if provided
+    if (updatedSchedule.name) {
+      progressiveTab.name = updatedSchedule.name;
+    }
+
+    // Update environment ID if provided
+    if (updatedSchedule.environmentId !== undefined) {
+      if (progressiveTab.property.testflowSchedule) {
+        progressiveTab.property.testflowSchedule.environmentId =
+          updatedSchedule.environmentId;
       }
     }
 
-    /**
-     * Handles the opening of a Testflow by reading the associated workspace,
-     * initializing a new Testflow tab, and creating the tab in the repository.
-     *
-     * @param _testflow - The Testflow document containing the workspace and flow data.
-     * @returns - A promise that resolves when the Testflow has been opened and the tab created.
-     */
-    public handleOpenTestflow = async (
-      _id: string,
-    ): Promise<void> => {
+    // Update run configuration if provided
+    if (updatedSchedule.runConfiguration) {
+      if (progressiveTab.property.testflowSchedule) {
+        progressiveTab.property.testflowSchedule.runConfiguration = {
+          ...progressiveTab.property.testflowSchedule.runConfiguration,
+          ...updatedSchedule.runConfiguration,
+        };
+      }
+    }
 
-      const testflowRxDoc = await this.testflowRepository.readTestflow(_id);
-      const testflowJSON = testflowRxDoc.toMutableJSON();
-      const currentWorkspace = await this.workspaceRepository.readWorkspace(
-        testflowJSON.workspaceId,
-      );
-      const testflowTab = new TestflowTabAdapter().adapt(
-        currentWorkspace._id,
-        testflowJSON,
-      );
-      this.tabRepository.createTab(testflowTab);
-      scrollToTab(testflowTab.id);
+    // Update notification settings if provided
+    if (updatedSchedule.notification) {
+      if (progressiveTab.property.testflowSchedule) {
+        progressiveTab.property.testflowSchedule.notification = {
+          ...progressiveTab.property.testflowSchedule.notification,
+          ...updatedSchedule.notification,
+        };
+      }
+    }
+
+    // Update the tab in memory
+    this.tab = progressiveTab;
+
+    // Update the tab in the repository
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+
+    return { success: true };
+  };
+  public editTestflowSchedule = async (isActive: boolean) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab.path.workspaceId,
+    );
+    let payload = {
+      isActive: isActive,
     };
 
-    /**
-     * @description - creates new local environment tab
-     * @param env - environment that needs to be opened
-     */
-    public handleOpenEnvironment = async (_id: string) => {
+    const response = await this.testflowService.updateTestflowSchedule(
+      progressiveTab.path.workspaceId,
+      progressiveTab.path.testflowId,
+      progressiveTab.id,
+      payload,
+      baseUrl,
+    );
+    if (response?.isSuccessful) {
+      const schedules = response.data.data.schedules;
+      updateTestflowSchedules(
+        progressiveTab?.path?.testflowId as string,
+        schedules,
+      );
+    }
+  };
 
-      const environmentRxDoc = await this.environmentRepository.readEnvironment(_id);
-      const environmentJSON = environmentRxDoc.toMutableJSON();
-      const currentWorkspace = await this.workspaceRepository.readWorkspace(
-        environmentJSON.workspaceId,
-      );
-  
-      const initEnvironmentTab = this.initTab.environment(
-        environmentJSON.id,
-        currentWorkspace._id,
-      );
-      initEnvironmentTab.setName(environmentJSON.name).setVariable(environmentJSON.variable);
-      initEnvironmentTab.setTabType(TabPersistenceTypeEnum.TEMPORARY);
-  
-      this.tabRepository.createTab(initEnvironmentTab.getValue());
-      scrollToTab(initEnvironmentTab.getValue().id);
-    };
+  /**
+   * Handles the opening of a Testflow by reading the associated workspace,
+   * initializing a new Testflow tab, and creating the tab in the repository.
+   *
+   * @param _testflow - The Testflow document containing the workspace and flow data.
+   * @returns - A promise that resolves when the Testflow has been opened and the tab created.
+   */
+  public handleOpenTestflow = async (_id: string): Promise<void> => {
+    const testflowRxDoc = await this.testflowRepository.readTestflow(_id);
+    const testflowJSON = testflowRxDoc.toMutableJSON();
+    const currentWorkspace = await this.workspaceRepository.readWorkspace(
+      testflowJSON.workspaceId,
+    );
+    const testflowTab = new TestflowTabAdapter().adapt(
+      currentWorkspace._id,
+      testflowJSON,
+    );
+    this.tabRepository.createTab(testflowTab);
+    scrollToTab(testflowTab.id);
+  };
+
+  /**
+   * @description - creates new local environment tab
+   * @param env - environment that needs to be opened
+   */
+  public handleOpenEnvironment = async (_id: string) => {
+    const environmentRxDoc =
+      await this.environmentRepository.readEnvironment(_id);
+    const environmentJSON = environmentRxDoc.toMutableJSON();
+    const currentWorkspace = await this.workspaceRepository.readWorkspace(
+      environmentJSON.workspaceId,
+    );
+
+    const initEnvironmentTab = this.initTab.environment(
+      environmentJSON.id,
+      currentWorkspace._id,
+    );
+    initEnvironmentTab
+      .setName(environmentJSON.name)
+      .setVariable(environmentJSON.variable);
+    initEnvironmentTab.setTabType(TabPersistenceTypeEnum.TEMPORARY);
+
+    this.tabRepository.createTab(initEnvironmentTab.getValue());
+    scrollToTab(initEnvironmentTab.getValue().id);
+  };
 }
 
 export default MockHistoryExplorerPage;
