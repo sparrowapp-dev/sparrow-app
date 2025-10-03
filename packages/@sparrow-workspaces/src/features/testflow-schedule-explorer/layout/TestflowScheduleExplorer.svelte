@@ -93,11 +93,12 @@
           />
         </div>
       </div>
-      <div class="d-flex">
+      <div class="d-flex pb-2">
         <Button
           title={testflow?.name}
           startIcon={FlowChartRegular}
           type={"link-secondary"}
+          size={"extra-small"}
           onClick={() => {
             onOpenTestflow(testflow?.id);
           }}
@@ -107,6 +108,7 @@
             title={scheduledEnvironment?.name || ""}
             startIcon={LayerRegular}
             type={"link-secondary"}
+            size={"extra-small"}
             onClick={() => {
               onOpenEnvironment(scheduledEnvironment?.id);
             }}
