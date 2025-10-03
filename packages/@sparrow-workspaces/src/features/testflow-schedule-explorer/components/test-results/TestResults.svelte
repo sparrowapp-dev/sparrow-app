@@ -15,8 +15,8 @@
 
   $: sortedHistory = schedule?.schedularRunHistory
     ? [...schedule.schedularRunHistory].sort((a, b) => {
-        const dateA = new Date(a.createdAt).getTime();
-        const dateB = new Date(b.createdAt).getTime();
+        const dateA = new Date(a.totalTime).getTime();
+        const dateB = new Date(b.totalTime).getTime();
         return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
       })
     : [];
@@ -54,33 +54,6 @@
     const parts = flowName.split("-");
     return parts.length > 1 ? parts[parts.length - 1].trim() : "";
   }
-
-  // function toggleMenu(e: MouseEvent, result: any, wrapper: HTMLElement) {
-  //   e.stopPropagation();
-  //   if (openMenuFor === result.createdAt) {
-  //     openMenuFor = null;
-  //     activeWrapper = null;
-  //     selectedResult = null;
-  //   } else {
-  //     openMenuFor = result.createdAt;
-  //     activeWrapper = wrapper;
-  //     selectedResult = result; // Store the result when opening menu
-  //     setTimeout(() => {
-  //       const focusWrapper = document.querySelector(
-  //         ".options-focus-wrapper",
-  //       ) as HTMLElement;
-  //       if (focusWrapper) {
-  //         focusWrapper.focus();
-  //       }
-  //     }, 0);
-  //   }
-  // }
-
-  function closeMenu() {
-    openMenuFor = null;
-    activeWrapper = null;
-    // Don't reset selectedResult here - keep it for the modal
-  }
 </script>
 
 {#if schedule?.schedularRunHistory && schedule.schedularRunHistory.length > 0}
@@ -92,7 +65,7 @@
             <tr>
               <th>Run Time</th>
               <th on:click={toggleSort} class="sortable">
-                <span class:rotated={sortDirection === "asc"}>
+                <span class:active-sort={sortDirection === "asc"}>
                   <ArrowSortRegular size="20px" />
                 </span>
               </th>
@@ -177,7 +150,7 @@
     border-bottom: 1px solid var(--border-ds-surface-200);
     thead {
       position: sticky;
-      top: 0; /* 👈 ensures header stays at the top */
+      top: 0;
       background: var(--bg-ds-surface-900, #111);
       z-index: 5;
       color: var(--text-secondary-200);
@@ -202,16 +175,24 @@
 
   .custom-table th.sortable span {
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
+    height: 24px;
+    width: 24px;
     user-select: none;
+    vertical-align: middle;
+    line-height: 0;
+    color: var(--text-secondary-200);
+    transition: color 0.2s ease;
   }
+
+  .custom-table th.sortable span.active-sort {
+    color: var(--accent-primary); /* blue when active */
+  }
+
   .custom-table th.sortable:hover {
     color: var(--text-primary-300);
-  }
-  .custom-table th.sortable span.rotated {
-    transform: rotate(180deg);
   }
 
   .options-focus-wrapper {
