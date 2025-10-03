@@ -19,6 +19,7 @@
   import type { RxDocument } from "rxdb";
   import type { CollectionDocType } from "src/models/collection.model";
   import type { Observable } from "rxjs";
+  import constants from "src/constants/constants";
 
   export let tab;
   // export let isTourGuideOpen = false;
@@ -245,4 +246,5 @@
   onHandleInsertPrompt={_viewModel.handleInsertAiPrompt}
   onUploadFiles={_viewModel.handleUploadFilesToCloud}
   bind:onCloseChatHistoryPanel
+  isSelfHost={constants.APP_EDITION === "SELFHOSTED" ? true : false}
 />

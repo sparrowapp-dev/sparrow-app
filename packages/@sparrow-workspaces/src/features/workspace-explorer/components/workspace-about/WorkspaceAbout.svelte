@@ -113,7 +113,7 @@
           >
             <span class="description">Max {maxChars} characters</span>
             <span class="description"
-              >{workspaceDescription.length}/{maxChars}</span
+              >{workspaceDescription?.length || 0}/{maxChars}</span
             >
           </div>
         </div>
