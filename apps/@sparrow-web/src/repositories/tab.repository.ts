@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RxDB, type TabDocument } from "../database/database";
 import type { Tab } from "@sparrow/common/types/workspace";
-import { TabPersistenceTypeEnum, TabTypeEnum } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  TabTypeEnum,
+} from "@sparrow/common/types/workspace/tab";
 import type { Observable } from "rxjs";
 
 export class TabRepository {
@@ -175,56 +178,53 @@ export class TabRepository {
    * await activeTab(tabIdToActivate);
    */
   public activeTab = async (id: string, wsId = ""): Promise<void> => {
-  // Get workspaceId
-    const workspaceId = wsId || (
-      await RxDB.getInstance()
-        .rxdb.workspace.findOne({ selector: { isActiveWorkspace: true } })
-        .exec()
-    )?.toMutableJSON()._id;
-  
+    // Get workspaceId
+    const workspaceId =
+      wsId ||
+      (
+        await RxDB.getInstance()
+          .rxdb.workspace.findOne({ selector: { isActiveWorkspace: true } })
+          .exec()
+      )?.toMutableJSON()._id;
+
     if (!workspaceId) return;
-  
+
     // Single query to get both tabs
     const result = await this.rxdb
       ?.find({
         selector: {
           "path.workspaceId": workspaceId,
-          $or: [
-            { id },
-            { isActive: true },
-          ],
+          $or: [{ id }, { isActive: true }],
         },
       })
       .exec();
-  
+
     if (!result?.length) return;
-  
+
     let selectedTab = null;
     let deselectedTab = null;
-  
+
     for (const doc of result) {
       const data = doc.toMutableJSON();
       if (data.id === id) selectedTab = doc;
       else if (data.isActive) deselectedTab = doc;
     }
-  
+
     if (!selectedTab || deselectedTab?.id === selectedTab.id) return;
-  
-    const updatedDocs = [
-      { ...selectedTab.toMutableJSON(), isActive: true },
-    ];
-  
+
+    const updatedDocs = [{ ...selectedTab.toMutableJSON(), isActive: true }];
+
     if (deselectedTab) {
       updatedDocs.push({ ...deselectedTab.toMutableJSON(), isActive: false });
     }
-  
+
     await this.rxdb.bulkUpsert(updatedDocs);
     return selectedTab;
   };
 
-    public bulkUpsertTabs = async (tabs: TabDocument[]): Promise<void> => {
-      await RxDB?.getInstance()?.rxdb?.tab.bulkUpsert(tabs);
-    };
+  public bulkUpsertTabs = async (tabs: TabDocument[]): Promise<void> => {
+    await RxDB?.getInstance()?.rxdb?.tab.bulkUpsert(tabs);
+  };
 
   /**
    * Retrieves the currently active tab as an observable.
@@ -258,6 +258,19 @@ export class TabRepository {
         isActive: true,
       },
     }).$;
+  };
+
+  public getTabWithWorkspaceIdDoc = async (
+    workspaceId: string,
+  ): Observable<TabDocument | null> | undefined => {
+    return await this.rxdb
+      ?.findOne({
+        selector: {
+          "path.workspaceId": workspaceId,
+          isActive: true,
+        },
+      })
+      .exec();
   };
 
   /**

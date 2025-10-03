@@ -32,6 +32,8 @@
    */
   export let currentWorkspaceUsers: { email: string }[] = [];
 
+  export let defaultEmail: string = "";
+
   // State variables
   let isOpen = false;
   let data = list;
@@ -95,6 +97,19 @@
 
   onMount(() => {
     window.addEventListener("click", handleDropdownClick);
+
+    // Check if default email is provided and matches an email in the list
+    if (defaultEmail) {
+      const matchingUser = list.find(
+        (user) => user.email.toLowerCase() === defaultEmail.toLowerCase(),
+      );
+
+      if (matchingUser && !emailstoBeSentArr.includes(matchingUser.email)) {
+        // Use the existing function to add the email
+        handleEmailOnAdd(matchingUser.email);
+        filterUser();
+      }
+    }
   });
 
   /**

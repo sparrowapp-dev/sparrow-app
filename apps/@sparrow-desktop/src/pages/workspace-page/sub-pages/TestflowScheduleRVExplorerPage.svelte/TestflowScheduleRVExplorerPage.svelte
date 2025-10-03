@@ -354,7 +354,6 @@
     {selectiveRunTestflow}
     handleContactSales={_viewModel.handleContactSales}
     onChangeSeletedAuthValue={_viewModel.parseAuthHeader}
-    onOpenTestflowScheduleTab={_viewModel.openTestflowScheduleTab}
   />
 {/if}
 

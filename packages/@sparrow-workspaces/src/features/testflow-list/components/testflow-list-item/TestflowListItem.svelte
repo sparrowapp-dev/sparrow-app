@@ -52,6 +52,8 @@
   // open the schedule run popup
   export let isScheduleRunPopupOpen;
 
+  export let isGuestUser;
+
   let showMenu: boolean = false;
   let isTestflowPopup: boolean = false;
   let newTestflowName: string = "";
@@ -141,10 +143,14 @@
         },
         {
           onClick: () => {
+            openTestflow();
             isScheduleRunPopupOpen = true;
           },
           displayText: "Schedule Run",
           disabled: false,
+          hidden:
+            isGuestUser ||
+            loggedUserRoleInWorkspace === WorkspaceRole.WORKSPACE_VIEWER,
         },
         {
           onClick: renameTestflow,
