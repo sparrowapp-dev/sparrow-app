@@ -320,10 +320,25 @@
         }
       }
     }
-
     let lastResult = "No results yet";
-    if (schedule.lastExecuted) {
-      lastResult = "Success";
+    const runHistory =
+      schedule.schedularRunHistory ||
+      schedule.originalData?.schedularRunHistory;
+
+    if (Array.isArray(runHistory) && runHistory.length > 0) {
+      // Sort by createdAt to get the most recent run (if array is not already sorted)
+      const sortedHistory = [...runHistory].sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+      );
+      const lastRun = sortedHistory[0];
+
+      if (lastRun.status === "pass") {
+        lastResult = "Success";
+      } else if (lastRun.status === "fail") {
+        lastResult = "Fail";
+      } else {
+        lastResult = lastRun.status || "Unknown";
+      }
     }
 
     let description = "";
@@ -344,7 +359,19 @@
 
     let environment = "None";
     if (schedule.environmentId && schedule.environmentId.trim() !== "") {
-      environment = schedule.environmentId;
+      // environmentVariables is an object with keys like "global", "local", etc.
+      // Each has an id and name property
+      let envObj = undefined;
+      for (const key in environmentVariables) {
+        if (
+          environmentVariables[key] &&
+          environmentVariables[key].id === schedule.environmentId
+        ) {
+          envObj = environmentVariables[key];
+          break;
+        }
+      }
+      environment = envObj?.name || "Deleted Environment";
     }
 
     return {
@@ -805,18 +832,48 @@
   }
 
   function getNextRunTooltip(schedule) {
-    if (schedule.status === "Paused") {
+    if (schedule.nextRun === "Paused") {
       return "This schedule is currently paused. Resume to enable future runs.";
     }
     if (schedule.status === "Expired") {
-      return `No more runs. Scheduled run was completed after last run on ${schedule.lastRunDate}.`;
+      const lastExecuted = schedule.originalData?.lastExecuted;
+      if (lastExecuted) {
+        const date = new Date(lastExecuted);
+        const formattedDate = date.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+        const formattedTime = date.toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+        });
+        return `No more runs. Scheduled run was completed after last run on ${formattedDate} at ${formattedTime}.`;
+      }
+      return "No more runs. This schedule has expired.";
     }
-    if (schedule.nextRun) {
-      return `Next run scheduled at ${schedule.nextRun}`;
+    if (schedule.nextRun && schedule.nextRun !== "Not scheduled") {
+      // You might want to show the actual executeAt time here
+      const executeAt = schedule.originalData?.runConfiguration?.executeAt;
+      if (executeAt) {
+        const date = new Date(executeAt);
+        const formattedDate = date.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+        const formattedTime = date.toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+        });
+        return `Next run scheduled at ${formattedDate} at ${formattedTime}`;
+      }
+      return `Next run: ${schedule.nextRun}`;
     }
     return "No upcoming runs scheduled.";
   }
-
   /**
    * Finds the next available node ID.
    * @param list - List of existing nodes.

@@ -4,14 +4,26 @@
   import { ErrorWithText } from "@sparrow/library/icons";
 
   export let schedule;
-
-  console.log("Schedule:", schedule);
   export let onPerformTestflowScheduleOperations;
   export let getTooltipMessage;
   export let handleToggleStatus;
   export let getNextRunTooltip;
   export let handleScheduleAction;
   export let getTagType;
+  function getFailTooltip(schedule) {
+    const runHistory = schedule.originalData?.schedularRunHistory;
+    if (Array.isArray(runHistory) && runHistory.length > 0) {
+      // Sort to get the latest run
+      const sortedHistory = [...runHistory].sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+      );
+      const lastRun = sortedHistory[0];
+      const total =
+        (lastRun.successRequests || 0) + (lastRun.failedRequests || 0);
+      return `• ${lastRun.successRequests}/${total} APIs passed.<br>• Avg. Response Time: ${lastRun.totalTime || "N/A"}`;
+    }
+    return "No results yet";
+  }
 </script>
 
 <tr
@@ -56,7 +68,21 @@
       </div>
     </Tooltip>
   </td>
-  <td>{schedule.environment}</td>
+  <td>
+    {#if schedule.environment === "Deleted Environment"}
+      <Tooltip
+        title="This environment has been removed and might impact test results."
+        placement="bottom-center"
+        size="small"
+      >
+        <span style="color: var(--text-ds-neutral-500);"
+          >{schedule.environment}</span
+        >
+      </Tooltip>
+    {:else}
+      {schedule.environment}
+    {/if}
+  </td>
   <td>
     <Tooltip
       title={getNextRunTooltip(schedule)}
@@ -69,25 +95,18 @@
     </Tooltip>
   </td>
   <td>
-    {#if schedule.lastResult !== "No results yet" && schedule.lastResult !== "error"}
-      <Tag
-        text={schedule.lastResult || "No results yet"}
-        type={getTagType(schedule.lastResult)}
-      />
-    {/if}
-
-    {#if schedule.lastResult === "No results yet"}
-      <span class="text-muted">No results yet</span>
-    {/if}
-
-    {#if schedule.lastResult === "error"}
+    {#if schedule.lastResult === "Success"}
+      <Tag text="Success" type={getTagType("Success")} />
+    {:else if schedule.lastResult === "Fail"}
       <Tooltip
-        title={"Run did not complete due to an execution error."}
+        title={getFailTooltip(schedule)}
         placement="bottom-center"
         size="small"
       >
         <ErrorWithText />
       </Tooltip>
+    {:else}
+      <span class="text-muted">No results yet</span>
     {/if}
   </td>
   <td>
