@@ -4,13 +4,25 @@
   import { ErrorWithText, MoreHorizontalRegular } from "@sparrow/library/icons";
 
   export let schedule;
-
-  console.log("Schedule:", schedule);
   export let onPerformTestflowScheduleOperations;
   export let getTooltipMessage;
   export let handleToggleStatus;
   export let getNextRunTooltip;
   export let getTagType;
+  function getFailTooltip(schedule) {
+    const runHistory = schedule.originalData?.schedularRunHistory;
+    if (Array.isArray(runHistory) && runHistory.length > 0) {
+      // Sort to get the latest run
+      const sortedHistory = [...runHistory].sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+      );
+      const lastRun = sortedHistory[0];
+      const total =
+        (lastRun.successRequests || 0) + (lastRun.failedRequests || 0);
+      return `• ${lastRun.successRequests}/${total} APIs passed.<br>• Avg. Response Time: ${lastRun.totalTime || "N/A"}`;
+    }
+    return "No results yet";
+  }
   export let onOpenTestflowScheduleTab;
   export let isTestflowEditable = true;
   export let onOpenTestflowScheduleConfigurationsTab;
@@ -203,11 +215,11 @@
 
     {#if schedule.lastResult === "error"}
       <Tooltip
-        title={"Run did not complete due to an execution error."}
-        placement="bottom-center"
+        title={getFailTooltip(schedule)}
+        placement="bottom-left"
         size="small"
       >
-        <ErrorWithText />
+        <Tag text="Partially Failed" type={getTagType("Partially Failed")} />
       </Tooltip>
     {/if}
   </td>
@@ -237,6 +249,12 @@
 <style>
   .custom-row td {
     background-color: var(--bg-ds-neutral-900) !important;
+  }
+
+  .custom-row {
+    width: 1079px;
+    height: 54px;
+    opacity: 1;
   }
 
   .scheduled-table {

@@ -126,7 +126,6 @@
   export let toggleHistoryDetails;
   export let toggleHistoryContainer;
   export let environmentVariables;
-  console.log("Environment Variables:", environmentVariables);
   export let isTestflowEditable;
   export let onRedrectRequest;
   export let onUpdateTestFlowName;
@@ -243,10 +242,6 @@
   const edges = writable<TFEdgeHandlerType[]>([]);
   setTimeout(() => {}, 1000);
 
-  // $: {
-  //   console.log(testflowScheduleStore);
-  // }
-
   /**
    * Checks if edges exist for the given node ID.
    * @param _id - Node ID to check for connected edges.
@@ -278,8 +273,6 @@
   let filteredSchedules = [];
 
   function mapScheduleData(schedule) {
-    console.log("Mapping schedule:", schedule);
-
     // Determine status based on isActive and executeAt
     let status = "Inactive";
     if (schedule.isActive) {
@@ -380,11 +373,6 @@
 
   function setActiveTab(tab) {
     activeTab = tab;
-  }
-
-  function handleLearnMore() {
-    // Handle learn more click
-    console.log("Learn more clicked");
   }
 
   let dismissed = false;
@@ -1919,7 +1907,7 @@
   <!-- Warning Message -->
   {#if activeTab === "scheduled" && filteredSchedules.some((schedule) => schedule.status === "Active") && !dismissed}
     <div
-      class="warning-banner d-flex align-items-center mb-3 p-2 position-relative"
+      class="warning-banner px-4 d-flex align-items-center mb-3 p-2 position-relative"
     >
       <div class="warning-icon me-2"><ToastIcon /></div>
       <div class="flex-grow-1">
@@ -1927,13 +1915,14 @@
           This flow has active schedules. Any changes here will affect future
           runs.
         </span>
-        <span
+        <!-- <span
           class="cursor-pointer ms-2 text-fs-12"
           on:click={handleLearnMore}
           style="color: #60a5fa;"
         >
+
           Learn More
-        </span>
+        </span> -->
       </div>
       <button class="btn-close-warning" on:click={dismissWarning}> × </button>
     </div>
@@ -2549,16 +2538,15 @@
 
   .scheduled-table th {
     background-color: var(--bg-ds-neutral-900);
-    padding: 12px;
+    padding-bottom: 12px;
     text-align: left;
     font-weight: 500;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--text-ds-neutral-300);
     border-bottom: 1px solid var(--border-ds-neutral-400);
   }
 
   .scheduled-table td {
-    padding: 12px;
     border-bottom: none;
     font-size: 14px;
     background-color: var(--bg-ds-neutral-900);

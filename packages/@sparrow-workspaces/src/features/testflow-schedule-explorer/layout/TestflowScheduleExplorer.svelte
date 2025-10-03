@@ -138,6 +138,7 @@
             {workspaceUsers}
             {onUpdateSchedule}
             {onSaveSchedule}
+            isSaved={$tab?.isSaved}
           />
         {/if}
       </div>
