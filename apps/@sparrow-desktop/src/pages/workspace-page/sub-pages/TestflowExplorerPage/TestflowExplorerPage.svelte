@@ -134,8 +134,6 @@
       ? [...schedulesFromMap]
       : [];
 
-    console.log("testflowScheduleStore from map:", testflowScheduleStore);
-
     const nodes = testflowStore?.nodes ?? [];
     const hasEmptyResponseStatus = nodes.some(
       (node) => !node.response?.status || node.response?.status === "",
@@ -309,7 +307,6 @@
   });
 
   async function refetchSchedules() {
-    console.log("Refetching schedules for tab:", tab?.id);
     if (tab && _viewModel) {
       const schedules = await _viewModel.getTestflowSchedules(tab.id);
       const newSchedules = Array.isArray(schedules) ? schedules : [];
@@ -323,7 +320,6 @@
 
       // Force local update with new reference
       testflowScheduleStore = [...newSchedules];
-      console.log("Updated testflowScheduleStore:", testflowScheduleStore);
     }
   }
   $: {
@@ -334,9 +330,6 @@
     testflowScheduleStore = Array.isArray(schedulesFromMap)
       ? [...schedulesFromMap]
       : [];
-
-    console.log("testflowScheduleStore from map:", testflowScheduleStore);
-    // ... rest of your code
   }
 </script>
 
