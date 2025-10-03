@@ -13,11 +13,25 @@
 
   $: totalItems = schedule?.schedularRunHistory?.length || 0;
 
+  function parseRunTime(time: string | number): number {
+    if (!time) return 0;
+    if (typeof time === "number") return time;
+    const val = parseFloat(time);
+    if (isNaN(val)) return 0;
+    if (time.toLowerCase().includes("ms")) {
+      return val;
+    } else if (time.toLowerCase().includes("s")) {
+      return val * 1000;
+    } else {
+      return val;
+    }
+  }
+
   $: sortedHistory = schedule?.schedularRunHistory
     ? [...schedule.schedularRunHistory].sort((a, b) => {
-        const dateA = new Date(a.totalTime).getTime();
-        const dateB = new Date(b.totalTime).getTime();
-        return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
+      const timeA = parseRunTime(a.totalTime);
+      const timeB = parseRunTime(b.totalTime);
+      return sortDirection === "asc" ? timeA - timeB : timeB - timeA;
       })
     : [];
 
@@ -188,7 +202,7 @@
   }
 
   .custom-table th.sortable span.active-sort {
-    color: var(--accent-primary); /* blue when active */
+    color: var(--accent-primary);
   }
 
   .custom-table th.sortable:hover {

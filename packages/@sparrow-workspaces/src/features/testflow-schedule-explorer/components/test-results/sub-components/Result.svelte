@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Button, Options, Tag, Modal } from "@sparrow/library/ui";
-  import { MoreHorizontalRegular, ThreeDotIcon } from "@sparrow/library/icons";
+  import { MoreHorizontalRegular, MoreVerticalRegular, ThreeDotIcon } from "@sparrow/library/icons";
  
   export let r;
   export let schedule;
@@ -94,7 +94,7 @@
           size="extra-small"
           customWidth={"24px"}
           type="teritiary-regular"
-          startIcon={MoreHorizontalRegular}
+          startIcon={MoreVerticalRegular}
           onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();
