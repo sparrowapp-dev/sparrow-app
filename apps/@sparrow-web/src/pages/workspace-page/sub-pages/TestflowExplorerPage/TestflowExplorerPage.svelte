@@ -120,9 +120,18 @@
   };
 
   let testflowStoreMap;
+  let testflowScheduleStoreMap;
 
   $: {
     testflowStore = testflowStoreMap?.get(tab?.tabId) as TFDataStoreType;
+
+    const schedulesFromMap = testflowScheduleStoreMap?.get(tab?.id);
+    testflowScheduleStore = Array.isArray(schedulesFromMap)
+      ? [...schedulesFromMap]
+      : [];
+
+    console.log("testflowScheduleStore from map:", testflowScheduleStore);
+
     const nodes = testflowStore?.nodes ?? [];
     const hasEmptyResponseStatus = nodes.some(
       (node) => !node.response?.status || node.response?.status === "",
@@ -285,15 +294,45 @@
     handleBlockLimitTestflow();
     collectionsSubscriber.unsubscribe();
   });
+
+  let testflowScheduleStore = [];
+
+  $: {
+    if (tab && _viewModel) {
+      (async () => {
+        testflowScheduleStore = await _viewModel.getTestflowSchedules(tab.id);
+      })();
+    }
+  }
+
+  async function refetchSchedules() {
+    console.log("Refetching schedules for tab:", tab?.id);
+    if (tab && _viewModel) {
+      const schedules = await _viewModel.getTestflowSchedules(tab.id);
+      const newSchedules = Array.isArray(schedules) ? schedules : [];
+
+      // Update the store
+      testflowSchedules.update((map) => {
+        const newMap = new Map(map);
+        newMap.set(tab.id, newSchedules);
+        return newMap;
+      });
+
+      // Force local update with new reference
+      testflowScheduleStore = [...newSchedules];
+      console.log("Updated testflowScheduleStore:", testflowScheduleStore);
+    }
+  }
 </script>
 
-{#if render}
+{#if render && _viewModel}
   <TestflowExplorer
     bind:isScheduleRunPopupOpen
     tab={_viewModel.tab}
     {environmentVariables}
     {isTestflowEditable}
     {testflowStore}
+    {testflowScheduleStore}
     onUpdateNodes={_viewModel.updateNodes}
     onUpdateEdges={_viewModel.updateEdges}
     {collectionListDocument}
@@ -332,6 +371,9 @@
     {selectiveRunTestflow}
     handleContactSales={_viewModel.handleContactSales}
     onChangeSeletedAuthValue={_viewModel.parseAuthHeader}
+    {currentWorkspaceId}
+    onUpdateScheduleStatus={_viewModel.updateTestflowScheduleStatus}
+    onScheduleStatusUpdated={refetchSchedules}
   />
 {/if}
 
