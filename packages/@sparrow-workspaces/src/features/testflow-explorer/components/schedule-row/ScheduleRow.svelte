@@ -10,7 +10,6 @@
   export let getTooltipMessage;
   export let handleToggleStatus;
   export let getNextRunTooltip;
-  export let handleScheduleAction;
   export let getTagType;
   export let onOpenTestflowScheduleTab;
   export let isTestflowEditable = true;
@@ -40,7 +39,6 @@
 
   let isDeletePopup = false;
   let deleteLoader = false;
-
 </script>
 
 <svelte:window

@@ -128,13 +128,7 @@
   $: {
     testflowStore = testflowStoreMap?.get(tab?.tabId) as TFDataStoreType;
 
-    // Get schedules from map with fallback to empty array
-    const schedulesFromMap = testflowScheduleStoreMap?.get(tab?.id);
-    testflowScheduleStore = Array.isArray(schedulesFromMap)
-      ? [...schedulesFromMap]
-      : [];
-
-    console.log("testflowScheduleStore from map:", testflowScheduleStore);
+    testflowScheduleStore = testflowScheduleStoreMap?.get(tab?.id);
 
     const nodes = testflowStore?.nodes ?? [];
     const hasEmptyResponseStatus = nodes.some(
@@ -307,40 +301,9 @@
     handleBlockLimitTestflow();
     collectionsSubscriber.unsubscribe();
   });
-
-  async function refetchSchedules() {
-    console.log("Refetching schedules for tab:", tab?.id);
-    if (tab && _viewModel) {
-      const schedules = await _viewModel.getTestflowSchedules(tab.id);
-      const newSchedules = Array.isArray(schedules) ? schedules : [];
-
-      // Update the store
-      testflowSchedules.update((map) => {
-        const newMap = new Map(map);
-        newMap.set(tab.id, newSchedules);
-        return newMap;
-      });
-
-      // Force local update with new reference
-      testflowScheduleStore = [...newSchedules];
-      console.log("Updated testflowScheduleStore:", testflowScheduleStore);
-    }
-  }
-  $: {
-    testflowStore = testflowStoreMap?.get(tab?.tabId) as TFDataStoreType;
-
-    // Get schedules from map with fallback to empty array
-    const schedulesFromMap = testflowScheduleStoreMap?.get(tab?.id);
-    testflowScheduleStore = Array.isArray(schedulesFromMap)
-      ? [...schedulesFromMap]
-      : [];
-
-    console.log("testflowScheduleStore from map:", testflowScheduleStore);
-    // ... rest of your code
-  }
 </script>
 
-{#if render && _viewModel}
+{#if render}
   <!-- {#if testflowScheduleStore}
     {#each testflowScheduleStore as schedule}
       <div>
@@ -383,7 +346,7 @@
     {environmentVariables}
     {isTestflowEditable}
     {testflowStore}
-    {testflowScheduleStore}
+    testflowScheduleStore={testflowScheduleStore || []}
     onUpdateNodes={_viewModel.updateNodes}
     onUpdateEdges={_viewModel.updateEdges}
     {collectionListDocument}
@@ -425,7 +388,6 @@
     onChangeSeletedAuthValue={_viewModel.parseAuthHeader}
     onOpenTestflowScheduleTab={_viewModel.openTestflowScheduleTab}
     onUpdateScheduleStatus={_viewModel.updateTestflowScheduleStatus}
-    onScheduleStatusUpdated={refetchSchedules}
     onPerformTestflowScheduleOperations={_viewModel.performTestflowScheduleOperations}
     onOpenTestflowScheduleConfigurationsTab={_viewModel.openTestflowScheduleConfigurationsTab}
   />

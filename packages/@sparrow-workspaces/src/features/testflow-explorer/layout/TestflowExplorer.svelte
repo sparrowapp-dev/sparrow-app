@@ -164,10 +164,6 @@
   export let onOpenTestflowScheduleTab;
   export let testflowScheduleStore = [];
 
-  $: safeTestflowScheduleStore = Array.isArray(testflowScheduleStore)
-    ? testflowScheduleStore
-    : [];
-
   export let onPerformTestflowScheduleOperations;
   export let onOpenTestflowScheduleConfigurationsTab;
 
@@ -366,28 +362,19 @@
     };
   }
 
-  function handleScheduleAction(scheduleId: string, action: string) {
-    if (action === "more") {
-      // Open more actions menu for this schedule
-      onPerformTestflowScheduleOperations("openActionsMenu", scheduleId);
-    }
-  }
-
   $: {
-    if (safeTestflowScheduleStore.length > 0) {
-      const mappedSchedules = safeTestflowScheduleStore.map(mapScheduleData);
+    const mappedSchedules = testflowScheduleStore.map(mapScheduleData);
 
-      if (searchQuery.trim() === "") {
-        filteredSchedules = [...mappedSchedules];
-      } else {
-        const query = searchQuery.toLowerCase();
-        filteredSchedules = mappedSchedules.filter(
-          (schedule) =>
-            schedule.name.toLowerCase().includes(query) ||
-            schedule.environment.toLowerCase().includes(query) ||
-            schedule.description.toLowerCase().includes(query),
-        );
-      }
+    if (searchQuery.trim() === "") {
+      filteredSchedules = [...mappedSchedules];
+    } else {
+      const query = searchQuery.toLowerCase();
+      filteredSchedules = mappedSchedules.filter(
+        (schedule) =>
+          schedule.name.toLowerCase().includes(query) ||
+          schedule.environment.toLowerCase().includes(query) ||
+          schedule.description.toLowerCase().includes(query),
+      );
     }
   }
 
@@ -417,37 +404,8 @@
     }
   }
 
-  export let onScheduleStatusUpdated = () => {};
-
   async function handleToggleStatus(id, isActive) {
-    const originalSchedules = Array.isArray(safeTestflowScheduleStore)
-      ? JSON.parse(JSON.stringify(safeTestflowScheduleStore))
-      : [];
-
-    testflowScheduleStore = safeTestflowScheduleStore.map((schedule) => {
-      if (schedule.id === id) {
-        return {
-          ...schedule,
-          isActive,
-          updatedAt: new Date().toISOString(),
-        };
-      }
-      return schedule;
-    });
-
-    testflowScheduleStore = [...testflowScheduleStore];
-
-    try {
-      const result = await onUpdateScheduleStatus(id, isActive);
-
-      if (!result.isSuccessful) {
-        testflowScheduleStore = JSON.parse(JSON.stringify(originalSchedules));
-      } else {
-        await onScheduleStatusUpdated();
-      }
-    } catch (err) {
-      testflowScheduleStore = JSON.parse(JSON.stringify(originalSchedules));
-    }
+    await onUpdateScheduleStatus(id, isActive);
   }
   const createBlankRequestObject = (
     _url: string,
@@ -2132,7 +2090,6 @@
                     {getTooltipMessage}
                     {handleToggleStatus}
                     {getNextRunTooltip}
-                    {handleScheduleAction}
                     {getTagType}
                     {onOpenTestflowScheduleConfigurationsTab}
                     {onOpenTestflowScheduleTab}

@@ -1780,77 +1780,6 @@ export class TestflowExplorerPageViewModel {
     return count;
   };
 
-  /**
-   * Updates the status of a testflow schedule
-   * @param scheduleId - The ID of the schedule to update
-   * @param isActive - The new active status
-   */
-  public updateTestflowScheduleStatus = async (
-    scheduleId: string,
-    isActive: boolean,
-  ) => {
-    try {
-      const progressiveTab = createDeepCopy(this._tab.getValue());
-      const workspaceId = progressiveTab.path.workspaceId;
-      const testflowId = progressiveTab.id;
-
-      if (!workspaceId || !testflowId) {
-        notifications.error("Missing workspace or testflow information");
-        return { isSuccessful: false, message: "Missing required information" };
-      }
-
-      // Get auth token
-      const [token] = getAuthJwt();
-
-      if (!token) {
-        notifications.error(
-          "Authentication token not found. Please login again.",
-        );
-        return { isSuccessful: false, message: "Authentication failed" };
-      }
-
-      const baseUrl = await this.constructBaseUrl(workspaceId);
-      const apiUrl = `${baseUrl}/api/workspace/${workspaceId}/testflow/${testflowId}/schedule/${scheduleId}`;
-
-      const response = await fetch(apiUrl, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          isActive: isActive,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || "Failed to update schedule");
-      }
-
-      const result = await response.json();
-
-      notifications.success(
-        `Schedule ${isActive ? "activated" : "deactivated"} successfully.`,
-      );
-
-      // Update the local store with the new schedule data
-      const schedules = result.data.schedules;
-      updateTestflowSchedules(testflowId as string, schedules);
-
-      return {
-        isSuccessful: true,
-        data: result.data,
-      };
-    } catch (error) {
-      Sentry.captureException(error);
-      notifications.error(`Failed to update schedule: ${error.message}`);
-      return {
-        isSuccessful: false,
-        message: error.message || "Error updating schedule",
-      };
-    }
-  };
 
   /**
    * @description - This function will provide user Limits based on teamId.
@@ -2029,7 +1958,6 @@ export class TestflowExplorerPageViewModel {
     if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
       updateTestflowSchedules(progressiveTab?.id as string, schedules);
-      debugger;
     }
   };
 
@@ -2074,7 +2002,7 @@ export class TestflowExplorerPageViewModel {
     }
   };
 
-  public updateTestflowSchedule = async (_scheduleId: string, payload: any) => {
+  public updateTestflowScheduleStatus = async (_scheduleId: string, isChecked: any) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const baseUrl = await this.constructBaseUrl(
       progressiveTab.path.workspaceId,
@@ -2083,7 +2011,7 @@ export class TestflowExplorerPageViewModel {
       progressiveTab.path.workspaceId,
       progressiveTab.id,
       _scheduleId,
-      payload,
+      {isActive: isChecked},
       baseUrl,
     );
     if (response?.isSuccessful) {
