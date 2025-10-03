@@ -12,7 +12,7 @@ import type {
 } from "../../../../database/database";
 
 // Utils
-import { createDeepCopy, Debounce, scrollToTab } from "@sparrow/common/utils";
+import { createDeepCopy, Debounce } from "@sparrow/common/utils";
 
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import {
@@ -42,7 +42,6 @@ class MockHistoryExplorerPage {
   private workspaceRepository = new WorkspaceRepository();
   private testflowRepository = new TestflowRepository();
   private testflowService = new TestflowService();
-  private environmentRepository = new EnvironmentRepository();
   private initTab = new InitTab();
   private environmentRepository = new EnvironmentRepository();
 

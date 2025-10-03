@@ -7,16 +7,7 @@
   import { ScheduleNavigator } from "../components";
   import { TestflowScheduleNavigatorEnum } from "../../../../../@sparrow-common/src/types/workspace/testflow-schedule-tab";
   import { Configurations, TestResults } from "../components";
-  import {
-    ArrowClockWiseRegular,
-    FlowChartRegular,
-    LayerRegular,
-  } from "@sparrow/library/icons";
-  import {
-    startLoading,
-    stopLoading,
-    loadingState,
-  } from "@sparrow/common/store";
+  import { FlowChartRegular, LayerRegular } from "@sparrow/library/icons";
 
   export let tab: Observable<Tab>;
   export let testflow;
@@ -57,39 +48,15 @@
           {schedule?.name || ""}
         </p>
         <div class="d-flex gap-2">
-          {#if isTestflowScheduleEditable}
-            <div class="d-flex align-items-center gap-2">
-              <Toggle
-                isActive={schedule?.isActive || false}
-                label="Active"
-                fontWeight="500"
-                onChange={() => {
-                  onEditTestflowSchedule(!schedule?.isActive);
-                }}
-              />
-            </div>
-            <Button
-              title={"Run Now"}
-              type={"primary"}
-              loader={$loadingState.get("schedule-run-" + schedule?.id)}
-              disable={$loadingState.get("schedule-run-" + schedule?.id)}
-              onClick={async () => {
-                startLoading("schedule-run-" + schedule?.id);
-                await onScheduleRun();
-                stopLoading("schedule-run-" + schedule?.id);
-              }}
-            />
-          {/if}
+          <div class="d-flex align-items-center gap-2">
+            <span class="text-fs-12"> Active </span>
+            <Toggle />
+          </div>
           <Button
-            title={""}
-            startIcon={ArrowClockWiseRegular}
-            type={"secondary"}
-            loader={$loadingState.get("schedule-refresh-" + schedule?.id)}
-            disable={$loadingState.get("schedule-refresh-" + schedule?.id)}
-            onClick={async () => {
-              startLoading("schedule-refresh-" + schedule?.id);
-              await onRefreshSchedule();
-              stopLoading("schedule-refresh-" + schedule?.id);
+            title={"Run Now"}
+            type={"primary"}
+            onClick={() => {
+              onScheduleRun();
             }}
           />
         </div>

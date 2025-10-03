@@ -96,7 +96,6 @@
             testflow = data?.toMutableJSON();
           });
           environments = _viewModel.environments;
-
           activeWorkspace = _viewModel.activeWorkspace;
           activeWorkspaceSubscriber = activeWorkspace.subscribe(
             (_workspace) => {
@@ -124,7 +123,6 @@
       prevTabId = tab?.tabId || "";
     }
   }
-
   onDestroy(() => {
     activeWorkspaceSubscriber.unsubscribe();
   });
