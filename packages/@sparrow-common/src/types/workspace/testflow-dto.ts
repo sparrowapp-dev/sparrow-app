@@ -12,7 +12,7 @@ export interface RunConfigurationDTO {
   days?: Array<number | string>;
 }
 
-export type ReceiveNotificationType = "failure" | "all" | "success";
+export type ReceiveNotificationType = "failure" | "every_time";
 
 export interface NotificationDTO {
   emails: string[];

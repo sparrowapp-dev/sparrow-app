@@ -9,6 +9,7 @@
   import { TestflowScheduleExplorer } from "@sparrow/workspaces/features";
   import { user } from "@app/store/auth.store";
   import { testflowSchedules } from "@sparrow/common/store";
+  import { environmentType } from "@sparrow/common/enums";
   import { WorkspaceRole } from "@sparrow/common/enums";
   import { onDestroy } from "svelte";
 
@@ -20,7 +21,14 @@
   // ViewModel initialization
   let _viewModel;
 
+  let activeWorkspaceSubscriber;
+
   let userId = "";
+  let environments;
+  let activeWorkspace;
+  let currentWorkspaceId = "";
+  let currentWorkspace;
+  let isTestflowScheduleEditable;
 
   user.subscribe((value) => {
     if (value) {
@@ -48,19 +56,30 @@
   let schedule;
 
   $: {
+    // First try to get schedule from store
     testflowScheduleStore = testflowScheduleStoreMap?.get(
       tab?.path?.testflowId,
     );
-    schedule = testflowScheduleStore?.find((schedule) => {
-      if (schedule.id === tab?.id) {
-        return true;
-      }
-    });
+
+    let storeSchedule = testflowScheduleStore?.find((s) => s.id === tab?.id);
+
+    // If tab has the updated schedule info in its property, use that as the source of truth
+    if (tab?.property?.testflowSchedule) {
+      // Merge store schedule with tab data for most up-to-date version
+      schedule = {
+        ...storeSchedule,
+        ...tab.property.testflowSchedule,
+        // Important fields to ensure they're updated
+        name: tab.name,
+        environmentId: tab.property.testflowSchedule.environmentId,
+        runConfiguration: tab.property.testflowSchedule.runConfiguration,
+        notification: tab.property.testflowSchedule.notification,
+      };
+    } else {
+      schedule = storeSchedule;
+    }
   }
-  let environments;
-  let activeWorkspace;
-  let activeWorkspaceSubscriber;
-  let isTestflowScheduleEditable;
+
   $: {
     if (tab) {
       if (prevTabId !== tab?.tabId) {
@@ -77,13 +96,14 @@
             testflow = data?.toMutableJSON();
           });
           environments = _viewModel.environments;
-
           activeWorkspace = _viewModel.activeWorkspace;
           activeWorkspaceSubscriber = activeWorkspace.subscribe(
             (_workspace) => {
               const workspaceDoc = _workspace?.toMutableJSON();
 
               if (workspaceDoc) {
+                currentWorkspace = _workspace;
+                currentWorkspaceId = _workspace.get("_id");
                 workspaceDoc.users?.forEach((_user) => {
                   if (_user.id === userId) {
                     if (_user.role !== WorkspaceRole.WORKSPACE_VIEWER) {
@@ -103,7 +123,6 @@
       prevTabId = tab?.tabId || "";
     }
   }
-
   onDestroy(() => {
     activeWorkspaceSubscriber.unsubscribe();
   });
@@ -111,14 +130,21 @@
 
 <TestflowScheduleExplorer
   tab={_viewModel.tab}
-  environments={$environments || []}
   {testflow}
   {schedule}
+  workspaceUsers={currentWorkspace?._data?.users || []}
+  environments={$environments?.filter(
+    (env) =>
+      env.workspaceId === currentWorkspaceId &&
+      env.type !== environmentType.GLOBAL,
+  ) || []}
   {isTestflowScheduleEditable}
   onUpdateScheduleState={_viewModel.updateScheduleState}
   onScheduleRun={_viewModel.runTestflowSchedule}
   onDeleteTestflowScheduleHistory={_viewModel.deleteTestflowScheduleHistory}
   onScheduleRunview={_viewModel.handleCreateTestflowSingleScheduleTab}
+  onUpdateSchedule={_viewModel.updateScheduleTab}
+  onSaveSchedule={_viewModel.updateTestflowSchedule}
   onRefreshSchedule={_viewModel.refreshTestflowSchedule}
   onEditTestflowSchedule={_viewModel.editTestflowSchedule}
   onOpenTestflow={_viewModel.handleOpenTestflow}

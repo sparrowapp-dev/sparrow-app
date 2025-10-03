@@ -160,13 +160,14 @@
   export let isGuestUser = false;
   export let collectionListDocument: CollectionDocument[];
   export let isScheduleRunPopupOpen;
+
+  export let onOpenTestflowScheduleTab;
   export let testflowScheduleStore = [];
 
   $: safeTestflowScheduleStore = Array.isArray(testflowScheduleStore)
     ? testflowScheduleStore
     : [];
 
-  export let onOpenTestflowScheduleTab;
   export let onPerformTestflowScheduleOperations;
 
   export let onUpdateScheduleStatus: (
@@ -244,6 +245,10 @@
   const nodes = writable<Node[]>([]);
   const edges = writable<TFEdgeHandlerType[]>([]);
   setTimeout(() => {}, 1000);
+
+  // $: {
+  //   console.log(testflowScheduleStore);
+  // }
 
   /**
    * Checks if edges exist for the given node ID.
@@ -1288,7 +1293,8 @@
            */
           unselectNodes();
           nodes.update((_nodes: Node[]) => {
-            const dbNodes = $tab?.property?.testflow?.nodes as TFNodeType[];
+            const dbNodes =
+              ($tab?.property?.testflow?.nodes as TFNodeType[]) || [];
             let res = [];
             for (let i = 0; i < dbNodes.length; i++) {
               res.push({
@@ -1364,7 +1370,8 @@
             return res;
           });
           edges.update((_edges: TFEdgeHandlerType[]) => {
-            const dbEdges = $tab?.property?.testflow?.edges as TFEdgeType[];
+            const dbEdges =
+              ($tab?.property?.testflow?.edges as TFEdgeType[]) || [];
             let res = [];
             for (let i = 0; i < dbEdges.length; i++) {
               res.push({
@@ -2123,6 +2130,7 @@
                     {getNextRunTooltip}
                     {handleScheduleAction}
                     {getTagType}
+                    {onOpenTestflowScheduleTab}
                   />
                 {/each}
               </tbody>

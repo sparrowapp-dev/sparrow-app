@@ -1,11 +1,14 @@
 <script lang="ts">
+  import { Options } from "@sparrow/library/ui";
   import { ArrowSortRegular } from "@sparrow/library/icons";
   import Result from "./sub-components/Result.svelte";
 
   export let schedule;
   export let onDeleteTestflowScheduleHistory;
   export let onScheduleRunview;
-  export let isTestflowScheduleEditable;
+
+  let openMenuFor: string | null = null;
+  let activeWrapper: HTMLElement | null = null;
 
   function formatDate(dateStr: string) {
     const date = new Date(dateStr);
@@ -25,6 +28,39 @@
   function getRunType(flowName: string) {
     const parts = flowName.split("-");
     return parts.length > 1 ? parts[parts.length - 1].trim() : "";
+  }
+
+  let deleteScheduleResultId;
+
+  function toggleMenu(
+    e: MouseEvent,
+    rowId: string,
+    wrapper: HTMLElement,
+    scheduleResultId,
+  ) {
+    e.stopPropagation();
+    deleteScheduleResultId = scheduleResultId;
+    if (openMenuFor === rowId) {
+      openMenuFor = null;
+      activeWrapper = null;
+    } else {
+      openMenuFor = rowId;
+      activeWrapper = wrapper;
+      // Focus the wrapper immediately to enable blur detection
+      setTimeout(() => {
+        const focusWrapper = document.querySelector(
+          ".options-focus-wrapper",
+        ) as HTMLElement;
+        if (focusWrapper) {
+          focusWrapper.focus();
+        }
+      }, 0);
+    }
+  }
+
+  function closeMenu() {
+    openMenuFor = null;
+    activeWrapper = null;
   }
 </script>
 
@@ -51,12 +87,52 @@
               {schedule}
               {formatDate}
               {getRunType}
-              {isTestflowScheduleEditable}
+              {toggleMenu}
+              {openMenuFor}
             />
           {/each}
         </tbody>
       </table>
     </div>
+  </div>
+{/if}
+
+{#if openMenuFor && activeWrapper}
+  <div
+    tabindex="0"
+    class="options-focus-wrapper"
+    on:blur={closeMenu}
+    on:click|stopPropagation
+    style="position:absolute; left:0; top:0;"
+  >
+    {#key openMenuFor}
+      <Options
+        xAxis={activeWrapper.getBoundingClientRect().right - 104}
+        yAxis={activeWrapper.getBoundingClientRect().bottom + 80 >
+        window.innerHeight
+          ? [
+              activeWrapper.getBoundingClientRect().top - 50,
+              activeWrapper.getBoundingClientRect().top - 14,
+            ]
+          : [
+              activeWrapper.getBoundingClientRect().top - 12,
+              activeWrapper.getBoundingClientRect().top + 24,
+            ]}
+        zIndex={700}
+        width="104px"
+        menuItems={[
+          {
+            onClick: () => {
+              onDeleteTestflowScheduleHistory(deleteScheduleResultId);
+              closeMenu();
+            },
+            displayText: "Delete",
+            disabled: false,
+            hidden: false,
+          },
+        ]}
+      />
+    {/key}
   </div>
 {/if}
 
