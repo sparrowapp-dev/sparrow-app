@@ -543,9 +543,7 @@ export default class CollectionsViewModel {
       newRequestTab.updateHeaders(
         restOfData.property.request.headers as KeyValueChecked[],
       );
-      newRequestTab.updateTests(
-        restOfData.property.request.tests,
-      );
+      newRequestTab.updateTests(restOfData.property.request.tests);
       newRequestTab.updateQueryParams(
         restOfData.property.request.queryParams as KeyValueChecked[],
       );
@@ -1366,6 +1364,143 @@ export default class CollectionsViewModel {
     }
 
     return null;
+  };
+
+  public handleMoveRequest = async (
+    requestId: string,
+    oldCollectionId: string,
+    oldFolderId?: string,
+    newCollectionId?: string,
+    newFolderId?: string,
+  ) => {
+    const request = await this.readRequestOrFolderInCollection(
+      oldCollectionId,
+      requestId,
+    );
+    if (!request || request.type !== CollectionItemTypeBaseEnum.REQUEST) {
+      throw new Error("Request not found");
+    }
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    // Move within the same collection (just folder change)
+    // If newCollectionId is empty, it means move within the same collection
+    const isMoveWithinSameCollection = oldCollectionId === newCollectionId;
+    if (isMoveWithinSameCollection && oldFolderId !== newFolderId) {
+      // Remove from old folder/collection (if oldFolderId is empty, it's from root)
+      debugger;
+      await this.collectionRepository.moveRequestWithinCollection(
+        oldCollectionId,
+        oldFolderId,
+        newFolderId,
+        requestId,
+      );
+      debugger;
+      // Update tabs
+      const tabsToUpdate =
+        await this.tabRepository.getTabsByRequestId(requestId);
+      for (const tab of tabsToUpdate) {
+        await this.tabRepository.updateTabByMongoId(tab.id, {
+          collectionId: oldCollectionId,
+          folderId: newFolderId,
+        });
+      }
+      notifications.success("Request moved within collection");
+      return;
+    }
+
+    if (isGuestUser === true) {
+      // For Guest Users
+      // Remove from old collection
+      await this.collectionRepository.deleteRequestOrFolderInCollection(
+        oldCollectionId,
+        requestId,
+      );
+      // Add to new collection/folder
+      if (newFolderId) {
+        await this.collectionRepository.addRequestOrFolderInCollection(
+          newCollectionId,
+          newFolderId,
+          request,
+        );
+      } else {
+        await this.collectionRepository.addRequestOrFolderInCollection(
+          newCollectionId,
+          request,
+        );
+      }
+      return;
+    }
+
+    // For Logged-in Users
+    // Move to different collection
+    const oldCollection = await this.readCollection(oldCollectionId);
+    let newCollection;
+    if (newCollectionId.length) {
+      newCollection = await this.readCollection(newCollectionId);
+    }
+    if (!oldCollection && !newCollection) {
+      throw new Error("Collection not found");
+    }
+    // const baseUrl = await this.constructBaseUrl(oldCollection.workspaceId);
+    // const res = await this.collectionService.moveRequestToAnotherCollection(
+    //   requestId,
+    //   {
+    //     oldCollectionId,
+    //     newCollectionId,
+    //     oldFolderId,
+    //     newFolderId,
+    //     workspaceId: oldCollection.workspaceId,
+    //     source: oldCollection?.activeSync ? "USER" : "SYSTEM",
+    //     currentBranch: oldCollection?.activeSync
+    //       ? oldCollection?.currentBranch
+    //       : undefined,
+    //   },
+    //   baseUrl,
+    // );
+    // if (res.isSuccessful) {
+    //   // Update local database
+    //   await this.collectionRepository.deleteRequestOrFolderInCollection(
+    //     oldCollectionId,
+    //     requestId,
+    //   );
+    //   await this.collectionRepository.addRequestOrFolderInCollection(
+    //     newCollectionId,
+    //     newFolderId,
+    //     res.data.data,
+    //   );
+    //   // Update tabs
+    //   const tabsToUpdate =
+    //     await this.tabRepository.getTabsByRequestId(requestId);
+    //   for (const tab of tabsToUpdate) {
+    //     await this.tabRepository.updateTabByMongoId(tab.id, {
+    //       collectionId: newCollectionId,
+    //       folderId: newFolderId,
+    //     });
+    //   }
+    //   // Update collections in workspace
+    //   await this.workspaceRepository.updateCollectionInWorkspace(
+    //     oldCollection.workspaceId,
+    //     {
+    //       id: oldCollectionId,
+    //       name: oldCollection.name,
+    //     },
+    //   );
+    //   if (oldCollectionId !== newCollectionId) {
+    //     await this.workspaceRepository.updateCollectionInWorkspace(
+    //       newCollection.workspaceId,
+    //       {
+    //         id: newCollectionId,
+    //         name: newCollection.name,
+    //       },
+    //     );
+    //   }
+    //   notifications.success("Request moved successfully");
+    // } else {
+    //   notifications.error(res.message || "Failed to move request");
+    // }
   };
 
   /**
@@ -5798,6 +5933,18 @@ export default class CollectionsViewModel {
   ) => {
     let response;
     switch (entityType) {
+      case "moveRequest":
+        // Move a request from one folder/collection to another
+        // args: { requestId, fromCollectionId, fromFolderId, toCollectionId, toFolderId }
+        // Implement RxDB update synchronously, then trigger API call in background
+        response = await this.handleMoveRequest(
+          args.requestId,
+          args.fromCollectionId,
+          args.fromFolderId,
+          args.toCollectionId,
+          args.toFolderId,
+        );
+        break;
       case "collection":
         response = await this.handleCreateCollection(args.workspaceId);
         break;
@@ -7765,9 +7912,9 @@ export default class CollectionsViewModel {
 
     const [selfhostBackendUrl] = getSelfhostUrls();
     if (selfhostBackendUrl) {
-        return selfhostBackendUrl;
+      return selfhostBackendUrl;
     }
-    
+
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;
@@ -8264,10 +8411,10 @@ export default class CollectionsViewModel {
 
   public handleRedirectToAdminPanel = async (teamId: string) => {
     const [authToken] = getAuthJwt();
-    const [,,selfhostAdminUrl] = getSelfhostUrls();
-    if(selfhostAdminUrl){
-        await open(selfhostAdminUrl);
-    }else{
+    const [, , selfhostAdminUrl] = getSelfhostUrls();
+    if (selfhostAdminUrl) {
+      await open(selfhostAdminUrl);
+    } else {
       await open(
         `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
       );

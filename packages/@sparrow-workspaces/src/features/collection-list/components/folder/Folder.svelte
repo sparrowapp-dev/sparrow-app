@@ -108,6 +108,7 @@
   let isFolderPopup: boolean = false;
   let noOfColumns = 180;
   let isRenaming = false;
+  let isDragOver = false;
   let requestCount: number;
   let mockRequestCount: number = 0;
   let aiRequestCount: number = 0;
@@ -216,6 +217,42 @@
   //     expand = false;
   //   }
   // });
+
+  // Drag and Drop Handlers for Request
+  function handleDragOver(event: DragEvent) {
+    // Only allow drop if dragging a request (type check can be improved as needed)
+    event.preventDefault();
+    isDragOver = true;
+  }
+
+  function handleDragLeave(event: DragEvent) {
+    isDragOver = false;
+  }
+
+  async function handleDrop(event: DragEvent) {
+    event.preventDefault();
+    isDragOver = false;
+    try {
+      const data = event.dataTransfer?.getData("text/plain");
+      if (!data) return;
+      const dragData = JSON.parse(data);
+      // Only allow dropping requests (not folders)
+      if (dragData.requestId) {
+        // Call parent handler to move the request
+        // You may want to pass more info as needed
+        onItemCreated &&
+          onItemCreated("moveRequest", {
+            requestId: dragData.requestId,
+            fromCollectionId: dragData.collectionId,
+            fromFolderId: dragData.folderId,
+            toCollectionId: collection.id,
+            toFolderId: explorer.id,
+          });
+      }
+    } catch (e) {
+      // Optionally handle error
+    }
+  }
 
   function rightClickContextMenu() {
     setTimeout(() => {
@@ -508,10 +545,13 @@
         activeTabId
           ? '0px'
           : '0px'} ; "
-        class=" d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
+        class="d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
-          : ''}"
+          : ''} {isDragOver ? 'drag-over-folder' : ''}"
+        on:dragover={handleDragOver}
+        on:dragleave={handleDragLeave}
+        on:drop={handleDrop}
       >
         <button
           tabindex="-1"
@@ -862,5 +902,12 @@
   }
   .shortcutIcon:hover {
     background: var(--right-border);
+  }
+
+  /* Drag-over highlight for folder drop target */
+  .drag-over-folder {
+    outline: 2px solid var(--bg-ds-primary-300);
+    background-color: var(--bg-ds-surface-400) !important;
+    transition: outline 0.1s;
   }
 </style>

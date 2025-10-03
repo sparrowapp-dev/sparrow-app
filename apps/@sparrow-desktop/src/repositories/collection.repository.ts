@@ -6,7 +6,7 @@ import type { Observable } from "rxjs";
 import type { CollectionItemsDto } from "@sparrow/common/types/workspace";
 import type { RxDocument } from "rxdb";
 import * as Sentry from "@sentry/svelte";
-import type { CollectionAuthProifleBaseInterface as AuthProfileDto} from "@sparrow/common/types/workspace/collection-base";
+import type { CollectionAuthProifleBaseInterface as AuthProfileDto } from "@sparrow/common/types/workspace/collection-base";
 export class CollectionRepository {
   constructor() {}
 
@@ -60,8 +60,10 @@ export class CollectionRepository {
         value.mockRequestHistory = data.mockRequestHistory;
       if (data.authProfiles) value.authProfiles = data.authProfiles;
       value.isGenerateVariableTrial = data.isGenerateVariableTrial;
-      value.isRequestTestsNoCodeDemoCompleted = data.isRequestTestsNoCodeDemoCompleted;
-      value.isRequestTestsScriptDemoCompleted = data.isRequestTestsScriptDemoCompleted;
+      value.isRequestTestsNoCodeDemoCompleted =
+        data.isRequestTestsNoCodeDemoCompleted;
+      value.isRequestTestsScriptDemoCompleted =
+        data.isRequestTestsScriptDemoCompleted;
       if (data.defaultSelectedAuthProfile)
         value.defaultSelectedAuthProfile = data.defaultSelectedAuthProfile;
       return value;
@@ -1051,9 +1053,7 @@ export class CollectionRepository {
 
     return tabData
       .toJSON()
-      ?.property?.testflow?.nodes?.find(
-        (element) => element.id === _nodeId,
-      );
+      ?.property?.testflow?.nodes?.find((element) => element.id === _nodeId);
   };
 
   /**
@@ -1260,6 +1260,71 @@ export class CollectionRepository {
     });
     collection.incrementalModify((value) => {
       value.authProfiles = [...updatedAuths];
+      return value;
+    });
+  };
+
+  public moveRequestWithinCollection = async (
+    collectionId: string,
+    oldFolderId: string,
+    newFolderId: string,
+    requestId: string,
+  ) => {
+    const collection = await RxDB.getInstance()
+      .rxdb!.collection.findOne({ selector: { id: collectionId } })
+      .exec();
+    if (!collection) return;
+    const items = createDeepCopy(collection.items);
+
+    let requestToMove = null;
+
+    // Remove request from old location
+    if (oldFolderId) {
+      // Find old folder and remove request from its items
+      for (const item of items) {
+        if (
+          item.id === oldFolderId &&
+          item.items &&
+          Array.isArray(item.items)
+        ) {
+          const idx = item.items.findIndex((req) => req.id === requestId);
+          if (idx !== -1) {
+            requestToMove = item.items[idx];
+            item.items.splice(idx, 1);
+            break;
+          }
+        }
+      }
+    } else {
+      // Remove from root
+      const idx = items.findIndex((req) => req.id === requestId);
+      if (idx !== -1) {
+        requestToMove = items[idx];
+        items.splice(idx, 1);
+      }
+    }
+
+    if (!requestToMove) return;
+
+    // Add to new folder's items
+    if (newFolderId) {
+      for (const item of items) {
+        if (
+          item.id === newFolderId &&
+          item.items &&
+          Array.isArray(item.items)
+        ) {
+          item.items.push(requestToMove);
+          break;
+        }
+      }
+    } else {
+      // Move to root
+      items.push(requestToMove);
+    }
+
+    await collection.incrementalModify((value) => {
+      value.items = items;
       return value;
     });
   };

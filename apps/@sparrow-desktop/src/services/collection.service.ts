@@ -1,3 +1,36 @@
+// Move a request from one collection/folder to another collection/folder in RxDB and trigger API sync
+// Usage: moveRequestToAnotherCollection(requestId, fromCollectionId, fromFolderId, toCollectionId, toFolderId)
+
+export async function moveRequestToAnotherCollection({
+  requestId,
+  fromCollectionId,
+  fromFolderId = "",
+  toCollectionId,
+  toFolderId = "",
+}: {
+  requestId: string;
+  fromCollectionId: string;
+  fromFolderId?: string;
+  toCollectionId: string;
+  toFolderId?: string;
+}) {
+  // TODO: Implement RxDB logic to:
+  // 1. Find and remove the request from the old location (fromCollectionId/fromFolderId)
+  // 2. Insert the request into the new location (toCollectionId/toFolderId)
+  // 3. Save both collections in RxDB
+  // 4. Trigger API call in background (if needed)
+  // 5. Return success/failure
+
+  // This is a stub. Replace with actual logic.
+  console.log("moveRequestToAnotherCollection", {
+    requestId,
+    fromCollectionId,
+    fromFolderId,
+    toCollectionId,
+    toFolderId,
+  });
+  return { success: true };
+}
 import {
   connectSocketIo,
   disconnectSocketIo,
@@ -71,13 +104,12 @@ import { getSelfhostUrls } from "@app/utils/jwt";
 
 export class CollectionService {
   constructor() {
-        const [selfhostBackendUrl] = getSelfhostUrls();
-        if (selfhostBackendUrl) {
-            this.apiUrl = selfhostBackendUrl;
-        }
-        else{
-            this.apiUrl = constants.API_URL;
-        }
+    const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+      this.apiUrl = selfhostBackendUrl;
+    } else {
+      this.apiUrl = constants.API_URL;
+    }
   }
 
   private apiUrl: string = constants.API_URL;
