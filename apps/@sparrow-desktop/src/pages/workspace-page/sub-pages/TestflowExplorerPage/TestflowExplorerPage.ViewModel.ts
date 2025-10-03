@@ -2031,6 +2031,7 @@ export class TestflowExplorerPageViewModel {
     if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
       updateTestflowSchedules(progressiveTab?.id as string, schedules);
+      debugger;
     }
   };
 
