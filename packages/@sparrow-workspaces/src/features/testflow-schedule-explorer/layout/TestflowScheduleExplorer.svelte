@@ -26,6 +26,7 @@
   export let isTestflowScheduleEditable;
   export let onOpenEnvironment;
   export let onOpenTestflow;
+  
 
   let scheduledEnvironment;
   $: {
@@ -106,6 +107,7 @@
           {workspaceUsers}
           {onUpdateSchedule}
           {onSaveSchedule}
+          isSaved ={$tab?.isSaved}
         />
       {/if}
     </div>
