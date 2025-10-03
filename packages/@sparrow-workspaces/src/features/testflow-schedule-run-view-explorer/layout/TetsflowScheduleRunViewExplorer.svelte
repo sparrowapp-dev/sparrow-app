@@ -112,6 +112,7 @@
   import { planInfoByRole } from "@sparrow/common/utils";
   import { TeamRole } from "@sparrow/common/enums";
   import { planContentDisable } from "@sparrow/common/utils";
+  import type { TestFlowScheduleRunResult } from "../../../../../@sparrow-common/src/types/workspace/testflow-schedule-run-view-tab";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -1202,6 +1203,72 @@
     });
   };
 
+  let testflowViewRequestItems: any;
+
+  const allocationNodeWithRequest = () => {
+    let nodes = $tab.property?.testflowScheduleRunView?.nodes || [];
+    let edges = $tab.property?.testflowScheduleRunView?.edges || [];
+    let runResult = $tab.property?.testflowScheduleRunView?.result;
+    // Find max node ID for graph size
+    let maxNodeId = 1;
+    for (let i = 0; i < nodes.length; i++) {
+      maxNodeId = Math.max(maxNodeId, Number(nodes[i].id));
+    }
+    // Initialize adjacency list for graph traversal
+    const graph = Array.from({ length: maxNodeId + 1 }, () => []);
+    // Populate adjacency list with edges
+    for (let i = 0; i < edges.length; i++) {
+      graph[Number(edges[i].source)].push(Number(edges[i].target));
+    }
+    // Find all connected nodes in sequential order starting from node "1"
+    let connectedNodes = [];
+    // Inner function to find connected nodes
+    const findNodes = (start: number, visited = new Set()) => {
+      if (visited.has(start)) return;
+      for (let i = 0; i < nodes.length; i++) {
+        if (Number(nodes[i].id) === start) {
+          connectedNodes.push(nodes[i]);
+        }
+      }
+      visited.add(start);
+      for (const neighbor of graph[start]) {
+        findNodes(neighbor, visited);
+      }
+    };
+    findNodes(Number("1"));
+    // Create array of objects with request, response, and node
+    let testflowStoreItems = [];
+    for (let i = 0; i < connectedNodes.length; i++) {
+      const node = connectedNodes[i];
+      // Get corresponding request and response from runResult
+      const request =
+        runResult?.requests?.[i] || node?.data?.requestData || null;
+      const response = runResult?.response?.[i] || node?.data?.response || null;
+      testflowStoreItems.push({
+        request: request,
+        response: response,
+        node: node,
+      });
+    }
+    return testflowStoreItems;
+  };
+
+  function getScheduleRunItemByIndex(
+    runResult: TestFlowScheduleRunResult | undefined,
+    index: number,
+  ): { id: string; request: any; response: any } | undefined {
+    const requests = runResult?.requests ?? [];
+    const responses = runResult?.response ?? [];
+    if (index < 0) {
+      return undefined;
+    }
+    return {
+      id: index.toString(),
+      request: requests[index - 1],
+      response: responses[index - 1],
+    };
+  }
+
   /**
    * Initializes nodes and edges on component mount.
    */
@@ -1220,7 +1287,7 @@
             const dbNodes = $tab?.property?.testflowScheduleRunView
               ?.nodes as TFNodeType[];
             let res = [];
-            for (let i = 0; i < dbNodes.length; i++) {
+            for (let i = 1; i < dbNodes.length; i++) {
               res.push({
                 id: dbNodes[i].id,
                 type: dbNodes[i].type,
@@ -1282,6 +1349,10 @@
                   requestData: dbNodes[i].data?.requestData,
                   collections: filteredCollections,
                   tabId: $tab.tabId,
+                  currentItem: getScheduleRunItemByIndex(
+                    $tab.property?.testflowScheduleRunView?.result,
+                    i,
+                  ),
                 },
                 position: {
                   x: dbNodes[i].position.x,
@@ -1689,6 +1760,12 @@
     currentPage = 1;
   }
 
+  $: {
+    if ($tab.property?.testflowScheduleRunView) {
+      testflowViewRequestItems = allocationNodeWithRequest();
+    }
+  }
+
   // Filter schedules based on search
   $: filteredSchedules = filteredSchedules.filter(
     (schedule) =>
@@ -1715,15 +1792,44 @@
   }}
 >
   <!-- Header Section with Name and Controls -->
-  <div class="p-3" style="position:absolute; z-index:3; top:0; left:0;">
-    <!-- INSERT NAME COMPONENT HERE -->
-    <TestFlowName {onUpdateTestFlowName} testFlowName={$tab?.name} />
-  </div>
-
   <div
-    class="d-flex justify-content-between position-absolute p-3"
-    style="top:0; right:0; z-index:3;"
-  ></div>
+    class="d-flex flex-column justify-content-between position-relative p-3"
+    style="top:0; left:0; z-index:3; background-color: var(--bg-ds-neutral-900);"
+  >
+    <h5 class="header-title-text">
+      Run Result - {$tab.property?.testflowScheduleRunView?.scheduleName}
+    </h5>
+    <div class="status-row">
+      <span>
+        {#if $tab.property?.testflowScheduleRunView?.lastestExecuted}
+          {new Date($tab.property.testflowScheduleRunView.lastestExecuted)
+            .toLocaleString("en-US", {
+              month: "short",
+              day: "2-digit",
+              year: "numeric",
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: true,
+            })
+            .replace(",", " at")}
+        {/if}
+      </span>
+      <span>
+        {$tab.property?.testflowScheduleRunView?.isScheduled
+          ? "Auto Run"
+          : "Manual Run"}
+      </span>
+      <span>{$tab.property?.testflowScheduleRunView?.result?.status}</span>
+      <span>
+        {($tab.property?.testflowScheduleRunView?.result?.successRequests ??
+          0) +
+          ($tab.property?.testflowScheduleRunView?.result?.failedRequests ?? 0)}
+        Requests (
+        {$tab.property?.testflowScheduleRunView?.result?.successRequests ?? 0} Passed,
+        {$tab.property?.testflowScheduleRunView?.result?.failedRequests ?? 0} Failed)
+      </span>
+    </div>
+  </div>
 
   <!-- Main Content Area -->
   <div style="flex: 1; overflow: auto;" class="px-3">
@@ -1765,6 +1871,7 @@
         {selectedAuthHeader}
         bind:selectAuthHeader
         {handleOpenCurrentDynamicExpression}
+        {testflowViewRequestItems}
       />
     </div>
   {:else if $isTestFlowTourGuideOpen && $currentStep === 7}
@@ -2367,5 +2474,38 @@
     margin-right: 6px;
     padding-left: 12px;
     border-radius: 4px;
+  }
+  .header-title-text {
+    font-family: "Inter", sans-serif;
+    font-weight: 600;
+    font-style: normal;
+    font-size: 20px;
+    line-height: 120%;
+    letter-spacing: 0;
+    color: var(--bg-ds-neutral-50);
+  }
+  .status-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    font-size: 12px;
+    line-height: 130%;
+    letter-spacing: 0;
+    text-align: center;
+    vertical-align: middle;
+    color: var(--bg-ds-neutral-200);
+  }
+
+  .status-row span::after {
+    content: "•";
+    margin-left: 8px;
+    color: #aaa;
+  }
+
+  .status-row span:last-child::after {
+    content: ""; /* remove dot after last item */
   }
 </style>
