@@ -15,6 +15,70 @@
   export let environments = [];
   export let workspaceUsers = [];
   export let onUpdateSchedule = (updatedSchedule) => {};
+  export let onSaveSchedule;
+
+  let updateDebounceTimer = null;
+  const UPDATE_DEBOUNCE_TIME = 300;
+
+  // Function to update schedule in real-time
+  function updateScheduleRealtime() {
+    clearTimeout(updateDebounceTimer);
+    updateDebounceTimer = setTimeout(() => {
+      // Only update if values have changed
+      if (!isFormDirty) return;
+
+      // Create runConfiguration object based on cycle type
+      let runConfiguration = {
+        runCycle: selectedCycle,
+      };
+
+      switch (selectedCycle) {
+        case "once":
+          if (formattedDate && selectedTime) {
+            runConfiguration.executeAt = formatDateForAPI(
+              formattedDate,
+              selectedTime,
+            );
+          }
+          break;
+        case "daily":
+          if (selectedTime) {
+            runConfiguration.time = selectedTime;
+          }
+          break;
+        case "weekly":
+          // Convert day values to day numbers
+          if (days.length > 0) {
+            runConfiguration.days = days
+              .map((dayValue) => {
+                const day = weekDays.find((d) => d.value === dayValue);
+                return day ? day.dayNumber : undefined;
+              })
+              .filter((day) => day !== undefined);
+          }
+          if (selectedTime) {
+            runConfiguration.time = selectedTime;
+          }
+          break;
+        case "hourly":
+          runConfiguration.intervalHours = intervalHours;
+          break;
+      }
+
+      const updatedSchedule = {
+        name: scheduleName,
+        environmentId: selectedEnvironment || undefined,
+        runConfiguration,
+        notification: {
+          emails: notificationEmails,
+          receiveNotifications,
+        },
+      };
+
+      // Call the update function from parent
+      onUpdateSchedule(updatedSchedule);
+    }, UPDATE_DEBOUNCE_TIME);
+  }
 
   // Form state
   let scheduleName = "";
@@ -56,9 +120,6 @@
   // Store initial values to track changes
   let initialFormData = null;
 
-  // Current user email for default notification
-  const currentUserEmail = "";
-
   // Format environments for Select component
   $: formattedEnvironments = environments.map((env) => ({
     id: env.id,
@@ -71,10 +132,6 @@
     email: user.email,
     name: user.name || "",
   }));
-
-  $: {
-    console.log("dd", environments, workspaceUsers);
-  }
 
   // Run Cycle options
   const cycleOptions = [
@@ -105,7 +162,6 @@
 
   // Initialize form with schedule data
   onMount(() => {
-    console.log("Component mounted, schedule:", schedule);
     if (schedule) {
       scheduleName = schedule.name || "";
       selectedEnvironment = schedule.environmentId || "";
@@ -136,9 +192,7 @@
           .filter(Boolean);
       }
 
-      notificationEmails =
-        schedule.notification?.emails ||
-        (currentUserEmail ? [currentUserEmail] : []);
+      notificationEmails = schedule.notification?.emails;
       receiveNotifications =
         schedule.notification?.receiveNotifications || "failure";
 
@@ -154,8 +208,6 @@
         notificationEmails: [...notificationEmails],
         receiveNotifications,
       };
-
-      console.log("Initial form data:", initialFormData);
     }
   });
 
@@ -213,38 +265,40 @@
       JSON.stringify(notificationEmails) !==
         JSON.stringify(initialFormData.notificationEmails) ||
       receiveNotifications !== initialFormData.receiveNotifications;
-
-    console.log("Form dirty state:", isFormDirty);
   }
 
-  // Handler for environment selection
   const handleEnvironmentSelect = (envId) => {
     selectedEnvironment = envId;
     checkFormDirty();
+    updateScheduleRealtime();
   };
 
   // Handler for cycle selection
   const handleCycleSelect = (cycle) => {
     selectedCycle = cycle;
     checkFormDirty();
+    updateScheduleRealtime();
   };
 
   // Handle schedule name change
   const handleScheduleNameChange = (e) => {
     scheduleName = e.detail;
     checkFormDirty();
+    updateScheduleRealtime();
   };
 
   // Handle date change
   const handleDateChange = (e) => {
     formattedDate = e.detail;
     checkFormDirty();
+    updateScheduleRealtime();
   };
 
   // Handle time change
   const handleTimeChange = (event) => {
     selectedTime = event.detail;
     checkFormDirty();
+    updateScheduleRealtime();
   };
 
   // Handle hourly interval change
@@ -269,6 +323,7 @@
       }
       hourlyProgressStep = closestIndex;
     }
+    updateScheduleRealtime();
   }
 
   // Handle progress bar change
@@ -276,6 +331,7 @@
     const { value } = event.detail;
     intervalHours = value;
     checkFormDirty();
+    updateScheduleRealtime();
   }
 
   // Format week days for display
@@ -303,18 +359,21 @@
       days = [...days, dayValue];
     }
     checkFormDirty();
+    updateScheduleRealtime();
   }
 
   // Handle notification emails change
   function handleNotificationEmailsChange(emails) {
     notificationEmails = emails;
     checkFormDirty();
+    updateScheduleRealtime();
   }
 
   // Handle notification preference change
   function handleNotificationPrefChange(event) {
     receiveNotifications = event.target.value;
     checkFormDirty();
+    updateScheduleRealtime();
   }
 
   // Format date for API
@@ -337,68 +396,37 @@
   // Save changes handler
   const handleSaveChanges = async () => {
     isUpdating = true;
-    console.log("Saving changes...");
 
-    // Create runConfiguration object based on cycle type
-    let runConfiguration = {
-      runCycle: selectedCycle,
-    };
+    try {
+      // Call onSaveSchedule instead of onUpdateSchedule
+      const result = await onSaveSchedule();
 
-    switch (selectedCycle) {
-      case "once":
-        runConfiguration.executeAt = formatDateForAPI(
+      if (result && result.success) {
+        // Update initialFormData to new values after successful save
+        initialFormData = {
+          scheduleName,
+          selectedEnvironment,
+          selectedCycle,
           formattedDate,
           selectedTime,
-        );
-        break;
-      case "daily":
-        runConfiguration.time = selectedTime;
-        break;
-      case "weekly":
-        // Convert day values to day numbers for API
-        runConfiguration.days = days
-          .map((dayValue) => {
-            const day = weekDays.find((d) => d.value === dayValue);
-            return day ? day.dayNumber : undefined;
-          })
-          .filter((day) => day !== undefined);
-        runConfiguration.time = selectedTime;
-        break;
-      case "hourly":
-        runConfiguration.intervalHours = intervalHours;
-        break;
+          intervalHours,
+          days: [...days],
+          notificationEmails: [...notificationEmails],
+          receiveNotifications,
+        };
+
+        // Reset form dirty state
+        isFormDirty = false;
+      } else {
+        console.error("Failed to save schedule:", result?.error);
+        // Optionally show error notification here
+      }
+    } catch (error) {
+      console.error("Error while saving schedule:", error);
+      // Optionally show error notification here
+    } finally {
+      isUpdating = false;
     }
-
-    const updatedSchedule = {
-      ...schedule,
-      name: scheduleName,
-      environmentId: selectedEnvironment,
-      runConfiguration,
-      notification: {
-        emails: notificationEmails,
-        receiveNotifications,
-      },
-    };
-
-    console.log("Updated schedule:", updatedSchedule);
-    await onUpdateSchedule(updatedSchedule);
-
-    // Update initialFormData to new values
-    initialFormData = {
-      scheduleName,
-      selectedEnvironment,
-      selectedCycle,
-      formattedDate,
-      selectedTime,
-      intervalHours,
-      days: [...days],
-      notificationEmails: [...notificationEmails],
-      receiveNotifications,
-    };
-
-    isUpdating = false;
-    isFormDirty = false;
-    console.log("Save complete");
   };
 
   const handleCancel = () => {
@@ -416,7 +444,6 @@
 
       // Reset dirty state
       isFormDirty = false;
-      console.log("Form reset to initial values");
     }
   };
 

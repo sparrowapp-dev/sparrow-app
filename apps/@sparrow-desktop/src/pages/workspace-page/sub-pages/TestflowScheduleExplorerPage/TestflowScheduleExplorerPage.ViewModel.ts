@@ -145,33 +145,80 @@ class MockHistoryExplorerPage {
     }
   };
 
-  public deleteTestflowScheduleHistory = async(_scheduleHistoryId: string) => {
+  public deleteTestflowScheduleHistory = async (_scheduleHistoryId: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-     const baseUrl = await this.constructBaseUrl(
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab.path.workspaceId,
+    );
+    const response = await this.testflowService.deleteScheduleRunHistory(
+      progressiveTab.path.workspaceId,
+      progressiveTab.path.testflowId,
+      progressiveTab.id,
+      _scheduleHistoryId,
+      baseUrl,
+    );
+    if (response?.isSuccessful) {
+      const schedules = response.data.data.schedules;
+      updateTestflowSchedules(
+        progressiveTab?.path?.testflowId as string,
+        schedules,
+      );
+    }
+  };
+
+  /**
+   * Updates the testflow schedule configuration and persists to database
+   * @param updatedSchedule - The updated schedule configuration data
+   * @returns Promise with operation result
+   */
+  public updateTestflowSchedule = async (updatedSchedule: any = {}) => {
+    try {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const baseUrl = await this.constructBaseUrl(
         progressiveTab.path.workspaceId,
       );
-    const response = await this.testflowService.deleteScheduleRunHistory(progressiveTab.path.workspaceId, progressiveTab.path.testflowId, progressiveTab.id, _scheduleHistoryId, baseUrl);
-    if(response?.isSuccessful){
-      const schedules = response.data.data.schedules;
-      updateTestflowSchedules(progressiveTab?.path?.testflowId as string, schedules);
-    }
-  }
+      // Prepare payload for API
+      const payload = {
+        name: progressiveTab.name,
+        environmentId: progressiveTab.property.testflowSchedule.environmentId,
+        runConfiguration:
+          progressiveTab.property.testflowSchedule.runConfiguration,
+        notification: progressiveTab.property.testflowSchedule.notification,
+      };
 
-    public updateTestflowSchedule = async() => {
-      const progressiveTab = createDeepCopy(this._tab.getValue());
-       const baseUrl = await this.constructBaseUrl(
-          progressiveTab.path.workspaceId,
-        );
-      let payload={
-        isActive: true
-      }
+      // Send to server
+      const response = await this.testflowService.updateTestflowSchedule(
+        progressiveTab.path.workspaceId,
+        progressiveTab.path.testflowId,
+        progressiveTab.id,
+        payload,
+        baseUrl,
+      );
 
-      const response = await this.testflowService.updateTestflowSchedule(progressiveTab.path.workspaceId, progressiveTab.path.testflowId, progressiveTab.id, payload, baseUrl);
-      if(response?.isSuccessful){
+      if (response?.isSuccessful) {
         const schedules = response.data.data.schedules;
         updateTestflowSchedules(progressiveTab?.id as string, schedules);
+        notifications.success(
+          `'${progressiveTab.name}' schedule saved successfully.`,
+        );
+        return { success: true };
+      } else {
+        notifications.error("Failed to save schedule. Please try again.");
+        return {
+          success: false,
+          error: response?.data?.message || "Failed to save schedule",
+        };
       }
+    } catch (error) {
+      notifications.error("Failed to save schedule. Please try again.");
+      console.error("Error saving schedule:", error);
+      return {
+        success: false,
+        error: "An unexpected error occurred while saving the schedule",
+      };
     }
+  };
+
   public handleCreateTestflowSingleScheduleTab = (_scheduleResult) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const x = new TestflowScheduleRunViewTabAdapter().adapt(
@@ -206,6 +253,57 @@ class MockHistoryExplorerPage {
   public get environments() {
     return this.environmentRepository.getEnvironment();
   }
+
+  /**
+   * Updates the testflow schedule tab data with the provided configuration
+   * This only updates the local tab data and doesn't save to the server
+   * @param updatedSchedule - The updated schedule configuration
+   */
+  public updateScheduleTab = async (updatedSchedule) => {
+    // Get current tab state
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+
+    // Update tab name if provided
+    if (updatedSchedule.name) {
+      progressiveTab.name = updatedSchedule.name;
+    }
+
+    // Update environment ID if provided
+    if (updatedSchedule.environmentId !== undefined) {
+      if (progressiveTab.property.testflowSchedule) {
+        progressiveTab.property.testflowSchedule.environmentId =
+          updatedSchedule.environmentId;
+      }
+    }
+
+    // Update run configuration if provided
+    if (updatedSchedule.runConfiguration) {
+      if (progressiveTab.property.testflowSchedule) {
+        progressiveTab.property.testflowSchedule.runConfiguration = {
+          ...progressiveTab.property.testflowSchedule.runConfiguration,
+          ...updatedSchedule.runConfiguration,
+        };
+      }
+    }
+
+    // Update notification settings if provided
+    if (updatedSchedule.notification) {
+      if (progressiveTab.property.testflowSchedule) {
+        progressiveTab.property.testflowSchedule.notification = {
+          ...progressiveTab.property.testflowSchedule.notification,
+          ...updatedSchedule.notification,
+        };
+      }
+    }
+
+    // Update the tab in memory
+    this.tab = progressiveTab;
+
+    // Update the tab in the repository
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+
+    return { success: true };
+  };
 }
 
 export default MockHistoryExplorerPage;

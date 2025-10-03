@@ -18,6 +18,7 @@
   export let environments = [];
   export let workspaceUsers = [];
   export let onUpdateSchedule = (updatedSchedule) => {};
+  export let onSaveSchedule;
 </script>
 
 {#if $tab.tabId}
@@ -69,6 +70,7 @@
           {environments}
           {workspaceUsers}
           {onUpdateSchedule}
+          {onSaveSchedule}
         />
       {/if}
     </div>
