@@ -10,6 +10,7 @@ import {
   type TFTabNodeType,
 } from "@sparrow/common/types/workspace/testflow";
 import { CollectionItemTypeDtoEnum } from "../types/workspace/collection-dto";
+import type { TestFlowScheduleRunResult } from "../types/workspace/testflow-schedule-run-view-tab";
 
 class InitTestflowScheduleRunViewTab {
   private _tab: Tab;
@@ -47,6 +48,17 @@ class InitTestflowScheduleRunViewTab {
             },
           ],
           edges: [],
+          result: {
+            failedRequests: 0,
+            successRequests: 0,
+            totalTime: "0ms",
+            status: "IDLE",
+            requests: [],
+            response: [],
+          },
+          isScheduled:false,
+          scheduleName:"",
+          lastestExecuted:"",
         },
       },
       path: {
@@ -92,6 +104,24 @@ class InitTestflowScheduleRunViewTab {
     this._tab.name = _name;
   }
 
+  public setScheduleName(_scheduleName:string){
+    if (this._tab?.property?.testflowScheduleRunView) {
+      this._tab.property.testflowScheduleRunView.scheduleName = _scheduleName;
+    }
+  }
+
+  public setIsScheduled(_isScheduled:boolean){
+    if (this._tab?.property?.testflowScheduleRunView) {
+      this._tab.property.testflowScheduleRunView.isScheduled = _isScheduled;
+    }
+  }
+
+  public setLastestTime(_lastedExecuted:string){
+    if (this._tab?.property?.testflowScheduleRunView) {
+      this._tab.property.testflowScheduleRunView.lastestExecuted = _lastedExecuted;
+    }
+  }
+
   public setNodes(_nodes: TFTabNodeType[]) {
     if (this._tab?.property?.testflowScheduleRunView?.nodes) {
       this._tab.property.testflowScheduleRunView.nodes = _nodes;
@@ -100,6 +130,11 @@ class InitTestflowScheduleRunViewTab {
   public setEdges(_edges: TFTabEdgeType[]) {
     if (this._tab?.property?.testflowScheduleRunView?.edges) {
       this._tab.property.testflowScheduleRunView.edges = _edges;
+    }
+  }
+  public setResult(_result:TestFlowScheduleRunResult){
+    if (this._tab?.property?.testflowScheduleRunView?.edges) {
+      this._tab.property.testflowScheduleRunView.result = _result;
     }
   }
 }

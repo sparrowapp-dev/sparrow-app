@@ -56,7 +56,7 @@
     stroke-width="1"
     class="svelte-flow__edge-interaction"
   />
-  <foreignObject
+  <!-- <foreignObject
     x={labelX}
     y={labelY}
     class="btn-container rounded p-2"
@@ -94,7 +94,7 @@
         ></span>
       </span>
     </div>
-  </foreignObject>
+  </foreignObject> -->
 </g>
 
 <!-- HTML Button Overlay -->

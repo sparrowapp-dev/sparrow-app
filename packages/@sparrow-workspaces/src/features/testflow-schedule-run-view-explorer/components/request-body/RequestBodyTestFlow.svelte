@@ -36,7 +36,7 @@
 
 <div
   class="ps-0 pe-0 d-flex flex-column rounded w-100 h-100 position-relative"
-  style="overflow: auto;"
+  style="overflow: auto; pointer-events: none;"
 >
   <RequestBodyNavigator
     {method}

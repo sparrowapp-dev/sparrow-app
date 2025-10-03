@@ -77,11 +77,6 @@
     ? "pointer-events: none; opacity: 0.7;"
     : ""}
   class="start-block position-relative"
-  on:click={() => {
-    if (isAddBlockVisible) return;
-    MixpanelEvent(Events.Start_TestFlows);
-    data.onClick("0");
-  }}
 >
   <span>
     <span style="opacity:{isAddBlockVisible ? '0.4' : '1'}">
@@ -99,35 +94,12 @@
       style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:8px; width:8px; z-index: 500;"
     />
     {#if isAddBlockVisible}
-      <div
-        class="add-block-btn"
-        style="position: absolute;"
-        on:drop={(e) => {
-          e.preventDefault();
-          const requestEvent = JSON.parse(e.dataTransfer.getData("text/plain"));
-          if (!requestEvent) return;
-          const requestData = {
-            requestId: requestEvent.requestId,
-            folderId: requestEvent.folderId,
-            workspaceId: requestEvent.workspaceId,
-            collectionId: requestEvent.collectionId,
-            name: requestEvent.name,
-            method: requestEvent.method,
-          };
-          data.onClick(id, requestData);
-        }}
-      >
+      <div class="add-block-btn" style="position: absolute;">
         <div class="arrow">
           <ArrowIcon />
         </div>
         <div id="add-block">
-          <span
-            on:click={(event) => {
-              event?.preventDefault();
-              event.stopPropagation();
-              data.onClick(id);
-            }}
-          >
+          <span>
             <span class="btnc py-1 px-3 d-flex align-items-center">
               <span class="text-fs-16 me-2">+</span> <span>Add Block</span>
             </span>
