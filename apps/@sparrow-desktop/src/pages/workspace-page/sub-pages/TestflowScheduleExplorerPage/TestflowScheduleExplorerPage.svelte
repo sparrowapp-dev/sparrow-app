@@ -54,14 +54,28 @@
   let schedule;
 
   $: {
+    // First try to get schedule from store
     testflowScheduleStore = testflowScheduleStoreMap?.get(
       tab?.path?.testflowId,
     );
-    schedule = testflowScheduleStore?.find((schedule) => {
-      if (schedule.id === tab?.id) {
-        return true;
-      }
-    });
+
+    let storeSchedule = testflowScheduleStore?.find((s) => s.id === tab?.id);
+
+    // If tab has the updated schedule info in its property, use that as the source of truth
+    if (tab?.property?.testflowSchedule) {
+      // Merge store schedule with tab data for most up-to-date version
+      schedule = {
+        ...storeSchedule,
+        ...tab.property.testflowSchedule,
+        // Important fields to ensure they're updated
+        name: tab.name,
+        environmentId: tab.property.testflowSchedule.environmentId,
+        runConfiguration: tab.property.testflowSchedule.runConfiguration,
+        notification: tab.property.testflowSchedule.notification,
+      };
+    } else {
+      schedule = storeSchedule;
+    }
   }
 
   $: {
@@ -117,4 +131,6 @@
   onScheduleRun={_viewModel.runTestflowSchedule}
   onDeleteTestflowScheduleHistory={_viewModel.deleteTestflowScheduleHistory}
   onScheduleRunview={_viewModel.handleCreateTestflowSingleScheduleTab}
+  onUpdateSchedule={_viewModel.updateScheduleTab}
+  onSaveSchedule={_viewModel.updateTestflowSchedule}
 />
