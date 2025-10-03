@@ -2111,7 +2111,7 @@
             style="overflow: auto;"
           >
             <table
-              class="table scheduled-table"
+              class="scheduled-table"
               style="background-color: transparent !important;"
             >
               <thead>
