@@ -31,7 +31,10 @@ import { getSelfhostUrls } from "@app/utils/jwt";
 import type { TestflowScheduleStateDto } from "@sparrow/common/types/workspace/testflow-schedule-tab";
 import { TestflowRepository } from "@app/repositories/testflow.repository";
 import { TestflowService } from "@app/services/testflow.service";
-import { updateTestflowSchedules } from "@sparrow/common/store";
+import {
+  testflowSchedules,
+  updateTestflowSchedules,
+} from "@sparrow/common/store";
 import { InitTab } from "@sparrow/common/factory";
 import { v4 as uuidv4 } from "uuid";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
@@ -46,12 +49,21 @@ class MockHistoryExplorerPage {
   private environmentRepository = new EnvironmentRepository();
 
   private _tab: BehaviorSubject<Tab> = new BehaviorSubject({});
-
+  private testflowScheduleStore;
   constructor(_tab: TabDocument) {
     const t = createDeepCopy(_tab.toMutableJSON());
     delete t.isActive;
     delete t.index;
     t.persistence = TabPersistenceTypeEnum.PERMANENT;
+    testflowSchedules.subscribe((_testflowScheduleStoreMap) => {
+      if (_testflowScheduleStoreMap) {
+        const testflowStore = _testflowScheduleStoreMap?.get(
+          t?.path?.testflowId,
+        );
+        this.testflowScheduleStore = testflowStore?.find((s) => s.id === t?.id);
+      }
+    });
+
     this.tab = t;
     this.getTestflow();
   }
@@ -66,6 +78,113 @@ class MockHistoryExplorerPage {
 
   public get environments() {
     return this.environmentRepository.getEnvironment();
+  }
+
+  /**
+   * Compares the current schedule tab with the server version and updates the saved status accordingly.
+   * This method is debounced to reduce the number of server requests.
+   * @return A promise that resolves when the comparison is complete.
+   */
+  /**
+   * Compares the current schedule tab with the stored server version and updates the saved status accordingly.
+   * This method is debounced to reduce the number of comparisons.
+   * @return A promise that resolves when the comparison is complete.
+   */
+  private compareScheduleWithServerDebounced = async () => {
+    try {
+      let result = true;
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+
+      if (
+        !progressiveTab?.property?.testflowSchedule ||
+        !this.testflowScheduleStore
+      ) {
+        // If we don't have both pieces of data, we can't compare
+        return;
+      }
+
+      // Compare name
+      if (this.testflowScheduleStore.name !== progressiveTab.name) {
+        result = false;
+      }
+
+      // Compare environment ID
+      if (
+        this.testflowScheduleStore.environmentId !==
+        progressiveTab.property.testflowSchedule.environmentId
+      ) {
+        result = false;
+      }
+
+      // Compare run configuration
+      const tabRunConfig =
+        progressiveTab.property.testflowSchedule.runConfiguration;
+      const serverRunConfig = this.testflowScheduleStore.runConfiguration;
+
+      if (!this.deepEqual(tabRunConfig, serverRunConfig)) {
+        result = false;
+      }
+
+      // Compare notification settings
+      const tabNotification =
+        progressiveTab.property.testflowSchedule.notification;
+      const serverNotification = this.testflowScheduleStore.notification;
+
+      if (!this.deepEqual(tabNotification, serverNotification)) {
+        result = false;
+      }
+
+      // Update the isSaved property based on comparison result
+      if (result) {
+        progressiveTab.isSaved = true;
+        this.tab = progressiveTab;
+        await this.tabRepository.updateTab(progressiveTab.tabId, {
+          isSaved: true,
+        });
+      } else {
+        progressiveTab.isSaved = false;
+        progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
+        this.tab = progressiveTab;
+        await this.tabRepository.updateTab(progressiveTab.tabId, {
+          isSaved: false,
+        });
+      }
+    } catch (error) {
+      console.error("Error comparing schedule with server:", error);
+    }
+  };
+  /**
+   * Debounced method to compare the current schedule tab with the server version.
+   */
+  private compareScheduleWithServer = new Debounce().debounce(
+    this.compareScheduleWithServerDebounced,
+    500,
+  );
+
+  /**
+   * Deep comparison utility for comparing objects
+   */
+  private deepEqual(obj1, obj2) {
+    if (obj1 === obj2) return true;
+    if (!obj1 || !obj2) return false;
+
+    if (Array.isArray(obj1) && Array.isArray(obj2)) {
+      if (obj1.length !== obj2.length) return false;
+      return obj1.every((item, index) => this.deepEqual(item, obj2[index]));
+    }
+
+    if (typeof obj1 === "object" && typeof obj2 === "object") {
+      const keys1 = Object.keys(obj1);
+      const keys2 = Object.keys(obj2);
+
+      if (keys1.length !== keys2.length) return false;
+
+      return keys1.every(
+        (key) => keys2.includes(key) && this.deepEqual(obj1[key], obj2[key]),
+      );
+    }
+
+    return obj1 === obj2;
   }
 
   /**
@@ -227,6 +346,12 @@ class MockHistoryExplorerPage {
           progressiveTab?.path?.testflowId as string,
           schedules,
         );
+        // Mark tab as saved after successful save
+        progressiveTab.isSaved = true;
+        this.tab = progressiveTab;
+        await this.tabRepository.updateTab(progressiveTab.tabId, {
+          isSaved: true,
+        });
         notifications.success(
           `'${progressiveTab.name}' schedule saved successfully.`,
         );
@@ -246,11 +371,18 @@ class MockHistoryExplorerPage {
         error: "An unexpected error occurred while saving the schedule",
       };
     }
-  }
-  
-  public handleCreateTestflowSingleScheduleTab = (_scheduleResult,scheduleName:string) => {
+  };
+
+  public handleCreateTestflowSingleScheduleTab = (
+    _scheduleResult,
+    scheduleName: string,
+  ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    const x = new TestflowScheduleRunViewTabAdapter().adapt(progressiveTab.path.workspaceId, _scheduleResult,scheduleName);
+    const x = new TestflowScheduleRunViewTabAdapter().adapt(
+      progressiveTab.path.workspaceId,
+      _scheduleResult,
+      scheduleName,
+    );
 
     // const initTestflowScheduleRunViewTab = this.initTab.testflowScheduleRunView(
     //   _scheduleResult.id,
@@ -316,6 +448,8 @@ class MockHistoryExplorerPage {
 
     // Update the tab in the repository
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    // Compare with server to update isSaved state
+    this.compareScheduleWithServer();
 
     return { success: true };
   };

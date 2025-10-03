@@ -126,7 +126,6 @@
   export let toggleHistoryDetails;
   export let toggleHistoryContainer;
   export let environmentVariables;
-  console.log("Environment Variables:", environmentVariables);
   export let isTestflowEditable;
   export let onRedrectRequest;
   export let onUpdateTestFlowName;
@@ -247,10 +246,6 @@
   const edges = writable<TFEdgeHandlerType[]>([]);
   setTimeout(() => {}, 1000);
 
-  // $: {
-  //   console.log(testflowScheduleStore);
-  // }
-
   /**
    * Checks if edges exist for the given node ID.
    * @param _id - Node ID to check for connected edges.
@@ -282,8 +277,6 @@
   let filteredSchedules = [];
 
   function mapScheduleData(schedule) {
-    console.log("Mapping schedule:", schedule);
-
     // Determine status based on isActive and executeAt
     let status = "Inactive";
     if (schedule.isActive) {
@@ -393,11 +386,6 @@
 
   function setActiveTab(tab) {
     activeTab = tab;
-  }
-
-  function handleLearnMore() {
-    // Handle learn more click
-    console.log("Learn more clicked");
   }
 
   let dismissed = false;
@@ -1974,6 +1962,7 @@
           on:click={handleLearnMore}
           style="color: #60a5fa;"
         >
+
           Learn More
         </span> -->
       </div>

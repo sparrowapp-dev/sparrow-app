@@ -4,8 +4,6 @@
   import { ErrorWithText, MoreHorizontalRegular } from "@sparrow/library/icons";
 
   export let schedule;
-
-  console.log("Schedule:", schedule);
   export let onPerformTestflowScheduleOperations;
   export let getTooltipMessage;
   export let handleToggleStatus;

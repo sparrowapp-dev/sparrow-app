@@ -69,6 +69,7 @@ import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/htt
 import { getAuthJwt, getSelfhostUrls } from "@app/utils/jwt";
 import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
 import { updateTestflowSchedules } from "@sparrow/common/store";
+import { TestflowScheduleNavigatorEnum } from "@sparrow/common/types/workspace/testflow-schedule-tab";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -1927,11 +1928,12 @@ export class TestflowExplorerPageViewModel {
       progressiveTab.path.workspaceId,
     )
       .updatePath({ testflowId: progressiveTab.id })
+      .updateState({
+        scheduleNavigator: TestflowScheduleNavigatorEnum.CONFIGURATION,
+      })
       .getValue();
     await this.tabRepository.createTab(initTestflowScheduleTab);
   };
-
-
 
   public handleContactSales = async () => {
     await open(`${constants.MARKETING_URL}/pricing/`);
@@ -2029,6 +2031,7 @@ export class TestflowExplorerPageViewModel {
     if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
       updateTestflowSchedules(progressiveTab?.id as string, schedules);
+      debugger;
     }
   };
 
