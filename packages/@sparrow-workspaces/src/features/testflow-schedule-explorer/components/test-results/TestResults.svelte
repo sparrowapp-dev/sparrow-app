@@ -1,14 +1,39 @@
 <script lang="ts">
-  import { Options } from "@sparrow/library/ui";
   import { ArrowSortRegular } from "@sparrow/library/icons";
   import Result from "./sub-components/Result.svelte";
-
+  import Pagination from "../../../../../../@sparrow-library/src/ui/pagination/Pagination.svelte";
+  import EmptyTestResult from "./sub-components/EmptyTestResult.svelte";
   export let schedule;
-  export let onDeleteTestflowScheduleHistory;
-  export let onScheduleRunview;
 
   let openMenuFor: string | null = null;
   let activeWrapper: HTMLElement | null = null;
+  let currentPage = 1;
+  let itemsPerPage = 10;
+  let sortDirection: "asc" | "desc" = "desc";
+
+  $: totalItems = schedule?.schedularRunHistory?.length || 0;
+
+  $: sortedHistory = schedule?.schedularRunHistory
+    ? [...schedule.schedularRunHistory].sort((a, b) => {
+        const dateA = new Date(a.totalTime).getTime();
+        const dateB = new Date(b.totalTime).getTime();
+        return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
+      })
+    : [];
+
+  $: paginatedHistory = sortedHistory.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
+  );
+
+  function toggleSort() {
+    sortDirection = sortDirection === "asc" ? "desc" : "asc";
+    currentPage = 1;
+  }
+
+  export let onDeleteTestflowScheduleHistory;
+  export let onScheduleRunview;
+  export let isTestflowScheduleEditable;
 
   function formatDate(dateStr: string) {
     const date = new Date(dateStr);
@@ -29,131 +54,105 @@
     const parts = flowName.split("-");
     return parts.length > 1 ? parts[parts.length - 1].trim() : "";
   }
-
-  let deleteScheduleResultId;
-
-  function toggleMenu(
-    e: MouseEvent,
-    rowId: string,
-    wrapper: HTMLElement,
-    scheduleResultId,
-  ) {
-    e.stopPropagation();
-    deleteScheduleResultId = scheduleResultId;
-    if (openMenuFor === rowId) {
-      openMenuFor = null;
-      activeWrapper = null;
-    } else {
-      openMenuFor = rowId;
-      activeWrapper = wrapper;
-      // Focus the wrapper immediately to enable blur detection
-      setTimeout(() => {
-        const focusWrapper = document.querySelector(
-          ".options-focus-wrapper",
-        ) as HTMLElement;
-        if (focusWrapper) {
-          focusWrapper.focus();
-        }
-      }, 0);
-    }
-  }
-
-  function closeMenu() {
-    openMenuFor = null;
-    activeWrapper = null;
-  }
 </script>
 
-{#if schedule?.schedularRunHistory}
-  <div class="content-wrapper">
-    <div class="table-container">
-      <table class="custom-table">
-        <thead>
-          <tr>
-            <th>Run Time</th>
-            <th class="icon-col"><ArrowSortRegular size="20px" /></th>
-            <th>Status</th>
-            <th>Total Requests</th>
-            <th>Result</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {#each schedule?.schedularRunHistory as r}
-            <Result
-              {onScheduleRunview}
-              {onDeleteTestflowScheduleHistory}
-              {r}
-              {schedule}
-              {formatDate}
-              {getRunType}
-              {toggleMenu}
-              {openMenuFor}
-            />
-          {/each}
-        </tbody>
-      </table>
+{#if schedule?.schedularRunHistory && schedule.schedularRunHistory.length > 0}
+  <div class="d-flex flex-column h-100 content-wrapper">
+    <div class="table-area" style="flex:1; overflow:auto;">
+      <div class="table-container">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Run Time</th>
+              <th on:click={toggleSort} class="sortable">
+                <span class:active-sort={sortDirection === "asc"}>
+                  <ArrowSortRegular size="20px" />
+                </span>
+              </th>
+              <th>Status</th>
+              <th>Total Requests</th>
+              <th>Result</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each paginatedHistory as r}
+              <Result
+                {onScheduleRunview}
+                {onDeleteTestflowScheduleHistory}
+                {r}
+                {schedule}
+                {formatDate}
+                {getRunType}
+                {isTestflowScheduleEditable}
+              />
+            {/each}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="pagination-wrapper">
+      <Pagination
+        {currentPage}
+        {itemsPerPage}
+        {totalItems}
+        onPageChange={(page) => (currentPage = page)}
+        onItemsPerPageChange={(newLimit) => (itemsPerPage = newLimit)}
+      />
     </div>
   </div>
-{/if}
-
-{#if openMenuFor && activeWrapper}
-  <div
-    tabindex="0"
-    class="options-focus-wrapper"
-    on:blur={closeMenu}
-    on:click|stopPropagation
-    style="position:absolute; left:0; top:0;"
-  >
-    {#key openMenuFor}
-      <Options
-        xAxis={activeWrapper.getBoundingClientRect().right - 104}
-        yAxis={activeWrapper.getBoundingClientRect().bottom + 80 >
-        window.innerHeight
-          ? [
-              activeWrapper.getBoundingClientRect().top - 50,
-              activeWrapper.getBoundingClientRect().top - 14,
-            ]
-          : [
-              activeWrapper.getBoundingClientRect().top - 12,
-              activeWrapper.getBoundingClientRect().top + 24,
-            ]}
-        zIndex={700}
-        width="104px"
-        menuItems={[
-          {
-            onClick: () => {
-              onDeleteTestflowScheduleHistory(deleteScheduleResultId);
-              closeMenu();
-            },
-            displayText: "Delete",
-            disabled: false,
-            hidden: false,
-          },
-        ]}
-      />
-    {/key}
-  </div>
+{:else}
+  <EmptyTestResult />
 {/if}
 
 <style lang="scss">
   .content-wrapper {
     display: flex;
     flex-direction: column;
-    flex: 1;
+    // position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     width: 100%;
   }
-  .table-container {
-    width: 100%;
+
+  .table-area {
     flex: 1;
-    overflow-x: auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .pagination-wrapper {
+    flex-shrink: 0;
+    width: 100%;
+    background: var(--bg-ds-surface-900, #111);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+  }
+
+  .table-container {
+    flex: 1;
+    width: 100%;
     overflow-y: auto;
+    overflow-x: auto;
+    min-height: 0;
+    position: relative;
   }
   .custom-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 12px;
+    border-bottom: 1px solid var(--border-ds-surface-200);
     thead {
+      position: sticky;
+      top: 0;
+      background: var(--bg-ds-surface-900, #111);
+      z-index: 5;
       color: var(--text-secondary-200);
     }
     th,
@@ -174,7 +173,78 @@
     }
   }
 
+  .custom-table th.sortable span {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+    width: 24px;
+    user-select: none;
+    vertical-align: middle;
+    line-height: 0;
+    color: var(--text-secondary-200);
+    transition: color 0.2s ease;
+  }
+
+  .custom-table th.sortable span.active-sort {
+    color: var(--accent-primary); /* blue when active */
+  }
+
+  .custom-table th.sortable:hover {
+    color: var(--text-primary-300);
+  }
+
   .options-focus-wrapper {
     outline: none;
+  }
+
+  .pagination-bar {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-top: 1px solid var(--border-ds-surface-200);
+    font-size: 12px;
+    color: var(--text-secondary-200);
+
+    position: fixed;
+    bottom: 0;
+    z-index: 10;
+
+    .info {
+      flex: 1;
+    }
+
+    .per-page {
+      margin: 0 12px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 4px;
+
+      button {
+        min-width: 28px;
+        height: 28px;
+        border: 1px solid var(--border-ds-surface-200);
+        background: transparent;
+        color: var(--text-secondary-200);
+        border-radius: 4px;
+        cursor: pointer;
+
+        &:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+        }
+
+        &.active {
+          background: var(--accent-primary);
+          color: white;
+          font-weight: bold;
+        }
+      }
+    }
   }
 </style>
