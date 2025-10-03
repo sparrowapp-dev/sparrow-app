@@ -246,6 +246,8 @@ class MockHistoryExplorerPage {
         error: "An unexpected error occurred while saving the schedule",
       };
     }
+  }
+  
   public handleCreateTestflowSingleScheduleTab = (_scheduleResult,scheduleName:string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const x = new TestflowScheduleRunViewTabAdapter().adapt(progressiveTab.path.workspaceId, _scheduleResult,scheduleName);
