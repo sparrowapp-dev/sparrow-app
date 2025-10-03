@@ -169,6 +169,7 @@
     : [];
 
   export let onPerformTestflowScheduleOperations;
+  export let onOpenTestflowScheduleConfigurationsTab;
 
   export let onUpdateScheduleStatus: (
     scheduleId: string,
@@ -2109,7 +2110,10 @@
             class="scheduled-table-container flex-grow-1"
             style="overflow: auto;"
           >
-            <table class="table scheduled-table">
+            <table
+              class="table scheduled-table"
+              style="background-color: transparent !important;"
+            >
               <thead>
                 <tr>
                   <th>Schedule Name</th>
@@ -2130,6 +2134,7 @@
                     {getNextRunTooltip}
                     {handleScheduleAction}
                     {getTagType}
+                    {onOpenTestflowScheduleConfigurationsTab}
                     {onOpenTestflowScheduleTab}
                   />
                 {/each}

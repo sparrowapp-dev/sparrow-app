@@ -1920,6 +1920,19 @@ export class TestflowExplorerPageViewModel {
     await this.tabRepository.createTab(initTestflowScheduleTab);
   };
 
+  public openTestflowScheduleConfigurationsTab = async (_schedule: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const initTestflowScheduleTab = new InitTestflowScheduleTab(
+      _schedule.id,
+      progressiveTab.path.workspaceId,
+    )
+      .updatePath({ testflowId: progressiveTab.id })
+      .getValue();
+    await this.tabRepository.createTab(initTestflowScheduleTab);
+  };
+
+
+
   public handleContactSales = async () => {
     await open(`${constants.MARKETING_URL}/pricing/`);
   };

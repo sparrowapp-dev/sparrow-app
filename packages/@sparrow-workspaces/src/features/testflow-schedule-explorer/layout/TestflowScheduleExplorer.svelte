@@ -66,6 +66,7 @@
           title={testflow?.name}
           startIcon={FlowChartRegular}
           type={"link-secondary"}
+          size={"extra-small"}
           onClick={() => {
             onOpenTestflow(testflow?.id);
           }}
@@ -75,6 +76,7 @@
             title={scheduledEnvironment?.name || ""}
             startIcon={LayerRegular}
             type={"link-secondary"}
+            size={"extra-small"}
             onClick={() => {
               onOpenEnvironment(scheduledEnvironment?.id);
             }}
