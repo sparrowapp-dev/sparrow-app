@@ -1811,10 +1811,10 @@ export class TestflowExplorerPageViewModel {
     }
   };
 
-  public openTestflowScheduleTab = async (_schedule) => {
+  private openTestflowScheduleTab = async (_scheduleId: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const initTestflowScheduleTab = new InitTestflowScheduleTab(
-      _schedule.id,
+      _scheduleId,
       progressiveTab.path.workspaceId,
     )
       .updatePath({ testflowId: progressiveTab.id })
@@ -1903,4 +1903,65 @@ export class TestflowExplorerPageViewModel {
       };
     }
   };
+
+   private deleteTestflowSchedule = async(_scheduleId: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+     const baseUrl = await this.constructBaseUrl(
+        progressiveTab.path.workspaceId,
+      );
+    const response = await this.testflowService.deleteTestflowSchedule(progressiveTab.path.workspaceId, progressiveTab.id, _scheduleId, baseUrl);
+    if(response?.isSuccessful){
+      const schedules = response.data.data.schedules;
+      updateTestflowSchedules(progressiveTab?.id as string, schedules);
+    }
+  }
+
+  private runTestflowSchedule = async(_scheduleId: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+     const baseUrl = await this.constructBaseUrl(
+        progressiveTab.path.workspaceId,
+      );
+    const response = await this.testflowService.runTestflowSchedule(progressiveTab.path.workspaceId, progressiveTab.id, _scheduleId, baseUrl);
+    if(response?.isSuccessful){
+      const schedules = response.data.data.schedules;
+      updateTestflowSchedules(progressiveTab?.id as string, schedules);
+    }
+  }
+
+  private editTestflowSchedule = async(_scheduleId: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const initTestflowScheduleTab = new InitTestflowScheduleTab(
+      _scheduleId,
+      progressiveTab.path.workspaceId,
+    )
+      .updatePath({ testflowId: progressiveTab.id })
+      .getValue();
+    await this.tabRepository.createTab(initTestflowScheduleTab);
+  }
+
+  public performTestflowScheduleOperations = async(_type: "run" | "edit" | "delete" | "open", _scheduleId: string) => {
+    if(_type === "run"){
+      this.runTestflowSchedule(_scheduleId);
+    }else if(_type === "edit"){
+      this.editTestflowSchedule(_scheduleId);
+    }else if(_type === "delete"){
+      this.deleteTestflowSchedule(_scheduleId);
+    }else if(_type === "open"){
+      this.openTestflowScheduleTab(_scheduleId);
+    }
+  }
+
+  public updateTestflowSchedule = async(_scheduleId: string, payload: any ) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+     const baseUrl = await this.constructBaseUrl(
+        progressiveTab.path.workspaceId,
+      );
+    const response = await this.testflowService.updateTestflowSchedule(progressiveTab.path.workspaceId, progressiveTab.id, _scheduleId, payload, baseUrl);
+    if(response?.isSuccessful){
+      const schedules = response.data.data.schedules;
+      updateTestflowSchedules(progressiveTab?.id as string, schedules);
+    }
+  }
+
+
 }

@@ -215,7 +215,6 @@
 
   const handleExpandCollectionLine = () => {
     isExpandCollectionLine = !isExpandCollectionLine;
-    // console.log(isExpandCollectionLine);
   };
   const handleExpandEnviromentLine = () => {
     isExpandEnviromentLine = !isExpandEnviromentLine;
@@ -855,6 +854,7 @@
           {handleTestflowLine}
           {ActiveTab}
           {handleTabUpdate}
+          {isGuestUser}
         />
       </div>
 

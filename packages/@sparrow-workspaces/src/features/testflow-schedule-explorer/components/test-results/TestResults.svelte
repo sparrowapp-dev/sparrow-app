@@ -11,7 +11,7 @@
   let currentPage = 1;
   let itemsPerPage = 10;
   let sortDirection: "asc" | "desc" = "desc";
-  
+
   // Delete modal state
   let isDeleteModalOpen = false;
   let selectedResult: any = null;
@@ -54,6 +54,10 @@
     sortDirection = sortDirection === "asc" ? "desc" : "asc";
     currentPage = 1;
   }
+
+  export let onDeleteTestflowScheduleHistory;
+  export let onScheduleRunview;
+  export let isTestflowScheduleEditable;
 
   function formatDate(dateStr: string) {
     const date = new Date(dateStr);
@@ -115,22 +119,21 @@
 
   async function handleDeleteConfirm() {
     if (!selectedResult) return;
-    
+
     deleteLoader = true;
     try {
       // Add your delete API call here
       // await deleteTestResult(selectedResult.createdAt);
-      
+
       // Example: Remove from local array (replace with actual API call)
       schedule.schedularRunHistory = schedule.schedularRunHistory.filter(
-        (r) => r.createdAt !== selectedResult.createdAt
+        (r) => r.createdAt !== selectedResult.createdAt,
       );
-      
+
       // Adjust pagination if needed
       if (paginatedHistory.length === 1 && currentPage > 1) {
         currentPage--;
       }
-      
     } catch (error) {
       console.error("Failed to delete test result:", error);
     } finally {
@@ -162,12 +165,13 @@
         <tbody>
           {#each paginatedHistory as r}
             <Result
+              {onScheduleRunview}
+              {onDeleteTestflowScheduleHistory}
               {r}
               {schedule}
               {formatDate}
               {getRunType}
-              {toggleMenu}
-              {openMenuFor}
+              {isTestflowScheduleEditable}
             />
           {/each}
         </tbody>
@@ -209,8 +213,13 @@
       </div>
 
       <div class="controls">
-        <button on:click={() => goToPage(1)} disabled={currentPage === 1}>«</button>
-        <button on:click={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>‹</button>
+        <button on:click={() => goToPage(1)} disabled={currentPage === 1}
+          >«</button
+        >
+        <button
+          on:click={() => goToPage(currentPage - 1)}
+          disabled={currentPage === 1}>‹</button
+        >
 
         {#each Array(totalPages) as _, i}
           {#if i + 1 === currentPage}
@@ -220,8 +229,14 @@
           {/if}
         {/each}
 
-        <button on:click={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}>›</button>
-        <button on:click={() => goToPage(totalPages)} disabled={currentPage === totalPages}>»</button>
+        <button
+          on:click={() => goToPage(currentPage + 1)}
+          disabled={currentPage === totalPages}>›</button
+        >
+        <button
+          on:click={() => goToPage(totalPages)}
+          disabled={currentPage === totalPages}>»</button
+        >
       </div>
     </div>
   </div>
@@ -238,7 +253,8 @@
     {#key openMenuFor}
       <Options
         xAxis={activeWrapper.getBoundingClientRect().right - 104}
-        yAxis={activeWrapper.getBoundingClientRect().bottom + 80 > window.innerHeight
+        yAxis={activeWrapper.getBoundingClientRect().bottom + 80 >
+        window.innerHeight
           ? [
               activeWrapper.getBoundingClientRect().top - 50,
               activeWrapper.getBoundingClientRect().top - 14,
@@ -272,12 +288,16 @@
   handleModalState={handleDeleteCancel}
 >
   <div class="text-lightGray mb-1">
-    <p class="text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-medium">
+    <p
+      class="text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-medium"
+    >
       Are you sure you want to delete this test result from
-      <span class="text-ds-font-weight-semi-bold" style="color: var(--text-ds-neutral-50);">
-        "{selectedResult ? formatDate(selectedResult.createdAt) : ''}"
-      </span>?
-      This action cannot be undone.
+      <span
+        class="text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-neutral-50);"
+      >
+        "{selectedResult ? formatDate(selectedResult.createdAt) : ""}"
+      </span>? This action cannot be undone.
     </p>
   </div>
 

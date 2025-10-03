@@ -23,6 +23,7 @@
 
   import { ScheduleRunPopUp } from "@sparrow/common/features";
   import { Modal } from "@sparrow/library/ui";
+  import { getClientUser } from "@app/utils/jwt";
 
   export let tab;
   export let teamDetails;
@@ -55,6 +56,8 @@
 
   //schedule run popup state
   let isScheduleRunPopupOpen: boolean = false;
+
+  const userEmail = getClientUser().email;
 
   isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
@@ -299,13 +302,42 @@
 </script>
 
 {#if render}
-  {#if testflowScheduleStore}
+  <!-- {#if testflowScheduleStore}
     {#each testflowScheduleStore as schedule}
-      <div on:click={() => _viewModel.openTestflowScheduleTab(schedule)}>
-        {schedule.name}
+      <div>
+        <button
+          on:click={() =>
+            _viewModel.performTestflowScheduleOperations("open", schedule.id)}
+        >
+          {schedule.name}
+        </button>
+        <button
+          on:click={() =>
+            _viewModel.performTestflowScheduleOperations("edit", schedule.id)}
+        >
+          edit
+        </button>
+        <button
+          on:click={() =>
+            _viewModel.performTestflowScheduleOperations("delete", schedule.id)}
+        >
+          delete
+        </button>
+        <button
+          on:click={() =>
+            _viewModel.performTestflowScheduleOperations("run", schedule.id)}
+        >
+          Run
+        </button>
+        <button
+          on:click={() =>
+            _viewModel.updateTestflowSchedule(schedule.id, { isActive: false })}
+        >
+          update
+        </button>
       </div>
     {/each}
-  {/if}
+  {/if} -->
   <TestflowExplorer
     bind:isScheduleRunPopupOpen
     tab={_viewModel.tab}
@@ -351,6 +383,7 @@
     {selectiveRunTestflow}
     handleContactSales={_viewModel.handleContactSales}
     onChangeSeletedAuthValue={_viewModel.parseAuthHeader}
+    onPerformTestflowScheduleOperations={_viewModel.performTestflowScheduleOperations}
   />
 {/if}
 
@@ -374,5 +407,6 @@
         env.type !== environmentType.GLOBAL,
     ) || []}
     handleScheduleTestFlowRun={_viewModel.scheduleTestFlowRun}
+    creatorEmail={userEmail}
   />
 </Modal>
