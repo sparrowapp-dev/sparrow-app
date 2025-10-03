@@ -181,6 +181,7 @@
   export let onGenerateDocumentation;
   export let onStopGeneratingAIResponse;
   export let generateMockData: () => any;
+  export let updateRequestStatAiChatBot: () => any;
 
   /**
    * Role of user in active workspace
@@ -1385,6 +1386,7 @@
                     {onStopGeneratingAIResponse}
                     {onToggleLike}
                     {handleApplyChangeOnAISuggestion}
+                    {updateRequestStatAiChatBot}
                   />
                 {/if}
               </div>
