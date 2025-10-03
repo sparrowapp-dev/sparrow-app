@@ -427,6 +427,7 @@
     onUpdateScheduleStatus={_viewModel.updateTestflowScheduleStatus}
     onScheduleStatusUpdated={refetchSchedules}
     onPerformTestflowScheduleOperations={_viewModel.performTestflowScheduleOperations}
+    onOpenTestflowScheduleConfigurationsTab={_viewModel.openTestflowScheduleConfigurationsTab}
   />
 {/if}
 

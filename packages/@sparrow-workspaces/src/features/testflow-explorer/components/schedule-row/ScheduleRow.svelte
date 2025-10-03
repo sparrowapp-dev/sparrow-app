@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { Tooltip } from "@sparrow/library/ui";
+  import { Options, Tooltip, Button, Modal } from "@sparrow/library/ui";
   import { Tag } from "@sparrow/library/ui";
-  import { ErrorWithText } from "@sparrow/library/icons";
+  import { ErrorWithText, MoreHorizontalRegular } from "@sparrow/library/icons";
 
   export let schedule;
 
@@ -12,7 +12,128 @@
   export let getNextRunTooltip;
   export let handleScheduleAction;
   export let getTagType;
+  export let isTestflowEditable = true;
+  export let onOpenTestflowScheduleConfigurationsTab;
+
+  let showMenu: boolean = false;
+  let activeWrapper: HTMLElement;
+  function rightClickContextMenu(e: Event) {
+    setTimeout(() => {
+      showMenu = !showMenu;
+    }, 100);
+  }
+
+  function handleSelectClick(event: MouseEvent) {
+    const selectElement = document.getElementById(
+      `show-more-schedule-${schedule?.id}`,
+    );
+    if (selectElement && !selectElement.contains(event.target as Node)) {
+      showMenu = false;
+    }
+  }
+
+  function formatRequestCount(success: number, failed: number) {
+    const total = Number(success) + Number(failed);
+    return `${total} ${total === 1 ? "request" : "requests"}`;
+  }
+
+  let isDeletePopup = false;
+  let deleteLoader = false;
 </script>
+
+<svelte:window
+  on:click={handleSelectClick}
+  on:contextmenu|preventDefault={handleSelectClick}
+/>
+
+<Modal
+  title={"Delete Schedule?"}
+  type={"danger"}
+  width={"35%"}
+  zIndex={10}
+  isOpen={isDeletePopup}
+  handleModalState={() => (isDeletePopup = false)}
+>
+  <div
+    class="text-lightGray mb-1 text-ds-font-size-14 text-ds-font-weight-medium"
+  >
+    <p>
+      Are you sure you want to delete
+      <span
+        class="text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-neutral-50);">"{schedule?.name}"</span
+      >
+      scheduled run? This will remove all future runs and delete all associated results
+      permanently. This action cannot be undone.
+    </p>
+  </div>
+
+  <div
+    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded w-100 text-ds-font-size-16"
+  >
+    <Button
+      disable={deleteLoader}
+      title={"Cancel"}
+      type={"secondary"}
+      loader={false}
+      onClick={() => {
+        isDeletePopup = false;
+      }}
+    />
+
+    <Button
+      disable={deleteLoader}
+      title={"Delete"}
+      type={"danger"}
+      loader={deleteLoader}
+      onClick={async () => {
+        deleteLoader = true;
+        await onPerformTestflowScheduleOperations("delete", schedule?.id);
+
+        deleteLoader = false;
+        isDeletePopup = false;
+      }}
+    />
+  </div></Modal
+>
+
+{#if showMenu}
+  <Options
+    xAxis={activeWrapper.getBoundingClientRect().right - 150}
+    yAxis={[
+      activeWrapper.getBoundingClientRect().top - 5,
+      activeWrapper.getBoundingClientRect().bottom + 5,
+    ]}
+    zIndex={700}
+    width="104px"
+    menuItems={[
+      {
+        onClick: () => {
+          onPerformTestflowScheduleOperations("run", schedule?.id);
+        },
+        displayText: "Run Now",
+        disabled: false,
+        hidden: false,
+      },
+      {
+        onClick: () => {
+          onOpenTestflowScheduleConfigurationsTab(schedule);
+        },
+        displayText: "Edit",
+        disabled: false,
+        hidden: false,
+      },
+      {
+        onClick: () => {
+          isDeletePopup = true;
+        },
+        displayText: "Delete",
+        disabled: false,
+        hidden: false,
+      },
+    ]}
+  />
+{/if}
 
 <tr
   class="custom-row"
@@ -90,17 +211,25 @@
       </Tooltip>
     {/if}
   </td>
-  <td>
+  <td bind:this={activeWrapper}>
     <div class="d-flex align-items-center gap-2" style="padding-left: 6px;">
-      <button
-        class="btn btn-sm action-btn"
-        on:click={(e) => {
-          e.stopPropagation();
-          handleScheduleAction(schedule.id, "more");
-        }}
-      >
-        ⋮
-      </button>
+      <span class="threedot-icon-container d-flex">
+        {#if isTestflowEditable}
+          <Button
+            tabindex={-1}
+            id={`show-more-schedule-${schedule.id}`}
+            size="extra-small"
+            customWidth={"24px"}
+            type="teritiary-regular"
+            startIcon={MoreHorizontalRegular}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              rightClickContextMenu(e);
+            }}
+          />
+        {/if}
+      </span>
     </div>
   </td>
 </tr>
