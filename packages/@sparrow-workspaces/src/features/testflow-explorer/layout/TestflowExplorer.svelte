@@ -10,6 +10,8 @@
     SvelteFlowProvider,
   } from "@xyflow/svelte";
 
+  import { Tag } from "@sparrow/library/ui";
+
   import {
     StartBlock,
     RequestBlock,
@@ -27,6 +29,7 @@
     TestFlowName,
     SaveTestflow,
     Edge,
+    ScheduleRow,
   } from "../components";
   import {
     RequestDatasetEnum,
@@ -39,10 +42,9 @@
   import { Search } from "@sparrow/library/forms";
 
   import { type Tab } from "@sparrow/common/types/workspace/tab";
-
   import "@xyflow/svelte/dist/style.css";
   import { onDestroy, onMount } from "svelte";
-  import { ToastIcon } from "@sparrow/library/icons";
+  import { ToastIcon, ErrorWithText } from "@sparrow/library/icons";
 
   import "@xyflow/svelte/dist/style.css";
   import type { Observable } from "rxjs";
@@ -124,6 +126,7 @@
   export let toggleHistoryDetails;
   export let toggleHistoryContainer;
   export let environmentVariables;
+  console.log("Environment Variables:", environmentVariables);
   export let isTestflowEditable;
   export let onRedrectRequest;
   export let onUpdateTestFlowName;
@@ -157,8 +160,19 @@
   export let isGuestUser = false;
   export let collectionListDocument: CollectionDocument[];
   export let isScheduleRunPopupOpen;
-  export let testflowScheduleStore;
   export let onOpenTestflowScheduleTab;
+  export let testflowScheduleStore = [];
+
+  $: safeTestflowScheduleStore = Array.isArray(testflowScheduleStore)
+    ? testflowScheduleStore
+    : [];
+
+  export let onPerformTestflowScheduleOperations;
+
+  export let onUpdateScheduleStatus: (
+    scheduleId: string,
+    isActive: boolean,
+  ) => Promise<any>;
 
   let planContent: any;
   let planContentNonActive: any;
@@ -266,6 +280,8 @@
   let filteredSchedules = [];
 
   function mapScheduleData(schedule) {
+    console.log("Mapping schedule:", schedule);
+
     // Determine status based on isActive and executeAt
     let status = "Inactive";
     if (schedule.isActive) {
@@ -343,18 +359,24 @@
       environment: environment,
       nextRun: nextRun,
       lastResult: lastResult,
-      isActive: schedule.isActive, // Keep the original isActive value
+      isActive: schedule.isActive,
       originalData: schedule,
     };
   }
 
-  // Reactive statement - yeh tab change hone par bhi run hoga
+  function handleScheduleAction(scheduleId: string, action: string) {
+    if (action === "more") {
+      // Open more actions menu for this schedule
+      onPerformTestflowScheduleOperations("openActionsMenu", scheduleId);
+    }
+  }
+
   $: {
-    if (testflowScheduleStore && Array.isArray(testflowScheduleStore)) {
-      const mappedSchedules = testflowScheduleStore.map(mapScheduleData);
+    if (safeTestflowScheduleStore.length > 0) {
+      const mappedSchedules = safeTestflowScheduleStore.map(mapScheduleData);
 
       if (searchQuery.trim() === "") {
-        filteredSchedules = mappedSchedules;
+        filteredSchedules = [...mappedSchedules];
       } else {
         const query = searchQuery.toLowerCase();
         filteredSchedules = mappedSchedules.filter(
@@ -364,8 +386,6 @@
             schedule.description.toLowerCase().includes(query),
         );
       }
-    } else {
-      filteredSchedules = [];
     }
   }
 
@@ -388,17 +408,44 @@
     searchQuery = event.target.value;
   }
 
-  function handleToggleStatus(id, isActive) {
-    testflowScheduleStore = testflowScheduleStore.map((schedule) => {
+  let testflowId: string | undefined;
+  $: {
+    if ($tab && $tab.id) {
+      testflowId = $tab.id;
+    }
+  }
+
+  export let onScheduleStatusUpdated = () => {};
+
+  async function handleToggleStatus(id, isActive) {
+    const originalSchedules = Array.isArray(safeTestflowScheduleStore)
+      ? JSON.parse(JSON.stringify(safeTestflowScheduleStore))
+      : [];
+
+    testflowScheduleStore = safeTestflowScheduleStore.map((schedule) => {
       if (schedule.id === id) {
         return {
           ...schedule,
-          isActive: isActive,
+          isActive,
           updatedAt: new Date().toISOString(),
         };
       }
       return schedule;
     });
+
+    testflowScheduleStore = [...testflowScheduleStore];
+
+    try {
+      const result = await onUpdateScheduleStatus(id, isActive);
+
+      if (!result.isSuccessful) {
+        testflowScheduleStore = JSON.parse(JSON.stringify(originalSchedules));
+      } else {
+        await onScheduleStatusUpdated();
+      }
+    } catch (err) {
+      testflowScheduleStore = JSON.parse(JSON.stringify(originalSchedules));
+    }
   }
   const createBlankRequestObject = (
     _url: string,
@@ -749,6 +796,30 @@
       return dbNodes;
     });
   };
+
+  function getTooltipMessage(schedule) {
+    if (schedule.status === "Expired") {
+      return "This schedule has completed all its runs and cannot be reactivated.";
+    } else if (schedule.status === "Inactive") {
+      return "This schedule is currently paused. Resume to enable future runs.";
+    } else if (schedule.status === "Active") {
+      return "Turn off to pause future runs.";
+    }
+    return "Turn on to resume future runs.";
+  }
+
+  function getNextRunTooltip(schedule) {
+    if (schedule.status === "Paused") {
+      return "This schedule is currently paused. Resume to enable future runs.";
+    }
+    if (schedule.status === "Expired") {
+      return `No more runs. Scheduled run was completed after last run on ${schedule.lastRunDate}.`;
+    }
+    if (schedule.nextRun) {
+      return `Next run scheduled at ${schedule.nextRun}`;
+    }
+    return "No upcoming runs scheduled.";
+  }
 
   /**
    * Finds the next available node ID.
@@ -1692,12 +1763,20 @@
     currentPage = 1;
   }
 
-  // Filter schedules based on search
-  $: filteredSchedules = filteredSchedules.filter(
-    (schedule) =>
-      schedule.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      schedule.description.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const getTagType = (status: string) => {
+    switch (status) {
+      case "Success":
+        return "green";
+      case "Failed":
+        return "orange";
+      case "Partially Failed":
+        return "yellow";
+      case "Expired":
+        return "grey";
+      default:
+        return "grey";
+    }
+  };
 
   // Get paginated schedules for current page
   $: paginatedSchedules = filteredSchedules.slice(
@@ -2040,73 +2119,15 @@
               </thead>
               <tbody>
                 {#each paginatedSchedules as schedule}
-                  <tr
-                    on:click={() =>
-                      onOpenTestflowScheduleTab(schedule.originalData)}
-                  >
-                    <td>
-                      <div class="d-flex flex-column">
-                        <span class="schedule-name">{schedule.name}</span>
-                        <span class="schedule-description text-muted">
-                          {schedule.description}
-                        </span>
-                      </div>
-                    </td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <label
-                          class="toggle-switch"
-                          on:click={(e) => e.stopPropagation()}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={schedule.status === "Active"}
-                            disabled={schedule.status === "Expired"}
-                            on:click={(e) => e.stopPropagation()}
-                            on:change={(e) => {
-                              e.stopPropagation();
-                              handleToggleStatus(schedule.id, e.target.checked);
-                            }}
-                          />
-                          <span
-                            class="toggle-slider {schedule.status === 'Expired'
-                              ? 'disabled'
-                              : ''}"
-                          ></span>
-                        </label>
-                        <span
-                          class="status-text ms-2 {schedule.status.toLowerCase()}"
-                        >
-                          {schedule.status}
-                        </span>
-                      </div>
-                    </td>
-                    <td>{schedule.environment}</td>
-                    <td>{schedule.nextRun}</td>
-                    <td>
-                      <span
-                        class="result-badge {schedule.lastResult?.toLowerCase()}"
-                      >
-                        {schedule.lastResult}
-                      </span>
-                    </td>
-                    <td>
-                      <div
-                        class="d-flex align-items-center gap-2"
-                        style="padding-left: 6px;"
-                      >
-                        <button
-                          class="btn btn-sm action-btn"
-                          on:click={(e) => {
-                            e.stopPropagation();
-                            handleScheduleAction(schedule.id, "more");
-                          }}
-                        >
-                          ⋮
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+                  <ScheduleRow
+                    {schedule}
+                    {onPerformTestflowScheduleOperations}
+                    {getTooltipMessage}
+                    {handleToggleStatus}
+                    {getNextRunTooltip}
+                    {handleScheduleAction}
+                    {getTagType}
+                  />
                 {/each}
               </tbody>
             </table>

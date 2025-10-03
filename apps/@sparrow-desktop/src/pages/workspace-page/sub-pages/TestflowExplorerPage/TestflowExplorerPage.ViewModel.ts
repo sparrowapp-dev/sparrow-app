@@ -1368,6 +1368,19 @@ export class TestflowExplorerPageViewModel {
     });
   };
 
+  public async getTestflowSchedules(testflowId: string): Promise<any[]> {
+    try {
+      const response = await this.testflowService.fetchTestflow(testflowId);
+      if (response?.isSuccessful) {
+        return response.data.data.schedules || [];
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching testflow schedules:", error);
+      return [];
+    }
+  }
+
   /**
    * @description - updates environment tab name
    * @param _name - new environment name
@@ -1765,6 +1778,78 @@ export class TestflowExplorerPageViewModel {
     const data = await this.testflowRepository.getTestflowDoc();
     count = data?.length;
     return count;
+  };
+
+  /**
+   * Updates the status of a testflow schedule
+   * @param scheduleId - The ID of the schedule to update
+   * @param isActive - The new active status
+   */
+  public updateTestflowScheduleStatus = async (
+    scheduleId: string,
+    isActive: boolean,
+  ) => {
+    try {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const workspaceId = progressiveTab.path.workspaceId;
+      const testflowId = progressiveTab.id;
+
+      if (!workspaceId || !testflowId) {
+        notifications.error("Missing workspace or testflow information");
+        return { isSuccessful: false, message: "Missing required information" };
+      }
+
+      // Get auth token
+      const [token] = getAuthJwt();
+
+      if (!token) {
+        notifications.error(
+          "Authentication token not found. Please login again.",
+        );
+        return { isSuccessful: false, message: "Authentication failed" };
+      }
+
+      const baseUrl = await this.constructBaseUrl(workspaceId);
+      const apiUrl = `${baseUrl}/api/workspace/${workspaceId}/testflow/${testflowId}/schedule/${scheduleId}`;
+
+      const response = await fetch(apiUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          isActive: isActive,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to update schedule");
+      }
+
+      const result = await response.json();
+
+      notifications.success(
+        `Schedule ${isActive ? "activated" : "deactivated"} successfully.`,
+      );
+
+      // Update the local store with the new schedule data
+      const schedules = result.data.schedules;
+      updateTestflowSchedules(testflowId as string, schedules);
+
+      return {
+        isSuccessful: true,
+        data: result.data,
+      };
+    } catch (error) {
+      Sentry.captureException(error);
+      notifications.error(`Failed to update schedule: ${error.message}`);
+      return {
+        isSuccessful: false,
+        message: error.message || "Error updating schedule",
+      };
+    }
   };
 
   /**

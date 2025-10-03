@@ -7,6 +7,16 @@
   import { ScheduleNavigator } from "../components";
   import { TestflowScheduleNavigatorEnum } from "../../../../../@sparrow-common/src/types/workspace/testflow-schedule-tab";
   import { Configurations, TestResults } from "../components";
+  import {
+    ArrowClockWiseRegular,
+    FlowChartRegular,
+    LayerRegular,
+  } from "@sparrow/library/icons";
+  import {
+    startLoading,
+    stopLoading,
+    loadingState,
+  } from "@sparrow/common/store";
 
   export let tab: Observable<Tab>;
   export let testflow;
@@ -19,6 +29,22 @@
   export let workspaceUsers = [];
   export let onUpdateSchedule = (updatedSchedule) => {};
   export let onSaveSchedule;
+  export let onRefreshSchedule;
+  // export let environments;
+  export let onEditTestflowSchedule;
+  export let isTestflowScheduleEditable;
+  export let onOpenEnvironment;
+  export let onOpenTestflow;
+
+  let scheduledEnvironment;
+  $: {
+    const filterEnvironment = environments?.find((env) => {
+      if (env.toMutableJSON().id === schedule?.environmentId) {
+        return true;
+      }
+    });
+    scheduledEnvironment = filterEnvironment?.toMutableJSON() || {};
+  }
 </script>
 
 {#if $tab.tabId}
@@ -31,23 +57,62 @@
           {schedule?.name || ""}
         </p>
         <div class="d-flex gap-2">
-          <div class="d-flex align-items-center gap-2">
-            <span class="text-fs-12"> Active </span>
-            <Toggle />
-          </div>
+          {#if isTestflowScheduleEditable}
+            <div class="d-flex align-items-center gap-2">
+              <Toggle
+                isActive={schedule?.isActive || false}
+                label="Active"
+                fontWeight="500"
+                onChange={() => {
+                  onEditTestflowSchedule(!schedule?.isActive);
+                }}
+              />
+            </div>
+            <Button
+              title={"Run Now"}
+              type={"primary"}
+              loader={$loadingState.get("schedule-run-" + schedule?.id)}
+              disable={$loadingState.get("schedule-run-" + schedule?.id)}
+              onClick={async () => {
+                startLoading("schedule-run-" + schedule?.id);
+                await onScheduleRun();
+                stopLoading("schedule-run-" + schedule?.id);
+              }}
+            />
+          {/if}
           <Button
-            title={"Run Now"}
-            type={"primary"}
-            onClick={() => {
-              onScheduleRun();
+            title={""}
+            startIcon={ArrowClockWiseRegular}
+            type={"secondary"}
+            loader={$loadingState.get("schedule-refresh-" + schedule?.id)}
+            disable={$loadingState.get("schedule-refresh-" + schedule?.id)}
+            onClick={async () => {
+              startLoading("schedule-refresh-" + schedule?.id);
+              await onRefreshSchedule();
+              stopLoading("schedule-refresh-" + schedule?.id);
             }}
           />
         </div>
       </div>
-      <div class="d-flex mb-2">
-        <span class="text-fs-10">
-          {testflow?.name}
-        </span>
+      <div class="d-flex pb-2">
+        <Button
+          title={testflow?.name}
+          startIcon={FlowChartRegular}
+          type={"link-secondary"}
+          onClick={() => {
+            onOpenTestflow(testflow?.id);
+          }}
+        />
+        {#if scheduledEnvironment?.name}
+          <Button
+            title={scheduledEnvironment?.name || ""}
+            startIcon={LayerRegular}
+            type={"link-secondary"}
+            onClick={() => {
+              onOpenEnvironment(scheduledEnvironment?.id);
+            }}
+          />
+        {/if}
       </div>
       <div class="mb-3">
         <ScheduleNavigator
@@ -63,6 +128,7 @@
           {schedule}
           {onScheduleRunview}
           {onDeleteTestflowScheduleHistory}
+          {isTestflowScheduleEditable}
         />
       {:else if $tab?.property?.testflowSchedule?.state?.scheduleNavigator === TestflowScheduleNavigatorEnum.CONFIGURATION}
         <Configurations
