@@ -19,3 +19,4 @@ export { default as NumberInput } from "./number-input/NumberInput.svelte";
 export { default as GithubStarRedirect } from "./github-star-redirect/GithubStarRedirect.svelte";
 export { default as HubPaymentFailed } from "./hub-payment-failed/HubPaymentFailed.svelte";
 export { default as UpgradeCurrentTeamPlanModal } from "./upgrade-current-team-plan-modal/UpgradeCurrentTeamPlanModal.svelte";
+export { default as EmailReceipentsPicker } from "./email-receipents-picker/EmailReceipentsPicker.svelte";

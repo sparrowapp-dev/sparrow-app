@@ -284,7 +284,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 20,
+  version: 21,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -1815,8 +1815,11 @@ export const tabSchemaLiteral = {
                 },
               },
             },
+            isScheduled: { type: "boolean" },
+            scheduleName: { type: "string" },
+            lastestExecuted: { type: "string" },
           },
-          required: ["nodes", "edges", "result"],
+          required: ["nodes", "edges", "result", "isScheduled", "scheduleName", "lastestExecuted"],
         },
       },
     },

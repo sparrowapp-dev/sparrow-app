@@ -6,6 +6,11 @@ import {
 } from "@sparrow/common/types/workspace/tab";
 import { v4 as uuidv4 } from "uuid";
 import { TestflowScheduleNavigatorEnum } from "../types/workspace/testflow-schedule-tab";
+import {
+  type RunConfigurationDTO,
+  type NotificationDTO,
+  type RunCycle,
+} from "@sparrow/common/types/workspace/testflow-dto";
 
 class InitTestflowScheduleTab {
   private _tab: Tab;
@@ -29,9 +34,21 @@ class InitTestflowScheduleTab {
       property: {
         testflowSchedule: {
           scheduleId: "",
+          environmentId: "",
+          runConfiguration: {
+            runCycle: "once",
+            executeAt: "",
+            time: "",
+            intervalHours: 1,
+            days: [],
+          },
+          notification: {
+            emails: [],
+            receiveNotifications: "failure",
+          },
           state: {
             scheduleNavigator: TestflowScheduleNavigatorEnum.TEST_RESULTS,
-          }
+          },
         },
       },
       path: {
@@ -75,7 +92,7 @@ class InitTestflowScheduleTab {
   public updatePath(_path: Path) {
     this._tab.path = {
       ...this._tab.path,
-      ..._path
+      ..._path,
     };
     return this;
   }
@@ -85,6 +102,51 @@ class InitTestflowScheduleTab {
         ...this._tab.property.testflowSchedule.state,
         ..._state,
       };
+    }
+    return this;
+  }
+  public updateEnvironmentId(_environmentId: string) {
+    if (this._tab.property.testflowSchedule) {
+      this._tab.property.testflowSchedule.environmentId = _environmentId;
+    }
+    return this;
+  }
+
+  public updateRunConfiguration(
+    _runConfiguration: Partial<RunConfigurationDTO>,
+  ) {
+    if (this._tab.property.testflowSchedule) {
+      this._tab.property.testflowSchedule.runConfiguration = {
+        ...this._tab.property.testflowSchedule.runConfiguration,
+        ..._runConfiguration,
+      };
+    }
+    return this;
+  }
+
+  public updateNotification(_notification: Partial<NotificationDTO>) {
+    if (this._tab.property.testflowSchedule) {
+      this._tab.property.testflowSchedule.notification = {
+        ...this._tab.property.testflowSchedule.notification,
+        ..._notification,
+      };
+    }
+    return this;
+  }
+
+  public updateRunCycle(_runCycle: RunCycle) {
+    if (this._tab.property.testflowSchedule) {
+      this._tab.property.testflowSchedule.runConfiguration = {
+        ...this._tab.property.testflowSchedule.runConfiguration,
+        runCycle: _runCycle,
+      };
+    }
+    return this;
+  }
+
+  public updateNotificationEmails(_emails: string[]) {
+    if (this._tab.property.testflowSchedule?.notification) {
+      this._tab.property.testflowSchedule.notification.emails = _emails;
     }
     return this;
   }

@@ -43,6 +43,7 @@
   export let handleOpenCurrentDynamicExpression;
   export let selectedAuthHeader;
   export let selectAuthHeader: string;
+  export let testflowViewRequestItems;
 
   let responseLoader = false;
   let height = 300;
@@ -178,33 +179,26 @@
       apiState = selectedBlock?.data?.requestData?.state;
       requestNavigation =
         selectedBlock?.data?.requestData?.state?.requestNavigation;
-
-      if (testflowStore) {
-        const nodes = testflowStore?.nodes ?? [];
-        const hasEmptyResponseStatus = nodes.some(
-          (node) => !node.response?.status || node.response?.status === "",
-        );
-        const nodeResponse = testflowStore?.nodes.find(
-          (item) => item?.id === selectedBlock?.id,
-        );
-
-        if (!testflowStore || nodes.length === 0 || hasEmptyResponseStatus) {
-          selectedNodeResponse = undefined;
-        } else {
-          selectedNodeResponse = nodeResponse;
-          responseState.responseBodyLanguage = selectedNodeResponse?.response
-            .responseContentType as string;
+      for (let i = 0; i < testflowViewRequestItems.length; i++) {
+        if (selectedBlock.id == testflowViewRequestItems[i].node.id) {
+          selectedNodeResponse = {
+            id: selectedBlock.id,
+            response: testflowViewRequestItems[i].response,
+            request: testflowViewRequestItems[i].request,
+          };
+          responseState.responseBodyLanguage = testflowViewRequestItems[i]
+            .response?.responseContentType as string;
+          break;
         }
       }
       if ($currentStep === 7 && $isTestFlowTourGuideOpen) {
         selectedNodeResponse = emptyRequest;
         responseState.responseBodyLanguage = selectedNodeResponse?.response
-          .responseContentType as string;
+          ?.responseContentType as string;
       }
       const selectedEnvs = extractPlaceholders(
         JSON.stringify(selectedBlock?.data?.requestData),
       );
-
       isAnyEnvVariableMissing =
         checkEnvironmentVariableExistValue(selectedEnvs);
     }
@@ -226,7 +220,7 @@
   />
 
   <!-- Content -->
-  <div style="margin-bottom: 8px;">
+  <div style="margin-bottom: 8px; pointer-events: none;">
     <div
       class="tab-container"
       style={`border: 1px solid ${isResizing || isResizingActive ? "var(--border-ds-primary-400)" : "transparent"}; border-bottom: none;`}
@@ -271,20 +265,23 @@
       </span>
     </div>
 
-    <TableNavbar
-      {selectedBlock}
-      onRedirect={handleRedirect}
-      {handleUpdateRequestData}
-      showRedirectButton={!!selectedBlock?.data?.collectionId &&
-        !!selectedBlock?.data?.requestId}
-      {truncateName}
-      {environmentVariables}
-      {userRole}
-      {onUpdateEnvironment}
-      {handleClickTestButton}
-      {handleOpenCurrentDynamicExpression}
-      isTestFlowRuning={testflowStore?.isTestFlowRunning || responseLoader}
-    />
+    <div style="pointer-events: none;">
+      <TableNavbar
+        {selectedBlock}
+        onRedirect={handleRedirect}
+        {handleUpdateRequestData}
+        showRedirectButton={!!selectedBlock?.data?.collectionId &&
+          !!selectedBlock?.data?.requestId}
+        {truncateName}
+        {environmentVariables}
+        {userRole}
+        {onUpdateEnvironment}
+        {handleClickTestButton}
+        {handleOpenCurrentDynamicExpression}
+        isTestFlowRuning={testflowStore?.isTestFlowRunning || responseLoader}
+        testflowView={true}
+      />
+    </div>
     {#if isAnyEnvVariableMissing}
       <div class="" style="margin-top: 8px;">
         <Alert
