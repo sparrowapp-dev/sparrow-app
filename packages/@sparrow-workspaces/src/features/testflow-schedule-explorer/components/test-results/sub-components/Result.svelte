@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, Options, Tag } from "@sparrow/library/ui";
+  import { Button, Options, Tag, Modal } from "@sparrow/library/ui";
   import { MoreHorizontalRegular, ThreeDotIcon } from "@sparrow/library/icons";
 
   export let r;
@@ -10,6 +10,17 @@
   export let onDeleteTestflowScheduleHistory;
   export let onScheduleRunview;
   export let isTestflowScheduleEditable;
+  export let deleteLoader;
+  let isDeleteModalOpen:boolean=false;
+
+  function handleDeleteCancel() {
+    isDeleteModalOpen = false;
+  }
+
+  function handleDeleteConfirm() {
+    onDeleteTestflowScheduleHistory(r?.id);
+    isDeleteModalOpen = false;
+  }
 
   let showMenu: boolean = false;
 
@@ -100,6 +111,54 @@
   </td>
 </tr>
 
+<!-- Delete Confirmation Modal -->
+<Modal
+  title="Delete Test Result?"
+  type="danger"
+  width="35%"
+  zIndex={1000}
+  isOpen={isDeleteModalOpen}
+  handleModalState={handleDeleteCancel}
+>
+  <div class="text-lightGray mb-1">
+    <p
+      class="text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-medium"
+    >
+      Are you sure you want to delete this test result from
+      <span
+        class="text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-neutral-50);"
+      >
+        "{r ? formatDate(r.createdAt) : ""}"
+      </span>? This action cannot be undone.
+    </p>
+  </div>
+
+  <div
+    class="d-flex align-items-center justify-content-end gap-3 rounded"
+    style="font-size: 16px; margin-bottom:2px;"
+  >
+    <Button
+      disable={deleteLoader}
+      title="Cancel"
+      textStyleProp="font-size: var(--base-text)"
+      type="secondary"
+      loader={false}
+      onClick={handleDeleteCancel}
+    />
+
+    <Button
+      disable={deleteLoader}
+      title="Delete"
+      textStyleProp="font-size: var(--base-text)"
+      loaderSize={18}
+      type="danger"
+      loader={deleteLoader}
+      onClick={handleDeleteConfirm}
+    />
+  </div>
+</Modal>
+
 {#if showMenu}
   <Options
     xAxis={activeWrapper.getBoundingClientRect().right - 150}
@@ -112,7 +171,8 @@
     menuItems={[
       {
         onClick: () => {
-          onDeleteTestflowScheduleHistory(r?.id);
+          isDeleteModalOpen=true
+          showMenu = false; 
         },
         displayText: "Delete",
         disabled: false,

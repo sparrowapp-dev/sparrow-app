@@ -9,7 +9,6 @@
   let openMenuFor: string | null = null;
   let activeWrapper: HTMLElement | null = null;
   let currentPage = 1;
-  let itemsPerPage = 10;
   let sortDirection: "asc" | "desc" = "desc";
 
   // Delete modal state
@@ -18,7 +17,6 @@
   let deleteLoader = false;
 
   $: totalItems = schedule?.schedularRunHistory?.length || 0;
-  $: totalPages = Math.ceil(totalItems / itemsPerPage);
 
   $: sortedHistory = schedule?.schedularRunHistory
     ? [...schedule.schedularRunHistory].sort((a, b) => {
@@ -27,28 +25,6 @@
         return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
       })
     : [];
-
-  $: paginatedHistory = sortedHistory.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
-
-  const perPageOptions = [
-    { name: "5 per page", id: "5" },
-    { name: "10 per page", id: "10" },
-    { name: "20 per page", id: "20" },
-  ];
-
-  function handlePageSizeChange(id: string) {
-    itemsPerPage = parseInt(id);
-    currentPage = 1;
-  }
-
-  function goToPage(page: number) {
-    if (page >= 1 && page <= totalPages) {
-      currentPage = page;
-    }
-  }
 
   function toggleSort() {
     sortDirection = sortDirection === "asc" ? "desc" : "asc";
@@ -106,42 +82,38 @@
     // Don't reset selectedResult here - keep it for the modal
   }
 
-  function handleDeleteClick() {
-    console.log("Delete clicked, selectedResult:", selectedResult);
-    isDeleteModalOpen = true;
-    closeMenu();
-  }
+  // function handleDeleteClick() {
+  //   console.log("Delete clicked, selectedResult:", selectedResult);<
+  //   isDeleteModalOpen = true;
+  //   closeMenu();
+  // }
 
-  function handleDeleteCancel() {
-    isDeleteModalOpen = false;
-    selectedResult = null;
-  }
+  // function handleDeleteCancel() {
+  //   isDeleteModalOpen = false;
+  //   selectedResult = null;
+  // }
 
-  async function handleDeleteConfirm() {
-    if (!selectedResult) return;
+  // async function handleDeleteConfirm() {
+  //   if (!selectedResult) return;
 
-    deleteLoader = true;
-    try {
-      // Add your delete API call here
-      // await deleteTestResult(selectedResult.createdAt);
+  //   deleteLoader = true;
+  //   try {
+  //     schedule.schedularRunHistory = schedule.schedularRunHistory.filter(
+  //       (r) => r.createdAt !== selectedResult.createdAt,
+  //     );
 
-      // Example: Remove from local array (replace with actual API call)
-      schedule.schedularRunHistory = schedule.schedularRunHistory.filter(
-        (r) => r.createdAt !== selectedResult.createdAt,
-      );
-
-      // Adjust pagination if needed
-      if (paginatedHistory.length === 1 && currentPage > 1) {
-        currentPage--;
-      }
-    } catch (error) {
-      console.error("Failed to delete test result:", error);
-    } finally {
-      deleteLoader = false;
-      isDeleteModalOpen = false;
-      selectedResult = null;
-    }
-  }
+  //     // Adjust pagination if needed
+  //     if (paginatedHistory.length === 1 && currentPage > 1) {
+  //       currentPage--;
+  //     }
+  //   } catch (error) {
+  //     console.error("Failed to delete test result:", error);
+  //   } finally {
+  //     deleteLoader = false;
+  //     isDeleteModalOpen = false;
+  //     selectedResult = null;
+  //   }
+  // }
 </script>
 
 {#if schedule?.schedularRunHistory}
@@ -163,7 +135,7 @@
           </tr>
         </thead>
         <tbody>
-          {#each paginatedHistory as r}
+          {#each schedule?.schedularRunHistory as r}
             <Result
               {onScheduleRunview}
               {onDeleteTestflowScheduleHistory}
@@ -178,7 +150,7 @@
       </table>
     </div>
 
-    <div class="pagination-bar">
+    <!-- <div class="pagination-bar">
       <span class="info">
         Showing {(currentPage - 1) * itemsPerPage + 1}–
         {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems}
@@ -238,11 +210,11 @@
           disabled={currentPage === totalPages}>»</button
         >
       </div>
-    </div>
+    </div> -->
   </div>
 {/if}
 
-{#if openMenuFor && activeWrapper}
+<!-- {#if openMenuFor && activeWrapper}
   <div
     tabindex="0"
     class="options-focus-wrapper"
@@ -276,55 +248,9 @@
       />
     {/key}
   </div>
-{/if}
+{/if} -->
 
-<!-- Delete Confirmation Modal -->
-<Modal
-  title="Delete Test Result?"
-  type="danger"
-  width="35%"
-  zIndex={1000}
-  isOpen={isDeleteModalOpen}
-  handleModalState={handleDeleteCancel}
->
-  <div class="text-lightGray mb-1">
-    <p
-      class="text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-medium"
-    >
-      Are you sure you want to delete this test result from
-      <span
-        class="text-ds-font-weight-semi-bold"
-        style="color: var(--text-ds-neutral-50);"
-      >
-        "{selectedResult ? formatDate(selectedResult.createdAt) : ""}"
-      </span>? This action cannot be undone.
-    </p>
-  </div>
 
-  <div
-    class="d-flex align-items-center justify-content-end gap-3 rounded"
-    style="font-size: 16px; margin-bottom:2px;"
-  >
-    <Button
-      disable={deleteLoader}
-      title="Cancel"
-      textStyleProp="font-size: var(--base-text)"
-      type="secondary"
-      loader={false}
-      onClick={handleDeleteCancel}
-    />
-
-    <Button
-      disable={deleteLoader}
-      title="Delete"
-      textStyleProp="font-size: var(--base-text)"
-      loaderSize={18}
-      type="danger"
-      loader={deleteLoader}
-      onClick={handleDeleteConfirm}
-    />
-  </div>
-</Modal>
 
 <style lang="scss">
   .content-wrapper {
@@ -395,7 +321,7 @@
     font-size: 12px;
     color: var(--text-secondary-200);
 
-    position: sticky;
+    position: fixed;
     bottom: 0;
     z-index: 10;
 
