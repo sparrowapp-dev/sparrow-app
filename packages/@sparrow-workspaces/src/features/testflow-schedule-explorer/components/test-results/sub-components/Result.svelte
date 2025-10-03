@@ -6,7 +6,7 @@
   export let schedule;
   export let formatDate: (date: string) => string;
   export let getRunType: (flowName: string) => string;
-
+  export let isScheduled:boolean;
   export let onDeleteTestflowScheduleHistory;
   export let onScheduleRunview;
   export let isTestflowScheduleEditable;
@@ -60,7 +60,7 @@
   <td>
     <div class="time-cell">
       <span>{formatDate(r.createdAt)}</span>
-      <span class="sub-text">{getRunType(schedule.name)}</span>
+      <span class="sub-text">{!(r.isScheduled) ? "Manual Run" : "Scheduled Run"}</span>
     </div>
   </td>
 
@@ -76,7 +76,6 @@
     </div>
   </td>
 
-  {#if r.status === "pass"}
     <td>{formatRequestCount(r.successRequests, r.failedRequests)}</td>
     <td>
       <div class="result-cell">
@@ -85,10 +84,6 @@
         <span class="duration">{r.totalTime}</span>
       </div>
     </td>
-  {:else}
-    <td></td>
-    <td></td>
-  {/if}
 
   <td bind:this={activeWrapper}>
     <span class="threedot-icon-container d-flex">

@@ -120,7 +120,7 @@
           {onUpdateScheduleState}
         />
       </div>
-      <div>
+      <div style="flex:1; overflow:auto;">
         {#if $tab?.property?.testflowSchedule?.state?.scheduleNavigator === TestflowScheduleNavigatorEnum.TEST_RESULTS}
           <TestResults
             {schedule}
