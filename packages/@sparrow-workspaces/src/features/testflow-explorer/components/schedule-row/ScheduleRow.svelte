@@ -8,7 +8,6 @@
   export let getTooltipMessage;
   export let handleToggleStatus;
   export let getNextRunTooltip;
-  export let handleScheduleAction;
   export let getTagType;
   function getFailTooltip(schedule) {
     const runHistory = schedule.originalData?.schedularRunHistory;
