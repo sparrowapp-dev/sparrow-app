@@ -1258,7 +1258,7 @@
   ): { id: string; request: any; response: any } | undefined {
     const requests = runResult?.requests ?? [];
     const responses = runResult?.response ?? [];
-    if (index < 0) {
+    if (index <= 0) {
       return undefined;
     }
     return {
@@ -1286,7 +1286,7 @@
             const dbNodes = $tab?.property?.testflowScheduleRunView
               ?.nodes as TFNodeType[];
             let res = [];
-            for (let i = 1; i < dbNodes.length; i++) {
+            for (let i = 0; i < dbNodes.length; i++) {
               res.push({
                 id: dbNodes[i].id,
                 type: dbNodes[i].type,
