@@ -1237,12 +1237,12 @@
     findNodes(Number("1"));
     // Create array of objects with request, response, and node
     let testflowStoreItems = [];
-    for (let i = 0; i < connectedNodes.length; i++) {
+    for (let i = 1; i < connectedNodes.length; i++) {
       const node = connectedNodes[i];
       // Get corresponding request and response from runResult
       const request =
-        runResult?.requests?.[i] || node?.data?.requestData || null;
-      const response = runResult?.response?.[i] || node?.data?.response || null;
+        runResult?.requests?.[i-1] || node?.data?.requestData || null;
+      const response = runResult?.response?.[i-1] || node?.data?.response || null;
       testflowStoreItems.push({
         request: request,
         response: response,
