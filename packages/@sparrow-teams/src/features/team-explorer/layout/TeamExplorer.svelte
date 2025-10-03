@@ -423,9 +423,12 @@
                     color={"var(--sparrow-text-color)"}
                     classProp="mx-2 my-auto d-flex"
                   />
-                  <span class="my-auto" style="width: 66px;"
-                    >{openTeam?.users.length} Members</span
+                  <span
+                    class="d-flex justify-content-center align-items-center my-auto"
+                    style="white-space: nowrap;"
                   >
+                    {openTeam?.users.length} Members
+                  </span>
                 </p>
               {/if}
               <Button
