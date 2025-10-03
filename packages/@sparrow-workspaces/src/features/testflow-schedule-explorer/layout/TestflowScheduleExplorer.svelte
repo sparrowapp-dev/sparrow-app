@@ -26,11 +26,14 @@
   export let onDeleteTestflowScheduleHistory;
   export let onScheduleRunview;
   export let onRefreshSchedule;
-  export let environments;
   export let onEditTestflowSchedule;
   export let isTestflowScheduleEditable;
   export let onOpenEnvironment;
   export let onOpenTestflow;
+  export let environments = [];
+  export let workspaceUsers = [];
+  export let onUpdateSchedule = (updatedSchedule) => {};
+  export let onSaveSchedule;
 
   let scheduledEnvironment;
   $: {
