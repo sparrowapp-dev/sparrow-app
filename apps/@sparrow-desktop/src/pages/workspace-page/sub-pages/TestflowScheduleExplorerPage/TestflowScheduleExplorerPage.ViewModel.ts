@@ -12,7 +12,7 @@ import type {
 } from "../../../../database/database";
 
 // Utils
-import { createDeepCopy, Debounce } from "@sparrow/common/utils";
+import { createDeepCopy, Debounce, scrollToTab } from "@sparrow/common/utils";
 
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import {
