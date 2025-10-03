@@ -177,9 +177,9 @@ class MockHistoryExplorerPage {
         updateTestflowSchedules(progressiveTab?.path?.testflowId as string, schedules);
       }
     }
-  public handleCreateTestflowSingleScheduleTab = (_scheduleResult) => {
+  public handleCreateTestflowSingleScheduleTab = (_scheduleResult,scheduleName:string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    const x = new TestflowScheduleRunViewTabAdapter().adapt(progressiveTab.path.workspaceId, _scheduleResult);
+    const x = new TestflowScheduleRunViewTabAdapter().adapt(progressiveTab.path.workspaceId, _scheduleResult,scheduleName);
 
     // const initTestflowScheduleRunViewTab = this.initTab.testflowScheduleRunView(
     //   _scheduleResult.id,

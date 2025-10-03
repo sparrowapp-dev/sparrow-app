@@ -43,7 +43,7 @@
 
 <tr
   on:click={() => {
-    onScheduleRunview(r);
+    onScheduleRunview(r,schedule.name);
   }}
 >
   <td>

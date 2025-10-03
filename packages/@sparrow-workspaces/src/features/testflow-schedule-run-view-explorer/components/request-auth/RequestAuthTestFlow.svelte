@@ -49,7 +49,7 @@
   export let handleOpenCurrentDynamicExpression;
 </script>
 
-<div class="d-flex flex-column w-100 h-100">
+<div class="d-flex flex-column w-100 h-100" style="pointer-events: none;">
   <div class="pb-2" style="font-size: 12px; font-weight:500;">
     <div class="">
       <span class="d-flex">
