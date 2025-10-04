@@ -93,7 +93,7 @@ class InitTestflowScheduleRunViewTab {
   public updateDescription(_description: string) {
     this._tab.description = _description;
   }
-  public updatePath(_path: Path) {
+  public updatePath(_path: Partial<Path>) {
     this._tab.path = {
       ...this._tab.path,
       ..._path,

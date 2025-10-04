@@ -254,7 +254,6 @@ private unsetBodyType = (bodyType: RequestDataTypeEnum | RequestDatasetEnum) : H
     initTestflowTab.setResult(result);
     initTestflowTab.setEdges(scheduleHistory.edges);
     initTestflowTab.updatePath({testflowScheduleId: _scheduleId, testflowId: _testflowId});
-    debugger;
     initTestflowTab.updateTabType(TabPersistenceTypeEnum.TEMPORARY);
     return initTestflowTab.getValue();
   }

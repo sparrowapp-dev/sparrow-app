@@ -535,6 +535,8 @@ export class TestflowViewModel {
       const baseUrl = await this.constructBaseUrl(workspaceId);
       const response = await this.testflowService.scheduleTestFlowRun(
         payload,
+        testflowId,
+        workspaceId,
         baseUrl,
       );
 
