@@ -78,6 +78,7 @@ import {
   type CollectionBaseInterface as CollectionDto,
   type CollectionArgsBaseInterface as CollectionArgsDto,
   type CollectionItemBaseInterface as CollectionItemsDto,
+  type MoveRequestArgsDto as MoveRequestArgsDto,
   CollectionItemTypeBaseEnum,
   CollectionTypeBaseEnum,
 } from "@sparrow/common/types/workspace/collection-base";
@@ -1366,13 +1367,148 @@ export default class CollectionsViewModel {
     return null;
   };
 
-  public handleMoveRequest = async (
-    requestId: string,
+  /**
+   * Check if request is being moved within the same collection
+   */
+  private isMoveWithinSameCollection = (
     oldCollectionId: string,
+    newCollectionId: string,
+  ): boolean => {
+    return oldCollectionId === newCollectionId;
+  };
+
+  /**
+   * Check if request is being moved between different collections
+   */
+  private isMoveInterCollection = (
+    oldCollectionId: string,
+    newCollectionId: string,
+  ): boolean => {
+    return oldCollectionId !== newCollectionId;
+  };
+
+  /**
+   * Check if request is being moved out of a folder (to root or another folder)
+   */
+  private isMoveOutOfFolder = (
     oldFolderId?: string,
-    newCollectionId?: string,
     newFolderId?: string,
+  ): boolean => {
+    return oldFolderId !== newFolderId;
+  };
+
+  /**
+   * Update tabs after moving a request
+   */
+  private updateTabsAfterMove = async (
+    collectionId: string,
+    folderId: string,
+    requestId: string,
+  ): Promise<void> => {
+    const tabsToUpdate = await this.tabRepository.getTabsByRequestId(requestId);
+    for (const tab of tabsToUpdate) {
+      await this.tabRepository.updateTabByMongoId(tab.id, {
+        collectionId,
+        folderId,
+      });
+    }
+  };
+
+  /**
+   * Handle moving request for guest users (local only)
+   */
+  private handleGuestUserMove = async (
+    oldCollectionId: string,
+    newCollectionId: string,
+    oldFolderId: string,
+    newFolderId: string,
+    requestId: string,
+  ): Promise<void> => {
+    // if (this.isMoveWithinSameCollection(oldCollectionId, newCollectionId)) {
+    //   // Move within same collection
+    //   await this.collectionRepository.moveRequestWithinCollection(
+    //     oldCollectionId,
+    //     requestId,
+    //     oldFolderId,
+    //     newFolderId,
+    //   );
+    //   await this.updateTabsAfterMove(requestId, oldCollectionId, newFolderId);
+    //   notifications.success("Request moved within collection");
+    // } else {
+    //   // Move between collections
+    //   await this.collectionRepository.deleteRequestOrFolderInCollection(
+    //     oldCollectionId,
+    //     requestId,
+    //   );
+    //   if (newFolderId) {
+    //     await this.collectionRepository.addRequestOrFolderInCollection(
+    //       newCollectionId,
+    //       newFolderId,
+    //       request,
+    //     );
+    //   } else {
+    //     await this.collectionRepository.addRequestOrFolderInCollection(
+    //       newCollectionId,
+    //       request,
+    //     );
+    //   }
+    //   await this.updateTabsAfterMove(requestId, newCollectionId, newFolderId);
+    //   notifications.success("Request moved between collections");
+    // }
+  };
+
+  /**
+   * Handle moving request for logged-in users (API + local)
+   */
+  private handleLoggedInUserMove = async (
+    oldCollectionId: string,
+    newCollectionId: string,
+    oldFolderId: string,
+    newFolderId: string,
+    requestId: string,
+  ): Promise<void> => {
+    // Get workspace ID for constructing base URL
+    const oldCollection = await this.readCollection(oldCollectionId);
+    const workspaceId = oldCollection?.workspaceId;
+
+    if (!workspaceId) {
+      throw new Error("Workspace not found");
+    }
+
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+
+    if (this.isMoveWithinSameCollection(oldCollectionId, newCollectionId)) {
+      const response = await this.collectionService.moveRequest(
+        oldCollectionId,
+        newCollectionId,
+        oldFolderId,
+        newFolderId,
+        requestId,
+        workspaceId,
+        baseUrl,
+      );
+      if (response.isSuccessful) {
+        debugger;
+        await this.collectionRepository.moveRequestWithinCollection(
+          oldCollectionId,
+          oldFolderId,
+          newFolderId,
+          requestId,
+        );
+        await this.updateTabsAfterMove(oldCollectionId, newFolderId, requestId);
+        notifications.success("Request moved within collection");
+      }
+    }
+  };
+
+  public handleMoveRequest = async (
+    oldCollectionId: string,
+    newCollectionId: string,
+    oldFolderId: string,
+    newFolderId: string,
+    requestId: string,
   ) => {
+    // Get the request to be moved
     const request = await this.readRequestOrFolderInCollection(
       oldCollectionId,
       requestId,
@@ -1380,127 +1516,35 @@ export default class CollectionsViewModel {
     if (!request || request.type !== CollectionItemTypeBaseEnum.REQUEST) {
       throw new Error("Request not found");
     }
+
+    // Check if user is guest
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
     });
 
-    // Move within the same collection (just folder change)
-    // If newCollectionId is empty, it means move within the same collection
-    const isMoveWithinSameCollection = oldCollectionId === newCollectionId;
-    if (isMoveWithinSameCollection && oldFolderId !== newFolderId) {
-      // Remove from old folder/collection (if oldFolderId is empty, it's from root)
-      debugger;
-      await this.collectionRepository.moveRequestWithinCollection(
-        oldCollectionId,
-        oldFolderId,
-        newFolderId,
-        requestId,
-      );
-      debugger;
-      // Update tabs
-      const tabsToUpdate =
-        await this.tabRepository.getTabsByRequestId(requestId);
-      for (const tab of tabsToUpdate) {
-        await this.tabRepository.updateTabByMongoId(tab.id, {
-          collectionId: oldCollectionId,
-          folderId: newFolderId,
-        });
-      }
-      notifications.success("Request moved within collection");
-      return;
-    }
-
-    if (isGuestUser === true) {
-      // For Guest Users
-      // Remove from old collection
-      await this.collectionRepository.deleteRequestOrFolderInCollection(
-        oldCollectionId,
-        requestId,
-      );
-      // Add to new collection/folder
-      if (newFolderId) {
-        await this.collectionRepository.addRequestOrFolderInCollection(
+    try {
+      if (isGuestUser === true) {
+        await this.handleGuestUserMove(
+          oldCollectionId,
           newCollectionId,
+          oldFolderId,
           newFolderId,
-          request,
+          requestId,
         );
       } else {
-        await this.collectionRepository.addRequestOrFolderInCollection(
+        await this.handleLoggedInUserMove(
+          oldCollectionId,
           newCollectionId,
-          request,
+          oldFolderId,
+          newFolderId,
+          requestId,
         );
       }
-      return;
+    } catch (error) {
+      console.error("Error in handleMoveRequest:", error);
+      throw error;
     }
-
-    // For Logged-in Users
-    // Move to different collection
-    const oldCollection = await this.readCollection(oldCollectionId);
-    let newCollection;
-    if (newCollectionId.length) {
-      newCollection = await this.readCollection(newCollectionId);
-    }
-    if (!oldCollection && !newCollection) {
-      throw new Error("Collection not found");
-    }
-    // const baseUrl = await this.constructBaseUrl(oldCollection.workspaceId);
-    // const res = await this.collectionService.moveRequestToAnotherCollection(
-    //   requestId,
-    //   {
-    //     oldCollectionId,
-    //     newCollectionId,
-    //     oldFolderId,
-    //     newFolderId,
-    //     workspaceId: oldCollection.workspaceId,
-    //     source: oldCollection?.activeSync ? "USER" : "SYSTEM",
-    //     currentBranch: oldCollection?.activeSync
-    //       ? oldCollection?.currentBranch
-    //       : undefined,
-    //   },
-    //   baseUrl,
-    // );
-    // if (res.isSuccessful) {
-    //   // Update local database
-    //   await this.collectionRepository.deleteRequestOrFolderInCollection(
-    //     oldCollectionId,
-    //     requestId,
-    //   );
-    //   await this.collectionRepository.addRequestOrFolderInCollection(
-    //     newCollectionId,
-    //     newFolderId,
-    //     res.data.data,
-    //   );
-    //   // Update tabs
-    //   const tabsToUpdate =
-    //     await this.tabRepository.getTabsByRequestId(requestId);
-    //   for (const tab of tabsToUpdate) {
-    //     await this.tabRepository.updateTabByMongoId(tab.id, {
-    //       collectionId: newCollectionId,
-    //       folderId: newFolderId,
-    //     });
-    //   }
-    //   // Update collections in workspace
-    //   await this.workspaceRepository.updateCollectionInWorkspace(
-    //     oldCollection.workspaceId,
-    //     {
-    //       id: oldCollectionId,
-    //       name: oldCollection.name,
-    //     },
-    //   );
-    //   if (oldCollectionId !== newCollectionId) {
-    //     await this.workspaceRepository.updateCollectionInWorkspace(
-    //       newCollection.workspaceId,
-    //       {
-    //         id: newCollectionId,
-    //         name: newCollection.name,
-    //       },
-    //     );
-    //   }
-    //   notifications.success("Request moved successfully");
-    // } else {
-    //   notifications.error(res.message || "Failed to move request");
-    // }
   };
 
   /**
@@ -5923,6 +5967,22 @@ export default class CollectionsViewModel {
   };
 
   /**
+   * Handle control of moving items
+   * @param args :object - arguments depending on entity type
+   */
+
+  public handleMoveItem = async (args: MoveRequestArgsDto) => {
+    debugger;
+    return await this.handleMoveRequest(
+      args.oldCollectionId,
+      args.newCollectionId,
+      args.oldFolderId,
+      args.newFolderId,
+      args.requestId,
+    );
+  };
+
+  /**
    * Handle control of creating items
    * @param entityType :string - type of entity, collection, folder or request
    * @param args :object - arguments depending on entity type
@@ -5933,18 +5993,6 @@ export default class CollectionsViewModel {
   ) => {
     let response;
     switch (entityType) {
-      case "moveRequest":
-        // Move a request from one folder/collection to another
-        // args: { requestId, fromCollectionId, fromFolderId, toCollectionId, toFolderId }
-        // Implement RxDB update synchronously, then trigger API call in background
-        response = await this.handleMoveRequest(
-          args.requestId,
-          args.fromCollectionId,
-          args.fromFolderId,
-          args.toCollectionId,
-          args.toFolderId,
-        );
-        break;
       case "collection":
         response = await this.handleCreateCollection(args.workspaceId);
         break;

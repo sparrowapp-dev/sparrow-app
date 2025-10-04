@@ -80,6 +80,7 @@
   export let onItemDeleted: (entityType: string, args: any) => void;
   export let onItemRenamed: (entityType: string, args: any) => void;
   export let onItemOpened: (entityType: string, args: any) => void;
+  export let onItemMoved: (args: any) => void;
   export let onCreateMockCollection: (
     collectionId: string,
     workspaceId: string,
@@ -785,6 +786,7 @@
             {onItemDeleted}
             {onItemRenamed}
             {onItemOpened}
+            {onItemMoved}
             {onBranchSwitched}
             {searchData}
             {toggleExpandCollection}

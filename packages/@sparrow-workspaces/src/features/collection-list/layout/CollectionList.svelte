@@ -68,6 +68,7 @@
     workspaceId: string,
   ) => void;
   export let onItemOpened: (entityType: string, args: any) => void;
+  export let onItemMoved: (args: any) => void;
   export let onSearchCollection: (
     collection: CollectionDocument[],
     searchData: string,
@@ -889,6 +890,7 @@
                   {onItemDeleted}
                   {onItemRenamed}
                   {onItemOpened}
+                  {onItemMoved}
                   collection={{
                     id: data.parentCollection.id,
                     name: data.parentCollection.name,

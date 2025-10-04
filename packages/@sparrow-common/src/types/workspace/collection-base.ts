@@ -224,3 +224,11 @@ interface Auth {
     addTo: string;
   };
 }
+
+export interface MoveRequestArgsDto {
+  oldCollectionId: string;
+  newCollectionId: string;
+  oldFolderId: string;
+  newFolderId: string;
+  requestId: string;
+}

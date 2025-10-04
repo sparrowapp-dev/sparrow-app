@@ -76,6 +76,12 @@
    */
   export let onItemOpened: (entityType: string, args: any) => void;
   /**
+   * Callback for Item Move
+   * @param args - Arguments to pass on move
+   */
+  export let onItemMoved: (args: any) => void;
+
+  /**
    * Whole Collection Document
    */
   export let collection: CollectionBaseInterface;
@@ -240,13 +246,13 @@
       if (dragData.requestId) {
         // Call parent handler to move the request
         // You may want to pass more info as needed
-        onItemCreated &&
-          onItemCreated("moveRequest", {
+        onItemMoved &&
+          onItemMoved({
+            oldCollectionId: dragData.collectionId,
+            newCollectionId: collection.id,
+            oldFolderId: dragData.folderId,
+            newFolderId: explorer.id,
             requestId: dragData.requestId,
-            fromCollectionId: dragData.collectionId,
-            fromFolderId: dragData.folderId,
-            toCollectionId: collection.id,
-            toFolderId: explorer.id,
           });
       }
     } catch (e) {

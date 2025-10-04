@@ -1,36 +1,3 @@
-// Move a request from one collection/folder to another collection/folder in RxDB and trigger API sync
-// Usage: moveRequestToAnotherCollection(requestId, fromCollectionId, fromFolderId, toCollectionId, toFolderId)
-
-export async function moveRequestToAnotherCollection({
-  requestId,
-  fromCollectionId,
-  fromFolderId = "",
-  toCollectionId,
-  toFolderId = "",
-}: {
-  requestId: string;
-  fromCollectionId: string;
-  fromFolderId?: string;
-  toCollectionId: string;
-  toFolderId?: string;
-}) {
-  // TODO: Implement RxDB logic to:
-  // 1. Find and remove the request from the old location (fromCollectionId/fromFolderId)
-  // 2. Insert the request into the new location (toCollectionId/toFolderId)
-  // 3. Save both collections in RxDB
-  // 4. Trigger API call in background (if needed)
-  // 5. Return success/failure
-
-  // This is a stub. Replace with actual logic.
-  console.log("moveRequestToAnotherCollection", {
-    requestId,
-    fromCollectionId,
-    fromFolderId,
-    toCollectionId,
-    toFolderId,
-  });
-  return { success: true };
-}
 import {
   connectSocketIo,
   disconnectSocketIo,
@@ -1071,6 +1038,34 @@ export class CollectionService {
         headers: getAuthHeaders(),
       },
     );
+    return response;
+  };
+
+  public moveRequest = async function (
+    oldCollectionId: string,
+    newCollectionId: string,
+    oldFolderId: string,
+    newFolderId: string,
+    requestId: string,
+    workspaceId: string,
+    baseUrl: string,
+  ) {
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/collection/move-request`,
+      {
+        body: {
+          oldCollectionId: `${oldCollectionId}`,
+          oldFolderId: `${oldFolderId}`,
+          newCollectionId: `${newCollectionId}`,
+          newFolderId: `${newFolderId}`,
+          requestId: `${requestId}`,
+          workspaceId: `${workspaceId}`,
+        },
+        headers: getAuthHeaders(),
+      },
+    );
+    debugger;
     return response;
   };
 }
