@@ -1065,7 +1065,6 @@ export class CollectionService {
         headers: getAuthHeaders(),
       },
     );
-    debugger;
     return response;
   };
 }

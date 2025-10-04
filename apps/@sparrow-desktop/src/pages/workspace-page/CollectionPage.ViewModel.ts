@@ -1368,36 +1368,6 @@ export default class CollectionsViewModel {
   };
 
   /**
-   * Check if request is being moved within the same collection
-   */
-  private isMoveWithinSameCollection = (
-    oldCollectionId: string,
-    newCollectionId: string,
-  ): boolean => {
-    return oldCollectionId === newCollectionId;
-  };
-
-  /**
-   * Check if request is being moved between different collections
-   */
-  private isMoveInterCollection = (
-    oldCollectionId: string,
-    newCollectionId: string,
-  ): boolean => {
-    return oldCollectionId !== newCollectionId;
-  };
-
-  /**
-   * Check if request is being moved out of a folder (to root or another folder)
-   */
-  private isMoveOutOfFolder = (
-    oldFolderId?: string,
-    newFolderId?: string,
-  ): boolean => {
-    return oldFolderId !== newFolderId;
-  };
-
-  /**
    * Update tabs after moving a request
    */
   private updateTabsAfterMove = async (
@@ -1477,27 +1447,25 @@ export default class CollectionsViewModel {
 
     const baseUrl = await this.constructBaseUrl(workspaceId);
 
-    if (this.isMoveWithinSameCollection(oldCollectionId, newCollectionId)) {
-      const response = await this.collectionService.moveRequest(
+    const response = await this.collectionService.moveRequest(
+      oldCollectionId,
+      newCollectionId,
+      oldFolderId,
+      newFolderId,
+      requestId,
+      workspaceId,
+      baseUrl,
+    );
+    if (response.isSuccessful) {
+      await this.collectionRepository.moveRequest(
         oldCollectionId,
         newCollectionId,
         oldFolderId,
         newFolderId,
         requestId,
-        workspaceId,
-        baseUrl,
       );
-      if (response.isSuccessful) {
-        debugger;
-        await this.collectionRepository.moveRequestWithinCollection(
-          oldCollectionId,
-          oldFolderId,
-          newFolderId,
-          requestId,
-        );
-        await this.updateTabsAfterMove(oldCollectionId, newFolderId, requestId);
-        notifications.success("Request moved within collection");
-      }
+      await this.updateTabsAfterMove(oldCollectionId, newFolderId, requestId);
+      notifications.success("Request moved within collection");
     }
   };
 
@@ -1508,16 +1476,6 @@ export default class CollectionsViewModel {
     newFolderId: string,
     requestId: string,
   ) => {
-    // Get the request to be moved
-    const request = await this.readRequestOrFolderInCollection(
-      oldCollectionId,
-      requestId,
-    );
-    if (!request || request.type !== CollectionItemTypeBaseEnum.REQUEST) {
-      throw new Error("Request not found");
-    }
-
-    // Check if user is guest
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
@@ -5972,7 +5930,6 @@ export default class CollectionsViewModel {
    */
 
   public handleMoveItem = async (args: MoveRequestArgsDto) => {
-    debugger;
     return await this.handleMoveRequest(
       args.oldCollectionId,
       args.newCollectionId,

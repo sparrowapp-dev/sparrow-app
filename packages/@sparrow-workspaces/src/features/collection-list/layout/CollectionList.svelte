@@ -734,6 +734,7 @@
                   {onItemDeleted}
                   {onItemRenamed}
                   {onItemOpened}
+                  {onItemMoved}
                   {onBranchSwitched}
                   {onRefetchCollection}
                   {userRoleInWorkspace}

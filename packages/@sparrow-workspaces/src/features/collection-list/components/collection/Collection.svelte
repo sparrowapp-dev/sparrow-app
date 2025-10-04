@@ -8,6 +8,7 @@
   export let onItemDeleted: (entityType: string, args: any) => void;
   export let onItemRenamed: (entityType: string, args: any) => void;
   export let onItemOpened: (entityType: string, args: any) => void;
+  export let onItemMoved: (args: any) => void;
   export let onBranchSwitched: (collection: CollectionBaseInterface) => any;
   export let onRefetchCollection: (
     workspaceId: string,
@@ -341,6 +342,42 @@
   let deleteLoader: boolean = false;
   let refreshCollectionLoader = false;
   let newCollectionName: string = "";
+  let isDragOver = false;
+
+  // Drag and Drop Handlers for Request
+  function handleDragOver(event: DragEvent) {
+    // Only allow drop if dragging a request (type check can be improved as needed)
+    event.preventDefault();
+    isDragOver = true;
+  }
+
+  function handleDragLeave(event: DragEvent) {
+    isDragOver = false;
+  }
+
+  async function handleDrop(event: DragEvent) {
+    event.preventDefault();
+    isDragOver = false;
+    try {
+      const data = event.dataTransfer?.getData("text/plain");
+      if (!data) return;
+      const dragData = JSON.parse(data);
+      // Only allow dropping requests (not folders)
+      if (dragData.requestId) {
+        // Call parent handler to move the request to collection root (no folder)
+        onItemMoved &&
+          onItemMoved({
+            oldCollectionId: dragData.collectionId,
+            newCollectionId: collection.id,
+            oldFolderId: dragData.folderId,
+            newFolderId: "", // Moving to collection root
+            requestId: dragData.requestId,
+          });
+      }
+    } catch (e) {
+      // Optionally handle error
+    }
+  }
 
   const handleRenameInput = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -773,7 +810,10 @@
       class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
       activeTabId
         ? 'active-collection-tab'
-        : ''}"
+        : ''} {isDragOver ? 'drag-over-collection' : ''}"
+      on:dragover={handleDragOver}
+      on:dragleave={handleDragLeave}
+      on:drop={handleDrop}
     >
       <button
         tabindex="-1"
@@ -1036,7 +1076,13 @@
     <!-- {#if !collection?.activeSync || isBranchSynced} -->
 
     {#if visibility}
-      <div class="z-1" style=" padding-left: 0; padding-right:0;">
+      <div 
+        class="z-1 collection-items-area {isDragOver ? 'drag-over-collection' : ''}" 
+        style="padding-left: 0; padding-right:0;"
+        on:dragover={handleDragOver}
+        on:dragleave={handleDragLeave}
+        on:drop={handleDrop}
+      >
         <div
           class=" ps-0 position-relative"
           style={`background-color: ${collection.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"}; margin-bottom: ${collection.id === activeTabId ? "0px" : "0px"};`}
@@ -1343,5 +1389,20 @@
     left: 40px;
     width: 1px;
     background-color: var(--bg-ds-surface-100);
+  }
+
+  /* Drag-over highlight for collection drop target */
+  .drag-over-collection {
+    outline: 2px solid var(--bg-ds-primary-300);
+    background-color: var(--bg-ds-surface-400) !important;
+    transition: outline 0.1s;
+  }
+
+  .collection-items-area {
+    position: relative;
+  }
+
+  .collection-items-area.drag-over-collection {
+    background-color: var(--bg-ds-surface-400) !important;
   }
 </style>
