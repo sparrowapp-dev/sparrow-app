@@ -1958,6 +1958,19 @@ export class TestflowExplorerPageViewModel {
       baseUrl,
     );
     if (response?.isSuccessful) {
+      const tabsIdsToDelete = [];
+      let childTabs = [];
+      // Remove the main tab
+      const mainTabId = await this.tabRepository.getTabById(_scheduleId);
+      if (mainTabId) tabsIdsToDelete.push(mainTabId.tabId);
+      childTabs = await this.tabRepository.getTabsByTestflowScheduleId(_scheduleId);
+      // Delete all child tabs if any exist
+      if (childTabs.length > 0) {
+        const allChildTabs = childTabs.map((tab) => tab.tabId);
+        tabsIdsToDelete.push(...allChildTabs);
+      }
+      await this.tabRepository.deleteTabsWithTabIdInAWorkspace(progressiveTab.path.workspaceId, tabsIdsToDelete);
+      debugger;
       const schedules = response.data.data.schedules;
       updateTestflowSchedules(progressiveTab?.id as string, schedules);
     }

@@ -132,13 +132,13 @@ private unsetBodyType = (bodyType: RequestDataTypeEnum | RequestDatasetEnum) : H
    * @param request - request tab frontend data
    * @returns
    */
-   public adapt(workspaceId: string, _testflow: any,scheduleName:string): Tab {
-    const testflow = createDeepCopy(_testflow);
+   public adapt(workspaceId: string, _scheduleHistory: any,scheduleName:string, _scheduleId: string, _testflowId: string): Tab {
+    const scheduleHistory = createDeepCopy(_scheduleHistory);
     const initTestflowTab = new InitTab().testflowScheduleRunView(
-      testflow.id,
+      scheduleHistory.id,
       workspaceId,
     );
-    const nds = testflow.nodes.map((_nd: any) => {
+    const nds = scheduleHistory.nodes.map((_nd: any) => {
       if (_nd?.type === "startBlock") {
         return {
           ..._nd,
@@ -239,20 +239,22 @@ private unsetBodyType = (bodyType: RequestDataTypeEnum | RequestDatasetEnum) : H
       }
     });
     const result = {
-      failedRequests: testflow.failedRequests,
-      requests: testflow.requests,
-      status: testflow.status,
-      successRequests: testflow.successRequests,
-      totalTime: testflow.totalTime,
-      response: testflow.responses,
+      failedRequests: scheduleHistory.failedRequests,
+      requests: scheduleHistory.requests,
+      status: scheduleHistory.status,
+      successRequests: scheduleHistory.successRequests,
+      totalTime: scheduleHistory.totalTime,
+      response: scheduleHistory.responses,
     };
     initTestflowTab.setScheduleName(scheduleName);
     initTestflowTab.setName(scheduleName);
-    initTestflowTab.setLastestTime(testflow.createdAt);
-    initTestflowTab.setIsScheduled(testflow.isScheduled);
+    initTestflowTab.setLastestTime(scheduleHistory.createdAt);
+    initTestflowTab.setIsScheduled(scheduleHistory.isScheduled);
     initTestflowTab.setNodes(nds);
     initTestflowTab.setResult(result);
-    initTestflowTab.setEdges(testflow.edges);
+    initTestflowTab.setEdges(scheduleHistory.edges);
+    initTestflowTab.updatePath({testflowScheduleId: _scheduleId, testflowId: _testflowId});
+    debugger;
     initTestflowTab.updateTabType(TabPersistenceTypeEnum.TEMPORARY);
     return initTestflowTab.getValue();
   }

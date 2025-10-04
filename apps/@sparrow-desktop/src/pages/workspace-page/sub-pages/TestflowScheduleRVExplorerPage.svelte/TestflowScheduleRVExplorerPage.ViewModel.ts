@@ -1799,14 +1799,14 @@ export class TestflowScheduleRVExplorerPageViewModel {
   };
 
   public openTestflowScheduleTab = async (_schedule) => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    const initTestflowScheduleTab = new InitTestflowScheduleTab(
-      _schedule.id,
-      progressiveTab.path.workspaceId,
-    )
-      .updatePath({ testflowId: progressiveTab.id })
-      .getValue();
-    await this.tabRepository.createTab(initTestflowScheduleTab);
+    // const progressiveTab = createDeepCopy(this._tab.getValue());
+    // const initTestflowScheduleTab = new InitTestflowScheduleTab(
+    //   _schedule.id,
+    //   progressiveTab.path.workspaceId,
+    // )
+    //   .updatePath({ testflowId: progressiveTab.id })   // idhar bug hai
+    //   .getValue();
+    // await this.tabRepository.createTab(initTestflowScheduleTab);
   };
 
   public handleContactSales = async () => {

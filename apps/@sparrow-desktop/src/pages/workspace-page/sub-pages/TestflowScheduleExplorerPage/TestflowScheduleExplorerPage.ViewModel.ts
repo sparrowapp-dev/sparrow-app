@@ -308,6 +308,7 @@ class MockHistoryExplorerPage {
         progressiveTab?.path?.testflowId as string,
         schedules,
       );
+      this.tabRepository.removeTab(_scheduleHistoryId);
     }
   };
 
@@ -374,30 +375,18 @@ class MockHistoryExplorerPage {
   };
 
   public handleCreateTestflowSingleScheduleTab = (
-    _scheduleResult,
-    scheduleName: string,
+    _scheduleResult: any,
+    schedule: any,
   ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const x = new TestflowScheduleRunViewTabAdapter().adapt(
       progressiveTab.path.workspaceId,
       _scheduleResult,
-      scheduleName,
+      schedule.name,
+      progressiveTab.id,
+      progressiveTab.path.testflowId
     );
 
-    // const initTestflowScheduleRunViewTab = this.initTab.testflowScheduleRunView(
-    //   _scheduleResult.id,
-    //   progressiveTab.path.workspaceId,
-    // );
-    // initTestflowScheduleRunViewTab.updateName(
-    //   `Result - ${progressiveTab.name}`,
-    // );
-    // initTestflowScheduleRunViewTab.setNodes(_scheduleResult.nodes);
-    // initTestflowScheduleRunViewTab.setEdges(_scheduleResult.edges);
-    // // initTestflowScheduleRunViewTab.setResult(result);
-    // initTestflowScheduleRunViewTab.updatePath({
-    //   workspaceId: progressiveTab.path.workspaceId,
-    //   testflowId: progressiveTab.path.testflowId,
-    // });
     this.tabRepository.createTab(x);
   };
 
