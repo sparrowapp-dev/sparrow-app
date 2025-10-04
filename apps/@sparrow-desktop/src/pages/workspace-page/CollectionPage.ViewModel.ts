@@ -1394,37 +1394,44 @@ export default class CollectionsViewModel {
     newFolderId: string,
     requestId: string,
   ): Promise<void> => {
-    // if (this.isMoveWithinSameCollection(oldCollectionId, newCollectionId)) {
-    //   // Move within same collection
-    //   await this.collectionRepository.moveRequestWithinCollection(
-    //     oldCollectionId,
-    //     requestId,
-    //     oldFolderId,
-    //     newFolderId,
-    //   );
-    //   await this.updateTabsAfterMove(requestId, oldCollectionId, newFolderId);
-    //   notifications.success("Request moved within collection");
-    // } else {
-    //   // Move between collections
-    //   await this.collectionRepository.deleteRequestOrFolderInCollection(
-    //     oldCollectionId,
-    //     requestId,
-    //   );
-    //   if (newFolderId) {
-    //     await this.collectionRepository.addRequestOrFolderInCollection(
-    //       newCollectionId,
-    //       newFolderId,
-    //       request,
-    //     );
-    //   } else {
-    //     await this.collectionRepository.addRequestOrFolderInCollection(
-    //       newCollectionId,
-    //       request,
-    //     );
-    //   }
-    //   await this.updateTabsAfterMove(requestId, newCollectionId, newFolderId);
-    //   notifications.success("Request moved between collections");
-    // }
+    const oldCollection = await this.readCollection(oldCollectionId);
+    const workspaceId = oldCollection?.workspaceId;
+
+    if (!workspaceId) {
+      throw new Error("Workspace not found");
+    }
+
+    let newCollection = oldCollection;
+
+    if (newCollectionId !== oldCollectionId) {
+      newCollection = await this.readCollection(newCollectionId);
+    }
+    let targetName = newCollection?.name || "collection";
+
+    if (newFolderId) {
+      const folderDetails = await this.readRequestOrFolderInCollection(
+        newCollectionId,
+        newFolderId,
+      );
+      targetName = folderDetails?.name || "folder";
+    }
+
+    // Move the request using the repository method
+    await this.collectionRepository.moveRequest(
+      oldCollectionId,
+      newCollectionId,
+      oldFolderId,
+      newFolderId,
+      requestId,
+    );
+
+    await this.updateTabsAfterMove(newCollectionId, newFolderId, requestId);
+
+    // Dynamic notification based on whether moved to folder or collection root
+    const notificationMessage = newFolderId
+      ? `Request moved to folder "${targetName}"`
+      : `Request moved to collection "${targetName}"`;
+    notifications.success(notificationMessage);
   };
 
   /**
@@ -1437,12 +1444,26 @@ export default class CollectionsViewModel {
     newFolderId: string,
     requestId: string,
   ): Promise<void> => {
-    // Get workspace ID for constructing base URL
     const oldCollection = await this.readCollection(oldCollectionId);
     const workspaceId = oldCollection?.workspaceId;
 
     if (!workspaceId) {
       throw new Error("Workspace not found");
+    }
+
+    let newCollection = oldCollection;
+
+    if (newCollectionId !== oldCollectionId) {
+      newCollection = await this.readCollection(newCollectionId);
+    }
+    let targetName = newCollection?.name || "collection";
+
+    if (newFolderId) {
+      const folderDetails = await this.readRequestOrFolderInCollection(
+        newCollectionId,
+        newFolderId,
+      );
+      targetName = folderDetails?.name || "folder";
     }
 
     const baseUrl = await this.constructBaseUrl(workspaceId);
@@ -1465,7 +1486,11 @@ export default class CollectionsViewModel {
         requestId,
       );
       await this.updateTabsAfterMove(oldCollectionId, newFolderId, requestId);
-      notifications.success("Request moved within collection");
+
+      const notificationMessage = newFolderId
+        ? `Request moved to folder "${targetName}"`
+        : `Request moved to collection "${targetName}"`;
+      notifications.success(notificationMessage);
     }
   };
 
@@ -1476,6 +1501,14 @@ export default class CollectionsViewModel {
     newFolderId: string,
     requestId: string,
   ) => {
+    // Early return if trying to move request to the same location
+    if (oldCollectionId === newCollectionId && oldFolderId === newFolderId) {
+      notifications.error(
+        "Request is already in the target location. No move needed.",
+      );
+      return;
+    }
+
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;
