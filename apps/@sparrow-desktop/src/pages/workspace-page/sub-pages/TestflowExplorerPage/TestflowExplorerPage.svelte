@@ -24,6 +24,7 @@
   import { ScheduleRunPopUp } from "@sparrow/common/features";
   import { Modal } from "@sparrow/library/ui";
   import { getClientUser } from "@app/utils/jwt";
+  import { PlanUpgradeModal } from "@sparrow/common/components";
 
   export let tab;
   export let teamDetails;
@@ -44,6 +45,7 @@
   let currentWorkspace;
   let planLimitTestFlowBlocks: number = 5;
   let planLimitTestflow: number = 3;
+  let planLimitTestScheduleCount = 3;
   let currentTestflowCount: number = 1;
   let testflowBlocksPlanModalOpen: boolean = false;
   let runHistoryPlanModalOpen: boolean = false;
@@ -117,6 +119,7 @@
       planLimitTestflow = planlimits?.testflowPerWorkspace?.value || 3;
       selectiveRunTestflow = planlimits?.selectiveTestflowRun?.active || false;
       planLimitRunHistoryCount = planlimits?.testflowRunHistory?.value || 5;
+      planLimitTestScheduleCount = planlimits?.testflowPerWorkspace?.value || 3;
     }
   };
 
@@ -301,6 +304,27 @@
     handleBlockLimitTestflow();
     collectionsSubscriber.unsubscribe();
   });
+
+  let isCreateTestflowScheduleLimitReachedModalOpen = false;
+  const createNewTestflowSchedule = async (
+    _testflowScheduleName: any,
+    _environemntId: any,
+    _runConfigurations: any,
+    _notifications: any,
+  ) => {
+    const response = await _viewModel.scheduleTestFlowRun(
+      _testflowScheduleName,
+      _environemntId,
+      _runConfigurations,
+      _notifications,
+    );
+    if (response.message === "Plan limit reached") {
+      isCreateTestflowScheduleLimitReachedModalOpen = true;
+    } else {
+      isCreateTestflowScheduleLimitReachedModalOpen = false;
+    }
+    return response;
+  };
 </script>
 
 {#if render}
@@ -376,6 +400,7 @@
     {planLimitTestFlowBlocks}
     {planLimitTestflow}
     {planLimitRunHistoryCount}
+    {planLimitTestScheduleCount}
     testflowCount={currentTestflowCount}
     {teamDetails}
     bind:testflowBlocksPlanModalOpen
@@ -390,6 +415,7 @@
     onUpdateScheduleStatus={_viewModel.updateTestflowScheduleStatus}
     onPerformTestflowScheduleOperations={_viewModel.performTestflowScheduleOperations}
     onOpenTestflowScheduleConfigurationsTab={_viewModel.openTestflowScheduleConfigurationsTab}
+    bind:isCreateTestflowScheduleLimitReachedModalOpen
   />
 {/if}
 
@@ -412,7 +438,7 @@
         env.workspaceId === currentWorkspaceId &&
         env.type !== environmentType.GLOBAL,
     ) || []}
-    handleScheduleTestFlowRun={_viewModel.scheduleTestFlowRun}
+    onScheduleTestFlowRun={createNewTestflowSchedule}
     creatorEmail={userEmail}
   />
 </Modal>
