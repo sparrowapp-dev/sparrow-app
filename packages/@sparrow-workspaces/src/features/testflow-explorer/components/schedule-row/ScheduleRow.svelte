@@ -129,7 +129,7 @@
       },
       {
         onClick: () => {
-          onOpenTestflowScheduleConfigurationsTab(schedule);
+          onOpenTestflowScheduleConfigurationsTab(schedule?.originalData);
         },
         displayText: "Edit",
         disabled: false,
