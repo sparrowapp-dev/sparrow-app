@@ -109,11 +109,13 @@ export class TestflowService {
 
   public scheduleTestFlowRun = async (
     payload: ScheduleTestFlowRunDto,
+    testflowId: string,
+    workspaceId: string,
     baseUrl: string,
   ) => {
     const response = await makeRequest(
       "POST",
-      `${baseUrl}/api/workspace/create-testflow-schedule`,
+      `${baseUrl}/api/workspace/${workspaceId}/testflow/${testflowId}/testflow-schedule`,
       {
         body: payload,
         headers: getAuthHeaders(),

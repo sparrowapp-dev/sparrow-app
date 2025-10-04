@@ -50,8 +50,11 @@ export interface RequestIdWrapper {
 export interface FolderIdWrapper {
   folderId?: string;
 }
-export interface testflowIdWrapper {
+export interface TestflowIdWrapper {
   testflowId?: string;
+}
+export interface TestflowScheduleIdWrapper {
+  testflowScheduleId?: string;
 }
 export interface LLMRequestIdWrapper {
   LLMRequestId?: string;
@@ -61,7 +64,8 @@ export interface Path
     CollectionIdWrapper,
     FolderIdWrapper,
     RequestIdWrapper,
-    testflowIdWrapper {}
+    TestflowIdWrapper,
+    TestflowScheduleIdWrapper {}
 export interface DescriptionWrapper {
   description: string;
 }

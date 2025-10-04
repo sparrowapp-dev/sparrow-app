@@ -144,6 +144,7 @@
   export let redirectDocsTestflow: () => void;
   export let handleEventOnClickQuestionMark;
   export let planLimitRunHistoryCount: number = 5;
+  export let planLimitTestScheduleCount: number = 5;
   export let planLimitTestFlowBlocks: number = 5;
   export let planLimitTestFlows: number = 3;
   export let testflowCount: number = 1;
@@ -165,6 +166,7 @@
 
   export let onPerformTestflowScheduleOperations;
   export let onOpenTestflowScheduleConfigurationsTab;
+  export let isCreateTestflowScheduleLimitReachedModalOpen;
 
   export let onUpdateScheduleStatus: (
     scheduleId: string,
@@ -1821,6 +1823,7 @@
               size="medium"
               title="Schedule Run"
               style="margin-left: 0;"
+              id="create-new-schedule"
               buttonType="button"
               onClick={() => {
                 isScheduleRunPopupOpen = true;
@@ -2397,6 +2400,26 @@
   description={planContentNonActive?.description}
   planType="Selective Runs"
   activePlan={selectiveRunTestflow ? "active" : "disabled"}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  {handleContactSales}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName}
+  userEmail={teamDetails?.teamOwnerEmail}
+  submitButtonName={planContent?.buttonName}
+/>
+
+<PlanUpgradeModal
+  bind:isOpen={isCreateTestflowScheduleLimitReachedModalOpen}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Test Schedule"
+  planLimitValue={planLimitTestScheduleCount}
+  currentPlanValue={planLimitTestScheduleCount}
   isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
     ? true
     : false}

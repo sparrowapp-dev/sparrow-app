@@ -57,7 +57,6 @@
   let activeWorkspace;
 
   //schedule run popup state
-  let isScheduleRunPopupOpen: boolean = false;
 
   isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
@@ -310,7 +309,6 @@
     {/each}
   {/if} -->
   <TetsflowScheduleRunViewExplorer
-    bind:isScheduleRunPopupOpen
     tab={_viewModel.tab}
     {environmentVariables}
     {isTestflowEditable}
@@ -356,26 +354,3 @@
     onChangeSeletedAuthValue={_viewModel.parseAuthHeader}
   />
 {/if}
-
-<Modal
-  title="Set Schedule Run"
-  type="dark"
-  width="35%"
-  zIndex={1000}
-  isOpen={isScheduleRunPopupOpen}
-  handleModalState={() => {
-    isScheduleRunPopupOpen = false;
-  }}
->
-  <ScheduleRunPopUp
-    bind:isScheduleRunPopupOpen
-    testFlowName={tab?.name}
-    workspaceUsers={currentWorkspace?._data?.users || []}
-    environments={$environments?.filter(
-      (env) =>
-        env.workspaceId === currentWorkspaceId &&
-        env.type !== environmentType.GLOBAL,
-    ) || []}
-    handleScheduleTestFlowRun={_viewModel.scheduleTestFlowRun}
-  />
-</Modal>

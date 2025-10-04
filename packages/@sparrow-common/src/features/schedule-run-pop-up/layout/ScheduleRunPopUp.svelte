@@ -13,7 +13,7 @@
   export let testFlowName;
   export let workspaceUsers = [];
   export let environments = [];
-  export let handleScheduleTestFlowRun;
+  export let onScheduleTestFlowRun;
   export let creatorEmail;
 
   // Form data
@@ -281,7 +281,7 @@
     }
 
     // Call the handler with the properly formatted data
-    const result = await handleScheduleTestFlowRun(
+    const result = await onScheduleTestFlowRun(
       scheduleName,
       selectedEnvironment,
       runConfiguration,
@@ -291,7 +291,7 @@
       },
     );
 
-    if (result?.isSuccessful) {
+    if (result?.isSuccessful || result.message === "Plan limit reached") {
       isScheduleRunPopupOpen = false;
     }
     isScheduling = false;

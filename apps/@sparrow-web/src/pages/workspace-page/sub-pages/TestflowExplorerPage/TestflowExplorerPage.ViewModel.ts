@@ -1848,6 +1848,8 @@ export class TestflowExplorerPageViewModel {
 
       const response = await this.testflowService.scheduleTestFlowRun(
         payload,
+        testflowId,
+        workspaceId,
         baseUrl,
       );
 

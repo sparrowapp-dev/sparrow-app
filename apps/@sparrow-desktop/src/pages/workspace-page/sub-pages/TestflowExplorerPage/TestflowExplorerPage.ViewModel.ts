@@ -1369,19 +1369,6 @@ export class TestflowExplorerPageViewModel {
     });
   };
 
-  public async getTestflowSchedules(testflowId: string): Promise<any[]> {
-    try {
-      const response = await this.testflowService.fetchTestflow(testflowId);
-      if (response?.isSuccessful) {
-        return response.data.data.schedules || [];
-      }
-      return [];
-    } catch (error) {
-      console.error("Error fetching testflow schedules:", error);
-      return [];
-    }
-  }
-
   /**
    * @description - updates environment tab name
    * @param _name - new environment name
@@ -1914,10 +1901,12 @@ export class TestflowExplorerPageViewModel {
 
       const response = await this.testflowService.scheduleTestFlowRun(
         payload,
+        testflowId,
+        workspaceId,
         baseUrl,
       );
 
-      if (response.isSuccessful) {
+      if (response?.isSuccessful) {
         notifications.success(`New schedule created successfully.`);
         const schedules = response.data.data.schedules;
         updateTestflowSchedules(progressiveTab.id as string, schedules);
@@ -1926,11 +1915,9 @@ export class TestflowExplorerPageViewModel {
           data: response.data,
         };
       } else {
-        notifications.error(
-          `Failed to schedule test flow: ${
-            response.message || "Unknown error"
-          }`,
-        );
+        if(response?.message !== "Plan limit reached"){
+          notifications.error(`${ response.message || "Failed to schedule test flow"}`);
+        }
         return {
           isSuccessful: false,
           message: response.message || "Failed to schedule test flow",
@@ -1938,10 +1925,10 @@ export class TestflowExplorerPageViewModel {
       }
     } catch (error) {
       Sentry.captureException(error);
-      notifications.error("Error scheduling test flow run");
+      notifications.error("Failed to schedule test flow");
       return {
         isSuccessful: false,
-        message: error.message || "Error scheduling test flow run",
+        message: error?.message || "Failed to schedule test flow",
       };
     }
   };
@@ -1958,6 +1945,19 @@ export class TestflowExplorerPageViewModel {
       baseUrl,
     );
     if (response?.isSuccessful) {
+      const tabsIdsToDelete = [];
+      let childTabs = [];
+      // Remove the main tab
+      const mainTabId = await this.tabRepository.getTabById(_scheduleId);
+      if (mainTabId) tabsIdsToDelete.push(mainTabId.tabId);
+      childTabs = await this.tabRepository.getTabsByTestflowScheduleId(_scheduleId);
+      // Delete all child tabs if any exist
+      if (childTabs.length > 0) {
+        const allChildTabs = childTabs.map((tab) => tab.tabId);
+        tabsIdsToDelete.push(...allChildTabs);
+      }
+      await this.tabRepository.deleteTabsWithTabIdInAWorkspace(progressiveTab.path.workspaceId, tabsIdsToDelete);
+      debugger;
       const schedules = response.data.data.schedules;
       updateTestflowSchedules(progressiveTab?.id as string, schedules);
     }
