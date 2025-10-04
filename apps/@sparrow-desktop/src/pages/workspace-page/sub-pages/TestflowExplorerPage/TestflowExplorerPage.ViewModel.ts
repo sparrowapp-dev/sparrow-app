@@ -1781,7 +1781,6 @@ export class TestflowExplorerPageViewModel {
     return count;
   };
 
-
   /**
    * @description - This function will provide user Limits based on teamId.
    */
@@ -1857,6 +1856,19 @@ export class TestflowExplorerPageViewModel {
       progressiveTab.path.workspaceId,
     )
       .updatePath({ testflowId: progressiveTab.id })
+      .updateName(_schedule.name)
+      .updateEnvironmentId(_schedule.environmentId)
+      .updateRunConfiguration({
+        runCycle: _schedule.runConfiguration.runCycle,
+        executeAt: _schedule.runConfiguration.executeAt,
+        time: _schedule.runConfiguration.time,
+        intervalHours: _schedule.runConfiguration.intervalHours,
+        days: _schedule.runConfiguration.days,
+      })
+      .updateNotification({
+        emails: _schedule.notification.emails,
+        receiveNotifications: _schedule.notification.receiveNotifications,
+      })
       .updateState({
         scheduleNavigator: TestflowScheduleNavigatorEnum.CONFIGURATION,
       })
@@ -2004,7 +2016,10 @@ export class TestflowExplorerPageViewModel {
     }
   };
 
-  public updateTestflowScheduleStatus = async (_scheduleId: string, isChecked: any) => {
+  public updateTestflowScheduleStatus = async (
+    _scheduleId: string,
+    isChecked: any,
+  ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const baseUrl = await this.constructBaseUrl(
       progressiveTab.path.workspaceId,
@@ -2013,7 +2028,7 @@ export class TestflowExplorerPageViewModel {
       progressiveTab.path.workspaceId,
       progressiveTab.id,
       _scheduleId,
-      {isActive: isChecked},
+      { isActive: isChecked },
       baseUrl,
     );
     if (response?.isSuccessful) {
