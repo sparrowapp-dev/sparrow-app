@@ -1393,6 +1393,8 @@ export default class CollectionsViewModel {
     oldFolderId: string,
     newFolderId: string,
     requestId: string,
+    targetRequestId?: string,
+    insertPosition?: "before" | "after",
   ): Promise<void> => {
     const oldCollection = await this.readCollection(oldCollectionId);
     const workspaceId = oldCollection?.workspaceId;
@@ -1415,7 +1417,6 @@ export default class CollectionsViewModel {
       );
       targetName = folderDetails?.name || "folder";
     }
-
     // Move the request using the repository method
     await this.collectionRepository.moveRequest(
       oldCollectionId,
@@ -1423,6 +1424,8 @@ export default class CollectionsViewModel {
       oldFolderId,
       newFolderId,
       requestId,
+      targetRequestId,
+      insertPosition,
     );
 
     await this.updateTabsAfterMove(newCollectionId, newFolderId, requestId);
@@ -1443,6 +1446,8 @@ export default class CollectionsViewModel {
     oldFolderId: string,
     newFolderId: string,
     requestId: string,
+    targetRequestId?: string,
+    insertPosition?: "before" | "after",
   ): Promise<void> => {
     const oldCollection = await this.readCollection(oldCollectionId);
     const workspaceId = oldCollection?.workspaceId;
@@ -1476,6 +1481,8 @@ export default class CollectionsViewModel {
       requestId,
       workspaceId,
       baseUrl,
+      targetRequestId,
+      insertPosition,
     );
     if (response.isSuccessful) {
       await this.collectionRepository.moveRequest(
@@ -1484,6 +1491,8 @@ export default class CollectionsViewModel {
         oldFolderId,
         newFolderId,
         requestId,
+        targetRequestId,
+        insertPosition,
       );
       await this.updateTabsAfterMove(oldCollectionId, newFolderId, requestId);
 
@@ -1500,6 +1509,8 @@ export default class CollectionsViewModel {
     oldFolderId: string,
     newFolderId: string,
     requestId: string,
+    targetRequestId?: string,
+    insertPosition?: "before" | "after",
   ) => {
     // Early return if trying to move request to the same location
     if (oldCollectionId === newCollectionId && oldFolderId === newFolderId) {
@@ -1522,6 +1533,8 @@ export default class CollectionsViewModel {
           oldFolderId,
           newFolderId,
           requestId,
+          targetRequestId,
+          insertPosition,
         );
       } else {
         await this.handleLoggedInUserMove(
@@ -1530,6 +1543,8 @@ export default class CollectionsViewModel {
           oldFolderId,
           newFolderId,
           requestId,
+          targetRequestId,
+          insertPosition,
         );
       }
     } catch (error) {
@@ -5969,6 +5984,8 @@ export default class CollectionsViewModel {
       args.oldFolderId,
       args.newFolderId,
       args.requestId,
+      args.targetRequestId,
+      args.insertPosition,
     );
   };
 

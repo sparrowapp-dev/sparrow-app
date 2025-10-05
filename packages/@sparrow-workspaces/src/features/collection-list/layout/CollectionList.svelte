@@ -760,6 +760,7 @@
                   {onItemRenamed}
                   {onItemDeleted}
                   {onItemOpened}
+                  {onItemMoved}
                   {activeTabPath}
                   {searchData}
                   {activeTabType}

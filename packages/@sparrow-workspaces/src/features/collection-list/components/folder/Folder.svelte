@@ -48,6 +48,7 @@
     addCollectionItem,
     removeCollectionItem,
   } from "../../../../stores/recent-left-panel";
+  import { setOverForbiddenZone } from "../../../../stores/drag-state";
   import MockRequest from "../mock-request/MockRequest.svelte";
   import AiRequest from "../ai-request/AiRequest.svelte";
   import { inview } from "svelte-inview";
@@ -115,6 +116,7 @@
   let noOfColumns = 180;
   let isRenaming = false;
   let isDragOver = false;
+  let isForbiddenDrop = false;
   let requestCount: number;
   let mockRequestCount: number = 0;
   let aiRequestCount: number = 0;
@@ -226,22 +228,62 @@
 
   // Drag and Drop Handlers for Request
   function handleDragOver(event: DragEvent) {
-    // Only allow drop if dragging a request (type check can be improved as needed)
     event.preventDefault();
-    isDragOver = true;
+
+    try {
+      // getData doesn't work in dragover, use sessionStorage
+      const dataStr = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('sparrow-drag-data') : null;
+      if (!dataStr) {
+        isDragOver = false;
+        isForbiddenDrop = false;
+        return;
+      }
+
+      const dragData = JSON.parse(dataStr);
+
+      // Check if dropping from folder "A" to folder "A" (forbidden)
+      if (dragData.folderId === explorer.id && dragData.collectionId === collection.id) {
+        isForbiddenDrop = true;
+        isDragOver = false;
+        setOverForbiddenZone(true);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "none";
+        }
+      } else {
+        isForbiddenDrop = false;
+        isDragOver = true;
+        setOverForbiddenZone(false);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "move";
+        }
+      }
+    } catch (e) {
+      isDragOver = false;
+      isForbiddenDrop = false;
+    }
   }
 
   function handleDragLeave(event: DragEvent) {
     isDragOver = false;
+    isForbiddenDrop = false;
+    setOverForbiddenZone(false);
   }
 
   async function handleDrop(event: DragEvent) {
     event.preventDefault();
     isDragOver = false;
+    isForbiddenDrop = false;
+
     try {
       const data = event.dataTransfer?.getData("text/plain");
       if (!data) return;
       const dragData = JSON.parse(data);
+
+      // Don't allow dropping from folder "A" to folder "A"
+      if (dragData.folderId === explorer.id && dragData.collectionId === collection.id) {
+        return;
+      }
+
       // Only allow dropping requests (not folders)
       if (dragData.requestId) {
         // Call parent handler to move the request
@@ -554,7 +596,7 @@
         class="d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
-          : ''} {isDragOver ? 'drag-over-folder' : ''}"
+          : ''} {isDragOver ? 'drag-over-folder' : ''} {isForbiddenDrop ? 'drag-forbidden' : ''}"
         on:dragover={handleDragOver}
         on:dragleave={handleDragLeave}
         on:drop={handleDrop}
@@ -914,6 +956,15 @@
   .drag-over-folder {
     outline: 2px solid var(--bg-ds-primary-300);
     background-color: var(--bg-ds-surface-400) !important;
-    transition: outline 0.1s;
+    transition: outline 0.1s, background-color 0.1s;
+  }
+
+  /* Forbidden drop cursor and styling */
+  .drag-forbidden {
+    cursor: not-allowed !important;
+  }
+
+  .drag-forbidden * {
+    cursor: not-allowed !important;
   }
 </style>

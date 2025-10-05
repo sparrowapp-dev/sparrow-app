@@ -28,6 +28,11 @@
     removeCollectionItem,
   } from "../../../../stores/recent-left-panel";
   import {
+    dragState,
+    setDragging,
+    setOverForbiddenZone,
+  } from "../../../../stores/drag-state";
+  import {
     ChevronDownRegular,
     ChevronRightRegular,
     MoreHorizontalRegular,
@@ -80,6 +85,7 @@
   export let activeTabType;
   export let isWebApp;
   export let isSharedWorkspace = false;
+  export let onItemMoved: (args: any) => void;
 
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
@@ -88,6 +94,9 @@
   let isRenaming = false;
   let deleteLoader: boolean = false;
   let isDragging: boolean = false;
+  let isDragOver: boolean = false;
+  let isForbiddenDrop: boolean = false;
+  let dropPosition: "top" | "bottom" | null = null; // Track where to show insertion line
 
   let requestTabWrapper: HTMLElement;
 
@@ -136,6 +145,7 @@
 
   const dragStart = (event: DragEvent, collection: CollectionBaseInterface) => {
     isDragging = true;
+    setDragging(true);
     const data = {
       workspaceId: collection.workspaceId,
       collectionId: collection.id,
@@ -145,6 +155,11 @@
       method: api?.request?.method,
     };
     event.dataTransfer?.setData("text/plain", JSON.stringify(data));
+    event.dataTransfer?.setData("application/json", JSON.stringify(data));
+    // Store in sessionStorage as fallback since getData doesn't work in dragover
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem('sparrow-drag-data', JSON.stringify(data));
+    }
   };
 
   let httpMethodUIStyle = "";
@@ -180,7 +195,131 @@
   // }
   const dragStop = () => {
     isDragging = false;
+    setDragging(false);
+    // Clean up sessionStorage
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem('sparrow-drag-data');
+    }
   };
+
+  // Drag and Drop Handlers for Request drop zone
+  function handleDragOver(event: DragEvent) {
+    event.preventDefault();
+
+    try {
+      // getData doesn't work in dragover, use sessionStorage
+      const dataStr = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('sparrow-drag-data') : null;
+      if (!dataStr) {
+        isDragOver = false;
+        isForbiddenDrop = false;
+        dropPosition = null;
+        return;
+      }
+
+      const dragData = JSON.parse(dataStr);
+
+      // Forbidden cases:
+      // 1. Dragging onto itself
+      if (dragData.requestId === api.id) {
+        isForbiddenDrop = true;
+        isDragOver = false;
+        dropPosition = null;
+        setOverForbiddenZone(true);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "none";
+        }
+        return;
+      }
+
+      // 2. Dragging from folder "A" onto another request in folder "A"
+      if (dragData.folderId && dragData.folderId === folder?.id && dragData.collectionId === collection.id) {
+        isForbiddenDrop = true;
+        isDragOver = false;
+        dropPosition = null;
+        setOverForbiddenZone(true);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "none";
+        }
+        return;
+      }
+
+      // 3. Dragging from collection root onto another request in same collection root
+      if (!dragData.folderId && !folder?.id && dragData.collectionId === collection.id) {
+        isForbiddenDrop = true;
+        isDragOver = false;
+        dropPosition = null;
+        setOverForbiddenZone(true);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "none";
+        }
+        return;
+      }
+
+      // Valid drop - calculate insertion position based on cursor Y position
+      const rect = requestTabWrapper.getBoundingClientRect();
+      const mouseY = event.clientY;
+      const elementMiddle = rect.top + rect.height / 2;
+
+      if (mouseY < elementMiddle) {
+        dropPosition = "top";
+      } else {
+        dropPosition = "bottom";
+      }
+
+      isForbiddenDrop = false;
+      isDragOver = false; // Don't highlight entire component
+      setOverForbiddenZone(false);
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = "move";
+      }
+    } catch (e) {
+      isDragOver = false;
+      isForbiddenDrop = false;
+      dropPosition = null;
+    }
+  }
+
+  function handleDragLeave(event: DragEvent) {
+    isDragOver = false;
+    isForbiddenDrop = false;
+    dropPosition = null;
+    setOverForbiddenZone(false);
+  }
+
+  async function handleDrop(event: DragEvent) {
+    event.preventDefault();
+    const currentDropPosition = dropPosition; // Save current position before resetting
+    isDragOver = false;
+    isForbiddenDrop = false;
+    dropPosition = null;
+
+    try {
+      const data = event.dataTransfer?.getData("text/plain");
+      if (!data) return;
+      const dragData = JSON.parse(data);
+
+      // Don't allow forbidden drops
+      if (dragData.requestId === api.id) return;
+      if (dragData.folderId && dragData.folderId === folder?.id && dragData.collectionId === collection.id) return;
+      if (!dragData.folderId && !folder?.id && dragData.collectionId === collection.id) return;
+
+      // Only allow dropping requests
+      if (dragData.requestId) {
+        onItemMoved &&
+          onItemMoved({
+            oldCollectionId: dragData.collectionId,
+            newCollectionId: collection.id,
+            oldFolderId: dragData.folderId,
+            newFolderId: folder?.id ?? "",
+            requestId: dragData.requestId,
+            targetRequestId: api.id,
+            insertPosition: currentDropPosition === "bottom" ? "after" : "before", // Top half = before, bottom half = after
+          });
+      }
+    } catch (e) {
+      // Optionally handle error
+    }
+  }
 </script>
 
 <svelte:window
@@ -302,12 +441,15 @@
   on:dragstart={(event) => {
     dragStart(event, collection);
   }}
-  on:dragleave={dragStop}
+  on:dragend={dragStop}
+  on:dragover={handleDragOver}
+  on:dragleave={handleDragLeave}
+  on:drop={handleDrop}
   bind:this={requestTabWrapper}
   class="d-flex draggable align-items-center justify-content-between my-button btn-primary {api.id ===
   activeTabId
     ? 'active-request-tab'
-    : ''}"
+    : ''} {isDragOver ? 'drag-over-request' : ''} {isForbiddenDrop ? 'drag-forbidden' : ''} {$dragState.isOverForbiddenZone && isDragging ? 'dragging-over-forbidden' : ''} {dropPosition === 'top' ? 'drop-indicator-top' : ''} {dropPosition === 'bottom' ? 'drop-indicator-bottom' : ''}"
   style={`height:32px; padding-left:3px; gap:4px; {margin-bottom :2px;}`}
 >
   <button
@@ -638,5 +780,62 @@
     width: 1px;
     // background-color: var(--bg-ds-surface-100);
     z-index: 150;
+  }
+
+  /* Drag-over highlight for request drop target */
+  .drag-over-request {
+    outline: 2px solid var(--bg-ds-primary-300);
+    background-color: var(--bg-ds-surface-400) !important;
+    transition: outline 0.1s, background-color 0.1s;
+  }
+
+  /* Insertion line indicators */
+  .drop-indicator-top {
+    position: relative;
+  }
+
+  .drop-indicator-top::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--bg-ds-primary-300);
+    z-index: 100;
+  }
+
+  .drop-indicator-bottom {
+    position: relative;
+  }
+
+  .drop-indicator-bottom::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--bg-ds-primary-300);
+    z-index: 100;
+  }
+
+  /* Forbidden drop cursor and styling */
+  .drag-forbidden {
+    cursor: not-allowed !important;
+  }
+
+  .drag-forbidden * {
+    cursor: not-allowed !important;
+  }
+
+  /* Apply forbidden cursor to the dragged element itself */
+  .dragging-over-forbidden {
+    cursor: not-allowed !important;
+    opacity: 0.6;
+  }
+
+  .dragging-over-forbidden * {
+    cursor: not-allowed !important;
   }
 </style>

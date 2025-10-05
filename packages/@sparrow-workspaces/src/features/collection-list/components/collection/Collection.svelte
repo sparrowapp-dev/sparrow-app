@@ -43,6 +43,7 @@
     addCollectionItem,
     removeCollectionItem,
   } from "../../../../stores/recent-left-panel";
+  import { setOverForbiddenZone } from "../../../../stores/drag-state";
 
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
@@ -343,25 +344,66 @@
   let refreshCollectionLoader = false;
   let newCollectionName: string = "";
   let isDragOver = false;
+  let isForbiddenDrop = false;
 
   // Drag and Drop Handlers for Request
   function handleDragOver(event: DragEvent) {
-    // Only allow drop if dragging a request (type check can be improved as needed)
     event.preventDefault();
-    isDragOver = true;
+
+    try {
+      // getData doesn't work in dragover, use sessionStorage
+      const dataStr = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('sparrow-drag-data') : null;
+      if (!dataStr) {
+        isDragOver = false;
+        isForbiddenDrop = false;
+        return;
+      }
+
+      const dragData = JSON.parse(dataStr);
+
+      // Check if dropping from same collection root to same collection root (forbidden)
+      if (dragData.collectionId === collection.id && !dragData.folderId) {
+        isForbiddenDrop = true;
+        isDragOver = false;
+        setOverForbiddenZone(true);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "none";
+        }
+      } else {
+        isForbiddenDrop = false;
+        isDragOver = true;
+        setOverForbiddenZone(false);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "move";
+        }
+      }
+    } catch (e) {
+      isDragOver = false;
+      isForbiddenDrop = false;
+    }
   }
 
   function handleDragLeave(event: DragEvent) {
     isDragOver = false;
+    isForbiddenDrop = false;
+    setOverForbiddenZone(false);
   }
 
   async function handleDrop(event: DragEvent) {
     event.preventDefault();
     isDragOver = false;
+    isForbiddenDrop = false;
+
     try {
       const data = event.dataTransfer?.getData("text/plain");
       if (!data) return;
       const dragData = JSON.parse(data);
+
+      // Don't allow dropping from same collection root to same collection root
+      if (dragData.collectionId === collection.id && !dragData.folderId) {
+        return;
+      }
+
       // Only allow dropping requests (not folders)
       if (dragData.requestId) {
         // Call parent handler to move the request to collection root (no folder)
@@ -810,7 +852,7 @@
       class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
       activeTabId
         ? 'active-collection-tab'
-        : ''} {isDragOver ? 'drag-over-collection' : ''}"
+        : ''} {isDragOver ? 'drag-over-collection' : ''} {isForbiddenDrop ? 'drag-forbidden' : ''}"
       on:dragover={handleDragOver}
       on:dragleave={handleDragLeave}
       on:drop={handleDrop}
@@ -1076,8 +1118,8 @@
     <!-- {#if !collection?.activeSync || isBranchSynced} -->
 
     {#if visibility}
-      <div 
-        class="z-1 collection-items-area {isDragOver ? 'drag-over-collection' : ''}" 
+      <div
+        class="z-1 collection-items-area {isDragOver ? 'drag-over-collection' : ''} {isForbiddenDrop ? 'drag-forbidden' : ''}"
         style="padding-left: 0; padding-right:0;"
         on:dragover={handleDragOver}
         on:dragleave={handleDragLeave}
@@ -1395,7 +1437,7 @@
   .drag-over-collection {
     outline: 2px solid var(--bg-ds-primary-300);
     background-color: var(--bg-ds-surface-400) !important;
-    transition: outline 0.1s;
+    transition: outline 0.1s, background-color 0.1s;
   }
 
   .collection-items-area {
@@ -1404,5 +1446,14 @@
 
   .collection-items-area.drag-over-collection {
     background-color: var(--bg-ds-surface-400) !important;
+  }
+
+  /* Forbidden drop cursor and styling */
+  .drag-forbidden {
+    cursor: not-allowed !important;
+  }
+
+  .drag-forbidden * {
+    cursor: not-allowed !important;
   }
 </style>

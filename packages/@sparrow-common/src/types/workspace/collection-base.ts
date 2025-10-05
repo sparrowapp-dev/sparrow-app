@@ -231,4 +231,6 @@ export interface MoveRequestArgsDto {
   oldFolderId: string;
   newFolderId: string;
   requestId: string;
+  targetRequestId?: string; // Optional: if provided, insert before/after this request
+  insertPosition?: "before" | "after"; // Optional: specifies whether to insert before or after targetRequestId (defaults to "before")
 }

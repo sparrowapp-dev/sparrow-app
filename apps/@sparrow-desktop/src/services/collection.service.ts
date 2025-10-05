@@ -1049,19 +1049,33 @@ export class CollectionService {
     requestId: string,
     workspaceId: string,
     baseUrl: string,
+    targetRequestId?: string,
+    insertPosition?: "before" | "after",
   ) {
+    const body: Record<string, string> = {
+      oldCollectionId: `${oldCollectionId}`,
+      oldFolderId: `${oldFolderId}`,
+      newCollectionId: `${newCollectionId}`,
+      newFolderId: `${newFolderId}`,
+      requestId: `${requestId}`,
+      workspaceId: `${workspaceId}`,
+    };
+
+    // Only include targetRequestId if it's provided
+    if (targetRequestId) {
+      body.targetRequestId = `${targetRequestId}`;
+    }
+
+    // Only include insertPosition if it's provided
+    if (insertPosition) {
+      body.insertPosition = insertPosition;
+    }
+
     const response = await makeRequest(
       "POST",
       `${baseUrl}/api/collection/move-request`,
       {
-        body: {
-          oldCollectionId: `${oldCollectionId}`,
-          oldFolderId: `${oldFolderId}`,
-          newCollectionId: `${newCollectionId}`,
-          newFolderId: `${newFolderId}`,
-          requestId: `${requestId}`,
-          workspaceId: `${workspaceId}`,
-        },
+        body,
         headers: getAuthHeaders(),
       },
     );

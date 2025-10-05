@@ -1270,8 +1270,12 @@ export class CollectionRepository {
     oldFolderId: string,
     newFolderId: string,
     requestId: string,
+    targetRequestId?: string,
+    insertPosition?: "before" | "after",
   ) => {
     try {
+      debugger;
+
       // Handle same collection move
       if (oldCollectionId === newCollectionId) {
         const collection = await RxDB.getInstance()
@@ -1318,13 +1322,54 @@ export class CollectionRepository {
               item.items &&
               Array.isArray(item.items)
             ) {
-              item.items.push(requestToMove);
+              // If targetRequestId is provided, insert before/after it
+              if (targetRequestId) {
+                const targetIdx = item.items.findIndex(
+                  (req) => req.id === targetRequestId,
+                );
+                if (targetIdx !== -1) {
+                  // Insert based on insertPosition (default is "before")
+                  if (insertPosition === "after") {
+                    // Insert after the target request (targetIdx + 1)
+                    item.items.splice(targetIdx + 1, 0, requestToMove);
+                  } else {
+                    // Insert before the target request
+                    item.items.splice(targetIdx, 0, requestToMove);
+                  }
+                } else {
+                  // Target not found, append to end
+                  item.items.push(requestToMove);
+                }
+              } else {
+                // No target specified, append to end
+                item.items.push(requestToMove);
+              }
               break;
             }
           }
         } else {
           // Move to root
-          items.push(requestToMove);
+          if (targetRequestId) {
+            const targetIdx = items.findIndex(
+              (req) => req.id === targetRequestId,
+            );
+            if (targetIdx !== -1) {
+              // Insert based on insertPosition (default is "before")
+              if (insertPosition === "after") {
+                // Insert after the target request (targetIdx + 1)
+                items.splice(targetIdx + 1, 0, requestToMove);
+              } else {
+                // Insert before the target request
+                items.splice(targetIdx, 0, requestToMove);
+              }
+            } else {
+              // Target not found, append to end
+              items.push(requestToMove);
+            }
+          } else {
+            // No target specified, append to end
+            items.push(requestToMove);
+          }
         }
 
         await collection.incrementalModify((value) => {
@@ -1385,13 +1430,54 @@ export class CollectionRepository {
               item.items &&
               Array.isArray(item.items)
             ) {
-              item.items.push(requestToMove);
+              // If targetRequestId is provided, insert before/after it
+              if (targetRequestId) {
+                const targetIdx = item.items.findIndex(
+                  (req) => req.id === targetRequestId,
+                );
+                if (targetIdx !== -1) {
+                  // Insert based on insertPosition (default is "before")
+                  if (insertPosition === "after") {
+                    // Insert after the target request (targetIdx + 1)
+                    item.items.splice(targetIdx + 1, 0, requestToMove);
+                  } else {
+                    // Insert before the target request
+                    item.items.splice(targetIdx, 0, requestToMove);
+                  }
+                } else {
+                  // Target not found, append to end
+                  item.items.push(requestToMove);
+                }
+              } else {
+                // No target specified, append to end
+                item.items.push(requestToMove);
+              }
               break;
             }
           }
         } else {
           // Add to new collection root
-          newItems.push(requestToMove);
+          if (targetRequestId) {
+            const targetIdx = newItems.findIndex(
+              (req) => req.id === targetRequestId,
+            );
+            if (targetIdx !== -1) {
+              // Insert based on insertPosition (default is "before")
+              if (insertPosition === "after") {
+                // Insert after the target request (targetIdx + 1)
+                newItems.splice(targetIdx + 1, 0, requestToMove);
+              } else {
+                // Insert before the target request
+                newItems.splice(targetIdx, 0, requestToMove);
+              }
+            } else {
+              // Target not found, append to end
+              newItems.push(requestToMove);
+            }
+          } else {
+            // No target specified, append to end
+            newItems.push(requestToMove);
+          }
         }
 
         // Update both collections
