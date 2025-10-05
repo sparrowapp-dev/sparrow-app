@@ -1228,6 +1228,20 @@ export class TestflowExplorerPageViewModel {
     this.compareTestflowWithServer();
   };
 
+   /**
+   * @description - updates testflow tab state
+   * @param _state - new test flow state
+   */
+  public updateTestflowState = async (_state: any) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.testflow.state = {
+      ...progressiveTab.property.testflow.state,
+      ..._state,
+    };
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  };
+
   private constructBaseUrl = async (_id: string) => {
     const workspaceData = await this.workspaceRepository.readWorkspace(_id);
     const hubUrl = workspaceData?.team?.hubUrl;

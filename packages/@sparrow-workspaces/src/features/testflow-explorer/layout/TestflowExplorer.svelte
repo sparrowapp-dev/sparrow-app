@@ -30,6 +30,7 @@
     SaveTestflow,
     Edge,
     ScheduleRow,
+    TestflowNavigator,
   } from "../components";
   import {
     RequestDatasetEnum,
@@ -65,13 +66,14 @@
   import DeleteNode from "../../../components/delete-node/DeleteNode.svelte";
   import CustomRequest from "../../../components/custom-request-modal/CustomRequest.svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
-  import type {
-    TFDataStoreType,
-    TFEdgeHandlerType,
-    TFEdgeType,
-    TFNodeHandlerType,
-    TFNodeStoreType,
-    TFNodeType,
+  import {
+    TestflowNavigatorEnum,
+    type TFDataStoreType,
+    type TFEdgeHandlerType,
+    type TFEdgeType,
+    type TFNodeHandlerType,
+    type TFNodeStoreType,
+    type TFNodeType,
   } from "@sparrow/common/types/workspace/testflow";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
@@ -129,6 +131,7 @@
   export let isTestflowEditable;
   export let onRedrectRequest;
   export let onUpdateTestFlowName;
+  export let onUpdateTestflowState;
   export let onUpdateBlockData;
   export let onSaveTestflow;
   export let isWebApp;
@@ -269,7 +272,6 @@
     return response;
   };
 
-  let activeTab = "testflow"; // Default to test flow
   let hasActiveSchedules = true; // This should come from your data
   let searchQuery = "";
   let filteredSchedules = [];
@@ -371,10 +373,6 @@
           schedule.description.toLowerCase().includes(query),
       );
     }
-  }
-
-  function setActiveTab(tab) {
-    activeTab = tab;
   }
 
   let dismissed = false;
@@ -1797,9 +1795,12 @@
                   type="primary"
                   size="medium"
                   startIcon={PlayFilled}
-                  title={activeTab === "scheduled" ? "Run Now" : "Run Now"}
+                  title={"Run Now"}
                   onClick={async () => {
-                    if (activeTab === "scheduled") {
+                    if (
+                      $tab?.property?.testflow?.state?.testflowNavigator ===
+                      TestflowNavigatorEnum.SCHEDULE
+                    ) {
                       // Handle scheduled run logic
                       await onClickScheduledRun();
                     } else {
@@ -1889,26 +1890,14 @@
   <!-- Tab Navigation and Warning Message -->
   <div class="pt-5 px-3" style="margin-top: 10px;">
     <!-- Tab Navigation -->
-    <div class="d-flex align-items-center justify-content-between mb-3">
-      <div class="d-flex">
-        <button
-          class="tab-button {activeTab === 'testflow' ? 'tab-active' : ''}"
-          on:click={() => setActiveTab("testflow")}
-        >
-          Test Flow
-        </button>
-        <button
-          class="tab-button {activeTab === 'scheduled' ? 'tab-active' : ''}"
-          on:click={() => setActiveTab("scheduled")}
-        >
-          Scheduled Run
-        </button>
-      </div>
-    </div>
+    <TestflowNavigator
+      testflowNavigator={$tab?.property?.testflow?.state?.testflowNavigator}
+      {onUpdateTestflowState}
+    />
   </div>
 
   <!-- Warning Message -->
-  {#if activeTab === "scheduled" && filteredSchedules.some((schedule) => schedule.status === "Active") && !dismissed}
+  {#if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.SCHEDULE && filteredSchedules.some((schedule) => schedule.status === "Active") && !dismissed}
     <div
       class="warning-banner px-4 d-flex align-items-center mb-3 p-2 position-relative"
     >
@@ -1933,7 +1922,7 @@
 
   <!-- Main Content Area -->
   <div style="flex: 1; overflow: auto;" class="px-3">
-    {#if activeTab === "testflow"}
+    {#if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.TESTFLOW}
       <!-- Test Flow Content -->
       <div
         bind:this={divElement}
@@ -2036,7 +2025,7 @@
           </div>
         {/if}
       </div>
-    {:else if activeTab === "scheduled"}
+    {:else if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.SCHEDULE}
       <!-- Scheduled Run Content -->
       <div class="scheduled-runs-container h-100">
         <div class="d-flex flex-column h-100">
@@ -2118,7 +2107,7 @@
   </div>
 
   <!-- Bottom Panel (only show for Test Flow) -->
-  {#if activeTab === "testflow"}
+  {#if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.TESTFLOW}
     {#if selectedBlock && selectedBlock?.data?.requestId}
       <div style="background-color: transparent; margin: 0px 13px 12px 13px;">
         <TestFlowBottomPanel
@@ -2207,20 +2196,22 @@
   {/if}
 
   <!-- Help Section -->
-  <div class="p-3" style="position:absolute; z-index:3; bottom:0; right:0;">
-    {#if testflowCount <= planLimitTestFlows || isGuestUser}
-      <p
-        class="mb-0 pb-0 text-fs-14"
-        style="color: var(--text-primary-300); font-weight:500; cursor:pointer;"
-        on:click={() => {
-          currentStep.set(1);
-          isTestFlowTourGuideOpen.set(true);
-        }}
-      >
-        Need help?
-      </p>
-    {/if}
-  </div>
+  {#if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.TESTFLOW}
+    <div class="p-3" style="position:absolute; z-index:3; bottom:0; right:0;">
+      {#if testflowCount <= planLimitTestFlows || isGuestUser}
+        <p
+          class="mb-0 pb-0 text-fs-14"
+          style="color: var(--text-primary-300); font-weight:500; cursor:pointer;"
+          on:click={() => {
+            currentStep.set(1);
+            isTestFlowTourGuideOpen.set(true);
+          }}
+        >
+          Need help?
+        </p>
+      {/if}
+    </div>
+  {/if}
 </div>
 <!-- <svelte:window on:keydown={handleKeyPress} /> -->
 
