@@ -1981,7 +1981,7 @@
   <!-- Warning Message -->
   {#if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.SCHEDULE && testflowScheduleStore.some((schedule) => schedule.isActive) && !dismissed}
     <div
-      class="warning-banner px-4 d-flex align-items-center mb-3 p-2 position-relative"
+      class="mx-3 warning-banner px-4 d-flex align-items-center mb-3 p-2 position-relative"
     >
       <div class="warning-icon me-2"><ToastIcon /></div>
       <div class="flex-grow-1">
@@ -2134,7 +2134,9 @@
                   <th>Environment</th>
                   <th>Next Run</th>
                   <th>Last Run Result</th>
-                  <th>Actions</th>
+                  {#if isTestflowEditable}
+                    <th>Actions</th>
+                  {/if}
                 </tr>
               </thead>
               <tbody>
@@ -2146,6 +2148,7 @@
                     {handleToggleStatus}
                     {getNextRunTooltip}
                     {getTagType}
+                    {isTestflowEditable}
                     {onOpenTestflowScheduleConfigurationsTab}
                     {onOpenTestflowScheduleTab}
                   />
@@ -2547,10 +2550,6 @@
     font-size: 14px;
     padding: 8px 12px;
     width: 300px;
-  }
-
-  .scheduled-runs-container {
-    padding: 16px;
   }
 
   .warning-banner {

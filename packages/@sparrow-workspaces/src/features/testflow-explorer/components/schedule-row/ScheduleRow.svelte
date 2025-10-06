@@ -9,6 +9,7 @@
   export let handleToggleStatus;
   export let getNextRunTooltip;
   export let getTagType;
+
   function getFailTooltip(schedule) {
     const runHistory = schedule.originalData?.schedularRunHistory;
     if (Array.isArray(runHistory) && runHistory.length > 0) {
@@ -170,7 +171,7 @@
           <input
             type="checkbox"
             checked={schedule.status === "Active"}
-            disabled={schedule.status === "Expired"}
+            disabled={schedule.status === "Expired" || !isTestflowEditable}
             on:click={(e) => e.stopPropagation()}
             on:change={(e) => {
               e.stopPropagation();
