@@ -4,6 +4,7 @@ import { environmentType } from "@sparrow/common/enums";
 import {
   createDeepCopy,
   InitRequestTab,
+  InitTestflowScheduleTab,
   scrollToTab,
 } from "@sparrow/common/utils";
 import { RequestTabAdapter, TestflowTabAdapter } from "../../../../adapter";
@@ -66,6 +67,9 @@ import { PlanRepository } from "@app/repositories/plan.repository";
 import { TeamService } from "src/services/team.service";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 import { getAuthJwt } from "src/utils/jwt";
+import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
+import { updateTestflowSchedules } from "@sparrow/common/store";
+import { TestflowScheduleNavigatorEnum } from "@sparrow/common/types/workspace/testflow-schedule-tab";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -1811,6 +1815,269 @@ export class TestflowExplorerPageViewModel {
     if (selectAuthHeader) {
       const response = new ReduceAuthHeader(selectAuthHeader, authContent);
       return response.getValue();
+    }
+  };
+
+    public openTestflowScheduleTab = async (_schedule: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const initTestflowScheduleTab = new InitTestflowScheduleTab(
+      _schedule.id,
+      progressiveTab.path.workspaceId,
+    )
+      .updatePath({ testflowId: progressiveTab.id })
+      .updateName(_schedule.name)
+      .updateEnvironmentId(_schedule.environmentId)
+      .updateRunConfiguration({
+        runCycle: _schedule.runConfiguration.runCycle,
+        executeAt: _schedule.runConfiguration.executeAt,
+        time: _schedule.runConfiguration.time,
+        intervalHours: _schedule.runConfiguration.intervalHours,
+        days: _schedule.runConfiguration.days,
+      })
+      .updateNotification({
+        emails: _schedule.notification.emails,
+        receiveNotifications: _schedule.notification.receiveNotifications,
+      })
+      .getValue();
+    await this.tabRepository.createTab(initTestflowScheduleTab);
+  };
+
+   /**
+   * @description - updates testflow tab state
+   * @param _state - new test flow state
+   */
+  public updateTestflowState = async (_state: any) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.testflow.state = {
+      ...progressiveTab.property.testflow.state,
+      ..._state,
+    };
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+  };
+
+
+    /**
+   * Updates the nodes in the testflow with debounce to avoid frequent calls
+   * @param _nodes - nodes of the testflow
+   */
+  private fetchTestflow = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const response = await this.testflowService.fetchTestflow(
+      progressiveTab.id as string,
+    );
+    if (response?.isSuccessful) {
+      const schedules = response.data.data.schedules;
+      updateTestflowSchedules(progressiveTab.id as string, schedules);
+    }
+  };
+
+
+
+  public openTestflowScheduleConfigurationsTab = async (_schedule: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const initTestflowScheduleTab = new InitTestflowScheduleTab(
+      _schedule.id,
+      progressiveTab.path.workspaceId,
+    )
+      .updatePath({ testflowId: progressiveTab.id })
+      .updateName(_schedule.name)
+      .updateEnvironmentId(_schedule.environmentId)
+      .updateRunConfiguration({
+        runCycle: _schedule.runConfiguration.runCycle,
+        executeAt: _schedule.runConfiguration.executeAt,
+        time: _schedule.runConfiguration.time,
+        intervalHours: _schedule.runConfiguration.intervalHours,
+        days: _schedule.runConfiguration.days,
+      })
+      .updateNotification({
+        emails: _schedule.notification.emails,
+        receiveNotifications: _schedule.notification.receiveNotifications,
+      })
+      .updateState({
+        scheduleNavigator: TestflowScheduleNavigatorEnum.CONFIGURATION,
+      })
+      .getValue();
+    await this.tabRepository.createTab(initTestflowScheduleTab);
+  };
+
+
+
+  /**
+   * Schedules a test flow run with the specified configuration
+   */
+  public scheduleTestFlowRun = async (
+    scheduleName: string,
+    environmentId: string,
+    runConfiguration: ScheduleTestFlowRunDto["runConfiguration"],
+    notification: ScheduleTestFlowRunDto["notification"],
+  ) => {
+    captureEvent("set_schedule_run_cta_clicked", {
+      event_source: "web_app",
+    });
+    try {
+      const baseUrl = await this.constructBaseUrl(
+        this._tab.getValue().path.workspaceId,
+      );
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const workspaceId = progressiveTab.path.workspaceId;
+      const testflowId = progressiveTab.id;
+
+      if (!workspaceId || !testflowId) {
+        notifications.error("Missing workspace or testflow information");
+        return { isSuccessful: false, message: "Missing required information" };
+      }
+
+      const payload: ScheduleTestFlowRunDto = {
+        name: scheduleName,
+        environmentId: environmentId || "",
+        workspaceId,
+        testflowId,
+        runConfiguration,
+        notification,
+      };
+
+      const response = await this.testflowService.scheduleTestFlowRun(
+        payload,
+        testflowId,
+        workspaceId,
+        baseUrl,
+      );
+
+      if (response?.isSuccessful) {
+        notifications.success(`New schedule created successfully.`);
+        const schedules = response.data.data.testflow.schedules;
+        const lastestSchedule = response.data.data.schedule;
+        updateTestflowSchedules(progressiveTab.id as string, schedules);
+        captureEvent("schedule_created", {
+          event_source: "web_app",
+          schedule_id: lastestSchedule.id,
+          testflowId: response.data.data.testflow._id,
+          schedule_run_frequency: lastestSchedule.runConfiguration.runCycle,
+          status: lastestSchedule.isActive,
+        });
+        return {
+          isSuccessful: true,
+          data: response.data,
+        };
+      } else {
+        if(response?.message !== "Plan limit reached"){
+          notifications.error(`${ response.message || "Failed to schedule test flow"}`);
+        }
+        return {
+          isSuccessful: false,
+          message: response.message || "Failed to schedule test flow",
+        };
+      }
+    } catch (error) {
+      Sentry.captureException(error);
+      notifications.error("Failed to schedule test flow");
+      return {
+        isSuccessful: false,
+        message: error?.message || "Failed to schedule test flow",
+      };
+    }
+  };
+
+  private deleteTestflowSchedule = async (_scheduleId: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab.path.workspaceId,
+    );
+    const response = await this.testflowService.deleteTestflowSchedule(
+      progressiveTab.path.workspaceId,
+      progressiveTab.id,
+      _scheduleId,
+      baseUrl,
+    );
+    if (response?.isSuccessful) {
+      const tabsIdsToDelete = [];
+      let childTabs = [];
+      // Remove the main tab
+      const mainTabId = await this.tabRepository.getTabById(_scheduleId);
+      if (mainTabId) tabsIdsToDelete.push(mainTabId.tabId);
+      childTabs = await this.tabRepository.getTabsByTestflowScheduleId(_scheduleId);
+      // Delete all child tabs if any exist
+      if (childTabs.length > 0) {
+        const allChildTabs = childTabs.map((tab) => tab.tabId);
+        tabsIdsToDelete.push(...allChildTabs);
+      }
+      await this.tabRepository.deleteTabsWithTabIdInAWorkspace(progressiveTab.path.workspaceId, tabsIdsToDelete);
+      debugger;
+      const schedules = response.data.data.schedules;
+      updateTestflowSchedules(progressiveTab?.id as string, schedules);
+    }
+  };
+
+  private runTestflowSchedule = async (_scheduleId: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab.path.workspaceId,
+    );
+    const response = await this.testflowService.runTestflowSchedule(
+      progressiveTab.path.workspaceId,
+      progressiveTab.id,
+      _scheduleId,
+      baseUrl,
+    );
+    if (response?.isSuccessful) {
+      const schedules = response.data.data.schedules;
+      updateTestflowSchedules(progressiveTab?.id as string, schedules);
+    }
+  };
+
+  private editTestflowSchedule = async (_scheduleId: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const initTestflowScheduleTab = new InitTestflowScheduleTab(
+      _scheduleId,
+      progressiveTab.path.workspaceId,
+    )
+      .updatePath({ testflowId: progressiveTab.id })
+      .getValue();
+    await this.tabRepository.createTab(initTestflowScheduleTab);
+  };
+
+  public performTestflowScheduleOperations = async (
+    _type: "run" | "edit" | "delete" | "open",
+    _scheduleId: string,
+  ) => {
+    if (_type === "run") {
+      this.runTestflowSchedule(_scheduleId);
+    } else if (_type === "edit") {
+      this.editTestflowSchedule(_scheduleId);
+    } else if (_type === "delete") {
+      this.deleteTestflowSchedule(_scheduleId);
+    }
+  };
+
+  public updateTestflowScheduleStatus = async (
+    _scheduleId: string,
+    isChecked: any,
+  ) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab.path.workspaceId,
+    );
+    const response = await this.testflowService.updateTestflowSchedule(
+      progressiveTab.path.workspaceId,
+      progressiveTab.id,
+      _scheduleId,
+      { isActive: isChecked },
+      baseUrl,
+    );
+    if (response?.isSuccessful) {
+      const schedules = response.data.data.schedules;
+       const matchedSchedule = schedules.find(sch => sch.id === _scheduleId);
+      captureEvent("schedule_status_changed",{
+        event_source : "desktop_app",
+        cta_location:"scheduled_run_tab",
+        schedule_id:_scheduleId,
+        testflow_id:progressiveTab.path.testflowId,
+        schedule_run_frequency:matchedSchedule.runConfiguration.runCycle,
+        previous_status:!isChecked ? "active" : "inactive",
+        new:isChecked ? "active" : "inactive",
+      })
+      updateTestflowSchedules(progressiveTab?.id as string, schedules);
     }
   };
 }

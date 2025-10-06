@@ -213,7 +213,7 @@
   disabled={disable}
   style={` ${`flex:none; min-width:${buttonSize}px; white-space:nowrap; height: ${buttonSize}px; width: ${customWidth}; border-radius: ${borderRadius}px;`}  `}
   class={`smooth-button-transition ${buttonClassProp}  
- py-1 px-${title.length > 0 ? 3 : 1} gap-2 d-flex align-items-center justify-content-center
+ py-1 px-${title?.length > 0 ? 3 : 1} gap-2 d-flex align-items-center justify-content-center
   ${btnClass}`}
   on:click={(e) => {
     onClick(e);
@@ -393,14 +393,15 @@
     background-color: transparent;
     color: var(--text-ds-neutral-200);
     border: 0px;
-    text-decoration: underline;
     text-underline-offset: 5px;
+  }
+  .custom-btn-link-secondary span {
+    text-decoration: underline;
   }
   .custom-btn-link-secondary:hover {
     background-color: transparent;
     color: var(--text-ds-neutral-50);
     border: 0px;
-    text-decoration: underline;
     text-underline-offset: 5px;
   }
   .custom-btn-link-secondary:focus-visible {
@@ -413,7 +414,6 @@
     background-color: transparent;
     color: var(--text-ds-primary-300);
     border: 0px;
-    text-decoration: underline;
     text-underline-offset: 5px;
   }
 

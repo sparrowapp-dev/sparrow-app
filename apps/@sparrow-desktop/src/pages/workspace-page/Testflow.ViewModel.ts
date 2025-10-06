@@ -20,6 +20,8 @@ import constants from "@app/constants/constants";
 import { TestflowTabAdapter } from "@app/adapter";
 import { WorkspaceType } from "@sparrow/common/enums";
 import { getSelfhostUrls } from "@app/utils/jwt";
+import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
+import { updateTestflowSchedules } from "@sparrow/common/store";
 
 export class TestflowViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -221,7 +223,18 @@ export class TestflowViewModel {
     );
     if (response.isSuccessful) {
       this.testflowRepository.removeTestflow(testflow._id);
-      this.tabRepository.removeTab(testflow._id);
+      const tabsIdsToDelete = [];
+      let childTabs = [];
+      // Remove the main tab
+      const mainTabId = await this.tabRepository.getTabById(testflow._id);
+      if (mainTabId) tabsIdsToDelete.push(mainTabId.tabId);
+      childTabs = await this.tabRepository.getTabsByTestflowId(testflow._id);
+      // Delete all child tabs if any exist
+      if (childTabs.length > 0) {
+        const allChildTabs = childTabs.map((tab) => tab.tabId);
+        tabsIdsToDelete.push(...allChildTabs);
+      }
+      await this.tabRepository.deleteTabsWithTabIdInAWorkspace(testflow.workspaceId, tabsIdsToDelete);
       notifications.success(
         `${testflow.name} testflow is removed from ${currentWorkspace.name}.`,
       );
@@ -322,9 +335,9 @@ export class TestflowViewModel {
 
     const [selfhostBackendUrl] = getSelfhostUrls();
     if (selfhostBackendUrl) {
-        return selfhostBackendUrl;
+      return selfhostBackendUrl;
     }
-    
+
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;
@@ -473,4 +486,5 @@ export class TestflowViewModel {
       await this.testflowRepository.getTestflowByWorkspaceId(workspaceId);
     return testflowDetails?.length;
   };
+
 }
