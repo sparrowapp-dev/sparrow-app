@@ -19,6 +19,8 @@
     type TFDocumentType,
   } from "@sparrow/common/types/workspace/testflow";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
+  import { Sleep } from "@sparrow/common/utils";
+
   /**
    * current workspace to identify the selected testflow
    */
@@ -48,9 +50,6 @@
    * Role of user in workspace
    */
   export let loggedUserRoleInWorkspace;
-
-  // open the schedule run popup
-  export let isScheduleRunPopupOpen;
 
   export let isGuestUser;
   export let isWebApp = false;
@@ -150,10 +149,11 @@
           disabled: false,
         },
         {
-          onClick: () => {
+          onClick: async () => {
             handleEventClickScheduleRun();
-            openTestflow();
-            isScheduleRunPopupOpen = true;
+            await openTestflow();
+            await new Sleep().setTime(200).exec();
+            document.getElementById("create-new-schedule")?.click();
           },
           displayText: "Schedule Run",
           disabled: false,

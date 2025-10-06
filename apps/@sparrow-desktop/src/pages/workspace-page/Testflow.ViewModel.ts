@@ -223,7 +223,18 @@ export class TestflowViewModel {
     );
     if (response.isSuccessful) {
       this.testflowRepository.removeTestflow(testflow._id);
-      this.tabRepository.removeTab(testflow._id);
+      const tabsIdsToDelete = [];
+      let childTabs = [];
+      // Remove the main tab
+      const mainTabId = await this.tabRepository.getTabById(testflow._id);
+      if (mainTabId) tabsIdsToDelete.push(mainTabId.tabId);
+      childTabs = await this.tabRepository.getTabsByTestflowId(testflow._id);
+      // Delete all child tabs if any exist
+      if (childTabs.length > 0) {
+        const allChildTabs = childTabs.map((tab) => tab.tabId);
+        tabsIdsToDelete.push(...allChildTabs);
+      }
+      await this.tabRepository.deleteTabsWithTabIdInAWorkspace(testflow.workspaceId, tabsIdsToDelete);
       notifications.success(
         `${testflow.name} testflow is removed from ${currentWorkspace.name}.`,
       );
@@ -476,96 +487,4 @@ export class TestflowViewModel {
     return testflowDetails?.length;
   };
 
-  /**
-   * Schedules a test flow run with the specified configuration
-   *
-   * @param scheduleName - Name for the scheduled run
-   * @param environmentId - ID of the environment to use
-   * @param runConfiguration - Configuration for when/how the testflow should run
-   * @param notification - Email notification settings
-   * @returns A promise that resolves to the API response
-   */
-  public scheduleTestFlowRun = async (
-    scheduleName: string,
-    environmentId: string,
-    runConfiguration: ScheduleTestFlowRunDto["runConfiguration"],
-    notification: ScheduleTestFlowRunDto["notification"],
-  ) => {
-    const wsRxDoc = await this.workspaceRepository.getActiveWorkspaceDoc();
-    const ws = wsRxDoc.toMutableJSON();
-    try {
-      const activeTabRxDoc = await this.tabRepository.getTabWithWorkspaceIdDoc(
-        ws._id,
-      );
-      const activeTab = activeTabRxDoc.toMutableJSON();
-
-      if (!activeTab) {
-        notifications.error("No active testflow tab found");
-        return { isSuccessful: false, message: "No active testflow tab found" };
-      }
-
-      const workspaceId = activeTab.path?.workspaceId;
-      const testflowId = activeTab.id;
-
-      if (!workspaceId || !testflowId) {
-        notifications.error("Missing workspace or testflow information");
-        return { isSuccessful: false, message: "Missing required information" };
-      }
-
-      // Check for guest user mode
-      const guestUser = await this.guestUserRepository.findOne({
-        name: "guestUser",
-      });
-      const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
-
-      if (isGuestUser) {
-        notifications.info("Scheduling is not available in guest mode");
-        return {
-          isSuccessful: false,
-          message: "Feature not available in guest mode",
-        };
-      }
-
-      // Prepare the payload
-      const payload: ScheduleTestFlowRunDto = {
-        name: scheduleName,
-        environmentId: environmentId || "",
-        workspaceId,
-        testflowId,
-        runConfiguration,
-        notification,
-      };
-
-      // Call the API
-      const baseUrl = await this.constructBaseUrl(workspaceId);
-      const response = await this.testflowService.scheduleTestFlowRun(
-        payload,
-        baseUrl,
-      );
-
-      // Handle response
-      if (response.isSuccessful) {
-        notifications.success(`New schedule created successfully.`);
-        const schedules = response.data.data.schedules;
-        updateTestflowSchedules(activeTab.id as string, schedules);
-        return {
-          isSuccessful: true,
-          data: response.data,
-        };
-      } else {
-        const errorMsg = response.message || "Unknown error";
-        notifications.error(`Failed to create schedule. Please try again.`);
-        return {
-          isSuccessful: false,
-          message: errorMsg,
-        };
-      }
-    } catch (error) {
-      notifications.error("Error scheduling test flow run");
-      return {
-        isSuccessful: false,
-        message: error.message || "Error scheduling test flow run",
-      };
-    }
-  };
 }

@@ -16,6 +16,7 @@
   export let workspaceUsers = [];
   export let onUpdateSchedule = (updatedSchedule) => {};
   export let onSaveSchedule;
+  export let isSaved;
 
   let updateDebounceTimer = null;
   const UPDATE_DEBOUNCE_TIME = 300;
@@ -24,9 +25,6 @@
   function updateScheduleRealtime() {
     clearTimeout(updateDebounceTimer);
     updateDebounceTimer = setTimeout(() => {
-      // Only update if values have changed
-      if (!isFormDirty) return;
-
       // Create runConfiguration object based on cycle type
       let runConfiguration = {
         runCycle: selectedCycle,
@@ -85,7 +83,6 @@
   let selectedEnvironment = "";
   let isError = false;
   let isUpdating = false;
-  let isFormDirty = false;
 
   // Run Configuration
   let selectedCycle = "once"; // once, daily, hourly, weekly
@@ -250,61 +247,38 @@
     selectedCycle,
   );
 
-  // Check form dirty state when any value changes
-  function checkFormDirty() {
-    if (!initialFormData) return false;
-
-    isFormDirty =
-      scheduleName !== initialFormData.scheduleName ||
-      selectedEnvironment !== initialFormData.selectedEnvironment ||
-      selectedCycle !== initialFormData.selectedCycle ||
-      formattedDate !== initialFormData.formattedDate ||
-      selectedTime !== initialFormData.selectedTime ||
-      intervalHours !== initialFormData.intervalHours ||
-      JSON.stringify(days) !== JSON.stringify(initialFormData.days) ||
-      JSON.stringify(notificationEmails) !==
-        JSON.stringify(initialFormData.notificationEmails) ||
-      receiveNotifications !== initialFormData.receiveNotifications;
-  }
-
   const handleEnvironmentSelect = (envId) => {
     selectedEnvironment = envId;
-    checkFormDirty();
     updateScheduleRealtime();
   };
 
   // Handler for cycle selection
   const handleCycleSelect = (cycle) => {
     selectedCycle = cycle;
-    checkFormDirty();
     updateScheduleRealtime();
   };
 
   // Handle schedule name change
   const handleScheduleNameChange = (e) => {
     scheduleName = e.detail;
-    checkFormDirty();
     updateScheduleRealtime();
   };
 
   // Handle date change
   const handleDateChange = (e) => {
     formattedDate = e.detail;
-    checkFormDirty();
     updateScheduleRealtime();
   };
 
   // Handle time change
   const handleTimeChange = (event) => {
     selectedTime = event.detail;
-    checkFormDirty();
     updateScheduleRealtime();
   };
 
   // Handle hourly interval change
   function handleHourlyNumberChange(event) {
     intervalHours = parseInt(event.detail) || 1;
-    checkFormDirty();
 
     const valueIndex = hourValues.indexOf(intervalHours);
     if (valueIndex !== -1) {
@@ -330,7 +304,6 @@
   function handleHourlyProgressChange(event) {
     const { value } = event.detail;
     intervalHours = value;
-    checkFormDirty();
     updateScheduleRealtime();
   }
 
@@ -358,21 +331,18 @@
     } else {
       days = [...days, dayValue];
     }
-    checkFormDirty();
     updateScheduleRealtime();
   }
 
   // Handle notification emails change
   function handleNotificationEmailsChange(emails) {
     notificationEmails = emails;
-    checkFormDirty();
     updateScheduleRealtime();
   }
 
   // Handle notification preference change
   function handleNotificationPrefChange(event) {
     receiveNotifications = event.target.value;
-    checkFormDirty();
     updateScheduleRealtime();
   }
 
@@ -414,9 +384,6 @@
           notificationEmails: [...notificationEmails],
           receiveNotifications,
         };
-
-        // Reset form dirty state
-        isFormDirty = false;
       } else {
         console.error("Failed to save schedule:", result?.error);
         // Optionally show error notification here
@@ -441,9 +408,7 @@
       days = [...initialFormData.days];
       notificationEmails = [...initialFormData.notificationEmails];
       receiveNotifications = initialFormData.receiveNotifications;
-
-      // Reset dirty state
-      isFormDirty = false;
+      updateScheduleRealtime();
     }
   };
 
@@ -779,7 +744,7 @@
       <Button
         title="Save Changes"
         onClick={handleSaveChanges}
-        disable={!isFormDirty ||
+        disable={isSaved ||
           !scheduleName.trim() ||
           (selectedCycle === "once" && (!formattedDate || !selectedTime)) ||
           (selectedCycle === "daily" && !selectedTime) ||
@@ -788,7 +753,7 @@
         type="primary"
         loader={isUpdating}
       />
-      {#if isFormDirty}
+      {#if !isSaved}
         <Button title="Cancel" onClick={handleCancel} type="secondary" />
       {/if}
     </div>

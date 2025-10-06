@@ -1,21 +1,49 @@
 <script lang="ts">
-  import { Tag } from "@sparrow/library/ui";
-  import { ThreeDotIcon } from "@sparrow/library/icons";
+  import { Button, Options, Tag, Modal } from "@sparrow/library/ui";
+  import {
+    MoreHorizontalRegular,
+    MoreVerticalRegular,
+    ThreeDotIcon,
+  } from "@sparrow/library/icons";
 
   export let r;
   export let schedule;
   export let formatDate: (date: string) => string;
   export let getRunType: (flowName: string) => string;
-  export let toggleMenu: (
-    e: MouseEvent,
-    rowId: string,
-    wrapper: HTMLElement,
-  ) => void;
-  export let openMenuFor: string | null;
+  export let isScheduled: boolean;
   export let onDeleteTestflowScheduleHistory;
   export let onScheduleRunview;
+  export let isTestflowScheduleEditable;
+  export let deleteLoader;
+  let isDeleteModalOpen: boolean = false;
 
-  let collectionTabWrapper: HTMLElement;
+  function handleDeleteCancel() {
+    isDeleteModalOpen = false;
+  }
+
+  function handleDeleteConfirm() {
+    onDeleteTestflowScheduleHistory(r?.id);
+    isDeleteModalOpen = false;
+  }
+
+  let showMenu: boolean = false;
+
+  function rightClickContextMenu(e: Event) {
+    setTimeout(() => {
+      showMenu = !showMenu;
+    }, 100);
+  }
+
+  function handleSelectClick(event: MouseEvent) {
+    const selectElement = document.getElementById(
+      `show-more-schedule-result-${r.id}`,
+    );
+    if (selectElement && !selectElement.contains(event.target as Node)) {
+      showMenu = false;
+    }
+  }
+
+  let activeWrapper: HTMLElement;
 
   function formatRequestCount(success: number, failed: number) {
     const total = Number(success) + Number(failed);
@@ -23,15 +51,22 @@
   }
 </script>
 
+<svelte:window
+  on:click={handleSelectClick}
+  on:contextmenu|preventDefault={handleSelectClick}
+/>
+
 <tr
   on:click={() => {
-    onScheduleRunview(r,schedule.name);
+    onScheduleRunview(r, schedule);
   }}
 >
   <td>
     <div class="time-cell">
       <span>{formatDate(r.createdAt)}</span>
-      <span class="sub-text">{getRunType(schedule.name)}</span>
+      <span class="sub-text"
+        >{!r.isScheduled ? "Manual Run" : "Scheduled Run"}</span
+      >
     </div>
   </td>
 
@@ -47,30 +82,106 @@
     </div>
   </td>
 
-  {#if r.status === "pass"}
-    <td>{formatRequestCount(r.successRequests, r.failedRequests)}</td>
-    <td>
-      <div class="result-cell">
-        <Tag text={`${r.successRequests} passed`} type="green" endIcon={null} />
-        <Tag text={`${r.failedRequests} failed`} type="orange" endIcon={null} />
-        <span class="duration">{r.totalTime}</span>
-      </div>
-    </td>
-  {:else}
-    <td></td>
-    <td></td>
-  {/if}
-
+  <td>{formatRequestCount(r.successRequests, r.failedRequests)}</td>
   <td>
-    <button
-      class="menu-btn"
-      bind:this={collectionTabWrapper}
-      on:click={(e) => toggleMenu(e, r.createdAt, collectionTabWrapper, r?.id)}
-    >
-      <ThreeDotIcon width="16px" height="16px" />
-    </button>
+    <div class="result-cell">
+      <Tag text={`${r.successRequests} passed`} type="green" endIcon={null} />
+      <Tag text={`${r.failedRequests} failed`} type="orange" endIcon={null} />
+      <span class="duration">{r.totalTime}</span>
+    </div>
+  </td>
+
+  <td bind:this={activeWrapper}>
+    <span class="threedot-icon-container d-flex">
+      {#if isTestflowScheduleEditable}
+        <Button
+          tabindex={-1}
+          id={`show-more-schedule-result-${r.id}`}
+          size="extra-small"
+          customWidth={"24px"}
+          type="teritiary-regular"
+          startIcon={MoreVerticalRegular}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            rightClickContextMenu(e);
+          }}
+        />
+      {/if}
+    </span>
   </td>
 </tr>
+
+<!-- Delete Confirmation Modal -->
+<Modal
+  title="Delete Test Result?"
+  type="danger"
+  width="35%"
+  zIndex={1000}
+  isOpen={isDeleteModalOpen}
+  handleModalState={handleDeleteCancel}
+>
+  <div class="text-lightGray mb-1">
+    <p
+      class="text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-medium"
+    >
+      Are you sure you want to delete this test result from
+      <span
+        class="text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-neutral-50);"
+      >
+        "{r ? formatDate(r.createdAt) : ""}"
+      </span>? This action cannot be undone.
+    </p>
+  </div>
+
+  <div
+    class="d-flex align-items-center justify-content-end gap-3 rounded"
+    style="font-size: 16px; margin-bottom:2px;"
+  >
+    <Button
+      disable={deleteLoader}
+      title="Cancel"
+      textStyleProp="font-size: var(--base-text)"
+      type="secondary"
+      loader={false}
+      onClick={handleDeleteCancel}
+    />
+
+    <Button
+      disable={deleteLoader}
+      title="Delete"
+      textStyleProp="font-size: var(--base-text)"
+      loaderSize={18}
+      type="danger"
+      loader={deleteLoader}
+      onClick={handleDeleteConfirm}
+    />
+  </div>
+</Modal>
+
+{#if showMenu}
+  <Options
+    xAxis={activeWrapper.getBoundingClientRect().right - 150}
+    yAxis={[
+      activeWrapper.getBoundingClientRect().top - 5,
+      activeWrapper.getBoundingClientRect().bottom + 5,
+    ]}
+    zIndex={700}
+    width="104px"
+    menuItems={[
+      {
+        onClick: () => {
+          isDeleteModalOpen = true;
+          showMenu = false;
+        },
+        displayText: "Delete",
+        disabled: false,
+        hidden: false,
+      },
+    ]}
+  />
+{/if}
 
 <style lang="scss">
   tr {

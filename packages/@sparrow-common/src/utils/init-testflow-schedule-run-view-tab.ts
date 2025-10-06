@@ -65,6 +65,8 @@ class InitTestflowScheduleRunViewTab {
         workspaceId: _workspaceId,
         collectionId: "",
         folderId: "",
+        testflowId: "",
+        testflowScheduleId: ""
       },
       isSaved: true,
       index: 0,
@@ -91,8 +93,11 @@ class InitTestflowScheduleRunViewTab {
   public updateDescription(_description: string) {
     this._tab.description = _description;
   }
-  public updatePath(_path: Path) {
-    this._tab.path = _path;
+  public updatePath(_path: Partial<Path>) {
+    this._tab.path = {
+      ...this._tab.path,
+      ..._path,
+    };
   }
   public updateActiveSync(_activeSync: boolean) {
     this._tab.activeSync = _activeSync;

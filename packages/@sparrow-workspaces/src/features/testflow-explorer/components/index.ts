@@ -19,3 +19,4 @@ export { default as TestFlowBottomPanel } from "../components/test-flow-bottom-p
 export { default as HttpUrlSection } from "./http-url-section/HttpUrlSection.svelte";
 export { default as Edge } from "./edge/Edge.svelte";
 export { default as ScheduleRow } from "./schedule-row/ScheduleRow.svelte";
+export { default as TestflowNavigator } from "./testflow-navigator/TestflowNavigator.svelte";

@@ -27,7 +27,6 @@ import {
 } from "@app/adapter";
 import constants from "@app/constants/constants";
 import { notifications } from "@sparrow/library/ui";
-import { getSelfhostUrls } from "@app/utils/jwt";
 import type { TestflowScheduleStateDto } from "@sparrow/common/types/workspace/testflow-schedule-tab";
 import { TestflowRepository } from "@app/repositories/testflow.repository";
 import { TestflowService } from "@app/services/testflow.service";
@@ -38,7 +37,6 @@ import {
 import { InitTab } from "@sparrow/common/factory";
 import { v4 as uuidv4 } from "uuid";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
-import { captureEvent } from "@app/utils/posthog/posthogConfig";
 // import { InitRequestTab } from "@sparrow/common/utils";
 
 class MockHistoryExplorerPage {
@@ -203,11 +201,6 @@ class MockHistoryExplorerPage {
     const workspaceData = await this.workspaceRepository.readWorkspace(_id);
     const hubUrl = workspaceData?.team?.hubUrl;
 
-    const [selfhostBackendUrl] = getSelfhostUrls();
-    if (selfhostBackendUrl) {
-      return selfhostBackendUrl;
-    }
-
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;
@@ -283,14 +276,6 @@ class MockHistoryExplorerPage {
       baseUrl,
     );
     if (response?.isSuccessful) {
-      captureEvent("schedule_run_now_clicked", {
-        event_source: "desktop_app",
-        schedule_id: progressiveTab.id,
-        testflow_id: progressiveTab.path.testflowId,
-        schedule_run_frequency:
-          progressiveTab.property.testflowSchedule.runConfiguration.runCycle,
-        status: progressiveTab.property.testflowSchedule.isActive,
-      });
       const schedules = response.data.data.schedules;
       updateTestflowSchedules(
         progressiveTab?.path?.testflowId as string,
@@ -312,14 +297,6 @@ class MockHistoryExplorerPage {
       baseUrl,
     );
     if (response?.isSuccessful) {
-      captureEvent("schedule_deleted", {
-        event_source: "desktop_app",
-        schedule_id: progressiveTab.id,
-        testflow_id: progressiveTab.path.testflowId,
-        schedule_run_frequency:
-          progressiveTab.property.testflowSchedule.runConfiguration.runCycle,
-        status: progressiveTab.property.testflowSchedule.isActive,
-      });
       const schedules = response.data.data.schedules;
       updateTestflowSchedules(
         progressiveTab?.path?.testflowId as string,
@@ -359,14 +336,6 @@ class MockHistoryExplorerPage {
       );
 
       if (response?.isSuccessful) {
-        captureEvent("schedule_updated", {
-          event_source: "desktop_app",
-          schedule_id: progressiveTab.id,
-          testflow_id: progressiveTab.path.testflowId,
-          schedule_run_frequency:
-            progressiveTab.property.testflowSchedule.runConfiguration.runCycle,
-          status: progressiveTab.property.testflowSchedule.isActive,
-        });
         const schedules = response.data.data.schedules;
         updateTestflowSchedules(
           progressiveTab?.path?.testflowId as string,

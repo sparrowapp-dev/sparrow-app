@@ -31,6 +31,8 @@
     HistoryRegular,
     HistoryIcon2,
     DatabaseStackRegular,
+    ClockRegular,
+    ClockAlarmRegular,
   } from "@sparrow/library/icons";
   import {
     TabPersistenceTypeEnum,
@@ -316,11 +318,18 @@
             color={"var(--icon-danger-1100)"}
           />
         </span>
+      {:else if tab.type === TabTypeEnum.TESTFLOW_SCHEDULE}
+        <span class="d-inline-block" style="transform: translateY(2px);">
+          <ClockAlarmRegular
+            size={"14px"}
+            color={"var(--icon-ds-neutral-100)"}
+          />
+        </span>
       {:else if tab.type === TabTypeEnum.AI_REQUEST}
         <span>
           <BotRegular height={"17px"} width={"15px"} />
         </span>
-      {:else if tab.type === TabTypeEnum.MOCK_HISTORY  || tab.type === TabTypeEnum.TESTFLOW_SCHEDULE_RUN_VIEW}
+      {:else if tab.type === TabTypeEnum.MOCK_HISTORY || tab.type === TabTypeEnum.TESTFLOW_SCHEDULE_RUN_VIEW}
         <span>
           <HistoryIcon2 height={"16px"} width={"16px"} />
         </span>

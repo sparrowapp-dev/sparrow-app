@@ -347,6 +347,11 @@ export class RxDB {
             return oldDoc;
           },
           21: function (oldDoc: TabDocument) {
+            if (oldDoc?.property?.testflow) {
+              oldDoc.property.testflow.state = {
+                testflowNavigator : "Testflow"
+              };
+            }
             return oldDoc;
           },
         },

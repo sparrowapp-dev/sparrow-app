@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { of, type Observable } from "rxjs";
+  import { type Observable } from "rxjs";
   import { TestflowScheduleRVExplorerPageViewModel } from "./TestflowScheduleRVExplorerPage.ViewModel";
   import {
     TestflowExplorer,
@@ -8,7 +8,7 @@
   import type {
     CollectionDocument,
     WorkspaceDocument,
-  } from "src/database/database";
+  } from "@app/database/database";
   import { testFlowDataStore } from "@sparrow/workspaces/features/testflow-explorer/store";
   import { onDestroy, onMount, tick } from "svelte";
   import type { TFDataStoreType } from "@sparrow/common/types/workspace/testflow";
@@ -19,8 +19,8 @@
     WorkspaceRole,
   } from "@sparrow/common/enums";
   import { Debounce } from "@sparrow/common/utils";
-  import constants from "src/constants/constants";
-  import { captureEvent } from "src/utils/posthog/posthogConfig";
+  import constants from "@app/constants/constants";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
 
   import { testflowSchedules } from "@sparrow/common/store";
 
@@ -57,7 +57,6 @@
   let activeWorkspace;
 
   //schedule run popup state
-  let isScheduleRunPopupOpen: boolean = false;
 
   isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
@@ -310,7 +309,6 @@
     {/each}
   {/if} -->
   <TetsflowScheduleRunViewExplorer
-    bind:isScheduleRunPopupOpen
     tab={_viewModel.tab}
     {environmentVariables}
     {isTestflowEditable}
@@ -356,26 +354,3 @@
     onChangeSeletedAuthValue={_viewModel.parseAuthHeader}
   />
 {/if}
-
-<Modal
-  title="Set Schedule Run"
-  type="dark"
-  width="35%"
-  zIndex={1000}
-  isOpen={isScheduleRunPopupOpen}
-  handleModalState={() => {
-    isScheduleRunPopupOpen = false;
-  }}
->
-  <ScheduleRunPopUp
-    bind:isScheduleRunPopupOpen
-    testFlowName={tab?.name}
-    workspaceUsers={currentWorkspace?._data?.users || []}
-    environments={$environments?.filter(
-      (env) =>
-        env.workspaceId === currentWorkspaceId &&
-        env.type !== environmentType.GLOBAL,
-    ) || []}
-    handleScheduleTestFlowRun={_viewModel.scheduleTestFlowRun}
-  />
-</Modal>

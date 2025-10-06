@@ -33,7 +33,6 @@ class InitTestflowScheduleTab {
       activeSync: false,
       property: {
         testflowSchedule: {
-          scheduleId: "",
           environmentId: "",
           runConfiguration: {
             runCycle: "once",
