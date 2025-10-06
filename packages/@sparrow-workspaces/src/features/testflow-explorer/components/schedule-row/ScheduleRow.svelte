@@ -101,7 +101,11 @@
       loader={deleteLoader}
       onClick={async () => {
         deleteLoader = true;
-        await onPerformTestflowScheduleOperations("delete", schedule?.id);
+        await onPerformTestflowScheduleOperations(
+          "delete",
+          schedule?.id,
+          schedule?.name,
+        );
 
         deleteLoader = false;
         isDeletePopup = false;
@@ -122,7 +126,11 @@
     menuItems={[
       {
         onClick: () => {
-          onPerformTestflowScheduleOperations("run", schedule?.id);
+          onPerformTestflowScheduleOperations(
+            "run",
+            schedule?.id,
+            schedule?.name,
+          );
         },
         displayText: "Run Now",
         disabled: false,
