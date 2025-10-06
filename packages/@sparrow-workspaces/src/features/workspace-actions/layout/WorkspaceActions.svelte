@@ -855,6 +855,7 @@
           {ActiveTab}
           {handleTabUpdate}
           {isGuestUser}
+          {isWebApp}
         />
       </div>
 
