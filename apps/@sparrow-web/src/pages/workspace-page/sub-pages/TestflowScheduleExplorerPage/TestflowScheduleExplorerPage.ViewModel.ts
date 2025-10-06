@@ -270,6 +270,10 @@ class MockHistoryExplorerPage {
     const baseUrl = await this.constructBaseUrl(
       progressiveTab.path.workspaceId,
     );
+
+    for (let i = 1; i < 5; i++) {
+      setTimeout(() => { this.getTestflow(); }, i * 500);
+    }
     const response = await this.testflowService.runTestflowSchedule(
       progressiveTab.path.workspaceId,
       progressiveTab.path.testflowId,
@@ -290,6 +294,9 @@ class MockHistoryExplorerPage {
         progressiveTab?.path?.testflowId as string,
         schedules,
       );
+      notifications.success("Run executed successfully.");
+    }else{
+      notifications.error("Run failed. View details in Test Results.");  
     }
   };
 

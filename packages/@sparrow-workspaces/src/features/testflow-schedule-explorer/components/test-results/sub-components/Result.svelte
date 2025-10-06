@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, Options, Tag, Modal } from "@sparrow/library/ui";
+  import { Button, Options, Tag, Modal, Spinner } from "@sparrow/library/ui";
   import {
     MoreHorizontalRegular,
     MoreVerticalRegular,
@@ -14,16 +14,19 @@
   export let onDeleteTestflowScheduleHistory;
   export let onScheduleRunview;
   export let isTestflowScheduleEditable;
-  export let deleteLoader;
+
+  let deleteLoader = false;
   let isDeleteModalOpen: boolean = false;
 
   function handleDeleteCancel() {
     isDeleteModalOpen = false;
   }
 
-  function handleDeleteConfirm() {
-    onDeleteTestflowScheduleHistory(r?.id);
+  async function handleDeleteConfirm() {
+    deleteLoader = true;
+    await onDeleteTestflowScheduleHistory(r?.id);
     isDeleteModalOpen = false;
+    deleteLoader = false;
   }
 
   let showMenu: boolean = false;
@@ -60,6 +63,7 @@
   on:click={() => {
     onScheduleRunview(r, schedule);
   }}
+  style={r?.status === "pending" ? "pointer-events: none;" : ""}
 >
   <td>
     <div class="time-cell">
@@ -75,25 +79,41 @@
   <td>
     <div style="display: flex; justify-content: center;">
       <Tag
-        text={r.status === "pass" ? "Completed" : "Error"}
-        type={r.status === "pass" ? "green" : "orange"}
+        text={r.status === "pending"
+          ? "Running"
+          : r.status === "pass"
+            ? "Completed"
+            : "Error"}
+        type={r.status === "pending"
+          ? "purple"
+          : r.status === "pass"
+            ? "green"
+            : "orange"}
         endIcon={null}
       />
     </div>
   </td>
 
-  <td>{formatRequestCount(r.successRequests, r.failedRequests)}</td>
+  <td>
+    {#if r?.status === "pending"}{:else}
+      {formatRequestCount(r.successRequests, r.failedRequests)}
+    {/if}
+  </td>
   <td>
     <div class="result-cell">
-      <Tag text={`${r.successRequests} passed`} type="green" endIcon={null} />
-      <Tag text={`${r.failedRequests} failed`} type="orange" endIcon={null} />
-      <span class="duration">{r.totalTime}</span>
+      {#if r?.status === "pending"}
+        <Spinner size={"16px"} />
+      {:else}
+        <Tag text={`${r.successRequests} passed`} type="green" endIcon={null} />
+        <Tag text={`${r.failedRequests} failed`} type="orange" endIcon={null} />
+        <span class="duration">{r.totalTime}</span>
+      {/if}
     </div>
   </td>
 
   <td bind:this={activeWrapper}>
     <span class="threedot-icon-container d-flex">
-      {#if isTestflowScheduleEditable}
+      {#if isTestflowScheduleEditable && r?.status !== "pending"}
         <Button
           tabindex={-1}
           id={`show-more-schedule-result-${r.id}`}
@@ -140,7 +160,6 @@
     style="font-size: 16px; margin-bottom:2px;"
   >
     <Button
-      disable={deleteLoader}
       title="Cancel"
       textStyleProp="font-size: var(--base-text)"
       type="secondary"
