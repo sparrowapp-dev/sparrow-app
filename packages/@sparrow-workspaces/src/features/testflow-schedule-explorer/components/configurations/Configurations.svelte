@@ -10,6 +10,7 @@
   import { EmailReceipentsPicker } from "@sparrow/common/components";
   import { onMount } from "svelte";
   import { environmentType } from "@sparrow/common/enums";
+  import { planContentDisable, TimeISOExtractor } from "@sparrow/common/utils";
 
   export let schedule = null;
   export let environments = [];
@@ -17,6 +18,9 @@
   export let onUpdateSchedule = (updatedSchedule) => {};
   export let onSaveSchedule;
   export let isSaved;
+
+  const extractTimeFromISOString = new TimeISOExtractor()
+    .extractTimeFromISOString;
 
   let updateDebounceTimer = null;
   const UPDATE_DEBOUNCE_TIME = 300;
@@ -179,7 +183,7 @@
         const minutes = executeAtDate.getMinutes().toString().padStart(2, "0");
         selectedTime = `${hours}:${minutes}`;
       } else {
-        selectedTime = schedule.runConfiguration?.time || "";
+        selectedTime = extractTimeFromISOString(schedule.runConfiguration.time);
       }
 
       intervalHours = schedule.runConfiguration?.intervalHours || 1;
