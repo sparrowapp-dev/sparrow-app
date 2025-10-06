@@ -1310,7 +1310,7 @@
   let prevTabName = "";
   let prevTabId = "";
   $: {
-    if ($tab) {
+    if ($tab?.tabId) {
       if (prevTabId !== $tab?.tabId) {
         (async () => {
           /**
