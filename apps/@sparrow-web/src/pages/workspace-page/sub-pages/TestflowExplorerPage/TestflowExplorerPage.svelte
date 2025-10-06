@@ -15,6 +15,7 @@
     ResponseMessage,
     WorkspaceRole,
   } from "@sparrow/common/enums";
+  import { testflowSchedules } from "@sparrow/common/store";
   import { Debounce } from "@sparrow/common/utils";
   import constants from "@app/constants/constants";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
@@ -40,6 +41,7 @@
   let currentWorkspace;
   let planLimitTestFlowBlocks: number = 5;
   let planLimitTestflow: number = 3;
+  let planLimitTestScheduleCount = 3;
   let currentTestflowCount: number = 1;
   let testflowBlocksPlanModalOpen: boolean = false;
   let runHistoryPlanModalOpen: boolean = false;
@@ -116,21 +118,18 @@
       planLimitTestflow = planlimits?.testflowPerWorkspace?.value || 3;
       selectiveRunTestflow = planlimits?.selectiveTestflowRun?.active || false;
       planLimitRunHistoryCount = planlimits?.testflowRunHistory?.value || 5;
+      planLimitTestScheduleCount = planlimits?.testflowPerWorkspace?.value || 3;
     }
   };
 
   let testflowStoreMap;
   let testflowScheduleStoreMap;
+  let testflowScheduleStore = [];
 
   $: {
     testflowStore = testflowStoreMap?.get(tab?.tabId) as TFDataStoreType;
 
-    const schedulesFromMap = testflowScheduleStoreMap?.get(tab?.id);
-    testflowScheduleStore = Array.isArray(schedulesFromMap)
-      ? [...schedulesFromMap]
-      : [];
-
-    console.log("testflowScheduleStore from map:", testflowScheduleStore);
+    testflowScheduleStore = testflowScheduleStoreMap?.get(tab?.id);
 
     const nodes = testflowStore?.nodes ?? [];
     const hasEmptyResponseStatus = nodes.some(
@@ -147,6 +146,12 @@
   testFlowDataStore.subscribe((_testflowStoreMap) => {
     if (_testflowStoreMap) {
       testflowStoreMap = _testflowStoreMap;
+    }
+  });
+
+  testflowSchedules.subscribe((_testflowScheduleStoreMap) => {
+    if (_testflowScheduleStoreMap) {
+      testflowScheduleStoreMap = _testflowScheduleStoreMap;
     }
   });
 
@@ -295,34 +300,26 @@
     collectionsSubscriber.unsubscribe();
   });
 
-  let testflowScheduleStore = [];
-
-  $: {
-    if (tab && _viewModel) {
-      (async () => {
-        testflowScheduleStore = await _viewModel.getTestflowSchedules(tab.id);
-      })();
+  let isCreateTestflowScheduleLimitReachedModalOpen = false;
+  const createNewTestflowSchedule = async (
+    _testflowScheduleName: any,
+    _environemntId: any,
+    _runConfigurations: any,
+    _notifications: any,
+  ) => {
+    const response = await _viewModel.scheduleTestFlowRun(
+      _testflowScheduleName,
+      _environemntId,
+      _runConfigurations,
+      _notifications,
+    );
+    if (response.message === "Plan limit reached") {
+      isCreateTestflowScheduleLimitReachedModalOpen = true;
+    } else {
+      isCreateTestflowScheduleLimitReachedModalOpen = false;
     }
-  }
-
-  async function refetchSchedules() {
-    console.log("Refetching schedules for tab:", tab?.id);
-    if (tab && _viewModel) {
-      const schedules = await _viewModel.getTestflowSchedules(tab.id);
-      const newSchedules = Array.isArray(schedules) ? schedules : [];
-
-      // Update the store
-      testflowSchedules.update((map) => {
-        const newMap = new Map(map);
-        newMap.set(tab.id, newSchedules);
-        return newMap;
-      });
-
-      // Force local update with new reference
-      testflowScheduleStore = [...newSchedules];
-      console.log("Updated testflowScheduleStore:", testflowScheduleStore);
-    }
-  }
+    return response;
+  };
 </script>
 
 {#if render && _viewModel}
@@ -373,7 +370,12 @@
     onChangeSeletedAuthValue={_viewModel.parseAuthHeader}
     {currentWorkspaceId}
     onUpdateScheduleStatus={_viewModel.updateTestflowScheduleStatus}
-    onScheduleStatusUpdated={refetchSchedules}
+    onOpenTestflowScheduleTab={_viewModel.openTestflowScheduleTab}
+    onPerformTestflowScheduleOperations={_viewModel.performTestflowScheduleOperations}
+    onOpenTestflowScheduleConfigurationsTab={_viewModel.openTestflowScheduleConfigurationsTab}
+    bind:isCreateTestflowScheduleLimitReachedModalOpen
+    onUpdateTestflowState={_viewModel.updateTestflowState}
+    {planLimitTestScheduleCount}
   />
 {/if}
 
@@ -396,7 +398,7 @@
         env.workspaceId === currentWorkspaceId &&
         env.type !== environmentType.GLOBAL,
     ) || []}
-    handleScheduleTestFlowRun={_viewModel.scheduleTestFlowRun}
+    onScheduleTestFlowRun={createNewTestflowSchedule}
     creatorEmail={userEmail}
   />
 </Modal>

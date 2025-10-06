@@ -1,17 +1,8 @@
 import { createDeepCopy } from "@sparrow/common/utils";
-import {
-  TabPersistenceTypeEnum,
-  type Tab,
-} from "@sparrow/common/types/workspace/tab";
+import { TabPersistenceTypeEnum, type Tab } from "@sparrow/common/types/workspace/tab";
 import { InitTab } from "@sparrow/common/factory";
-import {
-  HttpRequestAuthTypeBaseEnum,
-  HttpRequestContentTypeBaseEnum,
-} from "@sparrow/common/types/workspace/http-request-base";
-import {
-  RequestDatasetEnum,
-  RequestDataTypeEnum,
-} from "@sparrow/common/types/workspace";
+import { HttpRequestAuthTypeBaseEnum, HttpRequestContentTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
+import { RequestDatasetEnum, RequestDataTypeEnum } from "@sparrow/common/types/workspace";
 
 /**
  * @class - this class makes request tab compatible with backend server
@@ -19,9 +10,7 @@ import {
 export class TestflowScheduleRunViewTabAdapter {
   constructor() {}
 
-  private unsetBodyType = (
-    bodyType: RequestDataTypeEnum | RequestDatasetEnum,
-  ): HttpRequestContentTypeBaseEnum => {
+private unsetBodyType = (bodyType: RequestDataTypeEnum | RequestDatasetEnum) : HttpRequestContentTypeBaseEnum => {
     let contentType = HttpRequestContentTypeBaseEnum["text/plain"];
     switch (bodyType) {
       case RequestDatasetEnum.NONE:
@@ -43,8 +32,7 @@ export class TestflowScheduleRunViewTabAdapter {
         contentType = HttpRequestContentTypeBaseEnum["text/plain"];
         break;
       case RequestDatasetEnum.URLENCODED:
-        contentType =
-          HttpRequestContentTypeBaseEnum["application/x-www-form-urlencoded"];
+        contentType = HttpRequestContentTypeBaseEnum["application/x-www-form-urlencoded"];
         break;
       case RequestDatasetEnum.FORMDATA:
         contentType = HttpRequestContentTypeBaseEnum["multipart/form-data"];
@@ -91,53 +79,50 @@ export class TestflowScheduleRunViewTabAdapter {
     return { requestBodyLanguage, requestBodyNavigation };
   };
 
-  private unsetAuthType = (
-    auth: HttpRequestAuthTypeBaseEnum,
-  ): HttpRequestAuthTypeBaseEnum => {
-    let authType = HttpRequestAuthTypeBaseEnum.NO_AUTH;
-    switch (auth) {
-      case HttpRequestAuthTypeBaseEnum.NO_AUTH:
-        authType = HttpRequestAuthTypeBaseEnum.NO_AUTH;
-        break;
-      case HttpRequestAuthTypeBaseEnum.API_KEY:
-        authType = HttpRequestAuthTypeBaseEnum.API_KEY;
-        break;
-      case HttpRequestAuthTypeBaseEnum.BASIC_AUTH:
-        authType = HttpRequestAuthTypeBaseEnum.BASIC_AUTH;
-        break;
-      case HttpRequestAuthTypeBaseEnum.BEARER_TOKEN:
-        authType = HttpRequestAuthTypeBaseEnum.BEARER_TOKEN;
-        break;
-      case HttpRequestAuthTypeBaseEnum.INHERIT_AUTH:
-        authType = HttpRequestAuthTypeBaseEnum.INHERIT_AUTH;
-        break;
-    }
-    return authType;
-  };
+   private unsetAuthType = (auth: HttpRequestAuthTypeBaseEnum) : HttpRequestAuthTypeBaseEnum => {
+      let authType = HttpRequestAuthTypeBaseEnum.NO_AUTH;
+      switch (auth) {
+        case HttpRequestAuthTypeBaseEnum.NO_AUTH:
+          authType = HttpRequestAuthTypeBaseEnum.NO_AUTH;
+          break;
+        case HttpRequestAuthTypeBaseEnum.API_KEY:
+          authType = HttpRequestAuthTypeBaseEnum.API_KEY;
+          break;
+        case HttpRequestAuthTypeBaseEnum.BASIC_AUTH:
+          authType = HttpRequestAuthTypeBaseEnum.BASIC_AUTH;
+          break;
+        case HttpRequestAuthTypeBaseEnum.BEARER_TOKEN:
+          authType = HttpRequestAuthTypeBaseEnum.BEARER_TOKEN;
+          break;
+        case HttpRequestAuthTypeBaseEnum.INHERIT_AUTH:
+          authType = HttpRequestAuthTypeBaseEnum.INHERIT_AUTH;
+          break;
+            
+      }
+      return authType;
+    };
 
-  private setAuthType = (
-    auth: HttpRequestAuthTypeBaseEnum,
-  ): HttpRequestAuthTypeBaseEnum => {
-    let requestAuthNavigation = HttpRequestAuthTypeBaseEnum.NO_AUTH;
-    switch (auth) {
-      case HttpRequestAuthTypeBaseEnum.NO_AUTH:
-        requestAuthNavigation = HttpRequestAuthTypeBaseEnum.NO_AUTH;
-        break;
-      case HttpRequestAuthTypeBaseEnum.API_KEY:
-        requestAuthNavigation = HttpRequestAuthTypeBaseEnum.API_KEY;
-        break;
-      case HttpRequestAuthTypeBaseEnum.BASIC_AUTH:
-        requestAuthNavigation = HttpRequestAuthTypeBaseEnum.BASIC_AUTH;
-        break;
-      case HttpRequestAuthTypeBaseEnum.BEARER_TOKEN:
-        requestAuthNavigation = HttpRequestAuthTypeBaseEnum.BEARER_TOKEN;
-        break;
-      case HttpRequestAuthTypeBaseEnum.INHERIT_AUTH:
-        requestAuthNavigation = HttpRequestAuthTypeBaseEnum.INHERIT_AUTH;
-        break;
-    }
-    return requestAuthNavigation;
-  };
+    private setAuthType = (auth: HttpRequestAuthTypeBaseEnum) : HttpRequestAuthTypeBaseEnum => {
+        let requestAuthNavigation = HttpRequestAuthTypeBaseEnum.NO_AUTH;
+        switch (auth) {
+          case HttpRequestAuthTypeBaseEnum.NO_AUTH:
+            requestAuthNavigation = HttpRequestAuthTypeBaseEnum.NO_AUTH;
+            break;
+          case HttpRequestAuthTypeBaseEnum.API_KEY:
+            requestAuthNavigation = HttpRequestAuthTypeBaseEnum.API_KEY;
+            break;
+          case HttpRequestAuthTypeBaseEnum.BASIC_AUTH:
+            requestAuthNavigation = HttpRequestAuthTypeBaseEnum.BASIC_AUTH;
+            break;
+          case HttpRequestAuthTypeBaseEnum.BEARER_TOKEN:
+            requestAuthNavigation = HttpRequestAuthTypeBaseEnum.BEARER_TOKEN;
+            break;
+          case HttpRequestAuthTypeBaseEnum.INHERIT_AUTH:
+            requestAuthNavigation = HttpRequestAuthTypeBaseEnum.INHERIT_AUTH;
+          break;
+        }
+        return requestAuthNavigation;
+      };
 
   /**
    * @description - parse backend data to frontend compatible
@@ -147,13 +132,13 @@ export class TestflowScheduleRunViewTabAdapter {
    * @param request - request tab frontend data
    * @returns
    */
-  public adapt(workspaceId: string, _testflow: any,scheduleName:string): Tab {
-    const testflow = createDeepCopy(_testflow);
+   public adapt(workspaceId: string, _scheduleHistory: any,scheduleName:string, _scheduleId: string, _testflowId: string): Tab {
+    const scheduleHistory = createDeepCopy(_scheduleHistory);
     const initTestflowTab = new InitTab().testflowScheduleRunView(
-      testflow.id,
+      scheduleHistory.id,
       workspaceId,
     );
-    const nds = testflow.nodes.map((_nd: any) => {
+    const nds = scheduleHistory.nodes.map((_nd: any) => {
       if (_nd?.type === "startBlock") {
         return {
           ..._nd,
@@ -254,20 +239,21 @@ export class TestflowScheduleRunViewTabAdapter {
       }
     });
     const result = {
-      failedRequests: testflow.failedRequests,
-      requests: testflow.requests,
-      status: testflow.status,
-      successRequests: testflow.successRequests,
-      totalTime: testflow.totalTime,
-      response: testflow.responses,
+      failedRequests: scheduleHistory.failedRequests,
+      requests: scheduleHistory.requests,
+      status: scheduleHistory.status,
+      successRequests: scheduleHistory.successRequests,
+      totalTime: scheduleHistory.totalTime,
+      response: scheduleHistory.responses,
     };
     initTestflowTab.setScheduleName(scheduleName);
     initTestflowTab.setName(scheduleName);
-    initTestflowTab.setLastestTime(testflow.createdAt);
-    initTestflowTab.setIsScheduled(testflow.isScheduled);
+    initTestflowTab.setLastestTime(scheduleHistory.createdAt);
+    initTestflowTab.setIsScheduled(scheduleHistory.isScheduled);
     initTestflowTab.setNodes(nds);
     initTestflowTab.setResult(result);
-    initTestflowTab.setEdges(testflow.edges);
+    initTestflowTab.setEdges(scheduleHistory.edges);
+    initTestflowTab.updatePath({testflowScheduleId: _scheduleId, testflowId: _testflowId});
     initTestflowTab.updateTabType(TabPersistenceTypeEnum.TEMPORARY);
     return initTestflowTab.getValue();
   }
@@ -280,48 +266,47 @@ export class TestflowScheduleRunViewTabAdapter {
   public unadapt(_requestTab: Tab): any {
     const requestTab = createDeepCopy(_requestTab);
     const nodes = requestTab?.property?.testflow?.nodes.map((nd) => {
-      const bodyType =
+
+    const bodyType =
         nd.data.requestData?.state.requestBodyNavigation ===
-        RequestDatasetEnum.RAW
-          ? nd.data.requestData?.state.requestBodyLanguage
-          : nd.data.requestData?.state.requestBodyNavigation;
+      RequestDatasetEnum.RAW
+        ? nd.data.requestData?.state.requestBodyLanguage
+        : nd.data.requestData?.state.requestBodyNavigation;
       return {
         ...nd,
         data: {
-          ...nd.data,
-          name: nd.data?.requestData?.name,
-          method: nd.data?.requestData?.method,
-          requestData: {
-            ...nd.data.requestData,
-            selectedRequestBodyType: this.unsetBodyType(
-              bodyType as RequestDataTypeEnum | RequestDatasetEnum,
-            ),
-            selectedRequestAuthType: this.unsetAuthType(
-              nd.data.requestData?.state
-                ?.requestAuthNavigation as HttpRequestAuthTypeBaseEnum,
-            ),
-          },
-        },
-      };
-    });
-    nodes.forEach((nd) => {
-      if (nd?.type === "startBlock") {
-        nd.data.requestData = null;
-        nd.data.name = "";
-        nd.data.method = "";
-      } else {
-        if (nd?.data?.requestData?.state) {
-          delete nd.data.requestData.state;
-        }
-        if (nd?.data?.requestData.autoGeneratedHeaders) {
-          delete nd.data.requestData.autoGeneratedHeaders;
+            ...nd.data,
+            name: nd.data?.requestData?.name,
+            method: nd.data?.requestData?.method,
+            requestData: {
+                ...nd.data.requestData,
+                selectedRequestBodyType: this.unsetBodyType(bodyType as RequestDataTypeEnum | RequestDatasetEnum),
+                selectedRequestAuthType: this.unsetAuthType(
+                    nd.data.requestData?.state?.requestAuthNavigation as HttpRequestAuthTypeBaseEnum,),
+
+            }
+            
         }
       }
     });
+    nodes.forEach(nd => {
+        if(nd?.type === "startBlock"){
+            nd.data.requestData = null;
+            nd.data.name = "";
+            nd.data.method = "";
+        }else{
+            if(nd?.data?.requestData?.state){
+                delete nd.data.requestData.state;
+            }
+            if(nd?.data?.requestData.autoGeneratedHeaders){
+                delete nd.data.requestData.autoGeneratedHeaders
+            }
+        }
+    });
     return {
-      name: requestTab.name,
-      nodes: nodes,
-      edges: requestTab?.property?.testflow?.edges,
+        name: requestTab.name,
+        nodes: nodes,
+        edges: requestTab?.property?.testflow?.edges,
     };
   }
 }

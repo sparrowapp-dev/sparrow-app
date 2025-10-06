@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { of, type Observable } from "rxjs";
+  import { type Observable } from "rxjs";
   import { TestflowScheduleRVExplorerPageViewModel } from "./TestflowScheduleRVExplorerPage.ViewModel";
   import {
     TestflowExplorer,
