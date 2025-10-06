@@ -3,15 +3,15 @@
   import { Button } from "@sparrow/library/ui";
   import { ClockRegular } from "@sparrow/library/icons";
 
-  export let value = "16:00";
+  export let value = "";
   export let placeholder = "Select time";
   export let disabled = false;
 
   const dispatch = createEventDispatcher();
 
   let showTimePicker = false;
-  let selectedHour = "16";
-  let selectedMinute = "00";
+  let selectedHour = "";
+  let selectedMinute = "";
   let timePickerRef: HTMLDivElement;
   let timePickerContainer: HTMLDivElement;
   let timeInputRef: HTMLInputElement;
@@ -239,11 +239,30 @@
   }
 
   onMount(() => {
+    if (value) {
+      const [hour, minute] = value.split(":");
+      selectedHour = hour || "";
+      selectedMinute = minute || "";
+      internalValue = value;
+    }
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       window.removeEventListener("resize", checkPosition);
     };
   });
+  // Better synchronization with parent value changes
+  $: if (value !== internalValue) {
+    internalValue = value;
+
+    if (value) {
+      const [hour, minute] = value.split(":");
+      selectedHour = hour || "";
+      selectedMinute = minute || "";
+
+      // After updating state, scroll to make selected value visible
+      scrollToSelected();
+    }
+  }
 </script>
 
 <div class="time-picker-container" bind:this={timePickerContainer}>
