@@ -1912,6 +1912,9 @@ export class TestflowExplorerPageViewModel {
     runConfiguration: ScheduleTestFlowRunDto["runConfiguration"],
     notification: ScheduleTestFlowRunDto["notification"],
   ) => {
+    captureEvent("set_schedule_run_cta_clicked", {
+      event_source: "web_app",
+    });
     try {
       const baseUrl = await this.constructBaseUrl(
         this._tab.getValue().path.workspaceId,
@@ -1943,8 +1946,16 @@ export class TestflowExplorerPageViewModel {
 
       if (response?.isSuccessful) {
         notifications.success(`New schedule created successfully.`);
-        const schedules = response.data.data.schedules;
+        const schedules = response.data.data.testflow.schedules;
+        const lastestSchedule = response.data.data.schedule;
         updateTestflowSchedules(progressiveTab.id as string, schedules);
+        captureEvent("schedule_created", {
+          event_source: "web_app",
+          schedule_id: lastestSchedule.id,
+          testflowId: response.data.data.testflow._id,
+          schedule_run_frequency: lastestSchedule.runConfiguration.runCycle,
+          status: lastestSchedule.isActive,
+        });
         return {
           isSuccessful: true,
           data: response.data,
@@ -2056,6 +2067,16 @@ export class TestflowExplorerPageViewModel {
     );
     if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
+       const matchedSchedule = schedules.find(sch => sch.id === _scheduleId);
+      captureEvent("schedule_status_changed",{
+        event_source : "desktop_app",
+        cta_location:"scheduled_run_tab",
+        schedule_id:_scheduleId,
+        testflow_id:progressiveTab.path.testflowId,
+        schedule_run_frequency:matchedSchedule.runConfiguration.runCycle,
+        previous_status:!isChecked ? "active" : "inactive",
+        new:isChecked ? "active" : "inactive",
+      })
       updateTestflowSchedules(progressiveTab?.id as string, schedules);
     }
   };
