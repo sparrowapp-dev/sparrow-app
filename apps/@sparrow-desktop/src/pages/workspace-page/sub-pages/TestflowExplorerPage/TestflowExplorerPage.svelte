@@ -381,6 +381,7 @@
     deleteNodeResponse={_viewModel.deleteNodeResponse}
     onRedrectRequest={_viewModel.redirectRequest}
     onUpdateTestFlowName={_viewModel.updateName}
+    onUpdateTestflowState={_viewModel.updateTestflowState}
     onUpdateBlockData={_viewModel.updateBlockData}
     onSaveTestflow={handleSaveTestflow}
     onClickStop={_viewModel.handleStopApis}

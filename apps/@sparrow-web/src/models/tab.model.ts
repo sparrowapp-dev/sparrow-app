@@ -1410,6 +1410,14 @@ export const tabSchemaLiteral = {
                 required: ["id", "source", "target"],
               },
             },
+            state : {
+              type: "object",
+              properties: {
+                testflowNavigator: {
+                  type: "string",
+                },
+              }
+            }
           },
         },
         aiRequest: {
