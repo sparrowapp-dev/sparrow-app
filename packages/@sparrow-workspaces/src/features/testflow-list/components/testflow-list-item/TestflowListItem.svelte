@@ -136,7 +136,7 @@
   function handleEventClickScheduleRun() {
     captureEvent("schedule_run_cta_clicked", {
       event_source: isWebApp ? "web_app" : "desktop_app",
-      cta_location: "within_test_flow",
+      cta_location: "test_flow_more",
     });
   }
 
