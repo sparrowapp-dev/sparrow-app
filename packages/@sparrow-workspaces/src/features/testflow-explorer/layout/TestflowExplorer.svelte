@@ -115,7 +115,11 @@
   import { PlanUpgradeModal } from "@sparrow/common/components";
   import { planInfoByRole } from "@sparrow/common/utils";
   import { TeamRole } from "@sparrow/common/enums";
-  import { planContentDisable, TimeISOExtractor } from "@sparrow/common/utils";
+  import {
+    planContentDisable,
+    TimeISOExtractor,
+    FormatDays,
+  } from "@sparrow/common/utils";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -203,6 +207,7 @@
   const extractTimeFromISOString = new TimeISOExtractor()
     .extractTimeFromISOString;
 
+  const formatDaysInstance = new FormatDays();
   const osDetector = new OSDetector();
   let userOS = osDetector.getOS();
   let limitNodesChange = 0;
@@ -277,15 +282,6 @@
   let hasActiveSchedules = true; // This should come from your data
   let searchQuery = "";
   let filteredSchedules = [];
-  const weekDays = [
-    { label: "Mon", value: "monday", dayNumber: 1 },
-    { label: "Tue", value: "tuesday", dayNumber: 2 },
-    { label: "Wed", value: "wednesday", dayNumber: 3 },
-    { label: "Thu", value: "thursday", dayNumber: 4 },
-    { label: "Fri", value: "friday", dayNumber: 5 },
-    { label: "Sat", value: "saturday", dayNumber: 6 },
-    { label: "Sun", value: "sunday", dayNumber: 0 },
-  ];
 
   function mapScheduleData(schedule) {
     // Determine status based on isActive and executeAt
@@ -362,15 +358,7 @@
       } else if (config.runCycle === "daily" && config.time) {
         description = `Run everyday at ${extractTimeFromISOString(config.time)}`;
       } else if (config.runCycle === "weekly" && config.days && config.time) {
-        const dayNames = config.days
-          .map((dayNumber) => {
-            const dayObject = weekDays.find(
-              (day) => day.dayNumber === dayNumber,
-            );
-            return dayObject ? dayObject.label : dayNumber.toString();
-          })
-          .join(", ");
-        description = `Run every ${dayNames} at ${extractTimeFromISOString(config.time)}`;
+        const dayNames = formatDaysInstance.formatDays(config.days);
         description = `Run every ${dayNames} at ${extractTimeFromISOString(config.time)}`;
       }
     }
