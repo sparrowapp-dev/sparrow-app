@@ -277,6 +277,15 @@
   let hasActiveSchedules = true; // This should come from your data
   let searchQuery = "";
   let filteredSchedules = [];
+  const weekDays = [
+    { label: "Mon", value: "monday", dayNumber: 1 },
+    { label: "Tue", value: "tuesday", dayNumber: 2 },
+    { label: "Wed", value: "wednesday", dayNumber: 3 },
+    { label: "Thu", value: "thursday", dayNumber: 4 },
+    { label: "Fri", value: "friday", dayNumber: 5 },
+    { label: "Sat", value: "saturday", dayNumber: 6 },
+    { label: "Sun", value: "sunday", dayNumber: 0 },
+  ];
 
   function mapScheduleData(schedule) {
     // Determine status based on isActive and executeAt
@@ -353,7 +362,15 @@
       } else if (config.runCycle === "daily" && config.time) {
         description = `Run everyday at ${extractTimeFromISOString(config.time)}`;
       } else if (config.runCycle === "weekly" && config.days && config.time) {
-        const dayNames = config.days.join(", ");
+        const dayNames = config.days
+          .map((dayNumber) => {
+            const dayObject = weekDays.find(
+              (day) => day.dayNumber === dayNumber,
+            );
+            return dayObject ? dayObject.label : dayNumber.toString();
+          })
+          .join(", ");
+        description = `Run every ${dayNames} at ${extractTimeFromISOString(config.time)}`;
         description = `Run every ${dayNames} at ${extractTimeFromISOString(config.time)}`;
       }
     }
