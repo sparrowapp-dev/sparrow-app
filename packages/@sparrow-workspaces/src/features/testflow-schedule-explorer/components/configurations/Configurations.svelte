@@ -65,7 +65,8 @@
 
       const updatedSchedule = {
         name: scheduleName,
-        environmentId: selectedEnvironment || undefined,
+        environmentId:
+          selectedEnvironment === "none" ? "" : selectedEnvironment,
         runConfiguration,
         notification: {
           emails: notificationEmails,
@@ -118,11 +119,16 @@
   let initialFormData = null;
 
   // Format environments for Select component
-  $: formattedEnvironments = environments.map((env) => ({
-    id: env.id,
-    name: env.name,
-    description: "",
-  }));
+  $: formattedEnvironments = [
+    {
+      id: "none",
+      name: "None",
+    },
+    ...environments.map((env) => ({
+      id: env.id,
+      name: env.name,
+    })),
+  ];
 
   // Use the workspace users directly for notification suggestions
   $: notificationSuggestions = workspaceUsers.map((user) => ({
@@ -161,7 +167,7 @@
   onMount(() => {
     if (schedule) {
       scheduleName = schedule.name || "";
-      selectedEnvironment = schedule.environmentId || "";
+      selectedEnvironment = schedule.environmentId || "none";
       selectedCycle = schedule.runConfiguration?.runCycle || "once";
 
       if (selectedCycle === "once" && schedule.runConfiguration?.executeAt) {
@@ -467,11 +473,11 @@
         <Select
           id="environment-select"
           data={formattedEnvironments}
-          titleId={selectedEnvironment}
+          titleId={selectedEnvironment === "none" ? "" : selectedEnvironment}
           onclick={handleEnvironmentSelect}
           size="medium"
           minHeaderWidth="100%"
-          placeholderText="Select environment"
+          placeholderText="Select"
           menuItem="v2"
           showDescription={false}
           bodyTheme={"violet"}
