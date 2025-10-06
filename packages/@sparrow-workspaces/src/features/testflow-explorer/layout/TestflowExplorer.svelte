@@ -726,6 +726,12 @@
   let isSaveModalOpen = false;
 
   const handleOpenSaveModal = () => {
+    if (
+      activeTab === "scheduled" &&
+      filteredSchedules.some((schedule) => schedule.status === "Active")
+    ) {
+      handleEventClickTestflowSaveSchedule();
+    }
     isSaveModalOpen = true;
   };
 
@@ -796,6 +802,21 @@
       }
 
       return dbNodes;
+    });
+  };
+
+  
+  const handleEventClickScheduleRun = () => {
+    captureEvent("schedule_run_cta_clicked", {
+      event_source: isWebApp ? "web_app" : "desktop_app",
+      cta_location: "within_test_flow",
+    });
+  };
+
+  const handleEventClickTestflowSaveSchedule = () => {
+    captureEvent("test_flow_updated", {
+      event_source: isWebApp ? "web_app" : "desktop_app",
+      testflow_id: $tab.id,
     });
   };
 
@@ -1851,6 +1872,7 @@
                   startIcon={PlayFilled}
                   title={activeTab === "scheduled" ? "Run Now" : "Run Now"}
                   onClick={async () => {
+                    handleEventClickScheduleRun();
                     if (activeTab === "scheduled") {
                       // Handle scheduled run logic
                       await onClickScheduledRun();

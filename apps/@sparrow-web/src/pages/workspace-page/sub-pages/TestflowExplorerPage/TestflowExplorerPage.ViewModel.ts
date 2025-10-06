@@ -67,6 +67,7 @@ import { TeamService } from "src/services/team.service";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 import { getAuthJwt } from "src/utils/jwt";
 import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
+import { captureEvent } from "src/utils/posthog/posthogConfig";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -1824,6 +1825,9 @@ export class TestflowExplorerPageViewModel {
     runConfiguration: ScheduleTestFlowRunDto["runConfiguration"],
     notification: ScheduleTestFlowRunDto["notification"],
   ) => {
+    captureEvent("set_schedule_run_cta_clicked", {
+      event_source: "web_app",
+    });
     try {
       const baseUrl = await this.constructBaseUrl(
         this._tab.getValue().path.workspaceId,
@@ -1853,8 +1857,16 @@ export class TestflowExplorerPageViewModel {
 
       if (response.isSuccessful) {
         notifications.success(`New schedule created successfully.`);
-        const schedules = response.data.data.schedules;
+        const schedules = response.data.data.testflow.schedules;
+        const lastestSchedule = response.data.data.schedule;
         updateTestflowSchedules(progressiveTab.id as string, schedules);
+        captureEvent("schedule_created", {
+          event_source: "web_app",
+          schedule_id: lastestSchedule.id,
+          testflowId: response.data.data.testflow._id,
+          schedule_run_frequency: lastestSchedule.runConfiguration.runCycle,
+          status: lastestSchedule.isActive,
+        });
         return {
           isSuccessful: true,
           data: response.data,
@@ -1948,6 +1960,17 @@ export class TestflowExplorerPageViewModel {
       }
 
       const result = await response.json();
+      const schedules = result.data.schedules;
+      const matchedSchedule = schedules.find((sch) => sch.id === scheduleId);
+      captureEvent("schedule_status_changed", {
+        event_source: "desktop_app",
+        cta_location: "scheduled_run_tab",
+        schedule_id: scheduleId,
+        testflow_id: testflowId,
+        schedule_run_frequency: matchedSchedule.runConfiguration.runCycle,
+        previous_status: !isActive ? "active" : "inactive",
+        new: !isActive ? "active" : "inactive",
+      });
 
       notifications.success(
         `Schedule ${isActive ? "activated" : "deactivated"} successfully.`,
