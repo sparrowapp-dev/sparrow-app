@@ -10,6 +10,7 @@
   import { EmailReceipentsPicker } from "@sparrow/common/components";
   import { onMount } from "svelte";
   import { environmentType } from "@sparrow/common/enums";
+  import { planContentDisable, TimeISOExtractor } from "@sparrow/common/utils";
 
   export let schedule = null;
   export let environments = [];
@@ -17,6 +18,9 @@
   export let onUpdateSchedule = (updatedSchedule) => {};
   export let onSaveSchedule;
   export let isSaved;
+
+  const extractTimeFromISOString = new TimeISOExtractor()
+    .extractTimeFromISOString;
 
   let updateDebounceTimer = null;
   const UPDATE_DEBOUNCE_TIME = 300;
@@ -41,7 +45,7 @@
           break;
         case "daily":
           if (selectedTime) {
-            runConfiguration.time = selectedTime;
+            runConfiguration.time = formatDateForAPI(selectedTime);
           }
           break;
         case "weekly":
@@ -55,7 +59,7 @@
               .filter((day) => day !== undefined);
           }
           if (selectedTime) {
-            runConfiguration.time = selectedTime;
+            runConfiguration.time = formatDateForAPI(selectedTime);
           }
           break;
         case "hourly":
@@ -179,7 +183,7 @@
         const minutes = executeAtDate.getMinutes().toString().padStart(2, "0");
         selectedTime = `${hours}:${minutes}`;
       } else {
-        selectedTime = schedule.runConfiguration?.time || "";
+        selectedTime = extractTimeFromISOString(schedule.runConfiguration.time);
       }
 
       intervalHours = schedule.runConfiguration?.intervalHours || 1;
@@ -353,19 +357,25 @@
   }
 
   // Format date for API
-  function formatDateForAPI(date, time) {
-    if (!date || !time) return new Date().toISOString();
-
-    // Parse the date string (DD-MM-YYYY format)
-    const [day, month, year] = date.split("-").map(Number);
+  function formatDateForAPI(timeStr, dateStr = null) {
+    if (!timeStr) return new Date().toISOString();
 
     // Parse the time string (HH:MM format)
-    const [hours, minutes] = time.split(":").map(Number);
+    const [hours, minutes] = timeStr.split(":").map(Number);
 
-    // Create a new Date object
-    const dateObj = new Date(year, month - 1, day, hours, minutes);
+    let dateObj;
 
-    // Return ISO string
+    if (dateStr) {
+      // If a date string is provided, use it
+      const [day, month, year] = dateStr.split("-").map(Number);
+      dateObj = new Date(year, month - 1, day, hours, minutes);
+    } else {
+      // Otherwise use the current date with the specified time
+      dateObj = new Date();
+      dateObj.setHours(hours, minutes, 0, 0);
+    }
+
+    // Return ISO string (automatically in UTC)
     return dateObj.toISOString();
   }
 
