@@ -1818,7 +1818,7 @@ export class TestflowExplorerPageViewModel {
     }
   };
 
-    public openTestflowScheduleTab = async (_schedule: string) => {
+  public openTestflowScheduleTab = async (_schedule: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const initTestflowScheduleTab = new InitTestflowScheduleTab(
       _schedule.id,
@@ -1842,7 +1842,7 @@ export class TestflowExplorerPageViewModel {
     await this.tabRepository.createTab(initTestflowScheduleTab);
   };
 
-   /**
+  /**
    * @description - updates testflow tab state
    * @param _state - new test flow state
    */
@@ -1857,7 +1857,7 @@ export class TestflowExplorerPageViewModel {
   };
 
 
-    /**
+  /**
    * Updates the nodes in the testflow with debounce to avoid frequent calls
    * @param _nodes - nodes of the testflow
    */
@@ -1951,10 +1951,10 @@ export class TestflowExplorerPageViewModel {
         updateTestflowSchedules(progressiveTab.id as string, schedules);
         captureEvent("schedule_created", {
           event_source: "web_app",
-          schedule_id: lastestSchedule.id,
+          schedule_id: lastestSchedule.data.id,
           testflowId: response.data.data.testflow._id,
-          schedule_run_frequency: lastestSchedule.runConfiguration.runCycle,
-          status: lastestSchedule.isActive,
+          schedule_run_frequency: runConfiguration.runCycle,
+          status: lastestSchedule.data.isActive,
         });
         return {
           isSuccessful: true,
@@ -2003,7 +2003,6 @@ export class TestflowExplorerPageViewModel {
         tabsIdsToDelete.push(...allChildTabs);
       }
       await this.tabRepository.deleteTabsWithTabIdInAWorkspace(progressiveTab.path.workspaceId, tabsIdsToDelete);
-      debugger;
       const schedules = response.data.data.schedules;
       updateTestflowSchedules(progressiveTab?.id as string, schedules);
     }
@@ -2067,16 +2066,16 @@ export class TestflowExplorerPageViewModel {
     );
     if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
-       const matchedSchedule = schedules.find(sch => sch.id === _scheduleId);
-      captureEvent("schedule_status_changed",{
-        event_source : "desktop_app",
-        cta_location:"scheduled_run_tab",
-        schedule_id:_scheduleId,
-        testflow_id:progressiveTab.path.testflowId,
-        schedule_run_frequency:matchedSchedule.runConfiguration.runCycle,
-        previous_status:!isChecked ? "active" : "inactive",
-        new:isChecked ? "active" : "inactive",
-      })
+      const matchedSchedule = schedules.find((sch) => sch.id === _scheduleId);
+      captureEvent("schedule_status_changed", {
+        event_source: "desktop_app",
+        cta_location: "scheduled_run_tab",
+        schedule_id: _scheduleId,
+        testflow_id: progressiveTab.path.testflowId,
+        schedule_run_frequency: matchedSchedule?.runConfiguration?.runCycle,
+        previous_status: !isChecked ? "active" : "inactive",
+        new: isChecked ? "active" : "inactive",
+      });
       updateTestflowSchedules(progressiveTab?.id as string, schedules);
     }
   };
