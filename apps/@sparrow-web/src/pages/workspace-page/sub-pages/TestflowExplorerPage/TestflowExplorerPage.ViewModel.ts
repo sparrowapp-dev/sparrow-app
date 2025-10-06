@@ -70,6 +70,7 @@ import { getAuthJwt } from "src/utils/jwt";
 import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
 import { updateTestflowSchedules } from "@sparrow/common/store";
 import { TestflowScheduleNavigatorEnum } from "@sparrow/common/types/workspace/testflow-schedule-tab";
+import { captureEvent } from "src/utils/posthog/posthogConfig";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
