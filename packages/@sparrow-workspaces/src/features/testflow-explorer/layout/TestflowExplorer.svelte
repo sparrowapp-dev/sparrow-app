@@ -1894,24 +1894,38 @@
             {/if}
           {/if}
           {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-            <Tooltip
-              title={isGuestUser
-                ? "To access the feature, you need to login/signup on Sparrow."
-                : ""}
-            >
+            {#if isGuestUser}
+              <Tooltip
+                title={isGuestUser
+                  ? "To access the feature, you need to login/signup on Sparrow."
+                  : "Schedule Run"}
+              >
+                <Button
+                  type="secondary"
+                  size="medium"
+                  title="Schedule Run"
+                  style="margin-left: 0;"
+                  id="create-new-schedule"
+                  disable={isGuestUser}
+                  buttonType="button"
+                  onClick={() => {
+                    isScheduleRunPopupOpen = true;
+                  }}
+                />
+              </Tooltip>
+            {:else}
               <Button
                 type="secondary"
                 size="medium"
                 title="Schedule Run"
                 style="margin-left: 0;"
                 id="create-new-schedule"
-                disable={isGuestUser}
                 buttonType="button"
                 onClick={() => {
                   isScheduleRunPopupOpen = true;
                 }}
               />
-            </Tooltip>
+            {/if}
           {/if}
         </div>
 
