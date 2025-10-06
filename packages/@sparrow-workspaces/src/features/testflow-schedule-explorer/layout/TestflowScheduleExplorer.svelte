@@ -17,6 +17,11 @@
     stopLoading,
     loadingState,
   } from "@sparrow/common/store";
+  import {
+    planContentDisable,
+    TimeISOExtractor,
+    FormatDays,
+  } from "@sparrow/common/utils";
 
   export let tab: Observable<Tab>;
   export let testflow;
@@ -34,6 +39,11 @@
   export let workspaceUsers = [];
   export let onUpdateSchedule = (updatedSchedule) => {};
   export let onSaveSchedule;
+
+  const extractTimeFromISOString = new TimeISOExtractor()
+    .extractTimeFromISOString;
+
+  const formatDaysInstance = new FormatDays();
 
   let scheduledEnvironment;
   $: {
@@ -55,13 +65,13 @@
       } else if (config.runCycle === "once" && config.executeAt) {
         const date = new Date(config.executeAt);
         description = `Run once on ${date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} at ${date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })}`;
-      } else if (config.runCycle === "recurring" && config.intervalHours) {
+      } else if (config.runCycle === "hourly" && config.intervalHours) {
         description = `Run every ${config.intervalHours} hour${config.intervalHours > 1 ? "s" : ""}`;
       } else if (config.runCycle === "daily" && config.time) {
-        description = `Run everyday at ${config.time}`;
+        description = `Run everyday at ${extractTimeFromISOString(config.time)}`;
       } else if (config.runCycle === "weekly" && config.days && config.time) {
-        const dayNames = config.days.join(", ");
-        description = `Run every ${dayNames} at ${config.time}`;
+        const dayNames = formatDaysInstance.formatDays(config.days);
+        description = `Run every ${dayNames} at ${extractTimeFromISOString(config.time)}`;
       }
     }
   }

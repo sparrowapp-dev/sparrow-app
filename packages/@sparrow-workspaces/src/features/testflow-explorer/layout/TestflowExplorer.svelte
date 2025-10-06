@@ -115,7 +115,11 @@
   import { PlanUpgradeModal } from "@sparrow/common/components";
   import { planInfoByRole } from "@sparrow/common/utils";
   import { TeamRole } from "@sparrow/common/enums";
-  import { planContentDisable, TimeISOExtractor } from "@sparrow/common/utils";
+  import {
+    planContentDisable,
+    TimeISOExtractor,
+    FormatDays,
+  } from "@sparrow/common/utils";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -203,6 +207,7 @@
   const extractTimeFromISOString = new TimeISOExtractor()
     .extractTimeFromISOString;
 
+  const formatDaysInstance = new FormatDays();
   const osDetector = new OSDetector();
   let userOS = osDetector.getOS();
   let limitNodesChange = 0;
@@ -353,7 +358,7 @@
       } else if (config.runCycle === "daily" && config.time) {
         description = `Run everyday at ${extractTimeFromISOString(config.time)}`;
       } else if (config.runCycle === "weekly" && config.days && config.time) {
-        const dayNames = config.days.join(", ");
+        const dayNames = formatDaysInstance.formatDays(config.days);
         description = `Run every ${dayNames} at ${extractTimeFromISOString(config.time)}`;
       }
     }

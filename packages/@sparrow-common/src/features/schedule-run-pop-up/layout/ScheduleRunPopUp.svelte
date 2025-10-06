@@ -268,8 +268,8 @@
       case "once":
         // For once, we only need executeAt
         runConfiguration.executeAt = formatDateForAPI(
-          formattedDate,
           selectedTime,
+          formattedDate,
         );
         break;
       case "daily":

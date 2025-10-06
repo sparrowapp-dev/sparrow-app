@@ -111,7 +111,11 @@
   import { PlanUpgradeModal } from "@sparrow/common/components";
   import { planInfoByRole } from "@sparrow/common/utils";
   import { TeamRole } from "@sparrow/common/enums";
-  import { planContentDisable } from "@sparrow/common/utils";
+  import {
+    planContentDisable,
+    TimeISOExtractor,
+    FormatDays,
+  } from "@sparrow/common/utils";
   import type { TestFlowScheduleRunResult } from "../../../../../@sparrow-common/src/types/workspace/testflow-schedule-run-view-tab";
 
   // Declaring props for the component
@@ -309,6 +313,10 @@
     if (schedule.lastExecuted) {
       lastResult = "Success";
     }
+    const extractTimeFromISOString = new TimeISOExtractor()
+      .extractTimeFromISOString;
+
+    const formatDaysInstance = new FormatDays();
 
     let description = "";
     if (schedule.runConfiguration) {
@@ -319,10 +327,10 @@
       } else if (config.runCycle === "recurring" && config.intervalHours) {
         description = `Run every ${config.intervalHours} hour${config.intervalHours > 1 ? "s" : ""}`;
       } else if (config.runCycle === "daily" && config.time) {
-        description = `Run everyday at ${config.time}`;
+        description = `Run everyday at ${extractTimeFromISOString(config.time)}`;
       } else if (config.runCycle === "weekly" && config.days && config.time) {
-        const dayNames = config.days.join(", ");
-        description = `Run every ${dayNames} at ${config.time}`;
+        const dayNames = formatDaysInstance.formatDays(config.days);
+        description = `Run every ${dayNames} at ${extractTimeFromISOString(config.time)}`;
       }
     }
 
@@ -1241,8 +1249,9 @@
       const node = connectedNodes[i];
       // Get corresponding request and response from runResult
       const request =
-        runResult?.requests?.[i-1] || node?.data?.requestData || null;
-      const response = runResult?.response?.[i-1] || node?.data?.response || null;
+        runResult?.requests?.[i - 1] || node?.data?.requestData || null;
+      const response =
+        runResult?.response?.[i - 1] || node?.data?.response || null;
       testflowStoreItems.push({
         request: request,
         response: response,

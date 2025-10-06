@@ -11,12 +11,12 @@ export class TimeISOExtractor {
     if (!isoString) return "";
 
     try {
-      // Create a date object from the ISO string
+      // Create a date object from the ISO string (will be converted to local time)
       const date = new Date(isoString);
 
-      // Extract hours and minutes and format with leading zeros
-      const hours = date.getUTCHours().toString().padStart(2, "0");
-      const minutes = date.getUTCMinutes().toString().padStart(2, "0");
+      // Get local hours and minutes
+      const hours = date.getHours().toString().padStart(2, "0");
+      const minutes = date.getMinutes().toString().padStart(2, "0");
 
       // Return in HH:MM format
       return `${hours}:${minutes}`;
