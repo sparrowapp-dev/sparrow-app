@@ -305,348 +305,393 @@
   }
 </script>
 
-<div>
-  <div class="schedule-run-form">
-    <!-- Schedule Name Input -->
-    <div class="form-group mb-3">
-      <label
-        class="form-label text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium mb-2"
-        style="color: var(--text-ds-neutral-200);"
-      >
-        Schedule Name <span style="color: var(--text-ds-danger-300);">*</span>
-      </label>
-      <Input
-        bind:value={scheduleName}
-        placeholder="Enter schedule name"
-        variant="primary"
-        size="medium"
-        width="100%"
-        {isError}
-        id="schedule-name-input"
-      />
-      {#if isError && !scheduleName.trim()}
-        <p
-          class="error-text text-ds-font-size-12 mt-1"
-          style="color: var(--text-ds-danger-300);"
-        >
-          Schedule name is required
-        </p>
-      {/if}
-    </div>
-
-    <!-- Environment Select -->
-    <div class="form-group mb-4">
-      <label
-        class="form-label text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-medium mb-2"
-        style="color: var(--text-ds-neutral-200);"
-      >
-        Select Environment
-      </label>
-      <p
-        class="helper-text text-ds-font-size-12 mb-2"
-        style="color: var(--text-ds-neutral-400);"
-      >
-        Select an environment if your test flow uses environment variables, to
-        ensure the run executes without errors.
-      </p>
-      <Select
-        id="environment-select"
-        data={formattedEnvironments}
-        titleId={selectedEnvironment === "none" ? "" : selectedEnvironment}
-        onclick={handleEnvironmentSelect}
-        size="medium"
-        minHeaderWidth="100%"
-        placeholderText="Select"
-        menuItem="v2"
-        showDescription={false}
-        bodyTheme={"violet"}
-        headerTheme={"violet2"}
-        variant={"tertiary"}
-      />
-    </div>
-    <div
-      style="height: 1px; background-color: var(--bg-ds-surface-100); margin: 20px 0;"
-    ></div>
-
-    <!-- Run Configuration -->
-    <div class="form-group mb-4">
-      <label
-        class="form-label text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-medium mb-2"
-        style="color: var(--text-ds-neutral-300);"
-      >
-        Run Configuration
-      </label>
-
-      <!-- Run Cycle -->
-      <div class="mb-3">
+<div class="schedule-popup-container">
+  <div class="schedule-run-form-container">
+    <div class="schedule-run-form">
+      <!-- Schedule Name Input -->
+      <div class="form-group mb-3">
         <label
           class="form-label text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium mb-2"
           style="color: var(--text-ds-neutral-200);"
         >
-          Run Cycle <span style="color: var(--text-ds-danger-300);">*</span>
+          Schedule Name <span style="color: var(--text-ds-danger-300);">*</span>
         </label>
-        <div class="cycle-buttons d-flex mb-3">
-          {#each cycleOptions as cycle}
-            <button
-              type="button"
-              class="cycle-btn {selectedCycle === cycle.value ? 'active' : ''}"
-              on:click={() => handleCycleSelect(cycle.value)}
-            >
-              {cycle.name}
-            </button>
-          {/each}
+        <Input
+          bind:value={scheduleName}
+          placeholder="Enter schedule name"
+          variant="primary"
+          size="medium"
+          width="100%"
+          {isError}
+          id="schedule-name-input"
+        />
+        {#if isError && !scheduleName.trim()}
+          <p
+            class="error-text text-ds-font-size-12 mt-1"
+            style="color: var(--text-ds-danger-300);"
+          >
+            Schedule name is required
+          </p>
+        {/if}
+      </div>
+
+      <!-- Environment Select -->
+      <div class="form-group mb-4">
+        <label
+          class="form-label text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-medium mb-2"
+          style="color: var(--text-ds-neutral-200);"
+        >
+          Select Environment
+        </label>
+        <p
+          class="helper-text text-ds-font-size-12 mb-2"
+          style="color: var(--text-ds-neutral-400);"
+        >
+          Select an environment if your test flow uses environment variables, to
+          ensure the run executes without errors.
+        </p>
+        <Select
+          id="environment-select"
+          data={formattedEnvironments}
+          titleId={selectedEnvironment === "none" ? "" : selectedEnvironment}
+          onclick={handleEnvironmentSelect}
+          size="medium"
+          minHeaderWidth="100%"
+          placeholderText="Select"
+          menuItem="v2"
+          showDescription={false}
+          bodyTheme={"violet"}
+          headerTheme={"violet2"}
+          variant={"tertiary"}
+        />
+      </div>
+      <div
+        style="height: 1px; background-color: var(--bg-ds-surface-100); margin: 20px 0;"
+      ></div>
+
+      <!-- Run Configuration -->
+      <div class="form-group mb-4">
+        <label
+          class="form-label text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-medium mb-2"
+          style="color: var(--text-ds-neutral-300);"
+        >
+          Run Configuration
+        </label>
+
+        <!-- Run Cycle -->
+        <div class="mb-3">
+          <label
+            class="form-label text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium mb-2"
+            style="color: var(--text-ds-neutral-200);"
+          >
+            Run Cycle <span style="color: var(--text-ds-danger-300);">*</span>
+          </label>
+          <div class="cycle-buttons d-flex mb-3">
+            {#each cycleOptions as cycle}
+              <button
+                type="button"
+                class="cycle-btn {selectedCycle === cycle.value
+                  ? 'active'
+                  : ''}"
+                on:click={() => handleCycleSelect(cycle.value)}
+              >
+                {cycle.name}
+              </button>
+            {/each}
+          </div>
+        </div>
+
+        <!-- Date and Time -->
+        {#if selectedCycle === "Once"}
+          <div class="once-row">
+            <div class="once-item">
+              <label class="form-label">
+                Date <span style="color: var(--text-ds-danger-300);">*</span>
+              </label>
+              <div class="custom-datepicker">
+                <DatePicker
+                  bind:value={formattedDate}
+                  placeholder="Select date"
+                  disabled={false}
+                  minDate={new Date()}
+                />
+              </div>
+            </div>
+            <div class="once-item">
+              <label class="form-label">
+                Time <span style="color: var(--text-ds-danger-300);">*</span>
+              </label>
+              <div class="custom-timepicker">
+                <TimePicker
+                  bind:value={selectedTime}
+                  placeholder="Select time"
+                  on:change={handleTimeChange}
+                />
+              </div>
+            </div>
+          </div>
+          <!-- Schedule Preview -->
+          {#if selectedDate && selectedTime}
+            <div class="schedule-preview mb-3" style="">
+              <p class="text-ds-font-size-12 mb-0">
+                <span style="color: var(--text-ds-neutral-300);">Run</span>
+                <span style="color: var(--text-ds-neutral-50);">
+                  {schedulePreviewText}</span
+                >
+              </p>
+            </div>
+          {/if}
+        {:else if selectedCycle === "Daily"}
+          <!-- Daily cycle - only show time picker -->
+          <div class="once-row">
+            <div class="once-item">
+              <label class="form-label">
+                Time <span style="color: var(--text-ds-danger-300);">*</span>
+              </label>
+              <div class="custom-timepicker">
+                <TimePicker
+                  bind:value={selectedTime}
+                  placeholder="Select time"
+                  on:change={handleTimeChange}
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Daily schedule preview -->
+          {#if selectedTime}
+            <div class="schedule-preview mb-3">
+              <p class="text-ds-font-size-12 mb-0">
+                <span style="color: var(--text-ds-neutral-300);">Run</span>
+                <span style="color: var(--text-ds-neutral-50);">
+                  everyday at {formatTimeDisplay(selectedTime)}</span
+                >
+              </p>
+            </div>
+          {/if}
+        {:else if selectedCycle === "Hourly"}
+          <div class="hourly-selector form-field">
+            <div class="selector-container">
+              <div class="interval-label">Every</div>
+
+              <div class="progress-bar-wrapper">
+                <StepProgressBar
+                  steps={hourOptions}
+                  currentValue={selectedHours}
+                  minValue={1}
+                  maxValue={24}
+                  on:change={handleHourlyProgressChange}
+                />
+              </div>
+
+              <div class="number-input-wrapper">
+                <NumberInput
+                  value={selectedHours}
+                  min={1}
+                  max={24}
+                  width="70px"
+                  on:change={handleHourlyNumberChange}
+                  showErrorMessage={false}
+                />
+              </div>
+
+              <div class="interval-label">Hour(s)</div>
+            </div>
+          </div>
+
+          <!-- Hourly schedule preview -->
+          {#if selectedHours}
+            <div class="schedule-preview mb-3">
+              <p class="text-ds-font-size-12 mb-0">
+                <span style="color: var(--text-ds-neutral-300);">Run</span>
+                <span style="color: var(--text-ds-neutral-50);">
+                  every {selectedHours} hour{selectedHours > 1 ? "s" : ""}</span
+                >
+              </p>
+            </div>
+          {/if}
+        {:else if selectedCycle === "Weekly"}
+          <!-- Weekly Configuration -->
+          <div class="weekly-selector">
+            <!-- Day Selection -->
+            <div class="form-group mb-3">
+              <label class="form-label">
+                Select Day(s) <span style="color: var(--text-ds-danger-300);"
+                  >*</span
+                >
+              </label>
+
+              <!-- Custom Day Chips -->
+              <div class="day-chips-container">
+                {#each weekDays as day}
+                  <button
+                    type="button"
+                    class="day-chip {selectedWeekDays.includes(day.value)
+                      ? 'selected'
+                      : ''}"
+                    on:click={() => handleWeekDaySelect(day.value)}
+                  >
+                    {day.label}
+                  </button>
+                {/each}
+              </div>
+            </div>
+
+            <!-- Time Selection -->
+            <div class="form-group mb-3">
+              <label class="form-label">
+                Time <span style="color: var(--text-ds-danger-300);">*</span>
+              </label>
+              <div class="weekly-time-picker">
+                <TimePicker
+                  bind:value={selectedTime}
+                  placeholder="Select time"
+                  on:change={handleTimeChange}
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Weekly schedule preview -->
+          {#if selectedWeekDays.length > 0 && selectedTime}
+            <div class="schedule-preview mb-3">
+              <p class="text-ds-font-size-12 mb-0">
+                <span style="color: var(--text-ds-neutral-300);">Run</span>
+                <span style="color: var(--text-ds-neutral-50);">
+                  every {formatWeekDays(selectedWeekDays)} at {formatTimeDisplay(
+                    selectedTime,
+                  )}
+                </span>
+              </p>
+            </div>
+          {/if}
+        {/if}
+      </div>
+      <div
+        style="height: 1px; background-color: var(--bg-ds-surface-100); margin: 20px 0;"
+      ></div>
+      <!-- Notifications Section -->
+      <div class="form-group mb-4">
+        <label
+          class="form-label text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium mb-2"
+          style="color: var(--text-ds-neutral-300);"
+        >
+          Notifications
+        </label>
+        <!-- Email Recipients -->
+        <div class="form-group mb-3">
+          <label class="form-label"> Email Recipients </label>
+
+          <div class="email-picker-container">
+            <EmailReceipentsPicker
+              list={notificationSuggestions}
+              id="schedule-notification-emails"
+              currentWorkspaceUsers={[]}
+              onChange={handleNotificationEmailsChange}
+              defaultEmails={[creatorEmail]}
+            />
+          </div>
         </div>
       </div>
 
-      <!-- Date and Time -->
-      {#if selectedCycle === "Once"}
-        <div class="once-row">
-          <div class="once-item">
-            <label class="form-label">
-              Date <span style="color: var(--text-ds-danger-300);">*</span>
-            </label>
-            <div class="custom-datepicker">
-              <DatePicker
-                bind:value={formattedDate}
-                placeholder="Select date"
-                disabled={false}
-                minDate={new Date()}
-              />
-            </div>
-          </div>
-          <div class="once-item">
-            <label class="form-label">
-              Time <span style="color: var(--text-ds-danger-300);">*</span>
-            </label>
-            <div class="custom-timepicker">
-              <TimePicker
-                bind:value={selectedTime}
-                placeholder="Select time"
-                on:change={handleTimeChange}
-              />
-            </div>
-          </div>
-        </div>
-        <!-- Schedule Preview -->
-        {#if selectedDate && selectedTime}
-          <div class="schedule-preview mb-3" style="">
-            <p class="text-ds-font-size-12 mb-0">
-              <span style="color: var(--text-ds-neutral-300);">Run</span>
-              <span style="color: var(--text-ds-neutral-50);">
-                {schedulePreviewText}</span
-              >
-            </p>
-          </div>
-        {/if}
-      {:else if selectedCycle === "Daily"}
-        <!-- Daily cycle - only show time picker -->
-        <div class="once-row">
-          <div class="once-item">
-            <label class="form-label">
-              Time <span style="color: var(--text-ds-danger-300);">*</span>
-            </label>
-            <div class="custom-timepicker">
-              <TimePicker
-                bind:value={selectedTime}
-                placeholder="Select time"
-                on:change={handleTimeChange}
-              />
-            </div>
-          </div>
-        </div>
+      <!-- Notification Preferences -->
+      <div class="form-group mb-4">
+        <label class="form-label text-ds-font-size-14 mb-2">
+          Receive Notifications
+        </label>
+        <div class="radio-options-row">
+          <RadioButton
+            id="notification-failure"
+            name="notification-preference"
+            value="failure"
+            group={notificationPreference}
+            labelText="On Failure Only"
+            handleChange={handleNotificationPrefChange}
+            buttonSize="medium"
+          />
 
-        <!-- Daily schedule preview -->
-        {#if selectedTime}
-          <div class="schedule-preview mb-3">
-            <p class="text-ds-font-size-12 mb-0">
-              <span style="color: var(--text-ds-neutral-300);">Run</span>
-              <span style="color: var(--text-ds-neutral-50);">
-                everyday at {formatTimeDisplay(selectedTime)}</span
-              >
-            </p>
-          </div>
-        {/if}
-      {:else if selectedCycle === "Hourly"}
-        <div class="hourly-selector form-field">
-          <div class="selector-container">
-            <div class="interval-label">Every</div>
-
-            <div class="progress-bar-wrapper">
-              <StepProgressBar
-                steps={hourOptions}
-                currentValue={selectedHours}
-                minValue={1}
-                maxValue={24}
-                on:change={handleHourlyProgressChange}
-              />
-            </div>
-
-            <div class="number-input-wrapper">
-              <NumberInput
-                value={selectedHours}
-                min={1}
-                max={24}
-                width="70px"
-                on:change={handleHourlyNumberChange}
-                showErrorMessage={false}
-              />
-            </div>
-
-            <div class="interval-label">Hour(s)</div>
-          </div>
-        </div>
-
-        <!-- Hourly schedule preview -->
-        {#if selectedHours}
-          <div class="schedule-preview mb-3">
-            <p class="text-ds-font-size-12 mb-0">
-              <span style="color: var(--text-ds-neutral-300);">Run</span>
-              <span style="color: var(--text-ds-neutral-50);">
-                every {selectedHours} hour{selectedHours > 1 ? "s" : ""}</span
-              >
-            </p>
-          </div>
-        {/if}
-      {:else if selectedCycle === "Weekly"}
-        <!-- Weekly Configuration -->
-        <div class="weekly-selector">
-          <!-- Day Selection -->
-          <div class="form-group mb-3">
-            <label class="form-label">
-              Select Day(s) <span style="color: var(--text-ds-danger-300);"
-                >*</span
-              >
-            </label>
-
-            <!-- Custom Day Chips -->
-            <div class="day-chips-container">
-              {#each weekDays as day}
-                <button
-                  type="button"
-                  class="day-chip {selectedWeekDays.includes(day.value)
-                    ? 'selected'
-                    : ''}"
-                  on:click={() => handleWeekDaySelect(day.value)}
-                >
-                  {day.label}
-                </button>
-              {/each}
-            </div>
-          </div>
-
-          <!-- Time Selection -->
-          <div class="form-group mb-3">
-            <label class="form-label">
-              Time <span style="color: var(--text-ds-danger-300);">*</span>
-            </label>
-            <div class="weekly-time-picker">
-              <TimePicker
-                bind:value={selectedTime}
-                placeholder="Select time"
-                on:change={handleTimeChange}
-              />
-            </div>
-          </div>
-        </div>
-
-        <!-- Weekly schedule preview -->
-        {#if selectedWeekDays.length > 0 && selectedTime}
-          <div class="schedule-preview mb-3">
-            <p class="text-ds-font-size-12 mb-0">
-              <span style="color: var(--text-ds-neutral-300);">Run</span>
-              <span style="color: var(--text-ds-neutral-50);">
-                every {formatWeekDays(selectedWeekDays)} at {formatTimeDisplay(
-                  selectedTime,
-                )}
-              </span>
-            </p>
-          </div>
-        {/if}
-      {/if}
-    </div>
-    <div
-      style="height: 1px; background-color: var(--bg-ds-surface-100); margin: 20px 0;"
-    ></div>
-    <!-- Notifications Section -->
-    <div class="form-group mb-4">
-      <label
-        class="form-label text-ds-font-size-12 text-ds-line-height-130 text-ds-font-weight-medium mb-2"
-        style="color: var(--text-ds-neutral-300);"
-      >
-        Notifications
-      </label>
-      <!-- Email Recipients -->
-      <div class="form-group mb-3">
-        <label class="form-label"> Email Recipients </label>
-
-        <div class="email-picker-container">
-          <EmailReceipentsPicker
-            list={notificationSuggestions}
-            id="schedule-notification-emails"
-            currentWorkspaceUsers={[]}
-            onChange={handleNotificationEmailsChange}
-            defaultEmails={[creatorEmail]}
+          <RadioButton
+            id="notification-all"
+            name="notification-preference"
+            value="every_time"
+            group={notificationPreference}
+            labelText="On Every Run (Success/Failure)"
+            handleChange={handleNotificationPrefChange}
+            buttonSize="medium"
           />
         </div>
-      </div>
-    </div>
-
-    <!-- Notification Preferences -->
-    <div class="form-group mb-4">
-      <label class="form-label text-ds-font-size-14 mb-2">
-        Receive Notifications
-      </label>
-      <div class="radio-options-row">
-        <RadioButton
-          id="notification-failure"
-          name="notification-preference"
-          value="failure"
-          group={notificationPreference}
-          labelText="On Failure Only"
-          handleChange={handleNotificationPrefChange}
-          buttonSize="medium"
-        />
-
-        <RadioButton
-          id="notification-all"
-          name="notification-preference"
-          value="every_time"
-          group={notificationPreference}
-          labelText="On Every Run (Success/Failure)"
-          handleChange={handleNotificationPrefChange}
-          buttonSize="medium"
-        />
       </div>
     </div>
   </div>
 
   <!-- Action Buttons -->
-  <div
-    class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
-  >
-    <Button
-      title="Cancel"
-      type="secondary"
-      onClick={() => {
-        isScheduleRunPopupOpen = false;
-      }}
-    />
-    <Button
-      title={isScheduling ? "Scheduling.." : "Schedule Run"}
-      type="primary"
-      onClick={handleScheduleRun}
-      disable={!scheduleName.trim() ||
-        (selectedCycle === "Once" && (!selectedDate || !selectedTime)) ||
-        (selectedCycle === "Daily" && !selectedTime) ||
-        (selectedCycle === "Hourly" && !selectedHours) ||
-        (selectedCycle === "Weekly" &&
-          (selectedWeekDays.length === 0 || !selectedTime))}
-      loader={isScheduling}
-    />
+  <div class="schedule-popup-footer">
+    <div
+      class="d-flex align-items-center justify-content-end gap-3 mt-1 mb-0 rounded"
+    >
+      <Button
+        title="Cancel"
+        type="secondary"
+        onClick={() => {
+          isScheduleRunPopupOpen = false;
+        }}
+      />
+      <Button
+        title={isScheduling ? "Scheduling.." : "Schedule Run"}
+        type="primary"
+        onClick={handleScheduleRun}
+        disable={!scheduleName.trim() ||
+          (selectedCycle === "Once" && (!selectedDate || !selectedTime)) ||
+          (selectedCycle === "Daily" && !selectedTime) ||
+          (selectedCycle === "Hourly" && !selectedHours) ||
+          (selectedCycle === "Weekly" &&
+            (selectedWeekDays.length === 0 || !selectedTime))}
+        loader={isScheduling}
+      />
+    </div>
   </div>
 </div>
 
 <style lang="scss">
+  .schedule-popup-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: 80vh;
+    overflow: hidden;
+  }
+
+  .schedule-run-form-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 12px 16px 0;
+
+    /* Styling for the scrollbar */
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--bg-ds-surface-600);
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--bg-ds-neutral-300);
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: var(--bg-ds-neutral-300);
+    }
+  }
+
+  .schedule-popup-footer {
+    padding-top: 16px;
+    background-color: var(--bg-ds-surface-600);
+    border-top: 1px solid var(--border-ds-default);
+    z-index: 10;
+  }
   .radio-options-row {
     display: flex;
     gap: 24px;
