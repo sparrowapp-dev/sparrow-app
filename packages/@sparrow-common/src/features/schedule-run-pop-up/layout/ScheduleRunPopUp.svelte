@@ -54,7 +54,7 @@
 
   // Set default time
   $: if (!selectedTime) {
-    selectedTime = "12:00";
+    selectedTime = "23:59";
   }
 
   // Modified environment formatting to include None option
@@ -234,19 +234,25 @@
   }
 
   // Add function to format date for API
-  function formatDateForAPI(date, time) {
-    if (!date || !time) return new Date().toISOString();
-
-    // Parse the date string (DD-MM-YYYY format)
-    const [day, month, year] = date.split("-").map(Number);
+  function formatDateForAPI(timeStr, dateStr = null) {
+    if (!timeStr) return new Date().toISOString();
 
     // Parse the time string (HH:MM format)
-    const [hours, minutes] = time.split(":").map(Number);
+    const [hours, minutes] = timeStr.split(":").map(Number);
 
-    // Create a new Date object
-    const dateObj = new Date(year, month - 1, day, hours, minutes);
+    let dateObj;
 
-    // Return ISO string
+    if (dateStr) {
+      // If a date string is provided, use it
+      const [day, month, year] = dateStr.split("-").map(Number);
+      dateObj = new Date(year, month - 1, day, hours, minutes);
+    } else {
+      // Otherwise use the current date with the specified time
+      dateObj = new Date();
+      dateObj.setHours(hours, minutes, 0, 0);
+    }
+
+    // Return ISO string (automatically in UTC)
     return dateObj.toISOString();
   }
 
@@ -268,7 +274,7 @@
         break;
       case "daily":
         // For daily, we need time
-        runConfiguration.time = selectedTime;
+        runConfiguration.time = formatDateForAPI(selectedTime);
         break;
       case "weekly":
         // For weekly, we need days
@@ -278,7 +284,7 @@
             return day ? day.dayNumber : undefined;
           })
           .filter((day) => day !== undefined);
-        runConfiguration.time = selectedTime;
+        runConfiguration.time = formatDateForAPI(selectedTime);
         break;
         break;
       case "hourly":
