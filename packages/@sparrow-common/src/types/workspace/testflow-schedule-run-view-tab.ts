@@ -1,9 +1,13 @@
-import type { TFHistoryAPIResponseStoreType, TFTabNodesWrapperType } from "./testflow-tab";
+import type {
+  TFHistoryAPIResponseStoreType,
+  TFTabNodesWrapperType,
+} from "./testflow-tab";
 import type { TFTabEdgesWrapperType } from "./testflow-tab";
 
 export interface TestFlowScheduleRunViewResultItem
   extends TFTabNodesWrapperType,
-    TFTabEdgesWrapperType, TestFlowScheduleRunResultType {};
+    TFTabEdgesWrapperType,
+    TestFlowScheduleRunResultType,TestflowScheduleDetailsView {}
 
 export interface TestflowScheduleRunViewWrapperTabInterface {
   testflowScheduleRunView: TestFlowScheduleRunViewResultItem;
@@ -11,6 +15,12 @@ export interface TestflowScheduleRunViewWrapperTabInterface {
 
 export interface TestFlowScheduleRunResultType {
   result: TestFlowScheduleRunResult;
+}
+
+export interface TestflowScheduleDetailsView {
+  isScheduled: boolean;
+  scheduleName: string;
+  lastestExecuted: string;
 }
 
 export interface TestflowSchedularHistoryRequest {
@@ -26,7 +36,7 @@ export interface TestFlowScheduleRunResult {
   failedRequests: number;
   requests?: TestflowSchedularHistoryRequest[];
   status: string;
-  response?:TFHistoryAPIResponseStoreType[];
+  response?: TFHistoryAPIResponseStoreType[];
   successRequests: number;
   totalTime: string;
 }

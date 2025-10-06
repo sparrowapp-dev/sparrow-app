@@ -24,6 +24,7 @@
   import { ScheduleRunPopUp } from "@sparrow/common/features";
   import { Modal } from "@sparrow/library/ui";
   import { getClientUser } from "@app/utils/jwt";
+  import { PlanUpgradeModal } from "@sparrow/common/components";
 
   export let tab;
   export let teamDetails;
@@ -44,6 +45,7 @@
   let currentWorkspace;
   let planLimitTestFlowBlocks: number = 5;
   let planLimitTestflow: number = 3;
+  let planLimitTestScheduleCount = 3;
   let currentTestflowCount: number = 1;
   let testflowBlocksPlanModalOpen: boolean = false;
   let runHistoryPlanModalOpen: boolean = false;
@@ -117,6 +119,7 @@
       planLimitTestflow = planlimits?.testflowPerWorkspace?.value || 3;
       selectiveRunTestflow = planlimits?.selectiveTestflowRun?.active || false;
       planLimitRunHistoryCount = planlimits?.testflowRunHistory?.value || 5;
+      planLimitTestScheduleCount = planlimits?.testflowPerWorkspace?.value || 3;
     }
   };
 
@@ -128,13 +131,7 @@
   $: {
     testflowStore = testflowStoreMap?.get(tab?.tabId) as TFDataStoreType;
 
-    // Get schedules from map with fallback to empty array
-    const schedulesFromMap = testflowScheduleStoreMap?.get(tab?.id);
-    testflowScheduleStore = Array.isArray(schedulesFromMap)
-      ? [...schedulesFromMap]
-      : [];
-
-    console.log("testflowScheduleStore from map:", testflowScheduleStore);
+    testflowScheduleStore = testflowScheduleStoreMap?.get(tab?.id);
 
     const nodes = testflowStore?.nodes ?? [];
     const hasEmptyResponseStatus = nodes.some(
@@ -308,39 +305,29 @@
     collectionsSubscriber.unsubscribe();
   });
 
-  async function refetchSchedules() {
-    console.log("Refetching schedules for tab:", tab?.id);
-    if (tab && _viewModel) {
-      const schedules = await _viewModel.getTestflowSchedules(tab.id);
-      const newSchedules = Array.isArray(schedules) ? schedules : [];
-
-      // Update the store
-      testflowSchedules.update((map) => {
-        const newMap = new Map(map);
-        newMap.set(tab.id, newSchedules);
-        return newMap;
-      });
-
-      // Force local update with new reference
-      testflowScheduleStore = [...newSchedules];
-      console.log("Updated testflowScheduleStore:", testflowScheduleStore);
+  let isCreateTestflowScheduleLimitReachedModalOpen = false;
+  const createNewTestflowSchedule = async (
+    _testflowScheduleName: any,
+    _environemntId: any,
+    _runConfigurations: any,
+    _notifications: any,
+  ) => {
+    const response = await _viewModel.scheduleTestFlowRun(
+      _testflowScheduleName,
+      _environemntId,
+      _runConfigurations,
+      _notifications,
+    );
+    if (response.message === "Plan limit reached") {
+      isCreateTestflowScheduleLimitReachedModalOpen = true;
+    } else {
+      isCreateTestflowScheduleLimitReachedModalOpen = false;
     }
-  }
-  $: {
-    testflowStore = testflowStoreMap?.get(tab?.tabId) as TFDataStoreType;
-
-    // Get schedules from map with fallback to empty array
-    const schedulesFromMap = testflowScheduleStoreMap?.get(tab?.id);
-    testflowScheduleStore = Array.isArray(schedulesFromMap)
-      ? [...schedulesFromMap]
-      : [];
-
-    console.log("testflowScheduleStore from map:", testflowScheduleStore);
-    // ... rest of your code
-  }
+    return response;
+  };
 </script>
 
-{#if render && _viewModel}
+{#if render}
   <!-- {#if testflowScheduleStore}
     {#each testflowScheduleStore as schedule}
       <div>
@@ -383,7 +370,7 @@
     {environmentVariables}
     {isTestflowEditable}
     {testflowStore}
-    {testflowScheduleStore}
+    testflowScheduleStore={testflowScheduleStore || []}
     onUpdateNodes={_viewModel.updateNodes}
     onUpdateEdges={_viewModel.updateEdges}
     {collectionListDocument}
@@ -394,6 +381,7 @@
     deleteNodeResponse={_viewModel.deleteNodeResponse}
     onRedrectRequest={_viewModel.redirectRequest}
     onUpdateTestFlowName={_viewModel.updateName}
+    onUpdateTestflowState={_viewModel.updateTestflowState}
     onUpdateBlockData={_viewModel.updateBlockData}
     onSaveTestflow={handleSaveTestflow}
     onClickStop={_viewModel.handleStopApis}
@@ -413,6 +401,7 @@
     {planLimitTestFlowBlocks}
     {planLimitTestflow}
     {planLimitRunHistoryCount}
+    {planLimitTestScheduleCount}
     testflowCount={currentTestflowCount}
     {teamDetails}
     bind:testflowBlocksPlanModalOpen
@@ -425,8 +414,9 @@
     onChangeSeletedAuthValue={_viewModel.parseAuthHeader}
     onOpenTestflowScheduleTab={_viewModel.openTestflowScheduleTab}
     onUpdateScheduleStatus={_viewModel.updateTestflowScheduleStatus}
-    onScheduleStatusUpdated={refetchSchedules}
     onPerformTestflowScheduleOperations={_viewModel.performTestflowScheduleOperations}
+    onOpenTestflowScheduleConfigurationsTab={_viewModel.openTestflowScheduleConfigurationsTab}
+    bind:isCreateTestflowScheduleLimitReachedModalOpen
   />
 {/if}
 
@@ -449,7 +439,7 @@
         env.workspaceId === currentWorkspaceId &&
         env.type !== environmentType.GLOBAL,
     ) || []}
-    handleScheduleTestFlowRun={_viewModel.scheduleTestFlowRun}
+    onScheduleTestFlowRun={createNewTestflowSchedule}
     creatorEmail={userEmail}
   />
 </Modal>

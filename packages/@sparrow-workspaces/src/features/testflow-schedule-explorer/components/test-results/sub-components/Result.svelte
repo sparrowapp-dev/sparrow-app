@@ -1,15 +1,30 @@
 <script lang="ts">
-  import { Button, Options, Tag } from "@sparrow/library/ui";
-  import { MoreHorizontalRegular, ThreeDotIcon } from "@sparrow/library/icons";
+  import { Button, Options, Tag, Modal } from "@sparrow/library/ui";
+  import {
+    MoreHorizontalRegular,
+    MoreVerticalRegular,
+    ThreeDotIcon,
+  } from "@sparrow/library/icons";
 
   export let r;
   export let schedule;
   export let formatDate: (date: string) => string;
   export let getRunType: (flowName: string) => string;
-
+  export let isScheduled: boolean;
   export let onDeleteTestflowScheduleHistory;
   export let onScheduleRunview;
   export let isTestflowScheduleEditable;
+  export let deleteLoader;
+  let isDeleteModalOpen: boolean = false;
+
+  function handleDeleteCancel() {
+    isDeleteModalOpen = false;
+  }
+
+  function handleDeleteConfirm() {
+    onDeleteTestflowScheduleHistory(r?.id);
+    isDeleteModalOpen = false;
+  }
 
   let showMenu: boolean = false;
 
@@ -43,13 +58,15 @@
 
 <tr
   on:click={() => {
-    onScheduleRunview(r);
+    onScheduleRunview(r, schedule);
   }}
 >
   <td>
     <div class="time-cell">
       <span>{formatDate(r.createdAt)}</span>
-      <span class="sub-text">{getRunType(schedule.name)}</span>
+      <span class="sub-text"
+        >{!r.isScheduled ? "Manual Run" : "Scheduled Run"}</span
+      >
     </div>
   </td>
 
@@ -65,19 +82,14 @@
     </div>
   </td>
 
-  {#if r.status === "pass"}
-    <td>{formatRequestCount(r.successRequests, r.failedRequests)}</td>
-    <td>
-      <div class="result-cell">
-        <Tag text={`${r.successRequests} passed`} type="green" endIcon={null} />
-        <Tag text={`${r.failedRequests} failed`} type="orange" endIcon={null} />
-        <span class="duration">{r.totalTime}</span>
-      </div>
-    </td>
-  {:else}
-    <td></td>
-    <td></td>
-  {/if}
+  <td>{formatRequestCount(r.successRequests, r.failedRequests)}</td>
+  <td>
+    <div class="result-cell">
+      <Tag text={`${r.successRequests} passed`} type="green" endIcon={null} />
+      <Tag text={`${r.failedRequests} failed`} type="orange" endIcon={null} />
+      <span class="duration">{r.totalTime}</span>
+    </div>
+  </td>
 
   <td bind:this={activeWrapper}>
     <span class="threedot-icon-container d-flex">
@@ -88,7 +100,7 @@
           size="extra-small"
           customWidth={"24px"}
           type="teritiary-regular"
-          startIcon={MoreHorizontalRegular}
+          startIcon={MoreVerticalRegular}
           onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();
@@ -99,6 +111,54 @@
     </span>
   </td>
 </tr>
+
+<!-- Delete Confirmation Modal -->
+<Modal
+  title="Delete Test Result?"
+  type="danger"
+  width="35%"
+  zIndex={1000}
+  isOpen={isDeleteModalOpen}
+  handleModalState={handleDeleteCancel}
+>
+  <div class="text-lightGray mb-1">
+    <p
+      class="text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-medium"
+    >
+      Are you sure you want to delete this test result from
+      <span
+        class="text-ds-font-weight-semi-bold"
+        style="color: var(--text-ds-neutral-50);"
+      >
+        "{r ? formatDate(r.createdAt) : ""}"
+      </span>? This action cannot be undone.
+    </p>
+  </div>
+
+  <div
+    class="d-flex align-items-center justify-content-end gap-3 rounded"
+    style="font-size: 16px; margin-bottom:2px;"
+  >
+    <Button
+      disable={deleteLoader}
+      title="Cancel"
+      textStyleProp="font-size: var(--base-text)"
+      type="secondary"
+      loader={false}
+      onClick={handleDeleteCancel}
+    />
+
+    <Button
+      disable={deleteLoader}
+      title="Delete"
+      textStyleProp="font-size: var(--base-text)"
+      loaderSize={18}
+      type="danger"
+      loader={deleteLoader}
+      onClick={handleDeleteConfirm}
+    />
+  </div>
+</Modal>
 
 {#if showMenu}
   <Options
@@ -112,7 +172,8 @@
     menuItems={[
       {
         onClick: () => {
-          onDeleteTestflowScheduleHistory(r?.id);
+          isDeleteModalOpen = true;
+          showMenu = false;
         },
         displayText: "Delete",
         disabled: false,

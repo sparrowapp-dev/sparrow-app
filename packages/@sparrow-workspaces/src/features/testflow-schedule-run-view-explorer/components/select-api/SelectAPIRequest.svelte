@@ -283,7 +283,6 @@
     class="dropdown-header d-flex justify-content-between align-items-center mx-auto {isOpen
       ? 'active'
       : ''}"
-    on:click={() => (isOpen = !isOpen)}
     tabindex="0"
   >
     <div
@@ -303,7 +302,6 @@
         </div>
       {:else if (name || method) && !isOpen}
         <div
-          on:click={(e) => (e.stopPropagation(), (isOpen = !isOpen))}
           style="display: flex; align-items: center; gap: 6px; padding:0px 8px;"
         >
           <span
@@ -314,7 +312,7 @@
           </span>
           <span class="select-txt">{truncateName(name, 17)}</span>
         </div>
-      {:else}
+        <!-- {:else}
         <input
           class="search-box"
           type="text"
@@ -324,7 +322,7 @@
           on:click|stopPropagation={handleInputClick}
           on:blur={handleBlur}
           bind:this={searchInputRef}
-        />
+        />-->
       {/if}
     </div>
     <div
@@ -341,7 +339,7 @@
     </div>
   </div>
 
-  <div
+  <!-- <div
     class="dropdown-options px-1"
     style="overflow:auto; display: {isOpen
       ? 'block'
@@ -579,7 +577,7 @@
         Add Custom Request
       </div>
     </div>
-  </div>
+  </div> -->
 </div>
 
 <style>

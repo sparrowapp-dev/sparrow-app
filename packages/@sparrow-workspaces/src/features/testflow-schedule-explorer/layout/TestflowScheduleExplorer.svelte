@@ -26,11 +26,14 @@
   export let onDeleteTestflowScheduleHistory;
   export let onScheduleRunview;
   export let onRefreshSchedule;
-  export let environments;
   export let onEditTestflowSchedule;
   export let isTestflowScheduleEditable;
   export let onOpenEnvironment;
   export let onOpenTestflow;
+  export let environments = [];
+  export let workspaceUsers = [];
+  export let onUpdateSchedule = (updatedSchedule) => {};
+  export let onSaveSchedule;
 
   let scheduledEnvironment;
   $: {
@@ -93,13 +96,14 @@
           />
         </div>
       </div>
-      <div class="d-flex">
+      <div class="d-flex pb-2">
         <Button
           title={testflow?.name}
           startIcon={FlowChartRegular}
           type={"link-secondary"}
+          size={"extra-small"}
           onClick={() => {
-            onOpenTestflow(testflow?.id);
+            onOpenTestflow(testflow?._id);
           }}
         />
         {#if scheduledEnvironment?.name}
@@ -107,6 +111,7 @@
             title={scheduledEnvironment?.name || ""}
             startIcon={LayerRegular}
             type={"link-secondary"}
+            size={"extra-small"}
             onClick={() => {
               onOpenEnvironment(scheduledEnvironment?.id);
             }}
@@ -120,7 +125,7 @@
           {onUpdateScheduleState}
         />
       </div>
-      <div>
+      <div style="flex:1; overflow:auto;">
         {#if $tab?.property?.testflowSchedule?.state?.scheduleNavigator === TestflowScheduleNavigatorEnum.TEST_RESULTS}
           <TestResults
             {schedule}
@@ -129,7 +134,14 @@
             {isTestflowScheduleEditable}
           />
         {:else if $tab?.property?.testflowSchedule?.state?.scheduleNavigator === TestflowScheduleNavigatorEnum.CONFIGURATION}
-          <Configurations />
+          <Configurations
+            {schedule}
+            {environments}
+            {workspaceUsers}
+            {onUpdateSchedule}
+            {onSaveSchedule}
+            isSaved={$tab?.isSaved}
+          />
         {/if}
       </div>
     </div>

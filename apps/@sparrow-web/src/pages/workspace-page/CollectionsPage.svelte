@@ -114,6 +114,7 @@
   import { getClientUser } from "src/utils/jwt";
 
   import TestflowScheduleRVExplorerPage from "./sub-pages/TestflowScheduleRVExplorerPage.svelte/TestflowScheduleRVExplorerPage.svelte";
+  import TestflowScheduleExplorerPage from "./sub-pages/TestflowScheduleExplorerPage/TestflowScheduleExplorerPage.svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -1103,6 +1104,12 @@
                     <Motion {...scaleMotionProps} let:motion>
                       <div class="h-100">
                         <TestflowScheduleRVExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.TESTFLOW_SCHEDULE}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100">
+                        <TestflowScheduleExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if !$tabList?.length}

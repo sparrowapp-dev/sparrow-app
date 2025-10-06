@@ -18,6 +18,8 @@
     TFDefaultEnum,
     type TFDocumentType,
   } from "@sparrow/common/types/workspace/testflow";
+  import { captureEvent } from "@app/utils/posthog/posthogConfig";
+  import { Sleep } from "@sparrow/common/utils";
 
   /**
    * current workspace to identify the selected testflow
@@ -49,10 +51,8 @@
    */
   export let loggedUserRoleInWorkspace;
 
-  // open the schedule run popup
-  export let isScheduleRunPopupOpen;
-
   export let isGuestUser;
+  export let isWebApp = false;
 
   let showMenu: boolean = false;
   let isTestflowPopup: boolean = false;
@@ -133,6 +133,13 @@
   }[] = [];
   let testflowTabWrapper: HTMLElement;
 
+  function handleEventClickScheduleRun() {
+    captureEvent("schedule_run_cta_clicked", {
+      event_source: isWebApp ? "web_app" : "desktop_app",
+      cta_location: "test_flow_more",
+    });
+  }
+
   $: {
     if (currentWorkspace) {
       menuItems = [
@@ -142,9 +149,11 @@
           disabled: false,
         },
         {
-          onClick: () => {
-            openTestflow();
-            isScheduleRunPopupOpen = true;
+          onClick: async () => {
+            handleEventClickScheduleRun();
+            await openTestflow();
+            await new Sleep().setTime(200).exec();
+            document.getElementById("create-new-schedule")?.click();
           },
           displayText: "Schedule Run",
           disabled: false,

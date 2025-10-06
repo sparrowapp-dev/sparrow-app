@@ -61,6 +61,7 @@
     tabId: string;
     collections: Observable<CollectionDocument[]>;
     parentDrag: boolean;
+    currentItem: any;
   };
   export let selected;
 
@@ -85,7 +86,7 @@
   let isCreateBlockArrowHovered = false;
   let moreOptionsMenu: boolean = false;
   let testflowStore: TFDataStoreType;
-  let currentBlock: TFNodeStoreType | undefined;
+  let currentBlock: TFNodeStoreType | undefined | any;
   const parseTime = new ParseTime();
 
   const truncateName = (name: string, charLimit: number) => {
@@ -137,10 +138,10 @@
           }
         });
       } else {
-        currentBlock = undefined;
+        currentBlock = data.currentItem;
       }
     } else {
-      currentBlock = undefined;
+      currentBlock = data.currentItem;
     }
   });
 
@@ -352,17 +353,8 @@
       style="position: relative;"
       class="d-flex justify-content-center align-items-center"
       tabindex="0"
-      on:click={(e) => {
-        e.stopPropagation();
-        moreOptionsMenu = !moreOptionsMenu;
-      }}
-      on:blur={() => {
-        setTimeout(() => {
-          moreOptionsMenu = false;
-        }, 10);
-      }}
     >
-      <span
+      <!-- <span
         class="p-1 rounded-1 more-option-btn"
         style="cursor:pointer; {moreOptionsMenu
           ? 'background-color: var(--bg-ds-surface-400) !important;'
@@ -405,7 +397,7 @@
             </div>
           {/each}
         </div>
-      {/if}
+      {/if} -->
     </div>
   </div>
 
@@ -472,35 +464,8 @@
       </div>
     </div>
   {/if}
-  {#if $currentStep > 5 && isTestFlowTourGuideOpen}
-    <div class="px-2 d-flex response-status-container">
-      <!-- Response status -->
-      <div
-        class="d-flex align-items-center px-1 me-2 text-getColor}"
-        style="gap: 6px;"
-      >
-        <div class="d-flex justify-content-center alin-items-center">
-          <DotIcon
-            color={"var(--text-ds-success-400)"}
-            height={"6px"}
-            width={"6px"}
-          />
-        </div>
-        <span class="response-text-success">
-          {200}
-        </span>
-      </div>
-      <!-- Response time -->
-      <div class="d-flex align-items-center me-2" style="gap: 6px;">
-        <div class="d-flex justify-content-center alin-items-center clock-icon">
-          <ClockRegular size={"16px"} color={"var(--icon-ds-neutral-200)"} />
-        </div>
-        <span class="response-text"> 1629 ms </span>
-      </div>
-    </div>
-  {/if}
   <!-- ------------- -->
-  <div class="">
+  <!-- <div class="">
     {#if isDropHereVisible && isAddBlockVisible}
       <div class="">
         {#if isAddBlockVisible}
@@ -543,7 +508,7 @@
         {/if}
       </div>
     {/if}
-  </div>
+  </div> -->
   <Handle
     type="source"
     position={Position.Right}
@@ -551,7 +516,7 @@
     style="border:1px solid var(--border-ds-primary-300); background-color: var(--bg-ds-surface-600); height:8px; width:8px; z-index: 500;"
   />
   <!-- Circular arrow button by clicking this a new block adds -->
-  {#if !isDropHereVisible && isAddBlockVisible}
+  <!-- {#if !isDropHereVisible && isAddBlockVisible}
     <div class="add-block-btn py-5 ps-2 pe-5" style="position: absolute;   ">
       <span
         style="border-radius: 50%; cursor:pointer;"
@@ -582,10 +547,10 @@
         </span>
       </span>
     </div>
-  {/if}
+  {/if} -->
   <!-- ------------------- -->
   <!-- Dummy Add API block -->
-  {#if isCreateBlockArrowHovered && isAddBlockVisible}
+  <!-- {#if isCreateBlockArrowHovered && isAddBlockVisible}
     <div
       class="position-absolute d-flex align-items-center"
       style="right:-28px; top:50%; transform : translateX(100%) translateY(-50%); opacity:0.6;"
@@ -621,7 +586,7 @@
         </div>
       </div>
     </div>
-  {/if}
+  {/if} -->
   <!-- ----------------- -->
 </div>
 

@@ -27,7 +27,6 @@ import {
 } from "@app/adapter";
 import constants from "@app/constants/constants";
 import { notifications } from "@sparrow/library/ui";
-import { getSelfhostUrls } from "@app/utils/jwt";
 import type { TestflowScheduleStateDto } from "@sparrow/common/types/workspace/testflow-schedule-tab";
 import { TestflowRepository } from "@app/repositories/testflow.repository";
 import { TestflowService } from "@app/services/testflow.service";
@@ -38,7 +37,7 @@ import {
 import { InitTab } from "@sparrow/common/factory";
 import { v4 as uuidv4 } from "uuid";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
-import { captureEvent } from "@app/utils/posthog/posthogConfig";
+import { captureEvent } from "src/utils/posthog/posthogConfig";
 // import { InitRequestTab } from "@sparrow/common/utils";
 
 class MockHistoryExplorerPage {
@@ -202,11 +201,6 @@ class MockHistoryExplorerPage {
   public constructBaseUrl = async (_id: string) => {
     const workspaceData = await this.workspaceRepository.readWorkspace(_id);
     const hubUrl = workspaceData?.team?.hubUrl;
-
-    const [selfhostBackendUrl] = getSelfhostUrls();
-    if (selfhostBackendUrl) {
-      return selfhostBackendUrl;
-    }
 
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;

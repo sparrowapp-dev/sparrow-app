@@ -41,7 +41,7 @@
   };
 </script>
 
-<section class="w-100" style="">
+<section class="w-100" style="pointer-events: none;">
   <TabularInput
     isCheckBoxEditable={true}
     isInputBoxEditable={true}

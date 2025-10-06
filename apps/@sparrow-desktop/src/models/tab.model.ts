@@ -284,7 +284,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 36,
+  version: 37,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -414,37 +414,37 @@ export const tabSchemaLiteral = {
                 },
               },
             },
-            tests:{
+            tests: {
               type: "object",
               properties: {
                 testCaseMode: {
                   type: "string",
                 },
                 noCode: {
-                     type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        id: {
-                          type: "string",
-                        },
-                        name: {
-                          type: "string",
-                        },
-                        condition: {
-                          type: "string",
-                        },
-                        expectedResult: {
-                          type: "string",
-                        },
-                        testPath: {
-                          type: "string",
-                        },
-                        testTarget: {
-                          type: "string",
-                        },
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: {
+                        type: "string",
+                      },
+                      name: {
+                        type: "string",
+                      },
+                      condition: {
+                        type: "string",
+                      },
+                      expectedResult: {
+                        type: "string",
+                      },
+                      testPath: {
+                        type: "string",
+                      },
+                      testTarget: {
+                        type: "string",
                       },
                     },
+                  },
                 },
                 script: {
                   type: "string",
@@ -635,11 +635,11 @@ export const tabSchemaLiteral = {
             isGeneratedVariable: {
               type: "boolean",
             },
-            isRequestTestsNoCodeDemoCompleted:{
-              type:"boolean"
+            isRequestTestsNoCodeDemoCompleted: {
+              type: "boolean",
             },
-            isRequestTestsScriptDemoCompleted: { 
-              type: "boolean" 
+            isRequestTestsScriptDemoCompleted: {
+              type: "boolean",
             },
           },
         },
@@ -1400,6 +1400,14 @@ export const tabSchemaLiteral = {
                 required: ["id", "source", "target"],
               },
             },
+            state : {
+              type: "object",
+              properties: {
+                testflowNavigator: {
+                  type: "string",
+                },
+              }
+            }
           },
         },
         aiRequest: {
@@ -1805,8 +1813,64 @@ export const tabSchemaLiteral = {
                 },
               },
             },
+            isScheduled: { type: "boolean" },
+            scheduleName: { type: "string" },
+            lastestExecuted: { type: "string" },
           },
-          required: ["nodes", "edges", "result"],
+          required: [
+            "nodes",
+            "edges",
+            "result",
+            "isScheduled",
+            "scheduleName",
+            "lastestExecuted",
+          ],
+        },
+        testflowSchedule: {
+          type: "object",
+          properties: {    
+            notifications: {
+              type: "object",
+              properties: {
+                receiveNotifications: { type: "string" },
+                emails: {
+                  type: "array",
+                  items: {
+                    type: "string",
+                  },
+                },
+              },
+            },
+            runConfiguration: {
+              type: "object",
+              properties: {
+                runCycle: { type: "string" },
+                executeAt: { type: "string" },
+                time: { type: "string" },
+                intervalHours: { type: "number" },
+                days: {
+                  type: "array",
+                  items: {
+                    type: "number",
+                  },
+                },
+             
+              },
+            },
+            state: {
+              type: "object",
+              properties: {
+                scheduleNavigator: { type: "string" },     
+              },
+            },
+            environmentId: { type: "string" },
+          },
+          required: [
+            "state",
+            "environmentId",
+            "runConfiguration",
+            "notifications",
+          ],
         },
       },
     },
@@ -1826,6 +1890,12 @@ export const tabSchemaLiteral = {
           type: "string",
         },
         folderId: {
+          type: "string",
+        },
+        testflowId: {
+          type: "string",
+        },
+        testflowScheduleId: {
           type: "string",
         },
       },

@@ -1054,19 +1054,4 @@ export class CollectionService {
     );
     return response;
   };
-
-  public scheduleTestFlowRun = async (
-    payload: ScheduleTestFlowRunDto,
-    baseUrl: string,
-  ) => {
-    const response = await makeRequest(
-      "POST",
-      `${baseUrl}/api/workspace/create-testflow-schedule`,
-      {
-        body: payload,
-        headers: getAuthHeaders(),
-      },
-    );
-    return response;
-  };
 }

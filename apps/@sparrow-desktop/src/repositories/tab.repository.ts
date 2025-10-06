@@ -1063,6 +1063,48 @@ export class TabRepository {
     );
   };
 
+   /**
+   * Retrieves all tabs associated with a specific folder ID.
+   *
+   * @param {string} _testflowId - The ID of the testflow
+   * @returns {Promise<TabDocument[]>} - A promise that resolves to an array of tab documents
+   */
+  public getTabsByTestflowId = async (
+    _testflowId: string,
+  ): Promise<TabDocument[]> => {
+    return (
+      (await this.rxdb
+        ?.find({
+          selector: {
+            "path.testflowId": _testflowId,
+          },
+        })
+        .sort({ index: "asc" })
+        .exec()) || []
+    );
+  };
+
+   /**
+   * Retrieves all tabs associated with a specific folder ID.
+   *
+   * @param {string} testflowScheduleId - The ID of the testflow Schedule
+   * @returns {Promise<TabDocument[]>} - A promise that resolves to an array of tab documents
+   */
+  public getTabsByTestflowScheduleId = async (
+    _testflowScheduleId: string,
+  ): Promise<TabDocument[]> => {
+    return (
+      (await this.rxdb
+        ?.find({
+          selector: {
+            "path.testflowScheduleId": _testflowScheduleId,
+          },
+        })
+        .sort({ index: "asc" })
+        .exec()) || []
+    );
+  };
+
   /**
    * Retrieves all tabs associated with a specific request ID.
    *

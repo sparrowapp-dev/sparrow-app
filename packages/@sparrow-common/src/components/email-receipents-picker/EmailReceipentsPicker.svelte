@@ -4,7 +4,7 @@
   import { createDynamicComponents } from "@sparrow/common/utils/common.helper";
   import { onDestroy, onMount } from "svelte";
   import { slide } from "svelte/transition";
-  import type { List } from "../../types";
+  import type { List } from "./types";
   import { Avatar } from "@sparrow/library/ui";
 
   /**
@@ -32,7 +32,10 @@
    */
   export let currentWorkspaceUsers: { email: string }[] = [];
 
-  export let defaultEmail: string = "";
+  /**
+   * Array of default/pre-selected emails
+   */
+  export let defaultEmails: string[] = [];
 
   // State variables
   let isOpen = false;
@@ -40,6 +43,7 @@
   let emailstoBeSentArr: string[] = [];
   let currentEmailEntered = "";
   let invalidEmails: Set<string> = new Set();
+  let initialized = false;
 
   /**
    * Validates if an email is valid (exists in list and not already in workspace)
@@ -90,6 +94,34 @@
     }
   };
 
+  /**
+   * Initialize with default emails
+   */
+  const initializeDefaultEmails = () => {
+    if (initialized || !defaultEmails || defaultEmails.length === 0) return;
+
+    // Process each email
+    defaultEmails.forEach((email) => {
+      if (!email) return;
+
+      // Check if the email exists in the list
+      const matchingUser = list.find(
+        (user) => user.email.toLowerCase() === email.toLowerCase(),
+      );
+
+      if (matchingUser && !emailstoBeSentArr.includes(matchingUser.email)) {
+        // Use the existing function to add the email
+        handleEmailOnAdd(matchingUser.email);
+      } else if (!emailstoBeSentArr.includes(email)) {
+        // If email isn't in the list but is provided as default, still add it
+        handleEmailOnAdd(email);
+      }
+    });
+
+    filterUser();
+    initialized = true;
+  };
+
   // Lifecycle hook to add and remove event listeners
   onDestroy(() => {
     window.removeEventListener("click", handleDropdownClick);
@@ -98,19 +130,18 @@
   onMount(() => {
     window.addEventListener("click", handleDropdownClick);
 
-    // Check if default email is provided and matches an email in the list
-    if (defaultEmail) {
-      const matchingUser = list.find(
-        (user) => user.email.toLowerCase() === defaultEmail.toLowerCase(),
-      );
-
-      if (matchingUser && !emailstoBeSentArr.includes(matchingUser.email)) {
-        // Use the existing function to add the email
-        handleEmailOnAdd(matchingUser.email);
-        filterUser();
-      }
-    }
+    // Use setTimeout to ensure DOM is ready before initialization
+    setTimeout(() => {
+      initializeDefaultEmails();
+    }, 100);
   });
+
+  // Update when defaultEmails changes
+  $: if (!initialized && defaultEmails?.length > 0) {
+    setTimeout(() => {
+      initializeDefaultEmails();
+    }, 100);
+  }
 
   /**
    * Filters the user list based on the current input and already selected emails.
@@ -146,11 +177,18 @@
     email = email.replace(",", "");
     email = email.trim();
 
-    // Check if email exists in the original list
-    const emailExists = list.some(
-      (item) => item.email.toLowerCase() === email.toLowerCase(),
-    );
-    if (!emailExists) {
+    // Skip if email is empty
+    if (!email) return;
+
+    // Skip relaxed validation for initialization to allow pre-set emails
+    let skipValidation = !initialized;
+
+    // Check if email exists in the original list (unless we're initializing)
+    const emailExists =
+      skipValidation ||
+      list.some((item) => item.email.toLowerCase() === email.toLowerCase());
+
+    if (!emailExists && !skipValidation) {
       // Don't add emails not in the list
       return;
     }
@@ -167,7 +205,14 @@
       invalidEmails = invalidEmails;
     }
 
-    const emailDiv: HTMLElement = createDynamicComponents(
+    // Get the email container before creating any elements
+    const emailContainer = document.getElementById("input-email");
+    if (!emailContainer) {
+      console.error("Email container not found");
+      return;
+    }
+
+    const emailDiv = createDynamicComponents(
       "div",
       `d-flex bg-tertiary-750 sparrow-fs-12 gx-1 px-1 justify-content-center ps-2 me-1 rounded-1 align-items-center`,
     );
@@ -187,20 +232,21 @@
         },
       },
     ]) as HTMLImageElement;
+
     emailDiv.id = email;
     closeIconBtn.id = email;
     closeIconBtn.src = closeIcon;
     emailContentSpan.innerHTML = email;
+
     // Add red color for invalid emails
     if (!isValid) {
       emailContentSpan.style.color = "var(--text-ds-danger-300)";
     }
+
     emailDiv.appendChild(emailContentSpan);
     emailDiv.appendChild(closeIconBtn);
-    const emailContainer: HTMLElement = document.getElementById(
-      "input-email",
-    ) as HTMLElement;
     emailContainer.appendChild(emailDiv);
+
     currentEmailEntered = "";
     updateInvalidEmails();
   };
@@ -212,16 +258,17 @@
   const removeElement = (event: Event) => {
     const email = (event.target as HTMLElement)?.id;
     const removeElement = document.getElementById(email) as HTMLElement;
-    const emailContainer = document.getElementById(
-      "input-email",
-    ) as HTMLElement;
-    emailContainer.removeChild(removeElement);
-    emailstoBeSentArr = emailstoBeSentArr?.filter((e) => e != email);
-    // Remove from invalid emails set
-    invalidEmails.delete(email);
-    invalidEmails = invalidEmails;
-    updateInvalidEmails();
-    filterUser();
+    const emailContainer = document.getElementById("input-email");
+
+    if (emailContainer && removeElement) {
+      emailContainer.removeChild(removeElement);
+      emailstoBeSentArr = emailstoBeSentArr?.filter((e) => e != email);
+      // Remove from invalid emails set
+      invalidEmails.delete(email);
+      invalidEmails = invalidEmails;
+      updateInvalidEmails();
+      filterUser();
+    }
   };
 
   /**

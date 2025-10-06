@@ -8,17 +8,17 @@
   } from "@sparrow/library/forms";
   import { StepProgressBar } from "@sparrow/library/ui";
   import { NumberInput } from "@sparrow/common/components";
-  import { InviteUserPicker } from "../component";
+  import { EmailReceipentsPicker } from "@sparrow/common/components";
   export let isScheduleRunPopupOpen = true;
   export let testFlowName;
   export let workspaceUsers = [];
   export let environments = [];
-  export let handleScheduleTestFlowRun;
+  export let onScheduleTestFlowRun;
   export let creatorEmail;
 
   // Form data
   let scheduleName = "";
-  let selectedEnvironment = "";
+  let selectedEnvironment = "none";
   let isError = false;
   let isScheduling = false;
 
@@ -57,10 +57,17 @@
     selectedTime = "12:00";
   }
 
-  $: formattedEnvironments = environments.map((env) => ({
-    id: env.id,
-    name: env.name,
-  }));
+  // Modified environment formatting to include None option
+  $: formattedEnvironments = [
+    {
+      id: "none",
+      name: "None",
+    },
+    ...environments.map((env) => ({
+      id: env.id,
+      name: env.name,
+    })),
+  ];
 
   // Run Cycle options
   const cycleOptions = [
@@ -281,9 +288,9 @@
     }
 
     // Call the handler with the properly formatted data
-    const result = await handleScheduleTestFlowRun(
+    const result = await onScheduleTestFlowRun(
       scheduleName,
-      selectedEnvironment,
+      selectedEnvironment === "none" ? "" : selectedEnvironment,
       runConfiguration,
       {
         emails: notificationEmails,
@@ -291,7 +298,7 @@
       },
     );
 
-    if (result?.isSuccessful) {
+    if (result?.isSuccessful || result.message === "Plan limit reached") {
       isScheduleRunPopupOpen = false;
     }
     isScheduling = false;
@@ -345,11 +352,11 @@
       <Select
         id="environment-select"
         data={formattedEnvironments}
-        titleId={selectedEnvironment}
+        titleId={selectedEnvironment === "none" ? "" : selectedEnvironment}
         onclick={handleEnvironmentSelect}
         size="medium"
         minHeaderWidth="100%"
-        placeholderText="Select environment"
+        placeholderText="Select"
         menuItem="v2"
         showDescription={false}
         bodyTheme={"violet"}
@@ -573,12 +580,12 @@
         <label class="form-label"> Email Recipients </label>
 
         <div class="email-picker-container">
-          <InviteUserPicker
+          <EmailReceipentsPicker
             list={notificationSuggestions}
             id="schedule-notification-emails"
             currentWorkspaceUsers={[]}
             onChange={handleNotificationEmailsChange}
-            defaultEmail={creatorEmail}
+            defaultEmails={[creatorEmail]}
           />
         </div>
       </div>

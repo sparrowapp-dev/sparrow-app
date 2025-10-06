@@ -30,6 +30,7 @@
     SaveTestflow,
     Edge,
     ScheduleRow,
+    TestflowNavigator,
   } from "../components";
   import {
     RequestDatasetEnum,
@@ -65,13 +66,14 @@
   import DeleteNode from "../../../components/delete-node/DeleteNode.svelte";
   import CustomRequest from "../../../components/custom-request-modal/CustomRequest.svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
-  import type {
-    TFDataStoreType,
-    TFEdgeHandlerType,
-    TFEdgeType,
-    TFNodeHandlerType,
-    TFNodeStoreType,
-    TFNodeType,
+  import {
+    TestflowNavigatorEnum,
+    type TFDataStoreType,
+    type TFEdgeHandlerType,
+    type TFEdgeType,
+    type TFNodeHandlerType,
+    type TFNodeStoreType,
+    type TFNodeType,
   } from "@sparrow/common/types/workspace/testflow";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
@@ -126,10 +128,10 @@
   export let toggleHistoryDetails;
   export let toggleHistoryContainer;
   export let environmentVariables;
-  console.log("Environment Variables:", environmentVariables);
   export let isTestflowEditable;
   export let onRedrectRequest;
   export let onUpdateTestFlowName;
+  export let onUpdateTestflowState;
   export let onUpdateBlockData;
   export let onSaveTestflow;
   export let isWebApp;
@@ -145,6 +147,7 @@
   export let redirectDocsTestflow: () => void;
   export let handleEventOnClickQuestionMark;
   export let planLimitRunHistoryCount: number = 5;
+  export let planLimitTestScheduleCount: number = 5;
   export let planLimitTestFlowBlocks: number = 5;
   export let planLimitTestFlows: number = 3;
   export let testflowCount: number = 1;
@@ -160,14 +163,13 @@
   export let isGuestUser = false;
   export let collectionListDocument: CollectionDocument[];
   export let isScheduleRunPopupOpen;
-  export let testflowScheduleStore = [];
-
-  $: safeTestflowScheduleStore = Array.isArray(testflowScheduleStore)
-    ? testflowScheduleStore
-    : [];
 
   export let onOpenTestflowScheduleTab;
+  export let testflowScheduleStore = [];
+
   export let onPerformTestflowScheduleOperations;
+  export let onOpenTestflowScheduleConfigurationsTab;
+  export let isCreateTestflowScheduleLimitReachedModalOpen;
 
   export let onUpdateScheduleStatus: (
     scheduleId: string,
@@ -270,14 +272,11 @@
     return response;
   };
 
-  let activeTab = "testflow"; // Default to test flow
   let hasActiveSchedules = true; // This should come from your data
   let searchQuery = "";
   let filteredSchedules = [];
 
   function mapScheduleData(schedule) {
-    console.log("Mapping schedule:", schedule);
-
     // Determine status based on isActive and executeAt
     let status = "Inactive";
     if (schedule.isActive) {
@@ -387,38 +386,20 @@
     };
   }
 
-  function handleScheduleAction(scheduleId: string, action: string) {
-    if (action === "more") {
-      // Open more actions menu for this schedule
-      onPerformTestflowScheduleOperations("openActionsMenu", scheduleId);
-    }
-  }
-
   $: {
-    if (safeTestflowScheduleStore.length > 0) {
-      const mappedSchedules = safeTestflowScheduleStore.map(mapScheduleData);
+    const mappedSchedules = testflowScheduleStore.map(mapScheduleData);
 
-      if (searchQuery.trim() === "") {
-        filteredSchedules = [...mappedSchedules];
-      } else {
-        const query = searchQuery.toLowerCase();
-        filteredSchedules = mappedSchedules.filter(
-          (schedule) =>
-            schedule.name.toLowerCase().includes(query) ||
-            schedule.environment.toLowerCase().includes(query) ||
-            schedule.description.toLowerCase().includes(query),
-        );
-      }
+    if (searchQuery.trim() === "") {
+      filteredSchedules = [...mappedSchedules];
+    } else {
+      const query = searchQuery.toLowerCase();
+      filteredSchedules = mappedSchedules.filter(
+        (schedule) =>
+          schedule.name.toLowerCase().includes(query) ||
+          schedule.environment.toLowerCase().includes(query) ||
+          schedule.description.toLowerCase().includes(query),
+      );
     }
-  }
-
-  function setActiveTab(tab) {
-    activeTab = tab;
-  }
-
-  function handleLearnMore() {
-    // Handle learn more click
-    console.log("Learn more clicked");
   }
 
   let dismissed = false;
@@ -438,37 +419,8 @@
     }
   }
 
-  export let onScheduleStatusUpdated = () => {};
-
   async function handleToggleStatus(id, isActive) {
-    const originalSchedules = Array.isArray(safeTestflowScheduleStore)
-      ? JSON.parse(JSON.stringify(safeTestflowScheduleStore))
-      : [];
-
-    testflowScheduleStore = safeTestflowScheduleStore.map((schedule) => {
-      if (schedule.id === id) {
-        return {
-          ...schedule,
-          isActive,
-          updatedAt: new Date().toISOString(),
-        };
-      }
-      return schedule;
-    });
-
-    testflowScheduleStore = [...testflowScheduleStore];
-
-    try {
-      const result = await onUpdateScheduleStatus(id, isActive);
-
-      if (!result.isSuccessful) {
-        testflowScheduleStore = JSON.parse(JSON.stringify(originalSchedules));
-      } else {
-        await onScheduleStatusUpdated();
-      }
-    } catch (err) {
-      testflowScheduleStore = JSON.parse(JSON.stringify(originalSchedules));
-    }
+    await onUpdateScheduleStatus(id, isActive);
   }
   const createBlankRequestObject = (
     _url: string,
@@ -747,6 +699,12 @@
   let isSaveModalOpen = false;
 
   const handleOpenSaveModal = () => {
+    if (
+      activeTab === "scheduled" &&
+      filteredSchedules.some((schedule) => schedule.status === "Active")
+    ) {
+      handleEventClickTestflowSaveSchedule();
+    }
     isSaveModalOpen = true;
   };
 
@@ -817,6 +775,21 @@
       }
 
       return dbNodes;
+    });
+  };
+
+  
+  const handleEventClickScheduleRun = () => {
+    captureEvent("schedule_run_cta_clicked", {
+      event_source: isWebApp ? "web_app" : "desktop_app",
+      cta_location: "within_test_flow",
+    });
+  };
+
+  const handleEventClickTestflowSaveSchedule = () => {
+    captureEvent("test_flow_updated", {
+      event_source: isWebApp ? "web_app" : "desktop_app",
+      testflow_id: $tab.id,
     });
   };
 
@@ -1345,7 +1318,8 @@
            */
           unselectNodes();
           nodes.update((_nodes: Node[]) => {
-            const dbNodes = $tab?.property?.testflow?.nodes as TFNodeType[];
+            const dbNodes =
+              ($tab?.property?.testflow?.nodes as TFNodeType[]) || [];
             let res = [];
             for (let i = 0; i < dbNodes.length; i++) {
               res.push({
@@ -1421,7 +1395,8 @@
             return res;
           });
           edges.update((_edges: TFEdgeHandlerType[]) => {
-            const dbEdges = $tab?.property?.testflow?.edges as TFEdgeType[];
+            const dbEdges =
+              ($tab?.property?.testflow?.edges as TFEdgeType[]) || [];
             let res = [];
             for (let i = 0; i < dbEdges.length; i++) {
               res.push({
@@ -1898,9 +1873,13 @@
                   type="primary"
                   size="medium"
                   startIcon={PlayFilled}
-                  title={activeTab === "scheduled" ? "Run Now" : "Run Now"}
+                  title={"Run Now"}
                   onClick={async () => {
-                    if (activeTab === "scheduled") {
+                    handleEventClickScheduleRun();
+                    if (
+                      $tab?.property?.testflow?.state?.testflowNavigator ===
+                      TestflowNavigatorEnum.SCHEDULE
+                    ) {
                       // Handle scheduled run logic
                       await onClickScheduledRun();
                     } else {
@@ -1924,6 +1903,7 @@
               size="medium"
               title="Schedule Run"
               style="margin-left: 0;"
+              id="create-new-schedule"
               buttonType="button"
               onClick={() => {
                 isScheduleRunPopupOpen = true;
@@ -1989,28 +1969,16 @@
   <!-- Tab Navigation and Warning Message -->
   <div class="pt-5 px-3" style="margin-top: 10px;">
     <!-- Tab Navigation -->
-    <div class="d-flex align-items-center justify-content-between mb-3">
-      <div class="d-flex">
-        <button
-          class="tab-button {activeTab === 'testflow' ? 'tab-active' : ''}"
-          on:click={() => setActiveTab("testflow")}
-        >
-          Test Flow
-        </button>
-        <button
-          class="tab-button {activeTab === 'scheduled' ? 'tab-active' : ''}"
-          on:click={() => setActiveTab("scheduled")}
-        >
-          Scheduled Run
-        </button>
-      </div>
-    </div>
+    <TestflowNavigator
+      testflowNavigator={$tab?.property?.testflow?.state?.testflowNavigator}
+      {onUpdateTestflowState}
+    />
   </div>
 
   <!-- Warning Message -->
-  {#if activeTab === "scheduled" && filteredSchedules.some((schedule) => schedule.status === "Active") && !dismissed}
+  {#if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.SCHEDULE && filteredSchedules.some((schedule) => schedule.status === "Active") && !dismissed}
     <div
-      class="warning-banner d-flex align-items-center mb-3 p-2 position-relative"
+      class="warning-banner px-4 d-flex align-items-center mb-3 p-2 position-relative"
     >
       <div class="warning-icon me-2"><ToastIcon /></div>
       <div class="flex-grow-1">
@@ -2018,13 +1986,14 @@
           This flow has active schedules. Any changes here will affect future
           runs.
         </span>
-        <span
+        <!-- <span
           class="cursor-pointer ms-2 text-fs-12"
           on:click={handleLearnMore}
           style="color: #60a5fa;"
         >
+
           Learn More
-        </span>
+        </span> -->
       </div>
       <button class="btn-close-warning" on:click={dismissWarning}> × </button>
     </div>
@@ -2032,7 +2001,7 @@
 
   <!-- Main Content Area -->
   <div style="flex: 1; overflow: auto;" class="px-3">
-    {#if activeTab === "testflow"}
+    {#if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.TESTFLOW}
       <!-- Test Flow Content -->
       <div
         bind:this={divElement}
@@ -2135,7 +2104,7 @@
           </div>
         {/if}
       </div>
-    {:else if activeTab === "scheduled"}
+    {:else if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.SCHEDULE}
       <!-- Scheduled Run Content -->
       <div class="scheduled-runs-container h-100">
         <div class="d-flex flex-column h-100">
@@ -2159,7 +2128,10 @@
             class="scheduled-table-container flex-grow-1"
             style="overflow: auto;"
           >
-            <table class="table scheduled-table">
+            <table
+              class="scheduled-table"
+              style="background-color: transparent !important;"
+            >
               <thead>
                 <tr>
                   <th>Schedule Name</th>
@@ -2178,8 +2150,9 @@
                     {getTooltipMessage}
                     {handleToggleStatus}
                     {getNextRunTooltip}
-                    {handleScheduleAction}
                     {getTagType}
+                    {onOpenTestflowScheduleConfigurationsTab}
+                    {onOpenTestflowScheduleTab}
                   />
                 {/each}
               </tbody>
@@ -2213,7 +2186,7 @@
   </div>
 
   <!-- Bottom Panel (only show for Test Flow) -->
-  {#if activeTab === "testflow"}
+  {#if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.TESTFLOW}
     {#if selectedBlock && selectedBlock?.data?.requestId}
       <div style="background-color: transparent; margin: 0px 13px 12px 13px;">
         <TestFlowBottomPanel
@@ -2302,20 +2275,22 @@
   {/if}
 
   <!-- Help Section -->
-  <div class="p-3" style="position:absolute; z-index:3; bottom:0; right:0;">
-    {#if testflowCount <= planLimitTestFlows || isGuestUser}
-      <p
-        class="mb-0 pb-0 text-fs-14"
-        style="color: var(--text-primary-300); font-weight:500; cursor:pointer;"
-        on:click={() => {
-          currentStep.set(1);
-          isTestFlowTourGuideOpen.set(true);
-        }}
-      >
-        Need help?
-      </p>
-    {/if}
-  </div>
+  {#if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.TESTFLOW}
+    <div class="p-3" style="position:absolute; z-index:3; bottom:0; right:0;">
+      {#if testflowCount <= planLimitTestFlows || isGuestUser}
+        <p
+          class="mb-0 pb-0 text-fs-14"
+          style="color: var(--text-primary-300); font-weight:500; cursor:pointer;"
+          on:click={() => {
+            currentStep.set(1);
+            isTestFlowTourGuideOpen.set(true);
+          }}
+        >
+          Need help?
+        </p>
+      {/if}
+    </div>
+  {/if}
 </div>
 <!-- <svelte:window on:keydown={handleKeyPress} /> -->
 
@@ -2508,6 +2483,26 @@
   submitButtonName={planContent?.buttonName}
 />
 
+<PlanUpgradeModal
+  bind:isOpen={isCreateTestflowScheduleLimitReachedModalOpen}
+  title={planContent?.title}
+  description={planContent?.description}
+  planType="Test Schedule"
+  planLimitValue={planLimitTestScheduleCount}
+  currentPlanValue={planLimitTestScheduleCount}
+  isOwner={userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN
+    ? true
+    : false}
+  {handleContactSales}
+  handleSubmitButton={userRole === TeamRole.TEAM_OWNER ||
+  userRole === TeamRole.TEAM_ADMIN
+    ? handleRedirectToAdminPanel
+    : handleRequestOwner}
+  userName={teamDetails?.teamName}
+  userEmail={teamDetails?.teamOwnerEmail}
+  submitButtonName={planContent?.buttonName}
+/>
+
 <style>
   :global(.svelte-flow__attribution) {
     display: none;
@@ -2636,16 +2631,15 @@
 
   .scheduled-table th {
     background-color: var(--bg-ds-neutral-900);
-    padding: 12px;
+    padding-bottom: 12px;
     text-align: left;
     font-weight: 500;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--text-ds-neutral-300);
     border-bottom: 1px solid var(--border-ds-neutral-400);
   }
 
   .scheduled-table td {
-    padding: 12px;
     border-bottom: none;
     font-size: 14px;
     background-color: var(--bg-ds-neutral-900);
