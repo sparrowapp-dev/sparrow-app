@@ -672,9 +672,12 @@
   let isSaveModalOpen = false;
 
   const handleOpenSaveModal = () => {
-    isSaveModalOpen = true;
+    if (testflowScheduleStore.some((schedule) => schedule.isActive)) {
+      isSaveModalOpen = true;
+    } else {
+      onSaveTestflow();
+    }
   };
-
   const handleSaveConfirm = () => {
     onSaveTestflow(); // Your original save function
     isSaveModalOpen = false;
@@ -1897,7 +1900,7 @@
   </div>
 
   <!-- Warning Message -->
-  {#if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.SCHEDULE && filteredSchedules.some((schedule) => schedule.status === "Active") && !dismissed}
+  {#if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.SCHEDULE && testflowScheduleStore.some((schedule) => schedule.isActive) && !dismissed}
     <div
       class="warning-banner px-4 d-flex align-items-center mb-3 p-2 position-relative"
     >
@@ -1907,14 +1910,6 @@
           This flow has active schedules. Any changes here will affect future
           runs.
         </span>
-        <!-- <span
-          class="cursor-pointer ms-2 text-fs-12"
-          on:click={handleLearnMore}
-          style="color: #60a5fa;"
-        >
-
-          Learn More
-        </span> -->
       </div>
       <button class="btn-close-warning" on:click={dismissWarning}> × </button>
     </div>
