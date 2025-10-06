@@ -168,6 +168,14 @@ export class TestflowExplorerPageViewModel {
    */
   private fetchTestflow = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
+     // await this.updateEnvironmentState({ isSaveInProgress: true });
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
+      return;
+    }
     const response = await this.testflowService.fetchTestflow(
       progressiveTab.id as string,
     );

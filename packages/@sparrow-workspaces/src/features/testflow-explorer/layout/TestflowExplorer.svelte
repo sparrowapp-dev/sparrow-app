@@ -778,7 +778,6 @@
     });
   };
 
-  
   const handleEventClickScheduleRun = () => {
     captureEvent("schedule_run_cta_clicked", {
       event_source: isWebApp ? "web_app" : "desktop_app",
@@ -1897,18 +1896,25 @@
               </div>
             {/if}
           {/if}
-          {#if !isGuestUser && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-            <Button
-              type="secondary"
-              size="medium"
-              title="Schedule Run"
-              style="margin-left: 0;"
-              id="create-new-schedule"
-              buttonType="button"
-              onClick={() => {
-                isScheduleRunPopupOpen = true;
-              }}
-            />
+          {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+            <Tooltip
+              title={isGuestUser
+                ? "To access the feature, you need to login/signup on Sparrow."
+                : ""}
+            >
+              <Button
+                type="secondary"
+                size="medium"
+                title="Schedule Run"
+                style="margin-left: 0;"
+                id="create-new-schedule"
+                disable={isGuestUser}
+                buttonType="button"
+                onClick={() => {
+                  isScheduleRunPopupOpen = true;
+                }}
+              />
+            </Tooltip>
           {/if}
         </div>
 
