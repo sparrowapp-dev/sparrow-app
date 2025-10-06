@@ -189,7 +189,21 @@
       </div>
     </Tooltip>
   </td>
-  <td>{schedule.environment}</td>
+  <td>
+    {#if schedule.environment === "Deleted Environment"}
+      <Tooltip
+        title="This environment has been removed and might impact test results."
+        placement="bottom-center"
+        size="small"
+      >
+        <span style="color: var(--text-ds-neutral-500);"
+          >{schedule.environment}</span
+        >
+      </Tooltip>
+    {:else}
+      {schedule.environment}
+    {/if}
+  </td>
   <td>
     <Tooltip
       title={getNextRunTooltip(schedule)}
@@ -202,25 +216,18 @@
     </Tooltip>
   </td>
   <td>
-    {#if schedule.lastResult !== "No results yet" && schedule.lastResult !== "error"}
-      <Tag
-        text={schedule.lastResult || "No results yet"}
-        type={getTagType(schedule.lastResult)}
-      />
-    {/if}
-
-    {#if schedule.lastResult === "No results yet"}
-      <span class="text-muted">No results yet</span>
-    {/if}
-
-    {#if schedule.lastResult === "error"}
+    {#if schedule.lastResult === "Success"}
+      <Tag text="Success" type={getTagType("Success")} />
+    {:else if schedule.lastResult === "Fail"}
       <Tooltip
         title={getFailTooltip(schedule)}
-        placement="bottom-left"
+        placement="bottom-center"
         size="small"
       >
         <Tag text="Partially Failed" type={getTagType("Partially Failed")} />
       </Tooltip>
+    {:else}
+      <span class="text-muted">No results yet</span>
     {/if}
   </td>
   <td bind:this={activeWrapper}>
