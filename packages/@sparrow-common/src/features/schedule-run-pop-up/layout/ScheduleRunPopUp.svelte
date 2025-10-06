@@ -18,7 +18,7 @@
 
   // Form data
   let scheduleName = "";
-  let selectedEnvironment = "";
+  let selectedEnvironment = "none";
   let isError = false;
   let isScheduling = false;
 
@@ -57,10 +57,17 @@
     selectedTime = "12:00";
   }
 
-  $: formattedEnvironments = environments.map((env) => ({
-    id: env.id,
-    name: env.name,
-  }));
+  // Modified environment formatting to include None option
+  $: formattedEnvironments = [
+    {
+      id: "none",
+      name: "None",
+    },
+    ...environments.map((env) => ({
+      id: env.id,
+      name: env.name,
+    })),
+  ];
 
   // Run Cycle options
   const cycleOptions = [
@@ -283,7 +290,7 @@
     // Call the handler with the properly formatted data
     const result = await handleScheduleTestFlowRun(
       scheduleName,
-      selectedEnvironment,
+      selectedEnvironment === "none" ? "" : selectedEnvironment,
       runConfiguration,
       {
         emails: notificationEmails,
@@ -345,11 +352,11 @@
       <Select
         id="environment-select"
         data={formattedEnvironments}
-        titleId={selectedEnvironment}
+        titleId={selectedEnvironment === "none" ? "" : selectedEnvironment}
         onclick={handleEnvironmentSelect}
         size="medium"
         minHeaderWidth="100%"
-        placeholderText="Select environment"
+        placeholderText="Select"
         menuItem="v2"
         showDescription={false}
         bodyTheme={"violet"}
