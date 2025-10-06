@@ -39,6 +39,7 @@
   export let onUploadFiles;
   export let environmentVariables;
   export let onUpdateEnvironment;
+  export let isSelfHost;
 
   let scrollList: ScrollList;
 
@@ -149,6 +150,7 @@
       {onUploadFiles}
       {environmentVariables}
       {onUpdateEnvironment}
+      {isSelfHost}
     />
     <!-- <button class="chatten-box">
       <span class="chatten-box-icon">ASIF</span>

@@ -67,6 +67,7 @@
   export let isPromptBoxActive = false;
   export let environmentVariables;
   export let onUpdateEnvironment;
+  export let isSelfHost;
 
   let isRenaming = false;
   let newRequestName: string = "";
@@ -622,6 +623,7 @@
           disabled={!isPromptBoxActive}
           {environmentVariables}
           {onUpdateEnvironment}
+          {isSelfHost}
         />
       </div>
     </div>
