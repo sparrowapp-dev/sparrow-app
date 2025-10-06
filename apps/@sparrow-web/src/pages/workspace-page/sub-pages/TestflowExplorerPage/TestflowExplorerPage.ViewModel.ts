@@ -103,6 +103,7 @@ export class TestflowExplorerPageViewModel {
         delete t.isActive;
         delete t.index;
         this.tab = t;
+        this.fetchTestflow();
       }, 0);
     }
   }

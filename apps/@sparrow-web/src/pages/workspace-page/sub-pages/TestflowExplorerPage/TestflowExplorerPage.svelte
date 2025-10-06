@@ -329,7 +329,7 @@
     {environmentVariables}
     {isTestflowEditable}
     {testflowStore}
-    {testflowScheduleStore}
+    testflowScheduleStore={testflowScheduleStore || []}
     onUpdateNodes={_viewModel.updateNodes}
     onUpdateEdges={_viewModel.updateEdges}
     {collectionListDocument}

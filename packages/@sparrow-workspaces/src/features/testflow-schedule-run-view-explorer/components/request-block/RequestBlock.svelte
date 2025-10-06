@@ -163,7 +163,7 @@
         isNodeExistToLeft = data?.onCheckEdges(id, "left");
         isAddBlockVisible = !data?.onCheckEdges(id);
       }, 10);
-      isDropHereVisible = _nodes[0].data.parentDrag;
+      isDropHereVisible = _nodes?.[0]?.data?.parentDrag;
     });
     dataConnectorSubscriber = data.connector.subscribe(() => {
       // Update visibility of the "Add Block" button based on edge check
