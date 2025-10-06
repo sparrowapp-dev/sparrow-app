@@ -44,6 +44,27 @@
     });
     scheduledEnvironment = filterEnvironment?.toMutableJSON() || {};
   }
+
+  let description = "";
+
+  $: {
+    if (schedule.runConfiguration) {
+      const config = schedule.runConfiguration;
+      if (!schedule.isActive) {
+        description = "Paused";
+      } else if (config.runCycle === "once" && config.executeAt) {
+        const date = new Date(config.executeAt);
+        description = `Run once on ${date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} at ${date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })}`;
+      } else if (config.runCycle === "recurring" && config.intervalHours) {
+        description = `Run every ${config.intervalHours} hour${config.intervalHours > 1 ? "s" : ""}`;
+      } else if (config.runCycle === "daily" && config.time) {
+        description = `Run everyday at ${config.time}`;
+      } else if (config.runCycle === "weekly" && config.days && config.time) {
+        const dayNames = config.days.join(", ");
+        description = `Run every ${dayNames} at ${config.time}`;
+      }
+    }
+  }
 </script>
 
 {#if $tab.tabId}
@@ -107,15 +128,32 @@
           }}
         />
         {#if scheduledEnvironment?.name}
-          <Button
-            title={scheduledEnvironment?.name || ""}
-            startIcon={LayerRegular}
-            type={"link-secondary"}
-            size={"extra-small"}
-            onClick={() => {
-              onOpenEnvironment(scheduledEnvironment?.id);
-            }}
-          />
+          <div class="d-flex gap-2 align-items-center">
+            <span
+              class="dot"
+              style="transform: translateX(12px) translateY(2px);"
+            ></span>
+            <Button
+              title={scheduledEnvironment?.name || ""}
+              startIcon={LayerRegular}
+              type={"link-secondary"}
+              size={"extra-small"}
+              onClick={() => {
+                onOpenEnvironment(scheduledEnvironment?.id);
+              }}
+            />
+          </div>
+        {/if}
+        {#if description}
+          <div class="d-flex gap-2 align-items-center pt-1">
+            <span class="dot"></span>
+            <p
+              class="text-fs-12 mb-0"
+              style="color: var(--text-ds-neutral-200)"
+            >
+              {description || ""}
+            </p>
+          </div>
         {/if}
       </div>
       <div>
@@ -149,4 +187,10 @@
 {/if}
 
 <style>
+  .dot {
+    height: 4px;
+    width: 4px;
+    background-color: var(--text-ds-neutral-200);
+    border-radius: 50%;
+  }
 </style>

@@ -777,7 +777,6 @@
     });
   };
 
-  
   const handleEventClickScheduleRun = () => {
     captureEvent("schedule_run_cta_clicked", {
       event_source: isWebApp ? "web_app" : "desktop_app",
@@ -1896,18 +1895,39 @@
               </div>
             {/if}
           {/if}
-          {#if !isGuestUser && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-            <Button
-              type="secondary"
-              size="medium"
-              title="Schedule Run"
-              style="margin-left: 0;"
-              id="create-new-schedule"
-              buttonType="button"
-              onClick={() => {
-                isScheduleRunPopupOpen = true;
-              }}
-            />
+          {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+            {#if isGuestUser}
+              <Tooltip
+                title={isGuestUser
+                  ? "To access the feature, you need to login/signup on Sparrow."
+                  : "Schedule Run"}
+              >
+                <Button
+                  type="secondary"
+                  size="medium"
+                  title="Schedule Run"
+                  style="margin-left: 0;"
+                  id="create-new-schedule"
+                  disable={isGuestUser}
+                  buttonType="button"
+                  onClick={() => {
+                    isScheduleRunPopupOpen = true;
+                  }}
+                />
+              </Tooltip>
+            {:else}
+              <Button
+                type="secondary"
+                size="medium"
+                title="Schedule Run"
+                style="margin-left: 0;"
+                id="create-new-schedule"
+                buttonType="button"
+                onClick={() => {
+                  isScheduleRunPopupOpen = true;
+                }}
+              />
+            {/if}
           {/if}
         </div>
 
@@ -1977,7 +1997,7 @@
   <!-- Warning Message -->
   {#if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.SCHEDULE && testflowScheduleStore.some((schedule) => schedule.isActive) && !dismissed}
     <div
-      class="warning-banner px-4 d-flex align-items-center mb-3 p-2 position-relative"
+      class="mx-3 warning-banner px-4 d-flex align-items-center mb-3 p-2 position-relative"
     >
       <div class="warning-icon me-2"><ToastIcon /></div>
       <div class="flex-grow-1">
@@ -2130,7 +2150,9 @@
                   <th>Environment</th>
                   <th>Next Run</th>
                   <th>Last Run Result</th>
-                  <th>Actions</th>
+                  {#if isTestflowEditable}
+                    <th>Actions</th>
+                  {/if}
                 </tr>
               </thead>
               <tbody>
@@ -2142,6 +2164,7 @@
                     {handleToggleStatus}
                     {getNextRunTooltip}
                     {getTagType}
+                    {isTestflowEditable}
                     {onOpenTestflowScheduleConfigurationsTab}
                     {onOpenTestflowScheduleTab}
                   />
@@ -2543,10 +2566,6 @@
     font-size: 14px;
     padding: 8px 12px;
     width: 300px;
-  }
-
-  .scheduled-runs-container {
-    padding: 16px;
   }
 
   .warning-banner {

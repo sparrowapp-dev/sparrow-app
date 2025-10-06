@@ -104,6 +104,7 @@ export class TestflowExplorerPageViewModel {
         delete t.isActive;
         delete t.index;
         this.tab = t;
+
         this.fetchTestflow();
       }, 0);
     }
@@ -1865,6 +1866,14 @@ export class TestflowExplorerPageViewModel {
    */
   private fetchTestflow = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
+    // await this.updateEnvironmentState({ isSaveInProgress: true });
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) {
+      return;
+    }
     const response = await this.testflowService.fetchTestflow(
       progressiveTab.id as string,
     );
