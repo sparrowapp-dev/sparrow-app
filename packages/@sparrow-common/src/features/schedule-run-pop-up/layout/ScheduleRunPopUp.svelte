@@ -234,25 +234,72 @@
   }
 
   // Add function to format date for API
-  function formatDateForAPI(timeStr, dateStr = null) {
+  function formatDateForAPI(timeStr, dateStr) {
+    if (!timeStr) return new Date().toISOString();
+
+    let dateObj;
+    const now = new Date();
+
+    // Get current time in HH:MM format
+    const currentTimeStr = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`;
+
+    // Check if date is today
+    const isToday =
+      !dateStr ||
+      (() => {
+        const [day, month, year] = dateStr.split("-").map(Number);
+        const selectedDate = new Date(year, month - 1, day);
+        const today = new Date();
+        return (
+          selectedDate.getDate() === today.getDate() &&
+          selectedDate.getMonth() === today.getMonth() &&
+          selectedDate.getFullYear() === today.getFullYear()
+        );
+      })();
+
+    // Add 2 minutes buffer only if BOTH time is current AND date is today
+    if (timeStr === currentTimeStr && isToday) {
+      if (dateStr) {
+        const [day, month, year] = dateStr.split("-").map(Number);
+        dateObj = new Date(
+          year,
+          month - 1,
+          day,
+          now.getHours(),
+          now.getMinutes(),
+        );
+        dateObj.setMinutes(dateObj.getMinutes() + 2);
+      } else {
+        dateObj = new Date(now.getTime() + 2 * 60000);
+      }
+    } else {
+      // Normal case - parse the time string (HH:MM format)
+      const [hours, minutes] = timeStr.split(":").map(Number);
+
+      if (dateStr) {
+        // If a date string is provided, use it
+        const [day, month, year] = dateStr.split("-").map(Number);
+        dateObj = new Date(year, month - 1, day, hours, minutes);
+      } else {
+        // Otherwise use the current date with the specified time
+        dateObj = new Date();
+        dateObj.setHours(hours, minutes, 0, 0);
+      }
+    }
+
+    return dateObj.toISOString();
+  }
+
+  function formatTimetoUTC(timeStr) {
     if (!timeStr) return new Date().toISOString();
 
     // Parse the time string (HH:MM format)
     const [hours, minutes] = timeStr.split(":").map(Number);
 
-    let dateObj;
+    // Use current date with the specified time
+    const dateObj = new Date();
+    dateObj.setHours(hours, minutes, 0, 0);
 
-    if (dateStr) {
-      // If a date string is provided, use it
-      const [day, month, year] = dateStr.split("-").map(Number);
-      dateObj = new Date(year, month - 1, day, hours, minutes);
-    } else {
-      // Otherwise use the current date with the specified time
-      dateObj = new Date();
-      dateObj.setHours(hours, minutes, 0, 0);
-    }
-
-    // Return ISO string (automatically in UTC)
     return dateObj.toISOString();
   }
 
@@ -274,7 +321,7 @@
         break;
       case "daily":
         // For daily, we need time
-        runConfiguration.time = formatDateForAPI(selectedTime);
+        runConfiguration.time = formatTimetoUTC(selectedTime);
         break;
       case "weekly":
         // For weekly, we need days
@@ -284,7 +331,7 @@
             return day ? day.dayNumber : undefined;
           })
           .filter((day) => day !== undefined);
-        runConfiguration.time = formatDateForAPI(selectedTime);
+        runConfiguration.time = formatTimetoUTC(selectedTime);
         break;
         break;
       case "hourly":
