@@ -1936,7 +1936,7 @@ export class TestflowExplorerPageViewModel {
         testflowId,
         runConfiguration,
         notification,
-        userTimeZone,
+        timeZone: userTimeZone,
       };
 
       const response = await this.testflowService.scheduleTestFlowRun(

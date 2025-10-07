@@ -26,5 +26,5 @@ export interface ScheduleTestFlowRunDto {
   testflowId: string;
   runConfiguration: RunConfigurationDTO;
   notification?: NotificationDTO;
-  userTimeZone?: string;
+  timeZone?: string;
 }
