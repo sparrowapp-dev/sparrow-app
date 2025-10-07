@@ -78,6 +78,7 @@
   let isDropHereVisible = false; // state to track if there is drag in test flow screen
   let dataBlocksSubscriber: Unsubscriber;
   let dataConnectorSubscriber: Unsubscriber;
+  let dragEndHandler: () => void;
   let req = {
     name: "",
     method: "",
@@ -145,6 +146,13 @@
   });
 
   onMount(() => {
+    // Add global dragend event listener
+    dragEndHandler = () => {
+      isDropHereVisible = false;
+    };
+
+    document.addEventListener("dragend", dragEndHandler);
+
     // Subscribe to changes in the blocks
     dataBlocksSubscriber = data.blocks.subscribe((_nodes: Node) => {
       _nodes.forEach((_node) => {
@@ -179,6 +187,10 @@
     testFlowDataStoreSubscriber();
     dataBlocksSubscriber();
     dataConnectorSubscriber();
+    // Remove global dragend event listener
+    if (dragEndHandler) {
+      document.removeEventListener("dragend", dragEndHandler);
+    }
   });
 
   /**
@@ -521,6 +533,29 @@
                 method: requestEvent.method,
               };
               data.onClick(id, requestData);
+              isDropHereVisible = false;
+            }}
+            on:dragover={(e) => {
+              e.preventDefault();
+            }}
+            on:dragenter={(e) => {
+              e.preventDefault();
+            }}
+            on:dragleave={(e) => {
+              e.preventDefault();
+              // Check if we're really leaving the drop zone
+              const rect = e.currentTarget.getBoundingClientRect();
+              const x = e.clientX;
+              const y = e.clientY;
+
+              if (
+                x < rect.left ||
+                x > rect.right ||
+                y < rect.top ||
+                y > rect.bottom
+              ) {
+                isDropHereVisible = false;
+              }
             }}
           >
             <div class="d-flex align-items-center justify-content-center">

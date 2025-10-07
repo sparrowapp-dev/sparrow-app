@@ -1274,8 +1274,6 @@ export class CollectionRepository {
     insertPosition?: "before" | "after",
   ) => {
     try {
-      debugger;
-
       // Handle same collection move
       if (oldCollectionId === newCollectionId) {
         const collection = await RxDB.getInstance()
