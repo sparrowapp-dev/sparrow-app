@@ -476,6 +476,46 @@
   };
 
   /**
+   * Gets the current collection and folder location for a given request ID
+   * This ensures we always use the most up-to-date location even after drag-and-drop operations
+   */
+  const getCurrentApiLocation = (
+    requestId: string,
+    fallbackCollectionId: string,
+    fallbackFolderId: string,
+  ) => {
+    let currentCollectionId = fallbackCollectionId;
+    let currentFolderId = fallbackFolderId;
+
+    // If we have a requestId, find its current location in collections
+    if (requestId && collectionListDocument) {
+      for (const collection of collectionListDocument) {
+        const findInItems = (items: any[], parentFolderId: string = "") => {
+          for (const item of items || []) {
+            if (item.id === requestId) {
+              currentCollectionId = collection.id;
+              currentFolderId = parentFolderId;
+              return true;
+            }
+            if (item.items && item.items.length > 0) {
+              if (findInItems(item.items, item.id)) {
+                return true;
+              }
+            }
+          }
+          return false;
+        };
+
+        if (findInItems(collection.items)) {
+          break;
+        }
+      }
+    }
+
+    return { currentCollectionId, currentFolderId };
+  };
+
+  /**
    * Updates the selected API in a specific node.
    * @param id - Node ID.
    * @param name - Name of the API.
@@ -495,12 +535,23 @@
   ) => {
     let response: any = {};
     if (collectionId) {
-      response = await createCustomRequestObject(
-        collectionId,
+      // Get the most current location for this API
+      const { currentCollectionId, currentFolderId } = getCurrentApiLocation(
         requestId,
-        folderId as string,
+        collectionId,
+        folderId || "",
+      );
+
+      response = await createCustomRequestObject(
+        currentCollectionId,
+        requestId,
+        currentFolderId,
         name,
       );
+
+      // Update the node with current location info
+      collectionId = currentCollectionId;
+      folderId = currentFolderId;
     } else {
       // create custom API Request.
       response = await createBlankRequestObject(url as string, method, name);
