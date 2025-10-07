@@ -713,6 +713,7 @@
     }
   };
   const handleSaveConfirm = () => {
+    handleEventClickTestflowSaveSchedule();
     onSaveTestflow(); // Your original save function
     isSaveModalOpen = false;
   };
@@ -1878,7 +1879,6 @@
                   startIcon={PlayFilled}
                   title={"Run Now"}
                   onClick={async () => {
-                    handleEventClickScheduleRun();
                     if (
                       $tab?.property?.testflow?.state?.testflowNavigator ===
                       TestflowNavigatorEnum.SCHEDULE
@@ -1916,6 +1916,7 @@
                   disable={isGuestUser}
                   buttonType="button"
                   onClick={() => {
+                    handleEventClickScheduleRun();
                     isScheduleRunPopupOpen = true;
                   }}
                 />
@@ -1929,6 +1930,7 @@
                 id="create-new-schedule"
                 buttonType="button"
                 onClick={() => {
+                  handleEventClickScheduleRun();
                   isScheduleRunPopupOpen = true;
                 }}
               />
