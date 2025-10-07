@@ -275,7 +275,12 @@
 
   onMount(() => {
     handleBlockLimitTestflow();
-    collectionsSubscriber.unsubscribe();
+  });
+
+  onDestroy(() => {
+    if (collectionsSubscriber) {
+      collectionsSubscriber.unsubscribe();
+    }
   });
 </script>
 
