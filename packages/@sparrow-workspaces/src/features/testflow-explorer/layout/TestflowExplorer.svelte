@@ -338,6 +338,7 @@
     collectionId: string,
     requestId: string,
     folderId: string,
+    requestName?: string,
   ) => {
     const response: any = {};
     const tempTab = new InitRequestTab("uuid", "uuid").getValue().property
@@ -391,7 +392,10 @@
     } else {
       response.method = tempTab?.method;
     }
-    if (data?.name) {
+    // Use the provided requestName parameter first, then fallback to data.name, then "Untitled"
+    if (requestName) {
+      response.name = requestName;
+    } else if (data?.name) {
       response.name = data.name;
     } else {
       response.name = "Untitled";
@@ -495,6 +499,7 @@
         collectionId,
         requestId,
         folderId as string,
+        name,
       );
     } else {
       // create custom API Request.
@@ -791,6 +796,7 @@
         _requestData?.collectionId,
         _requestData?.requestId,
         _requestData?.folderId,
+        _requestData?.name,
       );
       requestMetaData = {
         collectionId: _requestData?.collectionId,
