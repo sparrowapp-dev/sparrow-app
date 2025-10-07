@@ -394,6 +394,7 @@
     onUpdateEnvironment={_viewModel.updateEnvironment}
     {userRole}
     {currentWorkspaceId}
+    environments={$environments}
     runSingleNode={_viewModel.handleSingleTestFlowNodeRun}
     onPreviewExpression={_viewModel.handlePreviewExpression}
     redirectDocsTestflow={_viewModel.redirectDocsTestflow}
