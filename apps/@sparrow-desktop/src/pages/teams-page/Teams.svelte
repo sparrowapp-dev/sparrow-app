@@ -41,6 +41,7 @@
     UpgradePlanPopUp,
   } from "@sparrow/common/components";
   import { shouldRunThrottled } from "@sparrow/common/store";
+  import { getSelfhostUrls } from "@app/utils/jwt";
 
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
@@ -70,8 +71,10 @@
   });
 
   const externalSparrowGithub = constants.SPARROW_GITHUB;
-
-  const sparrowAdminUrl = constants.ADMIN_URL;
+  const [, , selfhostAdminUrl] = getSelfhostUrls();
+  const sparrowAdminUrl = selfhostAdminUrl
+    ? selfhostAdminUrl
+    : constants.ADMIN_URL;
 
   onMount(async () => {
     let githubRepo = await _viewModel.getGithubRepo();

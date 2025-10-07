@@ -72,7 +72,10 @@
   >
     <div class="w-50 d-flex align-items-center">
       <!-- <div class="position-absolute top-0" style="width: calc(50% - 48px);"> -->
-      <div class="position-absolute top-0" style="width: calc(50% - 60px);">
+      <div
+        class="position-absolute top-0"
+        style="width: calc(50% - {isInputBoxEditable ? '90px' : '60px'});"
+      >
         <CodeMirrorInput
           bind:value={element.key}
           onUpdateInput={() => updateParam(index)}

@@ -4,9 +4,17 @@ import type {
   CreateEnvironmentPostBody,
   UpdateEnvironmentPostBody,
 } from "@sparrow/common/dto";
+import { getSelfhostUrls } from "@app/utils/jwt";
 
 export class EnvironmentService {
-  constructor() {}
+  constructor() {    const [selfhostBackendUrl] = getSelfhostUrls();
+        if (selfhostBackendUrl) {
+            this.apiUrl = selfhostBackendUrl;
+        }
+        else{
+            this.apiUrl = constants.API_URL;
+        }
+    }
 
   private apiUrl: string = constants.API_URL;
 

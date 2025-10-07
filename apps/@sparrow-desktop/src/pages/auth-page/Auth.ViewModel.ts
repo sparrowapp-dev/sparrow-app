@@ -1,4 +1,4 @@
-import { jwtDecode, setAuthJwt } from "@app/utils/jwt";
+import { jwtDecode, setAuthJwt, setSelfhostUrls } from "@app/utils/jwt";
 import { EnvironmentRepository } from "../../repositories/environment.repository";
 import { GuestUserRepository } from "../../repositories/guest-user.repository";
 import { GuideRepository } from "../../repositories/guide.repository";
@@ -59,6 +59,10 @@ export class AuthViewModel {
   const params = new URLSearchParams(url.split("?")[1]);
   const accessToken = params.get("accessToken");
   const refreshToken = params.get("refreshToken");
+  const selfhostBackendUrl = params.get("selfhostBackendUrl");
+  const selfhostWebAppUrl = params.get("selfhostWebUrl");
+  const selfhostAdminUrl = params.get("selfhostAdminUrl");
+
   const event = params.get("event");
   const method = params.get("method");
 
@@ -68,6 +72,7 @@ export class AuthViewModel {
     identifyUser(userDetails.email);
     setAuthJwt(constants.AUTH_TOKEN, accessToken);
     setAuthJwt(constants.REF_TOKEN, refreshToken);
+    setSelfhostUrls(selfhostBackendUrl as string, selfhostWebAppUrl as string, selfhostAdminUrl as string);
     setUser(jwtDecode(accessToken));
     this.sendUserDataToMixpanel(userDetails);
 

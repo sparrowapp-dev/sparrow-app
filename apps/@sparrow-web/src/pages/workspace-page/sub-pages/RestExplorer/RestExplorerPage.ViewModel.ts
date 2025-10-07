@@ -7,6 +7,7 @@ import {
   ReduceAuthParameter,
 } from "@sparrow/workspaces/features/rest-explorer/utils";
 import { createDeepCopy, scrollToTab } from "@sparrow/common/utils";
+import { XMLParser, XMLBuilder } from "fast-xml-parser";
 import {
   startLoading,
   stopLoading,
@@ -220,6 +221,9 @@ class RestExplorerViewModel {
           );
           await this.updateIsRequestTabDemo(
             collectionDoc?.isRequestTestsNoCodeDemoCompleted,
+          );
+          await this.updateIsRequestTabScriptDemo(
+            collectionDoc?.isRequestTestsScriptDemoCompleted,
           );
         }
 
@@ -549,6 +553,11 @@ class RestExplorerViewModel {
     } else if (
       requestServer.request.tests.testCaseMode !==
       progressiveTab.property.request.tests.testCaseMode
+    ) {
+      result = false;
+    } else if (
+      requestServer.request.tests.script !==
+      progressiveTab.property.request.tests.script
     ) {
       result = false;
     } else if (
@@ -1890,6 +1899,8 @@ class RestExplorerViewModel {
     const testcaseMode = progressiveTab.property.request.tests.testCaseMode;
     if (testcaseMode === TestCaseModeEnum.NO_CODE) {
       await this.executeNoCodeTestcases();
+    } else {
+      await this.executeScriptTestcases();
     }
   };
 
@@ -2016,6 +2027,57 @@ class RestExplorerViewModel {
     });
   };
 
+  private async executeScriptTestcases() {
+    const worker = new Worker(
+      new URL("../../../../workers/test-script-worker.ts", import.meta.url),
+      {
+        type: "module",
+      },
+    );
+    // minimal chai-like expect (you can replace with a real lib like chai)
+
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const javaScriptTestCases =
+      progressiveTab.property.request.tests.script || "";
+
+    restExplorerDataStore.update((restApiDataMap) => {
+      const r = restApiDataMap.get(progressiveTab?.tabId);
+      if (r) {
+        r.response.testResults = [];
+        r.response.testMessage = "";
+        restApiDataMap.set(progressiveTab.tabId, r);
+        worker.postMessage({
+          javaScriptTestCases,
+          response: r.response,
+        });
+      }
+      return restApiDataMap;
+    });
+
+    worker.onmessage = (e) => {
+      const { success, tests, error } = e.data;
+      restExplorerDataStore.update((restApiDataMap) => {
+        const r = restApiDataMap.get(progressiveTab?.tabId);
+        if (r) {
+          if (success) {
+            r.response.testResults = tests.map((t) => ({
+              testId: "",
+              testName: t.name,
+              testStatus: t.passed,
+              testMessage: t.error || "",
+            }));
+          } else {
+            r.response.testMessage = error;
+          }
+
+          restApiDataMap.set(progressiveTab.tabId, r);
+        }
+        return restApiDataMap;
+      });
+      worker.terminate(); // cleanup
+    };
+  }
+
   /**
    * Evaluates a test condition against the actual and expected values.
    *
@@ -2064,6 +2126,15 @@ class RestExplorerViewModel {
             ? ""
             : `Expected ${actual} to be less than ${expected || "(empty)"}`;
           break;
+        case TestCaseConditionOperatorEnum.LESS_THAN_OR_EQUAL:
+          passed =
+            typeof actual === "number"
+              ? actual <= Number(expected)
+              : actual.length <= Number(expected);
+          message = passed
+            ? ""
+            : `Expected ${actual} to be less than or equal to ${expected || "(empty)"}`;
+          break;
         case TestCaseConditionOperatorEnum.GREATER_THAN:
           passed =
             typeof actual === "number"
@@ -2072,6 +2143,15 @@ class RestExplorerViewModel {
           message = passed
             ? ""
             : `Expected ${actual} to be greater than ${expected || "(empty)"}`;
+          break;
+        case TestCaseConditionOperatorEnum.GREATER_THAN_OR_EQUAL:
+          passed =
+            typeof actual === "number"
+              ? actual >= Number(expected)
+              : actual.length >= Number(expected);
+          message = passed
+            ? ""
+            : `Expected ${actual} to be greater than or equal to ${expected || "(empty)"}`;
           break;
         case TestCaseConditionOperatorEnum.CONTAINS:
           passed = typeof actual === "string" && actual.includes(expected);
@@ -4099,6 +4179,52 @@ class RestExplorerViewModel {
   };
 
   /**
+   * Generates testcases for the particular API Request Tab.
+   *
+   * @param prompt - The prompt to be used for generating the testcases.
+   * @returns - The response from the AI assistant service.
+   */
+
+  public generateTestCases = async (prompt = "") => {
+    const isGuestUser = await this.getGuestUserState();
+    if (isGuestUser) {
+      return;
+    }
+    const componentData = this._tab.getValue();
+    const tabId = componentData?.tabId;
+    startLoading(tabId + "generatingTestCases");
+
+    let workspaceId = componentData.path.workspaceId;
+    let workspaceVal = await this.readWorkspace(workspaceId);
+    let teamId = workspaceVal.team?.teamId;
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const testCases = progressiveTab.property.request.tests;
+    const originalScript = testCases.script || "";
+
+    try {
+      const response = await this.aiAssistentService.generateTestCases({
+        text: prompt,
+        teamId: teamId,
+      });
+      if (response.isSuccessful) {
+        stopLoading(tabId + "generatingTestCases");
+        const generatedContent = response?.data?.data.result;
+        notifications.success("Test is generated successfully.");
+        return {
+          generatedContent: generatedContent,
+          originalContent: originalScript,
+        };
+      } else {
+        stopLoading(tabId + "generatingTestCases");
+        return response?.data;
+      }
+    } catch (error) {
+      stopLoading(tabId + "generatingTestCases");
+      notifications.error("Failed to generate test. Please try again.");
+    }
+  };
+
+  /**
    * Toggles the like or dislike status of a chat message.
    *
    * @param _messageId - The ID of the message to update.
@@ -4200,6 +4326,12 @@ class RestExplorerViewModel {
   public updateIsRequestTabDemo = async (value: boolean) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.isRequestTestsNoCodeDemoCompleted = value;
+    this.tab = progressiveTab;
+  };
+
+  public updateIsRequestTabScriptDemo = async (value: boolean) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.isRequestTestsScriptDemoCompleted = value;
     this.tab = progressiveTab;
   };
 
@@ -4478,6 +4610,10 @@ class RestExplorerViewModel {
    * @returns The mock data generated by the AI assistant service.
    */
   public generateMockData = async (): Promise<any> => {
+    const isGuestUser = await this.getGuestUserState();
+    if (isGuestUser) {
+      return;
+    }
     const progressiveTab = createDeepCopy(this._tab.getValue());
     captureEvent("gen_mock_data", {
       event_source: "web_app",
@@ -4652,6 +4788,53 @@ class RestExplorerViewModel {
     const teamDoc = teamData.toMutableJSON();
     if (teamDoc) {
       return teamDoc?.plan?.name;
+
+  /**
+   * Fixes the test script for the current request tab using AI assistance.
+   * It retrieves the active workspace and team ID, then sends the current test script to the AI service for fixing.
+   */
+  public fixTestScript = async (): Promise<void> => {
+    const isGuestUser = await this.getGuestUserState();
+    if (isGuestUser) {
+      return;
+    }
+    const workspaceData =
+      await this.workspaceRepository.getActiveWorkspaceDoc();
+    const teamId = workspaceData.toMutableJSON().team?.teamId || "";
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const testCases = progressiveTab.property.request.tests;
+    const response = await this.aiAssistentService.fixTestScript({
+      teamId: teamId,
+      testScript: testCases.script,
+    });
+    if (response.isSuccessful) {
+      this.updateRequestTests({
+        ...testCases,
+        script: response?.data?.data.result,
+      });
+      restExplorerDataStore.update((restApiDataMap) => {
+        const r = restApiDataMap.get(progressiveTab?.tabId);
+        if (r) {
+          r.response.testMessage = "";
+        }
+        return restApiDataMap;
+      });
+      notifications.success("Test script fixed successfully.");
+    } else if (
+      response?.data?.message === "Limit reached. Please try again later."
+    ) {
+      notifications.error("AI Limit has Reached.please upgrade plan.");
+    } else {
+      notifications.error("Failed to fix test script.");
+    }
+  };
+
+  public handleRequestTestScriptDemoCompleted = async () => {
+    const response =
+      await this.userService.requestTabScriptTestsDemoCompleted();
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (response.isSuccessful) {
+      await this.fetchCollections(progressiveTab?.path?.workspaceId);
     }
   };
 }

@@ -474,12 +474,12 @@
                 {/each}
               </div>
 
-              <p
-                class="mt-3 text-ds-font-size-14 text-ds-font-weight-regular"
+              <div
+                class="mt-3 text-ds-font-size-14"
                 style="color: var(--text-ds-neutral-200);"
               >
                 {@html marked(selectedEvent.markdownDetails)}
-              </p>
+              </div>
 
               <div class="d-flex align-items-center justify-content-between">
                 <Button

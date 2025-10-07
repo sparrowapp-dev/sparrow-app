@@ -36,7 +36,7 @@ class InitRequestTab {
   constructor(_id: string, _workspaceId: string) {
     this._tab = {
       id: _id,
-      label:"",
+      label: "",
       tabId: uuidv4(),
       name: "New " + RequestDefault.NAME,
       type: TabTypeEnum.REQUEST,
@@ -105,21 +105,21 @@ class InitRequestTab {
               checked: true,
             },
           ],
-           tests: {
-              testCaseMode: TestCaseModeEnum.NO_CODE,
-                noCode: [
-                  {
-                    id: "case-1",
-                    name: "New Test",
-                    condition: "",
-                    expectedResult: "",
-                    testPath: "",
-                    testTarget: "",
-                  },
-                ],
-             
-              script: "",
-            },
+          tests: {
+            testCaseMode: TestCaseModeEnum.NO_CODE,
+            noCode: [
+              {
+                id: "case-1",
+                name: "New Test",
+                condition: "",
+                expectedResult: "",
+                testPath: "",
+                testTarget: "",
+              },
+            ],
+
+            script: "",
+          },
           state: {
             requestBodyLanguage: RequestDataTypeEnum.TEXT,
             requestBodyNavigation: RequestDatasetEnum.NONE,
@@ -170,7 +170,8 @@ class InitRequestTab {
             size: 0,
           },
           isGeneratedVariable: false,
-          isRequestTestsNoCodeDemoCompleted:false
+          isRequestTestsNoCodeDemoCompleted: false,
+          isRequestTestsScriptDemoCompleted: false,
         },
       },
       path: {
@@ -269,6 +270,11 @@ class InitRequestTab {
   public updateIsRequestTestGuide(_value: boolean) {
     if (this._tab.property.request?.isRequestTestsNoCodeDemoCompleted) {
       this._tab.property.request.isRequestTestsNoCodeDemoCompleted = _value;
+    }
+  }
+  public updateIsRequestTestScriptGuide(_value: boolean) {
+    if (this._tab.property.request) {
+      this._tab.property.request.isRequestTestsScriptDemoCompleted = _value;
     }
   }
 }

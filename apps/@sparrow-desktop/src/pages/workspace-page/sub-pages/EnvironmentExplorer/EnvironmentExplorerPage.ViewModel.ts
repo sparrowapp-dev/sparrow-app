@@ -16,7 +16,7 @@ import { CollectionService } from "../../../../../src/services/collection.servic
 import constants from "../../../../../src/constants/constants";
 import { CollectionRepository } from "../../../../../src/repositories/collection.repository";
 import { open } from "@tauri-apps/plugin-shell";
-import { getClientUser } from "@app/utils/jwt";
+import { getClientUser, getSelfhostUrls } from "@app/utils/jwt";
 import { UserService } from "@app/services/user.service";
 import { captureEvent } from "@app/utils/posthog/posthogConfig";
 import { generateVariableTourCompleted } from "@sparrow/workspaces/stores";
@@ -190,6 +190,11 @@ export class EnvironmentExplorerViewModel {
     const workspaceData = await this.workspaceRepository.readWorkspace(_id);
     const hubUrl = workspaceData?.team?.hubUrl;
 
+    const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+        return selfhostBackendUrl;
+    }
+    
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;
@@ -234,6 +239,13 @@ export class EnvironmentExplorerViewModel {
         if (foundIndex !== -1) {
           const foundObject =
             progressiveTab.property.environment.aiVariable[foundIndex];
+          // validation: key and value must not be empty
+          if (!foundObject?.key || !foundObject?.value) {
+            notifications.warning(
+              "Variables with missing keys or values cannot be added to Global Variables.",
+            );
+            return;
+          }
           const currentPairs =
             progressiveTab.property?.environment?.variable || [];
           const updatedPairs = [...currentPairs];
@@ -292,17 +304,20 @@ export class EnvironmentExplorerViewModel {
       // Split aiVariables into undo:true and undo:false
       const undoAiVariables =
         progressiveTab.property.environment.aiVariable.filter(
-          (variable) => variable.undo === true,
+          (variable) =>
+            variable.undo === true || (!variable.key || !variable.value),
         );
 
-      const sanitizedAiVariables =
+       const sanitizedAiVariables =
         progressiveTab.property.environment.aiVariable
           .filter((variable) => !variable.undo)
           .map((variable) => ({
             ...variable,
             type: "ai-generated",
             lifespan: "short",
-          }));
+          }))
+          // Skip variables with empty key or value
+          .filter((variable) => variable.key && variable.value);
       await this.updateVariables([
         ...progressiveTab.property.environment.variable,
         ...sanitizedAiVariables,
@@ -547,7 +562,6 @@ export class EnvironmentExplorerViewModel {
           aiGeneratedVariables,
           "value",
         );
-
       if (uniqueAiGeneratedVariables.length > 0) {
         await this.updateVariables(
           currentEnvironment?.property?.environment?.variable.map((item) => {

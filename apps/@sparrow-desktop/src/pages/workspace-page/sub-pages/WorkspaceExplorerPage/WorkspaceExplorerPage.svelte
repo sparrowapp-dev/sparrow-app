@@ -21,6 +21,7 @@
   import { open } from "@tauri-apps/plugin-shell";
   import { ResponseMessage } from "@sparrow/common/enums";
   import type { addUsersInWorkspacePayload } from "@sparrow/common/dto";
+  import { getSelfhostUrls } from "@app/utils/jwt";
 
   export let collectionList;
   export let tab;
@@ -29,6 +30,8 @@
   const _viewModel = new WorkspaceExplorerViewModel(tab);
   const activeWorkspace: Observable<WorkspaceDocument> =
     _viewModel.activeWorkspace;
+
+  const [isSelfhost] = getSelfhostUrls();
 
   const onRemoveUserFromWorkspace = _viewModel.removeUserFromWorkspace;
   const onChangeUserRoleAtWorkspace = _viewModel.changeUserRoleAtWorkspace;
@@ -119,7 +122,10 @@
   const handleWorkspaceUpdatesScroll = () => {
     _viewModel.refetchPreviousUpdates(workspaceID);
   };
-  const workspaceLink = `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${currentWorkspace.id}`;
+  const [, selfhostWebUrl] = getSelfhostUrls();
+  const workspaceLink = `${
+    selfhostWebUrl ? selfhostWebUrl : constants.SPARROW_WEB_APP_URL
+  }/app/collections?workspaceId=${currentWorkspace.id}`;
 
   const handleInviteWorkspace = async (
     workspaceId: string,
@@ -227,6 +233,7 @@
     teamName={currentTeam?.name}
     plan={currentTeam?.plan}
     onInviteUserToWorkspace={handleInviteWorkspace}
+    isSelfHost={isSelfhost ? true : false}
   />
 </Modal>
 

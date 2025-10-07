@@ -48,6 +48,7 @@ mod urlencoded_handler;
 mod utils;
 
 // External Imports
+use once_cell::sync::Lazy;
 use base64;
 use formdata_handler::make_formdata_request;
 use group_policy_config::get_policy_config;
@@ -59,6 +60,7 @@ use request_handler::http_requests::make_without_body_request;
 use request_handler::json_handler_v2::make_json_request_v2;
 use request_handler::urlencoded_handler_v2::make_www_form_urlencoded_request_v2;
 use reqwest::Client;
+use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_json::Value;
@@ -73,14 +75,9 @@ use utils::response_decoder::decode_response_body;
 
 // Web socket imports
 use futures_util::{SinkExt, StreamExt};
-use hyper::header::HeaderValue;
-use hyper::header::{CONNECTION, UPGRADE};
-use hyper::{Client as OtherClient, Request};
-use hyper_tls::HttpsConnector;
 use std::sync::Arc;
 use tokio::sync::mpsc::{self, UnboundedSender};
 use tokio::sync::Mutex;
-use tokio_tungstenite::connect_async;
 use tokio_tungstenite::tungstenite::protocol::Message;
 // --- Connect WebSocket with invalid certs allowed ---
 use tokio_tungstenite::tungstenite::client::IntoClientRequest;
@@ -197,6 +194,19 @@ impl<R: Runtime> WindowExt for WebviewWindow<R> {
         // No-op: Not supported on Windows
     }
 }
+
+// Static Variables
+
+// Create a single instance of reqwest Client to be used throughout the app
+static CLIENT: Lazy<Client> = Lazy::new(|| {
+    Client::builder()
+        .danger_accept_invalid_certs(true)
+        .pool_max_idle_per_host(10) // keep a few idle connections per host
+        .tcp_keepalive(Some(std::time::Duration::from_secs(60)))
+        .pool_idle_timeout(Some(std::time::Duration::from_secs(90)))
+        .build()
+        .unwrap()
+});
 
 // Commands
 #[tauri::command]
@@ -402,11 +412,8 @@ async fn make_request_v2(
     body: &str,
     request: &str,
 ) -> Result<String, std::io::Error> {
-    // Create a client
-    let client = reqwest::Client::builder()
-        .danger_accept_invalid_certs(true)
-        .build()
-        .unwrap();
+    // Reuse the static client
+    let client = &*CLIENT;
 
     // Convert method string to reqwest::Method
     let reqwest_method = match method {
@@ -422,21 +429,19 @@ async fn make_request_v2(
     // Deserialize the JSON string into a Vec<KeyValue>
     let headers_key_values: Vec<KeyValue> = serde_json::from_str(headers).unwrap();
 
-    // Create a HashMap to store key-value pairs
-    let mut headers_key_value_map: HashMap<String, String> = HashMap::new();
-
-    // Iterate over key_values and add key-value pairs to the map
+    // Build HeaderMap directly (instead of HashMap<String, String>)
+    let mut header_map = HeaderMap::new();
     for kv in headers_key_values {
-        headers_key_value_map.insert(kv.key, kv.value);
+        if let (Ok(name), Ok(value)) = (
+            HeaderName::from_bytes(kv.key.as_bytes()),
+            HeaderValue::from_str(&kv.value),
+        ) {
+            header_map.insert(name, value);
+        }
     }
 
     // Create request builder with request method and url
-    let mut request_builder = client.request(reqwest_method, url);
-
-    // Add all headers in request builder
-    for (key, value) in headers_key_value_map.iter() {
-        request_builder = request_builder.header(key, value);
-    }
+    let mut request_builder = client.request(reqwest_method, url).headers(header_map);
 
     // Make request call as per Body type
     let check = match request {
@@ -514,20 +519,20 @@ async fn make_request_v2(
         };
     }
 
-    // Map headers into json
+    // Serialize headers directly without cloning
     let response_headers_json: serde_json::Value = response_headers
         .iter()
-        .map(|(name, value)| (name.to_string(), value.to_str().unwrap()))
+        .map(|(name, value)| (name.to_string(), value.to_str().unwrap_or("")))
         .collect();
 
     // Combining all the parameters
     let combined_json = json!({
         "headers": response_headers_json,
         "status": response_status.to_string(),
-        "body": response_body,   // body data can be base64 string or text
+        "body": response_body,
     });
 
-    return Ok(combined_json.to_string());
+    Ok(combined_json.to_string())
 }
 
 async fn make_request(
@@ -1188,11 +1193,8 @@ async fn send_graphql_request(
     query: &str,
     variables: Option<String>,
 ) -> Result<String, String> {
-    // Initialize an HTTP client for making requests.
-    let client = reqwest::Client::builder()
-        .danger_accept_invalid_certs(true)
-        .build()
-        .unwrap();
+    // Reuse the static client
+    let client = &*CLIENT;
 
     // Deserialize the JSON string `headers` into a Vec of key-value pairs.
     // Each key-value pair is represented by the KeyValue struct.

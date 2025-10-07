@@ -1,12 +1,21 @@
 import constants from "@app/constants/constants";
 import { makeRequest, getAuthHeaders } from "@app/containers/api/api.common";
+import { getSelfhostUrls } from "@app/utils/jwt";
 import { ContentTypeEnum } from "@sparrow/common/enums";
 import type { AiModelProviderEnum, AIModelVariant } from "@sparrow/common/types/workspace/ai-request-base";
 
 export class AiRequestService {
     private apiUrl: string = constants.API_URL;
 
-    constructor() { }
+    constructor() { 
+        const [selfhostBackendUrl] = getSelfhostUrls();
+        if (selfhostBackendUrl) {
+            this.apiUrl = selfhostBackendUrl;
+        }
+        else{
+            this.apiUrl = constants.API_URL;
+        }
+    }
 
 
     /**

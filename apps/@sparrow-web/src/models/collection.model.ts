@@ -263,7 +263,7 @@ export const collectionSchemaLiteral = {
   title: "collection",
   primaryKey: "id",
   type: "object",
-  version: 10,
+  version: 11,
   properties: {
     collectionId: {
       type: "string",
@@ -395,6 +395,7 @@ export const collectionSchemaLiteral = {
     },
     isGenerateVariableTrial: { type: "boolean" },
     isRequestTestsNoCodeDemoCompleted:{type:"boolean"},
+    isRequestTestsScriptDemoCompleted:{type:"boolean"},
     primaryBranch: { type: "string" },
     currentBranch: { type: "string" },
     createdAt: {

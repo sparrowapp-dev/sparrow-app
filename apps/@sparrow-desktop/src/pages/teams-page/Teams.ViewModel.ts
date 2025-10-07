@@ -25,7 +25,7 @@ import { PlanRepository } from "@app/repositories/plan.repository";
 import { PlanService } from "@app/services/plan.service";
 import constants from "@app/constants/constants";
 import { planBannerisOpen } from "@sparrow/common/store";
-import { getClientUser } from "@app/utils/jwt";
+import { getClientUser, getSelfhostUrls } from "@app/utils/jwt";
 import { open } from "@tauri-apps/plugin-shell";
 
 export class TeamsViewModel {
@@ -426,8 +426,9 @@ export class TeamsViewModel {
     const email = getClientUser().email;
     const accessToken = localStorage.getItem("AUTH_TOKEN");
     const refreshToken = localStorage.getItem("REF_TOKEN");
+    const [,,selfhostAdminUrl] = getSelfhostUrls();
     const url =
-      constants.ADMIN_URL +
+      `${selfhostAdminUrl ? selfhostAdminUrl : constants.ADMIN_URL}` +
       `?accessToken=${accessToken}&refreshToken=${refreshToken}&email=${email}&source=desktop&trial=login_trial`;
     open(url);
   };

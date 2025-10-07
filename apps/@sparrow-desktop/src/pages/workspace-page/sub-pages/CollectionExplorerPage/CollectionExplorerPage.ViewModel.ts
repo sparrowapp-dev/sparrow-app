@@ -69,6 +69,7 @@ import { MockHistoryTabAdapter } from "@app/adapter/mock-history-tab";
 import type { AiRequestBaseInterface } from "@sparrow/common/types/workspace/ai-request-base";
 import { environmentType } from "@sparrow/common/enums/environment.enum";
 import { captureEvent } from "@app/utils/posthog/posthogConfig";
+import { getSelfhostUrls } from "@app/utils/jwt";
 
 class CollectionExplorerPage {
   // Private Repositories
@@ -234,6 +235,11 @@ class CollectionExplorerPage {
     const workspaceData = await this.workspaceRepository.readWorkspace(_id);
     const hubUrl = workspaceData?.team?.hubUrl;
 
+    const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+        return selfhostBackendUrl;
+    }
+    
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;

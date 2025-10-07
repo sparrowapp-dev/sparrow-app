@@ -37,6 +37,9 @@
    */
   export let placeholder = "";
 
+  /** Threshold for "large" paste */
+  const LARGE_PASTE_THRESHOLD = 5000; // characters
+
   let editor: EditorJS;
 
   const parser = new edjsParser();
@@ -51,6 +54,16 @@
         parsedValue = editorData?.blocks || [];
       }
     }
+
+    const editorElement = document.getElementById(id);
+    if (editorElement) {
+      // Attach custom paste handler
+      editorElement.addEventListener("paste", handleCustomPaste);
+
+      // Attach custom fast delete handler
+      editorElement.addEventListener("keydown", handleFastDelete);
+    }
+
     editor = new EditorJS({
       holder: id,
       tools: {
@@ -104,7 +117,53 @@
     }
   };
 
-  // Reactive statement to update the editor when certain conditions change - When doc is generating.
+  /** Custom paste handler */
+  async function handleCustomPaste(e: ClipboardEvent) {
+    const pastedText = e.clipboardData?.getData("text/plain") || "";
+
+    if (pastedText.length < LARGE_PASTE_THRESHOLD) {
+      // Let Editor.js handle small pastes normally
+      return;
+    }
+
+    // If large text, override default paste
+    e.preventDefault();
+
+    const safeText = pastedText
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+
+    const block = {
+      type: "paragraph",
+      data: { text: safeText.replace(/\n/g, "<br>") },
+    };
+
+    // Persist immediately
+    onInput(JSON.stringify([block]));
+
+    // Replace editor content with plain-text block
+    await editor.render({ blocks: [block] });
+  }
+
+  /** Custom delete handler */
+  async function handleFastDelete(e: KeyboardEvent) {
+    if (e.key !== "Backspace" && e.key !== "Delete") return;
+
+    const selection = window.getSelection();
+    if (!selection) return;
+
+    const selectedLength = selection.toString().length;
+
+    // threshold: if selection is huge, reset editor
+    if (selectedLength > LARGE_PASTE_THRESHOLD) {
+      e.preventDefault();
+      await editor.clear();
+      await editor.render({ blocks: [] });
+      onInput(JSON.stringify([]));
+    }
+  }
+
   const docRerender = async () => {
     if (editor) {
       if (editor?.blocks) {

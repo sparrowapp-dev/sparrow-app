@@ -448,6 +448,17 @@ export class RxDB {
           35: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          36: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
+          37: function (oldDoc: TabDocument) {            
+            if (oldDoc?.property?.testflow) {
+              oldDoc.property.testflow.state = {
+                testflowNavigator : "Testflow"
+              };
+            }
+            return oldDoc;
+          },
         },
       },
       collection: {
@@ -509,6 +520,9 @@ export class RxDB {
             return oldDoc;
           },
           19: function (oldDoc: CollectionDocument) {
+            return oldDoc;
+          },
+          20: function (oldDoc: CollectionDocument) {
             return oldDoc;
           },
         },

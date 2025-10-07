@@ -61,6 +61,7 @@ export class CollectionRepository {
       if (data.authProfiles) value.authProfiles = data.authProfiles;
       value.isGenerateVariableTrial = data.isGenerateVariableTrial;
       value.isRequestTestsNoCodeDemoCompleted = data.isRequestTestsNoCodeDemoCompleted;
+      value.isRequestTestsScriptDemoCompleted = data.isRequestTestsScriptDemoCompleted;
       if (data.defaultSelectedAuthProfile)
         value.defaultSelectedAuthProfile = data.defaultSelectedAuthProfile;
 

@@ -7,9 +7,18 @@ import { TeamRepository } from "../repositories/team.repository";
 import { WorkspaceRepository } from "../repositories/workspace.repository";
 import constants from "@app/constants/constants";
 import type { InviteBody, TeamPostBody } from "@sparrow/common/dto/team-dto";
-const apiUrl: string = constants.API_URL;
+import { getSelfhostUrls } from "@app/utils/jwt";
+let apiUrl: string = constants.API_URL;
 export class TeamService {
-  constructor() {}
+  constructor() {
+    const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+      apiUrl = selfhostBackendUrl;
+    }
+    else{
+      apiUrl = constants.API_URL;
+    }
+  }
 
   private teamRepository = new TeamRepository();
   private workspaceRepository = new WorkspaceRepository();
@@ -26,6 +35,7 @@ export class TeamService {
   };
 
   public createTeam = async (team: TeamPostBody) => {
+
     const response = await makeRequest("POST", `${apiUrl}/api/team`, {
       body: team,
       headers: getMultipartAuthHeaders(),

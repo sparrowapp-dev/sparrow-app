@@ -14,8 +14,11 @@
   import type { InviteBody } from "@sparrow/common/dto/team-dto";
   import { ResponseMessage } from "@sparrow/common/enums";
   import type { addUsersInWorkspacePayload } from "@sparrow/common/dto";
+  import { getSelfhostUrls } from "@app/utils/jwt";
 
   export let sparrowAdminUrl: string;
+
+  const [isSelfhost] = getSelfhostUrls();
 
   let isWebEnvironment = false;
 
@@ -81,8 +84,11 @@
     isWorkspaceInviteModalOpen = true;
   };
   const handleCopyPublicWorkspaceLink = async (workspaceId: string) => {
+    const [, selfhostWebUrl] = getSelfhostUrls();
     await copyToClipBoard(
-      `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${workspaceId}`,
+      `${
+        selfhostWebUrl ? selfhostWebUrl : constants.SPARROW_WEB_APP_URL
+      }/app/collections?workspaceId=${workspaceId}`,
     );
   };
 
@@ -221,6 +227,7 @@
       isTeamInviteModalOpen = flag;
     }}
     onValidateEmail={_viewModel.validateUserEmail}
+    isSelfHost={isSelfhost ? true : false}
   />
 </Modal>
 
@@ -288,5 +295,6 @@
     teamName={currentTeam?.name}
     plan={currentTeam?.plan}
     onInviteUserToWorkspace={handleAddWorkspace}
+    isSelfHost={isSelfhost ? true : false}
   />
 </Modal>

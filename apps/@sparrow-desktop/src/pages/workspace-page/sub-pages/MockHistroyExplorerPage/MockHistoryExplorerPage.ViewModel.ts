@@ -23,6 +23,7 @@ import { BehaviorSubject, type Observable } from "rxjs";
 import { FolderTabAdapter } from "@app/adapter";
 import constants from "@app/constants/constants";
 import { notifications } from "@sparrow/library/ui";
+import { getSelfhostUrls } from "@app/utils/jwt";
 // import { InitRequestTab } from "@sparrow/common/utils";
 
 class MockHistoryExplorerPage {
@@ -72,6 +73,11 @@ class MockHistoryExplorerPage {
   public constructBaseUrl = async (_id: string) => {
     const workspaceData = await this.workspaceRepository.readWorkspace(_id);
     const hubUrl = workspaceData?.team?.hubUrl;
+
+    const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+        return selfhostBackendUrl;
+    }
 
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;

@@ -67,9 +67,18 @@ import type {
   HttpResponseRatiosMockUpdatePayloadDtoInterface,
 } from "@sparrow/common/types/workspace/http-response-mock-dto";
 import type { GeneratedVariable } from "@sparrow/common/dto";
+import { getSelfhostUrls } from "@app/utils/jwt";
 
 export class CollectionService {
-  constructor() {}
+  constructor() {
+        const [selfhostBackendUrl] = getSelfhostUrls();
+        if (selfhostBackendUrl) {
+            this.apiUrl = selfhostBackendUrl;
+        }
+        else{
+            this.apiUrl = constants.API_URL;
+        }
+  }
 
   private apiUrl: string = constants.API_URL;
   private collectionRepository = new CollectionRepository();

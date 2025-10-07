@@ -24,4 +24,6 @@ export * from "./workspace-tour-guide";
 export * from "./ai-request-explorer";
 export * from "./mock-history-explorer";
 export * from "./hub-explorer";
-export * from "./request-no-code-tour-guide";
+export * from "./request-tab-tour-guide";
+export * from "./testflow-schedule-explorer";
+export * from "./testflow-schedule-run-view-explorer";

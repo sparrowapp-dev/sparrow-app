@@ -106,8 +106,16 @@
     handleNextStep,
     handleCloseTour,
   } from "@sparrow/workspaces/features";
-  import { RequestNoCodeTourGuide } from "@sparrow/workspaces/features";
+  import { RequestTabTourGuide } from "@sparrow/workspaces/features";
   import { RequestTabTestsTourContent } from "@sparrow/workspaces/features";
+  import { ScheduleRunPopUp } from "@sparrow/common/features";
+  import { WorkspaceEnvironmentTypeBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
+
+  import { getClientUser } from "src/utils/jwt";
+
+  import TestflowScheduleRVExplorerPage from "./sub-pages/TestflowScheduleRVExplorerPage.svelte/TestflowScheduleRVExplorerPage.svelte";
+  import TestflowScheduleExplorerPage from "./sub-pages/TestflowScheduleExplorerPage/TestflowScheduleExplorerPage.svelte";
+
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
@@ -117,6 +125,8 @@
     _viewModel.getActiveWorkspace();
   let collectionList: Observable<CollectionDocument[]> =
     _viewModel.getCollectionList();
+
+  const userEmail = getClientUser().email;
 
   let removeTab: Tab;
   let isPopupClosed: boolean = false;
@@ -155,6 +165,8 @@
   let environmentsValues;
   let currentWOrkspaceValue: Observable<WorkspaceDocument>;
   const externalSparrowGithub = constants.SPARROW_GITHUB;
+
+  let isScheduleRunPopupOpen: boolean = false;
 
   const environmentSubscriber = environments.subscribe((value) => {
     if (value) {
@@ -897,6 +909,7 @@
         <WorkspaceActions
           bind:scrollList
           bind:userRole
+          bind:isScheduleRunPopupOpen
           userCount={totalTeamCount}
           {refreshWorkspace}
           {refreshLoad}
@@ -1087,6 +1100,18 @@
                         <HubExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.TESTFLOW_SCHEDULE_RUN_VIEW}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100">
+                        <TestflowScheduleRVExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.TESTFLOW_SCHEDULE}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100">
+                        <TestflowScheduleExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
                   {:else if !$tabList?.length}
                     <Motion {...scaleMotionProps} let:motion>
                       <div class="h-100">
@@ -1112,7 +1137,7 @@
             </div>
           {/if}
           {#if $requestTabTestNoCodeStep === 3}
-            <RequestNoCodeTourGuide
+            <RequestTabTourGuide
               targetId={RequestTabTestsTourContent[2].targetId}
               isVisible={true}
               cardPosition={requestTabNocodeCardPosition(3)}
@@ -1127,7 +1152,7 @@
                 onClose={handleCloseTour}
                 width={352}
               />
-            </RequestNoCodeTourGuide>
+            </RequestTabTourGuide>
           {/if}
         </section>
       </Pane>
@@ -1898,6 +1923,31 @@
     />
   </div>
 </Modal>
+
+<Modal
+  title="Set Schedule Run"
+  type="dark"
+  width="35%"
+  zIndex={1000}
+  isOpen={isScheduleRunPopupOpen}
+  handleModalState={() => {
+    isScheduleRunPopupOpen = false;
+  }}
+>
+  <ScheduleRunPopUp
+    bind:isScheduleRunPopupOpen
+    testFlowName={$activeTab?.name}
+    workspaceUsers={currentWOrkspaceValue?._data?.users || []}
+    environments={environmentsValues?.filter(
+      (env) =>
+        env.workspaceId === currentWOrkspaceValue?._id &&
+        env.type !== WorkspaceEnvironmentTypeBaseEnum.GLOBAL,
+    ) || []}
+    handleScheduleTestFlowRun={_viewModel3.scheduleTestFlowRun}
+    creatorEmail={userEmail}
+  />
+</Modal>
+
 <PlanUpgradeModal
   bind:isOpen={upgradePlanModel}
   title={planContent?.title}

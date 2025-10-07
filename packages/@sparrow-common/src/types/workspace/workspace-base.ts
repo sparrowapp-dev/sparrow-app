@@ -1,6 +1,6 @@
 export enum WorkspaceUserAgentBaseEnum {
-  BROWSER_AGENT= "Browser Agent",
-  CLOUD_AGENT= "Cloud Agent"
+  BROWSER_AGENT = "Browser Agent",
+  CLOUD_AGENT = "Cloud Agent",
 }
 
 export enum WorkspaceRoleDtoEnum {

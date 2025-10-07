@@ -35,7 +35,7 @@ import constants from "@app/constants/constants";
 import { TeamService } from "@app/services/team.service";
 import { PlanRepository } from "@app/repositories/plan.repository";
 import { open } from "@tauri-apps/plugin-shell";
-import { getAuthJwt } from "@app/utils/jwt";
+import { getAuthJwt, getSelfhostUrls } from "@app/utils/jwt";
 
 export default class WorkspaceExplorerViewModel {
   // Private Repositories
@@ -188,6 +188,11 @@ export default class WorkspaceExplorerViewModel {
     const workspaceData = await this.workspaceRepository.readWorkspace(_id);
     const hubUrl = workspaceData?.team?.hubUrl;
 
+    const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+        return selfhostBackendUrl;
+    }
+    
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;
@@ -594,8 +599,9 @@ export default class WorkspaceExplorerViewModel {
 
   public handleShareWorkspace = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
+    const [,selfhostWebUrl] = getSelfhostUrls();
     await copyToClipBoard(
-      `${constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${progressiveTab.id}`,
+      `${selfhostWebUrl ? selfhostWebUrl : constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${progressiveTab.id}`,
     );
     notifications.success("Link copied to clipboard.");
   };
@@ -646,9 +652,15 @@ export default class WorkspaceExplorerViewModel {
    */
   public handleRedirectToAdminPanel = async (teamId: string) => {
     const [authToken] = getAuthJwt();
-    await open(
-      `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
-    );
+    const [,,selfhostAdminUrl] = getSelfhostUrls();
+
+    if(selfhostAdminUrl){
+       await open(selfhostAdminUrl);
+    }else{
+      await open(
+        `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+      );
+    }
   };
 
   public handleContactSales = async () => {

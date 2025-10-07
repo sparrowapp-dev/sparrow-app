@@ -32,6 +32,14 @@
   export let newModifiedContent: string | KeyValuePair[];
 </script>
 
+{#if isMergeViewLoading}
+  <div
+    class=""
+    style="top: 0px; left: 0; right: 0; bottom: 0; z-index:3; position:absolute;"
+  >
+    <Loader loaderSize={"20px"} />
+  </div>
+{/if}
 <div class="ps-0 pe-0 d-flex flex-column rounded w-100 h-100 position-relative">
   <RequestBodyNavigator
     {method}
@@ -39,15 +47,6 @@
     {requestState}
     {updateBeautifiedState}
   />
-  {#if isMergeViewLoading}
-    <div
-      class=""
-      style="top: 0px; left: 0; right: 0; bottom: 0; z-index:3; position:absolute;"
-    >
-      <Loader loaderSize={"20px"} />
-    </div>
-  {/if}
-
   <div style="flex:1; overflow:auto;">
     {#if requestState.requestBodyNavigation === RequestDataset.RAW}
       {#if isMergeViewEnabled && mergeViewRequestDatasetType === RequestDatasetEnum.RAW}

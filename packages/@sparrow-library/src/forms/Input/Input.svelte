@@ -336,6 +336,10 @@
     border-color: transparent;
   }
 
+  input:disabled:hover {
+    border: 1px solid transparent !important;
+  }
+
   .small {
     height: 28px;
 

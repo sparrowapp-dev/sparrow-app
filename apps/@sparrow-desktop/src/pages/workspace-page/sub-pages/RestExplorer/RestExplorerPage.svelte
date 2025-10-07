@@ -54,6 +54,7 @@
   let isMergeViewLoading = false;
   let newModifiedContent: string | KeyValuePair[];
   let mergeViewRequestDatasetType: RequestDatasetEnum;
+  let scriptComponent = null;
   let planName: string = "";
 
   const restExplorerDataStoreSubscriber = restExplorerDataStore.subscribe(
@@ -103,11 +104,13 @@
   $: {
     if (tab) {
       if (prevTabId !== tab?.tabId) {
+        if (scriptComponent?.handleTabChange) {
+          scriptComponent.handleTabChange();
+        }
         isMergeViewEnableForRequestBody = false;
         isMergeViewEnableForParams = false;
         isMergeViewEnableForHeaders = false;
         isMergeViewLoading = false;
-        newModifiedContent = undefined;
         mergeViewRequestDatasetType = undefined;
         (async () => {
           /**
@@ -243,6 +246,7 @@
   bind:isMergeViewLoading
   bind:newModifiedContent
   bind:mergeViewRequestDatasetType
+  bind:scriptComponent
   onOpenCollection={_viewModel.openCollection}
   onSendRequest={_viewModel.sendRequest}
   onCancelRequest={_viewModel.cancelRequest}
@@ -278,6 +282,7 @@
   onSaveResponse={_viewModel.saveResponse}
   onStopGeneratingAIResponse={_viewModel.stopGeneratingAIResponse}
   onGenerateAiResponse={_viewModel.generateAIResponseWS}
+  onFixTestScript={_viewModel.fixTestScript}
   onToggleLike={_viewModel.toggleChatMessageLike}
   onUpdateAiModel={_viewModel.updateAIModel}
   generateMockData={_viewModel.generateMockData}
@@ -286,4 +291,7 @@
   InsertGenerateTrialFlow={_viewModel.InsertGenerateTrialFlow}
   isCloseRequestTestDemo={_viewModel.updateIsRequestTabDemo}
   requestTabTestsDemoCompleted={_viewModel.handleRequestTestNoCodeDemoCompleted}
+  isCloseRequestTestScriptDemo={_viewModel.updateIsRequestTabScriptDemo}
+  requestTabTestScriptDemoCompleted={_viewModel.handleRequestTestScriptDemoCompleted}
+  onGenerateTestCases={_viewModel.generateTestCases}
 />
