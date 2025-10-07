@@ -158,27 +158,18 @@
     return response;
   };
 
-  // Check if current user is admin or owner of the team
   $: isTeamAdminOrOwner = $activeTeam?.users?.some(
     (user) => 
       (user.id === userId || user._id === userId) && 
       (user.role === 'admin' || user.role === 'owner')
   ) || false;
-
-  // Filter workspaces for the current active team AND current user access
   $: filteredWorkspaces = $workspaces.filter((elem) => {
-    // First check if workspace belongs to current team
     if (elem?.team?.teamId !== $activeTeam?.teamId && elem?.team?.id !== $activeTeam?.teamId) {
       return false;
     }
-    
-    // If user is admin or owner of the team, they have access to all workspaces
     if (isTeamAdminOrOwner) {
       return true;
     }
-    
-    // For non-admin users, check if they have explicit access to this workspace
-    // Check the workspace's users array
     if (elem?.users && Array.isArray(elem.users)) {
       const hasAccess = elem.users.some((user) => {
         return user.id === userId || user._id === userId;
@@ -188,22 +179,8 @@
         return true;
       }
     }
-    
-    // If no users array or user not found, don't show the workspace
     return false;
   });
-
-  // Debug logging - uncomment to see what's happening
-  $: {
-    console.log('=== WORKSPACE FILTER DEBUG ===');
-    console.log('Current userId:', userId);
-    console.log('Active Team:', $activeTeam);
-    console.log('Is team admin/owner:', isTeamAdminOrOwner);
-    console.log('All workspaces count:', $workspaces.length);
-    console.log('Filtered workspaces count:', filteredWorkspaces.length);
-    console.log('All workspaces:', $workspaces);
-    console.log('Filtered workspaces:', filteredWorkspaces);
-  }
 
   onDestroy(() => {
     userSubscriber();
