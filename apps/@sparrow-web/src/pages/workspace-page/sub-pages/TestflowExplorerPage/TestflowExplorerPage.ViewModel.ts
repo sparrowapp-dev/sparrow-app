@@ -1990,7 +1990,7 @@ export class TestflowExplorerPageViewModel {
     }
   };
 
-  private deleteTestflowSchedule = async (_scheduleId: string) => {
+  private deleteTestflowSchedule = async (_scheduleId: string, _scheduleName: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const baseUrl = await this.constructBaseUrl(
       progressiveTab.path.workspaceId,
@@ -2016,6 +2016,9 @@ export class TestflowExplorerPageViewModel {
       await this.tabRepository.deleteTabsWithTabIdInAWorkspace(progressiveTab.path.workspaceId, tabsIdsToDelete);
       const schedules = response.data.data.schedules;
       updateTestflowSchedules(progressiveTab?.id as string, schedules);
+      notifications.success(`'${_scheduleName}' schedule deleted successfully.`);
+    }else{
+       notifications.error(`Failed to delete schedule. Please try again.`);
     }
   };
 
@@ -2024,6 +2027,10 @@ export class TestflowExplorerPageViewModel {
     const baseUrl = await this.constructBaseUrl(
       progressiveTab.path.workspaceId,
     );
+    notifications.success("Run started successfully.")
+    for (let i = 1; i < 5; i++) {
+      setTimeout(() => { this.fetchTestflow(); }, i * 500);
+    }
     const response = await this.testflowService.runTestflowSchedule(
       progressiveTab.path.workspaceId,
       progressiveTab.id,
@@ -2033,6 +2040,9 @@ export class TestflowExplorerPageViewModel {
     if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
       updateTestflowSchedules(progressiveTab?.id as string, schedules);
+      // notifications.success("Run executed successfully.");
+    }else{
+      // notifications.error("Run failed. View details in Test Results.");  
     }
   };
 
@@ -2050,13 +2060,14 @@ export class TestflowExplorerPageViewModel {
   public performTestflowScheduleOperations = async (
     _type: "run" | "edit" | "delete" | "open",
     _scheduleId: string,
+    _scheduleName: string,
   ) => {
     if (_type === "run") {
       this.runTestflowSchedule(_scheduleId);
     } else if (_type === "edit") {
       this.editTestflowSchedule(_scheduleId);
     } else if (_type === "delete") {
-      this.deleteTestflowSchedule(_scheduleId);
+      this.deleteTestflowSchedule(_scheduleId, _scheduleName);
     }
   };
 

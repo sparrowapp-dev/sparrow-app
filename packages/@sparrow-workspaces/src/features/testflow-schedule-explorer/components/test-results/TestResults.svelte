@@ -28,11 +28,9 @@
   }
 
   $: sortedHistory = schedule?.schedularRunHistory
-    ? [...schedule.schedularRunHistory].sort((a, b) => {
-      const timeA = parseRunTime(a.totalTime);
-      const timeB = parseRunTime(b.totalTime);
-      return sortDirection === "asc" ? timeA - timeB : timeB - timeA;
-      })
+    ? sortDirection === "asc"
+      ? [...schedule.schedularRunHistory].slice().reverse()
+      : [...schedule.schedularRunHistory]
     : [];
 
   $: paginatedHistory = sortedHistory.slice(

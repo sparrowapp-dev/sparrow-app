@@ -342,6 +342,8 @@
         lastResult = "Success";
       } else if (lastRun.status === "fail") {
         lastResult = "Fail";
+      } else if (lastRun.status === "pending") {
+        lastResult = "Pending";
       } else {
         lastResult = lastRun.status || "Unknown";
       }

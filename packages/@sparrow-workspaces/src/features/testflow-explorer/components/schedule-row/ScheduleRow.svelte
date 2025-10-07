@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { Options, Tooltip, Button, Modal } from "@sparrow/library/ui";
+  import {
+    Options,
+    Tooltip,
+    Button,
+    Modal,
+    Spinner,
+  } from "@sparrow/library/ui";
   import { Tag } from "@sparrow/library/ui";
   import { ErrorWithText, MoreHorizontalRegular } from "@sparrow/library/icons";
 
@@ -101,7 +107,11 @@
       loader={deleteLoader}
       onClick={async () => {
         deleteLoader = true;
-        await onPerformTestflowScheduleOperations("delete", schedule?.id);
+        await onPerformTestflowScheduleOperations(
+          "delete",
+          schedule?.id,
+          schedule?.name,
+        );
 
         deleteLoader = false;
         isDeletePopup = false;
@@ -122,7 +132,11 @@
     menuItems={[
       {
         onClick: () => {
-          onPerformTestflowScheduleOperations("run", schedule?.id);
+          onPerformTestflowScheduleOperations(
+            "run",
+            schedule?.id,
+            schedule?.name,
+          );
         },
         displayText: "Run Now",
         disabled: false,
@@ -217,7 +231,9 @@
     </Tooltip>
   </td>
   <td>
-    {#if schedule.lastResult === "Success"}
+    {#if schedule.lastResult === "Pending"}
+      <Spinner size={"16px"} />
+    {:else if schedule.lastResult === "Success"}
       <Tag text="Success" type={getTagType("Success")} />
     {:else if schedule.lastResult === "Fail"}
       <Tooltip
