@@ -651,10 +651,6 @@
 </div>
 
 <style>
-  .send-item,
-  .recieve-item {
-  }
-
   :global(
     .message-wrapper .markdown p,
     .message-wrapper .markdown li,
@@ -662,7 +658,7 @@
     .message-wrapper .markdown span,
     .message-wrapper .markdown code
   ) {
-    font-size: 14px;
+    font-size: 12px;
   }
 
   .markdown {
@@ -671,9 +667,9 @@
     padding: 8px;
     border-radius: 4px;
     margin-bottom: 4px;
-    overflow-x: auto;
+    overflow-x: hidden;
   }
-  
+
   .markdown.error-message {
     border: 0.2px solid var(--border-danger-200);
     color: var(--border-danger-200);
@@ -683,25 +679,44 @@
     margin-bottom: 0;
   }
 
-  /* Table-specific styling */
   :global(.message-wrapper .markdown table) {
-    border-collapse: collapse;
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     width: 100%;
-    min-width: 600px;
+    border-collapse: collapse;
+    margin-bottom: 8px;
+    border: 1px solid var(--border-ds-surface-400);
+    background-clip: padding-box;
+  }
+
+  :global(.message-wrapper .markdown table thead),
+  :global(.message-wrapper .markdown table tbody) {
+    display: table;
+    width: 100%;
     table-layout: auto;
   }
 
-  :global(.message-wrapper .markdown th,
-         .message-wrapper .markdown td) {
+  :global(.message-wrapper .markdown table tr) {
+    display: table-row;
+  }
+
+  :global(.message-wrapper .markdown th),
+  :global(.message-wrapper .markdown td) {
+    display: table-cell;
     padding: 8px 12px;
     text-align: left;
     border: 1px solid var(--border-ds-surface-400);
-    white-space: nowrap;
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: break-word;
+    vertical-align: top;
+    font-size:12px;
   }
 
   :global(.message-wrapper .markdown th) {
     background-color: var(--bg-ds-surface-500);
-    font-weight: 600;
+    font-weight: 400;
   }
 
   :global(.message-wrapper .markdown td) {
@@ -712,24 +727,23 @@
     background-color: var(--bg-ds-surface-500);
   }
 
-  :global(.message-wrapper .wrapper) {
-    border-radius: 4px !important;
-    margin-bottom: 10px;
+  :global(.message-wrapper .markdown th, .message-wrapper .markdown td) {
+    min-width: 140px;
   }
 
-  :global(.wrapper) {
-    position: relative;
+  :global(.message-wrapper .markdown table::-webkit-scrollbar) {
+    height: 10px;
+  }
+  :global(.message-wrapper .markdown table::-webkit-scrollbar-thumb) {
+    background-color: var(--bg-ds-surface-200);
+    border-radius: 6px;
+  }
+  :global(.message-wrapper .markdown table::-webkit-scrollbar-thumb:hover) {
+    background-color: var(--bg-ds-surface-300);
   }
 
-  :global(.code-header) {
-    position: absolute;
-    right: 0;
-    transform: translate(-30%, -50%);
-    border-radius: 4px;
-    background-color: var(--border-ds-surface-500);
-    border: 1px solid var(--border-ds-surface-300);
-    padding: 2px;
-    gap: 2px;
+  :global(.message-wrapper) {
+    overflow: visible !important;
   }
 
   :global(.message-wrapper .hljs) {
@@ -737,27 +751,13 @@
     min-width: 276px;
     max-height: 400px;
     min-height: 70px;
-
-    /* *sparrow black is not rendering, so using hardcode hexcode* */
-    /* background: var(--sparrow-black) !important; */
     background: #000 !important;
-
     border: 2px solid var(--border-ds-surface-400);
     border-radius: 8px;
     overflow-y: auto;
     overflow-x: hidden;
     white-space: pre-wrap;
     word-break: break-word;
-  }
-
-  /* Styling code block scroll bar */
-  :global(.message-wrapper .hljs::-webkit-scrollbar-thumb) {
-    background-color: var(--bg-ds-surface-100);
-  }
-  :global(.message-wrapper .hljs::-webkit-scrollbar),
-  :global(.message-wrapper .hljs::-webkit-scrollbar-thumb),
-  :global(.message-wrapper .hljs::-webkit-scrollbar-button) {
-    cursor: pointer;
   }
 
   :global(.action-button) {
@@ -770,15 +770,12 @@
   :global(.action-button:hover) {
     background-color: var(--bg-tertiary-190);
   }
-
   button:disabled {
     background-color: inherit;
   }
-
   :global(.tick-icon) {
     height: 16px;
   }
-
   :global(.codeBlock-action-btns-tooltip) {
     transition: 0.3s ease;
     font-weight: 400;
@@ -793,9 +790,7 @@
     padding: 4px 8px;
     background-color: var(--bg-ds-surface-100);
     opacity: 0;
-    -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
-    -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
-    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.75);
   }
   :global(.codeBlock-action-btns-tooltip-square) {
     position: absolute;
@@ -805,7 +800,7 @@
     height: 10px;
     width: 10px;
     background-color: var(--bg-ds-surface-100);
-    transform: translateX(-38%) rotate(45deg); /* Rotate 45 degrees */
+    transform: translateX(-38%) rotate(45deg);
   }
   :global(
     .codeBlock-action-btns-selector:hover .codeBlock-action-btns-tooltip
