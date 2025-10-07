@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { Options, Tooltip, Button, Modal } from "@sparrow/library/ui";
+  import {
+    Options,
+    Tooltip,
+    Button,
+    Modal,
+    Spinner,
+  } from "@sparrow/library/ui";
   import { Tag } from "@sparrow/library/ui";
   import { ErrorWithText, MoreHorizontalRegular } from "@sparrow/library/icons";
 
@@ -225,7 +231,9 @@
     </Tooltip>
   </td>
   <td>
-    {#if schedule.lastResult === "Success"}
+    {#if schedule.lastResult === "Pending"}
+      <Spinner size={"16px"} />
+    {:else if schedule.lastResult === "Success"}
       <Tag text="Success" type={getTagType("Success")} />
     {:else if schedule.lastResult === "Fail"}
       <Tooltip

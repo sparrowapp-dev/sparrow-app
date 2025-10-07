@@ -2017,6 +2017,10 @@ export class TestflowExplorerPageViewModel {
     const baseUrl = await this.constructBaseUrl(
       progressiveTab.path.workspaceId,
     );
+    notifications.success("Run started successfully.")
+    for (let i = 1; i < 5; i++) {
+      setTimeout(() => { this.fetchTestflow(); }, i * 500);
+    }
     const response = await this.testflowService.runTestflowSchedule(
       progressiveTab.path.workspaceId,
       progressiveTab.id,
@@ -2026,10 +2030,10 @@ export class TestflowExplorerPageViewModel {
     if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
       updateTestflowSchedules(progressiveTab?.id as string, schedules);
-      notifications.success("Run executed successfully.");
+      // notifications.success("Run executed successfully.");
     }
     else{
-      notifications.error("Run failed. View details in Test Results.");  
+      // notifications.error("Run failed. View details in Test Results.");  
     }
   };
 
