@@ -346,7 +346,7 @@
   let isDragOver = false;
   let isForbiddenDrop = false;
 
-    // Drag and Drop Handlers for Request
+  // Drag and Drop Handlers for Request
   function handleDragOver(event: DragEvent) {
     event.preventDefault();
 
@@ -363,7 +363,10 @@
 
     try {
       // getData doesn't work in dragover, use sessionStorage
-      const dataStr = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('sparrow-drag-data') : null;
+      const dataStr =
+        typeof sessionStorage !== "undefined"
+          ? sessionStorage.getItem("sparrow-drag-data")
+          : null;
       if (!dataStr) {
         isDragOver = false;
         isForbiddenDrop = false;
@@ -884,7 +887,9 @@
       class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
       activeTabId
         ? 'active-collection-tab'
-        : ''} {isDragOver ? 'valid-drop-zone' : ''} {isForbiddenDrop ? 'drag-forbidden' : ''}"
+        : ''} {isDragOver ? 'valid-drop-zone' : ''} {isForbiddenDrop
+        ? 'drag-forbidden'
+        : ''}"
       on:dragover={handleDragOver}
       on:dragleave={handleDragLeave}
       on:drop={handleDrop}
@@ -1151,7 +1156,9 @@
 
     {#if visibility}
       <div
-        class="z-1 collection-items-area {isForbiddenDrop ? 'drag-forbidden' : ''}"
+        class="z-1 collection-items-area {isForbiddenDrop
+          ? 'drag-forbidden'
+          : ''}"
         style="padding-left: 0; padding-right:0;"
         on:dragover={handleDragOver}
         on:dragleave={handleDragLeave}
@@ -1477,29 +1484,6 @@
   .drag-forbidden * {
     cursor: not-allowed !important;
   }
-
-  /* ActiveSync collections - no drop zone styling */
-  /* .active-sync-no-drop {
-    position: relative;
-  }
-
-  .active-sync-no-drop::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(220, 53, 69, 0.1);
-    border: 1px dashed rgba(220, 53, 69, 0.5);
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
-  .active-sync-no-drop:hover::after {
-    opacity: 1;
-  } */
 
   /* Valid drop zone styling - blue dashed border overlay */
   .valid-drop-zone {

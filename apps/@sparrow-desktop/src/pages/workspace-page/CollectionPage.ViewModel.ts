@@ -1512,14 +1512,6 @@ export default class CollectionsViewModel {
     targetRequestId?: string,
     insertPosition?: "before" | "after",
   ) => {
-    // Early return if trying to move request to the same location
-    if (oldCollectionId === newCollectionId && oldFolderId === newFolderId) {
-      notifications.error(
-        "Request is already in the target location. No move needed.",
-      );
-      return;
-    }
-
     let isGuestUser;
     isGuestUserActive.subscribe((value) => {
       isGuestUser = value;

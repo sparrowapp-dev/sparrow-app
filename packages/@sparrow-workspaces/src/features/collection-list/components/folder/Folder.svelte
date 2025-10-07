@@ -243,7 +243,10 @@
 
     try {
       // getData doesn't work in dragover, use sessionStorage
-      const dataStr = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('sparrow-drag-data') : null;
+      const dataStr =
+        typeof sessionStorage !== "undefined"
+          ? sessionStorage.getItem("sparrow-drag-data")
+          : null;
       if (!dataStr) {
         isDragOver = false;
         isForbiddenDrop = false;
@@ -264,7 +267,10 @@
       }
 
       // Check if dropping from folder "A" to folder "A" (forbidden)
-      if (dragData.folderId === explorer.id && dragData.collectionId === collection.id) {
+      if (
+        dragData.folderId === explorer.id &&
+        dragData.collectionId === collection.id
+      ) {
         isForbiddenDrop = true;
         isDragOver = false;
         setOverForbiddenZone(true);
@@ -312,7 +318,10 @@
       }
 
       // Don't allow dropping from folder "A" to folder "A"
-      if (dragData.folderId === explorer.id && dragData.collectionId === collection.id) {
+      if (
+        dragData.folderId === explorer.id &&
+        dragData.collectionId === collection.id
+      ) {
         return;
       }
 
@@ -330,7 +339,7 @@
           });
       }
     } catch (e) {
-      // Optionally handle error
+      console.error("Error handling drop in Folder:", e);
     }
   }
 
@@ -628,7 +637,9 @@
         class="d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
-          : ''} {isDragOver ? 'valid-drop-zone' : ''} {isForbiddenDrop ? 'drag-forbidden' : ''}"
+          : ''} {isDragOver ? 'valid-drop-zone' : ''} {isForbiddenDrop
+          ? 'drag-forbidden'
+          : ''}"
         on:dragover={handleDragOver}
         on:dragleave={handleDragLeave}
         on:drop={handleDrop}

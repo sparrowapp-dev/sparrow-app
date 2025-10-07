@@ -164,8 +164,8 @@
     event.dataTransfer?.setData("text/plain", JSON.stringify(data));
     event.dataTransfer?.setData("application/json", JSON.stringify(data));
     // Store in sessionStorage as fallback since getData doesn't work in dragover
-    if (typeof sessionStorage !== 'undefined') {
-      sessionStorage.setItem('sparrow-drag-data', JSON.stringify(data));
+    if (typeof sessionStorage !== "undefined") {
+      sessionStorage.setItem("sparrow-drag-data", JSON.stringify(data));
     }
   };
 
@@ -204,8 +204,8 @@
     isDragging = false;
     setDragging(false);
     // Clean up sessionStorage
-    if (typeof sessionStorage !== 'undefined') {
-      sessionStorage.removeItem('sparrow-drag-data');
+    if (typeof sessionStorage !== "undefined") {
+      sessionStorage.removeItem("sparrow-drag-data");
     }
   };
 
@@ -227,7 +227,10 @@
 
     try {
       // getData doesn't work in dragover, use sessionStorage
-      const dataStr = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('sparrow-drag-data') : null;
+      const dataStr =
+        typeof sessionStorage !== "undefined"
+          ? sessionStorage.getItem("sparrow-drag-data")
+          : null;
       if (!dataStr) {
         isDragOver = false;
         isForbiddenDrop = false;
@@ -263,7 +266,11 @@
       }
 
       // 2. Dragging from folder "A" onto another request in folder "A"
-      if (dragData.folderId && dragData.folderId === folder?.id && dragData.collectionId === collection.id) {
+      if (
+        dragData.folderId &&
+        dragData.folderId === folder?.id &&
+        dragData.collectionId === collection.id
+      ) {
         isForbiddenDrop = true;
         isDragOver = false;
         dropPosition = null;
@@ -275,7 +282,11 @@
       }
 
       // 3. Dragging from collection root onto another request in same collection root
-      if (!dragData.folderId && !folder?.id && dragData.collectionId === collection.id) {
+      if (
+        !dragData.folderId &&
+        !folder?.id &&
+        dragData.collectionId === collection.id
+      ) {
         isForbiddenDrop = true;
         isDragOver = false;
         dropPosition = null;
@@ -341,8 +352,18 @@
 
       // Don't allow forbidden drops
       if (dragData.requestId === api.id) return;
-      if (dragData.folderId && dragData.folderId === folder?.id && dragData.collectionId === collection.id) return;
-      if (!dragData.folderId && !folder?.id && dragData.collectionId === collection.id) return;
+      if (
+        dragData.folderId &&
+        dragData.folderId === folder?.id &&
+        dragData.collectionId === collection.id
+      )
+        return;
+      if (
+        !dragData.folderId &&
+        !folder?.id &&
+        dragData.collectionId === collection.id
+      )
+        return;
 
       // Only allow dropping requests
       if (dragData.requestId) {
@@ -354,11 +375,12 @@
             newFolderId: folder?.id ?? "",
             requestId: dragData.requestId,
             targetRequestId: api.id,
-            insertPosition: currentDropPosition === "bottom" ? "after" : "before", // Top half = before, bottom half = after
+            insertPosition:
+              currentDropPosition === "bottom" ? "after" : "before", // Top half = before, bottom half = after
           });
       }
     } catch (e) {
-      // Optionally handle error
+      console.error("Error handling drop on Request:", e);
     }
   }
 </script>
@@ -492,7 +514,16 @@
   class="d-flex draggable align-items-center justify-content-between my-button btn-primary {api.id ===
   activeTabId
     ? 'active-request-tab'
-    : ''} {isDragOver ? 'drag-over-request valid-drop-zone' : ''} {isForbiddenDrop ? 'drag-forbidden' : ''} {$dragState.isOverForbiddenZone && isDragging ? 'dragging-over-forbidden' : ''} {dropPosition === 'top' ? 'drop-indicator-top' : ''} {dropPosition === 'bottom' ? 'drop-indicator-bottom' : ''} {collection.activeSync ? 'active-sync-no-drag' : ''}"
+    : ''} {isDragOver
+    ? 'drag-over-request valid-drop-zone'
+    : ''} {isForbiddenDrop
+    ? 'drag-forbidden'
+    : ''} {$dragState.isOverForbiddenZone && isDragging
+    ? 'dragging-over-forbidden'
+    : ''} {dropPosition === 'top' ? 'drop-indicator-top' : ''} {dropPosition ===
+  'bottom'
+    ? 'drop-indicator-bottom'
+    : ''} {collection.activeSync ? 'active-sync-no-drag' : ''}"
   style={`height:32px; padding-left:3px; gap:4px; {margin-bottom :2px;}`}
 >
   <button
@@ -829,7 +860,9 @@
   .drag-over-request {
     outline: 2px solid var(--bg-ds-primary-300);
     background-color: var(--bg-ds-surface-400) !important;
-    transition: outline 0.1s, background-color 0.1s;
+    transition:
+      outline 0.1s,
+      background-color 0.1s;
   }
 
   /* Insertion line indicators */
