@@ -1859,7 +1859,6 @@ export class TestflowExplorerPageViewModel {
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
 
-
   /**
    * Updates the nodes in the testflow with debounce to avoid frequent calls
    * @param _nodes - nodes of the testflow
@@ -1882,8 +1881,6 @@ export class TestflowExplorerPageViewModel {
       updateTestflowSchedules(progressiveTab.id as string, schedules);
     }
   };
-
-
 
   public openTestflowScheduleConfigurationsTab = async (_schedule: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
@@ -1912,8 +1909,6 @@ export class TestflowExplorerPageViewModel {
     await this.tabRepository.createTab(initTestflowScheduleTab);
   };
 
-
-
   /**
    * Schedules a test flow run with the specified configuration
    */
@@ -1933,6 +1928,7 @@ export class TestflowExplorerPageViewModel {
       const progressiveTab = createDeepCopy(this._tab.getValue());
       const workspaceId = progressiveTab.path.workspaceId;
       const testflowId = progressiveTab.id;
+      const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
       if (!workspaceId || !testflowId) {
         notifications.error("Missing workspace or testflow information");
@@ -1946,6 +1942,7 @@ export class TestflowExplorerPageViewModel {
         testflowId,
         runConfiguration,
         notification,
+        userTimeZone,
       };
 
       const response = await this.testflowService.scheduleTestFlowRun(
@@ -1972,8 +1969,10 @@ export class TestflowExplorerPageViewModel {
           data: response.data,
         };
       } else {
-        if(response?.message !== "Plan limit reached"){
-          notifications.error(`${ response.message || "Failed to schedule test flow"}`);
+        if (response?.message !== "Plan limit reached") {
+          notifications.error(
+            `${response.message || "Failed to schedule test flow"}`,
+          );
         }
         return {
           isSuccessful: false,
@@ -2007,13 +2006,17 @@ export class TestflowExplorerPageViewModel {
       // Remove the main tab
       const mainTabId = await this.tabRepository.getTabById(_scheduleId);
       if (mainTabId) tabsIdsToDelete.push(mainTabId.tabId);
-      childTabs = await this.tabRepository.getTabsByTestflowScheduleId(_scheduleId);
+      childTabs =
+        await this.tabRepository.getTabsByTestflowScheduleId(_scheduleId);
       // Delete all child tabs if any exist
       if (childTabs.length > 0) {
         const allChildTabs = childTabs.map((tab) => tab.tabId);
         tabsIdsToDelete.push(...allChildTabs);
       }
-      await this.tabRepository.deleteTabsWithTabIdInAWorkspace(progressiveTab.path.workspaceId, tabsIdsToDelete);
+      await this.tabRepository.deleteTabsWithTabIdInAWorkspace(
+        progressiveTab.path.workspaceId,
+        tabsIdsToDelete,
+      );
       const schedules = response.data.data.schedules;
       updateTestflowSchedules(progressiveTab?.id as string, schedules);
     }
