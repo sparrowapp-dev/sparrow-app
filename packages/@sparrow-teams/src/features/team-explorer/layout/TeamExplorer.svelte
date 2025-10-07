@@ -185,7 +185,7 @@
       {
         name: "Workspaces",
         id: TeamTabsEnum.WORKSPACES,
-        count: openTeam?.workspaces?.length || 0,
+        count: workspaces?.length || 0,
         visible: true,
         disabled: isGuestUser === true ? true : false,
       },
@@ -231,7 +231,7 @@
    *
    */
   $: {
-    if (isGuestUser || openTeam) {
+    if (isGuestUser || openTeam || workspaces) {
       teamTabs = refreshTabs();
     }
   }
