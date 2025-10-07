@@ -347,6 +347,7 @@
     {isTestFlowEmpty}
     {isGuestUser}
     isWebApp={true}
+    environments={$environments}
     onSelectRequest={_viewModel.getRequestdata}
     checkRequestExistInNode={_viewModel.checkRequestExistInNode}
     onUpdateEnvironment={_viewModel.updateEnvironment}

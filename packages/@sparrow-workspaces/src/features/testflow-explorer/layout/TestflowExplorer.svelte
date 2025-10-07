@@ -132,6 +132,9 @@
   export let toggleHistoryDetails;
   export let toggleHistoryContainer;
   export let environmentVariables;
+  console.log("environmentVariables", environmentVariables);
+  export let environments;
+  console.log("environments in testflow", environments);
   export let isTestflowEditable;
   export let onRedrectRequest;
   export let onUpdateTestFlowName;
@@ -366,20 +369,21 @@
     }
 
     let environment = "None";
+    let isDeletedEnvironment = false;
+
     if (schedule.environmentId && schedule.environmentId.trim() !== "") {
-      // environmentVariables is an object with keys like "global", "local", etc.
-      // Each has an id and name property
-      let envObj = undefined;
-      for (const key in environmentVariables) {
-        if (
-          environmentVariables[key] &&
-          environmentVariables[key].id === schedule.environmentId
-        ) {
-          envObj = environmentVariables[key];
-          break;
-        }
+      // Find environment by ID in the environments array
+      const envObj = Array.isArray(environments)
+        ? environments.find((env) => env.id === schedule.environmentId)
+        : null;
+
+      if (envObj) {
+        environment = envObj.name;
+      } else {
+        // Environment not found in current list → deleted
+        environment = schedule?.environmentName || "Deleted Environment";
+        isDeletedEnvironment = true;
       }
-      environment = envObj?.name || "Deleted Environment";
     }
 
     return {
@@ -392,6 +396,7 @@
       lastResult: lastResult,
       isActive: schedule.isActive,
       originalData: schedule,
+      isDeletedEnvironment: isDeletedEnvironment,
     };
   }
 
