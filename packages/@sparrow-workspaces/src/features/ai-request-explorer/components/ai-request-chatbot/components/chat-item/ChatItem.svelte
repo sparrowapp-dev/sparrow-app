@@ -671,7 +671,9 @@
     padding: 8px;
     border-radius: 4px;
     margin-bottom: 4px;
+    overflow-x: auto;
   }
+  
   .markdown.error-message {
     border: 0.2px solid var(--border-danger-200);
     color: var(--border-danger-200);
@@ -679,6 +681,35 @@
 
   :global(.message-wrapper .markdown pre) {
     margin-bottom: 0;
+  }
+
+  /* Table-specific styling */
+  :global(.message-wrapper .markdown table) {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 600px;
+    table-layout: auto;
+  }
+
+  :global(.message-wrapper .markdown th,
+         .message-wrapper .markdown td) {
+    padding: 8px 12px;
+    text-align: left;
+    border: 1px solid var(--border-ds-surface-400);
+    white-space: nowrap;
+  }
+
+  :global(.message-wrapper .markdown th) {
+    background-color: var(--bg-ds-surface-500);
+    font-weight: 600;
+  }
+
+  :global(.message-wrapper .markdown td) {
+    background-color: var(--bg-ds-surface-600);
+  }
+
+  :global(.message-wrapper .markdown tr:hover td) {
+    background-color: var(--bg-ds-surface-500);
   }
 
   :global(.message-wrapper .wrapper) {
