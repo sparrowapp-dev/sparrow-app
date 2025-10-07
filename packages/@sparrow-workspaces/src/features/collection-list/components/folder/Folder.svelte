@@ -230,6 +230,17 @@
   function handleDragOver(event: DragEvent) {
     event.preventDefault();
 
+    // Reject all drops if this collection has activeSync enabled
+    if (collection.activeSync) {
+      isDragOver = false;
+      isForbiddenDrop = true;
+      setOverForbiddenZone(true);
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = "none";
+      }
+      return;
+    }
+
     try {
       // getData doesn't work in dragover, use sessionStorage
       const dataStr = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('sparrow-drag-data') : null;
@@ -240,6 +251,17 @@
       }
 
       const dragData = JSON.parse(dataStr);
+
+      // Reject drops from activeSync collections
+      if (dragData.collectionActiveSync) {
+        isDragOver = false;
+        isForbiddenDrop = true;
+        setOverForbiddenZone(true);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "none";
+        }
+        return;
+      }
 
       // Check if dropping from folder "A" to folder "A" (forbidden)
       if (dragData.folderId === explorer.id && dragData.collectionId === collection.id) {
@@ -274,10 +296,20 @@
     isDragOver = false;
     isForbiddenDrop = false;
 
+    // Reject all drops if this collection has activeSync enabled
+    if (collection.activeSync) {
+      return;
+    }
+
     try {
       const data = event.dataTransfer?.getData("text/plain");
       if (!data) return;
       const dragData = JSON.parse(data);
+
+      // Reject drops from activeSync collections
+      if (dragData.collectionActiveSync) {
+        return;
+      }
 
       // Don't allow dropping from folder "A" to folder "A"
       if (dragData.folderId === explorer.id && dragData.collectionId === collection.id) {
@@ -596,7 +628,7 @@
         class="d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
-          : ''} {isDragOver ? 'drag-over-folder' : ''} {isForbiddenDrop ? 'drag-forbidden' : ''}"
+          : ''} {isDragOver ? 'valid-drop-zone' : ''} {isForbiddenDrop ? 'drag-forbidden' : ''}"
         on:dragover={handleDragOver}
         on:dragleave={handleDragLeave}
         on:drop={handleDrop}
@@ -952,13 +984,6 @@
     background: var(--right-border);
   }
 
-  /* Drag-over highlight for folder drop target */
-  .drag-over-folder {
-    outline: 2px solid var(--bg-ds-primary-300);
-    background-color: var(--bg-ds-surface-400) !important;
-    transition: outline 0.1s, background-color 0.1s;
-  }
-
   /* Forbidden drop cursor and styling */
   .drag-forbidden {
     cursor: not-allowed !important;
@@ -966,5 +991,25 @@
 
   .drag-forbidden * {
     cursor: not-allowed !important;
+  }
+
+  /* Valid drop zone styling - blue dashed border overlay */
+  .valid-drop-zone {
+    position: relative;
+  }
+
+  .valid-drop-zone::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(59, 130, 246, 0.1);
+    border: 2px dashed rgba(59, 130, 246, 0.6);
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.2s;
+    border-radius: 4px;
   }
 </style>

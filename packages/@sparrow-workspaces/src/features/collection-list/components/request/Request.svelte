@@ -144,11 +144,18 @@
   };
 
   const dragStart = (event: DragEvent, collection: CollectionBaseInterface) => {
+    // Don't allow dragging from activeSync collections
+    if (collection.activeSync) {
+      event.preventDefault();
+      return;
+    }
+
     isDragging = true;
     setDragging(true);
     const data = {
       workspaceId: collection.workspaceId,
       collectionId: collection.id,
+      collectionActiveSync: collection.activeSync,
       folderId: folder?.id ?? "",
       requestId: api.id,
       name: api.name,
@@ -206,6 +213,18 @@
   function handleDragOver(event: DragEvent) {
     event.preventDefault();
 
+    // Reject all drops if this collection has activeSync enabled
+    if (collection.activeSync) {
+      isForbiddenDrop = true;
+      isDragOver = false;
+      dropPosition = null;
+      setOverForbiddenZone(true);
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = "none";
+      }
+      return;
+    }
+
     try {
       // getData doesn't work in dragover, use sessionStorage
       const dataStr = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('sparrow-drag-data') : null;
@@ -217,6 +236,18 @@
       }
 
       const dragData = JSON.parse(dataStr);
+
+      // Reject drops from activeSync collections
+      if (dragData.collectionActiveSync) {
+        isForbiddenDrop = true;
+        isDragOver = false;
+        dropPosition = null;
+        setOverForbiddenZone(true);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "none";
+        }
+        return;
+      }
 
       // Forbidden cases:
       // 1. Dragging onto itself
@@ -293,10 +324,20 @@
     isForbiddenDrop = false;
     dropPosition = null;
 
+    // Reject all drops if this collection has activeSync enabled
+    if (collection.activeSync) {
+      return;
+    }
+
     try {
       const data = event.dataTransfer?.getData("text/plain");
       if (!data) return;
       const dragData = JSON.parse(data);
+
+      // Reject drops from activeSync collections
+      if (dragData.collectionActiveSync) {
+        return;
+      }
 
       // Don't allow forbidden drops
       if (dragData.requestId === api.id) return;
@@ -437,9 +478,11 @@
 
 <div
   tabindex="0"
-  draggable={true}
+  draggable={!collection.activeSync}
   on:dragstart={(event) => {
-    dragStart(event, collection);
+    if (!collection.activeSync) {
+      dragStart(event, collection);
+    }
   }}
   on:dragend={dragStop}
   on:dragover={handleDragOver}
@@ -449,7 +492,7 @@
   class="d-flex draggable align-items-center justify-content-between my-button btn-primary {api.id ===
   activeTabId
     ? 'active-request-tab'
-    : ''} {isDragOver ? 'drag-over-request' : ''} {isForbiddenDrop ? 'drag-forbidden' : ''} {$dragState.isOverForbiddenZone && isDragging ? 'dragging-over-forbidden' : ''} {dropPosition === 'top' ? 'drop-indicator-top' : ''} {dropPosition === 'bottom' ? 'drop-indicator-bottom' : ''}"
+    : ''} {isDragOver ? 'drag-over-request valid-drop-zone' : ''} {isForbiddenDrop ? 'drag-forbidden' : ''} {$dragState.isOverForbiddenZone && isDragging ? 'dragging-over-forbidden' : ''} {dropPosition === 'top' ? 'drop-indicator-top' : ''} {dropPosition === 'bottom' ? 'drop-indicator-bottom' : ''} {collection.activeSync ? 'active-sync-no-drag' : ''}"
   style={`height:32px; padding-left:3px; gap:4px; {margin-bottom :2px;}`}
 >
   <button
@@ -837,5 +880,34 @@
 
   .dragging-over-forbidden * {
     cursor: not-allowed !important;
+  }
+
+  /* ActiveSync collections - non-draggable styling */
+  .active-sync-no-drag {
+    cursor: default !important;
+  }
+
+  .active-sync-no-drag * {
+    cursor: default !important;
+  }
+
+  /* Valid drop zone styling - blue dashed border overlay */
+  .valid-drop-zone {
+    position: relative;
+  }
+
+  .valid-drop-zone::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(59, 130, 246, 0.1);
+    border: 2px dashed rgba(59, 130, 246, 0.6);
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.2s;
+    border-radius: 4px;
   }
 </style>

@@ -346,9 +346,20 @@
   let isDragOver = false;
   let isForbiddenDrop = false;
 
-  // Drag and Drop Handlers for Request
+    // Drag and Drop Handlers for Request
   function handleDragOver(event: DragEvent) {
     event.preventDefault();
+
+    // Reject all drops if this collection has activeSync enabled
+    if (collection.activeSync) {
+      isDragOver = false;
+      isForbiddenDrop = true;
+      setOverForbiddenZone(true);
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = "none";
+      }
+      return;
+    }
 
     try {
       // getData doesn't work in dragover, use sessionStorage
@@ -361,17 +372,28 @@
 
       const dragData = JSON.parse(dataStr);
 
+      // Reject drops from activeSync collections
+      if (dragData.collectionActiveSync) {
+        isDragOver = false;
+        isForbiddenDrop = true;
+        setOverForbiddenZone(true);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "none";
+        }
+        return;
+      }
+
       // Check if dropping from same collection root to same collection root (forbidden)
       if (dragData.collectionId === collection.id && !dragData.folderId) {
-        isForbiddenDrop = true;
         isDragOver = false;
+        isForbiddenDrop = true;
         setOverForbiddenZone(true);
         if (event.dataTransfer) {
           event.dataTransfer.dropEffect = "none";
         }
       } else {
-        isForbiddenDrop = false;
         isDragOver = true;
+        isForbiddenDrop = false;
         setOverForbiddenZone(false);
         if (event.dataTransfer) {
           event.dataTransfer.dropEffect = "move";
@@ -394,10 +416,20 @@
     isDragOver = false;
     isForbiddenDrop = false;
 
+    // Reject all drops if this collection has activeSync enabled
+    if (collection.activeSync) {
+      return;
+    }
+
     try {
       const data = event.dataTransfer?.getData("text/plain");
       if (!data) return;
       const dragData = JSON.parse(data);
+
+      // Reject drops from activeSync collections
+      if (dragData.collectionActiveSync) {
+        return;
+      }
 
       // Don't allow dropping from same collection root to same collection root
       if (dragData.collectionId === collection.id && !dragData.folderId) {
@@ -852,7 +884,7 @@
       class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
       activeTabId
         ? 'active-collection-tab'
-        : ''} {isDragOver ? 'drag-over-collection' : ''} {isForbiddenDrop ? 'drag-forbidden' : ''}"
+        : ''} {isDragOver ? 'valid-drop-zone' : ''} {isForbiddenDrop ? 'drag-forbidden' : ''}"
       on:dragover={handleDragOver}
       on:dragleave={handleDragLeave}
       on:drop={handleDrop}
@@ -1119,7 +1151,7 @@
 
     {#if visibility}
       <div
-        class="z-1 collection-items-area {isDragOver ? 'drag-over-collection' : ''} {isForbiddenDrop ? 'drag-forbidden' : ''}"
+        class="z-1 collection-items-area {isForbiddenDrop ? 'drag-forbidden' : ''}"
         style="padding-left: 0; padding-right:0;"
         on:dragover={handleDragOver}
         on:dragleave={handleDragLeave}
@@ -1433,19 +1465,8 @@
     background-color: var(--bg-ds-surface-100);
   }
 
-  /* Drag-over highlight for collection drop target */
-  .drag-over-collection {
-    outline: 2px solid var(--bg-ds-primary-300);
-    background-color: var(--bg-ds-surface-400) !important;
-    transition: outline 0.1s, background-color 0.1s;
-  }
-
   .collection-items-area {
     position: relative;
-  }
-
-  .collection-items-area.drag-over-collection {
-    background-color: var(--bg-ds-surface-400) !important;
   }
 
   /* Forbidden drop cursor and styling */
@@ -1455,5 +1476,48 @@
 
   .drag-forbidden * {
     cursor: not-allowed !important;
+  }
+
+  /* ActiveSync collections - no drop zone styling */
+  /* .active-sync-no-drop {
+    position: relative;
+  }
+
+  .active-sync-no-drop::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px dashed rgba(220, 53, 69, 0.5);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .active-sync-no-drop:hover::after {
+    opacity: 1;
+  } */
+
+  /* Valid drop zone styling - blue dashed border overlay */
+  .valid-drop-zone {
+    position: relative;
+  }
+
+  .valid-drop-zone::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(59, 130, 246, 0.1);
+    border: 2px dashed rgba(59, 130, 246, 0.6);
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.2s;
+    border-radius: 4px;
   }
 </style>
