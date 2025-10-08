@@ -194,6 +194,15 @@ class MockHistoryExplorerPage {
     return this.workspaceRepository.getActiveWorkspace();
   }
 
+  /**
+   * Get workspace data through workspace id
+   * @param workspaceId - id of workspace
+   * @returns - workspace document
+   */
+  public getWorkspaceById = async (workspaceId: string) => {
+    return await this.workspaceRepository.readWorkspace(workspaceId);
+  };
+
   public getTestflowObserver = (_testflowId: string) => {
     return this.testflowRepository.getTestflowObserver(_testflowId);
   };
@@ -272,7 +281,9 @@ class MockHistoryExplorerPage {
     );
 
     for (let i = 1; i < 5; i++) {
-      setTimeout(() => { this.getTestflow(); }, i * 500);
+      setTimeout(() => {
+        this.getTestflow();
+      }, i * 500);
     }
     const response = await this.testflowService.runTestflowSchedule(
       progressiveTab.path.workspaceId,
@@ -282,7 +293,7 @@ class MockHistoryExplorerPage {
     );
     if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
-      const schedule = schedules.find((s:any) => s.id === progressiveTab.id);
+      const schedule = schedules.find((s: any) => s.id === progressiveTab.id);
       captureEvent("schedule_run_now_clicked", {
         event_source: "web_app",
         schedule_id: progressiveTab.id,
@@ -296,8 +307,8 @@ class MockHistoryExplorerPage {
         schedules,
       );
       notifications.success("Run executed successfully.");
-    }else{
-      notifications.error("Run failed. View details in Test Results.");  
+    } else {
+      notifications.error("Run failed. View details in Test Results.");
     }
   };
 

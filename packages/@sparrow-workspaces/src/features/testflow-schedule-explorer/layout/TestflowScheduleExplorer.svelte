@@ -39,6 +39,7 @@
   export let workspaceUsers = [];
   export let onUpdateSchedule = (updatedSchedule) => {};
   export let onSaveSchedule;
+  export let userRole;
 
   const extractTimeFromISOString = new TimeISOExtractor()
     .extractTimeFromISOString;
@@ -189,6 +190,7 @@
             {onUpdateSchedule}
             {onSaveSchedule}
             isSaved={$tab?.isSaved}
+            {userRole}
           />
         {/if}
       </div>

@@ -36,6 +36,7 @@
    * Array of default/pre-selected emails
    */
   export let defaultEmails: string[] = [];
+  export let disabled: boolean = false;
 
   // State variables
   let isOpen = false;
@@ -86,6 +87,7 @@
    * @param event - The mouse event.
    */
   const handleDropdownClick = (event: MouseEvent) => {
+    if (disabled) return;
     const dropdownElement = document.getElementById(`input-select-list-${id}`);
     if (dropdownElement && !dropdownElement.contains(event.target as Node)) {
       setTimeout(() => {
@@ -303,9 +305,7 @@
     id={`input-select-list-${id}`}
     class="parent-dropdown display-inline-block z-1 border-radius-4 {isError
       ? 'selectErrorBorderClass'
-      : ''}
-    
-    "
+      : ''} {disabled ? 'email-disabled' : ''}"
     style=" position: relative;"
   >
     <div>
@@ -324,18 +324,21 @@
           style="outline:none;border:none;flex-grow:1; background:transparent;"
           bind:value={currentEmailEntered}
           on:input={() => {
-            filterUser();
+            if (!disabled) filterUser();
           }}
           on:focus={() => {
-            isOpen = true;
+            if (!disabled) isOpen = true;
           }}
-          on:keydown={handleKeyDown}
+          on:keydown={(e) => {
+            if (!disabled) handleKeyDown(e);
+          }}
+          {disabled}
           class="input-container mt-1 sparrow-fs-12 my-1"
         />
       </div>
     </div>
 
-    {#if isOpen}
+    {#if isOpen && !disabled}
       <div
         class="d-none select-data p-1 rounded"
         class:select-active={isOpen}
@@ -383,6 +386,11 @@
 </div>
 
 <style>
+  .email-disabled {
+    opacity: 0.7;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
   .email-container {
     background-color: var(--bg-ds-surface-400);
     border: 1px solid;
