@@ -38,8 +38,8 @@
         case "once":
           if (formattedDate && selectedTime) {
             runConfiguration.executeAt = formatDateForAPI(
-              formattedDate,
               selectedTime,
+              formattedDate,
             );
           }
           break;
