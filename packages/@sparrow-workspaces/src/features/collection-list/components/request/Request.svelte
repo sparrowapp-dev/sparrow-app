@@ -29,8 +29,6 @@
   } from "../../../../stores/recent-left-panel";
   import {
     dragState,
-    setDragging,
-    setOverForbiddenZone,
   } from "../../../../stores/drag-state";
   import {
     ChevronDownRegular,
@@ -86,6 +84,13 @@
   export let isWebApp;
   export let isSharedWorkspace = false;
   export let onItemMoved: (args: any) => void;
+
+  // Drag handler functions passed from parent
+  export let dragStart: (event: DragEvent, collection: any, folder: any, api: any) => void;
+  export let dragStop: () => void;
+  export let handleDragOver: (event: DragEvent, collection: any, folder: any, api: any, requestTabWrapper: HTMLElement, setDropPosition: (pos: "top" | "bottom" | null) => void, setIsDragOver: (val: boolean) => void, setIsForbiddenDrop: (val: boolean) => void) => void;
+  export let handleDragLeave: (setIsDragOver: (val: boolean) => void, setIsForbiddenDrop: (val: boolean) => void, setDropPosition: (pos: "top" | "bottom" | null) => void) => void;
+  export let handleDrop: (event: DragEvent, collection: any, folder: any, api: any, setDropPosition: (pos: "top" | "bottom" | null) => void, setIsDragOver: (val: boolean) => void, setIsForbiddenDrop: (val: boolean) => void, currentDropPosition: "top" | "bottom" | null) => void;
 
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
@@ -143,32 +148,6 @@
     }
   };
 
-  const dragStart = (event: DragEvent, collection: CollectionBaseInterface) => {
-    // Don't allow dragging from activeSync collections
-    if (collection.activeSync) {
-      event.preventDefault();
-      return;
-    }
-
-    isDragging = true;
-    setDragging(true);
-    const data = {
-      workspaceId: collection.workspaceId,
-      collectionId: collection.id,
-      collectionActiveSync: collection.activeSync,
-      folderId: folder?.id ?? "",
-      requestId: api.id,
-      name: api.name,
-      method: api?.request?.method,
-    };
-    event.dataTransfer?.setData("text/plain", JSON.stringify(data));
-    event.dataTransfer?.setData("application/json", JSON.stringify(data));
-    // Store in sessionStorage as fallback since getData doesn't work in dragover
-    if (typeof sessionStorage !== "undefined") {
-      sessionStorage.setItem("sparrow-drag-data", JSON.stringify(data));
-    }
-  };
-
   let httpMethodUIStyle = "";
   $: {
     httpMethodUIStyle = getMethodStyle(
@@ -200,189 +179,6 @@
   //   }
   // }
   // }
-  const dragStop = () => {
-    isDragging = false;
-    setDragging(false);
-    // Clean up sessionStorage
-    if (typeof sessionStorage !== "undefined") {
-      sessionStorage.removeItem("sparrow-drag-data");
-    }
-  };
-
-  // Drag and Drop Handlers for Request drop zone
-  function handleDragOver(event: DragEvent) {
-    event.preventDefault();
-
-    // Reject all drops if this collection has activeSync enabled
-    if (collection.activeSync) {
-      isForbiddenDrop = true;
-      isDragOver = false;
-      dropPosition = null;
-      setOverForbiddenZone(true);
-      if (event.dataTransfer) {
-        event.dataTransfer.dropEffect = "none";
-      }
-      return;
-    }
-
-    try {
-      // getData doesn't work in dragover, use sessionStorage
-      const dataStr =
-        typeof sessionStorage !== "undefined"
-          ? sessionStorage.getItem("sparrow-drag-data")
-          : null;
-      if (!dataStr) {
-        isDragOver = false;
-        isForbiddenDrop = false;
-        dropPosition = null;
-        return;
-      }
-
-      const dragData = JSON.parse(dataStr);
-
-      // Reject drops from activeSync collections
-      if (dragData.collectionActiveSync) {
-        isForbiddenDrop = true;
-        isDragOver = false;
-        dropPosition = null;
-        setOverForbiddenZone(true);
-        if (event.dataTransfer) {
-          event.dataTransfer.dropEffect = "none";
-        }
-        return;
-      }
-
-      // Forbidden cases:
-      // 1. Dragging onto itself
-      if (dragData.requestId === api.id) {
-        isForbiddenDrop = true;
-        isDragOver = false;
-        dropPosition = null;
-        setOverForbiddenZone(true);
-        if (event.dataTransfer) {
-          event.dataTransfer.dropEffect = "none";
-        }
-        return;
-      }
-
-      // 2. Dragging from folder "A" onto another request in folder "A"
-      if (
-        dragData.folderId &&
-        dragData.folderId === folder?.id &&
-        dragData.collectionId === collection.id
-      ) {
-        isForbiddenDrop = true;
-        isDragOver = false;
-        dropPosition = null;
-        setOverForbiddenZone(true);
-        if (event.dataTransfer) {
-          event.dataTransfer.dropEffect = "none";
-        }
-        return;
-      }
-
-      // 3. Dragging from collection root onto another request in same collection root
-      if (
-        !dragData.folderId &&
-        !folder?.id &&
-        dragData.collectionId === collection.id
-      ) {
-        isForbiddenDrop = true;
-        isDragOver = false;
-        dropPosition = null;
-        setOverForbiddenZone(true);
-        if (event.dataTransfer) {
-          event.dataTransfer.dropEffect = "none";
-        }
-        return;
-      }
-
-      // Valid drop - calculate insertion position based on cursor Y position
-      const rect = requestTabWrapper.getBoundingClientRect();
-      const mouseY = event.clientY;
-      const elementMiddle = rect.top + rect.height / 2;
-
-      if (mouseY < elementMiddle) {
-        dropPosition = "top";
-      } else {
-        dropPosition = "bottom";
-      }
-
-      isForbiddenDrop = false;
-      isDragOver = false; // Don't highlight entire component
-      setOverForbiddenZone(false);
-      if (event.dataTransfer) {
-        event.dataTransfer.dropEffect = "move";
-      }
-    } catch (e) {
-      isDragOver = false;
-      isForbiddenDrop = false;
-      dropPosition = null;
-    }
-  }
-
-  function handleDragLeave(event: DragEvent) {
-    isDragOver = false;
-    isForbiddenDrop = false;
-    dropPosition = null;
-    setOverForbiddenZone(false);
-  }
-
-  async function handleDrop(event: DragEvent) {
-    event.preventDefault();
-    const currentDropPosition = dropPosition; // Save current position before resetting
-    isDragOver = false;
-    isForbiddenDrop = false;
-    dropPosition = null;
-
-    // Reject all drops if this collection has activeSync enabled
-    if (collection.activeSync) {
-      return;
-    }
-
-    try {
-      const data = event.dataTransfer?.getData("text/plain");
-      if (!data) return;
-      const dragData = JSON.parse(data);
-
-      // Reject drops from activeSync collections
-      if (dragData.collectionActiveSync) {
-        return;
-      }
-
-      // Don't allow forbidden drops
-      if (dragData.requestId === api.id) return;
-      if (
-        dragData.folderId &&
-        dragData.folderId === folder?.id &&
-        dragData.collectionId === collection.id
-      )
-        return;
-      if (
-        !dragData.folderId &&
-        !folder?.id &&
-        dragData.collectionId === collection.id
-      )
-        return;
-
-      // Only allow dropping requests
-      if (dragData.requestId) {
-        onItemMoved &&
-          onItemMoved({
-            oldCollectionId: dragData.collectionId,
-            newCollectionId: collection.id,
-            oldFolderId: dragData.folderId,
-            newFolderId: folder?.id ?? "",
-            requestId: dragData.requestId,
-            targetRequestId: api.id,
-            insertPosition:
-              currentDropPosition === "bottom" ? "after" : "before", // Top half = before, bottom half = after
-          });
-      }
-    } catch (e) {
-      console.error("Error handling drop on Request:", e);
-    }
-  }
 </script>
 
 <svelte:window
@@ -503,13 +299,17 @@
   draggable={!collection.activeSync}
   on:dragstart={(event) => {
     if (!collection.activeSync) {
-      dragStart(event, collection);
+      isDragging = true;
+      dragStart(event, collection, folder, api);
     }
   }}
-  on:dragend={dragStop}
-  on:dragover={handleDragOver}
-  on:dragleave={handleDragLeave}
-  on:drop={handleDrop}
+  on:dragend={() => {
+    isDragging = false;
+    dragStop();
+  }}
+  on:dragover={(event) => handleDragOver(event, collection, folder, api, requestTabWrapper, (pos) => dropPosition = pos, (val) => isDragOver = val, (val) => isForbiddenDrop = val)}
+  on:dragleave={() => handleDragLeave((val) => isDragOver = val, (val) => isForbiddenDrop = val, (pos) => dropPosition = pos)}
+  on:drop={(event) => handleDrop(event, collection, folder, api, (pos) => dropPosition = pos, (val) => isDragOver = val, (val) => isForbiddenDrop = val, dropPosition)}
   bind:this={requestTabWrapper}
   class="d-flex draggable align-items-center justify-content-between my-button btn-primary {api.id ===
   activeTabId
