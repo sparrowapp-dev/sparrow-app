@@ -1913,7 +1913,7 @@ export class TestflowExplorerPageViewModel {
     notification: ScheduleTestFlowRunDto["notification"],
   ) => {
     captureEvent("set_schedule_run_cta_clicked", {
-      event_source: "web_app",
+      event_source: "desktop_app",
     });
     try {
       const baseUrl = await this.constructBaseUrl(
@@ -1952,7 +1952,7 @@ export class TestflowExplorerPageViewModel {
         const lastestSchedule = response.data.data.schedule;
         updateTestflowSchedules(progressiveTab.id as string, schedules);
         captureEvent("schedule_created", {
-          event_source: "web_app",
+          event_source: "desktop_app",
           schedule_id: lastestSchedule.data.id,
           testflowId: response.data.data.testflow._id,
           schedule_run_frequency: runConfiguration.runCycle,
@@ -1988,6 +1988,12 @@ export class TestflowExplorerPageViewModel {
     const baseUrl = await this.constructBaseUrl(
       progressiveTab.path.workspaceId,
     );
+    const testflow = await this.testflowRepository.readTestflow(
+      progressiveTab.id,
+    );
+    const schedule = testflow._data?.schedules?.find(
+      (s) => s.id === _scheduleId,
+    );
     const response = await this.testflowService.deleteTestflowSchedule(
       progressiveTab.path.workspaceId,
       progressiveTab.id,
@@ -1995,6 +2001,13 @@ export class TestflowExplorerPageViewModel {
       baseUrl,
     );
     if (response?.isSuccessful) {
+      captureEvent("schedule_deleted", {
+        event_source: "web_app",
+        schedule_id: _scheduleId,
+        testflow_id: progressiveTab.id,
+        schedule_run_frequency: schedule?.runConfiguration?.runCycle,
+        status: schedule?.isActive,
+      });
       const tabsIdsToDelete = [];
       let childTabs = [];
       // Remove the main tab
@@ -2037,6 +2050,14 @@ export class TestflowExplorerPageViewModel {
     );
     if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
+      const schedule = schedules.find((s: any) => s.id === _scheduleId);
+      captureEvent("schedule_run_now_clicked", {
+        event_source: "desktop_app",
+        schedule_id: _scheduleId,
+        testflow_id: progressiveTab.id,
+        schedule_run_frequency: schedule.runConfiguration.runCycle,
+        status: schedule.isActive,
+      });
       updateTestflowSchedules(progressiveTab?.id as string, schedules);
       // notifications.success("Run executed successfully.");
     }
@@ -2092,10 +2113,10 @@ export class TestflowExplorerPageViewModel {
         event_source: "desktop_app",
         cta_location: "scheduled_run_tab",
         schedule_id: _scheduleId,
-        testflow_id: progressiveTab.path.testflowId,
+        testflow_id: progressiveTab.id,
         schedule_run_frequency: matchedSchedule?.runConfiguration?.runCycle,
         previous_status: !isChecked ? "active" : "inactive",
-        new: isChecked ? "active" : "inactive",
+        new_status: isChecked ? "active" : "inactive",
       });
       updateTestflowSchedules(progressiveTab?.id as string, schedules);
     }
