@@ -1874,6 +1874,7 @@ export class TestflowExplorerPageViewModel {
       return;
     }
     const response = await this.testflowService.fetchTestflow(
+      progressiveTab.path.workspaceId as string,
       progressiveTab.id as string,
     );
     if (response?.isSuccessful) {

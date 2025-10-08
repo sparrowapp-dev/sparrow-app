@@ -36,10 +36,10 @@ export class TestflowService {
     return response;
   };
 
-  public fetchTestflow = async (_testflowId: string) => {
+  public fetchTestflow = async (_workspaceId: string, _testflowId: string) => {
     const response = await makeRequest(
       "GET",
-      `${this.apiUrl}/api/workspace/testflow/${_testflowId}`,
+      `${this.apiUrl}/api/workspace/${_workspaceId}/testflow/${_testflowId}`,
       { headers: getAuthHeaders() },
     );
     return response;
