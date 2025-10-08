@@ -66,6 +66,7 @@ import type {
   HttpResponseRatiosMockUpdatePayloadDtoInterface,
 } from "@sparrow/common/types/workspace/http-response-mock-dto";
 import type { GeneratedVariable } from "@sparrow/common/dto";
+import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
 
 export class CollectionService {
   constructor() {}
