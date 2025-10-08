@@ -380,7 +380,7 @@ export class CollectionService {
     return makeHttpRequestV2(
       url,
       "GET",
-      '[{"key":"Accept-Encoding","value":"gzip, br","checked":true},{"key":"User-Agent","value":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36","checked":true},{"key":"Connection","value":"keep-alive","checked":true},{"key":"Accept","value":"*/*","checked":true}]',
+      '[{"key":"Accept-Encoding","value":"gzip, deflate, br","checked":true},{"key":"User-Agent","value":"SparrowAgent/v2","checked":true},{"key":"Connection","value":"keep-alive","checked":true},{"key":"Accept","value":"*/*","checked":true}]',
       "",
       "text/plain",
     );
