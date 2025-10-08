@@ -120,6 +120,7 @@
     TimeISOExtractor,
     FormatDays,
   } from "@sparrow/common/utils";
+  import { EnvironmentViewModel } from "@app/pages/workspace-page/EnvironmentPage.ViewModel";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -173,6 +174,7 @@
 
   export let onOpenTestflowScheduleTab;
   export let testflowScheduleStore = [];
+  const environmentViewModel = new EnvironmentViewModel();
 
   export let onPerformTestflowScheduleOperations;
   export let onOpenTestflowScheduleConfigurationsTab;
@@ -370,6 +372,7 @@
 
     let environment = "None";
     let isDeletedEnvironment = false;
+    let environmentData = null;
 
     if (schedule.environmentId && schedule.environmentId.trim() !== "") {
       // Find environment by ID in the environments array
@@ -379,6 +382,7 @@
 
       if (envObj) {
         environment = envObj.name;
+        environmentData = envObj.toMutableJSON();
       } else {
         // Environment not found in current list → deleted
         environment = schedule?.environmentName || "Deleted Environment";
@@ -391,6 +395,7 @@
       name: schedule.name,
       description: description,
       status: status,
+      environmentData: environmentData,
       environment: environment,
       nextRun: nextRun,
       lastResult: lastResult,
@@ -2181,6 +2186,7 @@
                     {isTestflowEditable}
                     {onOpenTestflowScheduleConfigurationsTab}
                     {onOpenTestflowScheduleTab}
+                    onOpenEnvironment={environmentViewModel.onOpenEnvironment}
                   />
                 {/each}
               </tbody>

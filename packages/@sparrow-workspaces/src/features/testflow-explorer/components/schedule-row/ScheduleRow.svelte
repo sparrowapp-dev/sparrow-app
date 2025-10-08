@@ -37,6 +37,7 @@
   export let onOpenTestflowScheduleTab;
   export let isTestflowEditable = true;
   export let onOpenTestflowScheduleConfigurationsTab;
+  export let onOpenEnvironment;
 
   let showMenu: boolean = false;
   let activeWrapper: HTMLElement;
@@ -64,6 +65,20 @@
   let deleteLoader = false;
 
   $: isDeletedEnvironment = schedule?.isDeletedEnvironment || false;
+
+  // Handle environment click
+  const handleEnvironmentClick = (e: Event) => {
+    e.stopPropagation();
+    if (
+      !isDeletedEnvironment &&
+      onOpenEnvironment &&
+      schedule?.environmentData
+    ) {
+      onOpenEnvironment(schedule.environmentData);
+    } else if (!isDeletedEnvironment && !schedule?.environmentData) {
+      console.warn("Environment data not found in schedule");
+    }
+  };
 </script>
 
 <svelte:window
@@ -223,8 +238,16 @@
           >{schedule.environment}</span
         ><WarningIconNew />
       </Tooltip>
+    {:else if schedule.environment && schedule.environment.toLowerCase() !== "none"}
+      <button
+        class="environment-link"
+        on:click={handleEnvironmentClick}
+        type="button"
+      >
+        {schedule.environment}
+      </button>
     {:else}
-      {schedule.environment}
+      <span style="color: var(--text-ds-neutral-300);"> None </span>
     {/if}
   </td>
   <td>
@@ -322,6 +345,33 @@
     font-size: 12px;
     color: var(--text-ds-neutral-400);
     margin-top: 2px;
+  }
+
+  .environment-link {
+    color: var(--text-ds-primary-400);
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: inherit;
+    font-weight: inherit;
+  }
+
+  .environment-link:hover {
+    color: var(--text-ds-primary-300);
+    text-decoration: underline;
+  }
+
+  .environment-link:active {
+    color: var(--text-ds-primary-500);
+  }
+
+  .environment-link:focus-visible {
+    outline: 2px solid var(--border-ds-primary-300);
+    outline-offset: 2px;
+    border-radius: 2px;
   }
 
   .status-badge {
