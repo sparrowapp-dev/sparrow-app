@@ -232,6 +232,7 @@ class MockHistoryExplorerPage {
   public getTestflow = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const response = await this.testflowService?.fetchTestflow(
+      progressiveTab.path.workspaceId as string,
       progressiveTab.path.testflowId,
     );
     if (response?.isSuccessful) {
@@ -246,6 +247,7 @@ class MockHistoryExplorerPage {
   public refreshTestflowSchedule = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const response = await this.testflowService?.fetchTestflow(
+      progressiveTab.path.workspaceId as string,
       progressiveTab.path.testflowId,
     );
     if (response?.isSuccessful) {

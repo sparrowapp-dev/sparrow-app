@@ -206,18 +206,7 @@ export class TestflowViewModel {
     const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
     if (isGuestUser) {
       this.testflowRepository.removeTestflow(testflow._id);
-      const tabsIdsToDelete = [];
-      let childTabs = [];
-      // Remove the main tab
-      const mainTabId = await this.tabRepository.getTabById(testflow._id);
-      if (mainTabId) tabsIdsToDelete.push(mainTabId.tabId);
-      childTabs = await this.tabRepository.getTabsByTestflowId(testflow._id);
-      // Delete all child tabs if any exist
-      if (childTabs.length > 0) {
-        const allChildTabs = childTabs.map((tab) => tab.tabId);
-        tabsIdsToDelete.push(...allChildTabs);
-      }
-      await this.tabRepository.deleteTabsWithTabIdInAWorkspace(testflow.workspaceId, tabsIdsToDelete);
+      await this.tabRepository.removeTab(testflow._id);
       notifications.success(
         `${testflow.name} ${TFDefaultEnum.NAME} is removed from ${currentWorkspace.name}.`,
       );
@@ -234,7 +223,18 @@ export class TestflowViewModel {
     );
     if (response.isSuccessful) {
       this.testflowRepository.removeTestflow(testflow._id);
-      this.tabRepository.removeTab(testflow._id);
+      const tabsIdsToDelete = [];
+      let childTabs = [];
+      // Remove the main tab
+      const mainTabId = await this.tabRepository.getTabById(testflow._id);
+      if (mainTabId) tabsIdsToDelete.push(mainTabId.tabId);
+      childTabs = await this.tabRepository.getTabsByTestflowId(testflow._id);
+      // Delete all child tabs if any exist
+      if (childTabs.length > 0) {
+        const allChildTabs = childTabs.map((tab) => tab.tabId);
+        tabsIdsToDelete.push(...allChildTabs);
+      }
+      await this.tabRepository.deleteTabsWithTabIdInAWorkspace(testflow.workspaceId, tabsIdsToDelete);
       notifications.success(
         `${testflow.name} testflow is removed from ${currentWorkspace.name}.`,
       );
