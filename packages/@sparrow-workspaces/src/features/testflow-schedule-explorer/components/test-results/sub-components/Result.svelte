@@ -81,12 +81,12 @@
       <Tag
         text={r.status === "pending"
           ? "Running"
-          : r.status === "pass"
+          : r.status === "pass" || r.status === "fail"
             ? "Completed"
             : "Error"}
         type={r.status === "pending"
           ? "purple"
-          : r.status === "pass"
+          : r.status === "pass" || r.status === "fail"
             ? "green"
             : "orange"}
         endIcon={null}
