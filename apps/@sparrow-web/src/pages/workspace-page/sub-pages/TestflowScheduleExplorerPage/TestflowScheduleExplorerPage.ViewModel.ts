@@ -281,15 +281,16 @@ class MockHistoryExplorerPage {
       baseUrl,
     );
     if (response?.isSuccessful) {
+      const schedules = response.data.data.schedules;
+      const schedule = schedules.find((s:any) => s.id === progressiveTab.id);
       captureEvent("schedule_run_now_clicked", {
-        event_source: "desktop_app",
+        event_source: "web_app",
         schedule_id: progressiveTab.id,
         testflow_id: progressiveTab.path.testflowId,
         schedule_run_frequency:
           progressiveTab.property.testflowSchedule.runConfiguration.runCycle,
-        status: progressiveTab.property.testflowSchedule.isActive,
+        status: schedule.isActive,
       });
-      const schedules = response.data.data.schedules;
       updateTestflowSchedules(
         progressiveTab?.path?.testflowId as string,
         schedules,
@@ -313,7 +314,7 @@ class MockHistoryExplorerPage {
       baseUrl,
     );
     if (response?.isSuccessful) {
-      captureEvent("schedule_deleted", {
+      captureEvent("schedule_history_deleted", {
         event_source: "desktop_app",
         schedule_id: progressiveTab.id,
         testflow_id: progressiveTab.path.testflowId,
@@ -360,19 +361,20 @@ class MockHistoryExplorerPage {
       );
 
       if (response?.isSuccessful) {
-        captureEvent("schedule_updated", {
-          event_source: "desktop_app",
-          schedule_id: progressiveTab.id,
-          testflow_id: progressiveTab.path.testflowId,
-          schedule_run_frequency:
-            progressiveTab.property.testflowSchedule.runConfiguration.runCycle,
-          status: progressiveTab.property.testflowSchedule.isActive,
-        });
         const schedules = response.data.data.schedules;
         updateTestflowSchedules(
           progressiveTab?.path?.testflowId as string,
           schedules,
         );
+        const schedule = schedules.find((s: any) => s.id === progressiveTab.id);
+        captureEvent("schedule_updated", {
+          event_source: "web_app",
+          schedule_id: progressiveTab.id,
+          testflow_id: progressiveTab.path.testflowId,
+          schedule_run_frequency:
+            progressiveTab.property.testflowSchedule.runConfiguration.runCycle,
+          status: schedule?.isActive,
+        });
         // Mark tab as saved after successful save
         progressiveTab.isSaved = true;
         this.tab = progressiveTab;
@@ -410,7 +412,7 @@ class MockHistoryExplorerPage {
       _scheduleResult,
       schedule.name,
       progressiveTab.id,
-      progressiveTab.path.testflowId
+      progressiveTab.path.testflowId,
     );
 
     this.tabRepository.createTab(x);
