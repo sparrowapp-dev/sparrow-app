@@ -215,6 +215,12 @@
   export let onGenerateTestCases;
   export let scriptComponent = null;
 
+  export let selectedModel;
+  export let onSelectAiModel: (modelId: string) => void;
+  $: {
+    console.log("bbbb", selectedModel);
+  }
+
   // Reference to the splitpane container element
   let splitpaneContainer;
   let splitpaneContainerWidth = 0;
@@ -1390,6 +1396,8 @@
                     {onToggleLike}
                     {handleApplyChangeOnAISuggestion}
                     {planName}
+                    {selectedModel}
+                    {onSelectAiModel}
                   />
                 {/if}
               </div>

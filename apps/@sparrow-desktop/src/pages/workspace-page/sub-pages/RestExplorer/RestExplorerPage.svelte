@@ -18,6 +18,12 @@
   import type { CollectionDocType } from "@app/models/collection.model";
   import { RequestDatasetEnum } from "@sparrow/common/types/workspace";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
+  import {
+    startLoading,
+    stopLoading,
+    updateModelForTeam,
+    aiModelByTeam,
+  } from "../../../../../../../packages/@sparrow-common/src/store";
 
   export let tab;
   export let isTourGuideOpen = false;
@@ -56,6 +62,24 @@
   let mergeViewRequestDatasetType: RequestDatasetEnum;
   let scriptComponent = null;
   let planName: string = "";
+  let teamId: string = "";
+  let selectedAIModel: string = "deepseek";
+
+  $: teamId = currentWorkspace
+    ? typeof currentWorkspace.get === "function"
+      ? currentWorkspace.get("team")?.teamId || ""
+      : currentWorkspace?.team?.teamId || ""
+    : "";
+
+  // reactive selected model for this team (fallback to "deepseek")
+  $: selectedAIModel = teamId
+    ? $aiModelByTeam.get(teamId) ?? "deepseek"
+    : "deepseek";
+
+  $: {
+    debugger;
+    console.log("kkk", selectedAIModel);
+  }
 
   const restExplorerDataStoreSubscriber = restExplorerDataStore.subscribe(
     (_webSocketMap) => {
@@ -103,6 +127,7 @@
 
   $: {
     if (tab) {
+      debugger;
       if (prevTabId !== tab?.tabId) {
         if (scriptComponent?.handleTabChange) {
           scriptComponent.handleTabChange();
@@ -216,6 +241,10 @@
     }
   }
 
+  $: {
+    console.log("ff", currentWorkspace);
+  }
+
   onDestroy(() => {
     collectionSubscriber?.unsubscribe();
     activeWorkspaceSubscriber?.unsubscribe();
@@ -294,4 +323,6 @@
   isCloseRequestTestScriptDemo={_viewModel.updateIsRequestTabScriptDemo}
   requestTabTestScriptDemoCompleted={_viewModel.handleRequestTestScriptDemoCompleted}
   onGenerateTestCases={_viewModel.generateTestCases}
+  onSelectAiModel={_viewModel.selectAiModel}
+  selectedModel={selectedAIModel}
 />

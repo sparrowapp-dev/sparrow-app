@@ -32,6 +32,8 @@
   export let onToggleLike;
   export let handleApplyChangeOnAISuggestion;
   export let planName;
+  export let selectedModel: string = "deepseek";
+  export let onSelectAiModel: (modelId: string) => void;
 
   let scrollList: ScrollList;
 
@@ -92,6 +94,8 @@
       {handleApplyChangeOnAISuggestion}
       {planName}
       bind:scrollList
+      {selectedModel}
+      {onSelectAiModel}
     />
   </div>
 {/if}

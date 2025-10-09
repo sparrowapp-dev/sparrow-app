@@ -23,6 +23,21 @@
   $: {
     console.log("fff", planName);
   }
+  export let selectedModel;
+  export let onSelectAiModel: (modelId: string) => void;
+
+  function handleModelClick(modelId: string) {
+    // notify parent/viewmodel and let page update global store
+    if (typeof onSelectAiModel === "function") onUpdateAiModel(modelId);
+  }
+
+  $: if (
+    selectedModel !== undefined &&
+    String(selectedModel) !== selectedModelId
+  ) {
+    selectedModelId = String(selectedModel);
+  }
+
   // let defaultModel = "GPT-4o";
   let selectedModelId = "deepseek";
 
