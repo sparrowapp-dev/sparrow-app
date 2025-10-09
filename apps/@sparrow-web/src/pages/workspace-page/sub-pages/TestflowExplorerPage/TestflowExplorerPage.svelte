@@ -376,6 +376,7 @@
     onOpenTestflowScheduleConfigurationsTab={_viewModel.openTestflowScheduleConfigurationsTab}
     bind:isCreateTestflowScheduleLimitReachedModalOpen
     onUpdateTestflowState={_viewModel.updateTestflowState}
+    onOpenEnvironment={_viewModel.handleOpenEnvironment}
     {planLimitTestScheduleCount}
   />
 {/if}
