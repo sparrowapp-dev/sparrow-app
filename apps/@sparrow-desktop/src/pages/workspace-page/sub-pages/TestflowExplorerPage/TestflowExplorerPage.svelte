@@ -394,6 +394,7 @@
     onUpdateEnvironment={_viewModel.updateEnvironment}
     {userRole}
     {currentWorkspaceId}
+    environments={$environments}
     runSingleNode={_viewModel.handleSingleTestFlowNodeRun}
     onPreviewExpression={_viewModel.handlePreviewExpression}
     redirectDocsTestflow={_viewModel.redirectDocsTestflow}
@@ -417,6 +418,7 @@
     onPerformTestflowScheduleOperations={_viewModel.performTestflowScheduleOperations}
     onOpenTestflowScheduleConfigurationsTab={_viewModel.openTestflowScheduleConfigurationsTab}
     bind:isCreateTestflowScheduleLimitReachedModalOpen
+    onOpenEnvironment={_viewModel.handleOpenEnvironment}
   />
 {/if}
 

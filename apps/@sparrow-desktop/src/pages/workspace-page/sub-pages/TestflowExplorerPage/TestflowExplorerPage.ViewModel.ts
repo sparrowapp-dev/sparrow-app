@@ -6,6 +6,7 @@ import {
   InitRequestTab,
   InitTestflowScheduleTab,
   scrollToTab,
+  InitEnvironmentTab,
 } from "@sparrow/common/utils";
 import { RequestTabAdapter, TestflowTabAdapter } from "../../../../adapter";
 import type {
@@ -168,7 +169,7 @@ export class TestflowExplorerPageViewModel {
    */
   private fetchTestflow = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-     // await this.updateEnvironmentState({ isSaveInProgress: true });
+    // await this.updateEnvironmentState({ isSaveInProgress: true });
     const guestUser = await this.guestUserRepository.findOne({
       name: "guestUser",
     });
@@ -177,6 +178,7 @@ export class TestflowExplorerPageViewModel {
       return;
     }
     const response = await this.testflowService.fetchTestflow(
+      progressiveTab.path.workspaceId as string,
       progressiveTab.id as string,
     );
     if (response?.isSuccessful) {
@@ -1237,7 +1239,7 @@ export class TestflowExplorerPageViewModel {
     this.compareTestflowWithServer();
   };
 
-   /**
+  /**
    * @description - updates testflow tab state
    * @param _state - new test flow state
    */
@@ -1913,7 +1915,7 @@ export class TestflowExplorerPageViewModel {
     notification: ScheduleTestFlowRunDto["notification"],
   ) => {
     captureEvent("set_schedule_run_cta_clicked", {
-      event_source: "web_app",
+      event_source: "desktop_app",
     });
     try {
       const baseUrl = await this.constructBaseUrl(
@@ -1949,11 +1951,11 @@ export class TestflowExplorerPageViewModel {
         const schedules = response.data.data.testflow.schedules;
         const lastestSchedule = response.data.data.schedule;
         updateTestflowSchedules(progressiveTab.id as string, schedules);
-         captureEvent("schedule_created", {
-          event_source: "web_app",
+        captureEvent("schedule_created", {
+          event_source: "desktop_app",
           schedule_id: lastestSchedule.data.id,
           testflowId: response.data.data.testflow._id,
-          schedule_run_frequency:runConfiguration.runCycle,
+          schedule_run_frequency: runConfiguration.runCycle,
           status: lastestSchedule.data.isActive,
         });
         return {
@@ -1961,8 +1963,10 @@ export class TestflowExplorerPageViewModel {
           data: response.data,
         };
       } else {
-        if(response?.message !== "Plan limit reached"){
-          notifications.error(`${ response.message || "Failed to schedule test flow"}`);
+        if (response?.message !== "Plan limit reached") {
+          notifications.error(
+            `${response.message || "Failed to schedule test flow"}`,
+          );
         }
         return {
           isSuccessful: false,
@@ -1979,10 +1983,19 @@ export class TestflowExplorerPageViewModel {
     }
   };
 
-  private deleteTestflowSchedule = async (_scheduleId: string, _scheduleName: string) => {
+  private deleteTestflowSchedule = async (
+    _scheduleId: string,
+    _scheduleName: string,
+  ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const baseUrl = await this.constructBaseUrl(
       progressiveTab.path.workspaceId,
+    );
+    const testflow = await this.testflowRepository.readTestflow(
+      progressiveTab.id,
+    );
+    const schedule = testflow._data?.schedules?.find(
+      (s) => s.id === _scheduleId,
     );
     const response = await this.testflowService.deleteTestflowSchedule(
       progressiveTab.path.workspaceId,
@@ -1991,23 +2004,35 @@ export class TestflowExplorerPageViewModel {
       baseUrl,
     );
     if (response?.isSuccessful) {
+      captureEvent("schedule_deleted", {
+        event_source: "web_app",
+        schedule_id: _scheduleId,
+        testflow_id: progressiveTab.id,
+        schedule_run_frequency: schedule?.runConfiguration?.runCycle,
+        status: schedule?.isActive,
+      });
       const tabsIdsToDelete = [];
       let childTabs = [];
       // Remove the main tab
       const mainTabId = await this.tabRepository.getTabById(_scheduleId);
       if (mainTabId) tabsIdsToDelete.push(mainTabId.tabId);
-      childTabs = await this.tabRepository.getTabsByTestflowScheduleId(_scheduleId);
+      childTabs =
+        await this.tabRepository.getTabsByTestflowScheduleId(_scheduleId);
       // Delete all child tabs if any exist
       if (childTabs.length > 0) {
         const allChildTabs = childTabs.map((tab) => tab.tabId);
         tabsIdsToDelete.push(...allChildTabs);
       }
-      await this.tabRepository.deleteTabsWithTabIdInAWorkspace(progressiveTab.path.workspaceId, tabsIdsToDelete);
+      await this.tabRepository.deleteTabsWithTabIdInAWorkspace(
+        progressiveTab.path.workspaceId,
+        tabsIdsToDelete,
+      );
       const schedules = response.data.data.schedules;
       updateTestflowSchedules(progressiveTab?.id as string, schedules);
-      notifications.success(`'${_scheduleName}' schedule deleted successfully.`);
-    }
-    else{
+      notifications.success(
+        `'${_scheduleName}' schedule deleted successfully.`,
+      );
+    } else {
       notifications.error(`Failed to delete schedule. Please try again.`);
     }
   };
@@ -2017,9 +2042,11 @@ export class TestflowExplorerPageViewModel {
     const baseUrl = await this.constructBaseUrl(
       progressiveTab.path.workspaceId,
     );
-    notifications.success("Run started successfully.")
+    notifications.success("Run started successfully.");
     for (let i = 1; i < 5; i++) {
-      setTimeout(() => { this.fetchTestflow(); }, i * 500);
+      setTimeout(() => {
+        this.fetchTestflow();
+      }, i * 500);
     }
     const response = await this.testflowService.runTestflowSchedule(
       progressiveTab.path.workspaceId,
@@ -2029,11 +2056,18 @@ export class TestflowExplorerPageViewModel {
     );
     if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
+      const schedule = schedules.find((s: any) => s.id === _scheduleId);
+      captureEvent("schedule_run_now_clicked", {
+        event_source: "desktop_app",
+        schedule_id: _scheduleId,
+        testflow_id: progressiveTab.id,
+        schedule_run_frequency: schedule.runConfiguration.runCycle,
+        status: schedule.isActive,
+      });
       updateTestflowSchedules(progressiveTab?.id as string, schedules);
       // notifications.success("Run executed successfully.");
-    }
-    else{
-      // notifications.error("Run failed. View details in Test Results.");  
+    } else {
+      // notifications.error("Run failed. View details in Test Results.");
     }
   };
 
@@ -2051,7 +2085,7 @@ export class TestflowExplorerPageViewModel {
   public performTestflowScheduleOperations = async (
     _type: "run" | "edit" | "delete" | "open",
     _scheduleId: string,
-    _scheduleName: string
+    _scheduleName: string,
   ) => {
     if (_type === "run") {
       this.runTestflowSchedule(_scheduleId);
@@ -2079,17 +2113,36 @@ export class TestflowExplorerPageViewModel {
     );
     if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
-      const matchedSchedule = schedules.find(sch => sch.id === _scheduleId);
-      captureEvent("schedule_status_changed",{
-        event_source : "desktop_app",
-        cta_location:"scheduled_run_tab",
-        schedule_id:_scheduleId,
-        testflow_id:progressiveTab.path.testflowId,
-        schedule_run_frequency:matchedSchedule?.runConfiguration?.runCycle,
-        previous_status:!isChecked ? "active" : "inactive",
-        new:isChecked ? "active" : "inactive",
-      })
+      const matchedSchedule = schedules.find((sch) => sch.id === _scheduleId);
+      captureEvent("schedule_status_changed", {
+        event_source: "desktop_app",
+        cta_location: "scheduled_run_tab",
+        schedule_id: _scheduleId,
+        testflow_id: progressiveTab.id,
+        schedule_run_frequency: matchedSchedule?.runConfiguration?.runCycle,
+        previous_status: !isChecked ? "active" : "inactive",
+        new_status: isChecked ? "active" : "inactive",
+      });
       updateTestflowSchedules(progressiveTab?.id as string, schedules);
     }
+  };
+
+  /**
+   * @description - creates new local environment tab
+   * @param env - environment that needs to be opened
+   */
+  public handleOpenEnvironment = async (env) => {
+    const currentWorkspace = await this.workspaceRepository.readWorkspace(
+      env.workspaceId,
+    );
+
+    const initEnvironmentTab = new InitEnvironmentTab(
+      env.id,
+      currentWorkspace._id,
+    );
+    initEnvironmentTab.setName(env.name).setVariable(env.variable);
+
+    this.tabRepository.createTab(initEnvironmentTab.getValue());
+    scrollToTab(initEnvironmentTab.getValue().id);
   };
 }

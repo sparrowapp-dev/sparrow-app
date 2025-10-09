@@ -7,7 +7,11 @@
     Spinner,
   } from "@sparrow/library/ui";
   import { Tag } from "@sparrow/library/ui";
-  import { ErrorWithText, MoreHorizontalRegular } from "@sparrow/library/icons";
+  import {
+    ErrorWithText,
+    MoreHorizontalRegular,
+    WarningIconNew,
+  } from "@sparrow/library/icons";
 
   export let schedule;
   export let onPerformTestflowScheduleOperations;
@@ -33,6 +37,7 @@
   export let onOpenTestflowScheduleTab;
   export let isTestflowEditable = true;
   export let onOpenTestflowScheduleConfigurationsTab;
+  export let onOpenEnvironment;
 
   let showMenu: boolean = false;
   let activeWrapper: HTMLElement;
@@ -58,6 +63,19 @@
 
   let isDeletePopup = false;
   let deleteLoader = false;
+
+  $: isDeletedEnvironment = schedule?.isDeletedEnvironment || false;
+
+  // Handle environment click
+  const handleEnvironmentClick = () => {
+    if (
+      !isDeletedEnvironment &&
+      onOpenEnvironment &&
+      schedule?.environmentData
+    ) {
+      onOpenEnvironment(schedule.environmentData);
+    }
+  };
 </script>
 
 <svelte:window
@@ -168,7 +186,9 @@
 >
   <td>
     <div class="d-flex flex-column">
-      <span class="schedule-name">{schedule.name}</span>
+      <Tooltip title={schedule.name} placement="bottom-left" size="small">
+        <span class="schedule-name truncate">{schedule.name}</span>
+      </Tooltip>
       <span class="schedule-description text-muted">
         {schedule.description}
       </span>
@@ -205,18 +225,26 @@
     </Tooltip>
   </td>
   <td>
-    {#if schedule.environment === "Deleted Environment"}
+    {#if isDeletedEnvironment}
       <Tooltip
         title="This environment has been removed and might impact test results."
-        placement="bottom-center"
+        placement="bottom-left"
         size="small"
       >
         <span style="color: var(--text-ds-neutral-500);"
           >{schedule.environment}</span
-        >
+        ><WarningIconNew />
       </Tooltip>
+    {:else if schedule.environment && schedule.environment.toLowerCase() !== "none"}
+      <div class="environment-link">
+        <Button
+          title={schedule.environment}
+          type="link-primary"
+          onClick={handleEnvironmentClick}
+        />
+      </div>
     {:else}
-      {schedule.environment}
+      <span style="color: var(--text-ds-neutral-300);"> None </span>
     {/if}
   </td>
   <td>
@@ -275,6 +303,15 @@
     background-color: var(--bg-ds-neutral-900) !important;
   }
 
+  .schedule-name.truncate {
+    max-width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
   .custom-row {
     width: 1079px;
     height: 54px;
@@ -305,6 +342,10 @@
     font-size: 12px;
     color: var(--text-ds-neutral-400);
     margin-top: 2px;
+  }
+
+  .environment-link {
+    margin-left: -18px;
   }
 
   .status-badge {

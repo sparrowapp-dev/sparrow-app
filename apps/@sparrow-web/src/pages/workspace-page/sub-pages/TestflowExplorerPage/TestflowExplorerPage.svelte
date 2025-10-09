@@ -347,6 +347,7 @@
     {isTestFlowEmpty}
     {isGuestUser}
     isWebApp={true}
+    environments={$environments}
     onSelectRequest={_viewModel.getRequestdata}
     checkRequestExistInNode={_viewModel.checkRequestExistInNode}
     onUpdateEnvironment={_viewModel.updateEnvironment}
@@ -375,6 +376,7 @@
     onOpenTestflowScheduleConfigurationsTab={_viewModel.openTestflowScheduleConfigurationsTab}
     bind:isCreateTestflowScheduleLimitReachedModalOpen
     onUpdateTestflowState={_viewModel.updateTestflowState}
+    onOpenEnvironment={_viewModel.handleOpenEnvironment}
     {planLimitTestScheduleCount}
   />
 {/if}
