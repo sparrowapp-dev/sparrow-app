@@ -63,7 +63,9 @@
   on:click={() => {
     onScheduleRunview(r, schedule);
   }}
-  style={r?.status === "pending" ? "pointer-events: none;" : ""}
+  style={r?.status === "pending" || r?.status === "error"
+    ? "pointer-events: none;"
+    : ""}
 >
   <td>
     <div class="time-cell">
@@ -81,12 +83,12 @@
       <Tag
         text={r.status === "pending"
           ? "Running"
-          : r.status === "pass"
+          : r.status === "pass" || r.status === "fail"
             ? "Completed"
             : "Error"}
         type={r.status === "pending"
           ? "purple"
-          : r.status === "pass"
+          : r.status === "pass" || r.status === "fail"
             ? "green"
             : "orange"}
         endIcon={null}
@@ -95,7 +97,7 @@
   </td>
 
   <td>
-    {#if r?.status === "pending"}{:else}
+    {#if r?.status === "pending" || r?.status === "error"}{:else}
       {formatRequestCount(r.successRequests, r.failedRequests)}
     {/if}
   </td>
@@ -103,7 +105,7 @@
     <div class="result-cell">
       {#if r?.status === "pending"}
         <Spinner size={"16px"} />
-      {:else}
+      {:else if r.status === "pass" || r.status === "fail"}
         <Tag text={`${r.successRequests} passed`} type="green" endIcon={null} />
         <Tag text={`${r.failedRequests} failed`} type="orange" endIcon={null} />
         <span class="duration">{r.totalTime}</span>
@@ -113,7 +115,7 @@
 
   <td bind:this={activeWrapper}>
     <span class="threedot-icon-container d-flex">
-      {#if isTestflowScheduleEditable && r?.status !== "pending"}
+      {#if isTestflowScheduleEditable && r?.status !== "pending" && r?.status !== "error"}
         <Button
           tabindex={-1}
           id={`show-more-schedule-result-${r.id}`}
