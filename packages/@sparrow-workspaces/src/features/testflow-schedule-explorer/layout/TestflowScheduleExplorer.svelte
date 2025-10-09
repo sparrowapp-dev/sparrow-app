@@ -86,7 +86,8 @@
     <div class="w-100 d-flex flex-column h-100 p-3 pb-0">
       <div class="d-flex justify-content-between align-items-center">
         <p
-          class="text-ds-font-size-20 text-ds-line-height-120 text-ds-font-weight-semi-bold mb-0"
+          class="ellipsis text-ds-font-size-20 text-ds-line-height-120 text-ds-font-weight-semi-bold mb-0"
+          style="padding-right: 30%;"
         >
           {schedule?.name || ""}
         </p>
