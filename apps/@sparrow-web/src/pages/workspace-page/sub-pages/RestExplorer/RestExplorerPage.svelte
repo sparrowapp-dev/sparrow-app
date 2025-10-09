@@ -18,6 +18,7 @@
   import type { CollectionDocType } from "@app/models/collection.model";
   import { RequestDatasetEnum } from "@sparrow/common/types/workspace";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
+  import { aiModelByTeam } from "@sparrow/common/store";
 
   export let tab;
   export let isTourGuideOpen = false;
@@ -56,6 +57,8 @@
   let mergeViewRequestDatasetType: RequestDatasetEnum;
   let planName: string = "";
   let scriptComponent = null;
+  let teamId: string = "";
+  let selectedAIModel: string = "deepseek";
 
   const restExplorerDataStoreSubscriber = restExplorerDataStore.subscribe(
     (_webSocketMap) => {
@@ -72,6 +75,10 @@
       userId = value._id;
     }
   });
+
+  $: teamId = currentWorkspace ? currentWorkspace?.team?.teamId : "";
+
+  $: selectedAIModel = teamId ? $aiModelByTeam.get(teamId) : "deepseek";
 
   $: {
     restExplorerData = webSocketMap?.get(tab?.tabId);
@@ -295,4 +302,5 @@
   isCloseRequestTestScriptDemo={_viewModel.updateIsRequestTabScriptDemo}
   requestTabTestScriptDemoCompleted={_viewModel.handleRequestTestScriptDemoCompleted}
   onGenerateTestCases={_viewModel.generateTestCases}
+  selectedModel={selectedAIModel}
 />

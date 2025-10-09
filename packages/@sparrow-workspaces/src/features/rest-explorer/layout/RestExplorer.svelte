@@ -216,10 +216,6 @@
   export let scriptComponent = null;
 
   export let selectedModel;
-  export let onSelectAiModel: (modelId: string) => void;
-  $: {
-    console.log("bbbb", selectedModel);
-  }
 
   // Reference to the splitpane container element
   let splitpaneContainer;
@@ -1397,7 +1393,6 @@
                     {handleApplyChangeOnAISuggestion}
                     {planName}
                     {selectedModel}
-                    {onSelectAiModel}
                   />
                 {/if}
               </div>

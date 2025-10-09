@@ -41,7 +41,6 @@
   export let onUpdateEnvironment;
   export let isSelfHost;
   export let selectedModel: string = "deepseek";
-  export let onSelectAiModel: (modelId: string) => void;
 
   let scrollList: ScrollList;
 

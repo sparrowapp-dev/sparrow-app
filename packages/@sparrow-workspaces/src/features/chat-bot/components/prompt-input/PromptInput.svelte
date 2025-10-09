@@ -20,21 +20,9 @@
   export let isResponseGenerating;
   export let onStopGeneratingAIResponse;
   export let planName;
-  $: {
-    console.log("fff", planName);
-  }
   export let selectedModel;
-  export let onSelectAiModel: (modelId: string) => void;
 
-  function handleModelClick(modelId: string) {
-    // notify parent/viewmodel and let page update global store
-    if (typeof onSelectAiModel === "function") onUpdateAiModel(modelId);
-  }
-
-  $: if (
-    selectedModel !== undefined &&
-    String(selectedModel) !== selectedModelId
-  ) {
+  $: if (selectedModel) {
     selectedModelId = String(selectedModel);
   }
 
@@ -52,7 +40,6 @@
   let isTyping = false;
 
   const hanldeStartGenerating = async () => {
-    debugger;
     // allows the DOM to update first before resetting the height.
     setTimeout(() => {
       adjustTextareaHeight();
@@ -145,16 +132,14 @@
           },
           {
             name: "GPT-4o",
-            id: "GPT-4o",
+            id: "gpt",
             disabled: planName === planType.PROFESSIONAL ? false : true,
             hide: planName === planType.PROFESSIONAL ? false : true,
           },
         ]}
         titleId={selectedModelId}
         onclick={(modelId) => {
-          debugger;
           selectedModelId = String(modelId);
-          console.log("clicked", modelId);
           handleEventOnClickAIOptions(modelId);
           onUpdateAiModel(modelId);
         }}

@@ -29,9 +29,8 @@
   export let onStopGeneratingAIResponse;
   export let handleApplyChangeOnAISuggestion;
   export let scrollList;
-  export let planName
+  export let planName;
   export let selectedModel: string = "deepseek";
-  export let onSelectAiModel: (modelId: string) => void;
 
   let chatContainer: HTMLElement;
   let suggestionCount = 0;
@@ -258,7 +257,6 @@
           {sendPrompt}
           {planName}
           {selectedModel}
-          {onSelectAiModel}
         />
       </div>
     </div>

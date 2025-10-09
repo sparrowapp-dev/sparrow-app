@@ -8,11 +8,10 @@ import { writable } from "svelte/store";
 export const aiModelByTeam = writable<Map<string, string>>(new Map());
 
 export const updateModelForTeam = (teamId: string, model: string) => {
-  debugger;
-  aiModelByTeam.update((current) => {
-    const next = new Map(current);
-    next.set(teamId, model);
-    return next;
+  aiModelByTeam.update((currentMap) => {
+    const updatedMap = new Map(currentMap);
+    updatedMap.set(teamId, model);
+    return updatedMap;
   });
 };
 
