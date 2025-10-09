@@ -39,6 +39,7 @@ import { InitTab } from "@sparrow/common/factory";
 import { v4 as uuidv4 } from "uuid";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
 import { captureEvent } from "@app/utils/posthog/posthogConfig";
+import { TestflowNavigatorEnum } from "@sparrow/common/types/workspace/testflow";
 // import { InitRequestTab } from "@sparrow/common/utils";
 
 class MockHistoryExplorerPage {
@@ -516,6 +517,15 @@ class MockHistoryExplorerPage {
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
       testflowJSON.workspaceId,
     );
+
+    
+    const testflowTabRxDoc = await  this.tabRepository.getTabById(_id);
+    let testflowTabJson = testflowTabRxDoc?.toMutableJSON();
+    if(testflowTabJson){
+      testflowTabJson.property.testflow.state.testflowNavigator = TestflowNavigatorEnum.TESTFLOW;
+      await this.tabRepository.updateTabByMongoId(_id, testflowTabJson);
+    }
+
     const testflowTab = new TestflowTabAdapter().adapt(
       currentWorkspace._id,
       testflowJSON,
