@@ -306,31 +306,106 @@
     let nextRun = "Not scheduled";
     if (!schedule.isActive) {
       nextRun = "Paused";
-    } else if (schedule.runConfiguration?.executeAt) {
-      const executeAt = new Date(schedule.runConfiguration.executeAt);
+    } else if (schedule.runConfiguration) {
+      const config = schedule.runConfiguration;
       const now = new Date();
-      const diff = executeAt - now;
+      let nextRunDate = null;
 
-      if (diff < 0 && schedule.runConfiguration.runCycle === "once") {
-        nextRun = "Completed";
-      } else if (diff < 0) {
-        nextRun = "Overdue";
-      } else {
-        const totalMinutes = Math.floor(diff / (1000 * 60));
-        const hours = Math.floor(totalMinutes / 60);
-        const minutes = totalMinutes % 60;
+      if (config.runCycle === "once" && config.executeAt) {
+        // Once: use executeAt directly
+        nextRunDate = new Date(config.executeAt);
+      } else if (config.runCycle === "hourly" && config.intervalHours) {
+        // Handle hourly schedules specifically
+        if (config.executeAt) {
+          const executeAt = new Date(config.executeAt);
 
-        if (hours > 24) {
-          const days = Math.floor(hours / 24);
-          const remainingHours = hours % 24;
-          nextRun = `In ${days}d ${remainingHours}h`;
-        } else if (hours > 0) {
-          nextRun = `In ${hours}h ${minutes}m`;
+          if (executeAt > now) {
+            nextRunDate = executeAt;
+          } else {
+            const intervalMs = config.intervalHours * 60 * 60 * 1000;
+            const timeSinceStart = now - executeAt;
+            const cyclesPassed = Math.floor(timeSinceStart / intervalMs);
+            nextRunDate = new Date(
+              executeAt.getTime() + (cyclesPassed + 1) * intervalMs,
+            );
+          }
         } else {
-          nextRun = `In ${minutes}m`;
+          // For hourly
+          const intervalMs = config.intervalHours * 60 * 60 * 1000;
+          nextRunDate = new Date(now.getTime() + intervalMs);
+        }
+      } else if (config.runCycle === "daily" && config.time) {
+        // Daily
+        const timeStr = extractTimeFromISOString(config.time);
+        const [hours, minutes] = timeStr.split(":").map((num) => parseInt(num));
+
+        nextRunDate = new Date(now);
+        nextRunDate.setHours(hours, minutes, 0, 0);
+
+        if (nextRunDate <= now) {
+          nextRunDate.setDate(nextRunDate.getDate() + 1);
+        }
+      } else if (config.runCycle === "weekly" && config.days && config.time) {
+        // Weekly
+        const timeStr = extractTimeFromISOString(config.time);
+        const [hours, minutes] = timeStr.split(":").map((num) => parseInt(num));
+        const scheduledDays = config.days;
+
+        nextRunDate = new Date(now);
+        nextRunDate.setHours(hours, minutes, 0, 0);
+
+        let daysToAdd = 0;
+        let found = false;
+
+        for (let i = 0; i < 7; i++) {
+          const checkDate = new Date(nextRunDate);
+          checkDate.setDate(checkDate.getDate() + i);
+          const dayOfWeek = checkDate.getDay();
+
+          if (scheduledDays.includes(dayOfWeek)) {
+            if (i === 0 && checkDate > now) {
+              daysToAdd = 0;
+              found = true;
+              break;
+            } else if (i > 0) {
+              daysToAdd = i;
+              found = true;
+              break;
+            }
+          }
+        }
+
+        if (found) {
+          nextRunDate.setDate(nextRunDate.getDate() + daysToAdd);
+        }
+      }
+
+      // Calculate and format the time difference
+      if (nextRunDate) {
+        const diff = nextRunDate - now;
+
+        if (diff < 0 && config.runCycle === "once") {
+          nextRun = "Completed";
+        } else if (diff < 0) {
+          nextRun = "Overdue";
+        } else {
+          const totalMinutes = Math.floor(diff / (1000 * 60));
+          const hours = Math.floor(totalMinutes / 60);
+          const minutes = totalMinutes % 60;
+
+          if (hours > 24) {
+            const days = Math.floor(hours / 24);
+            const remainingHours = hours % 24;
+            nextRun = `In ${days}d ${remainingHours}h`;
+          } else if (hours > 0) {
+            nextRun = `In ${hours}h ${minutes}m`;
+          } else {
+            nextRun = `In ${minutes}m`;
+          }
         }
       }
     }
+
     let lastResult = "No results yet";
     const runHistory =
       schedule.schedularRunHistory ||
@@ -360,7 +435,7 @@
       if (config.runCycle === "once" && config.executeAt) {
         const date = new Date(config.executeAt);
         description = `Run once on ${date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} at ${date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })}`;
-      } else if (config.runCycle === "recurring" && config.intervalHours) {
+      } else if (config.runCycle === "hourly" && config.intervalHours) {
         description = `Run every ${config.intervalHours} hour${config.intervalHours > 1 ? "s" : ""}`;
       } else if (config.runCycle === "daily" && config.time) {
         description = `Run everyday at ${extractTimeFromISOString(config.time)}`;
