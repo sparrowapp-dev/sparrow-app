@@ -330,7 +330,7 @@
     onClearTestflow={_viewModel.clearTestFlowData}
     {isTestFlowEmpty}
     {isGuestUser}
-    isWebApp={false}
+    isWebApp={true}
     onSelectRequest={_viewModel.getRequestdata}
     checkRequestExistInNode={_viewModel.checkRequestExistInNode}
     onUpdateEnvironment={_viewModel.updateEnvironment}
