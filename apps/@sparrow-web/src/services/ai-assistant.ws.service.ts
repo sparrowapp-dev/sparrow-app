@@ -338,7 +338,6 @@ export class AiAssistantWebSocketService {
     activity,
     teamId,
   ): Promise<boolean> => {
-    debugger;
     const message = {
       tabId,
       threadId,
