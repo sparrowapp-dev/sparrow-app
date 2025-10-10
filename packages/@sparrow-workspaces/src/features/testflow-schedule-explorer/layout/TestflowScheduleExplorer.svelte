@@ -178,17 +178,19 @@
         </div>
       </div>
       <div class="d-flex pb-2">
-        <Button
-          title={testflow?.name?.length > 30
-            ? testflow?.name?.slice(0, 30) + "..."
-            : testflow?.name || ""}
-          startIcon={FlowChartRegular}
-          type={"link-secondary"}
-          size={"extra-small"}
-          onClick={() => {
-            onOpenTestflow(testflow?._id);
-          }}
-        />
+        {#if testflow?.name}
+          <Button
+            title={testflow?.name?.length > 30
+              ? testflow?.name?.slice(0, 30) + "..."
+              : testflow?.name || ""}
+            startIcon={FlowChartRegular}
+            type={"link-secondary"}
+            size={"extra-small"}
+            onClick={() => {
+              onOpenTestflow(testflow?._id);
+            }}
+          />
+        {/if}
         {#if scheduledEnvironment?.name}
           <div class="d-flex gap-2 align-items-center">
             <span

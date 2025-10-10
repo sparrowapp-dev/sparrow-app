@@ -810,7 +810,7 @@
   }
 
   .schedule-config-content {
-    padding: 16px 24px 24px 24px;
+    padding: 16px 10px 24px 10px;
     min-height: 100%;
     width: 50%;
   }
