@@ -12,7 +12,12 @@ import type {
 } from "../../../../database/database";
 
 // Utils
-import { createDeepCopy, Debounce, scrollToTab, Sleep } from "@sparrow/common/utils";
+import {
+  createDeepCopy,
+  Debounce,
+  scrollToTab,
+  Sleep,
+} from "@sparrow/common/utils";
 
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import {
@@ -190,6 +195,15 @@ class MockHistoryExplorerPage {
   }
 
   /**
+   * Get workspace data through workspace id
+   * @param workspaceId - id of workspace
+   * @returns - workspace document
+   */
+  public getWorkspaceById = async (workspaceId: string) => {
+    return await this.workspaceRepository.readWorkspace(workspaceId);
+  };
+
+  /**
    * Return active workspace of the user
    */
   public get activeWorkspace() {
@@ -281,7 +295,9 @@ class MockHistoryExplorerPage {
     );
 
     for (let i = 1; i < 5; i++) {
-      setTimeout(() => { this.getTestflow(); }, i * 500);
+      setTimeout(() => {
+        this.getTestflow();
+      }, i * 500);
     }
     const response = await this.testflowService.runTestflowSchedule(
       progressiveTab.path.workspaceId,
@@ -291,7 +307,7 @@ class MockHistoryExplorerPage {
     );
     if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
-      const schedule = schedules.find((s:any) => s.id === progressiveTab.id);
+      const schedule = schedules.find((s: any) => s.id === progressiveTab.id);
       captureEvent("schedule_run_now_clicked", {
         event_source: "desktop_app",
         schedule_id: progressiveTab.id,
@@ -305,8 +321,8 @@ class MockHistoryExplorerPage {
         schedules,
       );
       notifications.success("Run executed successfully.");
-    }else{
-      notifications.error("Run failed. View details in Test Results.");  
+    } else {
+      notifications.error("Run failed. View details in Test Results.");
     }
   };
 
@@ -375,7 +391,7 @@ class MockHistoryExplorerPage {
           progressiveTab?.path?.testflowId as string,
           schedules,
         );
-        const schedule = schedules.find((s:any) => s.id === progressiveTab.id);
+        const schedule = schedules.find((s: any) => s.id === progressiveTab.id);
         captureEvent("schedule_updated", {
           event_source: "desktop_app",
           schedule_id: progressiveTab.id,
@@ -421,7 +437,7 @@ class MockHistoryExplorerPage {
       _scheduleResult,
       schedule.name,
       progressiveTab.id,
-      progressiveTab.path.testflowId
+      progressiveTab.path.testflowId,
     );
 
     this.tabRepository.createTab(x);

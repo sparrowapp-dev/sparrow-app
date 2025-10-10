@@ -6,6 +6,7 @@ import {
   InitRequestTab,
   InitTestflowScheduleTab,
   scrollToTab,
+  InitEnvironmentTab,
 } from "@sparrow/common/utils";
 import { RequestTabAdapter, TestflowTabAdapter } from "../../../../adapter";
 import type {
@@ -1988,7 +1989,10 @@ export class TestflowExplorerPageViewModel {
     }
   };
 
-  private deleteTestflowSchedule = async (_scheduleId: string, _scheduleName: string) => {
+  private deleteTestflowSchedule = async (
+    _scheduleId: string,
+    _scheduleName: string,
+  ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const baseUrl = await this.constructBaseUrl(
       progressiveTab.path.workspaceId,
@@ -2031,9 +2035,11 @@ export class TestflowExplorerPageViewModel {
       );
       const schedules = response.data.data.schedules;
       updateTestflowSchedules(progressiveTab?.id as string, schedules);
-      notifications.success(`'${_scheduleName}' schedule deleted successfully.`);
-    }else{
-       notifications.error(`Failed to delete schedule. Please try again.`);
+      notifications.success(
+        `'${_scheduleName}' schedule deleted successfully.`,
+      );
+    } else {
+      notifications.error(`Failed to delete schedule. Please try again.`);
     }
   };
 
@@ -2042,9 +2048,11 @@ export class TestflowExplorerPageViewModel {
     const baseUrl = await this.constructBaseUrl(
       progressiveTab.path.workspaceId,
     );
-    notifications.success("Run started successfully.")
+    notifications.success("Run started successfully.");
     for (let i = 1; i < 5; i++) {
-      setTimeout(() => { this.fetchTestflow(); }, i * 500);
+      setTimeout(() => {
+        this.fetchTestflow();
+      }, i * 500);
     }
     const response = await this.testflowService.runTestflowSchedule(
       progressiveTab.path.workspaceId,
@@ -2064,8 +2072,8 @@ export class TestflowExplorerPageViewModel {
       });
       updateTestflowSchedules(progressiveTab?.id as string, schedules);
       // notifications.success("Run executed successfully.");
-    }else{
-      // notifications.error("Run failed. View details in Test Results.");  
+    } else {
+      // notifications.error("Run failed. View details in Test Results.");
     }
   };
 
@@ -2123,5 +2131,23 @@ export class TestflowExplorerPageViewModel {
       });
       updateTestflowSchedules(progressiveTab?.id as string, schedules);
     }
+  };
+
+  /**
+   * @description - creates new local environment tab
+   * @param env - environment that needs to be opened
+   */
+  public handleOpenEnvironment = async (env) => {
+    const currentWorkspace = await this.workspaceRepository.readWorkspace(
+      env.workspaceId,
+    );
+
+    const initEnvironmentTab = new InitEnvironmentTab(
+      env.id,
+      currentWorkspace._id,
+    );
+    initEnvironmentTab.setName(env.name).setVariable(env.variable);
+    this.tabRepository.createTab(initEnvironmentTab.getValue());
+    scrollToTab(initEnvironmentTab.getValue().id);
   };
 }

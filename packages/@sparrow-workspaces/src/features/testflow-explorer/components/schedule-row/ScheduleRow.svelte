@@ -37,6 +37,7 @@
   export let onOpenTestflowScheduleTab;
   export let isTestflowEditable = true;
   export let onOpenTestflowScheduleConfigurationsTab;
+  export let onOpenEnvironment;
 
   let showMenu: boolean = false;
   let activeWrapper: HTMLElement;
@@ -64,6 +65,17 @@
   let deleteLoader = false;
 
   $: isDeletedEnvironment = schedule?.isDeletedEnvironment || false;
+
+  // Handle environment click
+  const handleEnvironmentClick = () => {
+    if (
+      !isDeletedEnvironment &&
+      onOpenEnvironment &&
+      schedule?.environmentData
+    ) {
+      onOpenEnvironment(schedule.environmentData);
+    }
+  };
 </script>
 
 <svelte:window
@@ -223,8 +235,16 @@
           >{schedule.environment}</span
         ><WarningIconNew />
       </Tooltip>
+    {:else if schedule.environment && schedule.environment.toLowerCase() !== "none"}
+      <div class="environment-link">
+        <Button
+          title={schedule.environment}
+          type="link-primary"
+          onClick={handleEnvironmentClick}
+        />
+      </div>
     {:else}
-      {schedule.environment}
+      <span style="color: var(--text-ds-neutral-300);"> None </span>
     {/if}
   </td>
   <td>
@@ -322,6 +342,10 @@
     font-size: 12px;
     color: var(--text-ds-neutral-400);
     margin-top: 2px;
+  }
+
+  .environment-link {
+    margin-left: -18px;
   }
 
   .status-badge {
