@@ -43,9 +43,9 @@
 
 <section class="w-100" style="pointer-events: none;">
   <TabularInput
-    isCheckBoxEditable={true}
-    isInputBoxEditable={true}
-    {isBulkEditRequired}
+    isCheckBoxEditable={false}
+    isInputBoxEditable={false}
+    isBulkEditRequired={false}
     bulkEditPlaceholder={placeholderHeader}
     {isBulkEditHeaderInfoRequired}
     {isBulkEditActive}
@@ -60,14 +60,14 @@
     }}
   />
   <div>
-    {#if !isBulkEditActive}
+    <!-- {#if !isBulkEditActive}
       <div class="d-flex align-items-center py-3">
         <Toggle
           bind:isActive={showGeneratedHeader}
           label="Show auto-generated headers"
         />
       </div>
-    {/if}
+    {/if} -->
   </div>
 
   {#if showGeneratedHeader && !isBulkEditActive}

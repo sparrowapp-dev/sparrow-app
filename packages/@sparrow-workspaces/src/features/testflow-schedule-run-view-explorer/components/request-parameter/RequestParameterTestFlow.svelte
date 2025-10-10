@@ -53,10 +53,10 @@
 
 <section class="w-100" style="pointer-events: none;">
   <TabularInput
-    isInputBoxEditable={true}
-    isCheckBoxEditable={true}
+    isInputBoxEditable={false}
+    isCheckBoxEditable={false}
     isTopHeaderRequired={true}
-    {isBulkEditRequired}
+    isBulkEditRequired={false}
     bulkEditPlaceholder={bulkEditParamsPlaceholder}
     {isBulkEditActive}
     onToggleBulkEdit={toggleBulkEdit}
