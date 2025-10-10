@@ -146,7 +146,7 @@
 
 {#if showMenu}
   <Options
-    xAxis={activeWrapper.getBoundingClientRect().right - 150}
+    xAxis={activeWrapper.getBoundingClientRect().right - 165}
     yAxis={[
       activeWrapper.getBoundingClientRect().top - 5,
       activeWrapper.getBoundingClientRect().bottom + 5,
