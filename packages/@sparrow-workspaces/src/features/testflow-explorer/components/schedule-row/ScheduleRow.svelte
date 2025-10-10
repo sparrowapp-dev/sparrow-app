@@ -192,9 +192,9 @@
 >
   <td>
     <div class="d-flex flex-column">
-      <Tooltip title={schedule.name} placement="bottom-left" size="small">
-        <span class="schedule-name text-fs-12 truncate">{schedule.name}</span>
-      </Tooltip>
+      <!-- <Tooltip title={schedule.name} placement="bottom-left" size="small"> -->
+      <span class="schedule-name text-fs-12 truncate">{schedule.name}</span>
+      <!-- </Tooltip> -->
       <span class="schedule-description text-fs-12 text-muted">
         {schedule.description}
       </span>
