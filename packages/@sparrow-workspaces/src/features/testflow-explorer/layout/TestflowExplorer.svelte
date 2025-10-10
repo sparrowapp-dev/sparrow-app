@@ -292,7 +292,6 @@
 
     // If the past time is in the past, keep adding interval until it's in the future
     if (schedule?.runConfiguration?.runCycle === "once") {
-      debugger;
       const pastCron = schedule?.cronExpression;
       if (pastCron) {
         const parts = pastCron.trim().split(/\s+/);
@@ -2261,8 +2260,8 @@
               style="background-color: transparent !important;"
             >
               <thead>
-                <tr>
-                  <th>Schedule Name</th>
+                <tr class="text-fs-12">
+                  <th class="text-fs-12">Schedule Name</th>
                   <th>Status</th>
                   <th>Environment</th>
                   <th>Next Run</th>
@@ -2762,14 +2761,22 @@
     padding-bottom: 12px;
     text-align: left;
     font-weight: 500;
-    font-size: 14px;
+    font-size: 12px;
     color: var(--text-ds-neutral-300);
-    border-bottom: 1px solid var(--border-ds-neutral-400);
+    border-bottom: 1px solid var(--border-ds-neutral-700);
+    padding-left: 12px;
+    padding-right: 12px;
   }
 
   .scheduled-table td {
     border-bottom: none;
-    font-size: 14px;
+    font-size: 12px;
+    background-color: var(--bg-ds-neutral-900);
+  }
+
+  .scheduled-table td {
+    border-bottom: none;
+    font-size: 12px;
     background-color: var(--bg-ds-neutral-900);
   }
 
