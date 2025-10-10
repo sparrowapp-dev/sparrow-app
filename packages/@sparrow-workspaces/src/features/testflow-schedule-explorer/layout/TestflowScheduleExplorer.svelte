@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, Toggle, Tooltip } from "@sparrow/library/ui";
+  import { Button, Spinner, Toggle, Tooltip } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
 
@@ -76,6 +76,33 @@
       }
     }
   }
+
+  let isScheduleExpired = false;
+  $: {
+    if (schedule?.runConfiguration?.runCycle === "once") {
+      const pastCron = schedule.cronExpression;
+      const parts = pastCron.trim().split(/\s+/);
+
+      let second = parseInt(parts[0], 10);
+      let minute = parseInt(parts[1], 10);
+      let hour = parseInt(parts[2], 10);
+      let day = parseInt(parts[3], 10);
+      let month = parseInt(parts[4], 10) - 1;
+
+      // Start from the past time
+      let now = new Date();
+      let next = new Date(
+        Date.UTC(now.getUTCFullYear(), month, day, hour, minute, second, 0),
+      );
+
+      // If the past time is in the past, keep adding interval until it's in the future
+      if (next <= now) {
+        isScheduleExpired = true;
+      } else {
+        isScheduleExpired = false;
+      }
+    }
+  }
 </script>
 
 {#if $tab.tabId}
@@ -93,15 +120,32 @@
         </p>
         <div class="d-flex gap-2">
           {#if isTestflowScheduleEditable}
-            <div class="d-flex align-items-center gap-2">
-              <Toggle
-                isActive={schedule?.isActive || false}
-                label="Active"
-                fontWeight="500"
-                onChange={() => {
-                  onEditTestflowSchedule(!schedule?.isActive);
-                }}
-              />
+            <div
+              class="d-flex align-items-center gap-2"
+              style={isScheduleExpired
+                ? "pointer-events: none; opacity: 0.7;"
+                : ""}
+            >
+              {#if $loadingState.get("schedule-status-" + schedule?.id)}
+                <Spinner size={"14px"} />
+              {:else}
+                <Toggle
+                  isActive={isScheduleExpired
+                    ? false
+                    : schedule?.isActive || false}
+                  label={isScheduleExpired
+                    ? "expired"
+                    : schedule?.isActive
+                      ? "Active"
+                      : "Inactive"}
+                  fontWeight="500"
+                  onChange={async () => {
+                    startLoading("schedule-status-" + schedule?.id);
+                    await onEditTestflowSchedule(!schedule?.isActive);
+                    stopLoading("schedule-status-" + schedule?.id);
+                  }}
+                />
+              {/if}
             </div>
             <Button
               title={"Run Now"}
