@@ -219,7 +219,7 @@
     onClick(e);
   }}
 >
-  {#if startIcon}
+  {#if startIcon && !loader}
     <svelte:component
       this={startIcon}
       height={`${iconSize}px`}
@@ -239,7 +239,7 @@
     </span>
   {/if}
 
-  {#if endIcon}
+  {#if endIcon && !loader}
     <svelte:component
       this={endIcon}
       height={`${iconSize}px`}
