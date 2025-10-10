@@ -493,7 +493,12 @@
   };
 
   // Common drag handler functions
-  const dragStart = (event: DragEvent, collection: any, folder: any, api: any) => {
+  const dragStart = (
+    event: DragEvent,
+    collection: any,
+    folder: any,
+    api: any,
+  ) => {
     // Don't allow dragging from activeSync collections
     if (collection.activeSync) {
       event.preventDefault();
@@ -509,6 +514,10 @@
       requestId: api.id,
       name: api.name,
       method: api?.request?.method || api?.mockRequest?.method,
+      // Identify if source collection is a mock collection
+      isMockCollection:
+        collection?.collectionType === CollectionTypeBaseEnum.MOCK ||
+        collection?.isMockCollection === true,
     };
     event.dataTransfer?.setData("text/plain", JSON.stringify(data));
     event.dataTransfer?.setData("application/json", JSON.stringify(data));
@@ -526,7 +535,16 @@
     }
   };
 
-  const handleDragOver = (event: DragEvent, collection: any, folder: any, api: any, requestTabWrapper: HTMLElement, setDropPosition: (pos: "top" | "bottom" | null) => void, setIsDragOver: (val: boolean) => void, setIsForbiddenDrop: (val: boolean) => void) => {
+  const handleDragOver = (
+    event: DragEvent,
+    collection: any,
+    folder: any,
+    api: any,
+    requestTabWrapper: HTMLElement,
+    setDropPosition: (pos: "top" | "bottom" | null) => void,
+    setIsDragOver: (val: boolean) => void,
+    setIsForbiddenDrop: (val: boolean) => void,
+  ) => {
     event.preventDefault();
 
     // Reject all drops if this collection has activeSync enabled
@@ -555,6 +573,24 @@
       }
 
       const dragData = JSON.parse(dataStr);
+      const targetIsMock =
+        collection?.collectionType === CollectionTypeBaseEnum.MOCK ||
+        collection?.isMockCollection === true;
+
+      // Disallow moving requests out of or into mock collections (only within same mock collection)
+      if (
+        (dragData.isMockCollection || targetIsMock) &&
+        dragData.collectionId !== collection.id
+      ) {
+        setIsForbiddenDrop(true);
+        setIsDragOver(false);
+        setDropPosition(null);
+        setOverForbiddenZone(true);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "none";
+        }
+        return;
+      }
 
       // Reject drops from activeSync collections
       if (dragData.collectionActiveSync) {
@@ -637,14 +673,27 @@
     }
   };
 
-  const handleDragLeave = (setIsDragOver: (val: boolean) => void, setIsForbiddenDrop: (val: boolean) => void, setDropPosition: (pos: "top" | "bottom" | null) => void) => {
+  const handleDragLeave = (
+    setIsDragOver: (val: boolean) => void,
+    setIsForbiddenDrop: (val: boolean) => void,
+    setDropPosition: (pos: "top" | "bottom" | null) => void,
+  ) => {
     setIsDragOver(false);
     setIsForbiddenDrop(false);
     setDropPosition(null);
     setOverForbiddenZone(false);
   };
 
-  const handleDrop = async (event: DragEvent, collection: any, folder: any, api: any, setDropPosition: (pos: "top" | "bottom" | null) => void, setIsDragOver: (val: boolean) => void, setIsForbiddenDrop: (val: boolean) => void, currentDropPosition: "top" | "bottom" | null) => {
+  const handleDrop = async (
+    event: DragEvent,
+    collection: any,
+    folder: any,
+    api: any,
+    setDropPosition: (pos: "top" | "bottom" | null) => void,
+    setIsDragOver: (val: boolean) => void,
+    setIsForbiddenDrop: (val: boolean) => void,
+    currentDropPosition: "top" | "bottom" | null,
+  ) => {
     event.preventDefault();
     setIsDragOver(false);
     setIsForbiddenDrop(false);
@@ -659,6 +708,17 @@
       const data = event.dataTransfer?.getData("text/plain");
       if (!data) return;
       const dragData = JSON.parse(data);
+      const targetIsMock =
+        collection?.collectionType === CollectionTypeBaseEnum.MOCK ||
+        collection?.isMockCollection === true;
+
+      // Restrict moving between mock and non-mock collections
+      if (
+        (dragData.isMockCollection || targetIsMock) &&
+        dragData.collectionId !== collection.id
+      ) {
+        return;
+      }
 
       // Reject drops from activeSync collections
       if (dragData.collectionActiveSync) {
@@ -987,6 +1047,7 @@
                     name: data.parentCollection.name,
                     workspaceId: data.parentCollection.workspaceId,
                     activeSync: data.parentCollection.activeSync,
+                    collectionType: data.parentCollection.collectionType,
                   }}
                   {activeTabId}
                   {isWebApp}
@@ -1018,6 +1079,7 @@
                       name: data.parentCollection.name,
                       workspaceId: data.parentCollection.workspaceId,
                       activeSync: data.parentCollection.activeSync,
+                      collectionType: data.parentCollection.collectionType,
                     }}
                     {activeTabId}
                     {dragStart}
@@ -1048,6 +1110,7 @@
                       name: data.parentCollection.name,
                       workspaceId: data.parentCollection.workspaceId,
                       activeSync: data.parentCollection.activeSync,
+                      collectionType: data.parentCollection.collectionType,
                     }}
                     {activeTabId}
                     {dragStart}
@@ -1078,6 +1141,7 @@
                       name: data.parentCollection.name,
                       workspaceId: data.parentCollection.workspaceId,
                       activeSync: data.parentCollection.activeSync,
+                      collectionType: data.parentCollection.collectionType,
                     }}
                     {activeTabId}
                     {dragStart}
@@ -1111,6 +1175,7 @@
                       name: data.parentCollection.name,
                       workspaceId: data.parentCollection.workspaceId,
                       activeSync: data.parentCollection.activeSync,
+                      collectionType: data.parentCollection.collectionType,
                     }}
                     {activeTabId}
                     {isWebApp}
@@ -1139,6 +1204,7 @@
                     name: data.parentCollection.name,
                     workspaceId: data.parentCollection.workspaceId,
                     activeSync: data.parentCollection.activeSync,
+                    collectionType: data.parentCollection.collectionType,
                   }}
                   {userRoleInWorkspace}
                   {activeTabPath}
@@ -1173,6 +1239,7 @@
                       name: data.parentCollection.name,
                       workspaceId: data.parentCollection.workspaceId,
                       activeSync: data.parentCollection.activeSync,
+                      collectionType: data.parentCollection.collectionType,
                     }}
                     {activeTabId}
                     {isWebApp}
@@ -1201,6 +1268,7 @@
                     name: data.parentCollection.name,
                     workspaceId: data.parentCollection.workspaceId,
                     activeSync: data.parentCollection.activeSync,
+                    collectionType: data.parentCollection.collectionType,
                   }}
                   request={{
                     id: data.parentRequest.id,

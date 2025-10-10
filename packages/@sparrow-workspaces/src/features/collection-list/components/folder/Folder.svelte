@@ -254,6 +254,21 @@
       }
 
       const dragData = JSON.parse(dataStr);
+      const targetIsMock = isMockCollection === true;
+
+      // Restrict mock collection cross-moves: cannot move into or out of a mock collection except within same collection
+      if (
+        (dragData.isMockCollection || targetIsMock) &&
+        dragData.collectionId !== collection.id
+      ) {
+        isForbiddenDrop = true;
+        isDragOver = false;
+        setOverForbiddenZone(true);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "none";
+        }
+        return;
+      }
 
       // Reject drops from activeSync collections
       if (dragData.collectionActiveSync) {
@@ -311,6 +326,14 @@
       const data = event.dataTransfer?.getData("text/plain");
       if (!data) return;
       const dragData = JSON.parse(data);
+      const targetIsMock = isMockCollection === true;
+
+      if (
+        (dragData.isMockCollection || targetIsMock) &&
+        dragData.collectionId !== collection.id
+      ) {
+        return; // Block cross-collection mock moves
+      }
 
       // Reject drops from activeSync collections
       if (dragData.collectionActiveSync) {
