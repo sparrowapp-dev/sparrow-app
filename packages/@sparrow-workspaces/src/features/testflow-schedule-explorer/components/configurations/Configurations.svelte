@@ -810,7 +810,7 @@
   }
 
   .schedule-config-content {
-    padding: 16px 10px 24px 10px;
+    padding: 8px 10px 24px 10px;
     min-height: 100%;
     width: 50%;
   }
@@ -823,7 +823,7 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    padding: 0 24px;
+    padding: 0 8px;
     border-top: 1px solid var(--bg-ds-surface-100);
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
     z-index: 10;
