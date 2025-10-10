@@ -29,6 +29,16 @@ export class TestflowRepository {
     return this.rxdb?.find().sort({ createdAt: "asc" }).$;
   };
 
+  public getTestflowObserver = (
+    uuid: string,
+  ): Observable<TFRxHandlerType | null> | undefined => {
+    return this.rxdb?.findOne({
+      selector: {
+        _id: uuid,
+      },
+    }).$;
+  };
+
   /**
    * Retrieves the list of test flow documents from the database.
    *
