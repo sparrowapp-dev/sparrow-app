@@ -12,6 +12,11 @@
     MoreHorizontalRegular,
     WarningIconNew,
   } from "@sparrow/library/icons";
+  import {
+    loadingState,
+    startLoading,
+    stopLoading,
+  } from "@sparrow/common/store";
 
   export let schedule;
   export let onPerformTestflowScheduleOperations;
@@ -195,34 +200,40 @@
     </div>
   </td>
   <td>
-    <Tooltip
-      title={getTooltipMessage(schedule)}
-      placement="bottom-center"
-      size="small"
-    >
-      <div class="d-flex align-items-center">
-        <label class="toggle-switch" on:click={(e) => e.stopPropagation()}>
-          <input
-            type="checkbox"
-            checked={schedule.status === "Active"}
-            disabled={schedule.status === "Expired" || !isTestflowEditable}
-            on:click={(e) => e.stopPropagation()}
-            on:change={(e) => {
-              e.stopPropagation();
-              handleToggleStatus(schedule.id, e.target.checked);
-            }}
-          />
-          <span
-            class="toggle-slider {schedule.status === 'Expired'
-              ? 'disabled'
-              : ''}"
-          ></span>
-        </label>
-        <span class="status-text ms-2 {schedule.status.toLowerCase()}">
-          {schedule.status}
-        </span>
-      </div>
-    </Tooltip>
+    {#if $loadingState.get("schedule-status-" + schedule?.id)}
+      <Spinner size={"14px"} />
+    {:else}
+      <Tooltip
+        title={getTooltipMessage(schedule)}
+        placement="bottom-center"
+        size="small"
+      >
+        <div class="d-flex align-items-center">
+          <label class="toggle-switch" on:click={(e) => e.stopPropagation()}>
+            <input
+              type="checkbox"
+              checked={schedule.status === "Active"}
+              disabled={schedule.status === "Expired" || !isTestflowEditable}
+              on:click={(e) => e.stopPropagation()}
+              on:change={async (e) => {
+                e.stopPropagation();
+                startLoading("schedule-status-" + schedule?.id);
+                await handleToggleStatus(schedule.id, e.target.checked);
+                stopLoading("schedule-status-" + schedule?.id);
+              }}
+            />
+            <span
+              class="toggle-slider {schedule.status === 'Expired'
+                ? 'disabled'
+                : ''}"
+            ></span>
+          </label>
+          <span class="status-text ms-2 {schedule.status.toLowerCase()}">
+            {schedule.status}
+          </span>
+        </div>
+      </Tooltip>
+    {/if}
   </td>
   <td>
     {#if isDeletedEnvironment}
@@ -240,7 +251,11 @@
         <Button
           title={schedule.environment}
           type="link-primary"
-          onClick={handleEnvironmentClick}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            handleEnvironmentClick();
+          }}
         />
       </div>
     {:else}

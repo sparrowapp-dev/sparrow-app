@@ -61,11 +61,10 @@
 
 <tr
   on:click={() => {
+    if (r?.status === "pending" || r?.status === "error") return;
     onScheduleRunview(r, schedule);
   }}
-  style={r?.status === "pending" || r?.status === "error"
-    ? "pointer-events: none;"
-    : ""}
+  style={r?.status === "pending" ? "pointer-events: none;" : ""}
 >
   <td>
     <div class="time-cell">
@@ -115,7 +114,7 @@
 
   <td bind:this={activeWrapper}>
     <span class="threedot-icon-container d-flex">
-      {#if isTestflowScheduleEditable && r?.status !== "pending" && r?.status !== "error"}
+      {#if isTestflowScheduleEditable}
         <Button
           tabindex={-1}
           id={`show-more-schedule-result-${r.id}`}
