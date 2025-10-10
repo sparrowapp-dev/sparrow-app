@@ -292,7 +292,8 @@
 
     // If the past time is in the past, keep adding interval until it's in the future
     if (schedule?.runConfiguration?.runCycle === "once") {
-      const pastCron = schedule.cronExpression;
+      debugger;
+      const pastCron = schedule?.cronExpression;
       if (pastCron) {
         const parts = pastCron.trim().split(/\s+/);
 
@@ -306,7 +307,6 @@
         let now = new Date();
         let next = new Date(
           Date.UTC(now.getUTCFullYear(), month, day, hour, minute, second, 0),
-          0,
         );
 
         if (next <= now) {
