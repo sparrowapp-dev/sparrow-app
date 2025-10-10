@@ -293,26 +293,31 @@
     // If the past time is in the past, keep adding interval until it's in the future
     if (schedule?.runConfiguration?.runCycle === "once") {
       const pastCron = schedule.cronExpression;
-      const parts = pastCron.trim().split(/\s+/);
+      if (pastCron) {
+        const parts = pastCron.trim().split(/\s+/);
 
-      let second = parseInt(parts[0], 10);
-      let minute = parseInt(parts[1], 10);
-      let hour = parseInt(parts[2], 10);
-      let day = parseInt(parts[3], 10);
-      let month = parseInt(parts[4], 10) - 1;
+        let second = parseInt(parts[0], 10);
+        let minute = parseInt(parts[1], 10);
+        let hour = parseInt(parts[2], 10);
+        let day = parseInt(parts[3], 10);
+        let month = parseInt(parts[4], 10) - 1;
 
-      // Start from the past time
-      let now = new Date();
-      let next = new Date(
-        Date.UTC(now.getUTCFullYear(), month, day, hour, minute, second, 0),
-      );
+        // Start from the past time
+        let now = new Date();
+        let next = new Date(
+          Date.UTC(now.getUTCFullYear(), month, day, hour, minute, second, 0),
+          0,
+        );
 
-      if (next <= now) {
-        status = "Expired";
-      } else if (schedule.isActive) {
-        status = "Active";
+        if (next <= now) {
+          status = "Expired";
+        } else if (schedule.isActive) {
+          status = "Active";
+        } else {
+          status = "Inactive";
+        }
       } else {
-        status = "Inactive";
+        status = "Expired";
       }
     } else if (schedule.isActive) {
       status = "Active";
