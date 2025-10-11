@@ -290,10 +290,20 @@
   // Create diagnostics based on the error message
   function createDiagnostics(doc: string): Diagnostic[] {
     if (isErrorVisible && errorMessage) {
+      // Clamp indices to current document length to avoid out-of-range errors
+      // that can occur if the parent component clears the editor content
+      // but hasn't yet reset outdated error positions (e.g., after rapid clears).
+      const docLen = doc.length;
+      let start = Math.min(Math.max(0, errorStartIndex), docLen);
+      let end = Math.min(Math.max(start, errorEndIndex), docLen);
+      // If start === end and we intended to show an error, extend by 1 char if possible
+      if (start === end && docLen > 0) {
+        end = Math.min(docLen, start + 1);
+      }
       return [
         {
-          from: errorStartIndex,
-          to: errorEndIndex,
+          from: start,
+          to: end,
           message: errorMessage,
           severity: "error",
         },
