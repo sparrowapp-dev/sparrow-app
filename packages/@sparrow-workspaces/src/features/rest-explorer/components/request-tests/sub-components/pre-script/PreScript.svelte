@@ -93,7 +93,7 @@
   };
 
   const handleCodeMirrorChange = (e: any) => {
-    onTestsChange({ ...tests, script: e.detail });
+    onTestsChange({ ...tests, preScript: e.detail });
 
     // Re-apply highlights immediately after any content change if we have generated content
     if (showGeneratedTestActions) {
@@ -111,9 +111,9 @@
   };
 
   const selectSnippet = (data: string): void => {
-    let value = tests?.script || "";
+    let value = tests?.preScript || "";
     value += value ? `\n${data}` : data;
-    onTestsChange({ ...tests, script: value });
+    onTestsChange({ ...tests, preScript: value });
   };
 
   const highlightMatch = (text: string, searchTerm: string): string => {
@@ -136,7 +136,7 @@
 
   const handleGenerateTestCases = async () => {
     // Store the original content and current prompt
-    originalTestContent = tests?.script || "";
+    originalTestContent = tests?.preScript || "";
     originalLineCount = originalTestContent.trim()
       ? originalTestContent.split("\n").length
       : 0;
@@ -169,7 +169,7 @@
   };
   const insertGeneratedContentDirectly = async () => {
     // Insert the generated test content into the current script
-    const currentScript = tests?.script || "";
+    const currentScript = tests?.preScript || "";
 
     // Calculate the exact line positions where generated content will be placed
     const currentLines = currentScript ? currentScript.split("\n") : [];
@@ -187,7 +187,7 @@
 
     onTestsChange({
       ...tests,
-      script: newScript,
+      preScript: newScript,
     });
 
     await tick();
@@ -383,7 +383,7 @@
     removeHighlight();
 
     // Revert to original content
-    onTestsChange({ ...tests, script: originalTestContent });
+    onTestsChange({ ...tests, preScript: originalTestContent });
     showGeneratedTestActions = false;
     generatedTestContent = "";
     originalTestContent = "";
@@ -399,7 +399,7 @@
     showGeneratedTestActions = false;
 
     // Revert to original content first
-    onTestsChange({ ...tests, script: originalTestContent });
+    onTestsChange({ ...tests, preScript: originalTestContent });
 
     // Use the same prompt to regenerate
     const result = await onGenerateTestCases(currentPrompt);
@@ -549,7 +549,7 @@
       >
         <Editor
           bind:lang
-          value={tests?.script || ""}
+          value={tests?.preScript || ""}
           on:change={handleCodeMirrorChange}
           isEditable={true}
           autofocus={true}
