@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, Toggle, Tooltip } from "@sparrow/library/ui";
+  import { Button, Spinner, Toggle, Tooltip } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
 
@@ -39,6 +39,7 @@
   export let workspaceUsers = [];
   export let onUpdateSchedule = (updatedSchedule) => {};
   export let onSaveSchedule;
+  export let userRole;
 
   const extractTimeFromISOString = new TimeISOExtractor()
     .extractTimeFromISOString;
@@ -75,6 +76,37 @@
       }
     }
   }
+
+  let isScheduleExpired = false;
+  $: {
+    if (schedule?.runConfiguration?.runCycle === "once") {
+      const pastCron = schedule?.cronExpression;
+      if (pastCron) {
+        const parts = pastCron.trim().split(/\s+/);
+
+        let second = parseInt(parts[0], 10);
+        let minute = parseInt(parts[1], 10);
+        let hour = parseInt(parts[2], 10);
+        let day = parseInt(parts[3], 10);
+        let month = parseInt(parts[4], 10) - 1;
+
+        // Start from the past time
+        let now = new Date();
+        let next = new Date(
+          Date.UTC(now.getUTCFullYear(), month, day, hour, minute, second, 0),
+        );
+
+        // If the past time is in the past, keep adding interval until it's in the future
+        if (next <= now) {
+          isScheduleExpired = true;
+        } else {
+          isScheduleExpired = false;
+        }
+      } else {
+        isScheduleExpired = true;
+      }
+    }
+  }
 </script>
 
 {#if $tab.tabId}
@@ -85,21 +117,39 @@
     <div class="w-100 d-flex flex-column h-100 p-3 pb-0">
       <div class="d-flex justify-content-between align-items-center">
         <p
-          class="text-ds-font-size-20 text-ds-line-height-120 text-ds-font-weight-semi-bold mb-0"
+          class="ellipsis text-ds-font-size-20 text-ds-line-height-120 text-ds-font-weight-semi-bold mb-0"
+          style="padding-right: 30%;"
         >
           {schedule?.name || ""}
         </p>
         <div class="d-flex gap-2">
           {#if isTestflowScheduleEditable}
-            <div class="d-flex align-items-center gap-2">
-              <Toggle
-                isActive={schedule?.isActive || false}
-                label="Active"
-                fontWeight="500"
-                onChange={() => {
-                  onEditTestflowSchedule(!schedule?.isActive);
-                }}
-              />
+            <div
+              class="d-flex align-items-center gap-2"
+              style={isScheduleExpired
+                ? "pointer-events: none; opacity: 0.7;"
+                : ""}
+            >
+              {#if $loadingState.get("schedule-status-" + schedule?.id)}
+                <Spinner size={"14px"} />
+              {:else}
+                <Toggle
+                  isActive={isScheduleExpired
+                    ? false
+                    : schedule?.isActive || false}
+                  label={isScheduleExpired
+                    ? "expired"
+                    : schedule?.isActive
+                      ? "Active"
+                      : "Inactive"}
+                  fontWeight="500"
+                  onChange={async () => {
+                    startLoading("schedule-status-" + schedule?.id);
+                    await onEditTestflowSchedule(!schedule?.isActive);
+                    stopLoading("schedule-status-" + schedule?.id);
+                  }}
+                />
+              {/if}
             </div>
             <Button
               title={"Run Now"}
@@ -127,16 +177,20 @@
           />
         </div>
       </div>
-      <div class="d-flex pb-2">
-        <Button
-          title={testflow?.name}
-          startIcon={FlowChartRegular}
-          type={"link-secondary"}
-          size={"extra-small"}
-          onClick={() => {
-            onOpenTestflow(testflow?._id);
-          }}
-        />
+      <div class="d-flex pb-3">
+        {#if testflow?.name}
+          <Button
+            title={testflow?.name?.length > 30
+              ? testflow?.name?.slice(0, 30) + "..."
+              : testflow?.name || ""}
+            startIcon={FlowChartRegular}
+            type={"link-secondary"}
+            size={"extra-small"}
+            onClick={() => {
+              onOpenTestflow(testflow?._id);
+            }}
+          />
+        {/if}
         {#if scheduledEnvironment?.name}
           <div class="d-flex gap-2 align-items-center">
             <span
@@ -144,7 +198,9 @@
               style="transform: translateX(12px) translateY(2px);"
             ></span>
             <Button
-              title={scheduledEnvironment?.name || ""}
+              title={scheduledEnvironment?.name?.length > 30
+                ? scheduledEnvironment?.name?.slice(0, 30) + "..."
+                : scheduledEnvironment?.name || ""}
               startIcon={LayerRegular}
               type={"link-secondary"}
               size={"extra-small"}
@@ -161,7 +217,7 @@
               class="text-fs-12 mb-0"
               style="color: var(--text-ds-neutral-200)"
             >
-              {description || ""}
+              {isScheduleExpired ? "Expired" : description || ""}
             </p>
           </div>
         {/if}
@@ -189,6 +245,7 @@
             {onUpdateSchedule}
             {onSaveSchedule}
             isSaved={$tab?.isSaved}
+            {userRole}
           />
         {/if}
       </div>

@@ -132,6 +132,7 @@
   export let toggleHistoryDetails;
   export let toggleHistoryContainer;
   export let environmentVariables;
+  export let environments;
   export let isTestflowEditable;
   export let onRedrectRequest;
   export let onUpdateTestFlowName;
@@ -179,6 +180,8 @@
     scheduleId: string,
     isActive: boolean,
   ) => Promise<any>;
+
+  export let onOpenEnvironment;
 
   let planContent: any;
   let planContentNonActive: any;
@@ -286,46 +289,145 @@
   function mapScheduleData(schedule) {
     // Determine status based on isActive and executeAt
     let status = "Inactive";
-    if (schedule.isActive) {
-      const executeAt = new Date(schedule.runConfiguration?.executeAt);
-      const now = new Date();
 
-      if (schedule.runConfiguration?.runCycle === "once" && executeAt < now) {
-        status = "Expired";
+    // If the past time is in the past, keep adding interval until it's in the future
+    if (schedule?.runConfiguration?.runCycle === "once") {
+      const pastCron = schedule?.cronExpression;
+      if (pastCron) {
+        const parts = pastCron.trim().split(/\s+/);
+
+        let second = parseInt(parts[0], 10);
+        let minute = parseInt(parts[1], 10);
+        let hour = parseInt(parts[2], 10);
+        let day = parseInt(parts[3], 10);
+        let month = parseInt(parts[4], 10) - 1;
+
+        // Start from the past time
+        let now = new Date();
+        let next = new Date(
+          Date.UTC(now.getUTCFullYear(), month, day, hour, minute, second, 0),
+        );
+
+        if (next <= now) {
+          status = "Expired";
+        } else if (schedule.isActive) {
+          status = "Active";
+        } else {
+          status = "Inactive";
+        }
       } else {
-        status = "Active";
+        status = "Expired";
       }
+    } else if (schedule.isActive) {
+      status = "Active";
+    } else {
+      status = "Inactive";
     }
 
     // Format next run time
     let nextRun = "Not scheduled";
     if (!schedule.isActive) {
       nextRun = "Paused";
-    } else if (schedule.runConfiguration?.executeAt) {
-      const executeAt = new Date(schedule.runConfiguration.executeAt);
+    } else if (schedule.runConfiguration) {
+      const config = schedule.runConfiguration;
       const now = new Date();
-      const diff = executeAt - now;
+      let nextRunDate = null;
 
-      if (diff < 0 && schedule.runConfiguration.runCycle === "once") {
-        nextRun = "Completed";
-      } else if (diff < 0) {
-        nextRun = "Overdue";
-      } else {
-        const totalMinutes = Math.floor(diff / (1000 * 60));
-        const hours = Math.floor(totalMinutes / 60);
-        const minutes = totalMinutes % 60;
+      if (config.runCycle === "once" && config.executeAt) {
+        // Once: use executeAt directly
+        nextRunDate = new Date(config.executeAt);
+      } else if (config.runCycle === "hourly" && config.intervalHours) {
+        // Handle hourly schedules specifically
+        if (config.executeAt) {
+          const executeAt = new Date(config.executeAt);
 
-        if (hours > 24) {
-          const days = Math.floor(hours / 24);
-          const remainingHours = hours % 24;
-          nextRun = `In ${days}d ${remainingHours}h`;
-        } else if (hours > 0) {
-          nextRun = `In ${hours}h ${minutes}m`;
+          if (executeAt > now) {
+            nextRunDate = executeAt;
+          } else {
+            const intervalMs = config.intervalHours * 60 * 60 * 1000;
+            const timeSinceStart = now - executeAt;
+            const cyclesPassed = Math.floor(timeSinceStart / intervalMs);
+            nextRunDate = new Date(
+              executeAt.getTime() + (cyclesPassed + 1) * intervalMs,
+            );
+          }
         } else {
-          nextRun = `In ${minutes}m`;
+          // For hourly
+          const intervalMs = config.intervalHours * 60 * 60 * 1000;
+          nextRunDate = new Date(now.getTime() + intervalMs);
+        }
+      } else if (config.runCycle === "daily" && config.time) {
+        // Daily
+        const timeStr = extractTimeFromISOString(config.time);
+        const [hours, minutes] = timeStr.split(":").map((num) => parseInt(num));
+
+        nextRunDate = new Date(now);
+        nextRunDate.setHours(hours, minutes, 0, 0);
+
+        if (nextRunDate <= now) {
+          nextRunDate.setDate(nextRunDate.getDate() + 1);
+        }
+      } else if (config.runCycle === "weekly" && config.days && config.time) {
+        // Weekly
+        const timeStr = extractTimeFromISOString(config.time);
+        const [hours, minutes] = timeStr.split(":").map((num) => parseInt(num));
+        const scheduledDays = config.days;
+
+        nextRunDate = new Date(now);
+        nextRunDate.setHours(hours, minutes, 0, 0);
+
+        let daysToAdd = 0;
+        let found = false;
+
+        for (let i = 0; i < 7; i++) {
+          const checkDate = new Date(nextRunDate);
+          checkDate.setDate(checkDate.getDate() + i);
+          const dayOfWeek = checkDate.getDay();
+
+          if (scheduledDays.includes(dayOfWeek)) {
+            if (i === 0 && checkDate > now) {
+              daysToAdd = 0;
+              found = true;
+              break;
+            } else if (i > 0) {
+              daysToAdd = i;
+              found = true;
+              break;
+            }
+          }
+        }
+
+        if (found) {
+          nextRunDate.setDate(nextRunDate.getDate() + daysToAdd);
+        }
+      }
+
+      // Calculate and format the time difference
+      if (nextRunDate) {
+        const diff = nextRunDate - now;
+
+        if (diff < 0 && config.runCycle === "once") {
+          nextRun = "Completed";
+        } else if (diff < 0) {
+          nextRun = "Overdue";
+        } else {
+          const totalMinutes = Math.floor(diff / (1000 * 60));
+          const hours = Math.floor(totalMinutes / 60);
+          const minutes = totalMinutes % 60;
+
+          if (hours > 24) {
+            const days = Math.floor(hours / 24);
+            const remainingHours = hours % 24;
+            nextRun = `In ${days}d ${remainingHours}h`;
+          } else if (hours > 0) {
+            nextRun = `In ${hours}h ${minutes}m`;
+          } else {
+            nextRun = `In ${minutes}m`;
+          }
         }
       }
     }
+
     let lastResult = "No results yet";
     const runHistory =
       schedule.schedularRunHistory ||
@@ -355,7 +457,7 @@
       if (config.runCycle === "once" && config.executeAt) {
         const date = new Date(config.executeAt);
         description = `Run once on ${date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} at ${date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })}`;
-      } else if (config.runCycle === "recurring" && config.intervalHours) {
+      } else if (config.runCycle === "hourly" && config.intervalHours) {
         description = `Run every ${config.intervalHours} hour${config.intervalHours > 1 ? "s" : ""}`;
       } else if (config.runCycle === "daily" && config.time) {
         description = `Run everyday at ${extractTimeFromISOString(config.time)}`;
@@ -366,20 +468,23 @@
     }
 
     let environment = "None";
+    let isDeletedEnvironment = false;
+    let environmentData = null;
+
     if (schedule.environmentId && schedule.environmentId.trim() !== "") {
-      // environmentVariables is an object with keys like "global", "local", etc.
-      // Each has an id and name property
-      let envObj = undefined;
-      for (const key in environmentVariables) {
-        if (
-          environmentVariables[key] &&
-          environmentVariables[key].id === schedule.environmentId
-        ) {
-          envObj = environmentVariables[key];
-          break;
-        }
+      // Find environment by ID in the environments array
+      const envObj = Array.isArray(environments)
+        ? environments.find((env) => env.id === schedule.environmentId)
+        : null;
+
+      if (envObj) {
+        environment = envObj.name;
+        environmentData = envObj.toMutableJSON();
+      } else {
+        // Environment not found in current list → deleted
+        environment = schedule?.environmentName || "Deleted Environment";
+        isDeletedEnvironment = true;
       }
-      environment = envObj?.name || "Deleted Environment";
     }
 
     return {
@@ -387,11 +492,13 @@
       name: schedule.name,
       description: description,
       status: status,
+      environmentData: environmentData,
       environment: environment,
       nextRun: nextRun,
       lastResult: lastResult,
       isActive: schedule.isActive,
       originalData: schedule,
+      isDeletedEnvironment: isDeletedEnvironment,
     };
   }
 
@@ -715,6 +822,7 @@
     }
   };
   const handleSaveConfirm = () => {
+    handleEventClickTestflowSaveSchedule();
     onSaveTestflow(); // Your original save function
     isSaveModalOpen = false;
   };
@@ -1880,7 +1988,6 @@
                   startIcon={PlayFilled}
                   title={"Run Now"}
                   onClick={async () => {
-                    handleEventClickScheduleRun();
                     if (
                       $tab?.property?.testflow?.state?.testflowNavigator ===
                       TestflowNavigatorEnum.SCHEDULE
@@ -1918,6 +2025,7 @@
                   disable={isGuestUser}
                   buttonType="button"
                   onClick={() => {
+                    handleEventClickScheduleRun();
                     isScheduleRunPopupOpen = true;
                   }}
                 />
@@ -1931,6 +2039,7 @@
                 id="create-new-schedule"
                 buttonType="button"
                 onClick={() => {
+                  handleEventClickScheduleRun();
                   isScheduleRunPopupOpen = true;
                 }}
               />
@@ -2151,8 +2260,8 @@
               style="background-color: transparent !important;"
             >
               <thead>
-                <tr>
-                  <th>Schedule Name</th>
+                <tr class="text-fs-12">
+                  <th class="text-fs-12">Schedule Name</th>
                   <th>Status</th>
                   <th>Environment</th>
                   <th>Next Run</th>
@@ -2174,6 +2283,7 @@
                     {isTestflowEditable}
                     {onOpenTestflowScheduleConfigurationsTab}
                     {onOpenTestflowScheduleTab}
+                    {onOpenEnvironment}
                   />
                 {/each}
               </tbody>
@@ -2651,14 +2761,22 @@
     padding-bottom: 12px;
     text-align: left;
     font-weight: 500;
-    font-size: 14px;
+    font-size: 12px;
     color: var(--text-ds-neutral-300);
-    border-bottom: 1px solid var(--border-ds-neutral-400);
+    border-bottom: 1px solid var(--border-ds-neutral-700);
+    padding-left: 12px;
+    padding-right: 12px;
   }
 
   .scheduled-table td {
     border-bottom: none;
-    font-size: 14px;
+    font-size: 12px;
+    background-color: var(--bg-ds-neutral-900);
+  }
+
+  .scheduled-table td {
+    border-bottom: none;
+    font-size: 12px;
     background-color: var(--bg-ds-neutral-900);
   }
 

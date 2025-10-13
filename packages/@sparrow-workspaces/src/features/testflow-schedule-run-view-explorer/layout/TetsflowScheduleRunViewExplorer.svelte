@@ -1804,7 +1804,7 @@
     class="d-flex flex-column justify-content-between position-relative p-3"
     style="top:0; left:0; z-index:3; background-color: var(--bg-ds-neutral-900);"
   >
-    <h5 class="header-title-text">
+    <h5 class="header-title-text ellipsis" style="padding-right: 30%;">
       Run Result - {$tab.property?.testflowScheduleRunView?.scheduleName}
     </h5>
     <div class="status-row">

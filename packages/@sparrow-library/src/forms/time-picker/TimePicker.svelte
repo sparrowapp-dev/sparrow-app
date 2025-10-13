@@ -75,9 +75,6 @@
       selectedHour = time.hour;
       selectedMinute = time.minute;
       dispatch("change", internalValue);
-    } else {
-      // Invalid time - show error but keep the text
-      isInvalid = true;
     }
   }
 
@@ -145,6 +142,9 @@
 
   const handleNow = () => {
     const now = new Date();
+    // Add one minute to current time
+    now.setMinutes(now.getMinutes() + 1);
+
     const hour = now.getHours().toString().padStart(2, "0");
     const minute = now.getMinutes().toString().padStart(2, "0");
     handleTimeSelect(hour, minute);

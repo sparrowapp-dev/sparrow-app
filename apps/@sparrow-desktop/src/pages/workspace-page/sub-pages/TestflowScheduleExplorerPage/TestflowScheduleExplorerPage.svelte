@@ -1,6 +1,6 @@
 <script lang="ts">
   // Document
-  import type { TabDocument } from "@app/database/database";
+  import type { TabDocument, WorkspaceDocument } from "@app/database/database";
 
   // ---- View Model
   import TestFlowScheduleExplorerPage from "./TestflowScheduleExplorerPage.ViewModel";
@@ -29,6 +29,21 @@
   let currentWorkspaceId = "";
   let currentWorkspace;
   let isTestflowScheduleEditable;
+  let userRole = "";
+
+  /**
+   * Find the role of user in active workspace
+   */
+  const findUserRole = async () => {
+    const workspace: WorkspaceDocument = await _viewModel.getWorkspaceById(
+      tab.path.workspaceId,
+    );
+    workspace.users?.forEach((value) => {
+      if (value.id === userId) {
+        userRole = value.role as string;
+      }
+    });
+  };
 
   user.subscribe((value) => {
     if (value) {
@@ -121,6 +136,7 @@
       }
       prevTabName = tab?.name || "";
       prevTabId = tab?.tabId || "";
+      findUserRole();
     }
   }
   onDestroy(() => {
@@ -132,6 +148,7 @@
   tab={_viewModel.tab}
   {testflow}
   {schedule}
+  {userRole}
   workspaceUsers={currentWorkspace?._data?.users || []}
   environments={$environments?.filter(
     (env) =>
