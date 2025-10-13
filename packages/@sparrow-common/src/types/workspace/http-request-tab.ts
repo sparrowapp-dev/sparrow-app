@@ -29,6 +29,7 @@ export enum RequestSectionEnum {
   REQUEST_BODY = "Request Body",
   DOCUMENTATION = "Description",
   TESTS = "Tests",
+  ASSERTIONS = "Assertions",
 }
 
 export enum MessageTypeEnum {

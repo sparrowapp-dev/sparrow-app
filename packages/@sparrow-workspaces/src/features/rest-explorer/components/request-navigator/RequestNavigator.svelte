@@ -62,6 +62,11 @@
         id: RequestSectionEnum.TESTS,
         count: 0,
       },
+      {
+        name: "Assertions",
+        id: RequestSectionEnum.ASSERTIONS,
+        count: 0,
+      },
       { name: "Auth", id: RequestSectionEnum.AUTHORIZATION, count: 0 },
       { name: "Doc", id: RequestSectionEnum.DOCUMENTATION, count: 0 },
     ];

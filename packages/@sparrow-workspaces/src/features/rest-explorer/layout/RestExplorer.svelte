@@ -125,6 +125,7 @@
     handleCloseTour,
     handleNextStep,
   } from "../../request-tab-tour-guide/utils/requestTabCardfunctions";
+  import NoCode from "../components/request-tests/sub-components/no-code/NoCode.svelte";
   export let tab: Observable<Tab>;
   export let collections: Observable<CollectionDocument[]>;
   export let requestAuthHeader: Observable<KeyValue>;
@@ -967,6 +968,15 @@
                           isTestCasesGenerating={$isTestCasesGenerating}
                           {isGuestUser}
                           {userRole}
+                        />
+                      {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.ASSERTIONS}
+                        <NoCode
+                          tests={$tab?.property?.request.tests}
+                          onTestsChange={onUpdateTests}
+                          tabSplitDirection={$tabsSplitterDirection}
+                          testResults={storeData?.response?.testResults}
+                          responseBody={storeData?.response?.body}
+                          responseHeader={storeData?.response?.headers}
                         />
                       {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.DOCUMENTATION}
                         <RequestDoc
