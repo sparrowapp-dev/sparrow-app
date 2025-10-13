@@ -92,7 +92,7 @@ import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explore
 import { InitTab } from "@sparrow/common/factory";
 import { CollectionTabAdapter, RequestSavedTabAdapter } from "@app/adapter";
 import type { Tab } from "@sparrow/common/types/workspace/tab";
-import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
+import { TabPersistenceTypeEnum, TabTypeEnum } from "@sparrow/common/types/workspace/tab";
 import {
   CollectionAuthTypeBaseEnum,
   CollectionItemTypeBaseEnum,
@@ -1652,7 +1652,7 @@ class RestExplorerViewModel {
     const allTabs = await this.tabRepository.getTabLs();
     if (!allTabs || allTabs.length === 0) return;
     for (const tab of allTabs) {
-      if (tab.id !== currentTab.id) {
+      if (tab.id !== currentTab.id && tab.type === TabTypeEnum.REQUEST) {
         let progressiveTab = createDeepCopy(tab);
         const conversationLength =
           progressiveTab.property?.request?.ai?.conversations?.length ?? 0;
