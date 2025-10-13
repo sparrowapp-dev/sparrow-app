@@ -137,7 +137,7 @@ class InitRequestTab {
             isSaveRequestInProgress: false,
             isParameterBulkEditActive: false,
             isHeaderBulkEditActive: false,
-            isChatbotActive: true,
+            isChatbotActive: false,
             isChatbotSuggestionsActive: true,
             isChatbotGeneratingResponse: false,
             isDocGenerating: false,
