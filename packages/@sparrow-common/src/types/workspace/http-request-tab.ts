@@ -431,12 +431,13 @@ export interface Tests {
   noCode: {
     id: string;
     name: string;
-    condition: TestCaseConditionOperatorEnum;
+    condition: TestCaseConditionOperatorEnum | "";
     expectedResult: string;
     testPath: string;
-    testTarget: TestCaseSelectionTypeEnum;
+    testTarget: TestCaseSelectionTypeEnum | '';
   }[];
   script: string;
+  preScript: string;
 }
 
 export interface TestsWrapper {

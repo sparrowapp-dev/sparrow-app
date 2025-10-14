@@ -85,6 +85,7 @@
         <p class="text-fs-12 mb-0 text-muted">JavaScript Code</p>
         <Button
           title="Read Documentation"
+          size={"extra-small"}
           type="link-secondary"
           onClick={() => {}}
         />
@@ -104,15 +105,6 @@
         bind:this={scriptComponent}
       />
     {:else if tests?.testCaseMode === TestCaseModeEnum.NO_CODE}
-      <!-- <NoCode
-        {tests}
-        {onTestsChange}
-        {tabSplitDirection}
-        {testResults}
-        {responseBody}
-        {responseHeader}
-      /> -->
-
       <PreScript
         {tabSplitDirection}
         {tests}

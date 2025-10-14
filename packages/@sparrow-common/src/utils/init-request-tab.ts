@@ -116,8 +116,8 @@ class InitRequestTab {
                 testTarget: "",
               },
             ],
-
             script: "",
+            preScript: "",
           },
           state: {
             requestBodyLanguage: RequestDataTypeEnum.TEXT,
