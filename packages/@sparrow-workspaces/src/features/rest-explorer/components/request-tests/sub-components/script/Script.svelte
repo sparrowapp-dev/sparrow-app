@@ -159,29 +159,6 @@
       });
     }
   };
-  // Helper function to extract only the generated content
-  const extractGeneratedContent = (fullContent: string): string => {
-    if (
-      !generatedTestContent ||
-      generatedContentStartLine < 0 ||
-      generatedContentEndLine < 0
-    )
-      return "";
-
-    const allLines = fullContent.split("\n");
-
-    // Extract content only from the known generated range
-    const extractedLines = [];
-    for (
-      let i = generatedContentStartLine;
-      i <= generatedContentEndLine && i < allLines.length;
-      i++
-    ) {
-      extractedLines.push(allLines[i]);
-    }
-
-    return extractedLines.join("\n");
-  };
 
   // Helper function to recalculate line positions after content changes
   const recalculateGeneratedContentLines = () => {
