@@ -1,6 +1,5 @@
 <script lang="ts">
   import { TestCaseModeEnum } from "@sparrow/common/types/workspace";
-  import { NoCode } from "./sub-components";
   import { Tooltip, Button } from "@sparrow/library/ui";
   import Script from "./sub-components/script/Script.svelte";
   import { PreScript } from "./sub-components";
