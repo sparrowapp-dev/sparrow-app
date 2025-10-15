@@ -1,4 +1,4 @@
-name: Sparrow-web-dev
+name: Sparrow-web-staging
 on:
   push:
     branches:
