@@ -5,6 +5,7 @@ import {
 } from "@sparrow/common/types/workspace/tab";
 import { TabTypeEnum, type Path } from "@sparrow/common/types/workspace/tab";
 import {
+  TestflowNavigatorEnum,
   TFDefaultEnum,
   type TFTabEdgeType,
   type TFTabNodeType,
@@ -47,6 +48,9 @@ class InitTestflowTab {
             },
           ],
           edges: [],
+          state: {
+            testflowNavigator: TestflowNavigatorEnum.TESTFLOW,
+          },
         },
       },
       path: {
