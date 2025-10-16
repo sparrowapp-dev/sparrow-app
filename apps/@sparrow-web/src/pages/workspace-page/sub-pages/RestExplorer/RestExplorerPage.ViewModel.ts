@@ -118,6 +118,7 @@ import { UserService } from "src/services/user.service";
 import * as xpath from "xpath";
 import { DOMParser } from "xmldom";
 import { JSONPath } from "jsonpath-plus";
+import { aiChatBotPanelClose } from "../../../../../../../packages/@sparrow-workspaces/src/stores/tabs-view";
 
 class RestExplorerViewModel {
   /**
@@ -1677,6 +1678,7 @@ class RestExplorerViewModel {
       }
     }
     // Always deactivate current tab AI chatbot panel.
+    aiChatBotPanelClose.set(false);
     currentTab.property.request.state.isChatbotActive = false;
     this.tab = currentTab;
     await this.tabRepository.updateTab(currentTab.tabId, currentTab);

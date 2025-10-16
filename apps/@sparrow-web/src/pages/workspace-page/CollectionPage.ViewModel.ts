@@ -60,6 +60,7 @@ import {
 import { InitFolderTab } from "@sparrow/common/utils";
 import {
   addCollectionItem,
+  aiChatBotPanelClose,
   tabsSplitterDirection,
 } from "@sparrow/workspaces/stores";
 import {
@@ -161,6 +162,7 @@ import { TeamService } from "src/services/team.service";
 import { PlanRepository } from "src/repositories/plan.repository";
 import { tick } from "svelte";
 import { getAuthJwt } from "src/utils/jwt";
+import { get } from "svelte/store";
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
   private workspaceRepository = new WorkspaceRepository();
@@ -420,9 +422,13 @@ export default class CollectionsViewModel {
     if (_limit === 0) return;
     const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
     if (ws) {
-      this.tabRepository.createTab(
-        new InitRequestTab("UNTRACKED-" + uuidv4(), ws._id).getValue(),
+      const initRequestTab = new InitRequestTab(
+        "UNTRACKED-" + uuidv4(),
+        ws._id,
       );
+      const aiPanelState = get(aiChatBotPanelClose);
+      initRequestTab.updateChatbotState(aiPanelState);
+      this.tabRepository.createTab(initRequestTab.getValue());
       scrollToTab("");
       MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
     } else {
@@ -544,9 +550,7 @@ export default class CollectionsViewModel {
       newRequestTab.updateHeaders(
         restOfData.property.request.headers as KeyValueChecked[],
       );
-      newRequestTab.updateTests(
-        restOfData.property.request.tests,
-      );
+      newRequestTab.updateTests(restOfData.property.request.tests);
       newRequestTab.updateQueryParams(
         restOfData.property.request.queryParams as KeyValueChecked[],
       );
@@ -561,7 +565,6 @@ export default class CollectionsViewModel {
       const { collectionId, folderId, ...filteredPath } = restOfData.path; // Remove collecitonId and folderId
       newRequestTab.updatePath(filteredPath as TabPath);
       newRequestTab.updateIsSave(false);
-
       this.tabRepository.createTab(newRequestTab.getValue());
       scrollToTab("");
     }

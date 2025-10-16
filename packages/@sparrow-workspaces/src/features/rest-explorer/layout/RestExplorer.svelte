@@ -74,6 +74,7 @@
     requestTabTestNoCodeStep,
     requestTabTestScriptDemo,
     requestTabTestScriptStep,
+    aiChatBotPanelClose,
   } from "../../../stores";
   import { Popover } from "@sparrow/library/ui";
   import { onDestroy, onMount } from "svelte";
@@ -1587,7 +1588,7 @@
         onUpdateRequestState({
           isChatbotActive: !$tab?.property?.request?.state?.isChatbotActive,
         });
-
+        aiChatBotPanelClose.set(true);
         MixpanelEvent(Events.AI_Chat_Initiation);
       }}
     >
