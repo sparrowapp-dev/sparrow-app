@@ -293,8 +293,26 @@ const testJsCompletions = (context: CompletionContext) => {
 const preTestJsCompletions = (context: CompletionContext) => {
   const beforeCursor = context.state.sliceDoc(0, context.pos);
   const spDotMatch = /sp\.$/.test(beforeCursor);
-  const spResponseDotMatch = /sp\.response\.$/.test(beforeCursor);
-  const spResponseBodyDotMatch = /sp\.response\.body\.$/.test(beforeCursor);
+  // Check for sp.request, sp.environment, sp.global, etc.
+  const spRequestDotMatch = /sp\.request\.$/.test(beforeCursor);
+  const spRequestHeadersDotMatch = /sp\.request\.headers\.$/.test(beforeCursor);
+  const spRequestParametersDotMatch = /sp\.request\.parameters\.$/.test(beforeCursor);
+  const spRequestBodyDotMatch = /sp\.request\.body\.$/.test(beforeCursor);
+  const spRequestBodyFormDataDotMatch = /sp\.request\.body\.formdata\.$/.test(beforeCursor);
+  const spRequestBodyUrlEncodedDotMatch = /sp\.request\.body\.urlencoded\.$/.test(beforeCursor);
+  const spRequestBodyRawDotMatch = /sp\.request\.body\.raw\.$/.test(beforeCursor);
+  const spRequestUrlDotMatch = /sp\.request\.url\.$/.test(beforeCursor);
+  const spRequestMethodDotMatch = /sp\.request\.method\.$/.test(beforeCursor);
+  const spRequestAuthDotMatch = /sp\.request\.auth\.$/.test(beforeCursor);
+  const spRequestAuthBearerTokenDotMatch = /sp\.request\.auth\.bearerToken\.$/.test(beforeCursor);
+  const spRequestAuthBasicAuthDotMatch = /sp\.request\.auth\.basicAuth\.$/.test(beforeCursor);
+  const spRequestAuthBasicAuthUsernameDotMatch = /sp\.request\.auth\.basicAuth\.username\.$/.test(beforeCursor);
+  const spRequestAuthBasicAuthPasswordDotMatch = /sp\.request\.auth\.basicAuth\.password\.$/.test(beforeCursor);
+  const spRequestAuthApiKeyDotMatch = /sp\.request\.auth\.apiKey\.$/.test(beforeCursor);
+  const spRequestAuthApiKeyKeyDotMatch = /sp\.request\.auth\.apiKey\.key\.$/.test(beforeCursor);
+  const spRequestAuthApiKeyValueDotMatch = /sp\.request\.auth\.apiKey\.value\.$/.test(beforeCursor);
+  const spEnvironmentDotMatch = /sp\.environment\.$/.test(beforeCursor);
+  const spGlobalDotMatch = /sp\.global\.$/.test(beforeCursor);
   const expectDotMatch = /expect\([^)]*\)\.$/.test(beforeCursor);
   const expectToDotMatch = /expect\([^)]*\)\.to\.$/.test(beforeCursor);  // expect().to.
   const expectToBeDotMatch = /expect\([^)]*\)\.to\.be\.$/.test(beforeCursor);  // expect().to.be.
@@ -302,26 +320,186 @@ const preTestJsCompletions = (context: CompletionContext) => {
   const expectToHaveAllDotMatch = /expect\([^)]*\)\.to\.have\.all\.$/.test(beforeCursor);  // expect().to.have.all.
   const word = context.matchBefore(/\w*/);
 
-  if (spResponseBodyDotMatch) {
+  if (spRequestBodyRawDotMatch) {
     return {
       from: context.pos,
       options: [
-        { label: "text", type: "function", info: "Get response body as text", apply: "text();" },
-        { label: "json", type: "function", info: "Get response body as JSON", apply: "json();" },
+        { label: "text", type: "function", info: "Get raw body as text", apply: "text();" },
+        { label: "json", type: "function", info: "Get raw body as JSON", apply: "json();" },
+        { label: "set", type: "function", info: "Set raw body content", apply: "set('');" },
       ],
       validFor: /^\w*$/,
     };
   }
 
-  if (spResponseDotMatch) {
+  if (spRequestBodyFormDataDotMatch || spRequestBodyUrlEncodedDotMatch) {
     return {
       from: context.pos,
       options: [
-        { label: "statusCode", type: "variable", info: "Response status code" },
-        { label: "body", type: "variable", info: "Response body object (text, json)" },
-        { label: "headers", type: "variable", info: "Response headers object" },
-        { label: "size", type: "variable", info: "Response size in KB" },
-        { label: "time", type: "variable", info: "Response time in ms" },
+        { label: "text", type: "function", info: "Get as JSON string", apply: "text();" },
+        { label: "json", type: "function", info: "Get as object", apply: "json();" },
+        { label: "set", type: "function", info: "Set key-value pair", apply: "set('key', 'value');" },
+        { label: "get", type: "function", info: "Get value by key", apply: "get('key');" },
+        { label: "remove", type: "function", info: "Remove key", apply: "remove('key');" },
+        { label: "clear", type: "function", info: "Clear all data", apply: "clear();" },
+        { label: "has", type: "function", info: "Check if key exists", apply: "has('key');" },
+        { label: "enable", type: "function", info: "Enable key", apply: "enable('key');" },
+        { label: "disable", type: "function", info: "Disable key", apply: "disable('key');" },
+        { label: "isChecked", type: "function", info: "Check if key is enabled", apply: "isChecked('key');" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestBodyDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "raw", type: "variable", info: "Raw body manipulation" },
+        { label: "formdata", type: "variable", info: "Form data manipulation" },
+        { label: "urlencoded", type: "variable", info: "URL encoded data manipulation" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestHeadersDotMatch || spRequestParametersDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "text", type: "function", info: "Get as JSON string", apply: "text();" },
+        { label: "json", type: "function", info: "Get as array", apply: "json();" },
+        { label: "set", type: "function", info: "Set key-value pair", apply: "set('key', 'value');" },
+        { label: "get", type: "function", info: "Get value by key", apply: "get('key');" },
+        { label: "remove", type: "function", info: "Remove key", apply: "remove('key');" },
+        { label: "clear", type: "function", info: "Clear all data", apply: "clear();" },
+        { label: "has", type: "function", info: "Check if key exists", apply: "has('key');" },
+        { label: "enable", type: "function", info: "Enable key", apply: "enable('key');" },
+        { label: "disable", type: "function", info: "Disable key", apply: "disable('key');" },
+        { label: "isChecked", type: "function", info: "Check if key is enabled", apply: "isChecked('key');" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestUrlDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "text", type: "function", info: "Get current URL", apply: "text();" },
+        { label: "set", type: "function", info: "Set new URL", apply: "set('');" },
+        { label: "getBaseUrl", type: "function", info: "Get base URL", apply: "getBaseUrl();" },
+        { label: "getPath", type: "function", info: "Get URL path", apply: "getPath();" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestMethodDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "text", type: "function", info: "Get current method", apply: "text();" },
+        { label: "set", type: "function", info: "Set HTTP method", apply: "set('GET');" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestAuthBearerTokenDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "text", type: "function", info: "Get bearer token", apply: "text();" },
+        { label: "set", type: "function", info: "Set bearer token", apply: "set('');" },
+        { label: "clear", type: "function", info: "Clear bearer token", apply: "clear();" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestAuthBasicAuthUsernameDotMatch || spRequestAuthBasicAuthPasswordDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "text", type: "function", info: "Get current value", apply: "text();" },
+        { label: "set", type: "function", info: "Set new value", apply: "set('');" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestAuthBasicAuthDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "username", type: "variable", info: "Basic auth username" },
+        { label: "password", type: "variable", info: "Basic auth password" },
+        { label: "set", type: "function", info: "Set username and password", apply: "set('username', 'password');" },
+        { label: "clear", type: "function", info: "Clear basic auth", apply: "clear();" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestAuthApiKeyKeyDotMatch || spRequestAuthApiKeyValueDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "text", type: "function", info: "Get current value", apply: "text();" },
+        { label: "set", type: "function", info: "Set new value", apply: "set('');" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestAuthApiKeyDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "key", type: "variable", info: "API key name" },
+        { label: "value", type: "variable", info: "API key value" },
+        { label: "set", type: "function", info: "Set API key and value", apply: "set('key', 'value');" },
+        { label: "clear", type: "function", info: "Clear API key", apply: "clear();" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestAuthDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "bearerToken", type: "variable", info: "Bearer token authentication" },
+        { label: "basicAuth", type: "variable", info: "Basic authentication" },
+        { label: "apiKey", type: "variable", info: "API key authentication" },
+        { label: "clear", type: "function", info: "Clear all auth data", apply: "clear();" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "body", type: "variable", info: "Request body manipulation" },
+        { label: "headers", type: "variable", info: "Request headers manipulation" },
+        { label: "parameters", type: "variable", info: "Query parameters manipulation" },
+        { label: "url", type: "variable", info: "URL manipulation" },
+        { label: "method", type: "variable", info: "HTTP method manipulation" },
+        { label: "auth", type: "variable", info: "Authentication manipulation" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spEnvironmentDotMatch || spGlobalDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "set", type: "function", info: "Set variable", apply: "set('key', 'value');" },
+        { label: "get", type: "function", info: "Get variable", apply: "get('key');" },
       ],
       validFor: /^\w*$/,
     };
@@ -332,28 +510,13 @@ const preTestJsCompletions = (context: CompletionContext) => {
     return {
       from: context.pos,
       options: [
-        { label: "expect", type: "function", info: "Expect testcase function", apply: "expect()" },
-        {
-          label: "xmlToJSON",
-          type: "function",
-          info: "Convert XML to JSON",
-          apply: "xmlToJSON();"
-        },
-        {
-          label: "response",
-          type: "variable",
-          info: "Get response object",
-          apply: "response"
-        },
-
-        {
-          label: "test",
-          type: "function",
-          info: "Test definition function",
-          apply: `test("", function () {
-
-});`
-        },
+        { label: "request", type: "variable", info: "Request data manipulation" },
+        { label: "environment", type: "variable", info: "Environment variables" },
+        { label: "global", type: "variable", info: "Global variables" },
+        { label: "test", type: "function", info: "Test definition function", apply: `test("", function () {\n\n});` },
+        { label: "expect", type: "function", info: "Expect testcase function", apply: "expect();" },
+        { label: "xmlToJSON", type: "function", info: "Convert XML to JSON", apply: "xmlToJSON();" },
+        { label: "uuid", type: "function", info: "Generate UUID", apply: "uuid();" },
       ],
       validFor: /^\w*$/,
     };
