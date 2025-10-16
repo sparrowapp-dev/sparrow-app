@@ -198,18 +198,35 @@
   // };
 
   const calculateLimitedVisitedWorkspace = () => {
+    // Create a map of current workspace data for quick lookup
+    const currentWorkspaceMap = new Map();
+    workspaceDocuments.forEach((workspace) => {
+      currentWorkspaceMap.set(workspace._id, {
+        name: workspace.name,
+        teamName: workspace.team?.teamName,
+        workspaceType: workspace.workspaceType,
+      });
+    });
+
     let workspaces =
-      recentVisitedWorkspaces?.slice(0, 5)?.map((workspace) => ({
-        id: workspace?._id,
-        name: workspace?.name,
-        description: workspace?.team?.teamName,
-        icon:
-          workspace?.workspaceType === "PUBLIC"
-            ? GlobeRegular
-            : LockClosedRegular,
-      })) || [];
+      recentVisitedWorkspaces?.slice(0, 5)?.map((workspace) => {
+        // Use updated data if available, otherwise fall back to cached data
+        const updatedData = currentWorkspaceMap.get(workspace._id);
+        return {
+          id: workspace?._id,
+          name: updatedData?.name || workspace?.name,
+          description: updatedData?.teamName || workspace?.team?.teamName,
+          icon:
+            (updatedData?.workspaceType || workspace?.workspaceType) ===
+            "PUBLIC"
+              ? GlobeRegular
+              : LockClosedRegular,
+        };
+      }) || [];
+
     // Remove any existing entry for current workspace
     workspaces = workspaces.filter((ws) => ws.id !== currentWorkspaceId);
+
     // Add current workspace at the start
     workspaces.unshift({
       id: currentWorkspaceId,
@@ -220,6 +237,7 @@
           ? GlobeRegular
           : LockClosedRegular,
     });
+
     // Deduplicate and limit to 5
     const res = createSetFromArray(workspaces, "id").slice(0, 5);
     workspaceData = res;

@@ -158,6 +158,8 @@
   export let onUpdateRunningState;
   export let appEdition = "MANAGED";
 
+  export let isScheduleRunPopupOpen;
+
   let collectionListMounted = false;
   function delayFrames(count: number): Promise<void> {
     return new Promise((resolve) => {
@@ -213,7 +215,6 @@
 
   const handleExpandCollectionLine = () => {
     isExpandCollectionLine = !isExpandCollectionLine;
-    // console.log(isExpandCollectionLine);
   };
   const handleExpandEnviromentLine = () => {
     isExpandEnviromentLine = !isExpandEnviromentLine;
@@ -837,6 +838,7 @@
         style=" overflow:auto; {$isExpandTestflow ? 'flex:1;' : ''}"
       >
         <TestflowList
+          bind:isScheduleRunPopupOpen
           testflows={$testflows}
           loggedUserRoleInWorkspace={userRole}
           {onCreateTestflow}
@@ -852,6 +854,8 @@
           {handleTestflowLine}
           {ActiveTab}
           {handleTabUpdate}
+          {isGuestUser}
+          {isWebApp}
         />
       </div>
 

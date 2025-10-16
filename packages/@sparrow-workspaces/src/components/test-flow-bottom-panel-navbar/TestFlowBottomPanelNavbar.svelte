@@ -20,6 +20,7 @@
   export let handleClickTestButton;
   export let isTestFlowRuning = false;
   export let handleOpenCurrentDynamicExpression;
+  export let testflowView = false;
 
   let requestUrl = selectedBlock?.data?.requestData?.url ?? "";
 
@@ -126,29 +127,33 @@
       }}
       bind:dispatcher
     />
-    <Button
-      size="medium"
-      type="teritiary-regular"
-      startIcon={MathFormulaRegular}
-      onClick={() => {
-        handleOpenCurrentDynamicExpression({
-          type: "url",
-          dispatch: dispatcher,
-        });
-      }}
-    />
+    {#if !testflowView}
+      <Button
+        size="medium"
+        type="teritiary-regular"
+        startIcon={MathFormulaRegular}
+        onClick={() => {
+          handleOpenCurrentDynamicExpression({
+            type: "url",
+            dispatch: dispatcher,
+          });
+        }}
+      />
+    {/if}
   </div>
 
-  <Button
-    disable={isTestFlowRuning}
-    title={"Test"}
-    textClassProp={"fs-6"}
-    type={"primary"}
-    onClick={handleClickTestButton}
-    loader={false}
-  />
+  {#if !testflowView}
+    <Button
+      disable={isTestFlowRuning}
+      title={"Test"}
+      textClassProp={"fs-6"}
+      type={"primary"}
+      onClick={handleClickTestButton}
+      loader={false}
+    />
+  {/if}
 
-  {#if showRedirectButton}
+  {#if showRedirectButton && !testflowView}
     <div class="arrow-icon-container">
       <Tooltip title="Redirect" placement={"bottom-center"} zIndex={100}>
         <span on:click={onRedirect} class="pe-2">

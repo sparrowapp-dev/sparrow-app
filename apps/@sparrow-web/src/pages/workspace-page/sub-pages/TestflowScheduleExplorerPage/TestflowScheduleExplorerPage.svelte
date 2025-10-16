@@ -1,0 +1,169 @@
+<script lang="ts">
+  // Document
+  import type { TabDocument } from "@app/database/database";
+
+  // ---- View Model
+  import TestFlowScheduleExplorerPage from "./TestflowScheduleExplorerPage.ViewModel";
+
+  // Component
+  import { TestflowScheduleExplorer } from "@sparrow/workspaces/features";
+  import { user } from "@app/store/auth.store";
+  import { testflowSchedules } from "@sparrow/common/store";
+  import { environmentType } from "@sparrow/common/enums";
+  import { WorkspaceRole } from "@sparrow/common/enums";
+  import { onDestroy } from "svelte";
+
+  /**
+   * folder tab document
+   */
+  export let tab: TabDocument;
+
+  // ViewModel initialization
+  let _viewModel;
+
+  let activeWorkspaceSubscriber;
+
+  let userId = "";
+  let environments;
+  let activeWorkspace;
+  let currentWorkspaceId = "";
+  let currentWorkspace;
+  let isTestflowScheduleEditable;
+  let userRole = "";
+
+  /**
+   * Find the role of user in active workspace
+   */
+  const findUserRole = async () => {
+    const workspace: WorkspaceDocument = await _viewModel.getWorkspaceById(
+      tab.path.workspaceId,
+    );
+    workspace.users?.forEach((value) => {
+      if (value.id === userId) {
+        userRole = value.role as string;
+      }
+    });
+  };
+
+  user.subscribe((value) => {
+    if (value) {
+      userId = value._id;
+    }
+  });
+
+  let prevTabId = "";
+  let prevTabName = "";
+
+  let testflowObserver;
+  let testflowSubscriber;
+  let testflow;
+
+  let testflowScheduleStoreMap;
+
+  let testflowScheduleStore;
+
+  testflowSchedules.subscribe((_testflowScheduleStoreMap) => {
+    if (_testflowScheduleStoreMap) {
+      testflowScheduleStoreMap = _testflowScheduleStoreMap;
+    }
+  });
+
+  let schedule;
+
+  $: {
+    // First try to get schedule from store
+    testflowScheduleStore = testflowScheduleStoreMap?.get(
+      tab?.path?.testflowId,
+    );
+
+    let storeSchedule = testflowScheduleStore?.find((s) => s.id === tab?.id);
+
+    // If tab has the updated schedule info in its property, use that as the source of truth
+    if (tab?.property?.testflowSchedule) {
+      // Merge store schedule with tab data for most up-to-date version
+      schedule = {
+        ...storeSchedule,
+        ...tab.property.testflowSchedule,
+        // Important fields to ensure they're updated
+        name: tab.name,
+        environmentId: tab.property.testflowSchedule.environmentId,
+        runConfiguration: tab.property.testflowSchedule.runConfiguration,
+        notification: tab.property.testflowSchedule.notification,
+      };
+    } else {
+      schedule = storeSchedule;
+    }
+  }
+
+  $: {
+    if (tab) {
+      if (prevTabId !== tab?.tabId) {
+        (async () => {
+          /**
+           * @description - Initialize the view model for the new http request tab
+           */
+          _viewModel = new TestFlowScheduleExplorerPage(tab);
+          testflowScheduleStore = testflowScheduleStoreMap?.get(tab?.id);
+          testflowObserver = _viewModel.getTestflowObserver(
+            tab?.path?.testflowId as string,
+          );
+          testflowSubscriber = testflowObserver?.subscribe((data) => {
+            testflow = data?.toMutableJSON();
+          });
+          environments = _viewModel.environments;
+          activeWorkspace = _viewModel.activeWorkspace;
+          activeWorkspaceSubscriber = activeWorkspace.subscribe(
+            (_workspace) => {
+              const workspaceDoc = _workspace?.toMutableJSON();
+
+              if (workspaceDoc) {
+                currentWorkspace = _workspace;
+                currentWorkspaceId = _workspace.get("_id");
+                workspaceDoc.users?.forEach((_user) => {
+                  if (_user.id === userId) {
+                    if (_user.role !== WorkspaceRole.WORKSPACE_VIEWER) {
+                      isTestflowScheduleEditable = true;
+                    } else {
+                      isTestflowScheduleEditable = false;
+                    }
+                  }
+                });
+              }
+            },
+          );
+        })();
+      } else if (tab?.name && prevTabName !== tab.name) {
+      }
+      prevTabName = tab?.name || "";
+      prevTabId = tab?.tabId || "";
+      findUserRole();
+    }
+  }
+  onDestroy(() => {
+    activeWorkspaceSubscriber.unsubscribe();
+  });
+</script>
+
+<TestflowScheduleExplorer
+  tab={_viewModel.tab}
+  {testflow}
+  {schedule}
+  {userRole}
+  workspaceUsers={currentWorkspace?._data?.users || []}
+  environments={$environments?.filter(
+    (env) =>
+      env.workspaceId === currentWorkspaceId &&
+      env.type !== environmentType.GLOBAL,
+  ) || []}
+  {isTestflowScheduleEditable}
+  onUpdateScheduleState={_viewModel.updateScheduleState}
+  onScheduleRun={_viewModel.runTestflowSchedule}
+  onDeleteTestflowScheduleHistory={_viewModel.deleteTestflowScheduleHistory}
+  onScheduleRunview={_viewModel.handleCreateTestflowSingleScheduleTab}
+  onUpdateSchedule={_viewModel.updateScheduleTab}
+  onSaveSchedule={_viewModel.updateTestflowSchedule}
+  onRefreshSchedule={_viewModel.refreshTestflowSchedule}
+  onEditTestflowSchedule={_viewModel.editTestflowSchedule}
+  onOpenTestflow={_viewModel.handleOpenTestflow}
+  onOpenEnvironment={_viewModel.handleOpenEnvironment}
+/>

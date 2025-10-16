@@ -11,6 +11,8 @@ import type { HttpRequestMockWrapperTabInterface } from "./http-request-mock-tab
 import type { AiRequestWrapper } from "./ai-request-tab";
 import type { MockHistoryWrapper } from "./mock-history-tab";
 import type { HubWrapper } from "./hub-tab";
+import type { TestflowScheduleWrapperTabInterface } from "./testflow-schedule-tab";
+import type { TestflowScheduleRunViewWrapperTabInterface } from "./testflow-schedule-run-view-tab";
 
 export enum TabTypeEnum {
   FOLDER = "FOLDER",
@@ -27,6 +29,8 @@ export enum TabTypeEnum {
   AI_REQUEST = "AI_REQUEST",
   MOCK_REQUEST = "MOCK_REQUEST",
   MOCK_HISTORY = "MOCK_HISTORY",
+  TESTFLOW_SCHEDULE = "TESTFLOW_SCHEDULE",
+  TESTFLOW_SCHEDULE_RUN_VIEW = "TESTFLOW_SCHEDULE_RUN_VIEW",
   HUB = "HUB",
 }
 
@@ -46,6 +50,12 @@ export interface RequestIdWrapper {
 export interface FolderIdWrapper {
   folderId?: string;
 }
+export interface TestflowIdWrapper {
+  testflowId?: string;
+}
+export interface TestflowScheduleIdWrapper {
+  testflowScheduleId?: string;
+}
 export interface LLMRequestIdWrapper {
   LLMRequestId?: string;
 }
@@ -53,7 +63,9 @@ export interface Path
   extends WorkspaceIdWrapper,
     CollectionIdWrapper,
     FolderIdWrapper,
-    RequestIdWrapper {}
+    RequestIdWrapper,
+    TestflowIdWrapper,
+    TestflowScheduleIdWrapper {}
 export interface DescriptionWrapper {
   description: string;
 }
@@ -114,6 +126,8 @@ export interface Property
     Partial<GraphqlRequestWrapperTabInterface>,
     Partial<HttpRequestMockWrapperTabInterface>,
     Partial<HttpRequestSavedWrapperTabInterface>,
+    Partial<TestflowScheduleWrapperTabInterface>,
+    Partial<TestflowScheduleRunViewWrapperTabInterface>,
     Partial<AiRequestWrapper>,
     Partial<HubWrapper> {}
 

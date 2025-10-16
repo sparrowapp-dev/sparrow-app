@@ -1,6 +1,6 @@
 {
   "name": "@sparrow/common",
-  "version": "2.32.0",
+  "version": "2.33.0",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
@@ -51,6 +51,7 @@
     "./types/workspace/socket-io-request-base": "./src/types/workspace/socket-io-request-base.ts",
     "./types/workspace/socket-io-request-dto": "./src/types/workspace/socket-io-request-dto.ts",
     "./types/workspace/socket-io-request-tab": "./src/types/workspace/socket-io-request-tab.ts",
+    "./types/workspace/testflow-schedule-tab": "./src/types/workspace/testflow-schedule-tab.ts",
     "./types/workspace/websocket-request-base": "./src/types/workspace/websocket-request-base.ts",
     "./types/workspace/workspace-base": "./src/types/workspace/workspace-base.ts",
     "./types/workspace/websocket-request-dto": "./src/types/workspace/websocket-request-dto.ts",
@@ -61,6 +62,7 @@
     "./types/workspace/folder": "./src/types/workspace/folder-tab.ts",
     "./types/workspace/tab": "./src/types/workspace/tab.ts",
     "./types/workspace/testflow": "./src/types/workspace/testflow-tab.ts",
+    "./types/workspace/testflow-dto": "./src/types/workspace/testflow-dto.ts",
     "./types/workspace/web-socket": "./src/types/workspace/websocket-request-tab.ts",
     "./types/workspace/workspace": "./src/types/workspace/workspace-tab.ts",
     "./types/editorjs": "./src/types/editorjs/index.ts",

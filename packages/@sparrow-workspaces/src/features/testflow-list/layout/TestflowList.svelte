@@ -78,6 +78,9 @@
 
   export let ActiveTab;
   export let handleTabUpdate;
+  export let isScheduleRunPopupOpen;
+  export let isGuestUser;
+  export let isWebApp;
 
   $: {
     if (testflows.find((item) => item._data._id === activeTabId)) {
@@ -274,12 +277,15 @@
             <VirtualScroll data={filteredflows} key="_id" let:data>
               <TestflowListItem
                 bind:loggedUserRoleInWorkspace
+                bind:isScheduleRunPopupOpen
                 flow={data}
                 {currentWorkspace}
                 {onDeleteTestflow}
                 {onUpdateTestflow}
                 {onOpenTestflow}
                 {activeTabId}
+                {isGuestUser}
+                {isWebApp}
               />
             </VirtualScroll>
           </div>

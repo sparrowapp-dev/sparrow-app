@@ -444,6 +444,11 @@ export class DashboardViewModel {
     const teamData = await this.teamRepository.getTeamDoc(_teamId);
     const hubUrl = teamData?.hubUrl;
 
+    const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+        return selfhostBackendUrl;
+    }
+
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;

@@ -226,4 +226,14 @@ export class TestflowRepository {
       })
       .remove();
   };
+
+   public getTestflowObserver = (
+    uuid: string,
+  ): Observable<TFRxHandlerType | null> | undefined => {
+    return this.rxdb?.findOne({
+      selector: {
+        _id: uuid,
+      },
+    }).$;
+  };
 }

@@ -15,9 +15,13 @@
     ResponseMessage,
     WorkspaceRole,
   } from "@sparrow/common/enums";
+  import { testflowSchedules } from "@sparrow/common/store";
   import { Debounce } from "@sparrow/common/utils";
   import constants from "@app/constants/constants";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
+  import { ScheduleRunPopUp } from "@sparrow/common/features";
+  import { Modal } from "@sparrow/library/ui";
+  import { getClientUser } from "src/utils/jwt";
   export let tab;
   export let teamDetails;
   export let upgradePlanModel;
@@ -37,6 +41,7 @@
   let currentWorkspace;
   let planLimitTestFlowBlocks: number = 5;
   let planLimitTestflow: number = 3;
+  let planLimitTestScheduleCount = 3;
   let currentTestflowCount: number = 1;
   let testflowBlocksPlanModalOpen: boolean = false;
   let runHistoryPlanModalOpen: boolean = false;
@@ -53,6 +58,11 @@
 
   let collectionListDocument = [];
   let collectionsSubscriber;
+
+  //schedule run popup state
+  let isScheduleRunPopupOpen: boolean = false;
+
+  const userEmail = getClientUser().email;
 
   /**
    * @description - refreshes the environment everytime workspace changes
@@ -108,13 +118,19 @@
       planLimitTestflow = planlimits?.testflowPerWorkspace?.value || 3;
       selectiveRunTestflow = planlimits?.selectiveTestflowRun?.active || false;
       planLimitRunHistoryCount = planlimits?.testflowRunHistory?.value || 5;
+      planLimitTestScheduleCount = planlimits?.testflowPerWorkspace?.value || 3;
     }
   };
 
   let testflowStoreMap;
+  let testflowScheduleStoreMap;
+  let testflowScheduleStore = [];
 
   $: {
     testflowStore = testflowStoreMap?.get(tab?.tabId) as TFDataStoreType;
+
+    testflowScheduleStore = testflowScheduleStoreMap?.get(tab?.id);
+
     const nodes = testflowStore?.nodes ?? [];
     const hasEmptyResponseStatus = nodes.some(
       (node) => !node.response?.status || node.response?.status === "",
@@ -130,6 +146,12 @@
   testFlowDataStore.subscribe((_testflowStoreMap) => {
     if (_testflowStoreMap) {
       testflowStoreMap = _testflowStoreMap;
+    }
+  });
+
+  testflowSchedules.subscribe((_testflowScheduleStoreMap) => {
+    if (_testflowScheduleStoreMap) {
+      testflowScheduleStoreMap = _testflowScheduleStoreMap;
     }
   });
 
@@ -277,14 +299,37 @@
     handleBlockLimitTestflow();
     collectionsSubscriber.unsubscribe();
   });
+
+  let isCreateTestflowScheduleLimitReachedModalOpen = false;
+  const createNewTestflowSchedule = async (
+    _testflowScheduleName: any,
+    _environemntId: any,
+    _runConfigurations: any,
+    _notifications: any,
+  ) => {
+    const response = await _viewModel.scheduleTestFlowRun(
+      _testflowScheduleName,
+      _environemntId,
+      _runConfigurations,
+      _notifications,
+    );
+    if (response.message === "Plan limit reached") {
+      isCreateTestflowScheduleLimitReachedModalOpen = true;
+    } else {
+      isCreateTestflowScheduleLimitReachedModalOpen = false;
+    }
+    return response;
+  };
 </script>
 
-{#if render}
+{#if render && _viewModel}
   <TestflowExplorer
+    bind:isScheduleRunPopupOpen
     tab={_viewModel.tab}
     {environmentVariables}
     {isTestflowEditable}
     {testflowStore}
+    testflowScheduleStore={testflowScheduleStore || []}
     onUpdateNodes={_viewModel.updateNodes}
     onUpdateEdges={_viewModel.updateEdges}
     {collectionListDocument}
@@ -302,6 +347,7 @@
     {isTestFlowEmpty}
     {isGuestUser}
     isWebApp={true}
+    environments={$environments}
     onSelectRequest={_viewModel.getRequestdata}
     checkRequestExistInNode={_viewModel.checkRequestExistInNode}
     onUpdateEnvironment={_viewModel.updateEnvironment}
@@ -323,5 +369,38 @@
     {selectiveRunTestflow}
     handleContactSales={_viewModel.handleContactSales}
     onChangeSeletedAuthValue={_viewModel.parseAuthHeader}
+    {currentWorkspaceId}
+    onUpdateScheduleStatus={_viewModel.updateTestflowScheduleStatus}
+    onOpenTestflowScheduleTab={_viewModel.openTestflowScheduleTab}
+    onPerformTestflowScheduleOperations={_viewModel.performTestflowScheduleOperations}
+    onOpenTestflowScheduleConfigurationsTab={_viewModel.openTestflowScheduleConfigurationsTab}
+    bind:isCreateTestflowScheduleLimitReachedModalOpen
+    onUpdateTestflowState={_viewModel.updateTestflowState}
+    onOpenEnvironment={_viewModel.handleOpenEnvironment}
+    {planLimitTestScheduleCount}
   />
 {/if}
+
+<Modal
+  title="Set Schedule Run"
+  type="dark"
+  width="35%"
+  zIndex={1000}
+  isOpen={isScheduleRunPopupOpen}
+  handleModalState={() => {
+    isScheduleRunPopupOpen = false;
+  }}
+>
+  <ScheduleRunPopUp
+    bind:isScheduleRunPopupOpen
+    testFlowName={tab?.name}
+    workspaceUsers={currentWorkspace?._data?.users || []}
+    environments={$environments?.filter(
+      (env) =>
+        env.workspaceId === currentWorkspaceId &&
+        env.type !== environmentType.GLOBAL,
+    ) || []}
+    onScheduleTestFlowRun={createNewTestflowSchedule}
+    creatorEmail={userEmail}
+  />
+</Modal>

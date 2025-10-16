@@ -40,7 +40,21 @@ const getAuthJwt = () => {
 };
 
 const getSelfhostUrls = () => {
-  return [localStorage.getItem("SELFHOST_BACKEND_URL"), localStorage.getItem("SELFHOST_WEB_APP_URL"), localStorage.getItem("SELFHOST_ADMIN_URL")];
+  let backendUrl  = localStorage.getItem("SELFHOST_BACKEND_URL");
+  let webAppUrl = localStorage.getItem("SELFHOST_WEB_APP_URL");
+  let adminUrl = localStorage.getItem("SELFHOST_ADMIN_URL")
+  
+  if(backendUrl === "null"){
+    backendUrl = null;
+  }
+  if(webAppUrl === "null"){
+    webAppUrl = null;
+  }
+  if(adminUrl === "null"){
+    adminUrl = null;
+  }
+
+  return [backendUrl, webAppUrl, adminUrl];
 };
 
 const clearAuthJwt = (): void => {
