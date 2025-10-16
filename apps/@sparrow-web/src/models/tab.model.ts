@@ -284,7 +284,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 21,
+  version: 22,
   properties: {
     tabId: {
       // ---- RxDocumentId

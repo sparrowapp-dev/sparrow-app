@@ -423,7 +423,7 @@ export const collectionSchemaLiteral = {
   title: "collection",
   primaryKey: "id",
   type: "object",
-  version: 20,
+  version: 21,
   properties: {
     collectionId: {
       type: "string",
