@@ -36,7 +36,7 @@
   export let userRole;
 
   type SplitDirection = "vertical" | "horizontal";
-  type EditorLanguage = "TestJavaScript";
+  type EditorLanguage = "PreTestJavaScript";
 
   // Snippet type (based on your utils/common-snippets.ts)
   interface Snippet {
@@ -45,7 +45,7 @@
   }
 
   export let tabSplitDirection: SplitDirection = "vertical";
-  export let lang: EditorLanguage = "TestJavaScript";
+  export let lang: EditorLanguage = "PreTestJavaScript";
 
   export let isBodyBeautified: boolean = false;
 
@@ -553,7 +553,7 @@
           on:change={handleCodeMirrorChange}
           isEditable={true}
           autofocus={true}
-          placeholder={`// What are the Pre-Request tests?\n// It runs before your request is sent. Use them to set variables, headers, prepare data.\n// For example: Need a timestamp for every request?\n// sp.environment.set("timestamp", Date.now());\n//     sp.request.headers.add({ key: "Auth-Token", value: "12345" });\n// });\n\n// You can:\n// - Use "Snippets" to insert common Pre-Requests\n// - Type a prompt and click "Generate" to create a Pre-Requests using AI\n// - Or, write Pre-Requests manually using scripting`}
+          placeholder={`// What are the Pre-Request tests?\n// It runs before your request is sent. Use them to set variables, headers, prepare data.\n// For example: Need a timestamp for every request?\n// sp.environment.set("timestamp", new Date());\n// sp.request.headers.set("Auth-Token", "12345");\n\n// You can:\n// - Use "Snippets" to insert common Pre-Requests\n// - Type a prompt and click "Generate" to create a Pre-Requests using AI\n// - Or, write Pre-Requests manually using scripting`}
           {isBodyBeautified}
           beautifySyntaxCallback={updateBeautifiedState}
         />

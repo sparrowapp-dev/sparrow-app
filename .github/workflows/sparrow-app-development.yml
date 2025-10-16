@@ -1,9 +1,9 @@
-name: Development release
+name: Development Release 2.34.0
 
 on:
   push:
     branches:
-      - development
+      - release/2.34.0
   workflow_dispatch:
 
 env:

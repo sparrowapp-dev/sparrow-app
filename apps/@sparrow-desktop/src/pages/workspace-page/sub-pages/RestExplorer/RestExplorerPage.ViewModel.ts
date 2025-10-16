@@ -6,7 +6,7 @@ import {
   ReduceAuthHeader,
   ReduceAuthParameter,
 } from "@sparrow/workspaces/features/rest-explorer/utils";
-import { createDeepCopy, scrollToTab } from "@sparrow/common/utils";
+import { createDeepCopy, scrollToTab, Sleep } from "@sparrow/common/utils";
 import {
   startLoading,
   stopLoading,
@@ -1779,9 +1779,7 @@ class RestExplorerViewModel {
       return restApiDataMap;
     });
     const start = Date.now();
-
-    const decodeData = this._decodeRequest.init(
-      this._tab.getValue().property.request,
+    const preRequest = await this.executePreScriptTestcases(this._tab.getValue().property.request,
       environmentVariables.filtered || [],
       this._tab.getValue().property.request.state.requestAuthNavigation ===
         HttpRequestAuthTypeBaseEnum.AUTH_PROFILES
@@ -1790,7 +1788,13 @@ class RestExplorerViewModel {
             collectionAuthNavigation:
               this._collectionAuthProfile.getValue().authType,
           } as HttpRequestCollectionLevelAuthTabInterface)
-        : this._collectionAuth.getValue(),
+        : this._collectionAuth.getValue());
+      
+
+    const decodeData = this._decodeRequest.init(
+      preRequest.request,
+      preRequest.env || [],
+      preRequest.auth,
     );
     makeHttpRequestV2(...decodeData, signal)
       .then(async (response) => {
@@ -1808,7 +1812,8 @@ class RestExplorerViewModel {
             restApiDataMap.set(progressiveTab.tabId, data);
             return restApiDataMap;
           });
-          await this.executeTestcases();
+          await this.executeScriptTestcases();
+          await this.executeNoCodeTestcases();
         } else {
           const end = Date.now();
           const byteLength = new TextEncoder().encode(
@@ -1845,7 +1850,9 @@ class RestExplorerViewModel {
             restApiDataMap.set(progressiveTab.tabId, data);
             return restApiDataMap;
           });
-          await this.executeTestcases();
+          await this.executeScriptTestcases();
+          await this.executeNoCodeTestcases();
+          
         }
       })
       .catch(async (error) => {
@@ -1868,24 +1875,9 @@ class RestExplorerViewModel {
           restApiDataMap.set(progressiveTab.tabId, data);
           return restApiDataMap;
         });
-        await this.executeTestcases();
+        await this.executeScriptTestcases();
+        await this.executeNoCodeTestcases();
       });
-  };
-
-  /**
-   * Executes test cases for the current tab based on the selected test case mode.
-   * If the mode is NO_CODE, it delegates to executeNoCodeTestcases.
-   *
-   */
-  private executeTestcases = async () => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-
-    const testcaseMode = progressiveTab.property.request.tests.testCaseMode;
-    if (testcaseMode === TestCaseModeEnum.NO_CODE) {
-      await this.executeNoCodeTestcases();
-    } else {
-      await this.executeScriptTestcases();
-    }
   };
 
   /**
@@ -1898,7 +1890,7 @@ class RestExplorerViewModel {
     restExplorerDataStore.update((restApiDataMap) => {
       const response = restApiDataMap.get(progressiveTab?.tabId);
       if (response) {
-        response.response.testResults = [];
+        // response.response.testResults = [];
         const testCases = progressiveTab.property.request.tests.noCode || [];
         testCases.map((test) => {
           let actual: any;
@@ -1999,6 +1991,7 @@ class RestExplorerViewModel {
             testId: test.id,
             testName: test.name,
             testStatus: testCasePassed,
+            initiator: "Assertions",
             testMessage: error || testCaseStatusMessage,
           };
 
@@ -2012,7 +2005,9 @@ class RestExplorerViewModel {
   };
 
   private async executeScriptTestcases() {
-    const worker = new Worker(
+    return new Promise((resolve)=>{
+
+const worker = new Worker(
       new URL("../../../../workers/test-script-worker.ts", import.meta.url),
       {
         type: "module",
@@ -2027,8 +2022,8 @@ class RestExplorerViewModel {
     restExplorerDataStore.update((restApiDataMap) => {
       const r = restApiDataMap.get(progressiveTab?.tabId);
       if (r) {
-        r.response.testResults = [];
-        r.response.testMessage = "";
+        // r.response.testResults = [];
+        // r.response.testMessage = "";
         restApiDataMap.set(progressiveTab.tabId, r);
         worker.postMessage({
           javaScriptTestCases,
@@ -2044,14 +2039,18 @@ class RestExplorerViewModel {
         const r = restApiDataMap.get(progressiveTab?.tabId);
         if (r) {
           if (success) {
-            r.response.testResults = tests.map((t) => ({
+            r.response.testResults = [...r.response.testResults, ...tests.map((t) => ({
               testId: "",
               testName: t.name,
               testStatus: t.passed,
               testMessage: t.error || "",
-            }));
+              initiator: "Post Script"
+            }))];
           } else {
-            r.response.testMessage = error;
+            r.response.testMessage = [...r.response.testMessage, {
+               error: error,
+               initiator: "Post-Request"
+            }];
           }
 
           restApiDataMap.set(progressiveTab.tabId, r);
@@ -2059,7 +2058,70 @@ class RestExplorerViewModel {
         return restApiDataMap;
       });
       worker.terminate(); // cleanup
+      resolve("resolved");
     };
+
+    });
+    
+  }
+
+  private async executePreScriptTestcases(request, env, auth) {
+    return new Promise((resolve) => {
+       const worker = new Worker(
+      new URL("../../../../workers/test-pre-script-worker.ts", import.meta.url),
+      {
+        type: "module",
+      },
+    );
+    // minimal chai-like expect (you can replace with a real lib like chai)
+
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const javaScriptTestCases =
+      progressiveTab.property.request.tests.preScript || "";
+
+    restExplorerDataStore.update((restApiDataMap) => {
+      const r = restApiDataMap.get(progressiveTab?.tabId);
+      if (r) {
+        r.response.testResults = [];
+        r.response.testMessage = [];
+        restApiDataMap.set(progressiveTab.tabId, r);
+        worker.postMessage({
+          javaScriptTestCases,
+          request, env,auth
+        });
+      }
+      return restApiDataMap;
+    });
+
+    worker.onmessage = (e) => {
+      const { success, tests, error, request, env, auth } = e.data;
+      restExplorerDataStore.update((restApiDataMap) => {
+        const r = restApiDataMap.get(progressiveTab?.tabId);
+        if (r) {
+          if (success) {
+            r.response.testResults = tests.map((t) => ({
+              testId: "",
+              testName: t.name,
+              testStatus: t.passed,
+              testMessage: t.error || "",
+              initiator: "Pre Script"
+            }));
+          } else {
+            r.response.testMessage = [{
+               error: error,
+               initiator: "Pre-Request"
+            }];
+          }
+
+          restApiDataMap.set(progressiveTab.tabId, r);
+        }
+        return restApiDataMap;
+      });
+      worker.terminate(); // cleanup
+      resolve({request, env, auth});
+    };
+    });
+   
   }
 
   /**
@@ -4797,7 +4859,7 @@ class RestExplorerViewModel {
       restExplorerDataStore.update((restApiDataMap) => {
         const r = restApiDataMap.get(progressiveTab?.tabId);
         if (r) {
-          r.response.testMessage = "";
+          r.response.testMessage = [];
         }
         return restApiDataMap;
       });
