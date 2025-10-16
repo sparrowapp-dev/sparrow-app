@@ -1,5 +1,4 @@
 import { XMLParser } from "fast-xml-parser";
-import { get } from "svelte/store";
 
 // Define expect helper (same as in your code)
  const expect = (actual: any) => ({
@@ -122,53 +121,6 @@ import { get } from "svelte/store";
 
 self.onmessage = (e) => {
   const { javaScriptTestCases, request, env, auth } = e.data;
-debugger;
-// const headersObject = Object.fromEntries(
-//                   JSON.parse(decodeData[2]).map(({ key, value }) => [
-//                     key,
-//                     value,
-//                   ]),
-//                 );
-//            let reqBody;
-//                 if (decodeData[4] === "application/json") {
-//                   // tried to handle js but that is treated as text/plain, skipping that for now
-//                   try {
-//                     reqBody = JSON.stringify(JSON.parse(decodeData[3]));
-//                   } catch (e) {
-//                     reqBody = JSON.stringify({});
-//                   }
-//                 } else if (
-//                   decodeData[4] === "multipart/form-data" ||
-//                   decodeData[4] === "application/x-www-form-urlencoded"
-//                 ) {
-//                   const formDataObject = Object.fromEntries(
-//                     JSON.parse(decodeData[3]).map(({ key, value }) => [
-//                       key,
-//                       value,
-//                     ]),
-//                   );
-//                   reqBody = JSON.stringify(formDataObject || {});
-//                 } else {
-//                   reqBody = decodeData[3];
-//                 }
-
-//                 const reqParam = {};
-//                 const params = new URL(decodeData[0]).searchParams;
-
-//                 for (const [key, value] of params.entries()) {
-//                   reqParam[key] = value;
-//                 }
-
-
-//           const preRequest =  {
-//                     headers: JSON.stringify(headersObject || {}),
-//                     body: reqBody,
-//                     parameters: JSON.stringify(reqParam || {}),
-//                     url: decodeData[0],
-
-//                   };
-
-
 
   const tests = [];
 
@@ -281,21 +233,21 @@ debugger;
       set:(key, value)=>{
         if(key){
           for(const e of env){
-            if(e.key === key){
+            if(e.key === key && e.type === "E"){
               e.value = value || "";
               break;
             }
           }
           // if didnt found the key then add new
-          if(!env.find((e)=>e.key === key)){
-            env.push({key, value: value || ""});
+          if(!env.find((e)=>e.key === key && e.type === "E")){
+            env.unshift({key, value: value || "", type: "E"});
           }
         }
       },
       get:(key)=>{
         if(key){
           for(const e of env){
-            if(e.key === key){
+            if(e.key === key && e.type === "E"){
               return e.value || "";
             }
           }
@@ -309,21 +261,21 @@ debugger;
       set:(key, value)=>{
         if(key){
           for(const e of env){
-            if(e.key === key){
+            if(e.key === key && e.type === "G"){
               e.value = value || "";
               break;
             }
           }
           // if didnt found the key then add new
-          if(!env.find((e)=>e.key === key)){
-            env.push({key, value: value || ""});
+          if(!env.find((e)=>e.key === key  && e.type === "G")){
+            env.push({key, value: value || "", type: "G"});
           }
         }
       },
       get:(key)=>{
         if(key){
           for(const e of env){
-            if(e.key === key){
+            if(e.key === key  && e.type === "G"){
               return e.value || "";
             }
           }
