@@ -6,7 +6,7 @@ import type { Observable } from "rxjs";
 import type { CollectionItemsDto } from "@sparrow/common/types/workspace";
 import type { RxDocument } from "rxdb";
 import * as Sentry from "@sentry/svelte";
-import type { CollectionAuthProifleBaseInterface as AuthProfileDto} from "@sparrow/common/types/workspace/collection-base";
+import type { CollectionAuthProifleBaseInterface as AuthProfileDto } from "@sparrow/common/types/workspace/collection-base";
 export class CollectionRepository {
   constructor() {}
 
@@ -60,8 +60,12 @@ export class CollectionRepository {
         value.mockRequestHistory = data.mockRequestHistory;
       if (data.authProfiles) value.authProfiles = data.authProfiles;
       value.isGenerateVariableTrial = data.isGenerateVariableTrial;
-      value.isRequestTestsNoCodeDemoCompleted = data.isRequestTestsNoCodeDemoCompleted;
-      value.isRequestTestsScriptDemoCompleted = data.isRequestTestsScriptDemoCompleted;
+      value.isRequestTestsNoCodeDemoCompleted =
+        data.isRequestTestsNoCodeDemoCompleted;
+      value.isRequestTestsScriptDemoCompleted =
+        data.isRequestTestsScriptDemoCompleted;
+      value.isRequestAssertionsDemoCompleted =
+        data.isRequestAssertionsDemoCompleted;
       if (data.defaultSelectedAuthProfile)
         value.defaultSelectedAuthProfile = data.defaultSelectedAuthProfile;
       return value;
@@ -1051,9 +1055,7 @@ export class CollectionRepository {
 
     return tabData
       .toJSON()
-      ?.property?.testflow?.nodes?.find(
-        (element) => element.id === _nodeId,
-      );
+      ?.property?.testflow?.nodes?.find((element) => element.id === _nodeId);
   };
 
   /**

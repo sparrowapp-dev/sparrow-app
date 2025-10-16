@@ -234,6 +234,10 @@ export interface isRequestTestsScriptDemoCompleted {
   isRequestTestsScriptDemoCompleted: boolean;
 }
 
+export interface isRequestAssertionsDemoCompleted {
+  isRequestAssertionsDemoCompleted: boolean;
+}
+
 export interface Response
   extends ResponseStatusWrapper,
     ResponseHeadersWrapper,
@@ -434,7 +438,7 @@ export interface Tests {
     condition: TestCaseConditionOperatorEnum | "";
     expectedResult: string;
     testPath: string;
-    testTarget: TestCaseSelectionTypeEnum | '';
+    testTarget: TestCaseSelectionTypeEnum | "";
   }[];
   script: string;
   preScript: string;
@@ -476,4 +480,5 @@ export interface Request
     isGeneratedVariable,
     isRequestTestsNoCodeDemoCompleted,
     isRequestTestsScriptDemoCompleted,
+    isRequestAssertionsDemoCompleted,
     HeadersWrapper {}

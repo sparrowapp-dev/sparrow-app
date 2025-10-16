@@ -1,6 +1,5 @@
 <script lang="ts">
   import { TestCaseModeEnum } from "@sparrow/common/types/workspace";
-  import { NoCode } from "./sub-components";
   import { Tooltip, Button } from "@sparrow/library/ui";
   import Script from "./sub-components/script/Script.svelte";
   import { PreScript } from "./sub-components";
@@ -11,7 +10,7 @@
   export let testResults;
   export let responseBody;
   export let responseHeader;
-  export let onShowModeChangeModal: (newMode: TestCaseModeEnum) => void;
+  export let onShowModeChangeModal;
   export let onGenerateTestCases;
   export let isTestCasesGenerating;
   export let isGuestUser;

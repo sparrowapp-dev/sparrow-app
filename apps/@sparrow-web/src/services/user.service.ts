@@ -136,4 +136,20 @@ export class UserService {
     );
     return response;
   };
+
+  /**
+   * If the user has completed Demo of RequestTests Assertions.
+   *
+   * @returns A promise that resolves to the server's response.
+   */
+  public requestTabAssertionsDemoCompleted = async () => {
+    const response = await makeRequest(
+      "POST",
+      `${apiUrl}/api/user/request-assertions-demo`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }
