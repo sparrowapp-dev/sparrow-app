@@ -17,7 +17,7 @@ export const predefinedTestSnippets = [
   },
   {
     title: "Set Timestamp Variables",
-    function: `sp.environment.set("timestamp", "10-08-23");`,
+    function: `sp.environment.set("timestamp", new Date());`,
   },
   
 ];

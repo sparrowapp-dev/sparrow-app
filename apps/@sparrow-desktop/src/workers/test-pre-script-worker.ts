@@ -121,7 +121,6 @@ import { XMLParser } from "fast-xml-parser";
 
 self.onmessage = (e) => {
   const { javaScriptTestCases, request, env, auth } = e.data;
-  debugger;
   const tests: any[] = [];
 
   const sp = {
