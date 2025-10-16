@@ -394,8 +394,9 @@ export const collectionSchemaLiteral = {
       },
     },
     isGenerateVariableTrial: { type: "boolean" },
-    isRequestTestsNoCodeDemoCompleted:{type:"boolean"},
-    isRequestTestsScriptDemoCompleted:{type:"boolean"},
+    isRequestTestsNoCodeDemoCompleted: { type: "boolean" },
+    isRequestTestsScriptDemoCompleted: { type: "boolean" },
+    isRequestAssertionsDemoCompleted: { type: "boolean" },
     primaryBranch: { type: "string" },
     currentBranch: { type: "string" },
     createdAt: {

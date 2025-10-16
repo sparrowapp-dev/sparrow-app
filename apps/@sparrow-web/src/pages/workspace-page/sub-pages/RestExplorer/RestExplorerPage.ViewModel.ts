@@ -223,6 +223,10 @@ class RestExplorerViewModel {
           await this.updateIsRequestTabScriptDemo(
             collectionDoc?.isRequestTestsScriptDemoCompleted,
           );
+
+          await this.updateIsRequestTabAssertionsDemo(
+            collectionDoc?.isRequestAssertionsDemoCompleted,
+          );
         }
 
         // console.log(
@@ -4331,6 +4335,12 @@ class RestExplorerViewModel {
     this.tab = progressiveTab;
   };
 
+  public updateIsRequestTabAssertionsDemo = async (value: boolean) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.isRequestAssertionsDemoCompleted = value;
+    this.tab = progressiveTab;
+  };
+
   private onOpenGlobalEnvironmentToGenerate = async (
     environment: any,
     collectionId: string,
@@ -4769,6 +4779,14 @@ class RestExplorerViewModel {
   public handleRequestTestNoCodeDemoCompleted = async () => {
     const response =
       await this.userService.requestTabNocodeTestsDemoCompleted();
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (response.isSuccessful) {
+      await this.fetchCollections(progressiveTab?.path?.workspaceId);
+    }
+  };
+
+  public handleRequestAssertionsDemoCompleted = async () => {
+    const response = await this.userService.requestTabAssertionsDemoCompleted();
     const progressiveTab = createDeepCopy(this._tab.getValue());
     if (response.isSuccessful) {
       await this.fetchCollections(progressiveTab?.path?.workspaceId);

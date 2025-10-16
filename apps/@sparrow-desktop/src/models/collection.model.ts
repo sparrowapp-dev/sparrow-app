@@ -525,8 +525,9 @@ export const collectionSchemaLiteral = {
     primaryBranch: { type: "string" },
     currentBranch: { type: "string" },
     isGenerateVariableTrial: { type: "boolean" },
-    isRequestTestsNoCodeDemoCompleted:{type:"boolean"},
-    isRequestTestsScriptDemoCompleted:{type:"boolean"},
+    isRequestTestsNoCodeDemoCompleted: { type: "boolean" },
+    isRequestTestsScriptDemoCompleted: { type: "boolean" },
+    isRequestAssertionsDemoCompleted: { type: "boolean" },
     createdAt: {
       type: "string",
     },

@@ -10,7 +10,7 @@
   export let testResults;
   export let responseBody;
   export let responseHeader;
-  export let onShowModeChangeModal: (newMode: TestCaseModeEnum) => void;
+  export let onShowModeChangeModal;
   export let onGenerateTestCases;
   export let isTestCasesGenerating;
   export let isGuestUser;

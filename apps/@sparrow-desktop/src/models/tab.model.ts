@@ -641,6 +641,9 @@ export const tabSchemaLiteral = {
             isRequestTestsScriptDemoCompleted: {
               type: "boolean",
             },
+            isRequestAssertionsDemoCompleted: {
+              type: "boolean",
+            },
           },
         },
         savedRequest: {
@@ -1400,14 +1403,14 @@ export const tabSchemaLiteral = {
                 required: ["id", "source", "target"],
               },
             },
-            state : {
+            state: {
               type: "object",
               properties: {
                 testflowNavigator: {
                   type: "string",
                 },
-              }
-            }
+              },
+            },
           },
         },
         aiRequest: {
@@ -1828,7 +1831,7 @@ export const tabSchemaLiteral = {
         },
         testflowSchedule: {
           type: "object",
-          properties: {    
+          properties: {
             notifications: {
               type: "object",
               properties: {
@@ -1854,13 +1857,12 @@ export const tabSchemaLiteral = {
                     type: "number",
                   },
                 },
-             
               },
             },
             state: {
               type: "object",
               properties: {
-                scheduleNavigator: { type: "string" },     
+                scheduleNavigator: { type: "string" },
               },
             },
             environmentId: { type: "string" },
