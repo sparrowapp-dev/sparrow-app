@@ -1,8 +1,8 @@
-name: Development Release 2.34.0
+name: Sparrow-web-dev
 on:
   push:
     branches:
-      - release/2.34.0
+      - development
 
 jobs:
   build:
