@@ -31,6 +31,7 @@
   export let onStopGeneratingAIResponse;
   export let onToggleLike;
   export let handleApplyChangeOnAISuggestion;
+  export let updateRequestStatAiChatBot:() => any;
 
   let scrollList: ScrollList;
 
@@ -89,6 +90,7 @@
       {onUpdateRequestState}
       {onStopGeneratingAIResponse}
       {handleApplyChangeOnAISuggestion}
+      {updateRequestStatAiChatBot}
       bind:scrollList
     />
   </div>

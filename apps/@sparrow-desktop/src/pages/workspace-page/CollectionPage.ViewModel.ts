@@ -61,6 +61,7 @@ import { InitCollectionTab } from "@sparrow/common/utils";
 import { InitFolderTab } from "@sparrow/common/utils";
 import {
   addCollectionItem,
+  aiChatBotPanelClose,
   tabsSplitterDirection,
 } from "@sparrow/workspaces/stores";
 import {
@@ -160,6 +161,7 @@ import { PlanRepository } from "@app/repositories/plan.repository";
 import { open } from "@tauri-apps/plugin-shell";
 import type { TransformedRequest } from "@sparrow/common/types/workspace/collection-base";
 import { getAuthJwt, getSelfhostUrls } from "@app/utils/jwt";
+import { get } from "svelte/store";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -421,9 +423,13 @@ export default class CollectionsViewModel {
     if (_limit === 0) return;
     const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
     if (ws) {
-      this.tabRepository.createTab(
-        new InitRequestTab("UNTRACKED-" + uuidv4(), ws._id).getValue(),
+      const initRequestTab = new InitRequestTab(
+        "UNTRACKED-" + uuidv4(),
+        ws._id,
       );
+      const aiPanelState = get(aiChatBotPanelClose);
+      initRequestTab.updateChatbotState(aiPanelState);
+      this.tabRepository.createTab(initRequestTab.getValue());
       scrollToTab("");
       MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
     } else {
@@ -543,9 +549,7 @@ export default class CollectionsViewModel {
       newRequestTab.updateHeaders(
         restOfData.property.request.headers as KeyValueChecked[],
       );
-      newRequestTab.updateTests(
-        restOfData.property.request.tests,
-      );
+      newRequestTab.updateTests(restOfData.property.request.tests);
       newRequestTab.updateQueryParams(
         restOfData.property.request.queryParams as KeyValueChecked[],
       );
@@ -7765,9 +7769,9 @@ export default class CollectionsViewModel {
 
     const [selfhostBackendUrl] = getSelfhostUrls();
     if (selfhostBackendUrl) {
-        return selfhostBackendUrl;
+      return selfhostBackendUrl;
     }
-    
+
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;
@@ -8264,10 +8268,10 @@ export default class CollectionsViewModel {
 
   public handleRedirectToAdminPanel = async (teamId: string) => {
     const [authToken] = getAuthJwt();
-    const [,,selfhostAdminUrl] = getSelfhostUrls();
-    if(selfhostAdminUrl){
-        await open(selfhostAdminUrl);
-    }else{
+    const [, , selfhostAdminUrl] = getSelfhostUrls();
+    if (selfhostAdminUrl) {
+      await open(selfhostAdminUrl);
+    } else {
       await open(
         `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
       );
