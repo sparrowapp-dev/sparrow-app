@@ -71,6 +71,7 @@
   export let onRenameFolder;
   export let isGraphqlEditable;
   export let onClearQuery;
+  export let onClearVariables;
   export let onFetchSchema;
   export let updateSchema;
   export let onUpdateVariables;
@@ -324,7 +325,7 @@
                         <RequestVariables
                           value={$tab.property?.graphql.variables}
                           onUpdateRequestVariable={onUpdateVariables}
-                          {onClearQuery}
+                          {onClearVariables}
                         />
                       {:else if $tab.property?.graphql?.state?.requestNavigation === RequestSectionEnum.HEADERS}
                         <RequestHeaders

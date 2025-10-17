@@ -40,4 +40,7 @@ export {
   requestTabTestScriptDemo,
   requestTabTestScriptStep,
   requestTabTestScriptTourCompleted,
+  requestTabAssertionsDemo,
+  requestTabAssertionsStep,
+  requestTabAssertionsTourCompleted,
 } from "./request-tab-test-tour-guide";

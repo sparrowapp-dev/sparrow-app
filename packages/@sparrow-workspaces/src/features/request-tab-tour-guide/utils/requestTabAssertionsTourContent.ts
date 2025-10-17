@@ -1,22 +1,22 @@
-export const RequestTabTestsScriptTourContent = [
+export const RequestTabAssertionsTourContent = [
   {
-    Title: "Write Your Post scripts here!",
+    Title: "Start Your Testing Journey!",
     description:
-      "Tests help you confirm your API results. Add custom test logic using code and check exactly what you need.",
+      "You can write tests your way, pick No-Code for a quick and easy setup if you prefer full control. You can switch anytime with just a click to script mode.",
     stepCount: 1,
     targetId: "request-tab-test-script",
   },
   {
-    Title: "Generate Tests with AI!",
+    Title: "Add Tests Without Coding!",
     description:
-      "You can use AI to quickly create tests. Just describe what you want to check, and AI writes the test for you.",
+      "In No-Code Mode, you don’t need to write a single line of code. Just pick conditions, set rules, and create tests in a few clicks.",
     stepCount: 2,
     targetId: "request-tab-test",
   },
   {
-    Title: "Speed Up with Snippets",
+    Title: "Add Your First Test!",
     description:
-      "No need to start from scratch. Use ready-made snippets to add common tests in just one click.",
+      "Click the Add Test button, then fill in the fields to set up your test. It’s quick and easy, just a few details and you’re ready..",
     stepCount: 3,
     targetId: "request-tab-test-script-leftpanel",
   },

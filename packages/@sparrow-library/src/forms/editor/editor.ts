@@ -288,6 +288,342 @@ const testJsCompletions = (context: CompletionContext) => {
 }
 
 /**
+ * Custom JavaScript autocompletion source for CodeMirror
+ */
+const preTestJsCompletions = (context: CompletionContext) => {
+  const beforeCursor = context.state.sliceDoc(0, context.pos);
+  const spDotMatch = /sp\.$/.test(beforeCursor);
+  // Check for sp.request, sp.environment, sp.global, etc.
+  const spRequestDotMatch = /sp\.request\.$/.test(beforeCursor);
+  const spRequestHeadersDotMatch = /sp\.request\.headers\.$/.test(beforeCursor);
+  const spRequestParametersDotMatch = /sp\.request\.parameters\.$/.test(beforeCursor);
+  const spRequestBodyDotMatch = /sp\.request\.body\.$/.test(beforeCursor);
+  const spRequestBodyFormDataDotMatch = /sp\.request\.body\.formdata\.$/.test(beforeCursor);
+  const spRequestBodyUrlEncodedDotMatch = /sp\.request\.body\.urlencoded\.$/.test(beforeCursor);
+  const spRequestBodyRawDotMatch = /sp\.request\.body\.raw\.$/.test(beforeCursor);
+  const spRequestUrlDotMatch = /sp\.request\.url\.$/.test(beforeCursor);
+  const spRequestMethodDotMatch = /sp\.request\.method\.$/.test(beforeCursor);
+  const spRequestAuthDotMatch = /sp\.request\.auth\.$/.test(beforeCursor);
+  const spRequestAuthBearerTokenDotMatch = /sp\.request\.auth\.bearerToken\.$/.test(beforeCursor);
+  const spRequestAuthBasicAuthDotMatch = /sp\.request\.auth\.basicAuth\.$/.test(beforeCursor);
+  const spRequestAuthBasicAuthUsernameDotMatch = /sp\.request\.auth\.basicAuth\.username\.$/.test(beforeCursor);
+  const spRequestAuthBasicAuthPasswordDotMatch = /sp\.request\.auth\.basicAuth\.password\.$/.test(beforeCursor);
+  const spRequestAuthApiKeyDotMatch = /sp\.request\.auth\.apiKey\.$/.test(beforeCursor);
+  const spRequestAuthApiKeyKeyDotMatch = /sp\.request\.auth\.apiKey\.key\.$/.test(beforeCursor);
+  const spRequestAuthApiKeyValueDotMatch = /sp\.request\.auth\.apiKey\.value\.$/.test(beforeCursor);
+  const spEnvironmentDotMatch = /sp\.environment\.$/.test(beforeCursor);
+  const spGlobalDotMatch = /sp\.global\.$/.test(beforeCursor);
+  const expectDotMatch = /expect\([^)]*\)\.$/.test(beforeCursor);
+  const expectToDotMatch = /expect\([^)]*\)\.to\.$/.test(beforeCursor);  // expect().to.
+  const expectToBeDotMatch = /expect\([^)]*\)\.to\.be\.$/.test(beforeCursor);  // expect().to.be.
+  const expectToHaveDotMatch = /expect\([^)]*\)\.to\.have\.$/.test(beforeCursor);  // expect().to.have.
+  const expectToHaveAllDotMatch = /expect\([^)]*\)\.to\.have\.all\.$/.test(beforeCursor);  // expect().to.have.all.
+  const word = context.matchBefore(/\w*/);
+
+  if (spRequestBodyRawDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "text", type: "function", info: "Get raw body as text", apply: "text();" },
+        { label: "json", type: "function", info: "Get raw body as JSON", apply: "json();" },
+        { label: "set", type: "function", info: "Set raw body content", apply: "set('');" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestBodyFormDataDotMatch || spRequestBodyUrlEncodedDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "text", type: "function", info: "Get as JSON string", apply: "text();" },
+        { label: "json", type: "function", info: "Get as object", apply: "json();" },
+        { label: "set", type: "function", info: "Set key-value pair", apply: "set('key', 'value');" },
+        { label: "get", type: "function", info: "Get value by key", apply: "get('key');" },
+        { label: "remove", type: "function", info: "Remove key", apply: "remove('key');" },
+        { label: "clear", type: "function", info: "Clear all data", apply: "clear();" },
+        { label: "has", type: "function", info: "Check if key exists", apply: "has('key');" },
+        { label: "enable", type: "function", info: "Enable key", apply: "enable('key');" },
+        { label: "disable", type: "function", info: "Disable key", apply: "disable('key');" },
+        { label: "isChecked", type: "function", info: "Check if key is enabled", apply: "isChecked('key');" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestBodyDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "raw", type: "variable", info: "Raw body manipulation" },
+        { label: "formdata", type: "variable", info: "Form data manipulation" },
+        { label: "urlencoded", type: "variable", info: "URL encoded data manipulation" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestHeadersDotMatch || spRequestParametersDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "text", type: "function", info: "Get as JSON string", apply: "text();" },
+        { label: "json", type: "function", info: "Get as array", apply: "json();" },
+        { label: "set", type: "function", info: "Set key-value pair", apply: "set('key', 'value');" },
+        { label: "get", type: "function", info: "Get value by key", apply: "get('key');" },
+        { label: "remove", type: "function", info: "Remove key", apply: "remove('key');" },
+        { label: "clear", type: "function", info: "Clear all data", apply: "clear();" },
+        { label: "has", type: "function", info: "Check if key exists", apply: "has('key');" },
+        { label: "enable", type: "function", info: "Enable key", apply: "enable('key');" },
+        { label: "disable", type: "function", info: "Disable key", apply: "disable('key');" },
+        { label: "isChecked", type: "function", info: "Check if key is enabled", apply: "isChecked('key');" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestUrlDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "text", type: "function", info: "Get current URL", apply: "text();" },
+        { label: "set", type: "function", info: "Set new URL", apply: "set('');" },
+        { label: "getBaseUrl", type: "function", info: "Get base URL", apply: "getBaseUrl();" },
+        { label: "getPath", type: "function", info: "Get URL path", apply: "getPath();" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestMethodDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "text", type: "function", info: "Get current method", apply: "text();" },
+        { label: "set", type: "function", info: "Set HTTP method", apply: "set('GET');" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestAuthBearerTokenDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "text", type: "function", info: "Get bearer token", apply: "text();" },
+        { label: "set", type: "function", info: "Set bearer token", apply: "set('');" },
+        { label: "clear", type: "function", info: "Clear bearer token", apply: "clear();" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestAuthBasicAuthUsernameDotMatch || spRequestAuthBasicAuthPasswordDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "text", type: "function", info: "Get current value", apply: "text();" },
+        { label: "set", type: "function", info: "Set new value", apply: "set('');" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestAuthBasicAuthDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "username", type: "variable", info: "Basic auth username" },
+        { label: "password", type: "variable", info: "Basic auth password" },
+        { label: "set", type: "function", info: "Set username and password", apply: "set('username', 'password');" },
+        { label: "clear", type: "function", info: "Clear basic auth", apply: "clear();" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestAuthApiKeyKeyDotMatch || spRequestAuthApiKeyValueDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "text", type: "function", info: "Get current value", apply: "text();" },
+        { label: "set", type: "function", info: "Set new value", apply: "set('');" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestAuthApiKeyDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "key", type: "variable", info: "API key name" },
+        { label: "value", type: "variable", info: "API key value" },
+        { label: "set", type: "function", info: "Set API key and value", apply: "set('key', 'value');" },
+        { label: "clear", type: "function", info: "Clear API key", apply: "clear();" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestAuthDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "bearerToken", type: "variable", info: "Bearer token authentication" },
+        { label: "basicAuth", type: "variable", info: "Basic authentication" },
+        { label: "apiKey", type: "variable", info: "API key authentication" },
+        { label: "clear", type: "function", info: "Clear all auth data", apply: "clear();" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spRequestDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "body", type: "variable", info: "Request body manipulation" },
+        { label: "headers", type: "variable", info: "Request headers manipulation" },
+        { label: "parameters", type: "variable", info: "Query parameters manipulation" },
+        { label: "url", type: "variable", info: "URL manipulation" },
+        { label: "method", type: "variable", info: "HTTP method manipulation" },
+        { label: "auth", type: "variable", info: "Authentication manipulation" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (spEnvironmentDotMatch || spGlobalDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "set", type: "function", info: "Set variable", apply: "set('key', 'value');" },
+        { label: "get", type: "function", info: "Get variable", apply: "get('key');" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  // Always show completions for 'sp.' and similar triggers, even if a word is present
+  if (spDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "request", type: "variable", info: "Request data manipulation" },
+        { label: "environment", type: "variable", info: "Environment variables" },
+        { label: "global", type: "variable", info: "Global variables" },
+        { label: "test", type: "function", info: "Test definition function", apply: `test("", function () {\n\n});` },
+        { label: "expect", type: "function", info: "Expect testcase function", apply: "expect();" },
+        { label: "xmlToJSON", type: "function", info: "Convert XML to JSON", apply: "xmlToJSON();" },
+        { label: "uuid", type: "function", info: "Generate UUID", apply: "uuid();" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (expectDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "to", type: "variable", info: "Matcher object for assertions" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (expectToDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "equal", type: "function", info: "Assert actual equals expected", apply: "equal();" },
+        { label: "notEqual", type: "function", info: "Assert actual not equals expected", apply: "notEqual();" },
+        { label: "exist", type: "function", info: "Assert actual exists", apply: "exist();" },
+        { label: "notExist", type: "function", info: "Assert actual does not exist", apply: "notExist();" },
+        { label: "be", type: "variable", info: "Type and value matchers" },
+        { label: "contain", type: "function", info: "Assert actual contains expected", apply: "contain();" },
+        { label: "notContain", type: "function", info: "Assert actual does not contain expected", apply: "notContain();" },
+        { label: "beInList", type: "function", info: "Assert actual is in list", apply: "beInList();" },
+        { label: "notBeInList", type: "function", info: "Assert actual is not in list", apply: "notBeInList();" },
+        { label: "have", type: "variable", info: "Object key matchers" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  if (expectToBeDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "a", type: "function", info: "Assert actual is of type", apply: "a();" },
+        { label: "true", type: "function", info: "Assert actual is true", apply: "true();" },
+        { label: "false", type: "function", info: "Assert actual is false", apply: "false();" },
+        { label: "within", type: "function", info: "Assert actual is within range", apply: "within( , )" },
+        { label: "lessThan", type: "function", info: "Assert actual is less than expected", apply: "lessThan();"},
+        { label: "greaterThan", type: "function", info: "Assert actual is greater than expected", apply: "greaterThan();" },
+        { label: "empty", type: "function", info: "Assert actual is empty", apply: "empty();" },
+        { label: "notEmpty", type: "function", info: "Assert actual is not empty", apply: "notEmpty();" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+   if (expectToHaveDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "all", type: "variable", info: "Assert actual has all expected properties", },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+   if (expectToHaveAllDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        { label: "keys", type: "function", info: "Assert actual has all expected keys", apply: "keys();" },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
+  return {
+    from: word ? word.from : context.pos,
+    options: [
+      { label: "sp", type: "variable", info: "Sparrow object 'sp'" },
+      { label: "Array", type: "class", info: "JavaScript Array constructor" },
+      { label: "Object", type: "class", info: "JavaScript Object constructor" },
+      { label: "String", type: "class", info: "JavaScript String constructor" },
+      { label: "Number", type: "class", info: "JavaScript Number constructor" },
+      { label: "Boolean", type: "class", info: "JavaScript Boolean constructor" },
+      { label: "Math", type: "namespace", info: "Math functions and constants" },
+      { label: "JSON", type: "namespace", info: "JSON utilities" },
+      { label: "parseInt", type: "function", info: "Parse string to integer", apply: "parseInt()" },
+      { label: "parseFloat", type: "function", info: "Parse string to float", apply: "parseFloat()" },
+      { label: "Date", type: "class", info: "JavaScript Date constructor" },
+      { label: "Promise", type: "class", info: "JavaScript Promise constructor" },
+      { label: "for", type: "keyword", info: "For loop", apply: "for (let i = 0; i < ; i++) {\n  \n}" },
+      { label: "foreach", type: "keyword", info: "Array forEach loop", apply: ".forEach((item) => {\n  \n});" },
+      { label: "let", type: "keyword", info: "Declare block-scoped variable", apply: "let " },
+      { label: "const", type: "keyword", info: "Declare constant variable", apply: "const " },
+      { label: "var", type: "keyword", info: "Declare function-scoped variable", apply: "var " },
+      { label: "if", type: "keyword", info: "If statement", apply: "if () {\n  \n}" },
+      { label: "else", type: "keyword", info: "Else statement", apply: "else {\n  \n}" },
+      { label: "while", type: "keyword", info: "While loop", apply: "while () {\n  \n}" },
+      { label: "do", type: "keyword", info: "Do-while loop", apply: "do {\n  \n} while ();" },
+      { label: "switch", type: "keyword", info: "Switch statement", apply: "switch () {\n  case :\n    break;\n  default:\n    break;\n}" },
+      { label: "case", type: "keyword", info: "Case in switch", apply: "case :\n  break;" },
+      { label: "break", type: "keyword", info: "Break statement", apply: "break;" },
+      { label: "continue", type: "keyword", info: "Continue statement", apply: "continue;" },
+      { label: "return", type: "keyword", info: "Return statement", apply: "return;" },
+      { label: "function", type: "keyword", info: "Function declaration", apply: "function name() {\n  \n}" },
+      { label: "try", type: "keyword", info: "Try block", apply: "try {\n  \n} catch (e) {\n  \n} finally {\n  \n}" },
+    ],
+    validFor: /^\w*$/,
+  };
+}
+
+/**
  * @description - adds syntax highlighting and formatting to code mirror view
  * @param codeMirrorView - code mirror constructor object
  * @param languageConf - dynamic configuration for code mirror
@@ -369,6 +705,28 @@ const handleCodeMirrorSyntaxFormat = (
           effects: languageConf.reconfigure([
             javascript({ jsx: true, typescript: true }),
             autocompletion({ override: [testJsCompletions] }),
+          ]),
+          ...payload,
+        });
+        beautifySyntaxCallback(false);
+      }
+      break;
+      case RequestDataType.PRETESTJAVASCRIPT:
+      if (codeMirrorView) {
+        let payload = {};
+        if (isFormatted) {
+          payload = {
+            changes: {
+              from: 0,
+              to: codeMirrorView.state.doc.length,
+              insert: js_beautify(value),
+            },
+          };
+        }
+        codeMirrorView.dispatch({
+          effects: languageConf.reconfigure([
+            javascript({ jsx: true, typescript: true }),
+            autocompletion({ override: [preTestJsCompletions] }),
           ]),
           ...payload,
         });
