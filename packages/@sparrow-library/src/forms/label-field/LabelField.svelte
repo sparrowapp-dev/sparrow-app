@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   export let variant: "primary" = "primary";
   export let size: "small" | "medium" = "medium";
   export let inputValueRequired: boolean = false;
@@ -15,6 +16,17 @@
   export let currentTextLength: number = 0;
   export let maxTextLength: number = 300;
   export let type: "input" | "textarea" = "input";
+  export let maxLines: number = 4;
+  let textElement: any;
+  let isOverflowing: boolean = false;
+
+  onMount(() => {
+    if (textElement) {
+      const lineHeight = parseInt(getComputedStyle(textElement).lineHeight);
+      const maxHeight = lineHeight * maxLines;
+      isOverflowing = textElement.scrollHeight > maxHeight;
+    }
+  });
 
   let fontSize =
     size === "small" ? "text-ds-font-size-12" : "text-ds-font-size-14";
@@ -43,45 +55,56 @@
 
   <!-- Help Label -->
   {#if helpLabel}
-    <div
-      class="help-wrapper d-flex justify-content-between"
-      style={helpIcon !== ""
-        ? "margin-left: 2px;"
-        : "gap: 4px; margin-left: 2px;"}
-    >
-      <div>
+    <div class="help-wrapper d-flex justify-content-between">
+      <div class="help-text-container">
         {#if helpIcon}
-          <svelte:component
-            this={helpIcon}
-            size="16px"
-            useParentColor={true}
-            color={isError
-              ? "var(--icon-ds-danger-300)"
-              : "var(--icon-ds-neutral-400)"}
-          />
+          <div class="icon-wrapper">
+            <svelte:component
+              this={helpIcon}
+              size="16px"
+              useParentColor={true}
+              color={isError
+                ? "var(--icon-ds-danger-300)"
+                : "var(--icon-ds-neutral-400)"}
+            />
+          </div>
         {/if}
-        {#if isError}
-          <p class="help-label-error" style="font-size: 12px;">
-            {errorMessage}
-          </p>
-        {:else if helpLabelValue}
-          <p class="help-label-text-{variant}" style="font-size: 12px;">
-            {helpLabelText}
-          </p>
-        {:else if supportLabelText}
-          <p class="support-label-text-{variant} text-ds-font-size-12">
-            {supportLabelText}
-          </p>
-        {/if}
+
+        <div class="text-content">
+          {#if isError}
+            <p
+              bind:this={textElement}
+              class="help-label-error text-clamp"
+              style="--max-lines: {maxLines}"
+              data-full-text={errorMessage}
+            >
+              {errorMessage}
+            </p>
+          {:else if helpLabelValue}
+            <p
+              bind:this={textElement}
+              class="help-label-text-{variant} text-clamp"
+              style="--max-lines: {maxLines}"
+              data-full-text={helpLabelText}
+            >
+              {helpLabelText}
+            </p>
+          {:else if supportLabelText}
+            <p
+              bind:this={textElement}
+              class="support-label-text-{variant} text-ds-font-size-12 text-clamp"
+              style="--max-lines: {maxLines}"
+              data-full-text={supportLabelText}
+            >
+              {supportLabelText}
+            </p>
+          {/if}
+        </div>
       </div>
 
       {#if type === "textarea"}
-        <div>
-          <p
-            style="margin: 0; font-size: 12px; font-family: 'Inter', sans-serif; color:{isError
-              ? 'var(--icon-ds-danger-300)'
-              : 'var(--icon-ds-neutral-400)'}"
-          >
+        <div class="character-count">
+          <p class="count-text" class:error={isError}>
             {maxTextLength - currentTextLength < 0
               ? 0
               : currentTextLength}/{maxTextLength}
@@ -129,5 +152,77 @@
 
   .help-wrapper {
     gap: 4px;
+    margin-left: 2px;
+    align-items: flex-start;
+  }
+
+  /* New styles for help label improvements */
+  .help-text-container{
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .icon-wrapper{
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .text-content{
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .text-clamp{
+    font-size: 12px;
+    margin: 0;
+    line-height: 1.4;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+    display: -webkit-box;
+    -webkit-line-clamp: var(--max-lines);
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    max-height: calc(var(--max-lines) * 1.4em);
+  }
+  .text-clamp.expanded {
+    -webkit-line-clamp: none;
+    max-height: none;
+    overflow: visible;
+  }
+  .read-more-btn {
+    background: none;
+    border: none;
+    color: var(--text-ds-primary-500, #0066cc);
+    cursor: pointer;
+    font-size: 11px;
+    margin-top: 4px;
+    padding: 0;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+    font-family: "Inter", sans-serif;
+  }
+  .read-more-btn:hover {
+    color: var(--text-ds-primary-600, #0052a3);
+  }
+  .read-more-btn:focus {
+    outline: 2px solid var(--border-ds-focus, #0066cc);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  .character-count {
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+  .count-text{
+    margin: 0;
+    font-size: 12px;
+    font-family: "Inter", sans-serif;
+    color: var(--icon-ds-neutral-400);
+  }
+  .count-text.error{
+    color: var(--icon-ds-danger-300);
   }
 </style>

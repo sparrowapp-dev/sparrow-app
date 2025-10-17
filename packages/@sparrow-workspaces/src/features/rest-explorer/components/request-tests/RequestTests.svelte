@@ -1,8 +1,8 @@
 <script lang="ts">
   import { TestCaseModeEnum } from "@sparrow/common/types/workspace";
-  import { NoCode } from "./sub-components";
-  import { Tooltip } from "@sparrow/library/ui";
+  import { Tooltip, Button } from "@sparrow/library/ui";
   import Script from "./sub-components/script/Script.svelte";
+  import { PreScript } from "./sub-components";
 
   export let tests;
   export let onTestsChange;
@@ -10,7 +10,7 @@
   export let testResults;
   export let responseBody;
   export let responseHeader;
-  export let onShowModeChangeModal: (newMode: TestCaseModeEnum) => void;
+  export let onShowModeChangeModal;
   export let onGenerateTestCases;
   export let isTestCasesGenerating;
   export let isGuestUser;
@@ -49,7 +49,7 @@
               }
             }}
           >
-            No Code
+            Pre-Request Script
           </span>
 
           <span
@@ -67,7 +67,7 @@
               ? 'var(--bg-ds-surface-400)'
               : 'transparent'}"
           >
-            Script Mode
+            Post-Request Script
           </span>
         </div>
       </div>
@@ -80,8 +80,14 @@
         <p class="text-fs-12 mb-0 text-muted">JavaScript Code</p>
       </div>
     {:else if tests?.testCaseMode === TestCaseModeEnum.NO_CODE}
-      <div class="px-3 py-2">
-        <p class="text-fs-12 mb-0 text-muted">Build tests using form fields</p>
+      <div class="d-flex align-items-center justify-content-between px-3 py-2">
+        <p class="text-fs-12 mb-0 text-muted">JavaScript Code</p>
+        <Button
+          title="Read Documentation"
+          size={"extra-small"}
+          type="link-secondary"
+          onClick={() => {}}
+        />
       </div>
     {/if}
   </div>
@@ -98,13 +104,15 @@
         bind:this={scriptComponent}
       />
     {:else if tests?.testCaseMode === TestCaseModeEnum.NO_CODE}
-      <NoCode
+      <PreScript
+        {tabSplitDirection}
         {tests}
         {onTestsChange}
-        {tabSplitDirection}
-        {testResults}
-        {responseBody}
-        {responseHeader}
+        {onGenerateTestCases}
+        {isTestCasesGenerating}
+        {isGuestUser}
+        {userRole}
+        bind:this={scriptComponent}
       />
     {/if}
   </div>
