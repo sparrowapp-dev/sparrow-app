@@ -11,4 +11,8 @@ export {
   testflowSchedules,
   updateTestflowSchedules,
 } from "./testflow-schedules";
-export { aiModelByTeam, updateModelForTeam, getModelForTeam } from "./aiModel";
+export {
+  aiChatBotModelByTeam,
+  updateAiChatBotModelforTeam,
+  getAiChatBotModelForTeam,
+} from "./aiModel";

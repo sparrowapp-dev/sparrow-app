@@ -10,8 +10,8 @@ import { createDeepCopy, scrollToTab } from "@sparrow/common/utils";
 import {
   startLoading,
   stopLoading,
-  updateModelForTeam,
-  getModelForTeam,
+  updateAiChatBotModelforTeam,
+  getAiChatBotModelForTeam,
 } from "../../../../../../../packages/@sparrow-common/src/store";
 import {
   CompareArray,
@@ -1462,7 +1462,7 @@ class RestExplorerViewModel {
       const workspaceDoc = await this.readWorkspace(workspaceId);
       const teamId = workspaceDoc?.team?.teamId || "";
       if (teamId) {
-        updateModelForTeam(teamId, _modelName);
+        updateAiChatBotModelforTeam(teamId, _modelName);
       }
     } catch (err) {
       console.error("updateAIModel: failed to update model store", err);
@@ -3734,6 +3734,7 @@ class RestExplorerViewModel {
    * @param Prompt - Prompt from the user
    */
   public generateAIResponseWS = async (prompt = "") => {
+    debugger;
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
 
@@ -3769,7 +3770,7 @@ class RestExplorerViewModel {
       let responseMessageId = uuidv4(); // Generate a single message ID for the entire response
       let accumulatedMessage = ""; // Track the accumulated message content
       let messageCreated = false; // Flag to track if we've created the initial message
-      let selectedAIModel = getModelForTeam(teamId) || "deepseek";
+      let selectedAIModel = getAiChatBotModelForTeam(teamId) || "deepseek";
 
       const socketResponse = await this.aiAssistentWebSocketService.sendMessage(
         componentData.tabId,
@@ -4000,6 +4001,7 @@ class RestExplorerViewModel {
    * @returns A promise that resolves to the response from the AI assistant service.
    */
   public generateAiResponse = async (prompt = "") => {
+    debugger;
     // Set the request state to indicate that a response is being generated
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();

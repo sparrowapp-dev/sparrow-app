@@ -11,8 +11,8 @@ import { XMLParser, XMLBuilder } from "fast-xml-parser";
 import {
   startLoading,
   stopLoading,
-  updateModelForTeam,
-  getModelForTeam,
+  updateAiChatBotModelforTeam,
+  getAiChatBotModelForTeam,
 } from "../../../../../../../packages/@sparrow-common/src/store";
 import {
   CompareArray,
@@ -1473,7 +1473,7 @@ class RestExplorerViewModel {
       const workspaceDoc = await this.readWorkspace(workspaceId);
       const teamId = workspaceDoc?.team?.teamId || "";
       if (teamId) {
-        updateModelForTeam(teamId, _modelName);
+        updateAiChatBotModelforTeam(teamId, _modelName);
       }
     } catch (err) {
       console.error("updateAIModel: failed to update model store", err);
@@ -3762,7 +3762,7 @@ class RestExplorerViewModel {
       let responseMessageId = uuidv4(); // Generate a single message ID for the entire response
       let accumulatedMessage = ""; // Track the accumulated message content
       let messageCreated = false; // Flag to track if we've created the initial message
-      let selectedAIModel = getModelForTeam(teamId) || "deepseek";
+      let selectedAIModel = getAiChatBotModelForTeam(teamId) || "deepseek";
 
       const socketResponse = await this.aiAssistentWebSocketService.sendMessage(
         componentData.tabId,

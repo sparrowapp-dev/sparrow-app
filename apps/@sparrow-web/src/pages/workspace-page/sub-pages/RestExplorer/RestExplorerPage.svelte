@@ -18,7 +18,7 @@
   import type { CollectionDocType } from "@app/models/collection.model";
   import { RequestDatasetEnum } from "@sparrow/common/types/workspace";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
-  import { aiModelByTeam } from "@sparrow/common/store";
+  import { aiChatBotModelByTeam } from "@sparrow/common/store";
 
   export let tab;
   export let isTourGuideOpen = false;
@@ -78,7 +78,7 @@
 
   $: teamId = currentWorkspace ? currentWorkspace?.team?.teamId : "";
 
-  $: selectedAIModel = teamId ? $aiModelByTeam.get(teamId) : "deepseek";
+  $: selectedAIModel = teamId ? $aiChatBotModelByTeam.get(teamId) : "deepseek";
 
   $: {
     restExplorerData = webSocketMap?.get(tab?.tabId);

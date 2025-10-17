@@ -5,19 +5,21 @@ import { writable } from "svelte/store";
  * Exposes only an update function and a synchronous getter.
  */
 
-export const aiModelByTeam = writable<Map<string, string>>(new Map());
+export const aiChatBotModelByTeam = writable<Map<string, string>>(new Map());
 
-export const updateModelForTeam = (teamId: string, model: string) => {
-  aiModelByTeam.update((currentMap) => {
+export const updateAiChatBotModelforTeam = (teamId: string, model: string) => {
+  aiChatBotModelByTeam.update((currentMap) => {
     const updatedMap = new Map(currentMap);
     updatedMap.set(teamId, model);
     return updatedMap;
   });
 };
 
-export const getModelForTeam = (teamId: string): string | undefined => {
+export const getAiChatBotModelForTeam = (
+  teamId: string,
+): string | undefined => {
   let result: string | undefined;
-  const unsub = aiModelByTeam.subscribe((map) => {
+  const unsub = aiChatBotModelByTeam.subscribe((map) => {
     result = map.get(teamId);
   });
   unsub();

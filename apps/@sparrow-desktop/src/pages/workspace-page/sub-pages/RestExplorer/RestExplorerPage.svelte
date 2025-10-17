@@ -18,7 +18,10 @@
   import type { CollectionDocType } from "@app/models/collection.model";
   import { RequestDatasetEnum } from "@sparrow/common/types/workspace";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
-  import { getModelForTeam, aiModelByTeam } from "@sparrow/common/store";
+  import {
+    getAiChatBotModelForTeam,
+    aiChatBotModelByTeam,
+  } from "@sparrow/common/store";
 
   export let tab;
   export let isTourGuideOpen = false;
@@ -63,7 +66,7 @@
   $: teamId = currentWorkspace ? currentWorkspace?.team?.teamId : "";
 
   // reactive selected model for this team (fallback to "deepseek")
-  $: selectedAIModel = teamId ? $aiModelByTeam.get(teamId) : "deepseek";
+  $: selectedAIModel = teamId ? $aiChatBotModelByTeam.get(teamId) : "deepseek";
 
   const restExplorerDataStoreSubscriber = restExplorerDataStore.subscribe(
     (_webSocketMap) => {
