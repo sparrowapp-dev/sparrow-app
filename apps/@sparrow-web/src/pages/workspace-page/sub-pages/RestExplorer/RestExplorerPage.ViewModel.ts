@@ -118,7 +118,7 @@ import { UserService } from "src/services/user.service";
 import * as xpath from "xpath";
 import { DOMParser } from "xmldom";
 import { JSONPath } from "jsonpath-plus";
-import { aiChatBotPanelClose } from "../../../../../../../packages/@sparrow-workspaces/src/stores/tabs-view";
+import { aiChatBotPanelClose } from "@sparrow/workspaces/stores";
 
 class RestExplorerViewModel {
   /**

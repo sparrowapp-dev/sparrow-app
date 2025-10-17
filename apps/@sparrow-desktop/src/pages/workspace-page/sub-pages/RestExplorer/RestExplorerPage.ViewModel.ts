@@ -103,6 +103,7 @@ import {
 } from "@sparrow/common/types/workspace/collection-base";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 import {
+  aiChatBotPanelClose,
   generatedVariableDemo,
   generateVariableStep,
 } from "@sparrow/workspaces/stores";
@@ -1666,6 +1667,7 @@ class RestExplorerViewModel {
       }
     }
     // Always deactivate current tab AI chatbot panel.
+    aiChatBotPanelClose.set(false);
     currentTab.property.request.state.isChatbotActive = false;
     this.tab = currentTab;
     await this.tabRepository.updateTab(currentTab.tabId, currentTab);

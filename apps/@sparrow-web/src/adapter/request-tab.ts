@@ -9,7 +9,7 @@ import {
 import { InitRequestTab } from "@sparrow/common/utils";
 import { TabPersistenceTypeEnum, type Tab } from "@sparrow/common/types/workspace/tab";
 import { HttpRequestAuthTypeBaseEnum, HttpRequestContentTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base"
-import { aiChatBotPanelClose } from "../../../../packages/@sparrow-workspaces/src/stores/tabs-view";
+import { aiChatBotPanelClose } from "@sparrow/workspaces/stores";
 import { get } from "svelte/store";
 
 /**
