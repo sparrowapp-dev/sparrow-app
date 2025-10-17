@@ -203,6 +203,7 @@
   export let isSharedWorkspace = false;
   export let onFixTestScript;
   const isTestCasesGenerating = writable<boolean>(false);
+  const isPreScriptGenerating = writable<boolean>(false);
 
   const loading = writable<boolean>(false);
   // Props for showing merge/diff view in RequestBody, Headers and Params
@@ -217,6 +218,10 @@
   //props for generating test cases function
   export let onGenerateTestCases;
   export let scriptComponent = null;
+  export let preScriptComponent = null;
+
+  //prop for generating pre-script function
+  export let onGeneratePreScript;
 
   // Reference to the splitpane container element
   let splitpaneContainer;
@@ -310,6 +315,12 @@
   $: {
     loadingState.subscribe((tab) => {
       isTestCasesGenerating.set(tab.get($tab.tabId + "generatingTestCases"));
+    });
+  }
+
+  $: {
+    loadingState.subscribe((tab) => {
+      isPreScriptGenerating.set(tab.get($tab.tabId + "generatingPreScript"));
     });
   }
   let isGuidePopup = false;
@@ -415,7 +426,6 @@
    * Handle mode change with confirmation if needed
    */
   const handleModeChange = (newMode: TestCaseModeEnum) => {
-    debugger;
     const currentTestMode =
       $tab?.property?.request?.tests?.testCaseMode || TestCaseModeEnum.NO_CODE;
     if (newMode === currentTestMode) return;
@@ -937,6 +947,7 @@
                       {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.TESTS}
                         <RequestTests
                           bind:scriptComponent
+                          bind:preScriptComponent
                           tests={$tab?.property?.request.tests}
                           onTestsChange={onUpdateTests}
                           tabSplitDirection={$tabsSplitterDirection}
@@ -945,6 +956,8 @@
                           onShowModeChangeModal={handleModeChange}
                           responseHeader={storeData?.response?.headers}
                           {onGenerateTestCases}
+                          {onGeneratePreScript}
+                          isPreScriptGenerating={$isPreScriptGenerating}
                           isTestCasesGenerating={$isTestCasesGenerating}
                           {isGuestUser}
                           {userRole}

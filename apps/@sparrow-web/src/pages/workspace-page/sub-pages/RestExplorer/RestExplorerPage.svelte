@@ -55,6 +55,7 @@
   let newModifiedContent: string | KeyValuePair[];
   let mergeViewRequestDatasetType: RequestDatasetEnum;
   let scriptComponent = null;
+  let preScriptComponent = null;
 
   const restExplorerDataStoreSubscriber = restExplorerDataStore.subscribe(
     (_webSocketMap) => {
@@ -98,6 +99,9 @@
       if (prevTabId !== tab?.tabId) {
         if (scriptComponent?.handleTabChange) {
           scriptComponent.handleTabChange();
+        }
+        if (preScriptComponent?.handleTabChange) {
+          preScriptComponent.handleTabChange();
         }
         isMergeViewEnableForRequestBody = false;
         isMergeViewEnableForParams = false;
@@ -231,6 +235,7 @@
   bind:newModifiedContent
   bind:mergeViewRequestDatasetType
   bind:scriptComponent
+  bind:preScriptComponent
   {collection}
   storeData={restExplorerData}
   {environmentVariables}
@@ -287,4 +292,5 @@
   isCloseRequestTestScriptDemo={_viewModel.updateIsRequestTabScriptDemo}
   requestTabTestScriptDemoCompleted={_viewModel.handleRequestTestScriptDemoCompleted}
   onGenerateTestCases={_viewModel.generateTestCases}
+  onGeneratePreScript={_viewModel.generatePreScript}
 />
