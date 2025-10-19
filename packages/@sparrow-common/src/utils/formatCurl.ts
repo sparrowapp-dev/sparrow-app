@@ -13,8 +13,17 @@ export class FormatCurl {
     );
 
     // Step 3: Check if command has malformed single-quoted data
-    if (this.hasMalformedSingleQuotedData(processedCommand)) {
-      return this.applyMinimalFormatting(processedCommand, heredoc, rawLiteral);
+    const hasMalformedData =
+      this.hasMalformedSingleQuotedData(processedCommand);
+
+    if (hasMalformedData) {
+      const minimalResult = this.applyMinimalFormatting(
+        processedCommand,
+        heredoc,
+        rawLiteral,
+      );
+
+      return minimalResult;
     }
 
     // Step 4: Apply full formatting
@@ -30,7 +39,8 @@ export class FormatCurl {
     const escaped = this.escapeSingleQuotesForCurl(cleaned);
 
     // Step 5: Fix any escaping artifacts
-    return this.repairEscapingArtifacts(escaped);
+    const finalResult = this.repairEscapingArtifacts(escaped);
+    return finalResult;
   };
 
   /**
@@ -72,7 +82,15 @@ export class FormatCurl {
   private hasMalformedSingleQuotedData(command: string): boolean {
     const hasDataFlagWithQuote = /(?:--data(?:-raw)?|-d)\s+'/.test(command);
     const singleQuoteCount = (command.match(/'/g) || []).length;
-    return hasDataFlagWithQuote && singleQuoteCount % 2 === 1;
+
+    // If we have data flag with single quotes AND complex JSON content, use minimal formatting
+    if (hasDataFlagWithQuote) {
+      const hasComplexJson =
+        /'\{[^']*"[^"]*"[^']*\}'/.test(command) || singleQuoteCount > 2; // More than just opening/closing quotes
+      return hasComplexJson || singleQuoteCount % 2 === 1;
+    }
+
+    return singleQuoteCount % 2 === 1;
   }
 
   /**
