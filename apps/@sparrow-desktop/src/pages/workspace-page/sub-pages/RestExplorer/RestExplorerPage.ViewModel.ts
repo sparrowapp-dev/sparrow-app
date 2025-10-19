@@ -1276,7 +1276,7 @@ class RestExplorerViewModel {
   ) => {
     if (typeof _url === "string" && _url.trim().startsWith("curl ")) {
       try {
-        const parsed = await this.parseCurl(_url);
+        const parsed = this.parseCurl(_url);
         if (parsed) {
           await this.handleImportCurl(parsed);
           return;
