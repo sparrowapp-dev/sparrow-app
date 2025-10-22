@@ -19,6 +19,7 @@
     LockClosedRegular,
     OpenRegular,
     PeopleRegular,
+    AlertOnIcon,
   } from "@sparrow/library/icons";
 
   import {
@@ -34,6 +35,7 @@
   import InvitesView from "../../invited-users/layout/InvitesView.svelte";
   import { open } from "@tauri-apps/plugin-shell";
   import { PlanUpgradeModal } from "@sparrow/common/components";
+  import { navigate } from "svelte-navigator";
 
   export let isWebApp = false;
 
@@ -148,6 +150,8 @@
   let userLimits: any;
   let planContent: any;
 
+  let isTeamDowngraded = true;
+
   let selectedFilter = "All";
 
   const addButtonData = [
@@ -177,6 +181,11 @@
       }
     });
   };
+
+  function handleUpgradePlan() {
+    // redirect or open modal, e.g.:
+    navigate("/billing/upgrade"); // or your own route
+  }
   /**
    *
    */
@@ -657,6 +666,50 @@
             </div>
           {/if}
         </div>
+        {#if isTeamDowngraded}
+          <div
+            class="downgrade-card position-fixed"
+            style="
+              bottom: 30px;
+              right: 20px;
+              z-index: 500;
+            "
+          >
+            <div class="downgrade-card-inner">
+              <div class="downgrade-header">
+                <div class="downgrade-icon">
+                  <AlertOnIcon />
+                </div>
+                <p class="downgrade-title">Your Hub Has Been Downgraded</p>
+                <button
+                  class="downgrade-close"
+                  on:click={() => (isTeamDowngraded = false)}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <p class="downgrade-description">
+                As scheduled, your Hub is now on the Community edition.
+                <br /><br />
+                Based on your previous selections, your excess workspaces have been
+                archived and team members removed from the Hub.
+                <br /><br />
+                To restore all content and permissions, you can upgrade your plan
+                anytime.
+              </p>
+
+              <div class="d-flex justify-content-center">
+                <Button
+                  title="Upgrade Plan"
+                  type="secondary"
+                  size="small"
+                  onClick={handleRedirectToAdminPanel}
+                />
+              </div>
+            </div>
+          </div>
+        {/if}
       </div>
     {:else}
       <div style="padding:16px; gap:24px" class="d-flex flex-column">
@@ -695,7 +748,7 @@
             </div>
           </div>
 
-          <div class="d-flex" style="gap:12px;">
+          <div class="d-flex;" style="gap:12px;">
             <Button
               type="primary"
               title="Accept"
@@ -827,7 +880,6 @@
     border-color: var(--border-color);
   }
   .search-input-container {
-    /* border: 1px solid var(--border-color); */
     background: var(--bg-tertiary-400);
     width: 27vw;
     font-size: 12px;
@@ -875,4 +927,97 @@
     outline: none;
     border: none;
   }
+  .downgrade-card {
+  width: 340px;
+  max-width: 480px;
+  background: linear-gradient(
+    135deg,
+    rgba(17, 173, 240, 1),
+    rgba(49, 108, 246, 1),
+    rgba(97, 71, 255, 1)
+  );
+  padding: 1px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  overflow: hidden; /* ✅ prevents content overflow */
+}
+
+.downgrade-card-inner {
+  background-color: rgba(24, 28, 38, 1);
+  border-radius: 7px;
+  width: 100%;
+  height: 100%;
+  padding: 16px; /* ✅ consistent padding */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+.downgrade-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.downgrade-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-ds-surface-200);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.downgrade-title {
+  color: var(--text-ds-neutral-50);
+  font-size: 12px;
+  font-weight: 500;
+  margin: 0;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.downgrade-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-ds-neutral-400);
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.downgrade-description {
+  font-size: 12px;
+  color: var(--text-ds-neutral-300);
+  line-height: 1.5;
+  margin: 8px 0 16px 0;
+  font-weight: 400;
+  flex: 1;
+  overflow-wrap: break-word;
+}
+
+.downgrade-upgrade-btn {
+  background-color: var(--accent-primary);
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.downgrade-upgrade-btn:hover {
+  opacity: 0.9;
+}
+
 </style>
