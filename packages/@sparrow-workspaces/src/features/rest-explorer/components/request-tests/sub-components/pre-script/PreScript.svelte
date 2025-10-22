@@ -30,8 +30,8 @@
 
   export let onTestsChange;
   export let tests;
-  export let onGenerateTestCases;
-  export let isTestCasesGenerating;
+  export let onGeneratePreScript;
+  export let isPreScriptGenerating;
   export let isGuestUser;
   export let userRole;
 
@@ -281,7 +281,7 @@
       : 0;
     currentPrompt = testCasePrompt;
 
-    const result = await onGenerateTestCases(testCasePrompt);
+    const result = await onGeneratePreScript(testCasePrompt);
     if (result?.error) {
       if (result?.message === "Limit reached. Please try again later.") {
         isUserLimitReached = true;
@@ -567,7 +567,7 @@
     temporaryDisplayContent = originalTestContent;
 
     // Use the same prompt to regenerate
-    const result = await onGenerateTestCases(currentPrompt);
+    const result = await onGeneratePreScript(currentPrompt);
     if (result?.error) {
       isError = true;
       errorMessage =
@@ -777,7 +777,7 @@
               </div>
             {/if}
 
-            {#if isTestCasesGenerating}
+            {#if isPreScriptGenerating}
               <p
                 class="text-primary-300 generating-img d-flex justify-content-center align-items-center"
                 in:fade={{ duration: 200 }}
@@ -820,7 +820,7 @@
                 <Button
                   size="small"
                   type="outline-secondary"
-                  startIcon={isTestCasesGenerating ||
+                  startIcon={isPreScriptGenerating ||
                   showGeneratedTestActions ||
                   isUserLimitReached ||
                   isError
@@ -831,7 +831,7 @@
                     isUserLimitReached ||
                     isError}
                   onClick={() => {
-                    if (!isTestCasesGenerating) {
+                    if (!isPreScriptGenerating) {
                       if (testCasePrompt.trim()) {
                         handleGenerateTestCases();
                       } else {

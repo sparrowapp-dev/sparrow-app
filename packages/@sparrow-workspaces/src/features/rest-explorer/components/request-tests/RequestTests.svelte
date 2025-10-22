@@ -16,6 +16,9 @@
   export let isGuestUser;
   export let userRole;
   export let scriptComponent = null;
+  export let preScriptComponent = null;
+  export let onGeneratePreScript;
+  export let isPreScriptGenerating;
 </script>
 
 <div
@@ -108,11 +111,11 @@
         {tabSplitDirection}
         {tests}
         {onTestsChange}
-        {onGenerateTestCases}
-        {isTestCasesGenerating}
+        {onGeneratePreScript}
+        {isPreScriptGenerating}
         {isGuestUser}
         {userRole}
-        bind:this={scriptComponent}
+        bind:this={preScriptComponent}
       />
     {/if}
   </div>
