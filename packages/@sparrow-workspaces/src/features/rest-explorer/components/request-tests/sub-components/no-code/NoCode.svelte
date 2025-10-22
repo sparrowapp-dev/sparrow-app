@@ -290,7 +290,7 @@
 >
   <div class="border rounded-top">
     <div class="d-flex align-items-center justify-content-between px-3 py-2">
-      <p class="text-fs-12 mb-0 text-muted">No Code</p>
+      <p class="text-fs-12 mb-0 text-muted">Build tests using form fields</p>
       <!-- <Button
         title="Read Documentation"
         type="link-secondary"

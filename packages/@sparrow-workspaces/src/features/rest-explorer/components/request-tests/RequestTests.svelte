@@ -82,12 +82,12 @@
     {:else if tests?.testCaseMode === TestCaseModeEnum.NO_CODE}
       <div class="d-flex align-items-center justify-content-between px-3 py-2">
         <p class="text-fs-12 mb-0 text-muted">JavaScript Code</p>
-        <Button
+        <!-- <Button
           title="Read Documentation"
           size={"extra-small"}
           type="link-secondary"
           onClick={() => {}}
-        />
+        /> -->
       </div>
     {/if}
   </div>

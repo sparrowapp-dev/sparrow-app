@@ -4855,7 +4855,7 @@ const worker = new Worker(
    * Fixes the test script for the current request tab using AI assistance.
    * It retrieves the active workspace and team ID, then sends the current test script to the AI service for fixing.
    */
-  public fixTestScript = async (): Promise<void> => {
+  public fixTestScript = async (type: string): Promise<void> => {
     const isGuestUser = await this.getGuestUserState();
     if (isGuestUser) {
       return;
@@ -4865,29 +4865,73 @@ const worker = new Worker(
     const teamId = workspaceData.toMutableJSON().team?.teamId || "";
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const testCases = progressiveTab.property.request.tests;
-    const response = await this.aiAssistentService.fixTestScript({
-      teamId: teamId,
-      testScript: testCases.script,
-    });
-    if (response.isSuccessful) {
-      this.updateRequestTests({
-        ...testCases,
-        script: response?.data?.data.result,
+    if(type === "Post-Request"){
+      const response = await this.aiAssistentService.fixTestScript({
+        teamId: teamId,
+        testScript: testCases.script,
+        type: "post-script"
       });
-      restExplorerDataStore.update((restApiDataMap) => {
-        const r = restApiDataMap.get(progressiveTab?.tabId);
-        if (r) {
-          r.response.testMessage = [];
-        }
-        return restApiDataMap;
+      if (response.isSuccessful) {
+        this.updateRequestTests({
+          ...testCases,
+          script: response?.data?.data.result,
+        });
+        restExplorerDataStore.update((restApiDataMap) => {
+          const r = restApiDataMap.get(progressiveTab?.tabId);
+          if (r) {
+            r.response.testMessage = r?.response?.testMessage?.filter((error)=>{
+              if(error.initiator === "Post-Request"){
+                return false;
+              }
+              else{
+                return true;
+              } 
+            }) || [];
+          }
+          return restApiDataMap;
+        });
+        notifications.success("Test script fixed successfully.");
+      } else if (
+        response?.data?.message === "Limit reached. Please try again later."
+      ) {
+        notifications.error("AI Limit has Reached.please upgrade plan.");
+      } else {
+        notifications.error("Failed to fix test script.");
+      }
+    }
+    else if(type === "Pre-Request"){
+      const response = await this.aiAssistentService.fixTestScript({
+        teamId: teamId,
+        testScript: testCases.preScript,
+        type: "pre-script"
       });
-      notifications.success("Test script fixed successfully.");
-    } else if (
-      response?.data?.message === "Limit reached. Please try again later."
-    ) {
-      notifications.error("AI Limit has Reached.please upgrade plan.");
-    } else {
-      notifications.error("Failed to fix test script.");
+      if (response.isSuccessful) {
+        this.updateRequestTests({
+          ...testCases,
+          preScript: response?.data?.data.result,
+        });
+        restExplorerDataStore.update((restApiDataMap) => {
+          const r = restApiDataMap.get(progressiveTab?.tabId);
+          if (r) {
+            r.response.testMessage = r?.response?.testMessage?.filter((error)=>{
+              if(error.initiator === "Pre-Request"){
+                return false;
+              }
+              else{
+                return true;
+              } 
+            }) || [];
+          }
+          return restApiDataMap;
+        });
+        notifications.success("Test script fixed successfully.");
+      } else if (
+        response?.data?.message === "Limit reached. Please try again later."
+      ) {
+        notifications.error("AI Limit has Reached.please upgrade plan.");
+      } else {
+        notifications.error("Failed to fix test script.");
+      }
     }
   };
 
