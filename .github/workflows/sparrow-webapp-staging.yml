@@ -1,8 +1,8 @@
-name: Development Release 2.35.0
+name: Sparrow-web-staging
 on:
   push:
     branches:
-      - release/2.35.0
+      - release/2.34.0
 
 jobs:
   build:

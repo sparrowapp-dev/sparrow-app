@@ -2943,6 +2943,30 @@ class GraphqlExplorerViewModel {
 
     notifications.success("Cleared query successfully.");
   };
+
+  /**
+   * Clears GraphQL variables content
+   */
+  public clearVariables = async () => {
+    try {
+      const progressiveTab: Tab = createDeepCopy(this._tab.getValue());
+      // Reset variables string
+      if (progressiveTab.property?.graphql) {
+        progressiveTab.property.graphql.variables = "";
+        this.tab = progressiveTab;
+        await this.tabRepository.updateTab(
+          progressiveTab.tabId,
+          progressiveTab,
+        );
+        notifications.success("Cleared variables successfully.");
+      } else {
+        notifications.error("No GraphQL context available to clear variables.");
+      }
+    } catch (error) {
+      console.error("Failed to clear variables", error);
+      notifications.error("Failed to clear variables. Please try again.");
+    }
+  };
 }
 
 export default GraphqlExplorerViewModel;

@@ -2005,7 +2005,7 @@ export class TestflowExplorerPageViewModel {
     );
     if (response?.isSuccessful) {
       captureEvent("schedule_deleted", {
-        event_source: "web_app",
+        event_source: "desktop_app",
         schedule_id: _scheduleId,
         testflow_id: progressiveTab.id,
         schedule_run_frequency: schedule?.runConfiguration?.runCycle,

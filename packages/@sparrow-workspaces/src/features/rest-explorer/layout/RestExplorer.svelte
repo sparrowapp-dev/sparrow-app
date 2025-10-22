@@ -74,6 +74,7 @@
     requestTabTestNoCodeStep,
     requestTabTestScriptDemo,
     requestTabTestScriptStep,
+    aiChatBotPanelClose,
     requestTabAssertionsDemo,
     requestTabAssertionsStep,
   } from "../../../stores";
@@ -188,6 +189,7 @@
   export let onGenerateDocumentation;
   export let onStopGeneratingAIResponse;
   export let generateMockData: () => any;
+  export let updateRequestStatAiChatBot: () => any;
 
   /**
    * Role of user in active workspace
@@ -1499,6 +1501,7 @@
                     {onStopGeneratingAIResponse}
                     {onToggleLike}
                     {handleApplyChangeOnAISuggestion}
+                    {updateRequestStatAiChatBot}
                   />
                 {/if}
               </div>
@@ -1663,7 +1666,7 @@
         onUpdateRequestState({
           isChatbotActive: !$tab?.property?.request?.state?.isChatbotActive,
         });
-
+        aiChatBotPanelClose.set(true);
         MixpanelEvent(Events.AI_Chat_Initiation);
       }}
     >

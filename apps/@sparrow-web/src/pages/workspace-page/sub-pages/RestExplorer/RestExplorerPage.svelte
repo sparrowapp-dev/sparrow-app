@@ -293,4 +293,5 @@
   requestTabTestScriptDemoCompleted={_viewModel.handleRequestTestScriptDemoCompleted}
   onGenerateTestCases={_viewModel.generateTestCases}
   onGeneratePreScript={_viewModel.generatePreScript}
+  updateRequestStatAiChatBot={_viewModel.updateRequestStateAiChatBot}
 />
