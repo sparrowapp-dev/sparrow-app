@@ -61,6 +61,7 @@ import { InitCollectionTab } from "@sparrow/common/utils";
 import { InitFolderTab } from "@sparrow/common/utils";
 import {
   addCollectionItem,
+  aiChatBotPanelClose,
   tabsSplitterDirection,
 } from "@sparrow/workspaces/stores";
 import {
@@ -161,6 +162,7 @@ import { PlanRepository } from "@app/repositories/plan.repository";
 import { open } from "@tauri-apps/plugin-shell";
 import type { TransformedRequest } from "@sparrow/common/types/workspace/collection-base";
 import { getAuthJwt, getSelfhostUrls } from "@app/utils/jwt";
+import { get } from "svelte/store";
 
 export default class CollectionsViewModel {
   private tabRepository = new TabRepository();
@@ -422,9 +424,13 @@ export default class CollectionsViewModel {
     if (_limit === 0) return;
     const ws = await this.workspaceRepository.getActiveWorkspaceDoc();
     if (ws) {
-      this.tabRepository.createTab(
-        new InitRequestTab("UNTRACKED-" + uuidv4(), ws._id).getValue(),
+      const initRequestTab = new InitRequestTab(
+        "UNTRACKED-" + uuidv4(),
+        ws._id,
       );
+      const aiPanelState = get(aiChatBotPanelClose);
+      initRequestTab.updateChatbotState(aiPanelState);
+      this.tabRepository.createTab(initRequestTab.getValue());
       scrollToTab("");
       MixpanelEvent(Events.ADD_NEW_API_REQUEST, { source: "TabBar" });
     } else {

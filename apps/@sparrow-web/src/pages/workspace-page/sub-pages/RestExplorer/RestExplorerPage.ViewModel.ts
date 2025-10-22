@@ -11,6 +11,8 @@ import { XMLParser, XMLBuilder } from "fast-xml-parser";
 import {
   startLoading,
   stopLoading,
+  updateAiChatBotModelforTeam,
+  getAiChatBotModelForTeam,
 } from "../../../../../../../packages/@sparrow-common/src/store";
 import {
   CompareArray,
@@ -90,7 +92,7 @@ import type { Socket } from "socket.io-client";
 import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explorer/store";
 import { CollectionTabAdapter } from "@app/adapter";
 import type { Tab } from "@sparrow/common/types/workspace/tab";
-import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
+import { TabPersistenceTypeEnum, TabTypeEnum } from "@sparrow/common/types/workspace/tab";
 import {
   CollectionAuthTypeBaseEnum,
   CollectionItemTypeBaseEnum,
@@ -118,6 +120,8 @@ import { UserService } from "src/services/user.service";
 import * as xpath from "xpath";
 import { DOMParser } from "xmldom";
 import { JSONPath } from "jsonpath-plus";
+import { TeamRepository } from "@app/repositories/team.repository";
+import { aiChatBotPanelClose } from "@sparrow/workspaces/stores";
 
 class RestExplorerViewModel {
   /**
@@ -132,6 +136,7 @@ class RestExplorerViewModel {
   private guestUserRepository = new GuestUserRepository();
   private compareArray = new CompareArray();
   private initTab = new InitTab();
+  private teamRepository = new TeamRepository();
 
   /**
    * Service
@@ -222,6 +227,10 @@ class RestExplorerViewModel {
           );
           await this.updateIsRequestTabScriptDemo(
             collectionDoc?.isRequestTestsScriptDemoCompleted,
+          );
+
+          await this.updateIsRequestTabAssertionsDemo(
+            collectionDoc?.isRequestAssertionsDemoCompleted,
           );
         }
 
@@ -1456,9 +1465,24 @@ class RestExplorerViewModel {
    */
   public updateAIModel = async (_modelName: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
+    // update tab's ai model
     progressiveTab.property.request.ai.aiModelName = _modelName;
     this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+
+    // persist selection globally mapped by teamId
+    try {
+      const workspaceId = progressiveTab.path?.workspaceId;
+      if (!workspaceId) return;
+
+      const workspaceDoc = await this.readWorkspace(workspaceId);
+      const teamId = workspaceDoc?.team?.teamId || "";
+      if (teamId) {
+        updateAiChatBotModelforTeam(teamId, _modelName);
+      }
+    } catch (err) {
+      console.error("updateAIModel: failed to update model store", err);
+    }
   };
 
   /**
@@ -1654,6 +1678,38 @@ class RestExplorerViewModel {
   };
 
   /**
+   * This function will close all AI chatbot instances except the one currently in use.
+   */
+  public updateRequestStateAiChatBot = async () => {
+    // Current tab from BehaviorSubject
+    const currentTab = createDeepCopy(this._tab.getValue());
+    // Get all tabs from repository
+    const allTabs = await this.tabRepository.getTabLs();
+    if (!allTabs || allTabs.length === 0) return;
+    for (const tab of allTabs) {
+      if (tab.id !== currentTab.id && tab.type === TabTypeEnum.REQUEST) {
+        let progressiveTab = createDeepCopy(tab);
+        const conversationLength =
+          progressiveTab.property?.request?.ai?.conversations?.length ?? 0;
+        if (conversationLength === 0) {
+          progressiveTab.property.request.state.isChatbotActive = false;
+          await this.tabRepository.updateTab(
+            progressiveTab.tabId,
+            progressiveTab,
+          );
+        }
+      }
+    }
+    // Always deactivate current tab AI chatbot panel.
+    aiChatBotPanelClose.set(false);
+    currentTab.property.request.state.isChatbotActive = false;
+    this.tab = currentTab;
+    await this.tabRepository.updateTab(currentTab.tabId, currentTab);
+    // Re-sync state with server
+    this.compareRequestWithServer();
+  };
+
+  /**
    *
    * @param  - response state
    */
@@ -1790,9 +1846,7 @@ class RestExplorerViewModel {
       return restApiDataMap;
     });
     const start = Date.now();
-
-    const decodeData = this._decodeRequest.init(
-      this._tab.getValue().property.request,
+    const preRequest = await this.executePreScriptTestcases(this._tab.getValue().property.request,
       environmentVariables.filtered,
       this._tab.getValue().property.request.state.requestAuthNavigation ===
         HttpRequestAuthTypeBaseEnum.AUTH_PROFILES
@@ -1801,7 +1855,11 @@ class RestExplorerViewModel {
             collectionAuthNavigation:
               this._collectionAuthProfile.getValue().authType,
           } as HttpRequestCollectionLevelAuthTabInterface)
-        : this._collectionAuth.getValue(),
+        : this._collectionAuth.getValue(),);
+    const decodeData = this._decodeRequest.init(
+      preRequest.request,
+      preRequest.env || [],
+      preRequest.auth,
     );
     const selectedAgent = localStorage.getItem(
       "selectedAgent",
@@ -1822,7 +1880,8 @@ class RestExplorerViewModel {
             restApiDataMap.set(progressiveTab.tabId, data);
             return restApiDataMap;
           });
-          await this.executeTestcases();
+          await this.executeScriptTestcases();
+        await this.executeNoCodeTestcases();
         } else {
           const end = Date.now();
           const byteLength = new TextEncoder().encode(
@@ -1860,7 +1919,8 @@ class RestExplorerViewModel {
 
             return restApiDataMap;
           });
-          await this.executeTestcases();
+          await this.executeScriptTestcases();
+        await this.executeNoCodeTestcases();
         }
       })
       .catch(async (error) => {
@@ -1882,25 +1942,11 @@ class RestExplorerViewModel {
           restApiDataMap.set(progressiveTab.tabId, data);
           return restApiDataMap;
         });
-        await this.executeTestcases();
+        await this.executeScriptTestcases();
+        await this.executeNoCodeTestcases();
       });
   };
 
-  /**
-   * Executes test cases for the current tab based on the selected test case mode.
-   * If the mode is NO_CODE, it delegates to executeNoCodeTestcases.
-   *
-   */
-  private executeTestcases = async () => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-
-    const testcaseMode = progressiveTab.property.request.tests.testCaseMode;
-    if (testcaseMode === TestCaseModeEnum.NO_CODE) {
-      await this.executeNoCodeTestcases();
-    } else {
-      await this.executeScriptTestcases();
-    }
-  };
 
   /**
    * Executes all no-code test cases for the current tab's response.
@@ -1912,7 +1958,7 @@ class RestExplorerViewModel {
     restExplorerDataStore.update((restApiDataMap) => {
       const response = restApiDataMap.get(progressiveTab?.tabId);
       if (response) {
-        response.response.testResults = [];
+        // response.response.testResults = [];
         const testCases = progressiveTab.property.request.tests.noCode || [];
         testCases.map((test) => {
           let actual: any;
@@ -2013,6 +2059,7 @@ class RestExplorerViewModel {
             testId: test.id,
             testName: test.name,
             testStatus: testCasePassed,
+            initiator: "Assertions",
             testMessage: error || testCaseStatusMessage,
           };
 
@@ -2025,8 +2072,69 @@ class RestExplorerViewModel {
     });
   };
 
-  private async executeScriptTestcases() {
-    const worker = new Worker(
+  private async executePreScriptTestcases(request, env, auth) {
+    return new Promise((resolve) => {
+       const worker = new Worker(
+      new URL("../../../../workers/test-pre-script-worker.ts", import.meta.url),
+      {
+        type: "module",
+      },
+    );
+    // minimal chai-like expect (you can replace with a real lib like chai)
+
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const javaScriptTestCases =
+      progressiveTab.property.request.tests.preScript || "";
+
+    restExplorerDataStore.update((restApiDataMap) => {
+      const r = restApiDataMap.get(progressiveTab?.tabId);
+      if (r) {
+        r.response.testResults = [];
+        r.response.testMessage = [];
+        restApiDataMap.set(progressiveTab.tabId, r);
+        worker.postMessage({
+          javaScriptTestCases,
+          request, env,auth
+        });
+      }
+      return restApiDataMap;
+    });
+
+    worker.onmessage = (e) => {
+      const { success, tests, error, request, env, auth } = e.data;
+      restExplorerDataStore.update((restApiDataMap) => {
+        const r = restApiDataMap.get(progressiveTab?.tabId);
+        if (r) {
+          if (success) {
+            r.response.testResults = tests.map((t) => ({
+              testId: "",
+              testName: t.name,
+              testStatus: t.passed,
+              testMessage: t.error || "",
+              initiator: "Pre Script"
+            }));
+          } else {
+            r.response.testMessage = [{
+               error: error,
+               initiator: "Pre-Request"
+            }];
+          }
+
+          restApiDataMap.set(progressiveTab.tabId, r);
+        }
+        return restApiDataMap;
+      });
+      worker.terminate(); // cleanup
+      resolve({request, env, auth});
+    };
+    });
+   
+  }
+
+ private async executeScriptTestcases() {
+    return new Promise((resolve)=>{
+
+const worker = new Worker(
       new URL("../../../../workers/test-script-worker.ts", import.meta.url),
       {
         type: "module",
@@ -2041,8 +2149,8 @@ class RestExplorerViewModel {
     restExplorerDataStore.update((restApiDataMap) => {
       const r = restApiDataMap.get(progressiveTab?.tabId);
       if (r) {
-        r.response.testResults = [];
-        r.response.testMessage = "";
+        // r.response.testResults = [];
+        // r.response.testMessage = "";
         restApiDataMap.set(progressiveTab.tabId, r);
         worker.postMessage({
           javaScriptTestCases,
@@ -2058,14 +2166,18 @@ class RestExplorerViewModel {
         const r = restApiDataMap.get(progressiveTab?.tabId);
         if (r) {
           if (success) {
-            r.response.testResults = tests.map((t) => ({
+            r.response.testResults = [...r.response.testResults, ...tests.map((t) => ({
               testId: "",
               testName: t.name,
               testStatus: t.passed,
               testMessage: t.error || "",
-            }));
+              initiator: "Post Script"
+            }))];
           } else {
-            r.response.testMessage = error;
+            r.response.testMessage = [...r.response.testMessage, {
+               error: error,
+               initiator: "Post-Request"
+            }];
           }
 
           restApiDataMap.set(progressiveTab.tabId, r);
@@ -2073,7 +2185,11 @@ class RestExplorerViewModel {
         return restApiDataMap;
       });
       worker.terminate(); // cleanup
+      resolve("resolved");
     };
+
+    });
+    
   }
 
   /**
@@ -3743,6 +3859,7 @@ class RestExplorerViewModel {
       let responseMessageId = uuidv4(); // Generate a single message ID for the entire response
       let accumulatedMessage = ""; // Track the accumulated message content
       let messageCreated = false; // Flag to track if we've created the initial message
+      let selectedAIModel = getAiChatBotModelForTeam(teamId) || "deepseek";
 
       const socketResponse = await this.aiAssistentWebSocketService.sendMessage(
         componentData.tabId,
@@ -3751,7 +3868,7 @@ class RestExplorerViewModel {
         prompt,
         JSON.stringify(apiData),
         formattedConversations,
-        "deepseek",
+        selectedAIModel,
         "chat",
         teamId,
       );
@@ -4221,6 +4338,53 @@ class RestExplorerViewModel {
   };
 
   /**
+   * Generates pre-request script for the particular API Request Tab.
+   *
+   * @param prompt - The prompt to be used for generating the pre-request script.
+   * @returns - The response from the AI assistant service.
+   */
+  public generatePreScript = async (prompt = "") => {
+    const isGuestUser = await this.getGuestUserState();
+    if (isGuestUser) {
+      return;
+    }
+    const componentData = this._tab.getValue();
+    const tabId = componentData?.tabId;
+    startLoading(tabId + "generatingPreScript");
+
+    let workspaceId = componentData.path.workspaceId;
+    let workspaceVal = await this.readWorkspace(workspaceId);
+    let teamId = workspaceVal.team?.teamId;
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const testCases = progressiveTab.property.request.tests;
+    const originalPreScript = testCases.preScript || "";
+
+    try {
+      const response = await this.aiAssistentService.generatePreScript({
+        text: prompt,
+        teamId: teamId,
+      });
+      if (response.isSuccessful) {
+        stopLoading(tabId + "generatingPreScript");
+        const generatedContent = response?.data?.data.result;
+        notifications.success("Pre-request script is generated successfully.");
+        return {
+          generatedContent: generatedContent,
+          originalContent: originalPreScript,
+        };
+      } else {
+        stopLoading(tabId + "generatingPreScript");
+        return response?.data;
+      }
+    } catch (error) {
+      stopLoading(tabId + "generatingPreScript");
+      notifications.error(
+        "Failed to generate pre-request script. Please try again.",
+      );
+    }
+  };
+
+  /**
    * Toggles the like or dislike status of a chat message.
    *
    * @param _messageId - The ID of the message to update.
@@ -4328,6 +4492,12 @@ class RestExplorerViewModel {
   public updateIsRequestTabScriptDemo = async (value: boolean) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.isRequestTestsScriptDemoCompleted = value;
+    this.tab = progressiveTab;
+  };
+
+  public updateIsRequestTabAssertionsDemo = async (value: boolean) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.isRequestAssertionsDemoCompleted = value;
     this.tab = progressiveTab;
   };
 
@@ -4774,12 +4944,32 @@ class RestExplorerViewModel {
       await this.fetchCollections(progressiveTab?.path?.workspaceId);
     }
   };
+  /**
+   * @description - This function will provide the plan Name for the hub.
+   */
+  public getPlanName = async () => {
+    const response = await this.workspaceRepository.getActiveWorkspaceDoc();
+    const teamId = response?._data?.team?.teamId || "";
+    const teamData = await this.teamRepository.getTeamDoc(teamId);
+    const teamDoc = teamData.toMutableJSON();
+    if (teamDoc) {
+      return teamDoc?.plan?.name;
+    }
+  };
+
+  public handleRequestAssertionsDemoCompleted = async () => {
+    const response = await this.userService.requestTabAssertionsDemoCompleted();
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (response.isSuccessful) {
+      await this.fetchCollections(progressiveTab?.path?.workspaceId);
+    }
+  };
 
   /**
    * Fixes the test script for the current request tab using AI assistance.
    * It retrieves the active workspace and team ID, then sends the current test script to the AI service for fixing.
    */
-  public fixTestScript = async (): Promise<void> => {
+  public fixTestScript = async (type: string): Promise<void> => {
     const isGuestUser = await this.getGuestUserState();
     if (isGuestUser) {
       return;
@@ -4789,30 +4979,76 @@ class RestExplorerViewModel {
     const teamId = workspaceData.toMutableJSON().team?.teamId || "";
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const testCases = progressiveTab.property.request.tests;
-    const response = await this.aiAssistentService.fixTestScript({
-      teamId: teamId,
-      testScript: testCases.script,
-    });
-    if (response.isSuccessful) {
-      this.updateRequestTests({
-        ...testCases,
-        script: response?.data?.data.result,
+    if(type === "Post-Request"){
+      const response = await this.aiAssistentService.fixTestScript({
+        teamId: teamId,
+        testScript: testCases.script,
+        type: "post-script"
       });
-      restExplorerDataStore.update((restApiDataMap) => {
-        const r = restApiDataMap.get(progressiveTab?.tabId);
-        if (r) {
-          r.response.testMessage = "";
-        }
-        return restApiDataMap;
-      });
-      notifications.success("Test script fixed successfully.");
-    } else if (
-      response?.data?.message === "Limit reached. Please try again later."
-    ) {
-      notifications.error("AI Limit has Reached.please upgrade plan.");
-    } else {
-      notifications.error("Failed to fix test script.");
+      if (response.isSuccessful) {
+        this.updateRequestTests({
+          ...testCases,
+          script: response?.data?.data.result,
+        });
+        restExplorerDataStore.update((restApiDataMap) => {
+          const r = restApiDataMap.get(progressiveTab?.tabId);
+          if (r) {
+              r.response.testMessage = r?.response?.testMessage?.filter((error)=>{
+                if(error.initiator === "Post-Request"){
+                  return false;
+                }
+                else{
+                  return true;
+                } 
+              }) || [];
+          }
+          return restApiDataMap;
+        });
+        notifications.success("Test script fixed successfully.");
+      } else if (
+        response?.data?.message === "Limit reached. Please try again later."
+      ) {
+        notifications.error("AI Limit has Reached.please upgrade plan.");
+      } else {
+        notifications.error("Failed to fix test script.");
+      }
     }
+    else if(type === "Pre-Request"){
+      const response = await this.aiAssistentService.fixTestScript({
+        teamId: teamId,
+        testScript: testCases.preScript,
+        type: "pre-script"
+      });
+      if (response.isSuccessful) {
+        this.updateRequestTests({
+          ...testCases,
+          preScript: response?.data?.data.result,
+        });
+        restExplorerDataStore.update((restApiDataMap) => {
+          const r = restApiDataMap.get(progressiveTab?.tabId);
+          if (r) {
+            r.response.testMessage = r?.response?.testMessage?.filter((error)=>{
+              if(error.initiator === "Pre-Request"){
+                return false;
+              }
+              else{
+                return true;
+              } 
+            }) || [];
+          }
+          return restApiDataMap;
+        });
+        notifications.success("Test script fixed successfully.");
+      } else if (
+        response?.data?.message === "Limit reached. Please try again later."
+      ) {
+        notifications.error("AI Limit has Reached.please upgrade plan.");
+      } else {
+        notifications.error("Failed to fix test script.");
+      }
+    }
+
+    
   };
 
   public handleRequestTestScriptDemoCompleted = async () => {

@@ -60,8 +60,12 @@ export class CollectionRepository {
         value.mockRequestHistory = data.mockRequestHistory;
       if (data.authProfiles) value.authProfiles = data.authProfiles;
       value.isGenerateVariableTrial = data.isGenerateVariableTrial;
-      value.isRequestTestsNoCodeDemoCompleted = data.isRequestTestsNoCodeDemoCompleted;
-      value.isRequestTestsScriptDemoCompleted = data.isRequestTestsScriptDemoCompleted;
+      value.isRequestTestsNoCodeDemoCompleted =
+        data.isRequestTestsNoCodeDemoCompleted;
+      value.isRequestTestsScriptDemoCompleted =
+        data.isRequestTestsScriptDemoCompleted;
+      value.isRequestAssertionsDemoCompleted =
+        data.isRequestAssertionsDemoCompleted;
       if (data.defaultSelectedAuthProfile)
         value.defaultSelectedAuthProfile = data.defaultSelectedAuthProfile;
 
@@ -1046,9 +1050,7 @@ export class CollectionRepository {
 
     return tabData
       .toJSON()
-      ?.property?.testflow?.nodes?.find(
-        (element) => element.id === _nodeId,
-      );
+      ?.property?.testflow?.nodes?.find((element) => element.id === _nodeId);
   };
 
   /**

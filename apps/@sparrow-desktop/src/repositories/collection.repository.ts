@@ -64,6 +64,8 @@ export class CollectionRepository {
         data.isRequestTestsNoCodeDemoCompleted;
       value.isRequestTestsScriptDemoCompleted =
         data.isRequestTestsScriptDemoCompleted;
+      value.isRequestAssertionsDemoCompleted =
+        data.isRequestAssertionsDemoCompleted;
       if (data.defaultSelectedAuthProfile)
         value.defaultSelectedAuthProfile = data.defaultSelectedAuthProfile;
       return value;

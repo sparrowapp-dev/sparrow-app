@@ -12,7 +12,12 @@ import type {
 } from "../../../../database/database";
 
 // Utils
-import { createDeepCopy, Debounce, scrollToTab, Sleep } from "@sparrow/common/utils";
+import {
+  createDeepCopy,
+  Debounce,
+  scrollToTab,
+  Sleep,
+} from "@sparrow/common/utils";
 
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import {
@@ -39,6 +44,7 @@ import { InitTab } from "@sparrow/common/factory";
 import { v4 as uuidv4 } from "uuid";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
 import { captureEvent } from "@app/utils/posthog/posthogConfig";
+import { TestflowNavigatorEnum } from "@sparrow/common/types/workspace/testflow";
 // import { InitRequestTab } from "@sparrow/common/utils";
 
 class MockHistoryExplorerPage {
@@ -189,6 +195,15 @@ class MockHistoryExplorerPage {
   }
 
   /**
+   * Get workspace data through workspace id
+   * @param workspaceId - id of workspace
+   * @returns - workspace document
+   */
+  public getWorkspaceById = async (workspaceId: string) => {
+    return await this.workspaceRepository.readWorkspace(workspaceId);
+  };
+
+  /**
    * Return active workspace of the user
    */
   public get activeWorkspace() {
@@ -232,6 +247,7 @@ class MockHistoryExplorerPage {
   public getTestflow = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const response = await this.testflowService?.fetchTestflow(
+      progressiveTab.path.workspaceId as string,
       progressiveTab.path.testflowId,
     );
     if (response?.isSuccessful) {
@@ -246,6 +262,7 @@ class MockHistoryExplorerPage {
   public refreshTestflowSchedule = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const response = await this.testflowService?.fetchTestflow(
+      progressiveTab.path.workspaceId as string,
       progressiveTab.path.testflowId,
     );
     if (response?.isSuccessful) {
@@ -278,7 +295,9 @@ class MockHistoryExplorerPage {
     );
 
     for (let i = 1; i < 5; i++) {
-      setTimeout(() => { this.getTestflow(); }, i * 500);
+      setTimeout(() => {
+        this.getTestflow();
+      }, i * 500);
     }
     const response = await this.testflowService.runTestflowSchedule(
       progressiveTab.path.workspaceId,
@@ -288,7 +307,7 @@ class MockHistoryExplorerPage {
     );
     if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
-      const schedule = schedules.find((s:any) => s.id === progressiveTab.id);
+      const schedule = schedules.find((s: any) => s.id === progressiveTab.id);
       captureEvent("schedule_run_now_clicked", {
         event_source: "desktop_app",
         schedule_id: progressiveTab.id,
@@ -302,8 +321,8 @@ class MockHistoryExplorerPage {
         schedules,
       );
       notifications.success("Run executed successfully.");
-    }else{
-      notifications.error("Run failed. View details in Test Results.");  
+    } else {
+      notifications.error("Run failed. View details in Test Results.");
     }
   };
 
@@ -372,7 +391,7 @@ class MockHistoryExplorerPage {
           progressiveTab?.path?.testflowId as string,
           schedules,
         );
-        const schedule = schedules.find((s:any) => s.id === progressiveTab.id);
+        const schedule = schedules.find((s: any) => s.id === progressiveTab.id);
         captureEvent("schedule_updated", {
           event_source: "desktop_app",
           schedule_id: progressiveTab.id,
@@ -418,7 +437,7 @@ class MockHistoryExplorerPage {
       _scheduleResult,
       schedule.name,
       progressiveTab.id,
-      progressiveTab.path.testflowId
+      progressiveTab.path.testflowId,
     );
 
     this.tabRepository.createTab(x);
@@ -514,6 +533,15 @@ class MockHistoryExplorerPage {
     const currentWorkspace = await this.workspaceRepository.readWorkspace(
       testflowJSON.workspaceId,
     );
+
+    
+    const testflowTabRxDoc = await  this.tabRepository.getTabById(_id);
+    let testflowTabJson = testflowTabRxDoc?.toMutableJSON();
+    if(testflowTabJson){
+      testflowTabJson.property.testflow.state.testflowNavigator = TestflowNavigatorEnum.TESTFLOW;
+      await this.tabRepository.updateTabByMongoId(_id, testflowTabJson);
+    }
+
     const testflowTab = new TestflowTabAdapter().adapt(
       currentWorkspace._id,
       testflowJSON,

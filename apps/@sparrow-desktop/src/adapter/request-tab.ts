@@ -13,6 +13,8 @@ import {
   HttpRequestAuthTypeBaseEnum,
   HttpRequestContentTypeBaseEnum,
 } from "@sparrow/common/types/workspace/http-request-base";
+import { aiChatBotPanelClose } from "@sparrow/workspaces/stores";
+import { get } from "svelte/store";
 
 /**
  * @class - this class makes request tab compatible with backend server
@@ -180,6 +182,8 @@ export class RequestTabAdapter {
     );
     adaptedRequest.updatePath(path);
     adaptedRequest.updateTabType(TabPersistenceTypeEnum.PERMANENT);
+    const aiPanelState = get(aiChatBotPanelClose);
+    adaptedRequest.updateChatbotState(aiPanelState);
 
     // parsing body type
     const selectedRequestBodyType = request.request?.selectedRequestBodyType;

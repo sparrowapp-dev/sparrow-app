@@ -11,6 +11,7 @@
   import { onMount } from "svelte";
   import { environmentType } from "@sparrow/common/enums";
   import { planContentDisable, TimeISOExtractor } from "@sparrow/common/utils";
+  import { WorkspaceRole } from "@sparrow/common/enums/team.enum";
 
   export let schedule = null;
   export let environments = [];
@@ -18,6 +19,7 @@
   export let onUpdateSchedule = (updatedSchedule) => {};
   export let onSaveSchedule;
   export let isSaved;
+  export let userRole;
 
   const extractTimeFromISOString = new TimeISOExtractor()
     .extractTimeFromISOString;
@@ -139,6 +141,8 @@
     email: user.email,
     name: user.name || "",
   }));
+
+  $: isReadOnly = userRole === WorkspaceRole.WORKSPACE_VIEWER;
 
   // Run Cycle options
   const cycleOptions = [
@@ -454,6 +458,7 @@
           {isError}
           id="schedule-name-input"
           on:input={handleScheduleNameChange}
+          disabled={isReadOnly}
         />
         {#if isError && !scheduleName.trim()}
           <p
@@ -493,6 +498,7 @@
           bodyTheme={"violet"}
           headerTheme={"violet2"}
           variant={"tertiary"}
+          disabled={isReadOnly}
         />
       </div>
       <div
@@ -524,6 +530,7 @@
                   ? 'active'
                   : ''}"
                 on:click={() => handleCycleSelect(cycle.value)}
+                disabled={isReadOnly}
               >
                 {cycle.name}
               </button>
@@ -542,7 +549,7 @@
                 <DatePicker
                   value={formattedDate}
                   placeholder="Select date"
-                  disabled={false}
+                  disabled={isReadOnly}
                   minDate={new Date()}
                   on:change={handleDateChange}
                 />
@@ -557,6 +564,7 @@
                   value={selectedTime}
                   placeholder="Select time"
                   on:change={handleTimeChange}
+                  disabled={isReadOnly}
                 />
               </div>
             </div>
@@ -623,6 +631,7 @@
                   width="70px"
                   on:change={handleHourlyNumberChange}
                   showErrorMessage={false}
+                  disabled={isReadOnly}
                 />
               </div>
 
@@ -661,6 +670,7 @@
                       ? 'selected'
                       : ''}"
                     on:click={() => handleWeekDaySelect(day.value)}
+                    disabled={isReadOnly}
                   >
                     {day.label}
                   </button>
@@ -720,6 +730,7 @@
               currentWorkspaceUsers={[]}
               onChange={handleNotificationEmailsChange}
               defaultEmails={notificationEmails}
+              disabled={isReadOnly}
             />
           </div>
         </div>
@@ -739,6 +750,7 @@
             labelText="On Failure Only"
             handleChange={handleNotificationPrefChange}
             buttonSize="medium"
+            disabled={isReadOnly}
           />
 
           <RadioButton
@@ -749,6 +761,7 @@
             labelText="On Every Run (Success/Failure)"
             handleChange={handleNotificationPrefChange}
             buttonSize="medium"
+            disabled={isReadOnly}
           />
         </div>
       </div>
@@ -757,20 +770,23 @@
   <!-- Fixed footer with save button -->
   <div class="configurations-footer">
     <div class="footer-buttons">
-      <Button
-        title="Save Changes"
-        onClick={handleSaveChanges}
-        disable={isSaved ||
-          !scheduleName.trim() ||
-          (selectedCycle === "once" && (!formattedDate || !selectedTime)) ||
-          (selectedCycle === "daily" && !selectedTime) ||
-          (selectedCycle === "hourly" && !intervalHours) ||
-          (selectedCycle === "weekly" && (days.length === 0 || !selectedTime))}
-        type="primary"
-        loader={isUpdating}
-      />
-      {#if !isSaved}
-        <Button title="Cancel" onClick={handleCancel} type="secondary" />
+      {#if !isReadOnly}
+        <Button
+          title="Save Changes"
+          onClick={handleSaveChanges}
+          disable={isSaved ||
+            !scheduleName.trim() ||
+            (selectedCycle === "once" && (!formattedDate || !selectedTime)) ||
+            (selectedCycle === "daily" && !selectedTime) ||
+            (selectedCycle === "hourly" && !intervalHours) ||
+            (selectedCycle === "weekly" &&
+              (days.length === 0 || !selectedTime))}
+          type="primary"
+          loader={isUpdating}
+        />
+        {#if !isSaved}
+          <Button title="Cancel" onClick={handleCancel} type="secondary" />
+        {/if}
       {/if}
     </div>
   </div>
@@ -794,7 +810,7 @@
   }
 
   .schedule-config-content {
-    padding: 16px 24px 24px 24px;
+    padding: 8px 10px 24px 10px;
     min-height: 100%;
     width: 50%;
   }
@@ -807,7 +823,7 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    padding: 0 24px;
+    padding: 0 8px;
     border-top: 1px solid var(--bg-ds-surface-100);
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
     z-index: 10;

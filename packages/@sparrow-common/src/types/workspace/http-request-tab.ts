@@ -29,6 +29,7 @@ export enum RequestSectionEnum {
   REQUEST_BODY = "Request Body",
   DOCUMENTATION = "Description",
   TESTS = "Tests",
+  ASSERTIONS = "Assertions",
 }
 
 export enum MessageTypeEnum {
@@ -233,6 +234,10 @@ export interface isRequestTestsScriptDemoCompleted {
   isRequestTestsScriptDemoCompleted: boolean;
 }
 
+export interface isRequestAssertionsDemoCompleted {
+  isRequestAssertionsDemoCompleted: boolean;
+}
+
 export interface Response
   extends ResponseStatusWrapper,
     ResponseHeadersWrapper,
@@ -430,12 +435,13 @@ export interface Tests {
   noCode: {
     id: string;
     name: string;
-    condition: TestCaseConditionOperatorEnum;
+    condition: TestCaseConditionOperatorEnum | "";
     expectedResult: string;
     testPath: string;
-    testTarget: TestCaseSelectionTypeEnum;
+    testTarget: TestCaseSelectionTypeEnum | "";
   }[];
   script: string;
+  preScript: string;
 }
 
 export interface TestsWrapper {
@@ -474,4 +480,5 @@ export interface Request
     isGeneratedVariable,
     isRequestTestsNoCodeDemoCompleted,
     isRequestTestsScriptDemoCompleted,
+    isRequestAssertionsDemoCompleted,
     HeadersWrapper {}

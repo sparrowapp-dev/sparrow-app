@@ -423,6 +423,7 @@
     onPerformTestflowScheduleOperations={_viewModel.performTestflowScheduleOperations}
     onOpenTestflowScheduleConfigurationsTab={_viewModel.openTestflowScheduleConfigurationsTab}
     bind:isCreateTestflowScheduleLimitReachedModalOpen
+    onOpenEnvironment={_viewModel.handleOpenEnvironment}
   />
 {/if}
 

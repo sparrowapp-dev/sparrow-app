@@ -18,6 +18,10 @@
   import type { CollectionDocType } from "@app/models/collection.model";
   import { RequestDatasetEnum } from "@sparrow/common/types/workspace";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
+  import {
+    getAiChatBotModelForTeam,
+    aiChatBotModelByTeam,
+  } from "@sparrow/common/store";
 
   export let tab;
   export let isTourGuideOpen = false;
@@ -55,6 +59,15 @@
   let newModifiedContent: string | KeyValuePair[];
   let mergeViewRequestDatasetType: RequestDatasetEnum;
   let scriptComponent = null;
+  let planName: string = "";
+  let teamId: string = "";
+  let selectedAIModel: string = "deepseek";
+
+  $: teamId = currentWorkspace ? currentWorkspace?.team?.teamId : "";
+
+  // reactive selected model for this team (fallback to "deepseek")
+  $: selectedAIModel = teamId ? $aiChatBotModelByTeam.get(teamId) : "deepseek";
+  let preScriptComponent = null;
 
   const restExplorerDataStoreSubscriber = restExplorerDataStore.subscribe(
     (_webSocketMap) => {
@@ -90,6 +103,13 @@
     });
   };
 
+  /**
+   * Find the plan of the hub
+   */
+  const getPlanName = async () => {
+    planName = await _viewModel.getPlanName();
+  };
+
   let activeWorkspaceSubscriber;
   let collectionSubscriber;
 
@@ -98,6 +118,9 @@
       if (prevTabId !== tab?.tabId) {
         if (scriptComponent?.handleTabChange) {
           scriptComponent.handleTabChange();
+        }
+        if (preScriptComponent?.handleTabChange) {
+          preScriptComponent.handleTabChange();
         }
         isMergeViewEnableForRequestBody = false;
         isMergeViewEnableForParams = false;
@@ -151,6 +174,7 @@
       }
       debouncedAPIUpdater(tab);
       findUserRole();
+      getPlanName();
       prevTabName = tab?.name || "";
       prevTabId = tab?.tabId || "";
     }
@@ -230,6 +254,7 @@
   {isGuestUser}
   {isLoginBannerActive}
   {isSharedWorkspace}
+  {planName}
   bind:isMergeViewEnableForRequestBody
   bind:isMergeViewEnableForParams
   bind:isMergeViewEnableForHeaders
@@ -237,6 +262,7 @@
   bind:newModifiedContent
   bind:mergeViewRequestDatasetType
   bind:scriptComponent
+  bind:preScriptComponent
   onOpenCollection={_viewModel.openCollection}
   onSendRequest={_viewModel.sendRequest}
   onCancelRequest={_viewModel.cancelRequest}
@@ -281,7 +307,12 @@
   InsertGenerateTrialFlow={_viewModel.InsertGenerateTrialFlow}
   isCloseRequestTestDemo={_viewModel.updateIsRequestTabDemo}
   requestTabTestsDemoCompleted={_viewModel.handleRequestTestNoCodeDemoCompleted}
+  requestTabAssertionsDemoCompleted={_viewModel.handleRequestAssertionsDemoCompleted}
+  isCloseRequestAssertionsDemo={_viewModel.updateIsRequestTabAssertionsDemo}
   isCloseRequestTestScriptDemo={_viewModel.updateIsRequestTabScriptDemo}
   requestTabTestScriptDemoCompleted={_viewModel.handleRequestTestScriptDemoCompleted}
   onGenerateTestCases={_viewModel.generateTestCases}
+  selectedModel={selectedAIModel}
+  onGeneratePreScript={_viewModel.generatePreScript}
+  updateRequestStatAiChatBot={_viewModel.updateRequestStateAiChatBot}
 />
