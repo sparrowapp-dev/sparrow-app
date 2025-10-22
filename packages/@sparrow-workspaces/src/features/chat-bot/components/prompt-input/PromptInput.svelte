@@ -10,6 +10,8 @@
   import { Button, Tooltip } from "@sparrow/library/ui";
 
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
+  import { planType } from "@sparrow/common/enums";
+
   export let placeholder = "";
   export let sendPrompt;
   export let prompt: string = "";
@@ -17,9 +19,15 @@
   export let onUpdateAiModel;
   export let isResponseGenerating;
   export let onStopGeneratingAIResponse;
+  export let planName;
+  export let selectedModel;
+
+  $: if (selectedModel) {
+    selectedModelId = String(selectedModel);
+  }
 
   // let defaultModel = "GPT-4o";
-  let defaultModel = "deepseek";
+  let selectedModelId = "deepseek";
 
   function adjustTextareaHeight() {
     const textAreaInput = document.getElementById("input-prompt-text");
@@ -84,7 +92,7 @@
           captureEvent("ai_chatbot_send_button_clicked", {
             component: "PromptInput",
             message_length: prompt.length,
-            selected_engine: "deepseek",
+            selected_engine: selectedModelId,
             timestamp: new Date().toISOString(),
             response_time: null,
           });
@@ -124,14 +132,14 @@
           },
           {
             name: "GPT-4o",
-            id: "GPT-4o",
-            disabled: true,
-            hide: true,
+            id: "gpt",
+            disabled: planName === planType.PROFESSIONAL ? false : true,
+            hide: planName === planType.PROFESSIONAL ? false : true,
           },
         ]}
-        titleId={defaultModel}
+        titleId={selectedModelId}
         onclick={(modelId) => {
-          console.log("clicked", modelId);
+          selectedModelId = String(modelId);
           handleEventOnClickAIOptions(modelId);
           onUpdateAiModel(modelId);
         }}
@@ -148,18 +156,24 @@
           class="post-dropdown"
           style="justify-content: center; align-items:center;"
         >
-          <div class="custom-tooltip-wrapper">
-            <div class="locked-models text-ds-font-size-12" on:click={() => {}}>
-              <span>GPT 4o</span>
-              <Button
-                type="teritiary-regular"
-                startIcon={LockClosedRegular}
-                size="small"
-              />
+          {#if planName !== planType.PROFESSIONAL}
+            <div class="custom-tooltip-wrapper">
+              <div
+                class="locked-models text-ds-font-size-12"
+                on:click={() => {}}
+              >
+                <span>GPT 4o</span>
+                <Button
+                  type="teritiary-regular"
+                  startIcon={LockClosedRegular}
+                  size="small"
+                />
+              </div>
+              <span class="custom-tooltip"
+                >Upgrade to use additional models.</span
+              >
             </div>
-            <span class="custom-tooltip">Upgrade to use additional models.</span
-            >
-          </div>
+          {/if}
           <!-- <div class="custom-tooltip-wrapper">
             <div class="locked-models text-ds-font-size-12" on:click={() => {}}>
               <span>Azure AI</span>

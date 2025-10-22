@@ -10,6 +10,8 @@ import { createDeepCopy, scrollToTab, Sleep } from "@sparrow/common/utils";
 import {
   startLoading,
   stopLoading,
+  updateAiChatBotModelforTeam,
+  getAiChatBotModelForTeam,
 } from "../../../../../../../packages/@sparrow-common/src/store";
 import {
   CompareArray,
@@ -112,6 +114,7 @@ import { UserService } from "@app/services/user.service";
 import { getClientUser, getSelfhostUrls } from "@app/utils/jwt";
 import constants from "@app/constants/constants";
 import * as curlconverter from "curlconverter";
+import { TeamRepository } from "@app/repositories/team.repository";
 
 import * as Sentry from "@sentry/svelte";
 import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection-tab";
@@ -134,6 +137,7 @@ class RestExplorerViewModel {
   private guestUserRepository = new GuestUserRepository();
   private compareArray = new CompareArray();
   private initTab = new InitTab();
+  private teamRepository = new TeamRepository();
 
   /**
    * Service
@@ -1450,9 +1454,24 @@ class RestExplorerViewModel {
    */
   public updateAIModel = async (_modelName: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
+    // update tab's ai model
     progressiveTab.property.request.ai.aiModelName = _modelName;
     this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+
+    // persist selection globally mapped by teamId
+    try {
+      const workspaceId = progressiveTab.path?.workspaceId;
+      if (!workspaceId) return;
+
+      const workspaceDoc = await this.readWorkspace(workspaceId);
+      const teamId = workspaceDoc?.team?.teamId || "";
+      if (teamId) {
+        updateAiChatBotModelforTeam(teamId, _modelName);
+      }
+    } catch (err) {
+      console.error("updateAIModel: failed to update model store", err);
+    }
   };
 
   /**
@@ -3820,6 +3839,7 @@ const worker = new Worker(
    * @param Prompt - Prompt from the user
    */
   public generateAIResponseWS = async (prompt = "") => {
+    debugger;
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
 
@@ -3855,6 +3875,7 @@ const worker = new Worker(
       let responseMessageId = uuidv4(); // Generate a single message ID for the entire response
       let accumulatedMessage = ""; // Track the accumulated message content
       let messageCreated = false; // Flag to track if we've created the initial message
+      let selectedAIModel = getAiChatBotModelForTeam(teamId) || "deepseek";
 
       const socketResponse = await this.aiAssistentWebSocketService.sendMessage(
         componentData.tabId,
@@ -3863,7 +3884,7 @@ const worker = new Worker(
         prompt,
         JSON.stringify(apiData),
         formattedConversations,
-        "deepseek",
+        selectedAIModel,
         "chat",
         teamId,
       );
@@ -4085,6 +4106,7 @@ const worker = new Worker(
    * @returns A promise that resolves to the response from the AI assistant service.
    */
   public generateAiResponse = async (prompt = "") => {
+    debugger;
     // Set the request state to indicate that a response is being generated
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
@@ -5021,6 +5043,19 @@ const worker = new Worker(
     const progressiveTab = createDeepCopy(this._tab.getValue());
     if (response.isSuccessful) {
       await this.fetchCollections(progressiveTab?.path?.workspaceId);
+    }
+  };
+
+  /**
+   * @description - This function will provide the plan name for hub.
+   */
+  public getPlanName = async () => {
+    const response = await this.workspaceRepository.getActiveWorkspaceDoc();
+    const teamId = response?._data?.team?.teamId || "";
+    const teamData = await this.teamRepository.getTeamDoc(teamId);
+    const teamDoc = teamData.toMutableJSON();
+    if (teamDoc) {
+      return teamDoc?.plan?.name;
     }
   };
 }

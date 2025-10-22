@@ -29,6 +29,8 @@
   export let onStopGeneratingAIResponse;
   export let handleApplyChangeOnAISuggestion;
   export let scrollList;
+  export let planName;
+  export let selectedModel: string = "deepseek";
   export let updateRequestStatAiChatBot: () => any;
 
   let chatContainer: HTMLElement;
@@ -211,7 +213,7 @@
               {:else}
                 <div class="h-100 w-100">
                   {#each conversations as chat, index}
-                    <div in:fade={{ duration: 200, delay:50 }}>
+                    <div in:fade={{ duration: 200, delay: 50 }}>
                       <ChatItem
                         message={chat.message}
                         messageId={chat.messageId}
@@ -254,6 +256,8 @@
           {onStopGeneratingAIResponse}
           placeholder={"How can I help you?"}
           {sendPrompt}
+          {planName}
+          {selectedModel}
         />
       </div>
     </div>
