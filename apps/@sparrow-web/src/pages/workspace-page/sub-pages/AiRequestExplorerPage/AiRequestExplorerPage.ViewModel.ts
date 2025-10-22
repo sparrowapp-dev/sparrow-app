@@ -108,7 +108,11 @@ import type {
   AiRequestCollectionLevelAuthProfileTabInterface,
   AiRequestCollectionLevelAuthTabInterface,
 } from "@sparrow/common/types/workspace/ai-request-base";
-import type { ENVDocumentType, ENVExtractVariableType } from "@sparrow/common/types/workspace/environment";
+import type {
+  ENVDocumentType,
+  ENVExtractVariableType,
+} from "@sparrow/common/types/workspace/environment";
+import { TeamRepository } from "src/repositories/team.repository";
 
 class AiRequestExplorerViewModel {
   // Repository
@@ -118,6 +122,7 @@ class AiRequestExplorerViewModel {
   private guestUserRepository = new GuestUserRepository();
   private aiRequestRepository = new AiRequestRepository();
   private tabRepository = new TabRepository();
+  private teamRepository = new TeamRepository();
   private compareArray = new CompareArray();
 
   // Services
@@ -515,8 +520,8 @@ class AiRequestExplorerViewModel {
     const componentData = this._tab.getValue();
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const providerAuthKey = (await this.decodeAiRequestAuth(
-      componentData.property.aiRequest,
-      this._collectionAuthProfile.getValue(),
+        componentData.property.aiRequest,
+        this._collectionAuthProfile.getValue(),
     ))?.apiKey.authValue;
 
     if (!provider || !providerAuthKey) {
@@ -561,7 +566,7 @@ class AiRequestExplorerViewModel {
     const conversations =
       componentData?.property?.aiRequest?.ai?.conversations || [];
     const configurations =
-    componentData?.property?.aiRequest?.configurations || {};
+      componentData?.property?.aiRequest?.configurations || {};
     const systemPrompt =
     componentData?.property?.aiRequest?.systemPrompt || "";
     const conversationId =
@@ -569,8 +574,8 @@ class AiRequestExplorerViewModel {
     const conversationTitle =
       componentData?.property?.aiRequest?.ai?.conversationTitle;
     const providerAuthKey = (await this.decodeAiRequestAuth(
-      componentData.property.aiRequest,
-      this._collectionAuthProfile.getValue(),
+        componentData.property.aiRequest,
+        this._collectionAuthProfile.getValue(),
     ))?.apiKey.authValue;
 
     // if (!conversations.length || !provider || !providerAuthKey) {
@@ -740,8 +745,8 @@ class AiRequestExplorerViewModel {
     const currTabConversationId =
       componentData?.property?.aiRequest?.ai?.conversationId;
     const providerAuthKey = (await this.decodeAiRequestAuth(
-      componentData.property.aiRequest,
-      this._collectionAuthProfile.getValue(),
+        componentData.property.aiRequest,
+        this._collectionAuthProfile.getValue(),
     ))?.apiKey.authValue;
 
     if (!provider || !providerAuthKey) {
@@ -802,8 +807,8 @@ class AiRequestExplorerViewModel {
     const currTabConversationId =
       componentData?.property?.aiRequest?.ai?.conversationId;
     const providerAuthKey = (await this.decodeAiRequestAuth(
-      componentData.property.aiRequest,
-      this._collectionAuthProfile.getValue(),
+        componentData.property.aiRequest,
+        this._collectionAuthProfile.getValue(),
     ))?.apiKey.authValue;
 
     if (!conversationId || !provider || !providerAuthKey) {
@@ -849,8 +854,8 @@ class AiRequestExplorerViewModel {
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const providerModel = componentData?.property?.aiRequest?.aiModelVariant;
     const providerAuthKey = (await this.decodeAiRequestAuth(
-      componentData.property.aiRequest,
-      this._collectionAuthProfile.getValue(),
+        componentData.property.aiRequest,
+        this._collectionAuthProfile.getValue(),
     ))?.apiKey.authValue;
 
     // Don't allow file uploads when auth key is not present.
@@ -2179,7 +2184,7 @@ class AiRequestExplorerViewModel {
       progressiveTab.property.aiRequest.configurations = _configurations;
     }
     if(_systemPrompt !== null){
-      progressiveTab.property.aiRequest.systemPrompt = _systemPrompt;   
+      progressiveTab.property.aiRequest.systemPrompt = _systemPrompt;
     }
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
@@ -2426,8 +2431,8 @@ class AiRequestExplorerViewModel {
     const modelProvider = componentData.property.aiRequest.aiModelProvider;
     const modelVariant = componentData.property.aiRequest.aiModelVariant;
     const authKey = (await this.decodeAiRequestAuth(
-      componentData.property.aiRequest,
-      this._collectionAuthProfile.getValue(),
+        componentData.property.aiRequest,
+        this._collectionAuthProfile.getValue(),
     ))?.apiKey;
     const systemPrompt = componentData.property.aiRequest.systemPrompt;
     const currConfigurations = componentData.property.aiRequest.configurations;
@@ -2440,7 +2445,7 @@ class AiRequestExplorerViewModel {
       : false;
 
     let prompt = this.setEnvironmentVariables(_prompt, environments.filtered);
-    
+
     let finalSP = null;
     if (systemPrompt.length) {
        finalSP = this.setEnvironmentVariables(systemPrompt, environments.filtered);
@@ -2551,8 +2556,18 @@ class AiRequestExplorerViewModel {
               let errorMessage: string;
 
               if (response.message.includes("Limit Reached")) {
-                errorMessage =
-                  "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section.";
+                let teamData;
+                const workspace =
+                  await this.workspaceRepository.getActiveWorkspaceDoc();
+                const teamId = workspace.toMutableJSON().team?.teamId;
+                if (teamId) {
+                  teamData = await this.teamRepository.getTeamDoc(teamId);
+                }
+                errorMessage = `You have used all ${teamData?.toMutableJSON()
+                  .plan?.limits?.aiRequestsPerMonth
+                  ?.value} of your Sparrow AI requests for the month on the ${teamData?.toMutableJSON()
+                  .plan
+                  ?.name} Plan. To continue getting instant help with debugging, suggestions, and analysis, please upgrade your plan.`;
               } else if (response.message.includes("Some Issue Occurred")) {
                 errorMessage =
                   "Some issue occurred from server while processing your request, please try again.";
@@ -2815,70 +2830,70 @@ class AiRequestExplorerViewModel {
     this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
   };
 
-    private getActiveEnvironments = async (currentWorkspaceId: string) => {
-      let environmentId: string;
-      const activeWorkspace =
-        await this.workspaceRepository.getActiveWorkspaceDoc();
-  
-      if (activeWorkspace) {
-        currentWorkspaceId = activeWorkspace.get("_id");
-        environmentId = activeWorkspace.get("environmentId");
+  private getActiveEnvironments = async (currentWorkspaceId: string) => {
+    let environmentId: string;
+    const activeWorkspace =
+      await this.workspaceRepository.getActiveWorkspaceDoc();
+
+    if (activeWorkspace) {
+      currentWorkspaceId = activeWorkspace.get("_id");
+      environmentId = activeWorkspace.get("environmentId");
+    }
+
+    const environments = await this.environmentRepository.getEnvironment();
+    let environmentDocuments: EnvironmentDocument[] = [];
+
+    environments.subscribe((value) => {
+      if (value) {
+        environmentDocuments = value;
       }
-  
-      const environments = await this.environmentRepository.getEnvironment();
-      let environmentDocuments: EnvironmentDocument[] = [];
-  
-      environments.subscribe((value) => {
-        if (value) {
-          environmentDocuments = value;
-        }
-      });
-  
-      let environmentVariables: {
-        filtered: ENVExtractVariableType[];
-      } = {
-        filtered: [],
-      };
-  
-      if (environmentDocuments && currentWorkspaceId) {
-        if (environmentDocuments?.length > 0) {
-          const filteredEnv = environmentDocuments
-            .filter((elem) => {
-              return elem.workspaceId === currentWorkspaceId;
-            })
-            .filter((elem) => {
-              if (
-                elem.type === environmentType.GLOBAL ||
-                elem.id === environmentId
-              ) {
-                return true;
+    });
+
+    let environmentVariables: {
+      filtered: ENVExtractVariableType[];
+    } = {
+      filtered: [],
+    };
+
+    if (environmentDocuments && currentWorkspaceId) {
+      if (environmentDocuments?.length > 0) {
+        const filteredEnv = environmentDocuments
+          .filter((elem) => {
+            return elem.workspaceId === currentWorkspaceId;
+          })
+          .filter((elem) => {
+            if (
+              elem.type === environmentType.GLOBAL ||
+              elem.id === environmentId
+            ) {
+              return true;
+            }
+          });
+        if (filteredEnv?.length > 0) {
+          const envs: ENVExtractVariableType[] = [];
+          filteredEnv.forEach((elem) => {
+            environmentVariables = {
+              filtered: [],
+            };
+
+            const temp = elem.toMutableJSON() as ENVDocumentType;
+            temp.variable.forEach((variable) => {
+              if (variable.key && variable.checked) {
+                envs.unshift({
+                  key: variable.key,
+                  value: variable.value,
+                  type: temp.type === environmentType.GLOBAL ? "G" : "E",
+                  environment: temp.name,
+                });
               }
             });
-          if (filteredEnv?.length > 0) {
-            const envs: ENVExtractVariableType[] = [];
-            filteredEnv.forEach((elem) => {
-              environmentVariables = {
-                filtered: [],
-              };
-  
-              const temp = elem.toMutableJSON() as ENVDocumentType;
-              temp.variable.forEach((variable) => {
-                if (variable.key && variable.checked) {
-                  envs.unshift({
-                    key: variable.key,
-                    value: variable.value,
-                    type: temp.type === environmentType.GLOBAL ? "G" : "E",
-                    environment: temp.name,
-                  });
-                }
-              });
-              environmentVariables.filtered = envs;
-            });
-          }
+            environmentVariables.filtered = envs;
+          });
         }
       }
-      return environmentVariables;
-    };
+    }
+    return environmentVariables;
+  };
 
   public generateAiPrompt = async (
     target: "UserPrompt" | "SystemPrompt",
@@ -2892,7 +2907,7 @@ class AiRequestExplorerViewModel {
   }> => {
     const componentData = this._tab.getValue();
     let workspaceId = componentData.path.workspaceId;
-    const environments = await this.getActiveEnvironments(workspaceId)
+    const environments = await this.getActiveEnvironments(workspaceId);
     const prompt = this.setEnvironmentVariables(_prompt, environments.filtered);
     let workspaceVal = await this.readWorkspace(workspaceId);
     let teamId = workspaceVal.team?.teamId;
@@ -2908,9 +2923,14 @@ class AiRequestExplorerViewModel {
         typeof response.data?.data === "string" &&
         response.data.data.includes("Limit Reached")
       ) {
+        let teamData;
+        if (teamId) {
+          teamData = await this.teamRepository.getTeamDoc(teamId);
+        }
+        const updatedMessage = `You have used all ${teamData?.toMutableJSON().plan?.limits?.aiRequestsPerMonth?.value} of your Sparrow AI requests for the month on the ${teamData?.toMutableJSON().plan?.name} Plan. To continue getting instant help with debugging, suggestions, and analysis, please upgrade your plan.`;
         return {
           successStatus: false,
-          message: response.data.message,
+          message: updatedMessage,
           aiGeneratedPrompt: "",
           isLimitReached: true,
           target,

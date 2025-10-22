@@ -30,6 +30,7 @@
   export let handleApplyChangeOnAISuggestion;
   export let scrollList;
   export let updateRequestStatAiChatBot: () => any;
+  export let upgradePlanRedirect
 
   let chatContainer: HTMLElement;
   let suggestionCount = 0;
@@ -254,6 +255,7 @@
           {onStopGeneratingAIResponse}
           placeholder={"How can I help you?"}
           {sendPrompt}
+          {upgradePlanRedirect}
         />
       </div>
     </div>

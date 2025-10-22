@@ -17,6 +17,7 @@
   export let onUpdateAiModel;
   export let isResponseGenerating;
   export let onStopGeneratingAIResponse;
+  export let upgradePlanRedirect;
 
   // let defaultModel = "GPT-4o";
   let defaultModel = "deepseek";
@@ -157,7 +158,10 @@
                 size="small"
               />
             </div>
-            <span class="custom-tooltip">Upgrade to use additional models.</span
+            <span class="custom-tooltip"
+              >Upgrade to use additional models.<strong
+                class="custom-tooltip-upgrade-text" on:click={upgradePlanRedirect}>Upgrade plan</strong
+              ></span
             >
           </div>
           <!-- <div class="custom-tooltip-wrapper">
@@ -289,6 +293,10 @@
     white-space: nowrap;
     margin-bottom: 4px;
     z-index: 1000;
+  }
+  .custom-tooltip-upgrade-text {
+    color: var(--bg-ds-primary-400);
+    cursor: pointer;
   }
 
   .custom-tooltip::after {

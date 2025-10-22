@@ -32,6 +32,7 @@
   export let onToggleLike;
   export let handleApplyChangeOnAISuggestion;
   export let updateRequestStatAiChatBot:() => any;
+  export let upgradePlanRedirect;
 
   let scrollList: ScrollList;
 
@@ -92,6 +93,7 @@
       {handleApplyChangeOnAISuggestion}
       {updateRequestStatAiChatBot}
       bind:scrollList
+      {upgradePlanRedirect}
     />
   </div>
 {/if}

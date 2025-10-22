@@ -111,6 +111,7 @@ import type {
   ENVDocumentType,
   ENVExtractVariableType,
 } from "@sparrow/common/types/workspace/environment";
+import { TeamRepository } from "@app/repositories/team.repository";
 
 class AiRequestExplorerViewModel {
   // Repository
@@ -121,6 +122,7 @@ class AiRequestExplorerViewModel {
   private aiRequestRepository = new AiRequestRepository();
   private tabRepository = new TabRepository();
   private compareArray = new CompareArray();
+  private teamRepository = new TeamRepository();
 
   // Services
   private environmentService = new EnvironmentService();
@@ -937,9 +939,9 @@ class AiRequestExplorerViewModel {
 
     const [selfhostBackendUrl] = getSelfhostUrls();
     if (selfhostBackendUrl) {
-        return selfhostBackendUrl;
+      return selfhostBackendUrl;
     }
-    
+
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;
@@ -2588,8 +2590,18 @@ class AiRequestExplorerViewModel {
               let errorMessage: string;
 
               if (response.message.includes("Limit Reached")) {
-                errorMessage =
-                  "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section.";
+                let teamData;
+                const workspace =
+                  await this.workspaceRepository.getActiveWorkspaceDoc();
+                const teamId = workspace.toMutableJSON().team?.teamId;
+                if (teamId) {
+                  teamData = await this.teamRepository.getTeamDoc(teamId);
+                }
+                errorMessage = `You have used all ${teamData?.toMutableJSON()
+                  .plan?.limits?.aiRequestsPerMonth
+                  ?.value} of your Sparrow AI requests for the month on the ${teamData?.toMutableJSON()
+                  .plan
+                  ?.name} Plan. To continue getting instant help with debugging, suggestions, and analysis, please upgrade your plan.`;
               } else if (response.message.includes("Some Issue Occurred")) {
                 errorMessage =
                   "Some issue occurred from server while processing your request, please try again.";
@@ -2945,9 +2957,18 @@ class AiRequestExplorerViewModel {
         typeof response.data?.data === "string" &&
         response.data.data.includes("Limit Reached")
       ) {
+        let teamData;
+        if (teamId) {
+          teamData = await this.teamRepository.getTeamDoc(teamId);
+        }
+        const updatedMessage = `You have used all ${teamData?.toMutableJSON()
+          .plan?.limits?.aiRequestsPerMonth
+          ?.value} of your Sparrow AI requests for the month on the ${teamData?.toMutableJSON()
+          .plan
+          ?.name} Plan. To continue getting instant help with debugging, suggestions, and analysis, please upgrade your plan.`;
         return {
           successStatus: false,
-          message: response.data.message,
+          message: updatedMessage,
           aiGeneratedPrompt: "",
           isLimitReached: true,
           target,

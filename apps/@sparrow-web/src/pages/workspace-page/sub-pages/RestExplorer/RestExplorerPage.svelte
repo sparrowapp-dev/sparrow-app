@@ -288,4 +288,5 @@
   requestTabTestScriptDemoCompleted={_viewModel.handleRequestTestScriptDemoCompleted}
   onGenerateTestCases={_viewModel.generateTestCases}
   updateRequestStatAiChatBot={_viewModel.updateRequestStateAiChatBot}
+  upgradePlanRedirect={_viewModel.handleRedirectToAdminPanel}
 />

@@ -177,6 +177,7 @@
   export let isCloseRequestAssertionsDemo: (value: boolean) => void;
   export let isCloseRequestTestScriptDemo: (value: boolean) => void;
   export let requestTabTestScriptDemoCompleted: () => void;
+  export let upgradePlanRedirect;
 
   // export let isLoginBannerActive = false;
   export let isPopoverContainer = true;
@@ -1489,6 +1490,7 @@
                     {onToggleLike}
                     {handleApplyChangeOnAISuggestion}
                     {updateRequestStatAiChatBot}
+                    {upgradePlanRedirect}
                   />
                 {/if}
               </div>
