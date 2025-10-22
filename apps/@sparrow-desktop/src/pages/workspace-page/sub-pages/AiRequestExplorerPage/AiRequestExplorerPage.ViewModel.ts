@@ -2590,18 +2590,8 @@ class AiRequestExplorerViewModel {
               let errorMessage: string;
 
               if (response.message.includes("Limit Reached")) {
-                let teamData;
-                const workspace =
-                  await this.workspaceRepository.getActiveWorkspaceDoc();
-                const teamId = workspace.toMutableJSON().team?.teamId;
-                if (teamId) {
-                  teamData = await this.teamRepository.getTeamDoc(teamId);
-                }
-                errorMessage = `You have used all ${teamData?.toMutableJSON()
-                  .plan?.limits?.aiRequestsPerMonth
-                  ?.value} of your Sparrow AI requests for the month on the ${teamData?.toMutableJSON()
-                  .plan
-                  ?.name} Plan. To continue getting instant help with debugging, suggestions, and analysis, please upgrade your plan.`;
+                errorMessage =
+                  "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section.";
               } else if (response.message.includes("Some Issue Occurred")) {
                 errorMessage =
                   "Some issue occurred from server while processing your request, please try again.";
@@ -2961,14 +2951,9 @@ class AiRequestExplorerViewModel {
         if (teamId) {
           teamData = await this.teamRepository.getTeamDoc(teamId);
         }
-        const updatedMessage = `You have used all ${teamData?.toMutableJSON()
-          .plan?.limits?.aiRequestsPerMonth
-          ?.value} of your Sparrow AI requests for the month on the ${teamData?.toMutableJSON()
-          .plan
-          ?.name} Plan. To continue getting instant help with debugging, suggestions, and analysis, please upgrade your plan.`;
         return {
           successStatus: false,
-          message: updatedMessage,
+          message: response.data.message,
           aiGeneratedPrompt: "",
           isLimitReached: true,
           target,

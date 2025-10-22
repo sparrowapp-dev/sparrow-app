@@ -73,7 +73,6 @@ import {
   AiModelProviderEnum,
   OpenAIModelEnum,
   type modelsConfigType,
- 
   type PromptFileAttachment,
   AiRequestAuthTypeBaseEnum,
 } from "@sparrow/common/types/workspace/ai-request-base";
@@ -453,10 +452,10 @@ class AiRequestExplorerViewModel {
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
-        persistence: TabPersistenceTypeEnum.PERMANENT
+        persistence: TabPersistenceTypeEnum.PERMANENT,
       });
       progressiveTab.isSaved = false;
-      progressiveTab.persistence= TabPersistenceTypeEnum.PERMANENT;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
       this.tab = progressiveTab;
     }
   };
@@ -477,10 +476,12 @@ class AiRequestExplorerViewModel {
 
     const componentData = this._tab.getValue();
     const provider = componentData.property.aiRequest.aiModelProvider;
-    const providerAuthKey = (await this.decodeAiRequestAuth(
-      componentData.property.aiRequest,
-      this._collectionAuthProfile.getValue(),
-    ))?.apiKey.authValue;
+    const providerAuthKey = (
+      await this.decodeAiRequestAuth(
+        componentData.property.aiRequest,
+        this._collectionAuthProfile.getValue(),
+      )
+    )?.apiKey.authValue;
 
     if (!providerAuthKey || !provider) {
       console.error(
@@ -516,13 +517,15 @@ class AiRequestExplorerViewModel {
    * Get list of conversations based on specific apikey
    * @returns :Observable<CollectionDocument[]> - the list of collection from current active workspace
    */
-  public getConversationsList = async() => {
+  public getConversationsList = async () => {
     const componentData = this._tab.getValue();
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
-    const providerAuthKey = (await this.decodeAiRequestAuth(
+    const providerAuthKey = (
+      await this.decodeAiRequestAuth(
         componentData.property.aiRequest,
         this._collectionAuthProfile.getValue(),
-    ))?.apiKey.authValue;
+      )
+    )?.apiKey.authValue;
 
     if (!provider || !providerAuthKey) {
       console.error(
@@ -567,16 +570,17 @@ class AiRequestExplorerViewModel {
       componentData?.property?.aiRequest?.ai?.conversations || [];
     const configurations =
       componentData?.property?.aiRequest?.configurations || {};
-    const systemPrompt =
-    componentData?.property?.aiRequest?.systemPrompt || "";
+    const systemPrompt = componentData?.property?.aiRequest?.systemPrompt || "";
     const conversationId =
       componentData?.property?.aiRequest?.ai?.conversationId;
     const conversationTitle =
       componentData?.property?.aiRequest?.ai?.conversationTitle;
-    const providerAuthKey = (await this.decodeAiRequestAuth(
+    const providerAuthKey = (
+      await this.decodeAiRequestAuth(
         componentData.property.aiRequest,
         this._collectionAuthProfile.getValue(),
-    ))?.apiKey.authValue;
+      )
+    )?.apiKey.authValue;
 
     // if (!conversations.length || !provider || !providerAuthKey) {
     if (!provider || !providerAuthKey) {
@@ -602,7 +606,7 @@ class AiRequestExplorerViewModel {
         date: this.getLocalDate(),
         time: this.getFormattedTime(),
         conversation: conversations,
-        configurations:  configurations ,
+        configurations: configurations,
         systemPrompt: systemPrompt,
         authoredBy: isGuestUser ? "Guest User" : user.name,
         updatedBy: isGuestUser
@@ -744,10 +748,12 @@ class AiRequestExplorerViewModel {
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const currTabConversationId =
       componentData?.property?.aiRequest?.ai?.conversationId;
-    const providerAuthKey = (await this.decodeAiRequestAuth(
+    const providerAuthKey = (
+      await this.decodeAiRequestAuth(
         componentData.property.aiRequest,
         this._collectionAuthProfile.getValue(),
-    ))?.apiKey.authValue;
+      )
+    )?.apiKey.authValue;
 
     if (!provider || !providerAuthKey) {
       console.error("Missing provider, conversations, or authKey.");
@@ -806,10 +812,12 @@ class AiRequestExplorerViewModel {
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const currTabConversationId =
       componentData?.property?.aiRequest?.ai?.conversationId;
-    const providerAuthKey = (await this.decodeAiRequestAuth(
+    const providerAuthKey = (
+      await this.decodeAiRequestAuth(
         componentData.property.aiRequest,
         this._collectionAuthProfile.getValue(),
-    ))?.apiKey.authValue;
+      )
+    )?.apiKey.authValue;
 
     if (!conversationId || !provider || !providerAuthKey) {
       console.error("Missing provider or authKey.");
@@ -853,10 +861,12 @@ class AiRequestExplorerViewModel {
     const componentData = this._tab.getValue();
     const provider = componentData?.property?.aiRequest?.aiModelProvider;
     const providerModel = componentData?.property?.aiRequest?.aiModelVariant;
-    const providerAuthKey = (await this.decodeAiRequestAuth(
+    const providerAuthKey = (
+      await this.decodeAiRequestAuth(
         componentData.property.aiRequest,
         this._collectionAuthProfile.getValue(),
-    ))?.apiKey.authValue;
+      )
+    )?.apiKey.authValue;
 
     // Don't allow file uploads when auth key is not present.
     if (!provider || !providerAuthKey) {
@@ -2173,17 +2183,17 @@ class AiRequestExplorerViewModel {
     _conversationTitle: string,
     _conversations: Conversation[],
     _configurations = null,
-    _systemPrompt = null
+    _systemPrompt = null,
   ) => {
     this.updateRequestState({ isChatbotConversationLoading: true });
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.aiRequest.ai.conversationId = _conversationId;
     progressiveTab.property.aiRequest.ai.conversationTitle = _conversationTitle;
     progressiveTab.property.aiRequest.ai.conversations = _conversations;
-    if(_configurations){
+    if (_configurations) {
       progressiveTab.property.aiRequest.configurations = _configurations;
     }
-    if(_systemPrompt !== null){
+    if (_systemPrompt !== null) {
       progressiveTab.property.aiRequest.systemPrompt = _systemPrompt;
     }
     this.tab = progressiveTab;
@@ -2370,7 +2380,7 @@ class AiRequestExplorerViewModel {
     // this.compareRequestWithServer();
   };
 
-  private decodeAiRequestAuth = async(
+  private decodeAiRequestAuth = async (
     aiRequest: AiRequestType,
     _collectionLevelAuth: Partial<AiRequestCollectionLevelAuthProfileTabInterface>,
   ): Auth | CollectionAuthBaseInterface => {
@@ -2407,9 +2417,14 @@ class AiRequestExplorerViewModel {
       }
     } else {
       const componentData = this._tab.getValue();
-      const environments =  await this.getActiveEnvironments(componentData?.path?.workspaceId);
+      const environments = await this.getActiveEnvironments(
+        componentData?.path?.workspaceId,
+      );
       const token = aiRequest.auth.apiKey.authValue;
-      const decryptToken = this.setEnvironmentVariables(token, environments.filtered)
+      const decryptToken = this.setEnvironmentVariables(
+        token,
+        environments.filtered,
+      );
       auth = createDeepCopy(aiRequest.auth);
       auth.apiKey.authValue = decryptToken;
     }
@@ -2426,14 +2441,18 @@ class AiRequestExplorerViewModel {
   ) => {
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
-    const environments = await this.getActiveEnvironments(componentData?.path?.workspaceId);
+    const environments = await this.getActiveEnvironments(
+      componentData?.path?.workspaceId,
+    );
     const tabId = componentData.tabId;
     const modelProvider = componentData.property.aiRequest.aiModelProvider;
     const modelVariant = componentData.property.aiRequest.aiModelVariant;
-    const authKey = (await this.decodeAiRequestAuth(
+    const authKey = (
+      await this.decodeAiRequestAuth(
         componentData.property.aiRequest,
         this._collectionAuthProfile.getValue(),
-    ))?.apiKey;
+      )
+    )?.apiKey;
     const systemPrompt = componentData.property.aiRequest.systemPrompt;
     const currConfigurations = componentData.property.aiRequest.configurations;
     const isChatAutoClearActive =
@@ -2448,16 +2467,27 @@ class AiRequestExplorerViewModel {
 
     let finalSP = null;
     if (systemPrompt.length) {
-       finalSP = this.setEnvironmentVariables(systemPrompt, environments.filtered);
+      finalSP = this.setEnvironmentVariables(
+        systemPrompt,
+        environments.filtered,
+      );
       // const SPDatas = JSON.parse(systemPromptWithVariables);
       // if (SPDatas.length)
       //   finalSP = SPDatas.map((obj) => obj.data.text).join("");
     }
 
-    let stringifiedConversation = JSON.stringify(componentData?.property?.aiRequest?.ai?.conversations || []);
-    let decryptedConversationString = this.setEnvironmentVariables(stringifiedConversation, environments.filtered);
+    let stringifiedConversation = JSON.stringify(
+      componentData?.property?.aiRequest?.ai?.conversations || [],
+    );
+    let decryptedConversationString = this.setEnvironmentVariables(
+      stringifiedConversation,
+      environments.filtered,
+    );
     let decryptedConversationObject = JSON.parse(decryptedConversationString);
-    let decryptedAuth =  this.setEnvironmentVariables(authKey.authValue || "", environments.filtered);
+    let decryptedAuth = this.setEnvironmentVariables(
+      authKey.authValue || "",
+      environments.filtered,
+    );
 
     if (isJsonFormatEnabed) prompt = `${prompt} (Give Response In JSON Format)`;
     const userInputConvo = this.aiAssistentWebSocketService.prepareConversation(
@@ -2556,18 +2586,8 @@ class AiRequestExplorerViewModel {
               let errorMessage: string;
 
               if (response.message.includes("Limit Reached")) {
-                let teamData;
-                const workspace =
-                  await this.workspaceRepository.getActiveWorkspaceDoc();
-                const teamId = workspace.toMutableJSON().team?.teamId;
-                if (teamId) {
-                  teamData = await this.teamRepository.getTeamDoc(teamId);
-                }
-                errorMessage = `You have used all ${teamData?.toMutableJSON()
-                  .plan?.limits?.aiRequestsPerMonth
-                  ?.value} of your Sparrow AI requests for the month on the ${teamData?.toMutableJSON()
-                  .plan
-                  ?.name} Plan. To continue getting instant help with debugging, suggestions, and analysis, please upgrade your plan.`;
+                errorMessage =
+                  "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section.";
               } else if (response.message.includes("Some Issue Occurred")) {
                 errorMessage =
                   "Some issue occurred from server while processing your request, please try again.";
@@ -2923,14 +2943,9 @@ class AiRequestExplorerViewModel {
         typeof response.data?.data === "string" &&
         response.data.data.includes("Limit Reached")
       ) {
-        let teamData;
-        if (teamId) {
-          teamData = await this.teamRepository.getTeamDoc(teamId);
-        }
-        const updatedMessage = `You have used all ${teamData?.toMutableJSON().plan?.limits?.aiRequestsPerMonth?.value} of your Sparrow AI requests for the month on the ${teamData?.toMutableJSON().plan?.name} Plan. To continue getting instant help with debugging, suggestions, and analysis, please upgrade your plan.`;
         return {
           successStatus: false,
-          message: updatedMessage,
+          message: response.data.message,
           aiGeneratedPrompt: "",
           isLimitReached: true,
           target,
