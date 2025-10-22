@@ -939,7 +939,7 @@
   padding: 1px;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  overflow: hidden; /* ✅ prevents content overflow */
+  overflow: hidden;
 }
 
 .downgrade-card-inner {
@@ -947,7 +947,7 @@
   border-radius: 7px;
   width: 100%;
   height: 100%;
-  padding: 16px; /* ✅ consistent padding */
+  padding: 16px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
