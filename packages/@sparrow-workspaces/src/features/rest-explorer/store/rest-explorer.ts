@@ -12,6 +12,7 @@ export type restExplorerData = {
     bodyLanguage: string;
     bodyFormatter: string;
     testResults?: any[];
+    testMessage?: {error: string; initiator: "Pre-Request" | "Post-Request"}[];
   };
   isSendRequestInProgress: boolean;
 };

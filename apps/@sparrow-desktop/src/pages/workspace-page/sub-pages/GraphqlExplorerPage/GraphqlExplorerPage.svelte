@@ -203,6 +203,7 @@
   onRenameCollection={_viewModel.handleRenameCollection}
   onRenameFolder={_viewModel.handleRenameFolder}
   onClearQuery={_viewModel.clearQuery}
+  onClearVariables={_viewModel.clearVariables}
   onFetchSchema={_viewModel.updateRequestSchema}
   updateSchema={_viewModel.updateSchema}
   onUpdateVariables={_viewModel.updateRequestVariables}

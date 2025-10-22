@@ -72,6 +72,7 @@ use tauri::Manager;
 use url_fetch_handler::import_swagger_url;
 use urlencoded_handler::make_www_form_urlencoded_request;
 use utils::response_decoder::decode_response_body;
+use base64::Engine;
 
 // Web socket imports
 use futures_util::{SinkExt, StreamExt};
@@ -79,6 +80,7 @@ use std::sync::Arc;
 use tokio::sync::mpsc::{self, UnboundedSender};
 use tokio::sync::Mutex;
 use tokio_tungstenite::tungstenite::protocol::Message;
+
 // --- Connect WebSocket with invalid certs allowed ---
 use tokio_tungstenite::tungstenite::client::IntoClientRequest;
 use tokio_tungstenite::Connector as WsConnector;
@@ -98,10 +100,7 @@ use tokio::sync::Mutex as SocketMutex;
 extern crate objc;
 
 #[cfg(target_os = "macos")]
-extern crate cocoa;
-
-#[cfg(target_os = "macos")]
-use cocoa::appkit::{NSWindow, NSWindowButton, NSWindowStyleMask, NSWindowTitleVisibility};
+use objc::runtime::{Object, YES, NO};
 use tauri::{Runtime, WebviewWindow};
 
 pub trait WindowExt {
@@ -114,53 +113,53 @@ pub trait WindowExt {
 impl<R: Runtime> WindowExt for WebviewWindow<R> {
     fn set_transparent_titlebar(&self, title_transparent: bool, remove_toolbar: bool) {
         unsafe {
-            let id = self.ns_window().unwrap() as cocoa::base::id;
+            let id = self.ns_window().unwrap() as *mut Object;
 
             // Set titlebar transparency
-            NSWindow::setTitlebarAppearsTransparent_(id, cocoa::base::YES);
-            let mut style_mask = id.styleMask();
-            style_mask.set(
-                NSWindowStyleMask::NSFullSizeContentViewWindowMask,
-                title_transparent,
-            );
-            id.setStyleMask_(style_mask);
+            let _: () = msg_send![id, setTitlebarAppearsTransparent: YES];
+            
+            // Get current style mask
+            let mut style_mask: u64 = msg_send![id, styleMask];
+            
+            // NSFullSizeContentViewWindowMask = 1 << 15 = 32768
+            const NS_FULL_SIZE_CONTENT_VIEW_WINDOW_MASK: u64 = 1 << 15;
+            
+            if title_transparent {
+                style_mask |= NS_FULL_SIZE_CONTENT_VIEW_WINDOW_MASK;
+            } else {
+                style_mask &= !NS_FULL_SIZE_CONTENT_VIEW_WINDOW_MASK;
+            }
+            
+            let _: () = msg_send![id, setStyleMask: style_mask];
 
             // Adjust toolbar visibility
             if remove_toolbar {
                 self.set_toolbar_visibility(false);
             }
 
-            id.setTitleVisibility_(if title_transparent {
-                NSWindowTitleVisibility::NSWindowTitleHidden
-            } else {
-                NSWindowTitleVisibility::NSWindowTitleVisible
-            });
+            // NSWindowTitleHidden = 1, NSWindowTitleVisible = 0
+            let title_visibility = if title_transparent { 1u32 } else { 0u32 };
+            let _: () = msg_send![id, setTitleVisibility: title_visibility];
 
-            id.setTitlebarAppearsTransparent_(if title_transparent {
-                cocoa::base::YES
-            } else {
-                cocoa::base::NO
-            });
+            let transparent = if title_transparent { YES } else { NO };
+            let _: () = msg_send![id, setTitlebarAppearsTransparent: transparent];
         }
     }
 
     fn set_toolbar_visibility(&self, visible: bool) {
         unsafe {
-            let id = self.ns_window().unwrap() as cocoa::base::id;
+            let id = self.ns_window().unwrap() as *mut Object;
 
-            let visibility = if visible {
-                cocoa::base::NO
-            } else {
-                cocoa::base::YES
-            };
-            let buttons = [
-                id.standardWindowButton_(NSWindowButton::NSWindowCloseButton),
-                id.standardWindowButton_(NSWindowButton::NSWindowMiniaturizeButton),
-                id.standardWindowButton_(NSWindowButton::NSWindowZoomButton),
-            ];
-
-            for button in buttons {
-                let _: () = msg_send![button, setHidden: visibility];
+            let visibility = if visible { NO } else { YES };
+            
+            // NSWindowCloseButton = 0, NSWindowMiniaturizeButton = 1, NSWindowZoomButton = 2
+            let button_types = [0u32, 1u32, 2u32];
+            
+            for button_type in button_types {
+                let button: *mut Object = msg_send![id, standardWindowButton: button_type];
+                if !button.is_null() {
+                    let _: () = msg_send![button, setHidden: visibility];
+                }
             }
         }
     }
@@ -186,26 +185,32 @@ impl<R: Runtime> WindowExt for WebviewWindow<R> {
 
 #[cfg(target_os = "windows")]
 impl<R: Runtime> WindowExt for WebviewWindow<R> {
-    fn set_transparent_titlebar(&self, title_transparent: bool, remove_toolbar: bool) {
+    fn set_transparent_titlebar(&self, _title_transparent: bool, _remove_toolbar: bool) {
         // No-op: Not supported on Windows
     }
 
-    fn set_toolbar_visibility(&self, visible: bool) {
+    fn set_toolbar_visibility(&self, _visible: bool) {
         // No-op: Not supported on Windows
     }
 }
-
-// Static Variables
 
 // Create a single instance of reqwest Client to be used throughout the app
 static CLIENT: Lazy<Client> = Lazy::new(|| {
     Client::builder()
         .danger_accept_invalid_certs(true)
-        .pool_max_idle_per_host(10) // keep a few idle connections per host
-        .tcp_keepalive(Some(std::time::Duration::from_secs(60)))
-        .pool_idle_timeout(Some(std::time::Duration::from_secs(90)))
+        .pool_max_idle_per_host(5)         
+        .pool_idle_timeout(Some(Duration::from_secs(30))) 
+        .connect_timeout(Duration::from_secs(30))       
+        .gzip(true)
+        .deflate(true)
+        .brotli(true)
+        .tcp_nodelay(true)                
+        .cookie_store(true)
         .build()
-        .unwrap()
+        .unwrap_or_else(|e| {
+            eprintln!("Failed to build HTTP client: {}", e);
+            std::process::exit(1);
+        })
 });
 
 // Commands
@@ -441,7 +446,7 @@ async fn make_request_v2(
     }
 
     // Create request builder with request method and url
-    let mut request_builder = client.request(reqwest_method, url).headers(header_map);
+    let request_builder = client.request(reqwest_method, url).headers(header_map);
 
     // Make request call as per Body type
     let check = match request {
@@ -494,9 +499,7 @@ async fn make_request_v2(
                 Err(err) => format!("Error: {}", err),
             };
 
-            println!("{}", svg_string);
-
-            base64_string = base64::encode(svg_string);
+            base64_string = base64::engine::general_purpose::STANDARD.encode(svg_string);
         } else {
             //extract bytes from respose body for further conversion
             let bytes = response_value
@@ -504,7 +507,7 @@ async fn make_request_v2(
                 .await
                 .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
 
-            base64_string = base64::encode(bytes); // convert bytes to base64 string effiecient for transmission / no data willl not get currupted.
+            base64_string = base64::engine::general_purpose::STANDARD.encode(bytes); // convert bytes to base64 string for efficient transmission such that no data will get corrupted.
         }
 
         //create src from content type and base64 string
@@ -612,7 +615,7 @@ async fn make_request(
     return Ok(combined_json.to_string());
 }
 
-// Sturct Types
+// Struct Types
 #[derive(Clone, serde::Serialize)]
 struct Payload {
     url: String,
@@ -653,7 +656,7 @@ struct WebSocketResponse {
 #[tauri::command]
 async fn connect_websocket(
     url: String,
-    httpurl: String,
+    _httpurl: String,
     tabid: String,
     headers: String, // Stringified JSON headers
     state: tauri::State<'_, Arc<AppState>>,
@@ -973,6 +976,7 @@ async fn connect_socket_io(
 
         async move {
             // Create a message JSON object
+            #[allow(deprecated)]
             let message_json = match payload {
                 SocketIoPayload::String(str) => {
                     json!({
@@ -1037,6 +1041,7 @@ async fn connect_socket_io(
 
             // If socket_io server is not connected, that means it was a abrupt socket.io server disconnection and we need to emit the disconnect event
             if !connected {
+                #[allow(deprecated)]
                 let error_message = match err {
                     SocketIoPayload::Binary(_) => "Binary data error".to_string(),
                     SocketIoPayload::Text(values) => values
@@ -1280,7 +1285,7 @@ fn main() {
             #[cfg(any(target_os = "linux", all(debug_assertions, windows)))]
             {
                 use tauri_plugin_deep_link::DeepLinkExt;
-                app.deep_link().register_all();
+                let _ = app.deep_link().register_all();
             }
             let window = if app.get_webview_window("main").is_some() {
                 app.get_webview_window("main").unwrap()
@@ -1366,7 +1371,7 @@ fn main() {
             send_socket_io_message,
             send_graphql_request,
             show_toolbar,
-            hide_toolbar
+            hide_toolbar,
         ])
         .on_page_load(|wry_window, _payload| {
             if let Ok(url) = wry_window.url() {

@@ -289,15 +289,39 @@
   function mapScheduleData(schedule) {
     // Determine status based on isActive and executeAt
     let status = "Inactive";
-    if (schedule.isActive) {
-      const executeAt = new Date(schedule.runConfiguration?.executeAt);
-      const now = new Date();
 
-      if (schedule.runConfiguration?.runCycle === "once" && executeAt < now) {
-        status = "Expired";
+    // If the past time is in the past, keep adding interval until it's in the future
+    if (schedule?.runConfiguration?.runCycle === "once") {
+      const pastCron = schedule?.cronExpression;
+      if (pastCron) {
+        const parts = pastCron.trim().split(/\s+/);
+
+        let second = parseInt(parts[0], 10);
+        let minute = parseInt(parts[1], 10);
+        let hour = parseInt(parts[2], 10);
+        let day = parseInt(parts[3], 10);
+        let month = parseInt(parts[4], 10) - 1;
+
+        // Start from the past time
+        let now = new Date();
+        let next = new Date(
+          Date.UTC(now.getUTCFullYear(), month, day, hour, minute, second, 0),
+        );
+
+        if (next <= now) {
+          status = "Expired";
+        } else if (schedule.isActive) {
+          status = "Active";
+        } else {
+          status = "Inactive";
+        }
       } else {
-        status = "Active";
+        status = "Expired";
       }
+    } else if (schedule.isActive) {
+      status = "Active";
+    } else {
+      status = "Inactive";
     }
 
     // Format next run time
@@ -2236,8 +2260,8 @@
               style="background-color: transparent !important;"
             >
               <thead>
-                <tr>
-                  <th>Schedule Name</th>
+                <tr class="text-fs-12">
+                  <th class="text-fs-12">Schedule Name</th>
                   <th>Status</th>
                   <th>Environment</th>
                   <th>Next Run</th>
@@ -2737,14 +2761,22 @@
     padding-bottom: 12px;
     text-align: left;
     font-weight: 500;
-    font-size: 14px;
+    font-size: 12px;
     color: var(--text-ds-neutral-300);
-    border-bottom: 1px solid var(--border-ds-neutral-400);
+    border-bottom: 1px solid var(--border-ds-neutral-700);
+    padding-left: 12px;
+    padding-right: 12px;
   }
 
   .scheduled-table td {
     border-bottom: none;
-    font-size: 14px;
+    font-size: 12px;
+    background-color: var(--bg-ds-neutral-900);
+  }
+
+  .scheduled-table td {
+    border-bottom: none;
+    font-size: 12px;
     background-color: var(--bg-ds-neutral-900);
   }
 

@@ -59,6 +59,7 @@
   let scriptComponent = null;
   let teamId: string = "";
   let selectedAIModel: string = "deepseek";
+  let preScriptComponent = null;
 
   const restExplorerDataStoreSubscriber = restExplorerDataStore.subscribe(
     (_webSocketMap) => {
@@ -113,6 +114,9 @@
       if (prevTabId !== tab?.tabId) {
         if (scriptComponent?.handleTabChange) {
           scriptComponent.handleTabChange();
+        }
+        if (preScriptComponent?.handleTabChange) {
+          preScriptComponent.handleTabChange();
         }
         isMergeViewEnableForRequestBody = false;
         isMergeViewEnableForParams = false;
@@ -247,6 +251,7 @@
   bind:newModifiedContent
   bind:mergeViewRequestDatasetType
   bind:scriptComponent
+  bind:preScriptComponent
   {collection}
   storeData={restExplorerData}
   {environmentVariables}
@@ -299,8 +304,12 @@
   InsertGenerateTrialFlow={_viewModel.InsertGenerateTrialFlow}
   isCloseRequestTestDemo={_viewModel.updateIsRequestTabDemo}
   requestTabTestsDemoCompleted={_viewModel.handleRequestTestNoCodeDemoCompleted}
+  requestTabAssertionsDemoCompleted={_viewModel.handleRequestAssertionsDemoCompleted}
+  isCloseRequestAssertionsDemo={_viewModel.updateIsRequestTabAssertionsDemo}
   isCloseRequestTestScriptDemo={_viewModel.updateIsRequestTabScriptDemo}
   requestTabTestScriptDemoCompleted={_viewModel.handleRequestTestScriptDemoCompleted}
   onGenerateTestCases={_viewModel.generateTestCases}
   selectedModel={selectedAIModel}
+  onGeneratePreScript={_viewModel.generatePreScript}
+  updateRequestStatAiChatBot={_viewModel.updateRequestStateAiChatBot}
 />

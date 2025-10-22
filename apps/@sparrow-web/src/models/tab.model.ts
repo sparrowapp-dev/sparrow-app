@@ -284,7 +284,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 21,
+  version: 22,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -414,37 +414,37 @@ export const tabSchemaLiteral = {
                 },
               },
             },
-            tests:{
+            tests: {
               type: "object",
               properties: {
                 testCaseMode: {
                   type: "string",
                 },
                 noCode: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        id: {
-                          type: "string",
-                        },
-                        name: {
-                          type: "string",
-                        },
-                        condition: {
-                          type: "string",
-                        },
-                        expectedResult: {
-                          type: "string",
-                        },
-                        testPath: {
-                          type: "string",
-                        },
-                        testTarget: {
-                          type: "string",
-                        },
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      id: {
+                        type: "string",
+                      },
+                      name: {
+                        type: "string",
+                      },
+                      condition: {
+                        type: "string",
+                      },
+                      expectedResult: {
+                        type: "string",
+                      },
+                      testPath: {
+                        type: "string",
+                      },
+                      testTarget: {
+                        type: "string",
                       },
                     },
+                  },
                 },
                 script: {
                   type: "string",
@@ -634,11 +634,14 @@ export const tabSchemaLiteral = {
             isGeneratedVariable: {
               type: "boolean",
             },
-            isRequestTestsNoCodeDemoCompleted:{
-              type:"boolean"
+            isRequestTestsNoCodeDemoCompleted: {
+              type: "boolean",
             },
-            isRequestTestsScriptDemoCompleted: { 
-              type: "boolean" 
+            isRequestTestsScriptDemoCompleted: {
+              type: "boolean",
+            },
+            isRequestAssertionsDemoCompleted: {
+              type: "boolean",
             },
           },
         },
@@ -1410,14 +1413,14 @@ export const tabSchemaLiteral = {
                 required: ["id", "source", "target"],
               },
             },
-            state : {
+            state: {
               type: "object",
               properties: {
                 testflowNavigator: {
                   type: "string",
                 },
-              }
-            }
+              },
+            },
           },
         },
         aiRequest: {
@@ -1827,11 +1830,18 @@ export const tabSchemaLiteral = {
             scheduleName: { type: "string" },
             lastestExecuted: { type: "string" },
           },
-          required: ["nodes", "edges", "result", "isScheduled", "scheduleName", "lastestExecuted"],
+          required: [
+            "nodes",
+            "edges",
+            "result",
+            "isScheduled",
+            "scheduleName",
+            "lastestExecuted",
+          ],
         },
         testflowSchedule: {
           type: "object",
-          properties: {    
+          properties: {
             notifications: {
               type: "object",
               properties: {
@@ -1857,13 +1867,12 @@ export const tabSchemaLiteral = {
                     type: "number",
                   },
                 },
-             
               },
             },
             state: {
               type: "object",
               properties: {
-                scheduleNavigator: { type: "string" },     
+                scheduleNavigator: { type: "string" },
               },
             },
             environmentId: { type: "string" },

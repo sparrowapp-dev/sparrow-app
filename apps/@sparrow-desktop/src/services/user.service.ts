@@ -6,11 +6,10 @@ import { getSelfhostUrls } from "@app/utils/jwt";
 let apiUrl: string = constants.API_URL;
 export class UserService {
   constructor() {
-     const [selfhostBackendUrl] = getSelfhostUrls();
+    const [selfhostBackendUrl] = getSelfhostUrls();
     if (selfhostBackendUrl) {
       apiUrl = selfhostBackendUrl;
-    }
-    else{
+    } else {
       apiUrl = constants.API_URL;
     }
   }
@@ -139,6 +138,22 @@ export class UserService {
     const response = await makeRequest(
       "POST",
       `${apiUrl}/api/user/request-tests-script-demo`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  /**
+   * If the user has completed Demo of RequestTests Assertions.
+   *
+   * @returns A promise that resolves to the server's response.
+   */
+  public requestTabAssertionsDemoCompleted = async () => {
+    const response = await makeRequest(
+      "POST",
+      `${apiUrl}/api/user/request-assertions-demo`,
       {
         headers: getAuthHeaders(),
       },

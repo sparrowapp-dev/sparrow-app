@@ -67,6 +67,7 @@
 
   // reactive selected model for this team (fallback to "deepseek")
   $: selectedAIModel = teamId ? $aiChatBotModelByTeam.get(teamId) : "deepseek";
+  let preScriptComponent = null;
 
   const restExplorerDataStoreSubscriber = restExplorerDataStore.subscribe(
     (_webSocketMap) => {
@@ -117,6 +118,9 @@
       if (prevTabId !== tab?.tabId) {
         if (scriptComponent?.handleTabChange) {
           scriptComponent.handleTabChange();
+        }
+        if (preScriptComponent?.handleTabChange) {
+          preScriptComponent.handleTabChange();
         }
         isMergeViewEnableForRequestBody = false;
         isMergeViewEnableForParams = false;
@@ -258,6 +262,7 @@
   bind:newModifiedContent
   bind:mergeViewRequestDatasetType
   bind:scriptComponent
+  bind:preScriptComponent
   onOpenCollection={_viewModel.openCollection}
   onSendRequest={_viewModel.sendRequest}
   onCancelRequest={_viewModel.cancelRequest}
@@ -302,8 +307,12 @@
   InsertGenerateTrialFlow={_viewModel.InsertGenerateTrialFlow}
   isCloseRequestTestDemo={_viewModel.updateIsRequestTabDemo}
   requestTabTestsDemoCompleted={_viewModel.handleRequestTestNoCodeDemoCompleted}
+  requestTabAssertionsDemoCompleted={_viewModel.handleRequestAssertionsDemoCompleted}
+  isCloseRequestAssertionsDemo={_viewModel.updateIsRequestTabAssertionsDemo}
   isCloseRequestTestScriptDemo={_viewModel.updateIsRequestTabScriptDemo}
   requestTabTestScriptDemoCompleted={_viewModel.handleRequestTestScriptDemoCompleted}
   onGenerateTestCases={_viewModel.generateTestCases}
   selectedModel={selectedAIModel}
+  onGeneratePreScript={_viewModel.generatePreScript}
+  updateRequestStatAiChatBot={_viewModel.updateRequestStateAiChatBot}
 />

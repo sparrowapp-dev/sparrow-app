@@ -40,10 +40,13 @@
           ? 100
           : (existingShortcuts.length - 1 - index) * 100;
 
-      // Use y animation when isUpAnimation is true, x animation otherwise
+      // Horizontal or vertical based on screen size
       const targetX = expanding ? (isUpAnimation ? 0 : -20) : 0;
-      const targetY = expanding ? (isUpAnimation ? -20 : 0) : 0;
-
+      let targetY = 0;
+      if (isUpAnimation) {
+        // only apply -20px if width >= 600
+        targetY = expanding && width >= 600 ? -20 : 0;
+      }
       setTimeout(() => {
         if (isUpAnimation) {
           element.style.transform = `translateY(${targetY}px)`;

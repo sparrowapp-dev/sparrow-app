@@ -31,6 +31,7 @@
   export let scrollList;
   export let planName;
   export let selectedModel: string = "deepseek";
+  export let updateRequestStatAiChatBot: () => any;
 
   let chatContainer: HTMLElement;
   let suggestionCount = 0;
@@ -144,7 +145,7 @@
               <div
                 on:click={() => {
                   handleEventOnCloseAIPanel();
-                  onUpdateRequestState({ isChatbotActive: false });
+                  updateRequestStatAiChatBot();
                   isChatbotOpenInCurrTab.set(false);
                 }}
                 class="close-btn d-flex align-items-center justify-content-center"

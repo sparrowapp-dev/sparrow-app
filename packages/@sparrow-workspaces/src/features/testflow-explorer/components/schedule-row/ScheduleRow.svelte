@@ -10,8 +10,14 @@
   import {
     ErrorWithText,
     MoreHorizontalRegular,
+    MoreVerticalRegular,
     WarningIconNew,
   } from "@sparrow/library/icons";
+  import {
+    loadingState,
+    startLoading,
+    stopLoading,
+  } from "@sparrow/common/store";
 
   export let schedule;
   export let onPerformTestflowScheduleOperations;
@@ -140,7 +146,7 @@
 
 {#if showMenu}
   <Options
-    xAxis={activeWrapper.getBoundingClientRect().right - 150}
+    xAxis={activeWrapper.getBoundingClientRect().right - 165}
     yAxis={[
       activeWrapper.getBoundingClientRect().top - 5,
       activeWrapper.getBoundingClientRect().bottom + 5,
@@ -186,43 +192,51 @@
 >
   <td>
     <div class="d-flex flex-column">
-      <Tooltip title={schedule.name} placement="bottom-left" size="small">
-        <span class="schedule-name truncate">{schedule.name}</span>
-      </Tooltip>
-      <span class="schedule-description text-muted">
+      <!-- <Tooltip title={schedule.name} placement="bottom-left" size="small"> -->
+      <span class="schedule-name text-fs-12 truncate">{schedule.name}</span>
+      <!-- </Tooltip> -->
+      <span class="schedule-description text-fs-12 text-muted">
         {schedule.description}
       </span>
     </div>
   </td>
   <td>
-    <Tooltip
-      title={getTooltipMessage(schedule)}
-      placement="bottom-center"
-      size="small"
-    >
-      <div class="d-flex align-items-center">
-        <label class="toggle-switch" on:click={(e) => e.stopPropagation()}>
-          <input
-            type="checkbox"
-            checked={schedule.status === "Active"}
-            disabled={schedule.status === "Expired" || !isTestflowEditable}
-            on:click={(e) => e.stopPropagation()}
-            on:change={(e) => {
-              e.stopPropagation();
-              handleToggleStatus(schedule.id, e.target.checked);
-            }}
-          />
+    {#if $loadingState.get("schedule-status-" + schedule?.id)}
+      <Spinner size={"14px"} />
+    {:else}
+      <Tooltip
+        title={getTooltipMessage(schedule)}
+        placement="bottom-center"
+        size="small"
+      >
+        <div class="d-flex align-items-center">
+          <label class="toggle-switch" on:click={(e) => e.stopPropagation()}>
+            <input
+              type="checkbox"
+              checked={schedule.status === "Active"}
+              disabled={schedule.status === "Expired" || !isTestflowEditable}
+              on:click={(e) => e.stopPropagation()}
+              on:change={async (e) => {
+                e.stopPropagation();
+                startLoading("schedule-status-" + schedule?.id);
+                await handleToggleStatus(schedule.id, e.target.checked);
+                stopLoading("schedule-status-" + schedule?.id);
+              }}
+            />
+            <span
+              class="toggle-slider {schedule.status === 'Expired'
+                ? 'disabled'
+                : ''}"
+            ></span>
+          </label>
           <span
-            class="toggle-slider {schedule.status === 'Expired'
-              ? 'disabled'
-              : ''}"
-          ></span>
-        </label>
-        <span class="status-text ms-2 {schedule.status.toLowerCase()}">
-          {schedule.status}
-        </span>
-      </div>
-    </Tooltip>
+            class="status-text text-fs-12 ms-2 {schedule.status.toLowerCase()}"
+          >
+            {schedule.status}
+          </span>
+        </div>
+      </Tooltip>
+    {/if}
   </td>
   <td>
     {#if isDeletedEnvironment}
@@ -231,20 +245,29 @@
         placement="bottom-left"
         size="small"
       >
-        <span style="color: var(--text-ds-neutral-500);"
+        <span class="text-fs-12" style="color: var(--text-ds-neutral-500);"
           >{schedule.environment}</span
         ><WarningIconNew />
       </Tooltip>
     {:else if schedule.environment && schedule.environment.toLowerCase() !== "none"}
       <div class="environment-link">
         <Button
-          title={schedule.environment}
+          title={schedule?.environment?.length > 30
+            ? schedule?.environment?.slice(0, 30) + "..."
+            : schedule?.environment || ""}
           type="link-primary"
-          onClick={handleEnvironmentClick}
+          size={"extra-small"}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            handleEnvironmentClick();
+          }}
         />
       </div>
     {:else}
-      <span style="color: var(--text-ds-neutral-300);"> None </span>
+      <span class="text-fs-12" style="color: var(--text-ds-neutral-300);">
+        None
+      </span>
     {/if}
   </td>
   <td>
@@ -253,7 +276,7 @@
       placement="bottom-center"
       size="small"
     >
-      <span class="next-run-text">
+      <span class="next-run-text text-fs-12">
         {schedule.nextRun}
       </span>
     </Tooltip>
@@ -272,7 +295,7 @@
         <Tag text="Partially Failed" type={getTagType("Partially Failed")} />
       </Tooltip>
     {:else}
-      <span class="text-muted">No results yet</span>
+      <span class="text-muted text-fs-12">No results yet</span>
     {/if}
   </td>
   <td bind:this={activeWrapper}>
@@ -285,7 +308,7 @@
             size="extra-small"
             customWidth={"24px"}
             type="teritiary-regular"
-            startIcon={MoreHorizontalRegular}
+            startIcon={MoreVerticalRegular}
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
@@ -470,5 +493,10 @@
 
   .status-text.expired {
     color: var(--text-ds-neutral-500);
+  }
+  td {
+    border-bottom: 1px solid var(--border-ds-neutral-700);
+    padding-left: 12px;
+    padding-right: 12px;
   }
 </style>

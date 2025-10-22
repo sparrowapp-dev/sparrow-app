@@ -33,6 +33,7 @@
   export let handleApplyChangeOnAISuggestion;
   export let planName;
   export let selectedModel: string = "deepseek";
+  export let updateRequestStatAiChatBot:() => any;
 
   let scrollList: ScrollList;
 
@@ -92,6 +93,7 @@
       {onStopGeneratingAIResponse}
       {handleApplyChangeOnAISuggestion}
       {planName}
+      {updateRequestStatAiChatBot}
       bind:scrollList
       {selectedModel}
     />

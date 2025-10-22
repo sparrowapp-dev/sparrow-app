@@ -95,13 +95,12 @@ class InitRequestTab {
             },
             {
               key: "User-Agent",
-              value:
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+              value: "SparrowAgent/v2",
               checked: true,
             },
             {
               key: "Accept-Encoding",
-              value: "gzip, br",
+              value: "gzip, deflate, br",
               checked: true,
             },
           ],
@@ -117,8 +116,8 @@ class InitRequestTab {
                 testTarget: "",
               },
             ],
-
             script: "",
+            preScript: "",
           },
           state: {
             requestBodyLanguage: RequestDataTypeEnum.TEXT,
@@ -172,6 +171,7 @@ class InitRequestTab {
           isGeneratedVariable: false,
           isRequestTestsNoCodeDemoCompleted: false,
           isRequestTestsScriptDemoCompleted: false,
+          isRequestAssertionsDemoCompleted: false,
         },
       },
       path: {
@@ -275,6 +275,11 @@ class InitRequestTab {
   public updateIsRequestTestScriptGuide(_value: boolean) {
     if (this._tab.property.request) {
       this._tab.property.request.isRequestTestsScriptDemoCompleted = _value;
+    }
+  }
+  public updateIsRequestAssertionsGuide(_value: boolean) {
+    if (this._tab.property.request) {
+      this._tab.property.request.isRequestAssertionsDemoCompleted = _value;
     }
   }
 }

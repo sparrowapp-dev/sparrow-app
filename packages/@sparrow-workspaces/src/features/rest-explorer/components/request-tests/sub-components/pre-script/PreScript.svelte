@@ -30,13 +30,13 @@
 
   export let onTestsChange;
   export let tests;
-  export let onGenerateTestCases;
-  export let isTestCasesGenerating;
+  export let onGeneratePreScript;
+  export let isPreScriptGenerating;
   export let isGuestUser;
   export let userRole;
 
   type SplitDirection = "vertical" | "horizontal";
-  type EditorLanguage = "TestJavaScript";
+  type EditorLanguage = "PreTestJavaScript";
 
   // Snippet type (based on your utils/common-snippets.ts)
   interface Snippet {
@@ -45,7 +45,7 @@
   }
 
   export let tabSplitDirection: SplitDirection = "vertical";
-  export let lang: EditorLanguage = "TestJavaScript";
+  export let lang: EditorLanguage = "PreTestJavaScript";
 
   export let isBodyBeautified: boolean = false;
 
@@ -62,8 +62,8 @@
   let originalTestContent = "";
   let currentPrompt = "";
   let originalLineCount = 0;
-  let temporaryDisplayContent = "";
-  let contentAddedDuringGeneration = "";
+  let temporaryDisplayContent = ""; // Added for temporary content display
+  let contentAddedDuringGeneration = ""; // Added to track snippets during generation
 
   // Persistent highlighting variables
   let observer: MutationObserver | null = null;
@@ -87,13 +87,13 @@
   const updateBeautifiedState = (val: boolean): void => {
     isBodyBeautified = val;
   };
-
   //handler function to remove the changes on tab switch
   export const handleTabChange = () => {
     if (showGeneratedTestActions) {
       rejectGeneratedTest();
     }
   };
+
   const handleCodeMirrorChange = (e: any) => {
     const newContent = e.detail;
 
@@ -145,10 +145,10 @@
       }
 
       const nonGeneratedContent = nonGeneratedLines.join("\n");
-      onTestsChange({ ...tests, script: nonGeneratedContent });
+      onTestsChange({ ...tests, preScript: nonGeneratedContent });
     } else {
       // Normal behavior when no generated content is protected
-      onTestsChange({ ...tests, script: newContent });
+      onTestsChange({ ...tests, preScript: newContent });
     }
 
     // Re-apply highlights if we have generated content
@@ -215,11 +215,10 @@
     isLeftPanelCollapsed = !isLeftPanelCollapsed;
   };
 
-  // Update the selectSnippet function to properly handle snippets without affecting generated content tracking
   const selectSnippet = (data: string): void => {
     let value = showGeneratedTestActions
       ? temporaryDisplayContent
-      : tests?.script || "";
+      : tests?.preScript || "";
 
     const newValue = value ? `${value}\n${data}` : data;
 
@@ -245,16 +244,13 @@
         ? `${contentAddedDuringGeneration}\n${data}`
         : data;
 
-      // DON'T update the stored tests.script during generation
-      // This preserves the original content for rejection
-
       // Reapply highlights
       setTimeout(() => {
         highlightGeneratedContent();
       }, 0);
     } else {
       // Normal behavior when no generated content is active
-      onTestsChange({ ...tests, script: newValue });
+      onTestsChange({ ...tests, preScript: newValue });
     }
   };
 
@@ -278,14 +274,14 @@
 
   const handleGenerateTestCases = async () => {
     // Store the original content and current prompt
-    originalTestContent = tests?.script || "";
+    originalTestContent = tests?.preScript || "";
     contentAddedDuringGeneration = "";
     originalLineCount = originalTestContent.trim()
       ? originalTestContent.split("\n").length
       : 0;
     currentPrompt = testCasePrompt;
 
-    const result = await onGenerateTestCases(testCasePrompt);
+    const result = await onGeneratePreScript(testCasePrompt);
     if (result?.error) {
       if (result?.message === "Limit reached. Please try again later.") {
         isUserLimitReached = true;
@@ -518,7 +514,7 @@
     removeHighlight();
 
     // Save the complete content (original + snippets + generated)
-    onTestsChange({ ...tests, script: temporaryDisplayContent });
+    onTestsChange({ ...tests, preScript: temporaryDisplayContent });
 
     // Clear temporary state
     showGeneratedTestActions = false;
@@ -546,7 +542,7 @@
     }
 
     // Save the reverted content (original + snippets, but no AI generation)
-    onTestsChange({ ...tests, script: revertedContent });
+    onTestsChange({ ...tests, preScript: revertedContent });
 
     // Clear all temporary state
     showGeneratedTestActions = false;
@@ -571,7 +567,7 @@
     temporaryDisplayContent = originalTestContent;
 
     // Use the same prompt to regenerate
-    const result = await onGenerateTestCases(currentPrompt);
+    const result = await onGeneratePreScript(currentPrompt);
     if (result?.error) {
       isError = true;
       errorMessage =
@@ -720,11 +716,11 @@
           bind:lang
           value={showGeneratedTestActions
             ? temporaryDisplayContent
-            : tests?.script || ""}
+            : tests?.preScript || ""}
           on:change={handleCodeMirrorChange}
           isEditable={true}
           autofocus={true}
-          placeholder={`// What are the tests?\n// Tests are scripts that automatically check your API's response.\n// For example: Is the status code 200? Does the body contain an email field?\n// sp.test("Status code is 200", function () {\n//   sp.expect(sp.response.statusCode).to.equal(200);\n// });\n\n// You can:\n// - Use "Snippets" to insert common tests\n// - Or, write test cases manually using scripting or no code method`}
+          placeholder={`// What are the Pre-Request tests?\n// It runs before your request is sent. Use them to set variables, headers, prepare data.\n// For example: Need a timestamp for every request?\n// sp.environment.set("timestamp", new Date());\n// sp.request.headers.set("Auth-Token", "12345");\n\n// You can:\n// - Use "Snippets" to insert common Pre-Requests\n// - Type a prompt and click "Generate" to create a Pre-Requests using AI\n// - Or, write Pre-Requests manually using scripting`}
           {isBodyBeautified}
           beautifySyntaxCallback={updateBeautifiedState}
         />
@@ -781,7 +777,7 @@
               </div>
             {/if}
 
-            {#if isTestCasesGenerating}
+            {#if isPreScriptGenerating}
               <p
                 class="text-primary-300 generating-img d-flex justify-content-center align-items-center"
                 in:fade={{ duration: 200 }}
@@ -800,7 +796,7 @@
                 <div class="input-with-button">
                   <Input
                     id="sparkle-input"
-                    placeholder="Ask AI to generate a test"
+                    placeholder="Ask AI to generate a Pre-Request"
                     startIcon={showGeneratedTestActions || isUserLimitReached
                       ? SparkleFilledIcon
                       : SparkleColoredIcon}
@@ -824,7 +820,7 @@
                 <Button
                   size="small"
                   type="outline-secondary"
-                  startIcon={isTestCasesGenerating ||
+                  startIcon={isPreScriptGenerating ||
                   showGeneratedTestActions ||
                   isUserLimitReached ||
                   isError
@@ -835,7 +831,7 @@
                     isUserLimitReached ||
                     isError}
                   onClick={() => {
-                    if (!isTestCasesGenerating) {
+                    if (!isPreScriptGenerating) {
                       if (testCasePrompt.trim()) {
                         handleGenerateTestCases();
                       } else {

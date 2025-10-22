@@ -59,6 +59,7 @@ export enum RequestDataType {
   PYTHON = "Python",
   CURL = "Curl",
   TESTJAVASCRIPT = "TestJavaScript",
+  PRETESTJAVASCRIPT = "PreTestJavaScript",
 }
 
 export enum RequestDataset {
