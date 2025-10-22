@@ -31,6 +31,8 @@
   export let onStopGeneratingAIResponse;
   export let onToggleLike;
   export let handleApplyChangeOnAISuggestion;
+  export let planName;
+  export let selectedModel: string = "deepseek";
   export let updateRequestStatAiChatBot:() => any;
   export let upgradePlanRedirect;
 
@@ -91,9 +93,11 @@
       {onUpdateRequestState}
       {onStopGeneratingAIResponse}
       {handleApplyChangeOnAISuggestion}
+      {planName}
       {updateRequestStatAiChatBot}
       bind:scrollList
       {upgradePlanRedirect}
+      {selectedModel}
     />
   </div>
 {/if}

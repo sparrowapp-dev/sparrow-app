@@ -218,6 +218,10 @@
   export let newModifiedContent: string | KeyValuePair[];
   export let mergeViewRequestDatasetType: RequestDatasetEnum;
 
+  /**
+   * Plan name of hub
+   */
+  export let planName;
   //props for generating test cases function
   export let onGenerateTestCases;
   export let scriptComponent = null;
@@ -225,6 +229,8 @@
 
   //prop for generating pre-script function
   export let onGeneratePreScript;
+
+  export let selectedModel;
 
   // Reference to the splitpane container element
   let splitpaneContainer;
@@ -1502,6 +1508,8 @@
                     {onStopGeneratingAIResponse}
                     {onToggleLike}
                     {handleApplyChangeOnAISuggestion}
+                    {planName}
+                    {selectedModel}
                     {updateRequestStatAiChatBot}
                     {upgradePlanRedirect}
                   />

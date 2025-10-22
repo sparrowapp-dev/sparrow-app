@@ -18,6 +18,7 @@
   import type { CollectionDocType } from "@app/models/collection.model";
   import { RequestDatasetEnum } from "@sparrow/common/types/workspace";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
+  import { aiChatBotModelByTeam } from "@sparrow/common/store";
 
   export let tab;
   export let isTourGuideOpen = false;
@@ -54,7 +55,10 @@
   let isMergeViewLoading = false;
   let newModifiedContent: string | KeyValuePair[];
   let mergeViewRequestDatasetType: RequestDatasetEnum;
+  let planName: string = "";
   let scriptComponent = null;
+  let teamId: string = "";
+  let selectedAIModel: string = "deepseek";
   let preScriptComponent = null;
 
   const restExplorerDataStoreSubscriber = restExplorerDataStore.subscribe(
@@ -73,6 +77,10 @@
     }
   });
 
+  $: teamId = currentWorkspace ? currentWorkspace?.team?.teamId : "";
+
+  $: selectedAIModel = teamId ? $aiChatBotModelByTeam.get(teamId) : "deepseek";
+
   $: {
     restExplorerData = webSocketMap?.get(tab?.tabId);
   }
@@ -89,6 +97,13 @@
         userRole = value.role as string;
       }
     });
+  };
+
+  /**
+   * Find the plan of the hub
+   */
+  const getPlanName = async () => {
+    planName = await _viewModel.getPlanName();
   };
 
   let activeWorkspaceSubscriber;
@@ -155,6 +170,7 @@
       }
       debouncedAPIUpdater(tab);
       findUserRole();
+      getPlanName();
       prevTabName = tab?.name || "";
       prevTabId = tab?.tabId || "";
     }
@@ -242,6 +258,7 @@
   {isGuestUser}
   {isSharedWorkspace}
   {isLoginBannerActive}
+  {planName}
   onOpenCollection={_viewModel.openCollection}
   onSendRequest={_viewModel.sendRequest}
   onCancelRequest={_viewModel.cancelRequest}
@@ -292,6 +309,7 @@
   isCloseRequestTestScriptDemo={_viewModel.updateIsRequestTabScriptDemo}
   requestTabTestScriptDemoCompleted={_viewModel.handleRequestTestScriptDemoCompleted}
   onGenerateTestCases={_viewModel.generateTestCases}
+  selectedModel={selectedAIModel}
   onGeneratePreScript={_viewModel.generatePreScript}
   updateRequestStatAiChatBot={_viewModel.updateRequestStateAiChatBot}
   upgradePlanRedirect={_viewModel.handleRedirectToAdminPanel}

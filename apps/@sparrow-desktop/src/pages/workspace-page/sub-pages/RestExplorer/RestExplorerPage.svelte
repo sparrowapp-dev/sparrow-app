@@ -18,6 +18,10 @@
   import type { CollectionDocType } from "@app/models/collection.model";
   import { RequestDatasetEnum } from "@sparrow/common/types/workspace";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
+  import {
+    getAiChatBotModelForTeam,
+    aiChatBotModelByTeam,
+  } from "@sparrow/common/store";
 
   export let tab;
   export let isTourGuideOpen = false;
@@ -55,6 +59,14 @@
   let newModifiedContent: string | KeyValuePair[];
   let mergeViewRequestDatasetType: RequestDatasetEnum;
   let scriptComponent = null;
+  let planName: string = "";
+  let teamId: string = "";
+  let selectedAIModel: string = "deepseek";
+
+  $: teamId = currentWorkspace ? currentWorkspace?.team?.teamId : "";
+
+  // reactive selected model for this team (fallback to "deepseek")
+  $: selectedAIModel = teamId ? $aiChatBotModelByTeam.get(teamId) : "deepseek";
   let preScriptComponent = null;
 
   const restExplorerDataStoreSubscriber = restExplorerDataStore.subscribe(
@@ -89,6 +101,13 @@
         userRole = value.role as string;
       }
     });
+  };
+
+  /**
+   * Find the plan of the hub
+   */
+  const getPlanName = async () => {
+    planName = await _viewModel.getPlanName();
   };
 
   let activeWorkspaceSubscriber;
@@ -155,6 +174,7 @@
       }
       debouncedAPIUpdater(tab);
       findUserRole();
+      getPlanName();
       prevTabName = tab?.name || "";
       prevTabId = tab?.tabId || "";
     }
@@ -234,6 +254,7 @@
   {isGuestUser}
   {isLoginBannerActive}
   {isSharedWorkspace}
+  {planName}
   bind:isMergeViewEnableForRequestBody
   bind:isMergeViewEnableForParams
   bind:isMergeViewEnableForHeaders
@@ -291,6 +312,7 @@
   isCloseRequestTestScriptDemo={_viewModel.updateIsRequestTabScriptDemo}
   requestTabTestScriptDemoCompleted={_viewModel.handleRequestTestScriptDemoCompleted}
   onGenerateTestCases={_viewModel.generateTestCases}
+  selectedModel={selectedAIModel}
   onGeneratePreScript={_viewModel.generatePreScript}
   updateRequestStatAiChatBot={_viewModel.updateRequestStateAiChatBot}
   upgradePlanRedirect={_viewModel.handleRedirectToAdminPanel}

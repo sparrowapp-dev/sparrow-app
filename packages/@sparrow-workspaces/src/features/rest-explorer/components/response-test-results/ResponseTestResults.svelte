@@ -113,10 +113,10 @@
     >
       {#if responseTestMessage?.length > 0}
         {#each responseTestMessage as errorMessage}
-          <div class="d-flex">
+          <div class="d-flex align-items-center px-2 mb-1 pt-2" style="">
             <p
-              class="text-fs-12 mb-2 pt-4"
-              style="color: var(--text-ds-danger-400); max-width: 700px;"
+              class="text-fs-12 pe-2 mb-0"
+              style="color: var(--text-ds-danger-400); max-width: calc(100% - 130px);"
             >
               <span class="d-inline-block">
                 <ErrorCircleRegular size={"12px"} />
@@ -128,6 +128,7 @@
             {#if !isGuestUser && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
               <Button
                 title="Fix Script"
+                size={"extra-small"}
                 startIcon={SparkleRegular}
                 type="outline-secondary"
                 loader={$loadingState.get(
