@@ -92,7 +92,7 @@ import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explore
 import { InitTab } from "@sparrow/common/factory";
 import { CollectionTabAdapter, RequestSavedTabAdapter } from "@app/adapter";
 import type { Tab } from "@sparrow/common/types/workspace/tab";
-import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
+import { TabPersistenceTypeEnum, TabTypeEnum } from "@sparrow/common/types/workspace/tab";
 import {
   CollectionAuthTypeBaseEnum,
   CollectionItemTypeBaseEnum,
@@ -103,6 +103,7 @@ import {
 } from "@sparrow/common/types/workspace/collection-base";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 import {
+  aiChatBotPanelClose,
   generatedVariableDemo,
   generateVariableStep,
 } from "@sparrow/workspaces/stores";
@@ -1643,6 +1644,38 @@ class RestExplorerViewModel {
         ).getValue();
       }
     }
+    this.compareRequestWithServer();
+  };
+
+  /**
+   * This function will close all AI chatbot instances except the one currently in use.
+   */
+  public updateRequestStateAiChatBot = async () => {
+    // Current tab from BehaviorSubject
+    const currentTab = createDeepCopy(this._tab.getValue());
+    // Get all tabs from repository
+    const allTabs = await this.tabRepository.getTabLs();
+    if (!allTabs || allTabs.length === 0) return;
+    for (const tab of allTabs) {
+      if (tab.id !== currentTab.id && tab.type === TabTypeEnum.REQUEST) {
+        let progressiveTab = createDeepCopy(tab);
+        const conversationLength =
+          progressiveTab.property?.request?.ai?.conversations?.length ?? 0;
+        if (conversationLength === 0) {
+          progressiveTab.property.request.state.isChatbotActive = false;
+          await this.tabRepository.updateTab(
+            progressiveTab.tabId,
+            progressiveTab,
+          );
+        }
+      }
+    }
+    // Always deactivate current tab AI chatbot panel.
+    aiChatBotPanelClose.set(false);
+    currentTab.property.request.state.isChatbotActive = false;
+    this.tab = currentTab;
+    await this.tabRepository.updateTab(currentTab.tabId, currentTab);
+    // Re-sync state with server
     this.compareRequestWithServer();
   };
 
