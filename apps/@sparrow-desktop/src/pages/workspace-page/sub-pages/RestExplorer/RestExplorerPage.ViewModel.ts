@@ -150,6 +150,7 @@ class RestExplorerViewModel {
    * Utils
    */
   private _decodeRequest = new DecodeRequest();
+  private _formatCurl = new FormatCurl();
   /**
    * Rest tools
    */
@@ -910,7 +911,7 @@ class RestExplorerViewModel {
   };
 
   public handleFormatCurl = (curlCommand: string): string => {
-    return new FormatCurl().handleFormatCurl(curlCommand);
+    return this._formatCurl.handleFormatCurl(curlCommand);
   };
 
   public handleFormatUrl = (url: string) => {
