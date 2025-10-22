@@ -18,6 +18,7 @@ import {
   Debounce,
   InitRequestTab,
   MarkdownFormatter,
+  FormatCurl,
 } from "@sparrow/common/utils";
 
 // ---- DB
@@ -94,7 +95,10 @@ import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explore
 import { InitTab } from "@sparrow/common/factory";
 import { CollectionTabAdapter, RequestSavedTabAdapter } from "@app/adapter";
 import type { Tab } from "@sparrow/common/types/workspace/tab";
-import { TabPersistenceTypeEnum, TabTypeEnum } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  TabTypeEnum,
+} from "@sparrow/common/types/workspace/tab";
 import {
   CollectionAuthTypeBaseEnum,
   CollectionItemTypeBaseEnum,
@@ -123,7 +127,6 @@ import { DOMParser } from "xmldom";
 import { JSONPath } from "jsonpath-plus";
 import { captureEvent } from "@app/utils/posthog/posthogConfig";
 import { size } from "@tauri-apps/plugin-fs";
-
 class RestExplorerViewModel {
   /**
    * Repository
@@ -151,6 +154,7 @@ class RestExplorerViewModel {
    * Utils
    */
   private _decodeRequest = new DecodeRequest();
+  private _formatCurl = new FormatCurl();
   /**
    * Rest tools
    */
@@ -911,58 +915,7 @@ class RestExplorerViewModel {
   };
 
   public handleFormatCurl = (curlCommand: string): string => {
-    const rawLiteralRegex = /(\$'[\s\S]*?')$/m;
-    let rawLiteral = "";
-    const rawMatch = curlCommand.match(rawLiteralRegex);
-    if (rawMatch) {
-      rawLiteral = rawMatch[0];
-      curlCommand = curlCommand.slice(0, rawMatch.index).trim();
-    }
-    const heredocRegex = /(<<\s*EOF[\s\S]*?^EOF\s*)$/m;
-    const heredocMatch = curlCommand.match(heredocRegex);
-    let heredoc = "";
-    if (heredocMatch) {
-      heredoc = heredocMatch[0]
-        .replace(/\r\n/g, "\n")
-        .replace(/^\s+|\s+$/g, "");
-      curlCommand = curlCommand.slice(0, heredocMatch.index).trim();
-    }
-    curlCommand = curlCommand.replace(/\\\s*\n\s*/g, " ");
-    curlCommand = curlCommand.replace(/\\\s*/g, " ");
-    curlCommand = curlCommand.replace(/\s+/g, " ").trim();
-    const parts = curlCommand.match(/"[^"]*"|'[^']*'|\S+/g) || [];
-    let formatted = "";
-    for (let i = 0; i < parts.length; i++) {
-      const part = parts[i];
-      if (i === 0) {
-        formatted += part;
-      } else if (
-        part.startsWith("--") ||
-        (part.startsWith("-") && !/^-\d/.test(part))
-      ) {
-        formatted += " \\\n  " + part;
-      } else if (
-        /^https?:\/\//.test(part) ||
-        /^\$\{.*\}/.test(part) ||
-        /^[\w\/:.?&=%-]+$/.test(part)
-      ) {
-        if (parts[i - 1] && parts[i - 1].startsWith("--request")) {
-          formatted += " " + part;
-        } else {
-          formatted += " \\\n  " + part;
-        }
-      } else {
-        formatted += " " + part;
-      }
-    }
-    if (heredoc) {
-      const [firstLine, ...restLines] = heredoc.split("\n");
-      formatted += " \\\n  " + firstLine + "\n" + restLines.join("\n");
-    }
-    if (rawLiteral && !formatted.includes(rawLiteral)) {
-      formatted += ` \\\n  ${rawLiteral}`;
-    }
-    return formatted.trim();
+    return this._formatCurl.handleFormatCurl(curlCommand);
   };
 
   public handleFormatUrl = (url: string) => {
@@ -1280,7 +1233,6 @@ class RestExplorerViewModel {
 
     const updatedCurl = this.handleFormatCurl(curl);
     const stringifiedCurl = curlconverter.toJsonString(updatedCurl);
-
     const parsedCurl = JSON.parse(stringifiedCurl);
 
     // Use the same regex as ImportCurl.svelte
@@ -1835,7 +1787,8 @@ class RestExplorerViewModel {
       return restApiDataMap;
     });
     const start = Date.now();
-    const preRequest = await this.executePreScriptTestcases(this._tab.getValue().property.request,
+    const preRequest = await this.executePreScriptTestcases(
+      this._tab.getValue().property.request,
       environmentVariables.filtered || [],
       this._tab.getValue().property.request.state.requestAuthNavigation ===
         HttpRequestAuthTypeBaseEnum.AUTH_PROFILES
@@ -1844,8 +1797,8 @@ class RestExplorerViewModel {
             collectionAuthNavigation:
               this._collectionAuthProfile.getValue().authType,
           } as HttpRequestCollectionLevelAuthTabInterface)
-        : this._collectionAuth.getValue());
-      
+        : this._collectionAuth.getValue(),
+    );
 
     const decodeData = this._decodeRequest.init(
       preRequest.request,
@@ -1908,7 +1861,6 @@ class RestExplorerViewModel {
           });
           await this.executeScriptTestcases();
           await this.executeNoCodeTestcases();
-          
         }
       })
       .catch(async (error) => {
@@ -2061,123 +2013,132 @@ class RestExplorerViewModel {
   };
 
   private async executeScriptTestcases() {
-    return new Promise((resolve)=>{
+    return new Promise((resolve) => {
+      const worker = new Worker(
+        new URL("../../../../workers/test-script-worker.ts", import.meta.url),
+        {
+          type: "module",
+        },
+      );
+      // minimal chai-like expect (you can replace with a real lib like chai)
 
-const worker = new Worker(
-      new URL("../../../../workers/test-script-worker.ts", import.meta.url),
-      {
-        type: "module",
-      },
-    );
-    // minimal chai-like expect (you can replace with a real lib like chai)
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const javaScriptTestCases =
+        progressiveTab.property.request.tests.script || "";
 
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    const javaScriptTestCases =
-      progressiveTab.property.request.tests.script || "";
-
-    restExplorerDataStore.update((restApiDataMap) => {
-      const r = restApiDataMap.get(progressiveTab?.tabId);
-      if (r) {
-        // r.response.testResults = [];
-        // r.response.testMessage = "";
-        restApiDataMap.set(progressiveTab.tabId, r);
-        worker.postMessage({
-          javaScriptTestCases,
-          response: r.response,
-        });
-      }
-      return restApiDataMap;
-    });
-
-    worker.onmessage = (e) => {
-      const { success, tests, error } = e.data;
       restExplorerDataStore.update((restApiDataMap) => {
         const r = restApiDataMap.get(progressiveTab?.tabId);
         if (r) {
-          if (success) {
-            r.response.testResults = [...r.response.testResults, ...tests.map((t) => ({
-              testId: "",
-              testName: t.name,
-              testStatus: t.passed,
-              testMessage: t.error || "",
-              initiator: "Post Script"
-            }))];
-          } else {
-            r.response.testMessage = [...r.response.testMessage, {
-               error: error,
-               initiator: "Post-Request"
-            }];
-          }
-
+          // r.response.testResults = [];
+          // r.response.testMessage = "";
           restApiDataMap.set(progressiveTab.tabId, r);
+          worker.postMessage({
+            javaScriptTestCases,
+            response: r.response,
+          });
         }
         return restApiDataMap;
       });
-      worker.terminate(); // cleanup
-      resolve("resolved");
-    };
 
+      worker.onmessage = (e) => {
+        const { success, tests, error } = e.data;
+        restExplorerDataStore.update((restApiDataMap) => {
+          const r = restApiDataMap.get(progressiveTab?.tabId);
+          if (r) {
+            if (success) {
+              r.response.testResults = [
+                ...r.response.testResults,
+                ...tests.map((t) => ({
+                  testId: "",
+                  testName: t.name,
+                  testStatus: t.passed,
+                  testMessage: t.error || "",
+                  initiator: "Post Script",
+                })),
+              ];
+            } else {
+              r.response.testMessage = [
+                ...r.response.testMessage,
+                {
+                  error: error,
+                  initiator: "Post-Request",
+                },
+              ];
+            }
+
+            restApiDataMap.set(progressiveTab.tabId, r);
+          }
+          return restApiDataMap;
+        });
+        worker.terminate(); // cleanup
+        resolve("resolved");
+      };
     });
-    
   }
 
   private async executePreScriptTestcases(request, env, auth) {
     return new Promise((resolve) => {
-       const worker = new Worker(
-      new URL("../../../../workers/test-pre-script-worker.ts", import.meta.url),
-      {
-        type: "module",
-      },
-    );
-    // minimal chai-like expect (you can replace with a real lib like chai)
+      const worker = new Worker(
+        new URL(
+          "../../../../workers/test-pre-script-worker.ts",
+          import.meta.url,
+        ),
+        {
+          type: "module",
+        },
+      );
+      // minimal chai-like expect (you can replace with a real lib like chai)
 
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    const javaScriptTestCases =
-      progressiveTab.property.request.tests.preScript || "";
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const javaScriptTestCases =
+        progressiveTab.property.request.tests.preScript || "";
 
-    restExplorerDataStore.update((restApiDataMap) => {
-      const r = restApiDataMap.get(progressiveTab?.tabId);
-      if (r) {
-        r.response.testResults = [];
-        r.response.testMessage = [];
-        restApiDataMap.set(progressiveTab.tabId, r);
-        worker.postMessage({
-          javaScriptTestCases,
-          request, env,auth
-        });
-      }
-      return restApiDataMap;
-    });
-
-    worker.onmessage = (e) => {
-      const { success, tests, error, request, env, auth } = e.data;
       restExplorerDataStore.update((restApiDataMap) => {
         const r = restApiDataMap.get(progressiveTab?.tabId);
         if (r) {
-          if (success) {
-            r.response.testResults = tests.map((t) => ({
-              testId: "",
-              testName: t.name,
-              testStatus: t.passed,
-              testMessage: t.error || "",
-              initiator: "Pre Script"
-            }));
-          } else {
-            r.response.testMessage = [{
-               error: error,
-               initiator: "Pre-Request"
-            }];
-          }
-
+          r.response.testResults = [];
+          r.response.testMessage = [];
           restApiDataMap.set(progressiveTab.tabId, r);
+          worker.postMessage({
+            javaScriptTestCases,
+            request,
+            env,
+            auth,
+          });
         }
         return restApiDataMap;
       });
-      worker.terminate(); // cleanup
-      resolve({request, env, auth});
-    };
+
+      worker.onmessage = (e) => {
+        const { success, tests, error, request, env, auth } = e.data;
+        restExplorerDataStore.update((restApiDataMap) => {
+          const r = restApiDataMap.get(progressiveTab?.tabId);
+          if (r) {
+            if (success) {
+              r.response.testResults = tests.map((t) => ({
+                testId: "",
+                testName: t.name,
+                testStatus: t.passed,
+                testMessage: t.error || "",
+                initiator: "Pre Script",
+              }));
+            } else {
+              r.response.testMessage = [
+                {
+                  error: error,
+                  initiator: "Pre-Request",
+                },
+              ];
+            }
+
+            restApiDataMap.set(progressiveTab.tabId, r);
+          }
+          return restApiDataMap;
+        });
+        worker.terminate(); // cleanup
+        resolve({ request, env, auth });
+      };
     });
-   
   }
 
   /**
