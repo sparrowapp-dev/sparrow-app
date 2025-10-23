@@ -564,6 +564,11 @@ class RestExplorerViewModel {
     ) {
       result = false;
     } else if (
+      requestServer.request.tests.preScript !==
+      progressiveTab.property.request.tests.preScript
+    ) {
+      result = false;
+    } else if (
       !this.compareArray.init(
         requestServer.request.queryParams,
         progressiveTab.property.request.queryParams,
@@ -3751,7 +3756,6 @@ class RestExplorerViewModel {
     await this.updateRequestAIConversation([
       ...(componentData?.property?.request?.ai?.conversations || []),
       {
-        message: errorMessage || "Something went wrong. Please try again",
         message: errorMessage || "Something went wrong. Please try again",
         messageId: uuidv4(),
         type: MessageTypeEnum.RECEIVER,

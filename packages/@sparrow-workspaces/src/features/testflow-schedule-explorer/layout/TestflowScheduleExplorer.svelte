@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, Spinner, Toggle, Tooltip } from "@sparrow/library/ui";
+  import { Button, Modal, Spinner, Toggle, Tooltip } from "@sparrow/library/ui";
   import type { Observable } from "rxjs";
   import type { Tab } from "@sparrow/common/types/workspace/tab";
 
@@ -40,6 +40,12 @@
   export let onUpdateSchedule = (updatedSchedule) => {};
   export let onSaveSchedule;
   export let userRole;
+  export let onValidateTestflowRun;
+
+  let scheduleRunValidateData: {
+    hasLocalhostUrls?: boolean;
+    hasFormdataFiles?: boolean;
+  };
 
   const extractTimeFromISOString = new TimeISOExtractor()
     .extractTimeFromISOString;
@@ -107,6 +113,8 @@
       }
     }
   }
+
+  let isRunScheduleModalOpen = false;
 </script>
 
 {#if $tab.tabId}
@@ -158,7 +166,15 @@
               disable={$loadingState.get("schedule-run-" + schedule?.id)}
               onClick={async () => {
                 startLoading("schedule-run-" + schedule?.id);
-                await onScheduleRun();
+                scheduleRunValidateData = await onValidateTestflowRun();
+                if (
+                  scheduleRunValidateData?.hasLocalhostUrls ||
+                  scheduleRunValidateData?.hasFormdataFiles
+                ) {
+                  isRunScheduleModalOpen = true;
+                } else {
+                  await onScheduleRun();
+                }
                 stopLoading("schedule-run-" + schedule?.id);
               }}
             />
@@ -252,6 +268,80 @@
     </div>
   </div>
 {/if}
+
+<Modal
+  title={"Run Schedule"}
+  zIndex={1000}
+  isOpen={isRunScheduleModalOpen}
+  width={"35%"}
+  handleModalState={() => {
+    isRunScheduleModalOpen = false;
+  }}
+>
+  <div class="mt-2 mb-4">
+    {#if scheduleRunValidateData?.hasLocalhostUrls && scheduleRunValidateData?.hasFormdataFiles}
+      <p
+        class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium mb-3"
+        style="color: var(--text-ds-neutral-100);"
+      >
+        The schedule <b>“{schedule?.name || ""}”</b> contains APIs that may not execute
+        on the cloud. It includes local-only endpoints and form-data file uploads,
+        which cannot be accessed during scheduled execution.
+      </p>
+    {:else if scheduleRunValidateData?.hasFormdataFiles}
+      <p
+        class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium mb-3"
+        style="color: var(--text-ds-neutral-100);"
+      >
+        The schedule <b>“{schedule?.name || ""}”</b> includes form-data file uploads
+        that can’t be executed on the cloud. Please remove or replace them before
+        proceeding.
+      </p>
+    {:else if scheduleRunValidateData?.hasLocalhostUrls}
+      <p
+        class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium mb-3"
+        style="color: var(--text-ds-neutral-100);"
+      >
+        The schedule <b>“{schedule?.name || ""}”</b> contains local APIs that will
+        not execute on the cloud. To ensure all tests run successfully, deploy the
+        APIs before running.
+      </p>
+    {:else}
+      <p
+        class="text-ds-font-size-14 text-ds-line-height-143 text-ds-font-weight-medium mb-3"
+        style="color: var(--text-ds-neutral-100);"
+      >
+        Something went wrong while validating the testflow before running the
+        schedule.
+      </p>
+    {/if}
+  </div>
+  <div class="d-flex justify-content-end gap-2">
+    <Button
+      title={"Cancel"}
+      textClassProp={"fs-6"}
+      size={"medium"}
+      customWidth={"95px"}
+      type={"secondary"}
+      onClick={() => {
+        isRunScheduleModalOpen = false;
+      }}
+    ></Button>
+    <Button
+      title={"Run Anyway"}
+      size={"medium"}
+      textClassProp={"fs-6"}
+      type={"primary"}
+      customWidth={"155px"}
+      onClick={async () => {
+        isRunScheduleModalOpen = false;
+        startLoading("schedule-run-" + schedule?.id);
+        await onScheduleRun();
+        stopLoading("schedule-run-" + schedule?.id);
+      }}
+    ></Button>
+  </div>
+</Modal>
 
 <style>
   .dot {

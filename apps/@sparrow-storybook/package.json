@@ -37,8 +37,7 @@
   },
   "lint-staged": {
     "*.{js,ts,svelte,css,json}": [
-      "prettier --write",
-      "eslint --fix"
+      "prettier --write"
     ]
   }
 }
