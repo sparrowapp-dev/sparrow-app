@@ -573,6 +573,11 @@ class RestExplorerViewModel {
     ) {
       result = false;
     } else if (
+      requestServer.request.tests.preScript !==
+      progressiveTab.property.request.tests.preScript
+    ) {
+      result = false;
+    } else if (
       !this.compareArray.init(
         requestServer.request.queryParams,
         progressiveTab.property.request.queryParams,
@@ -4301,7 +4306,7 @@ class RestExplorerViewModel {
     }
   };
 
-  /**
+   /**
    * Generates pre-request script for the particular API Request Tab.
    *
    * @param prompt - The prompt to be used for generating the pre-request script.

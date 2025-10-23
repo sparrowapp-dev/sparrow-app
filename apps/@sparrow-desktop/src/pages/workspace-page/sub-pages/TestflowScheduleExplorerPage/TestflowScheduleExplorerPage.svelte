@@ -166,4 +166,5 @@
   onEditTestflowSchedule={_viewModel.editTestflowSchedule}
   onOpenTestflow={_viewModel.handleOpenTestflow}
   onOpenEnvironment={_viewModel.handleOpenEnvironment}
+  onValidateTestflowRun={_viewModel.validateTestflowRun}
 />
