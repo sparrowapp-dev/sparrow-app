@@ -564,6 +564,11 @@ class RestExplorerViewModel {
     ) {
       result = false;
     } else if (
+      requestServer.request.tests.preScript !==
+      progressiveTab.property.request.tests.preScript
+    ) {
+      result = false;
+    } else if (
       !this.compareArray.init(
         requestServer.request.queryParams,
         progressiveTab.property.request.queryParams,
@@ -4314,53 +4319,6 @@ const worker = new Worker(
     } catch (error) {
       stopLoading(tabId + "generatingTestCases");
       notifications.error("Failed to generate test. Please try again.");
-    }
-  };
-
-  /**
-   * Generates pre-request script for the particular API Request Tab.
-   *
-   * @param prompt - The prompt to be used for generating the pre-request script.
-   * @returns - The response from the AI assistant service.
-   */
-  public generatePreScript = async (prompt = "") => {
-    const isGuestUser = await this.getGuestUserState();
-    if (isGuestUser) {
-      return;
-    }
-    const componentData = this._tab.getValue();
-    const tabId = componentData?.tabId;
-    startLoading(tabId + "generatingPreScript");
-
-    let workspaceId = componentData.path.workspaceId;
-    let workspaceVal = await this.readWorkspace(workspaceId);
-    let teamId = workspaceVal.team?.teamId;
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    const testCases = progressiveTab.property.request.tests;
-    const originalPreScript = testCases.preScript || "";
-
-    try {
-      const response = await this.aiAssistentService.generatePreScript({
-        text: prompt,
-        teamId: teamId,
-      });
-      if (response.isSuccessful) {
-        stopLoading(tabId + "generatingPreScript");
-        const generatedContent = response?.data?.data.result;
-        notifications.success("Pre-request script is generated successfully.");
-        return {
-          generatedContent: generatedContent,
-          originalContent: originalPreScript,
-        };
-      } else {
-        stopLoading(tabId + "generatingPreScript");
-        return response?.data;
-      }
-    } catch (error) {
-      stopLoading(tabId + "generatingPreScript");
-      notifications.error(
-        "Failed to generate pre-request script. Please try again.",
-      );
     }
   };
 
