@@ -26,7 +26,7 @@
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import Teams from "../Teams/Teams.svelte";
-  import { Modal, notifications } from "@sparrow/library/ui";
+  import { Button, Modal, notifications } from "@sparrow/library/ui";
   import { CreateWorkspace } from "@sparrow/teams/features";
   import { CreateTeam } from "@sparrow/common/features";
   import CollectionsPage from "../workspace-page/CollectionsPage.svelte";
@@ -44,7 +44,11 @@
   import { GlobalSearch } from "@sparrow/common/features";
   import MarketplacePage from "../marketplace-page/MarketplacePage.svelte";
   import { ResponseMessage, TeamRole } from "@sparrow/common/enums";
-  import { planBannerisOpen, shouldRunThrottled } from "@sparrow/common/store";
+  import {
+    isSubscriptionOverDue,
+    planBannerisOpen,
+    shouldRunThrottled,
+  } from "@sparrow/common/store";
   import {
     addCollectionItem,
     isExpandCollection,
@@ -316,6 +320,7 @@
   let showProgressBar = false;
 
   let isCreateTeamModalOpen: boolean = false;
+  let isSubscriptionOverDueOpen: boolean = false;
   isGuestUserActive.subscribe((value) => {
     isGuestUser = value;
   });
@@ -607,6 +612,9 @@
     if (userRole) {
       planContent = planInfoByRole(userRole);
     }
+    if ($isSubscriptionOverDue) {
+      isSubscriptionOverDueOpen = true;
+    }
   }
 </script>
 
@@ -726,6 +734,47 @@
       }}
       onCreateTeam={_viewModel.createTeam}
     />
+  </Modal>
+
+  <Modal
+    title={"Your Subscription is Overdue"}
+    type={"dark"}
+    width={"35%"}
+    zIndex={1000}
+    isOpen={isSubscriptionOverDueOpen}
+    handleModalState={(flag) => {
+      isSubscriptionOverDueOpen = flag;
+    }}
+  >
+    <div class="d-flex flex-column">
+      <p class="text-subscription-overdue" style="margin: 0 0 16px 0;">
+        We were unable to process the payment for your {currentPlan} for the {currentTeamName}
+        Hub.
+      </p>
+
+      <p class="text-subscription-overdue" style="margin: 0 0 16px 0;">
+        Access for you and your team has been temporarily restricted. To restore
+        full access immediately, please update your payment method.
+      </p>
+      <div class="d-flex justify-content-end gap-2">
+        <!-- Close button -->
+        <Button
+          title="Access Other Hubs"
+          type="secondary"
+          size="medium"
+          onClick={() => (isSubscriptionOverDueOpen = false)}
+        />
+        <!-- Proceed button -->
+        <Button
+          title="Restore Hub Access"
+          type="primary"
+          size="medium"
+          onClick={async () => {
+            await _viewModel.handleRedirectToAdminPanel(currentTeamId);
+          }}
+        />
+      </div>
+    </div>
   </Modal>
 
   <!-- 
@@ -898,5 +947,15 @@
     width: 100%;
     max-width: 600px;
     margin: 0 auto;
+  }
+  .text-subscription-overdue {
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 1.43;
+    letter-spacing: 0;
+    vertical-align: middle;
+    color: var(--text-ds-neutral-200);
   }
 </style>
