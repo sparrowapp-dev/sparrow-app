@@ -27,7 +27,7 @@
   import constants from "@app/constants/constants";
   import { open } from "@tauri-apps/plugin-shell";
   import { Update, check } from "@tauri-apps/plugin-updater";
-  import { notifications } from "@sparrow/library/ui";
+  import { Button, notifications } from "@sparrow/library/ui";
   import { relaunch } from "@tauri-apps/plugin-process";
   import { Progress } from "@sparrow/library/ui";
   import { Updater } from "@sparrow/common/components";
@@ -50,7 +50,11 @@
   import MarketplacePage from "../marketplace-page/MarketplacePage.svelte";
   import { ResponseMessage, TeamRole } from "@sparrow/common/enums";
   import { planInfoByRole } from "@sparrow/common/utils";
-  import { planBannerisOpen, shouldRunThrottled } from "@sparrow/common/store";
+  import {
+    isSubscriptionOverDue,
+    planBannerisOpen,
+    shouldRunThrottled,
+  } from "@sparrow/common/store";
   import {
     addCollectionItem,
     isExpandCollection,
@@ -326,6 +330,7 @@
   let newAppVersion: string | undefined = "";
   let updater: Update | null;
   let isGlobalSearchOpen = false;
+  let isSubscriptionOverDueOpen: boolean = false;
 
   const WAIT_TIME_BEFORE_RESTART_IN_SECONDS = 5;
 
@@ -680,6 +685,12 @@
       planContent = planInfoByRole(userRole);
     }
   }
+
+  $: {
+    if ($isSubscriptionOverDue) {
+      isSubscriptionOverDueOpen = true;
+    }
+  }
 </script>
 
 {#if isGlobalSearchOpen && !hideGlobalSearch}
@@ -895,6 +906,48 @@
     bind:isUpgradePlanModelOpen
     handleSubmit={handleRedirectToAdmin}
   />
+</Modal>
+
+<Modal
+  title={"Your Subscription is Overdue"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isSubscriptionOverDueOpen}
+  handleModalState={(flag) => {
+    isSubscriptionOverDueOpen = flag;
+  }}
+>
+  <div class="d-flex flex-column">
+    <p class="text-subscription-overdue" style="margin: 0 0 16px 0;">
+      We were unable to process the payment for your {currentPlan} for the {currentTeamName}
+      Hub.
+    </p>
+
+    <p class="text-subscription-overdue" style="margin: 0 0 16px 0;">
+      Access for you and your team has been temporarily restricted. To restore
+      full access immediately, please update your payment method.
+    </p>
+    <div class="d-flex justify-content-end gap-2">
+      <!-- Close button -->
+      <Button
+        title="Access Other Hubs"
+        type="secondary"
+        size="medium"
+        onClick={() => (isSubscriptionOverDueOpen = false)}
+      />
+      <!-- Proceed button -->
+      <Button
+        title="Restore Hub Access"
+        type="primary"
+        size="medium"
+        onClick={async () => {
+          await _viewModel.handleRedirectToAdminPanel(currentTeamId);
+          isSubscriptionOverDueOpen = false;
+        }}
+      />
+    </div>
+  </div>
 </Modal>
 
 <Modal

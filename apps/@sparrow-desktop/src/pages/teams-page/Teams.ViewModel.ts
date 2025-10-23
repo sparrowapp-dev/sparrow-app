@@ -24,7 +24,7 @@ import { TestflowRepository } from "@app/repositories/testflow.repository";
 import { PlanRepository } from "@app/repositories/plan.repository";
 import { PlanService } from "@app/services/plan.service";
 import constants from "@app/constants/constants";
-import { planBannerisOpen } from "@sparrow/common/store";
+import { isSubscriptionOverDue, planBannerisOpen } from "@sparrow/common/store";
 import { getClientUser, getSelfhostUrls } from "@app/utils/jwt";
 import { open } from "@tauri-apps/plugin-shell";
 
@@ -103,6 +103,7 @@ export class TeamsViewModel {
           isNewInvite,
           invites,
           billing,
+          isRestricted
         } = elem;
         const updatedWorkspaces = workspaces?.map((workspace) => ({
           workspaceId: workspace.id,
@@ -133,7 +134,11 @@ export class TeamsViewModel {
           isOpen: isOpenTeam,
           invites,
           billing,
+          isRestricted
         };
+        if(isRestricted === true){
+          isSubscriptionOverDue.set(true);
+        }
         data.push(item);
       }
 

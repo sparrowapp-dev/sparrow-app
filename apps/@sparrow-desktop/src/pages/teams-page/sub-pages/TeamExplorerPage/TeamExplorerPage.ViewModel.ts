@@ -25,12 +25,17 @@ import { notifications } from "@sparrow/library/ui";
 import { BehaviorSubject, Observable } from "rxjs";
 import { navigate } from "svelte-navigator";
 import { v4 as uuidv4 } from "uuid";
-import { getAuthJwt, getClientUser, getSelfhostUrls } from "../../../../utils/jwt";
+import {
+  getAuthJwt,
+  getClientUser,
+  getSelfhostUrls,
+} from "../../../../utils/jwt";
 import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
 import constants from "@app/constants/constants";
 import { RecentWorkspaceRepository } from "@app/repositories/recent-workspace.repository";
 import { PlanRepository } from "@app/repositories/plan.repository";
 import { open } from "@tauri-apps/plugin-shell";
+import { isSubscriptionOverDue } from "@sparrow/common/store";
 
 export class TeamExplorerPageViewModel {
   constructor() {}
@@ -163,6 +168,7 @@ export class TeamExplorerPageViewModel {
           updatedAt,
           updatedBy,
           isNewInvite,
+          isRestricted,
         } = elem;
         const updatedWorkspaces = workspaces.map((workspace) => ({
           workspaceId: workspace.id,
@@ -191,7 +197,11 @@ export class TeamExplorerPageViewModel {
           updatedBy,
           isNewInvite,
           isOpen: isOpenTeam,
+          isRestricted,
         };
+        if (isRestricted === true) {
+          isSubscriptionOverDue.set(true);
+        }
         data.push(item);
       }
 
@@ -776,7 +786,7 @@ export class TeamExplorerPageViewModel {
 
     const [selfhostBackendUrl] = getSelfhostUrls();
     if (selfhostBackendUrl) {
-        return selfhostBackendUrl;
+      return selfhostBackendUrl;
     }
 
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
@@ -912,7 +922,7 @@ export class TeamExplorerPageViewModel {
 
     const [selfhostBackendUrl] = getSelfhostUrls();
     if (selfhostBackendUrl) {
-        return selfhostBackendUrl;
+      return selfhostBackendUrl;
     }
 
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
@@ -1083,7 +1093,7 @@ export class TeamExplorerPageViewModel {
         await open(
           `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
         );
-      } 
+      }
     }
   };
 

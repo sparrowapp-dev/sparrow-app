@@ -612,6 +612,9 @@
     if (userRole) {
       planContent = planInfoByRole(userRole);
     }
+  }
+
+  $: {
     if ($isSubscriptionOverDue) {
       isSubscriptionOverDueOpen = true;
     }
@@ -771,6 +774,7 @@
           size="medium"
           onClick={async () => {
             await _viewModel.handleRedirectToAdminPanel(currentTeamId);
+            isSubscriptionOverDueOpen = false;
           }}
         />
       </div>

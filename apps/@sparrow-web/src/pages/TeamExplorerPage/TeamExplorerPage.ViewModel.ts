@@ -29,6 +29,7 @@ import constants from "src/constants/constants";
 import { Sleep } from "@sparrow/common/utils";
 import { RecentWorkspaceRepository } from "src/repositories/recent-workspace.repository";
 import { PlanRepository } from "src/repositories/plan.repository";
+import { isSubscriptionOverDue } from "@sparrow/common/store";
 
 export class TeamExplorerPageViewModel {
   constructor() {}
@@ -192,6 +193,7 @@ export class TeamExplorerPageViewModel {
           updatedAt,
           updatedBy,
           isNewInvite,
+          isRestricted
         } = elem;
         const updatedWorkspaces = workspaces.map((workspace) => ({
           workspaceId: workspace.id,
@@ -220,7 +222,11 @@ export class TeamExplorerPageViewModel {
           updatedBy,
           isNewInvite,
           isOpen: isOpenTeam,
+          isRestricted
         };
+        if(isRestricted === true){
+          isSubscriptionOverDue.set(true);
+        }
         data.push(item);
       }
 

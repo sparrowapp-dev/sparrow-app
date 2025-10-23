@@ -202,6 +202,10 @@ export const teamSchemaLiteral = {
       type: "boolean",
       default: false,
     },
+    isRestricted: {
+      type: "boolean",
+      default: false,
+    },
     createdAt: {
       type: "string",
     },

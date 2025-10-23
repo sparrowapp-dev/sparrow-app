@@ -24,7 +24,7 @@ import { TestflowRepository } from "src/repositories/testflow.repository";
 import { PlanRepository } from "src/repositories/plan.repository";
 import { PlanService } from "src/services/plan.service";
 import constants from "src/constants/constants";
-import { planBannerisOpen } from "@sparrow/common/store";
+import { isSubscriptionOverDue, planBannerisOpen } from "@sparrow/common/store";
 import { getClientUser } from "src/utils/jwt";
 
 export class TeamsViewModel {
@@ -125,6 +125,7 @@ export class TeamsViewModel {
           isNewInvite,
           invites,
           billing,
+          isRestricted,
         } = elem;
         const updatedWorkspaces = workspaces?.map((workspace) => ({
           workspaceId: workspace.id,
@@ -155,10 +156,13 @@ export class TeamsViewModel {
           isOpen: isOpenTeam,
           invites,
           billing,
+          isRestricted,
         };
+        if (isRestricted === true) {
+          isSubscriptionOverDue.set(true);
+        }
         data.push(item);
       }
-
       await this.teamRepository.bulkInsertData(data);
       await this.teamRepository.deleteOrphanTeams(
         data.map((_team) => {
