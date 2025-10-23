@@ -5,7 +5,7 @@ export const requestTabScriptCardPosition = (currentStep: number) => {
     case 1:
       finalResult = {
         top: 44,
-        left: 160,
+        left: 255,
         placement: "left" as const,
       };
       break;
