@@ -265,7 +265,7 @@ export class TestflowTabAdapter {
    */
   public unadapt(_requestTab: Tab): any {
     const requestTab = createDeepCopy(_requestTab);
-    const nodes = requestTab?.property?.testflow?.nodes.map((nd) => {
+    const nodes = requestTab?.property?.testflow?.nodes.map((nd: any) => {
       const bodyType =
         nd.data.requestData?.state.requestBodyNavigation ===
         RequestDatasetEnum.RAW
@@ -310,7 +310,7 @@ export class TestflowTabAdapter {
         },
       };
     });
-    nodes.forEach((nd) => {
+    nodes.forEach((nd: any) => {
       if (nd?.type === "startBlock") {
         nd.data.requestData = null;
         nd.data.name = "";
