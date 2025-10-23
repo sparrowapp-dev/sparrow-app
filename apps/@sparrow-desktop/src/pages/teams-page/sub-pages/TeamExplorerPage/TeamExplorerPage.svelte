@@ -33,7 +33,7 @@
   const activeTeamTab: Observable<string> = _viewModel.activeTeamTab;
   let upgradePlanModalInvite = false;
   let upgradePlanModal = false;
-  let usersInvitePlanxCount: number = 5;
+  let usersInvitePlanCount: number = 5;
 
   const OnleaveTeam = _viewModel.leaveTeam;
   let userId = "";
