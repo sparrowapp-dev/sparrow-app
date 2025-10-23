@@ -177,6 +177,7 @@
   export let isCloseRequestAssertionsDemo: (value: boolean) => void;
   export let isCloseRequestTestScriptDemo: (value: boolean) => void;
   export let requestTabTestScriptDemoCompleted: () => void;
+  export let upgradePlanRedirect;
 
   // export let isLoginBannerActive = false;
   export let isPopoverContainer = true;
@@ -1506,6 +1507,7 @@
                     {planName}
                     {selectedModel}
                     {updateRequestStatAiChatBot}
+                    {upgradePlanRedirect}
                   />
                 {/if}
               </div>

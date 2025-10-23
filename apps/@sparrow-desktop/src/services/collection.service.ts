@@ -71,13 +71,12 @@ import { getSelfhostUrls } from "@app/utils/jwt";
 
 export class CollectionService {
   constructor() {
-        const [selfhostBackendUrl] = getSelfhostUrls();
-        if (selfhostBackendUrl) {
-            this.apiUrl = selfhostBackendUrl;
-        }
-        else{
-            this.apiUrl = constants.API_URL;
-        }
+    const [selfhostBackendUrl] = getSelfhostUrls();
+    if (selfhostBackendUrl) {
+      this.apiUrl = selfhostBackendUrl;
+    } else {
+      this.apiUrl = constants.API_URL;
+    }
   }
 
   private apiUrl: string = constants.API_URL;
@@ -1036,6 +1035,47 @@ export class CollectionService {
           workspaceId: `${workspaceId}`,
           generatedeVariables: generatedeVariables,
         },
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public moveRequest = async function (
+    oldCollectionId: string,
+    newCollectionId: string,
+    oldFolderId: string,
+    newFolderId: string,
+    requestId: string,
+    workspaceId: string,
+    baseUrl: string,
+    targetRequestId?: string,
+    insertPosition?: "before" | "after",
+  ) {
+    const body: Record<string, string> = {
+      oldCollectionId: `${oldCollectionId}`,
+      oldFolderId: `${oldFolderId}`,
+      newCollectionId: `${newCollectionId}`,
+      newFolderId: `${newFolderId}`,
+      requestId: `${requestId}`,
+      workspaceId: `${workspaceId}`,
+    };
+
+    // Only include targetRequestId if it's provided
+    if (targetRequestId) {
+      body.targetRequestId = `${targetRequestId}`;
+    }
+
+    // Only include insertPosition if it's provided
+    if (insertPosition) {
+      body.insertPosition = insertPosition;
+    }
+
+    const response = await makeRequest(
+      "POST",
+      `${baseUrl}/api/collection/move-request`,
+      {
+        body,
         headers: getAuthHeaders(),
       },
     );
