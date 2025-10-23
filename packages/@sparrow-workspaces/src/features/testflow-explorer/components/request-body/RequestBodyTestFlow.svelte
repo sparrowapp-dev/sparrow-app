@@ -15,6 +15,7 @@
   export let method;
   export let onUpdateRequestState;
   export let onUpdateEnvironment;
+  export let isWebApp;
 
   let isBodyBeautified = false;
 
@@ -83,6 +84,7 @@
         }}
         {handleOpenCurrentDynamicExpression}
         {onUpdateEnvironment}
+        {isWebApp}
       />
     {/if}
   </div>
