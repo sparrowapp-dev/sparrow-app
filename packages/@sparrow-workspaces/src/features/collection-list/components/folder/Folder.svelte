@@ -48,6 +48,7 @@
     addCollectionItem,
     removeCollectionItem,
   } from "../../../../stores/recent-left-panel";
+  import { setOverForbiddenZone } from "../../../../stores/drag-state";
   import MockRequest from "../mock-request/MockRequest.svelte";
   import AiRequest from "../ai-request/AiRequest.svelte";
   import { inview } from "svelte-inview";
@@ -75,6 +76,12 @@
    * @param args - Arguments to pass on open
    */
   export let onItemOpened: (entityType: string, args: any) => void;
+  /**
+   * Callback for Item Move
+   * @param args - Arguments to pass on move
+   */
+  export let onItemMoved: (args: any) => void;
+
   /**
    * Whole Collection Document
    */
@@ -108,6 +115,8 @@
   let isFolderPopup: boolean = false;
   let noOfColumns = 180;
   let isRenaming = false;
+  let isDragOver = false;
+  let isForbiddenDrop = false;
   let requestCount: number;
   let mockRequestCount: number = 0;
   let aiRequestCount: number = 0;
@@ -216,6 +225,146 @@
   //     expand = false;
   //   }
   // });
+
+  // Drag and Drop Handlers for Request
+  function handleDragOver(event: DragEvent) {
+    event.preventDefault();
+
+    // Reject all drops if this collection has activeSync enabled
+    if (collection.activeSync) {
+      isDragOver = false;
+      isForbiddenDrop = true;
+      setOverForbiddenZone(true);
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = "none";
+      }
+      return;
+    }
+
+    try {
+      // getData doesn't work in dragover, use sessionStorage
+      const dataStr =
+        typeof sessionStorage !== "undefined"
+          ? sessionStorage.getItem("sparrow-drag-data")
+          : null;
+      if (!dataStr) {
+        isDragOver = false;
+        isForbiddenDrop = false;
+        return;
+      }
+
+      const dragData = JSON.parse(dataStr);
+      const targetIsMock = isMockCollection === true;
+
+      // Restrict mock collection cross-moves: cannot move into or out of a mock collection except within same collection
+      if (
+        (dragData.isMockCollection || targetIsMock) &&
+        dragData.collectionId !== collection.id
+      ) {
+        isForbiddenDrop = true;
+        isDragOver = false;
+        setOverForbiddenZone(true);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "none";
+        }
+        return;
+      }
+
+      // Reject drops from activeSync collections
+      if (dragData.collectionActiveSync) {
+        isDragOver = false;
+        isForbiddenDrop = true;
+        setOverForbiddenZone(true);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "none";
+        }
+        return;
+      }
+
+      // Check if dropping from folder "A" to folder "A" (forbidden)
+      if (
+        dragData.folderId === explorer.id &&
+        dragData.collectionId === collection.id
+      ) {
+        isForbiddenDrop = true;
+        isDragOver = false;
+        setOverForbiddenZone(true);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "none";
+        }
+      } else {
+        isForbiddenDrop = false;
+        isDragOver = true;
+        setOverForbiddenZone(false);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "move";
+        }
+      }
+    } catch (e) {
+      isDragOver = false;
+      isForbiddenDrop = false;
+    }
+  }
+
+  function handleDragLeave(event: DragEvent) {
+    isDragOver = false;
+    isForbiddenDrop = false;
+    setOverForbiddenZone(false);
+  }
+
+  async function handleDrop(event: DragEvent) {
+    event.preventDefault();
+    isDragOver = false;
+    isForbiddenDrop = false;
+
+    // Reject all drops if this collection has activeSync enabled
+    if (collection.activeSync) {
+      return;
+    }
+
+    try {
+      const data = event.dataTransfer?.getData("text/plain");
+      if (!data) return;
+      const dragData = JSON.parse(data);
+      const targetIsMock = isMockCollection === true;
+
+      if (
+        (dragData.isMockCollection || targetIsMock) &&
+        dragData.collectionId !== collection.id
+      ) {
+        return; // Block cross-collection mock moves
+      }
+
+      // Reject drops from activeSync collections
+      if (dragData.collectionActiveSync) {
+        return;
+      }
+
+      // Don't allow dropping from folder "A" to folder "A"
+      if (
+        dragData.folderId === explorer.id &&
+        dragData.collectionId === collection.id
+      ) {
+        return;
+      }
+
+      // Only allow dropping requests (not folders)
+      if (dragData.requestId) {
+        // Call parent handler to move the request
+        // You may want to pass more info as needed
+        onItemMoved &&
+          onItemMoved({
+            oldCollectionId: dragData.collectionId,
+            newCollectionId: collection.id,
+            oldFolderId: dragData.folderId,
+            newFolderId: explorer.id,
+            requestId: dragData.requestId,
+          });
+      }
+    } catch (e) {
+      console.error("Error handling drop in Folder:", e);
+    }
+  }
 
   function rightClickContextMenu() {
     setTimeout(() => {
@@ -508,10 +657,15 @@
         activeTabId
           ? '0px'
           : '0px'} ; "
-        class=" d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
+        class="d-flex align-items-center justify-content-between my-button btn-primary {explorer.id ===
         activeTabId
           ? 'active-folder-tab'
+          : ''} {isDragOver ? 'valid-drop-zone' : ''} {isForbiddenDrop
+          ? 'drag-forbidden'
           : ''}"
+        on:dragover={handleDragOver}
+        on:dragleave={handleDragLeave}
+        on:drop={handleDrop}
       >
         <button
           tabindex="-1"
@@ -862,5 +1016,34 @@
   }
   .shortcutIcon:hover {
     background: var(--right-border);
+  }
+
+  /* Forbidden drop cursor and styling */
+  .drag-forbidden {
+    cursor: not-allowed !important;
+  }
+
+  .drag-forbidden * {
+    cursor: not-allowed !important;
+  }
+
+  /* Valid drop zone styling - blue dashed border overlay */
+  .valid-drop-zone {
+    position: relative;
+  }
+
+  .valid-drop-zone::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(59, 130, 246, 0.1);
+    border: 2px dashed rgba(59, 130, 246, 0.6);
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.2s;
+    border-radius: 4px;
   }
 </style>

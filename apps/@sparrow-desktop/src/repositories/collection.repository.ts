@@ -1265,4 +1265,236 @@ export class CollectionRepository {
       return value;
     });
   };
+
+  public moveRequest = async (
+    oldCollectionId: string,
+    newCollectionId: string,
+    oldFolderId: string,
+    newFolderId: string,
+    requestId: string,
+    targetRequestId?: string,
+    insertPosition?: "before" | "after",
+  ) => {
+    try {
+      // Handle same collection move
+      if (oldCollectionId === newCollectionId) {
+        const collection = await RxDB.getInstance()
+          .rxdb!.collection.findOne({ selector: { id: oldCollectionId } })
+          .exec();
+        if (!collection) return;
+
+        const items = createDeepCopy(collection.items);
+        let requestToMove = null;
+
+        // Remove request from old location
+        if (oldFolderId) {
+          // Find old folder and remove request from its items
+          for (const item of items) {
+            if (
+              item.id === oldFolderId &&
+              item.items &&
+              Array.isArray(item.items)
+            ) {
+              const idx = item.items.findIndex((req) => req.id === requestId);
+              if (idx !== -1) {
+                requestToMove = item.items[idx];
+                item.items.splice(idx, 1);
+                break;
+              }
+            }
+          }
+        } else {
+          // Remove from root
+          const idx = items.findIndex((req) => req.id === requestId);
+          if (idx !== -1) {
+            requestToMove = items[idx];
+            items.splice(idx, 1);
+          }
+        }
+
+        if (!requestToMove) return;
+
+        // Add to new location
+        if (newFolderId) {
+          for (const item of items) {
+            if (
+              item.id === newFolderId &&
+              item.items &&
+              Array.isArray(item.items)
+            ) {
+              // If targetRequestId is provided, insert before/after it
+              if (targetRequestId) {
+                const targetIdx = item.items.findIndex(
+                  (req) => req.id === targetRequestId,
+                );
+                if (targetIdx !== -1) {
+                  // Insert based on insertPosition (default is "before")
+                  if (insertPosition === "after") {
+                    // Insert after the target request (targetIdx + 1)
+                    item.items.splice(targetIdx + 1, 0, requestToMove);
+                  } else {
+                    // Insert before the target request
+                    item.items.splice(targetIdx, 0, requestToMove);
+                  }
+                } else {
+                  // Target not found, append to end
+                  item.items.push(requestToMove);
+                }
+              } else {
+                // No target specified, append to end
+                item.items.push(requestToMove);
+              }
+              break;
+            }
+          }
+        } else {
+          // Move to root
+          if (targetRequestId) {
+            const targetIdx = items.findIndex(
+              (req) => req.id === targetRequestId,
+            );
+            if (targetIdx !== -1) {
+              // Insert based on insertPosition (default is "before")
+              if (insertPosition === "after") {
+                // Insert after the target request (targetIdx + 1)
+                items.splice(targetIdx + 1, 0, requestToMove);
+              } else {
+                // Insert before the target request
+                items.splice(targetIdx, 0, requestToMove);
+              }
+            } else {
+              // Target not found, append to end
+              items.push(requestToMove);
+            }
+          } else {
+            // No target specified, append to end
+            items.push(requestToMove);
+          }
+        }
+
+        await collection.incrementalModify((value) => {
+          value.items = items;
+          return value;
+        });
+      } else {
+        // Handle cross-collection move
+        const [oldCollection, newCollection] = await Promise.all([
+          RxDB.getInstance()
+            .rxdb!.collection.findOne({ selector: { id: oldCollectionId } })
+            .exec(),
+          RxDB.getInstance()
+            .rxdb!.collection.findOne({ selector: { id: newCollectionId } })
+            .exec(),
+        ]);
+
+        if (!oldCollection || !newCollection) return;
+
+        const oldItems = createDeepCopy(oldCollection.items);
+        const newItems = createDeepCopy(newCollection.items);
+        let requestToMove = null;
+
+        // Remove request from old collection
+        if (oldFolderId) {
+          // Remove from old folder in old collection
+          for (const item of oldItems) {
+            if (
+              item.id === oldFolderId &&
+              item.items &&
+              Array.isArray(item.items)
+            ) {
+              const idx = item.items.findIndex((req) => req.id === requestId);
+              if (idx !== -1) {
+                requestToMove = item.items[idx];
+                item.items.splice(idx, 1);
+                break;
+              }
+            }
+          }
+        } else {
+          // Remove from old collection root
+          const idx = oldItems.findIndex((req) => req.id === requestId);
+          if (idx !== -1) {
+            requestToMove = oldItems[idx];
+            oldItems.splice(idx, 1);
+          }
+        }
+
+        if (!requestToMove) return;
+
+        // Add request to new collection
+        if (newFolderId) {
+          // Add to new folder in new collection
+          for (const item of newItems) {
+            if (
+              item.id === newFolderId &&
+              item.items &&
+              Array.isArray(item.items)
+            ) {
+              // If targetRequestId is provided, insert before/after it
+              if (targetRequestId) {
+                const targetIdx = item.items.findIndex(
+                  (req) => req.id === targetRequestId,
+                );
+                if (targetIdx !== -1) {
+                  // Insert based on insertPosition (default is "before")
+                  if (insertPosition === "after") {
+                    // Insert after the target request (targetIdx + 1)
+                    item.items.splice(targetIdx + 1, 0, requestToMove);
+                  } else {
+                    // Insert before the target request
+                    item.items.splice(targetIdx, 0, requestToMove);
+                  }
+                } else {
+                  // Target not found, append to end
+                  item.items.push(requestToMove);
+                }
+              } else {
+                // No target specified, append to end
+                item.items.push(requestToMove);
+              }
+              break;
+            }
+          }
+        } else {
+          // Add to new collection root
+          if (targetRequestId) {
+            const targetIdx = newItems.findIndex(
+              (req) => req.id === targetRequestId,
+            );
+            if (targetIdx !== -1) {
+              // Insert based on insertPosition (default is "before")
+              if (insertPosition === "after") {
+                // Insert after the target request (targetIdx + 1)
+                newItems.splice(targetIdx + 1, 0, requestToMove);
+              } else {
+                // Insert before the target request
+                newItems.splice(targetIdx, 0, requestToMove);
+              }
+            } else {
+              // Target not found, append to end
+              newItems.push(requestToMove);
+            }
+          } else {
+            // No target specified, append to end
+            newItems.push(requestToMove);
+          }
+        }
+
+        // Update both collections
+        await Promise.all([
+          oldCollection.incrementalModify((value) => {
+            value.items = oldItems;
+            return value;
+          }),
+          newCollection.incrementalModify((value) => {
+            value.items = newItems;
+            return value;
+          }),
+        ]);
+      }
+    } catch (error) {
+      console.error("Error moving request:", error);
+      Sentry.captureException(error);
+    }
+  };
 }
