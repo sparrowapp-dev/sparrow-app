@@ -32,6 +32,7 @@
   export let planName;
   export let selectedModel: string = "deepseek";
   export let updateRequestStatAiChatBot: () => any;
+  export let upgradePlanRedirect;
 
   let chatContainer: HTMLElement;
   let suggestionCount = 0;
@@ -256,6 +257,7 @@
           {onStopGeneratingAIResponse}
           placeholder={"How can I help you?"}
           {sendPrompt}
+          {upgradePlanRedirect}
           {planName}
           {selectedModel}
         />

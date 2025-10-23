@@ -19,6 +19,7 @@
   export let onUpdateAiModel;
   export let isResponseGenerating;
   export let onStopGeneratingAIResponse;
+  export let upgradePlanRedirect;
   export let planName;
   export let selectedModel;
 
@@ -170,7 +171,10 @@
                 />
               </div>
               <span class="custom-tooltip"
-                >Upgrade to use additional models.</span
+                >Upgrade to use additional models.<strong
+                  class="custom-tooltip-upgrade-text"
+                  on:click={upgradePlanRedirect}>Upgrade plan</strong
+                ></span
               >
             </div>
           {/if}
@@ -303,6 +307,10 @@
     white-space: nowrap;
     margin-bottom: 4px;
     z-index: 1000;
+  }
+  .custom-tooltip-upgrade-text {
+    color: var(--bg-ds-primary-400);
+    cursor: pointer;
   }
 
   .custom-tooltip::after {

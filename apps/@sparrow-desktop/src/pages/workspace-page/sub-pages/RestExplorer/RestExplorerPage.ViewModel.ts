@@ -115,7 +115,7 @@ import {
 } from "@sparrow/workspaces/stores";
 import { UserService } from "@app/services/user.service";
 
-import { getClientUser, getSelfhostUrls } from "@app/utils/jwt";
+import { getAuthJwt, getClientUser, getSelfhostUrls } from "@app/utils/jwt";
 import constants from "@app/constants/constants";
 import * as curlconverter from "curlconverter";
 import { TeamRepository } from "@app/repositories/team.repository";
@@ -3915,9 +3915,16 @@ class RestExplorerViewModel {
               events.forEach((event) =>
                 this.aiAssistentWebSocketService.removeListener(event),
               );
-
+              let teamData;
+              if (teamId) {
+                teamData = await this.teamRepository.getTeamDoc(teamId);
+              }
               const errorMessage = response.messages.includes("Limit Reached")
-                ? "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section."
+                ? `You have used all ${teamData?.toMutableJSON().plan?.limits
+                    ?.aiRequestsPerMonth
+                    ?.value} of your Sparrow AI requests for the month on the ${teamData?.toMutableJSON()
+                    .plan
+                    ?.name} Plan. To continue getting instant help with debugging, suggestions, and analysis, please upgrade your plan.`
                 : "Some issue occurred while processing your request, please try again.";
 
               await this.updateRequestAIConversation([
@@ -4932,11 +4939,11 @@ class RestExplorerViewModel {
     const teamId = workspaceData.toMutableJSON().team?.teamId || "";
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const testCases = progressiveTab.property.request.tests;
-    if(type === "Post-Request"){
+    if (type === "Post-Request") {
       const response = await this.aiAssistentService.fixTestScript({
         teamId: teamId,
         testScript: testCases.script,
-        type: "post-script"
+        type: "post-script",
       });
       if (response.isSuccessful) {
         this.updateRequestTests({
@@ -4946,14 +4953,14 @@ class RestExplorerViewModel {
         restExplorerDataStore.update((restApiDataMap) => {
           const r = restApiDataMap.get(progressiveTab?.tabId);
           if (r) {
-            r.response.testMessage = r?.response?.testMessage?.filter((error)=>{
-              if(error.initiator === "Post-Request"){
-                return false;
-              }
-              else{
-                return true;
-              } 
-            }) || [];
+            r.response.testMessage =
+              r?.response?.testMessage?.filter((error) => {
+                if (error.initiator === "Post-Request") {
+                  return false;
+                } else {
+                  return true;
+                }
+              }) || [];
           }
           return restApiDataMap;
         });
@@ -4965,12 +4972,11 @@ class RestExplorerViewModel {
       } else {
         notifications.error("Failed to fix test script.");
       }
-    }
-    else if(type === "Pre-Request"){
+    } else if (type === "Pre-Request") {
       const response = await this.aiAssistentService.fixTestScript({
         teamId: teamId,
         testScript: testCases.preScript,
-        type: "pre-script"
+        type: "pre-script",
       });
       if (response.isSuccessful) {
         this.updateRequestTests({
@@ -4980,14 +4986,14 @@ class RestExplorerViewModel {
         restExplorerDataStore.update((restApiDataMap) => {
           const r = restApiDataMap.get(progressiveTab?.tabId);
           if (r) {
-            r.response.testMessage = r?.response?.testMessage?.filter((error)=>{
-              if(error.initiator === "Pre-Request"){
-                return false;
-              }
-              else{
-                return true;
-              } 
-            }) || [];
+            r.response.testMessage =
+              r?.response?.testMessage?.filter((error) => {
+                if (error.initiator === "Pre-Request") {
+                  return false;
+                } else {
+                  return true;
+                }
+              }) || [];
           }
           return restApiDataMap;
         });
@@ -5008,6 +5014,21 @@ class RestExplorerViewModel {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     if (response.isSuccessful) {
       await this.fetchCollections(progressiveTab?.path?.workspaceId);
+    }
+  };
+
+  public handleRedirectToAdminPanel = async () => {
+    const workspace = await this.workspaceRepository.getActiveWorkspaceDoc();
+    const teamId = workspace.toMutableJSON().team?.teamId;
+    const [authToken] = getAuthJwt();
+    const [, , selfhostAdminUrl] = getSelfhostUrls();
+
+    if (selfhostAdminUrl) {
+      await open(selfhostAdminUrl);
+    } else {
+      await open(
+        `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+      );
     }
   };
 

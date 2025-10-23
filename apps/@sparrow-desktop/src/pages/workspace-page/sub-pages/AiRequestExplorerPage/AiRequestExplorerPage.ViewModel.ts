@@ -111,6 +111,7 @@ import type {
   ENVDocumentType,
   ENVExtractVariableType,
 } from "@sparrow/common/types/workspace/environment";
+import { TeamRepository } from "@app/repositories/team.repository";
 
 class AiRequestExplorerViewModel {
   // Repository
@@ -121,6 +122,7 @@ class AiRequestExplorerViewModel {
   private aiRequestRepository = new AiRequestRepository();
   private tabRepository = new TabRepository();
   private compareArray = new CompareArray();
+  private teamRepository = new TeamRepository();
 
   // Services
   private environmentService = new EnvironmentService();
@@ -937,9 +939,9 @@ class AiRequestExplorerViewModel {
 
     const [selfhostBackendUrl] = getSelfhostUrls();
     if (selfhostBackendUrl) {
-        return selfhostBackendUrl;
+      return selfhostBackendUrl;
     }
-    
+
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;
@@ -2945,6 +2947,10 @@ class AiRequestExplorerViewModel {
         typeof response.data?.data === "string" &&
         response.data.data.includes("Limit Reached")
       ) {
+        let teamData;
+        if (teamId) {
+          teamData = await this.teamRepository.getTeamDoc(teamId);
+        }
         return {
           successStatus: false,
           message: response.data.message,
