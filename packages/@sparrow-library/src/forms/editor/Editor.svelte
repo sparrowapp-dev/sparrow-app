@@ -34,7 +34,8 @@
     | "Graphql"
     | "Python"
     | "Curl"
-    | "TestJavaScript" = "Text";
+    | "TestJavaScript"
+    | "PreTestJavaScript" = "Text";
   export let value = "";
   export let customSuggestions = false;
   export let isEnterKeyNotAllowed = false;
@@ -339,7 +340,9 @@
       CreatePlaceHolder(placeholder),
       lintGutter(), // Add lint gutter support
       // Enable JS linting only if language is JS
-      ...(lang === "TestJavaScript" ? [linter(jsLinter())] : []),
+      ...(lang === "TestJavaScript" || lang === "PreTestJavaScript"
+        ? [linter(jsLinter())]
+        : []),
     ];
 
     // Removing window style space(\r\n) to find correct cursor position

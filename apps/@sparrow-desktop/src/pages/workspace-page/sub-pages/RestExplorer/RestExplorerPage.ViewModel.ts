@@ -18,6 +18,7 @@ import {
   Debounce,
   InitRequestTab,
   MarkdownFormatter,
+  FormatCurl,
 } from "@sparrow/common/utils";
 
 // ---- DB
@@ -126,7 +127,6 @@ import { DOMParser } from "xmldom";
 import { JSONPath } from "jsonpath-plus";
 import { captureEvent } from "@app/utils/posthog/posthogConfig";
 import { size } from "@tauri-apps/plugin-fs";
-
 class RestExplorerViewModel {
   /**
    * Repository
@@ -154,6 +154,7 @@ class RestExplorerViewModel {
    * Utils
    */
   private _decodeRequest = new DecodeRequest();
+  private _formatCurl = new FormatCurl();
   /**
    * Rest tools
    */
@@ -563,6 +564,11 @@ class RestExplorerViewModel {
     ) {
       result = false;
     } else if (
+      requestServer.request.tests.preScript !==
+      progressiveTab.property.request.tests.preScript
+    ) {
+      result = false;
+    } else if (
       !this.compareArray.init(
         requestServer.request.queryParams,
         progressiveTab.property.request.queryParams,
@@ -914,58 +920,7 @@ class RestExplorerViewModel {
   };
 
   public handleFormatCurl = (curlCommand: string): string => {
-    const rawLiteralRegex = /(\$'[\s\S]*?')$/m;
-    let rawLiteral = "";
-    const rawMatch = curlCommand.match(rawLiteralRegex);
-    if (rawMatch) {
-      rawLiteral = rawMatch[0];
-      curlCommand = curlCommand.slice(0, rawMatch.index).trim();
-    }
-    const heredocRegex = /(<<\s*EOF[\s\S]*?^EOF\s*)$/m;
-    const heredocMatch = curlCommand.match(heredocRegex);
-    let heredoc = "";
-    if (heredocMatch) {
-      heredoc = heredocMatch[0]
-        .replace(/\r\n/g, "\n")
-        .replace(/^\s+|\s+$/g, "");
-      curlCommand = curlCommand.slice(0, heredocMatch.index).trim();
-    }
-    curlCommand = curlCommand.replace(/\\\s*\n\s*/g, " ");
-    curlCommand = curlCommand.replace(/\\\s*/g, " ");
-    curlCommand = curlCommand.replace(/\s+/g, " ").trim();
-    const parts = curlCommand.match(/"[^"]*"|'[^']*'|\S+/g) || [];
-    let formatted = "";
-    for (let i = 0; i < parts.length; i++) {
-      const part = parts[i];
-      if (i === 0) {
-        formatted += part;
-      } else if (
-        part.startsWith("--") ||
-        (part.startsWith("-") && !/^-\d/.test(part))
-      ) {
-        formatted += " \\\n  " + part;
-      } else if (
-        /^https?:\/\//.test(part) ||
-        /^\$\{.*\}/.test(part) ||
-        /^[\w\/:.?&=%-]+$/.test(part)
-      ) {
-        if (parts[i - 1] && parts[i - 1].startsWith("--request")) {
-          formatted += " " + part;
-        } else {
-          formatted += " \\\n  " + part;
-        }
-      } else {
-        formatted += " " + part;
-      }
-    }
-    if (heredoc) {
-      const [firstLine, ...restLines] = heredoc.split("\n");
-      formatted += " \\\n  " + firstLine + "\n" + restLines.join("\n");
-    }
-    if (rawLiteral && !formatted.includes(rawLiteral)) {
-      formatted += ` \\\n  ${rawLiteral}`;
-    }
-    return formatted.trim();
+    return this._formatCurl.handleFormatCurl(curlCommand);
   };
 
   public handleFormatUrl = (url: string) => {
@@ -1283,7 +1238,6 @@ class RestExplorerViewModel {
 
     const updatedCurl = this.handleFormatCurl(curl);
     const stringifiedCurl = curlconverter.toJsonString(updatedCurl);
-
     const parsedCurl = JSON.parse(stringifiedCurl);
 
     // Use the same regex as ImportCurl.svelte
@@ -3802,7 +3756,6 @@ class RestExplorerViewModel {
     await this.updateRequestAIConversation([
       ...(componentData?.property?.request?.ai?.conversations || []),
       {
-        message: errorMessage || "Something went wrong. Please try again",
         message: errorMessage || "Something went wrong. Please try again",
         messageId: uuidv4(),
         type: MessageTypeEnum.RECEIVER,

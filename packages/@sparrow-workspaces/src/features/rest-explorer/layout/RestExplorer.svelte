@@ -352,10 +352,6 @@
     isChatbotOpenInCurrTab.set(false);
   });
 
-  $: {
-    console.log("ff", $tab);
-  }
-
   /**
    * Enables the diff/merge view while having suggested changes by AI
    * @param newContent The new changes suggested
