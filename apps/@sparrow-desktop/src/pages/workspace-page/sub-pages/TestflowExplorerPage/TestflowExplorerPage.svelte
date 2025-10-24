@@ -4,6 +4,7 @@
   import { TestflowExplorer } from "@sparrow/workspaces/features";
   import type {
     CollectionDocument,
+    TeamDocument,
     WorkspaceDocument,
   } from "@app/database/database";
   import { testFlowDataStore } from "@sparrow/workspaces/features/testflow-explorer/store";
@@ -60,6 +61,8 @@
   let isScheduleRunPopupOpen: boolean = false;
 
   let isTeamDowngraded: boolean = false;
+
+  let currentTeam: TeamDocument;
 
   const userEmail = getClientUser().email;
 
@@ -303,8 +306,9 @@
     }
   };
 
-  onMount(() => {
+  onMount(async () => {
     handleBlockLimitTestflow();
+    currentTeam = await _viewModel.getTeamDetails();
   });
 
   onDestroy(() => {
@@ -429,6 +433,7 @@
     onOpenEnvironment={_viewModel.handleOpenEnvironment}
     onFetchTestflow={_viewModel.fetchTestflow}
     {isTeamDowngraded}
+    teamPlanName={currentTeam?.plan?.name}
   />
 {/if}
 

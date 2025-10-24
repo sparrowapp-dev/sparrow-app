@@ -193,6 +193,7 @@
   export let isCreateTestflowScheduleLimitReachedModalOpen;
   export let onFetchTestflow;
   export let isTeamDowngraded: boolean = false;
+  export let teamPlanName;
 
   export let onUpdateScheduleStatus: (
     scheduleId: string,
@@ -2757,8 +2758,8 @@
       </div>
 
       <p class="text-ds-font-size-12" style="color:var(--text-ds-neutral-100)">
-        Your Hub is now on the Community edition, which has a limit of 3 active
-        Test Flows per workspace.
+        Your Hub is now on the {teamPlanName} edition, which has a limit of {planLimitTestFlows}
+        active Test Flows per workspace.
       </p>
       <ul class="text-ds-font-size-12" style="color:var(--text-ds-neutral-100)">
         <li>
