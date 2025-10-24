@@ -110,7 +110,7 @@ import { RequestSavedTabAdapter } from "src/adapter/request-saved-tab";
 import { InitTab } from "@sparrow/common/factory";
 import type { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
 
-import { getClientUser } from "src/utils/jwt";
+import { getAuthJwt, getClientUser } from "src/utils/jwt";
 import constants from "src/constants/constants";
 import * as curlconverter from "curlconverter";
 import * as Sentry from "@sentry/svelte";
@@ -570,6 +570,11 @@ class RestExplorerViewModel {
     } else if (
       requestServer.request.tests.script !==
       progressiveTab.property.request.tests.script
+    ) {
+      result = false;
+    } else if (
+      requestServer.request.tests.preScript !==
+      progressiveTab.property.request.tests.preScript
     ) {
       result = false;
     } else if (
@@ -3898,9 +3903,12 @@ class RestExplorerViewModel {
               events.forEach((event) =>
                 this.aiAssistentWebSocketService.removeListener(event),
               );
-
+              let teamData;
+              if (teamId) {
+                teamData = await this.teamRepository.getTeamDoc(teamId);
+              }
               const errorMessage = response.messages.includes("Limit Reached")
-                ? "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section."
+                ? `You have used all ${teamData?.toMutableJSON().plan?.limits?.aiRequestsPerMonth?.value} of your Sparrow AI requests for the month on the ${teamData?.toMutableJSON().plan?.name} Plan. To continue getting instant help with debugging, suggestions, and analysis, please upgrade your plan.`
                 : "Some issue occurred while processing your request, please try again.";
 
               await this.updateRequestAIConversation([
@@ -4301,7 +4309,7 @@ class RestExplorerViewModel {
     }
   };
 
-  /**
+   /**
    * Generates pre-request script for the particular API Request Tab.
    *
    * @param prompt - The prompt to be used for generating the pre-request script.
@@ -5022,6 +5030,18 @@ class RestExplorerViewModel {
     if (response.isSuccessful) {
       await this.fetchCollections(progressiveTab?.path?.workspaceId);
     }
+  };
+
+  public handleRedirectToAdminPanel = async () => {
+    const workspace = await this.workspaceRepository.getActiveWorkspaceDoc();
+    const teamId = workspace.toMutableJSON().team?.teamId;
+    const [authToken] = getAuthJwt();
+    window.open(
+      constants.ADMIN_URL +
+        `/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+      "_blank",
+    );
+    return;
   };
 }
 

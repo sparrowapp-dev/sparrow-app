@@ -1,0 +1,617 @@
+name: Production Desktop Windows AppInstaller Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  VITE_API_URL: ${{vars.VITE_API_URL}}
+  VITE_MIX_PANEL_TOKEN: ${{vars.VITE_MIX_PANEL_TOKEN}}
+  VITE_ENABLE_MIX_PANEL: ${{vars.VITE_ENABLE_MIX_PANEL}}
+  VITE_API_TIMEOUT: ${{vars.VITE_API_TIMEOUT}}
+  VITE_SPARROW_SUPPORT_EMAIL: ${{ vars.VITE_SPARROW_SUPPORT_EMAIL }}
+  VITE_AUTH_URL: ${{ vars.VITE_AUTH_URL }}
+  VITE_SPARROW_GITHUB: ${{ vars.VITE_SPARROW_GITHUB }}
+  VITE_SPARROW_DOWNLOAD_LINK: ${{ vars.VITE_SPARROW_DOWNLOAD_LINK }}
+  VITE_RELEASE_NOTES_PAT_TOKEN: ${{ secrets.VITE_RELEASE_NOTES_PAT_TOKEN }}
+  VITE_RELEASE_NOTES_API: ${{ vars.VITE_RELEASE_NOTES_API }}
+  VITE_AZURE_CDN_URL: ${{ vars.VITE_AZURE_CDN_URL }}
+  VITE_AZURE_INSIGHTS_CONNECTION_STRING: ${{ vars.VITE_AZURE_INSIGHTS_CONNECTION_STRING }}
+  VITE_CANNY_API: ${{ vars.VITE_CANNY_API }}
+  VITE_CANNY_URL: ${{ vars.VITE_CANNY_URL }}
+  VITE_BASE_URL: ${{ vars.VITE_BASE_URL }}
+  VITE_SPARROW_LINKEDIN: ${{ vars.VITE_SPARROW_LINKEDIN }}
+  VITE_WEB_SOCKET_IO_API_URL: ${{ vars.VITE_WEB_SOCKET_IO_API_URL }}
+  VITE_SPARROW_DOCS: ${{ vars.VITE_SPARROW_DOCS }}
+  VITE_SPARROW_AI_WEBSOCKET: ${{ vars.VITE_SPARROW_AI_WEBSOCKET }}
+  VITE_APP_ENVIRONMENT_PATH: ${{ vars.VITE_APP_ENVIRONMENT_PATH }}
+  VITE_CANNY_FEEDBACK_URL: ${{ vars.VITE_CANNY_FEEDBACK_URL }}
+  VITE_SPARROW_WEB_APP_URL: ${{ vars.VITE_SPARROW_WEB_APP_URL }}
+  VITE_MARKETING_URL: ${{ vars.VITE_MARKETING_URL }}
+  VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
+  VITE_APP_ENVIRONMENT: ${{ vars.VITE_APP_ENVIRONMENT }}
+  VITE_POSTHOG_CONNECTION_API_KEY: ${{ vars.VITE_POSTHOG_CONNECTION_API_KEY }}
+  VITE_POSTHOG_API_URL: ${{ vars.VITE_POSTHOG_API_URL }}
+  VITE_SPARROW_ADMIN_URL: ${{ vars.VITE_SPARROW_ADMIN_URL }}
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+  CI: false
+
+jobs:
+  release_win:
+    runs-on: windows-latest
+    environment: production
+
+    steps:
+      # --- STAGE 1: INITIAL SETUP AND PREREQUISITE INSTALLATIONS ---
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "20.8"
+
+      - name: Install Rust 1.82.0
+        run: |
+          Invoke-WebRequest -Uri https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -OutFile rustup-init.exe
+          .\rustup-init.exe -y
+          rustup install 1.82.0
+          rustup default 1.82.0
+      
+      # Set up DigiCert certificate for cloud signing
+      - name: Set up DigiCert certificate
+        shell: pwsh
+        run: |
+          Write-Host "Decoding DigiCert .p12 into D:\Certificate_pkcs12.p12"
+          $bytes = [Convert]::FromBase64String("${{ secrets.SM_CLIENT_CERT_FILE_B64 }}")
+          [IO.File]::WriteAllBytes("D:\Certificate_pkcs12.p12", $bytes)
+      
+      # Set environment variables for DigiCert
+      - name: Set variables
+        id: variables
+        run: |
+          echo "SM_HOST=${{ secrets.SM_HOST }}" >> "$GITHUB_ENV"
+          echo "SM_API_KEY=${{ secrets.SM_API_KEY }}" >> "$GITHUB_ENV"
+          echo "SM_CLIENT_CERT_FILE=D:\\Certificate_pkcs12.p12" >> "$GITHUB_ENV"
+          echo "SM_CLIENT_CERT_PASSWORD=${{ secrets.SM_CLIENT_CERT_PASSWORD }}" >> "$GITHUB_ENV"
+        shell: bash
+
+      # Setup Android SDK (required by DigiCert action for compatibility)
+      - name: Setup Android SDK (for DigiCert action compatibility)
+        run: |
+          # Create minimal Android SDK structure to satisfy DigiCert action requirements
+          $androidSdkPath = "C:\Android\android-sdk"
+          $buildToolsPath = "$androidSdkPath\build-tools\30.0.2"
+          
+          Write-Host "Creating Android SDK directory structure..." -ForegroundColor Yellow
+          New-Item -ItemType Directory -Path $buildToolsPath -Force
+          
+          # Create dummy files that the DigiCert action expects to find
+          Write-Host "Creating required Android build tool files..." -ForegroundColor Yellow
+          New-Item -ItemType File -Path "$buildToolsPath\apksigner.bat" -Force
+          New-Item -ItemType File -Path "$buildToolsPath\zipalign.exe" -Force
+          New-Item -ItemType File -Path "$buildToolsPath\aapt.exe" -Force
+          New-Item -ItemType File -Path "$buildToolsPath\aapt2.exe" -Force
+          
+          # Set Android environment variables
+          echo "ANDROID_HOME=$androidSdkPath" >> $env:GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$androidSdkPath" >> $env:GITHUB_ENV
+          
+          Write-Host "Android SDK structure created successfully" -ForegroundColor Green
+        shell: powershell
+
+      # Install DigiCert Signing Manager Tools
+      - name: Install DigiCert Signing Manager Tools
+        uses: digicert/ssm-code-signing@v1.0.0
+
+      - name: Extract first KeyPair alias
+        id: extract_alias
+        shell: pwsh
+        run: |
+          $line  = (smctl keypair ls | Select-Object -Skip 2 | Select-Object -First 1)
+          $alias = ($line -split '\s{2,}')[2]
+          Write-Host "✅ Using alias: $alias"
+          "KEYPAIR_ALIAS=$alias" | Out-File -FilePath $env:GITHUB_ENV -Encoding ascii
+      
+      - name: Sync Certificate into Windows Store
+        shell: pwsh
+        run: |
+          Write-Host "🔄 Syncing cert for alias: $($env:KEYPAIR_ALIAS)"
+          smctl windows certsync `
+            --keypair-alias="$($env:KEYPAIR_ALIAS)" `
+            --store=system
+      
+      # --- STAGE 2: BUILD APP ---
+      - name: Disable updater in tauri.conf.json for AppInstaller Build
+        run: |
+          $confPath = "apps/@sparrow-desktop/src-tauri/tauri.conf.json"
+          $json = Get-Content $confPath -Raw | ConvertFrom-Json
+          if ($null -ne $json.plugins -and $null -ne $json.plugins.updater) {
+            if (-not ($json.plugins.updater.PSObject.Properties.Name -contains "active")) {
+              $json.plugins.updater | Add-Member -NotePropertyName "active" -NotePropertyValue $false
+            }
+            elseif ($json.plugins.updater.active -ne $false) {
+              # enforce correct value in case it exists but is true
+              $json.plugins.updater.active = $false
+            }
+            $json | ConvertTo-Json -Depth 20 | Set-Content $confPath -Encoding UTF8
+          }
+        shell: pwsh
+
+      - name: Change bundle.targets to an array that contains only "msi"
+        run: |
+          $confPath = "apps/@sparrow-desktop/src-tauri/tauri.conf.json"
+          $json = Get-Content $confPath -Raw | ConvertFrom-Json
+          if ($null -ne $json.bundle -and $null -ne $json.bundle.targets) {
+            $json.bundle.targets = @("msi")
+            $json | ConvertTo-Json -Depth 20 | Set-Content $confPath -Encoding UTF8
+          }
+
+          # Print the updated tauri.conf.json
+          Write-Host "Updated tauri.conf.json:"
+          Get-Content $confPath
+        shell: pwsh
+
+      - name: Increase Yarn network timeout
+        run: yarn config set network-timeout 600000
+
+      - name: Update @tauri-apps/* versions in desktop package.json from root
+        run: |
+          $rootPkg = Get-Content package.json | ConvertFrom-Json
+          $desktopPkgPath = "apps/@sparrow-desktop/package.json"
+          $desktopPkg = Get-Content $desktopPkgPath | ConvertFrom-Json
+          $tauriPackages = @(
+            "@tauri-apps/api",
+            "@tauri-apps/cli",
+            "@tauri-apps/plugin-deep-link",
+            "@tauri-apps/plugin-dialog",
+            "@tauri-apps/plugin-fs",
+            "@tauri-apps/plugin-os",
+            "@tauri-apps/plugin-process",
+            "@tauri-apps/plugin-shell",
+            "@tauri-apps/plugin-updater"
+          )
+          foreach ($pkg in $tauriPackages) {
+            if ($rootPkg.dependencies.PSObject.Properties.Name -contains $pkg) {
+              $desktopPkg.dependencies.$pkg = $rootPkg.dependencies.$pkg
+            }
+          }
+          $desktopPkg | ConvertTo-Json -Depth 20 | Set-Content $desktopPkgPath
+        shell: pwsh
+
+      - name: Build Tauri App
+        run: |
+          yarn cache clean
+          npm install -g pnpm
+          yarn install
+          yarn desktop-build
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+
+      # --- STAGE 3: SIGN MSIX ---
+      - name: Verify preinstalled Windows SDK tools
+        shell: pwsh
+        run: |
+          Write-Host "🔎 Looking for signtool.exe and MakeAppx.exe..."
+          $signtool = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter signtool.exe | Where-Object FullName -Match '\\x64\\signtool\.exe$' | Select-Object -First 1
+          $makeappx = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter MakeAppx.exe | Where-Object FullName -Match '\\x64\\MakeAppx\.exe$' | Select-Object -First 1
+          
+          if (-not $signtool) { throw "❌ signtool.exe not found!" }
+          if (-not $makeappx) { throw "❌ MakeAppx.exe not found!" }
+          
+          Write-Host "✅ signtool.exe found at $($signtool.FullName)"
+          Write-Host "✅ MakeAppx.exe found at $($makeappx.FullName)"
+          # Export paths for later steps
+          echo "SIGNTOOL_PATH=$($signtool.FullName)" >> $env:GITHUB_ENV
+          echo "MAKEAPPX_PATH=$($makeappx.FullName)" >> $env:GITHUB_ENV
+
+      - name: Find and Sign MSI files
+        shell: pwsh
+        run: |
+          $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
+          $bundlePath = "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi"
+          
+          # List all files in the bundle directory for debugging
+          Write-Host "🔍 Contents of bundle directory:"
+          Get-ChildItem -Path $bundlePath -Recurse | Format-Table Name, FullName
+          
+          # Find all MSI files
+          $msiFiles = Get-ChildItem -Path $bundlePath -Filter "*.msi"
+          
+          if ($msiFiles.Count -eq 0) {
+            Write-Host "❌ No MSI files found in $bundlePath"
+            Write-Host "🔍 Checking parent directories..."
+            Get-ChildItem -Path "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target" -Recurse -Filter "*.msi" | ForEach-Object {
+              Write-Host "Found MSI: $($_.FullName)"
+            }
+            exit 1
+          }
+          
+          $signtoolPath = $env:SIGNTOOL_PATH.Trim()
+          # Sign each MSI file found
+          foreach ($msiFile in $msiFiles) {
+            Write-Host "🔐 Signing: $($msiFile.FullName)"
+            & "$signtoolPath" sign `
+              /sm /s My `
+              /tr http://timestamp.digicert.com `
+              /td sha256 `
+              /fd sha256 `
+              /sha1 $certThumb `
+              "$($msiFile.FullName)"
+            
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "❌ Failed to sign $($msiFile.Name)"
+              exit 1
+            }
+            
+            Write-Host "✅ Successfully signed $($msiFile.Name)"
+          }
+
+      - name: Verify MSI Signature
+        shell: pwsh
+        run: |
+          $bundlePath = "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi"
+          
+          $allValid = $true
+          
+          $files = Get-ChildItem -Path $bundlePath -Include "*.msi" -Recurse
+          
+          foreach ($file in $files) {
+            $sig = Get-AuthenticodeSignature $file.FullName
+            
+            if ($sig.Status -ne 'Valid') {
+              Write-Host "❌ Invalid signature on $($file.Name): $($sig.Status)"
+              $allValid = $false
+            } else {
+              Write-Host "✅ Valid signature on $($file.Name)"
+            }
+          }
+          
+          if (-not $allValid) {
+            throw "One or more MSI files have invalid signatures"
+          }
+          
+          Write-Host "🎉 MSI files successfully signed and verified"
+      
+      # --- STAGE 4: CONVERT TO MSIX USING MAKEAPPX ---
+      - name: Prepare App Folder for MakeAppx
+        run: |
+          New-Item -ItemType Directory -Force -Path "app-root/Assets"
+          $msiPath = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug/bundle/msi" -Filter "Sparrow_*_x64_en-US.msi" | Select-Object -First 1
+          $extractPath = "app-root"
+          Start-Process msiexec.exe -ArgumentList "/a `"$msiPath`" /qn TARGETDIR=`"$extractPath`"" -Wait -NoNewWindow
+          #Copy app executable (MakeAppx requires it)
+          $exeSource = Get-ChildItem -Path "apps/@sparrow-desktop/src-tauri/target/debug" -Filter "sparrow-app.exe" -Recurse | Select-Object -First 1
+          if ($exeSource) {
+            Copy-Item $exeSource.FullName -Destination "app-root/Sparrow.exe"
+          } else {
+            Write-Host "::error::Sparrow.exe not found! Expected path: apps/@sparrow-desktop/src-tauri/target/debug/sparrow-app.exe"
+            exit 1
+          }
+           # Copy actual StoreLogo from known path
+          $logo = "apps/@sparrow-desktop/src-tauri/icons/StoreLogo.png"
+          Copy-Item $logo -Destination "app-root/Assets/StoreLogo.png"
+          Copy-Item $logo -Destination "app-root/Assets/Square150x150Logo.png"
+          Copy-Item $logo -Destination "app-root/Assets/Square44x44Logo.png"
+          Copy-Item $logo -Destination "app-root/Assets/SplashScreen.png"
+        shell: powershell
+
+      - name: Generate AppxManifest.xml with version injection
+        shell: pwsh
+        run: |
+          # Debug: Check current working directory
+          Write-Host "🔍 Current working directory: $(Get-Location)"
+          
+          # Ensure app-root directory exists
+          $appRootPath = "app-root"
+          if (-not (Test-Path $appRootPath)) {
+              Write-Host "📁 Creating app-root directory..."
+              New-Item -ItemType Directory -Path $appRootPath -Force
+          }
+          
+          Write-Host "📁 Contents of app-root directory before manifest generation:"
+          Get-ChildItem -Path $appRootPath | ForEach-Object { Write-Host "  - $($_.Name)" }
+          # 1. Read version from Cargo.toml
+          $cargoFile   = "apps/@sparrow-desktop/src-tauri/Cargo.toml"
+          Write-Host "🔍 Reading version from: $cargoFile"
+          
+          if (-not (Test-Path $cargoFile)) {
+              Write-Error "❌ Cargo.toml not found at: $cargoFile"
+              exit 1
+          }
+          
+          $versionLine = Select-String -Path $cargoFile -Pattern '^\s*version\s*=\s*"(.*?)"' | Select-Object -First 1
+          if (-not $versionLine) {
+              Write-Error "❌ Version not found in Cargo.toml"
+              exit 1
+          }
+          
+          $version = $versionLine.Matches.Groups[1].Value
+          Write-Host "✅ Found version: $version"
+          # 2. Lookup our synced cert by thumbprint and get full Subject DN
+          $thumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
+          Write-Host "🔍 Looking for certificate with thumbprint: $thumb"
+          
+          $cert = Get-ChildItem Cert:\LocalMachine\My | Where-Object Thumbprint -eq $thumb
+          if (-not $cert) {
+              Write-Error "❌ Certificate not found with thumbprint: $thumb"
+              Write-Host "Available certificates:"
+              Get-ChildItem Cert:\LocalMachine\My | ForEach-Object { 
+                  Write-Host "  - Thumbprint: $($_.Thumbprint), Subject: $($_.Subject)" 
+              }
+              exit 1
+          }
+          
+          $publisherDN = $cert.Subject
+          Write-Host "✅ Using Publisher DN: $publisherDN"
+          # 3. Build the AppxManifest.xml with the exact Publisher
+          $manifest = @"
+          <?xml version="1.0" encoding="utf-8"?>
+          <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+                   xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest"
+                   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+                   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+                   IgnorableNamespaces="uap mp rescap">
+            <Identity Name="Sparrow"
+                      Publisher="$publisherDN"
+                      Version="$version.0"
+                      ProcessorArchitecture="x64" />
+            <Properties>
+              <DisplayName>Sparrow</DisplayName>
+              <PublisherDisplayName>sparrowapp</PublisherDisplayName>
+              <Description>Sparrow</Description>
+              <Logo>Assets\StoreLogo.png</Logo>
+            </Properties>
+            <Dependencies>
+              <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.0.0" MaxVersionTested="10.0.19041.0" />
+            </Dependencies>
+            <Resources>
+              <Resource Language="en-us" />
+            </Resources>
+            <Capabilities>
+              <rescap:Capability Name="runFullTrust" />
+            </Capabilities>
+            <Applications>
+              <Application Id="SparrowApp" Executable="Sparrow.exe" EntryPoint="Windows.FullTrustApplication">
+                <uap:VisualElements DisplayName="Sparrow"
+                                    Description="Sparrow App"
+                                    BackgroundColor="transparent"
+                                    Square150x150Logo="Assets\Square150x150Logo.png"
+                                    Square44x44Logo="Assets\Square44x44Logo.png">
+                </uap:VisualElements>
+              </Application>
+            </Applications>
+          </Package>
+          "@
+          # 4. Write out the manifest
+          $manifestPath = Join-Path $appRootPath "AppxManifest.xml"
+          $manifest | Set-Content -Encoding UTF8 -Path $manifestPath
+          Write-Host "✅ Generated AppxManifest.xml at: $manifestPath"
+          
+          # Verify the file was created
+          if (Test-Path $manifestPath) {
+              Write-Host "✅ AppxManifest.xml created successfully"
+              Write-Host "📄 File size: $((Get-Item $manifestPath).Length) bytes"
+          } else {
+              Write-Error "❌ Failed to create AppxManifest.xml"
+              exit 1
+          }
+      
+      - name: Create MSIX Package using MakeAppx
+        run: |
+          New-Item -ItemType Directory -Force -Path "msix-output"
+          $msixPath = "C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix"
+          $makeappxPath = $env:MAKEAPPX_PATH.Trim()
+          & "$makeappxPath" pack /d "app-root" /p $msixPath
+        shell: powershell
+
+      # --- STAGE 5: SIGN AND VERIFY MSIX ---
+      - name: Find and Sign MSIX files
+        shell: pwsh
+        run: |
+          # 1. Sync certificate into Windows store
+          smctl windows certsync --keypair-alias="$env:KEYPAIR_ALIAS"
+          # 2. Sign all MSIX packages
+          $certThumb = "${{ secrets.SM_CODE_SIGNING_CERT_SHA1_HASH }}"
+          Get-ChildItem -Path "C:\a\sparrow-app\sparrow-app\msix-output" -Filter "*.msix" | ForEach-Object {
+            Write-Host "🔐 Signing: $($_.FullName)"
+            
+            & "$env:SIGNTOOL_PATH" sign /v /debug /sm /sha1 $certThumb /td SHA256 /fd sha256 /tr http://timestamp.digicert.com "$($_.FullName)"
+            
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "❌ Failed to sign $($_.Name)"
+              exit 1
+            }
+            Write-Host "✅ Successfully signed $($_.Name)"
+          }
+
+      - name: Verify MSIX Signature
+        run: |
+          # Verify the MSIX file exists
+          if (-Not (Test-Path C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix)) {
+              Write-Host "MSIX file not found at msix-output/sparrow.msix"
+              exit 1
+          }
+          Write-Host "Verifying signature for: C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix"
+          # Get the Authenticode signature
+          $sig = Get-AuthenticodeSignature -FilePath C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix
+          # Check the signature status
+          if ($sig.Status -eq 'Valid') {
+              Write-Host "Valid signature on C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix"
+          } else {
+              Write-Host "Invalid signature on C:\a\sparrow-app\sparrow-app\msix-output\sparrow.msix: $($sig.Status)"
+              exit 1
+          }
+        shell: powershell
+        
+      # --- STAGE 6: GENERATE APPINSTALLER FILE ---
+      - name: Generate App Installer File
+        id: generate_appinstaller
+        shell: pwsh
+        run: |
+            # Debug: Check current working directory and list contents
+            Write-Host "🔍 Current working directory: $(Get-Location)"
+            Write-Host "📁 Contents of current directory:"
+            Get-ChildItem -Path "." | ForEach-Object { Write-Host "  - $($_.Name)" }
+            
+            # Debug: Check if app-root directory exists and list its contents
+            $appRootPath = "app-root"
+            if (Test-Path $appRootPath) {
+                Write-Host "📁 Contents of app-root directory:"
+                Get-ChildItem -Path $appRootPath | ForEach-Object { Write-Host "  - $($_.Name)" }
+            } else {
+                Write-Host "❌ app-root directory does not exist!"
+                Write-Host "🔍 Looking for app-root in absolute path..."
+                $absoluteAppRoot = "C:\a\sparrow-app\sparrow-app\app-root"
+                if (Test-Path $absoluteAppRoot) {
+                    Write-Host "✅ Found app-root at absolute path: $absoluteAppRoot"
+                    $appRootPath = $absoluteAppRoot
+                } else {
+                    Write-Host "❌ app-root not found at absolute path either!"
+                    # Search for AppxManifest.xml anywhere in the workspace
+                    Write-Host "🔍 Searching for AppxManifest.xml files in workspace..."
+                    Get-ChildItem -Path "C:\a\sparrow-app\sparrow-app" -Recurse -Filter "AppxManifest.xml" -ErrorAction SilentlyContinue | ForEach-Object {
+                        Write-Host "Found AppxManifest.xml at: $($_.FullName)"
+                    }
+                    exit 1
+                }
+            }
+            
+            $manifestPath = Join-Path $appRootPath "AppxManifest.xml"
+            Write-Host "🔍 Looking for manifest at: $manifestPath"
+            
+            if (-not (Test-Path $manifestPath)) {
+                Write-Error "❌ AppxManifest.xml not found at: $manifestPath"
+                Write-Host "🔍 Contents of $appRootPath directory:"
+                Get-ChildItem -Path $appRootPath -Force | ForEach-Object { Write-Host "  - $($_.Name)" }
+                exit 1
+            }
+            
+            Write-Host "✅ Found AppxManifest.xml at: $manifestPath"
+            
+            # Read and parse the manifest
+            [xml]$manifest = Get-Content $manifestPath
+            $identityName = $manifest.Package.Identity.Name
+            $publisher = $manifest.Package.Identity.Publisher
+            $version = $manifest.Package.Identity.Version
+            $architecture = $manifest.Package.Identity.ProcessorArchitecture
+            Write-Host "📋 Manifest Info:"
+            Write-Host "  - Name: $identityName"
+            Write-Host "  - Publisher: $publisher"
+            Write-Host "  - Version: $version"
+            Write-Host "  - Architecture: $architecture"
+            # Find the MSIX file
+            $msixOutputPath = "C:\a\sparrow-app\sparrow-app\msix-output"
+            Write-Host "🔍 Looking for MSIX files in: $msixOutputPath"
+            
+            if (Test-Path $msixOutputPath) {
+                Write-Host "📁 Contents of msix-output directory:"
+                Get-ChildItem -Path $msixOutputPath | ForEach-Object { Write-Host "  - $($_.Name)" }
+            } else {
+                Write-Host "❌ Directory does not exist: $msixOutputPath"
+                # Try relative path
+                if (Test-Path "msix-output") {
+                    Write-Host "✅ Found msix-output using relative path"
+                    $msixOutputPath = "msix-output"
+                } else {
+                    Write-Host "❌ msix-output directory not found anywhere!"
+                    exit 1
+                }
+            }
+            
+            $msixFile = Get-ChildItem -Path $msixOutputPath -Filter "*.msix" | Select-Object -First 1
+            if (-not $msixFile) {
+                Write-Error "❌ No MSIX file found in $msixOutputPath folder!"
+                exit 1
+            }
+            
+            $msixBaseName = [System.IO.Path]::GetFileName($msixFile.Name)
+            Write-Host "✅ Found MSIX file: $msixBaseName"
+
+            # Copy MSIX to root for artifact upload and S3 upload
+            Copy-Item -Path $msixFile.FullName -Destination ".\$msixBaseName" -Force
+
+            # URLs for hosting on S3
+            $msixUrl = "https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/windows/$msixBaseName"
+            $appInstallerUrl = "https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/windows/Sparrow.appinstaller"
+            $appInstallerContent = @"
+            <?xml version="1.0" encoding="utf-8"?>
+            <AppInstaller
+                xmlns="http://schemas.microsoft.com/appx/appinstaller/2018"
+                Version="$version"
+                Uri="$appInstallerUrl">
+              <MainPackage
+                  Name="$identityName"
+                  Publisher="$publisher"
+                  Version="$version"
+                  ProcessorArchitecture="$architecture"
+                  Uri="$msixUrl" />
+              <UpdateSettings>
+                <AutomaticBackgroundTask />
+              </UpdateSettings>
+            </AppInstaller>
+            "@
+            
+            Set-Content -Path "Sparrow.appinstaller" -Value $appInstallerContent -Encoding UTF8
+            Write-Host "✅ Generated Sparrow.appinstaller successfully"
+            echo "MSIX_FILE_NAME=$msixBaseName" >> $env:GITHUB_ENV
+
+      - name: Upload appinstaller and msix to S3
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+        run: |
+          aws s3 cp Sparrow.appinstaller s3://sparrow-release-assests-prod/windows/Sparrow.appinstaller --acl public-read
+          aws s3 cp $MSIX_FILE_NAME s3://sparrow-release-assests-prod/windows/$MSIX_FILE_NAME --acl public-read
+
+      - name: Post Windows App Installer Link to Teams
+        run: |
+          $appInstallerUrl = "https://sparrow-release-assests-prod.s3.us-west-1.amazonaws.com/windows/Sparrow.appinstaller"
+          $buildDate = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+          $body = @{
+          "type" = "message"
+          "attachments" = @(
+          @{
+            "contentType" = "application/vnd.microsoft.card.adaptive"
+            "content" = @{
+          "type" = "AdaptiveCard"
+          "body" = @(
+            @{
+              "type" = "TextBlock"
+              "text" = "🚀 New Windows App Installer Available"
+              "weight" = "bolder"
+              "size" = "large"
+            }
+            @{
+              "type" = "TextBlock"
+              "text" = "Branch: main"
+              "wrap" = $true
+            }
+            @{
+              "type" = "TextBlock"
+              "text" = "Build Date: $buildDate"
+              "wrap" = $true
+            }
+          )
+          "actions" = @(
+            @{
+              "type" = "Action.OpenUrl"
+              "title" = "📥 Install via App Installer"
+              "url" = $appInstallerUrl
+            }
+          )
+          "$schema" = "http://adaptivecards.io/schemas/adaptive-card.json"
+          "version" = "1.2"
+            }
+          }
+          )
+          }
+          $jsonBody = $body | ConvertTo-Json -Depth 10
+          Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
+        shell: pwsh

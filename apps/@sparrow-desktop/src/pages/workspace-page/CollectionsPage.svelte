@@ -886,6 +886,7 @@
           onItemDeleted={_viewModel.handleDeleteItem}
           onItemRenamed={_viewModel.handleRenameItem}
           onItemOpened={_viewModel.handleOpenItem}
+          onItemMoved={_viewModel.handleMoveItem}
           onBranchSwitched={_viewModel.handleBranchSwitch}
           onRefetchCollection={_viewModel.handleRefetchCollection}
           onSearchCollection={_viewModel.handleSearchCollection}

@@ -564,6 +564,12 @@ export class RxDB {
           7: function (oldDoc: TeamDocument) {
             return oldDoc;
           },
+          8: function (oldDoc: TeamDocument) {
+            return oldDoc;
+          },
+          9: function (oldDoc: TeamDocument) {
+            return oldDoc;
+          },
         },
       },
       environment: {

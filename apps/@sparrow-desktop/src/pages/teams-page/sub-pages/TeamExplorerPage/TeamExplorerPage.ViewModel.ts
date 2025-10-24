@@ -35,6 +35,11 @@ import constants from "@app/constants/constants";
 import { RecentWorkspaceRepository } from "@app/repositories/recent-workspace.repository";
 import { PlanRepository } from "@app/repositories/plan.repository";
 import { open } from "@tauri-apps/plugin-shell";
+import {
+  isSubscriptionOverDue,
+  isSubscriptionOverTeamId,
+} from "@sparrow/common/store";
+import { get } from "svelte/store";
 
 export class TeamExplorerPageViewModel {
   constructor() {}
@@ -167,6 +172,7 @@ export class TeamExplorerPageViewModel {
           updatedAt,
           updatedBy,
           isNewInvite,
+          isRestricted,
           isDowngraded,
         } = elem;
         const updatedWorkspaces = workspaces.map((workspace) => ({
@@ -196,8 +202,13 @@ export class TeamExplorerPageViewModel {
           updatedBy,
           isNewInvite,
           isOpen: isOpenTeam,
+          isRestricted,
           isDowngraded,
         };
+        if (isRestricted === true && !get(isSubscriptionOverDue)) {
+          isSubscriptionOverDue.set(true);
+          isSubscriptionOverTeamId.set(_id);
+        }
         data.push(item);
       }
 

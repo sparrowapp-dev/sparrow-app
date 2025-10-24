@@ -34,6 +34,7 @@
   export let planName;
   export let selectedModel: string = "deepseek";
   export let updateRequestStatAiChatBot:() => any;
+  export let upgradePlanRedirect;
 
   let scrollList: ScrollList;
 
@@ -95,6 +96,7 @@
       {planName}
       {updateRequestStatAiChatBot}
       bind:scrollList
+      {upgradePlanRedirect}
       {selectedModel}
     />
   </div>

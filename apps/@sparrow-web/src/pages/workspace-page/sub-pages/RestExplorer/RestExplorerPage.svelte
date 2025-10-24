@@ -312,4 +312,5 @@
   selectedModel={selectedAIModel}
   onGeneratePreScript={_viewModel.generatePreScript}
   updateRequestStatAiChatBot={_viewModel.updateRequestStateAiChatBot}
+  upgradePlanRedirect={_viewModel.handleRedirectToAdminPanel}
 />

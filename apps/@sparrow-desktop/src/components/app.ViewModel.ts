@@ -152,6 +152,7 @@ export class AppViewModel {
           updatedBy,
           isNewInvite,
           billing,
+          isRestricted,
           isDowngraded,
         } = elem;
         const updatedWorkspaces = workspaces?.map((workspace) => ({
@@ -182,6 +183,7 @@ export class AppViewModel {
           isNewInvite,
           isOpen: isOpenTeam,
           billing,
+          isRestricted,
           isDowngraded,
         };
         data.push(item);

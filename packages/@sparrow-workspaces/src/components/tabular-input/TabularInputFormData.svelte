@@ -536,7 +536,7 @@
       </div>
       <div
         class="w-50 position-relative header-text"
-        style="padding-left: 62px;"
+        style="padding-left: 53px;"
       >
         Value
       </div>
