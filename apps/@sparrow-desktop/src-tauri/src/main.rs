@@ -657,7 +657,6 @@ struct WebSocketResponse {
 #[tauri::command]
 async fn connect_websocket(
     url: String,
-    _httpurl: String,
     tabid: String,
     headers: String, // Stringified JSON headers
     state: tauri::State<'_, Arc<AppState>>,
