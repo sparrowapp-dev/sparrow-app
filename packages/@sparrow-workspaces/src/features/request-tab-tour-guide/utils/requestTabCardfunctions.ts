@@ -9,7 +9,7 @@ import {
 } from "../../../stores";
 
 const MAX_STEP = 5;
-const MAX_PRE_SCRIPT_STEP = 4;
+const MAX_NO_SCRIPT_STEP = 4;
 
 const resetNoCodeTour = () => {
   requestTabTestNoCodeStep.set(0);
@@ -30,7 +30,7 @@ export const handleNextStep = () => {
   // Check if No Code tour is active
   if (get(requestTabTestDemo)) {
     const currentStep = get(requestTabTestNoCodeStep);
-    if (currentStep < MAX_PRE_SCRIPT_STEP) {
+    if (currentStep < MAX_NO_SCRIPT_STEP) {
       requestTabTestNoCodeStep.set(currentStep + 1);
     } else {
       resetNoCodeTour();
