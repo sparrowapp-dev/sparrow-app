@@ -192,6 +192,7 @@ export class TeamExplorerPageViewModel {
           updatedAt,
           updatedBy,
           isNewInvite,
+          isDowngraded,
         } = elem;
         const updatedWorkspaces = workspaces.map((workspace) => ({
           workspaceId: workspace.id,
@@ -220,6 +221,7 @@ export class TeamExplorerPageViewModel {
           updatedBy,
           isNewInvite,
           isOpen: isOpenTeam,
+          isDowngraded,
         };
         data.push(item);
       }

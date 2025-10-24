@@ -8,6 +8,7 @@ export const testFlowDataStore = writable<Map<string, TFDataStoreType>>(
 export const isDynamicExpressionModalOpen = writable(false);
 
 export const selectedRequestTypes = writable({});
+export const isTeamDowngradePopupDismissed = writable(false);
 
 export const isDynamicExpressionContent = writable([
   {

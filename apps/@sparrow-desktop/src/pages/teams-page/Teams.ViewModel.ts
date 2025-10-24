@@ -103,6 +103,7 @@ export class TeamsViewModel {
           isNewInvite,
           invites,
           billing,
+          isDowngraded,
         } = elem;
         const updatedWorkspaces = workspaces?.map((workspace) => ({
           workspaceId: workspace.id,
@@ -133,6 +134,7 @@ export class TeamsViewModel {
           isOpen: isOpenTeam,
           invites,
           billing,
+          isDowngraded,
         };
         data.push(item);
       }
@@ -426,7 +428,7 @@ export class TeamsViewModel {
     const email = getClientUser().email;
     const accessToken = localStorage.getItem("AUTH_TOKEN");
     const refreshToken = localStorage.getItem("REF_TOKEN");
-    const [,,selfhostAdminUrl] = getSelfhostUrls();
+    const [, , selfhostAdminUrl] = getSelfhostUrls();
     const url =
       `${selfhostAdminUrl ? selfhostAdminUrl : constants.ADMIN_URL}` +
       `?accessToken=${accessToken}&refreshToken=${refreshToken}&email=${email}&source=desktop&trial=login_trial`;

@@ -62,6 +62,8 @@
   //schedule run popup state
   let isScheduleRunPopupOpen: boolean = false;
 
+  let isTeamDowngraded: boolean = false;
+
   const userEmail = getClientUser().email;
 
   /**
@@ -243,6 +245,7 @@
             1000,
           );
           handleBlockLimitTestflow();
+          isTeamDowngraded = await _viewModel.getTeamDowngradeStatus();
         })();
       } else if (tab?.name && prevTabName !== tab?.name) {
         renameWithTestFlowList(tab.name);
@@ -379,6 +382,7 @@
     onOpenEnvironment={_viewModel.handleOpenEnvironment}
     {planLimitTestScheduleCount}
     onFetchTestflow={_viewModel.fetchTestflow}
+    {isTeamDowngraded}
   />
 {/if}
 

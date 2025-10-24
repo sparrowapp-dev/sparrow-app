@@ -25,7 +25,11 @@ import { notifications } from "@sparrow/library/ui";
 import { BehaviorSubject, Observable } from "rxjs";
 import { navigate } from "svelte-navigator";
 import { v4 as uuidv4 } from "uuid";
-import { getAuthJwt, getClientUser, getSelfhostUrls } from "../../../../utils/jwt";
+import {
+  getAuthJwt,
+  getClientUser,
+  getSelfhostUrls,
+} from "../../../../utils/jwt";
 import { WorkspaceTabAdapter } from "@app/adapter/workspace-tab";
 import constants from "@app/constants/constants";
 import { RecentWorkspaceRepository } from "@app/repositories/recent-workspace.repository";
@@ -163,6 +167,7 @@ export class TeamExplorerPageViewModel {
           updatedAt,
           updatedBy,
           isNewInvite,
+          isDowngraded,
         } = elem;
         const updatedWorkspaces = workspaces.map((workspace) => ({
           workspaceId: workspace.id,
@@ -191,6 +196,7 @@ export class TeamExplorerPageViewModel {
           updatedBy,
           isNewInvite,
           isOpen: isOpenTeam,
+          isDowngraded,
         };
         data.push(item);
       }
@@ -776,7 +782,7 @@ export class TeamExplorerPageViewModel {
 
     const [selfhostBackendUrl] = getSelfhostUrls();
     if (selfhostBackendUrl) {
-        return selfhostBackendUrl;
+      return selfhostBackendUrl;
     }
 
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
@@ -912,7 +918,7 @@ export class TeamExplorerPageViewModel {
 
     const [selfhostBackendUrl] = getSelfhostUrls();
     if (selfhostBackendUrl) {
-        return selfhostBackendUrl;
+      return selfhostBackendUrl;
     }
 
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
@@ -1071,19 +1077,21 @@ export class TeamExplorerPageViewModel {
     options?: { toWorkspace?: boolean },
   ) => {
     const [authToken] = getAuthJwt();
-    const [,,selfhostAdminUrl] = getSelfhostUrls();
+    const [, , selfhostAdminUrl] = getSelfhostUrls();
     if (options?.toWorkspace) {
       await open(
-        `${selfhostAdminUrl ? selfhostAdminUrl : constants.ADMIN_URL}/hubs/workspace/${teamId}?xid=${authToken}`,
+        `${
+          selfhostAdminUrl ? selfhostAdminUrl : constants.ADMIN_URL
+        }/hubs/workspace/${teamId}?xid=${authToken}`,
       );
     } else {
-      if(selfhostAdminUrl){
+      if (selfhostAdminUrl) {
         await open(selfhostAdminUrl);
-      }else{
+      } else {
         await open(
           `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
         );
-      } 
+      }
     }
   };
 

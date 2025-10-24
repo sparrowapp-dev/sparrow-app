@@ -2150,4 +2150,17 @@ export class TestflowExplorerPageViewModel {
     this.tabRepository.createTab(initEnvironmentTab.getValue());
     scrollToTab(initEnvironmentTab.getValue().id);
   };
+
+  /**
+   * @description - This function will provide the downgraded status of the team.
+   */
+  public getTeamDowngradeStatus = async () => {
+    const response = await this.workspaceRepository.getActiveWorkspaceDoc();
+    const teamId = response?._data?.team?.teamId || "";
+    const teamData = await this.teamRepository.getTeamDoc(teamId);
+    const teamDoc = teamData.toMutableJSON();
+    if (teamDoc) {
+      return teamDoc?.isDowngraded;
+    }
+  };
 }
