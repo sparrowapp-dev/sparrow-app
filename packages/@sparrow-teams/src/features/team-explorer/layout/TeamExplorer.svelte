@@ -19,6 +19,7 @@
     LockClosedRegular,
     OpenRegular,
     PeopleRegular,
+    AlertOnIcon,
   } from "@sparrow/library/icons";
 
   import {
@@ -34,6 +35,7 @@
   import InvitesView from "../../invited-users/layout/InvitesView.svelte";
   import { open } from "@tauri-apps/plugin-shell";
   import { PlanUpgradeModal } from "@sparrow/common/components";
+  import { navigate } from "svelte-navigator";
 
   export let isWebApp = false;
 
@@ -147,7 +149,7 @@
   let isInviteAcceptProgress = false;
   let userLimits: any;
   let planContent: any;
-
+  let isTeamDowngraded = openTeam?._data?.isDowngraded
   let selectedFilter = "All";
 
   const addButtonData = [
@@ -664,6 +666,126 @@
             </div>
           {/if}
         </div>
+        {#if isTeamDowngraded && (userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER)}
+          <div
+            class="downgrade-card position-fixed"
+            style="
+              bottom: 30px;
+              right: 20px;
+              z-index: 500;
+            "
+          >
+            <div class="downgrade-card-inner">
+              <div class="downgrade-header">
+                <div class="downgrade-icon">
+                  <AlertOnIcon />
+                </div>
+                <p class="downgrade-title">Your Hub Has Been Downgraded</p>
+                <button
+                  class="downgrade-close"
+                  on:click={() => (isTeamDowngraded = false)}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <p class="downgrade-description">
+                As scheduled, your Hub is now on the Community edition.
+                <br /><br />
+                Based on your previous selections, your excess workspaces have been
+                archived and team members removed from the Hub.
+                <br /><br />
+                To restore all content and permissions, you can upgrade your plan
+                anytime.
+              </p>
+
+              <div class="d-flex justify-content-center">
+                <Button
+                  title="Upgrade Plan"
+                  type="secondary"
+                  size="small"
+                  onClick={handleRedirectToAdminPanel}
+                />
+              </div>
+            </div>
+          </div>
+        {/if}
+      </div>
+    {:else if teamRestricted}
+      <div
+        style="padding:16px; gap:24px; min-height:100vh"
+        class="d-flex flex-column justify-content-center"
+      >
+        <div class="d-flex flex-row align-items-center">
+          <h2 class="d-flex ellipsis overflow-visible team-title">
+            <Avatar
+              type="letter"
+              size="large"
+              letter={openTeam?.name[0] ? openTeam?.name[0] : ""}
+              bgColor="var(--bg-ds-secondary-400)"
+            />
+            <span
+              class="my-auto ellipsis overflow-hidden heading text-ds-font-size-28 text-ds-line-height-120 text-ds-font-weight-semi-bold"
+              style="margin-left:12px"
+              >{openTeam?.name || ""}
+            </span>
+          </h2>
+
+          <div class="d-flex justify-content-end gap-4" style="">
+            <Button
+              title={`Invite collaborators`}
+              type={"secondary"}
+              startIcon={PeopleRegular}
+              onClick={() => {}}
+              disable={true}
+            />
+            <Button
+              title={`New Workspace`}
+              type={`primary`}
+              startIcon={AddRegular}
+              onClick={() => {}}
+              loader={false}
+              disable={true}
+            />
+          </div>
+        </div>
+
+        <div class="d-flex flex-row justfi-content-start">
+          <div class="d-flex" style="gap:10px; margin-left: 16px;">
+            <p class="text-restricted-headers">workspaces</p>
+            <p class="text-restricted-headers">members</p>
+          </div>
+        </div>
+
+        <div
+          class="d-flex justify-content-center align-items-center flex-column"
+          style="gap:10px; flex:1"
+        >
+          <p class="text-ds-font-size-20 text-ds-font-weight-semi-bold">
+            Action Required to Restore This Hub
+          </p>
+          <div
+            class="d-flex flex-column w-100 mx-auto text-ds-font-weight-regular text-ds-line-height-143 text-ds-font-size-14 d-flex justify-content-center align-items-center"
+            style="max-width: 492px; color:var(--bg-ds-neutral-100);"
+          >
+            <div class="text-center">
+              {#if userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN}
+                Access to the {openTeam?.name} is restricted for you and your team
+                due to a <br /> payment failure.
+                <a
+                  on:click={handleRedirectToAdminPanel}
+                  style="color:var(--bg-ds-primary-400); cursor:pointer;"
+                  >Restore Hub Access</a
+                >
+              {:else}
+                Access to the Rapid API Suite Hub is restricted due to a payment
+                issue with the subscription. Please contact your Hub Owner, and
+                ask them to update the Hub's billing information to restore
+                access for the team.
+              {/if}
+            </div>
+          </div>
+        </div>
       </div>
     {:else if teamRestricted}
       <div
@@ -778,7 +900,7 @@
             </div>
           </div>
 
-          <div class="d-flex" style="gap:12px;">
+          <div class="d-flex;" style="gap:12px;">
             <Button
               type="primary"
               title="Accept"
@@ -910,7 +1032,6 @@
     border-color: var(--border-color);
   }
   .search-input-container {
-    /* border: 1px solid var(--border-color); */
     background: var(--bg-tertiary-400);
     width: 27vw;
     font-size: 12px;
@@ -968,5 +1089,97 @@
     text-align: center;
     color: var(--text-ds-neutral-500);
     margin: 0px;
+  }
+  .downgrade-card {
+    width: 340px;
+    max-width: 480px;
+    background: linear-gradient(
+      135deg,
+      rgba(17, 173, 240, 1),
+      rgba(49, 108, 246, 1),
+      rgba(97, 71, 255, 1)
+    );
+    padding: 1px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+  }
+
+  .downgrade-card-inner {
+    background-color: rgba(24, 28, 38, 1);
+    border-radius: 7px;
+    width: 100%;
+    height: 100%;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: var(--text-primary);
+    box-sizing: border-box;
+  }
+
+  .downgrade-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .downgrade-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-ds-surface-200);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+
+  .downgrade-title {
+    color: var(--text-ds-neutral-50);
+    font-size: 12px;
+    font-weight: 500;
+    margin: 0;
+    white-space: nowrap;
+    flex: 1;
+  }
+
+  .downgrade-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-ds-neutral-400);
+    font-size: 14px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .downgrade-description {
+    font-size: 12px;
+    color: var(--text-ds-neutral-300);
+    line-height: 1.5;
+    margin: 8px 0 16px 0;
+    font-weight: 400;
+    flex: 1;
+    overflow-wrap: break-word;
+  }
+
+  .downgrade-upgrade-btn {
+    background-color: var(--accent-primary);
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  .downgrade-upgrade-btn:hover {
+    opacity: 0.9;
   }
 </style>

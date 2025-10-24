@@ -127,6 +127,7 @@ export class TeamsViewModel {
           invites,
           billing,
           isRestricted,
+          isDowngraded
         } = elem;
         const updatedWorkspaces = workspaces?.map((workspace) => ({
           workspaceId: workspace.id,
@@ -158,6 +159,7 @@ export class TeamsViewModel {
           invites,
           billing,
           isRestricted,
+          isDowngraded
         };
         if (isRestricted === true && !get(isSubscriptionOverDue)) {
           isSubscriptionOverDue.set(true);
