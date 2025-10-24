@@ -177,6 +177,7 @@
   export let isCloseRequestAssertionsDemo: (value: boolean) => void;
   export let isCloseRequestTestScriptDemo: (value: boolean) => void;
   export let requestTabTestScriptDemoCompleted: () => void;
+  export let upgradePlanRedirect;
 
   // export let isLoginBannerActive = false;
   export let isPopoverContainer = true;
@@ -217,6 +218,10 @@
   export let newModifiedContent: string | KeyValuePair[];
   export let mergeViewRequestDatasetType: RequestDatasetEnum;
 
+  /**
+   * Plan name of hub
+   */
+  export let planName;
   //props for generating test cases function
   export let onGenerateTestCases;
   export let scriptComponent = null;
@@ -224,6 +229,8 @@
 
   //prop for generating pre-script function
   export let onGeneratePreScript;
+
+  export let selectedModel;
 
   // Reference to the splitpane container element
   let splitpaneContainer;
@@ -344,10 +351,6 @@
   onDestroy(() => {
     isChatbotOpenInCurrTab.set(false);
   });
-
-  $: {
-    console.log("ff", $tab);
-  }
 
   /**
    * Enables the diff/merge view while having suggested changes by AI
@@ -1501,7 +1504,10 @@
                     {onStopGeneratingAIResponse}
                     {onToggleLike}
                     {handleApplyChangeOnAISuggestion}
+                    {planName}
+                    {selectedModel}
                     {updateRequestStatAiChatBot}
+                    {upgradePlanRedirect}
                   />
                 {/if}
               </div>

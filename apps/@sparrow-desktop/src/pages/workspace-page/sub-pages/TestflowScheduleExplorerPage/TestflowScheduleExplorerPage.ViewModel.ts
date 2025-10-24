@@ -326,6 +326,24 @@ class MockHistoryExplorerPage {
     }
   };
 
+  public validateTestflowRun = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab.path.workspaceId,
+    );
+
+    const response = await this.testflowService.validateTestFlowRun(
+      progressiveTab.path.workspaceId,
+      progressiveTab.path.testflowId,
+      baseUrl,
+    );
+    if (response?.isSuccessful) {
+      const result = response.data.data;
+      return result;
+    } else {
+    }
+  };
+
   public deleteTestflowScheduleHistory = async (_scheduleHistoryId: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const baseUrl = await this.constructBaseUrl(

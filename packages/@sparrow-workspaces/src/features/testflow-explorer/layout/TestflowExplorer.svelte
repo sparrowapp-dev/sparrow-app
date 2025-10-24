@@ -10,7 +10,7 @@
     SvelteFlowProvider,
   } from "@xyflow/svelte";
 
-  import { Tag } from "@sparrow/library/ui";
+  import { notifications, Tag } from "@sparrow/library/ui";
 
   import {
     StartBlock,
@@ -45,7 +45,14 @@
   import { type Tab } from "@sparrow/common/types/workspace/tab";
   import "@xyflow/svelte/dist/style.css";
   import { onDestroy, onMount } from "svelte";
-  import { ToastIcon, ErrorWithText } from "@sparrow/library/icons";
+  import {
+    ToastIcon,
+    ErrorWithText,
+    AddRegular,
+    ChevronUpRegular,
+    ChevronDownRegular,
+    ArrowClockWiseRegular,
+  } from "@sparrow/library/icons";
 
   import "@xyflow/svelte/dist/style.css";
   import type { Observable } from "rxjs";
@@ -60,7 +67,7 @@
     StopFilled,
     Clock,
   } from "@sparrow/library/icons";
-  import { Button, Modal, notifications } from "@sparrow/library/ui";
+  import { Button, Modal, Dropdown } from "@sparrow/library/ui";
   import { BroomRegular } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
   import DeleteNode from "../../../components/delete-node/DeleteNode.svelte";
@@ -121,6 +128,12 @@
     FormatDays,
   } from "@sparrow/common/utils";
 
+  import {
+    startLoading,
+    stopLoading,
+    loadingState,
+  } from "@sparrow/common/store";
+
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
   export let onUpdateNodes;
@@ -175,6 +188,7 @@
   export let onPerformTestflowScheduleOperations;
   export let onOpenTestflowScheduleConfigurationsTab;
   export let isCreateTestflowScheduleLimitReachedModalOpen;
+  export let onFetchTestflow;
 
   export let onUpdateScheduleStatus: (
     scheduleId: string,
@@ -634,6 +648,7 @@
     collectionId: string,
     requestId: string,
     folderId: string,
+    requestName?: string,
   ) => {
     const response: any = {};
     const tempTab = new InitRequestTab("uuid", "uuid").getValue().property
@@ -687,7 +702,10 @@
     } else {
       response.method = tempTab?.method;
     }
-    if (data?.name) {
+    // Use the provided requestName parameter first, then fallback to data.name, then "Untitled"
+    if (requestName) {
+      response.name = requestName;
+    } else if (data?.name) {
       response.name = data.name;
     } else {
       response.name = "Untitled";
@@ -768,6 +786,46 @@
   };
 
   /**
+   * Gets the current collection and folder location for a given request ID
+   * This ensures we always use the most up-to-date location even after drag-and-drop operations
+   */
+  const getCurrentApiLocation = (
+    requestId: string,
+    fallbackCollectionId: string,
+    fallbackFolderId: string,
+  ) => {
+    let currentCollectionId = fallbackCollectionId;
+    let currentFolderId = fallbackFolderId;
+
+    // If we have a requestId, find its current location in collections
+    if (requestId && collectionListDocument) {
+      for (const collection of collectionListDocument) {
+        const findInItems = (items: any[], parentFolderId: string = "") => {
+          for (const item of items || []) {
+            if (item.id === requestId) {
+              currentCollectionId = collection.id;
+              currentFolderId = parentFolderId;
+              return true;
+            }
+            if (item.items && item.items.length > 0) {
+              if (findInItems(item.items, item.id)) {
+                return true;
+              }
+            }
+          }
+          return false;
+        };
+
+        if (findInItems(collection.items)) {
+          break;
+        }
+      }
+    }
+
+    return { currentCollectionId, currentFolderId };
+  };
+
+  /**
    * Updates the selected API in a specific node.
    * @param id - Node ID.
    * @param name - Name of the API.
@@ -787,11 +845,23 @@
   ) => {
     let response: any = {};
     if (collectionId) {
-      response = await createCustomRequestObject(
-        collectionId,
+      // Get the most current location for this API
+      const { currentCollectionId, currentFolderId } = getCurrentApiLocation(
         requestId,
-        folderId as string,
+        collectionId,
+        folderId || "",
       );
+
+      response = await createCustomRequestObject(
+        currentCollectionId,
+        requestId,
+        currentFolderId,
+        name,
+      );
+
+      // Update the node with current location info
+      collectionId = currentCollectionId;
+      folderId = currentFolderId;
     } else {
       // create custom API Request.
       response = await createBlankRequestObject(url as string, method, name);
@@ -1169,6 +1239,7 @@
         _requestData?.collectionId,
         _requestData?.requestId,
         _requestData?.folderId,
+        _requestData?.name,
       );
       requestMetaData = {
         collectionId: _requestData?.collectionId,
@@ -1933,6 +2004,8 @@
     itemsPerPage = newItemsPerPage;
     currentPage = 1; // Reset to first page
   };
+
+  let runButtonMenu = false;
 </script>
 
 <div
@@ -2010,40 +2083,52 @@
             {/if}
           {/if}
           {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-            {#if isGuestUser}
-              <Tooltip
-                title={isGuestUser
-                  ? "To access the feature, you need to login/signup on Sparrow."
-                  : "Schedule Run"}
-              >
-                <Button
-                  type="secondary"
-                  size="medium"
-                  title="Schedule Run"
-                  style="margin-left: 0;"
-                  id="create-new-schedule"
-                  disable={isGuestUser}
-                  buttonType="button"
-                  onClick={() => {
-                    handleEventClickScheduleRun();
-                    isScheduleRunPopupOpen = true;
-                  }}
-                />
-              </Tooltip>
-            {:else}
+            <Dropdown
+              zIndex={600}
+              buttonId="test-run-button"
+              isBackgroundClickable={true}
+              bind:isMenuOpen={runButtonMenu}
+              horizontalPosition={"left"}
+              minWidth={165}
+              options={[
+                {
+                  name: "Schedule Run",
+                  icon: AddRegular,
+                  iconColor: "var(--icon-secondary-130)",
+                  iconSize: "13px",
+                  onclick: () => {
+                    if (isGuestUser) {
+                      notifications.error(
+                        "To access the feature, you need to login/signup on Sparrow.",
+                      );
+                    } else {
+                      handleEventClickScheduleRun();
+                      isScheduleRunPopupOpen = true;
+                    }
+                  },
+                },
+              ]}
+            >
+              <!-- <Tooltip
+                title={"Add Options"}
+                placement={"bottom-center"}
+                distance={12}
+                show={!runButtonMenu}
+                zIndex={10}
+              > -->
               <Button
-                type="secondary"
-                size="medium"
-                title="Schedule Run"
-                style="margin-left: 0;"
-                id="create-new-schedule"
-                buttonType="button"
+                type="primary"
+                id="test-run-button"
+                size={"medium"}
+                startIcon={runButtonMenu
+                  ? ChevronUpRegular
+                  : ChevronDownRegular}
                 onClick={() => {
-                  handleEventClickScheduleRun();
-                  isScheduleRunPopupOpen = true;
+                  runButtonMenu = !runButtonMenu;
                 }}
               />
-            {/if}
+              <!-- </Tooltip> -->
+            </Dropdown>
           {/if}
         </div>
 
@@ -2237,7 +2322,7 @@
         <div class="d-flex flex-column h-100">
           <!-- Search Bar -->
           <div class="mb-3">
-            <div class="d-flex align-items-center">
+            <div class="d-flex align-items-center justify-content-between">
               <div class="search-container">
                 <Search
                   type="text"
@@ -2247,6 +2332,20 @@
                   on:input={handleSearchSchedules}
                 />
               </div>
+
+              <Button
+                title={"Refresh"}
+                startIcon={ArrowClockWiseRegular}
+                type={"secondary"}
+                size={"small"}
+                loader={$loadingState?.get("schedule-refresh-" + $tab?.id)}
+                disable={$loadingState?.get("schedule-refresh-" + $tab?.id)}
+                onClick={async () => {
+                  startLoading("schedule-refresh-" + $tab?.id);
+                  await onFetchTestflow();
+                  stopLoading("schedule-refresh-" + $tab?.id);
+                }}
+              />
             </div>
           </div>
 
@@ -2293,7 +2392,7 @@
             {#if filteredSchedules.length === 0}
               <div class="empty-state text-center py-5">
                 <Clock />
-                <p class="text-costum">No results found</p>
+                <p class="text-costum text-fs-14">No results found</p>
               </div>
             {/if}
           </div>

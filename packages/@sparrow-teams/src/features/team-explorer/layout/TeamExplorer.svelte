@@ -297,6 +297,7 @@
   });
 
   let filteredWorkspaces = [];
+  let teamRestricted = false;
   $: {
     if (selectedFilter !== "All") {
       filteredWorkspaces = workspaces.filter(
@@ -329,6 +330,12 @@
     upgradePlanModal = false;
     upgradePlanModalInvite = false;
   };
+
+  $: {
+    if (openTeam?.isRestricted) {
+      teamRestricted = true;
+    }
+  }
 </script>
 
 {#if openTeam}
@@ -336,7 +343,7 @@
     class="teams-content h-100"
     style="background-color: var(--bg-ds-surface-900);"
   >
-    {#if openTeam.owner}
+    {#if openTeam.owner && !teamRestricted}
       <div class="content-teams d-flex flex-column h-100 px-3 pt-3 pb-2">
         <div class="" style="">
           <div
@@ -704,6 +711,158 @@
           </div>
         {/if}
       </div>
+    {:else if teamRestricted}
+      <div
+        style="padding:16px; gap:24px; min-height:100vh"
+        class="d-flex flex-column justify-content-center"
+      >
+        <div class="d-flex flex-row align-items-center">
+          <h2 class="d-flex ellipsis overflow-visible team-title">
+            <Avatar
+              type="letter"
+              size="large"
+              letter={openTeam?.name[0] ? openTeam?.name[0] : ""}
+              bgColor="var(--bg-ds-secondary-400)"
+            />
+            <span
+              class="my-auto ellipsis overflow-hidden heading text-ds-font-size-28 text-ds-line-height-120 text-ds-font-weight-semi-bold"
+              style="margin-left:12px"
+              >{openTeam?.name || ""}
+            </span>
+          </h2>
+
+          <div class="d-flex justify-content-end gap-4" style="">
+            <Button
+              title={`Invite collaborators`}
+              type={"secondary"}
+              startIcon={PeopleRegular}
+              onClick={() => {}}
+              disable={true}
+            />
+            <Button
+              title={`New Workspace`}
+              type={`primary`}
+              startIcon={AddRegular}
+              onClick={() => {}}
+              loader={false}
+              disable={true}
+            />
+          </div>
+        </div>
+
+        <div class="d-flex flex-row justfi-content-start">
+          <div class="d-flex" style="gap:10px; margin-left: 16px;">
+            <p class="text-restricted-headers">workspaces</p>
+            <p class="text-restricted-headers">members</p>
+          </div>
+        </div>
+
+        <div
+          class="d-flex justify-content-center align-items-center flex-column"
+          style="gap:10px; flex:1"
+        >
+          <p class="text-ds-font-size-20 text-ds-font-weight-semi-bold">
+            Action Required to Restore This Hub
+          </p>
+          <div
+            class="d-flex flex-column w-100 mx-auto text-ds-font-weight-regular text-ds-line-height-143 text-ds-font-size-14 d-flex justify-content-center align-items-center"
+            style="max-width: 492px; color:var(--bg-ds-neutral-100);"
+          >
+            <div class="text-center">
+              {#if userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN}
+                Access to the {openTeam?.name} is restricted for you and your team
+                due to a <br /> payment failure.
+                <a
+                  on:click={handleRedirectToAdminPanel}
+                  style="color:var(--bg-ds-primary-400); cursor:pointer;"
+                  >Restore Hub Access</a
+                >
+              {:else}
+                Access to the Rapid API Suite Hub is restricted due to a payment
+                issue with the subscription. Please contact your Hub Owner, and
+                ask them to update the Hub's billing information to restore
+                access for the team.
+              {/if}
+            </div>
+          </div>
+        </div>
+      </div>
+    {:else if teamRestricted}
+      <div
+        style="padding:16px; gap:24px; min-height:100vh"
+        class="d-flex flex-column justify-content-center"
+      >
+        <div class="d-flex flex-row align-items-center">
+          <h2 class="d-flex ellipsis overflow-visible team-title">
+            <Avatar
+              type="letter"
+              size="large"
+              letter={openTeam?.name[0] ? openTeam?.name[0] : ""}
+              bgColor="var(--bg-ds-secondary-400)"
+            />
+            <span
+              class="my-auto ellipsis overflow-hidden heading text-ds-font-size-28 text-ds-line-height-120 text-ds-font-weight-semi-bold"
+              style="margin-left:12px"
+              >{openTeam?.name || ""}
+            </span>
+          </h2>
+
+          <div class="d-flex justify-content-end gap-4" style="">
+            <Button
+              title={`Invite collaborators`}
+              type={"secondary"}
+              startIcon={PeopleRegular}
+              onClick={() => {}}
+              disable={true}
+            />
+            <Button
+              title={`New Workspace`}
+              type={`primary`}
+              startIcon={AddRegular}
+              onClick={() => {}}
+              loader={false}
+              disable={true}
+            />
+          </div>
+        </div>
+
+        <div class="d-flex flex-row justfi-content-start">
+          <div class="d-flex" style="gap:10px; margin-left: 16px;">
+            <p class="text-restricted-headers">workspaces</p>
+            <p class="text-restricted-headers">members</p>
+          </div>
+        </div>
+
+        <div
+          class="d-flex justify-content-center align-items-center flex-column"
+          style="gap:10px; flex:1"
+        >
+          <p class="text-ds-font-size-20 text-ds-font-weight-semi-bold">
+            Action Required to Restore This Hub
+          </p>
+          <div
+            class="d-flex flex-column w-100 mx-auto text-ds-font-weight-regular text-ds-line-height-143 text-ds-font-size-14 d-flex justify-content-center align-items-center"
+            style="max-width: 492px; color:var(--bg-ds-neutral-100);"
+          >
+            <div class="text-center">
+              {#if userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN}
+                Access to the {openTeam?.name} is restricted for you and your team
+                due to a <br /> payment failure.
+                <a
+                  on:click={handleRedirectToAdminPanel}
+                  style="color:var(--bg-ds-primary-400); cursor:pointer;"
+                  >Restore Hub Access</a
+                >
+              {:else}
+                Access to the Rapid API Suite Hub is restricted due to a payment
+                issue with the subscription. Please contact your Hub Owner, and
+                ask them to update the Hub's billing information to restore
+                access for the team.
+              {/if}
+            </div>
+          </div>
+        </div>
+      </div>
     {:else}
       <div style="padding:16px; gap:24px" class="d-flex flex-column">
         <h2 class="d-flex ellipsis overflow-visible team-title">
@@ -919,6 +1078,17 @@
   .btn-formatter {
     outline: none;
     border: none;
+  }
+  .text-restricted-headers {
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    font-size: 12px;
+    line-height: 130%;
+    letter-spacing: 0;
+    text-align: center;
+    color: var(--text-ds-neutral-500);
+    margin: 0px;
   }
   .downgrade-card {
     width: 340px;

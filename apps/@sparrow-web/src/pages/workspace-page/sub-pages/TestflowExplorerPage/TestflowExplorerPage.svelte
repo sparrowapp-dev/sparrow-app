@@ -378,6 +378,7 @@
     onUpdateTestflowState={_viewModel.updateTestflowState}
     onOpenEnvironment={_viewModel.handleOpenEnvironment}
     {planLimitTestScheduleCount}
+    onFetchTestflow={_viewModel.fetchTestflow}
   />
 {/if}
 

@@ -56,6 +56,11 @@
     CollectionItemTypeBaseEnum,
     CollectionTypeBaseEnum,
   } from "@sparrow/common/types/workspace/collection-base";
+  import {
+    dragState,
+    setDragging,
+    setOverForbiddenZone,
+  } from "../../../stores/drag-state";
 
   export let collectionList: Observable<CollectionDocument[]>;
   export let showImportCollectionPopup: () => void;
@@ -68,6 +73,7 @@
     workspaceId: string,
   ) => void;
   export let onItemOpened: (entityType: string, args: any) => void;
+  export let onItemMoved: (args: any) => void;
   export let onSearchCollection: (
     collection: CollectionDocument[],
     searchData: string,
@@ -485,6 +491,273 @@
       }
     });
   };
+
+  // Common drag handler functions
+  const dragStart = (
+    event: DragEvent,
+    collection: any,
+    folder: any,
+    api: any,
+  ) => {
+    // Don't allow dragging from activeSync collections
+    if (collection.activeSync) {
+      event.preventDefault();
+      return;
+    }
+
+    setDragging(true);
+    const data = {
+      workspaceId: collection.workspaceId,
+      collectionId: collection.id,
+      collectionActiveSync: collection.activeSync,
+      folderId: folder?.id ?? "",
+      requestId: api.id,
+      name: api.name,
+      method: api?.request?.method || api?.mockRequest?.method,
+      // Identify if source collection is a mock collection
+      isMockCollection:
+        collection?.collectionType === CollectionTypeBaseEnum.MOCK ||
+        collection?.isMockCollection === true,
+    };
+    event.dataTransfer?.setData("text/plain", JSON.stringify(data));
+    event.dataTransfer?.setData("application/json", JSON.stringify(data));
+    // Store in sessionStorage as fallback since getData doesn't work in dragover
+    if (typeof sessionStorage !== "undefined") {
+      sessionStorage.setItem("sparrow-drag-data", JSON.stringify(data));
+    }
+  };
+
+  const dragStop = () => {
+    setDragging(false);
+    // Clean up sessionStorage
+    if (typeof sessionStorage !== "undefined") {
+      sessionStorage.removeItem("sparrow-drag-data");
+    }
+  };
+
+  const handleDragOver = (
+    event: DragEvent,
+    collection: any,
+    folder: any,
+    api: any,
+    requestTabWrapper: HTMLElement,
+    setDropPosition: (pos: "top" | "bottom" | null) => void,
+    setIsDragOver: (val: boolean) => void,
+    setIsForbiddenDrop: (val: boolean) => void,
+  ) => {
+    event.preventDefault();
+
+    // Reject all drops if this collection has activeSync enabled
+    if (collection.activeSync) {
+      setIsForbiddenDrop(true);
+      setIsDragOver(false);
+      setDropPosition(null);
+      setOverForbiddenZone(true);
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = "none";
+      }
+      return;
+    }
+
+    try {
+      // getData doesn't work in dragover, use sessionStorage
+      const dataStr =
+        typeof sessionStorage !== "undefined"
+          ? sessionStorage.getItem("sparrow-drag-data")
+          : null;
+      if (!dataStr) {
+        setIsDragOver(false);
+        setIsForbiddenDrop(false);
+        setDropPosition(null);
+        return;
+      }
+
+      const dragData = JSON.parse(dataStr);
+      const targetIsMock =
+        collection?.collectionType === CollectionTypeBaseEnum.MOCK ||
+        collection?.isMockCollection === true;
+
+      // Disallow moving requests out of or into mock collections (only within same mock collection)
+      if (
+        (dragData.isMockCollection || targetIsMock) &&
+        dragData.collectionId !== collection.id
+      ) {
+        setIsForbiddenDrop(true);
+        setIsDragOver(false);
+        setDropPosition(null);
+        setOverForbiddenZone(true);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "none";
+        }
+        return;
+      }
+
+      // Reject drops from activeSync collections
+      if (dragData.collectionActiveSync) {
+        setIsForbiddenDrop(true);
+        setIsDragOver(false);
+        setDropPosition(null);
+        setOverForbiddenZone(true);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "none";
+        }
+        return;
+      }
+
+      // Forbidden cases:
+      // 1. Dragging onto itself
+      if (dragData.requestId === api.id) {
+        setIsForbiddenDrop(true);
+        setIsDragOver(false);
+        setDropPosition(null);
+        setOverForbiddenZone(true);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "none";
+        }
+        return;
+      }
+
+      // 2. Dragging from folder "A" onto another request in folder "A"
+      if (
+        dragData.folderId &&
+        dragData.folderId === folder?.id &&
+        dragData.collectionId === collection.id
+      ) {
+        setIsForbiddenDrop(true);
+        setIsDragOver(false);
+        setDropPosition(null);
+        setOverForbiddenZone(true);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "none";
+        }
+        return;
+      }
+
+      // 3. Dragging from collection root onto another request in same collection root
+      if (
+        !dragData.folderId &&
+        !folder?.id &&
+        dragData.collectionId === collection.id
+      ) {
+        setIsForbiddenDrop(true);
+        setIsDragOver(false);
+        setDropPosition(null);
+        setOverForbiddenZone(true);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "none";
+        }
+        return;
+      }
+
+      // Valid drop - calculate insertion position based on cursor Y position
+      const rect = requestTabWrapper.getBoundingClientRect();
+      const mouseY = event.clientY;
+      const elementMiddle = rect.top + rect.height / 2;
+
+      if (mouseY < elementMiddle) {
+        setDropPosition("top");
+      } else {
+        setDropPosition("bottom");
+      }
+
+      setIsForbiddenDrop(false);
+      setIsDragOver(false); // Don't highlight entire component
+      setOverForbiddenZone(false);
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = "move";
+      }
+    } catch (e) {
+      setIsDragOver(false);
+      setIsForbiddenDrop(false);
+      setDropPosition(null);
+    }
+  };
+
+  const handleDragLeave = (
+    setIsDragOver: (val: boolean) => void,
+    setIsForbiddenDrop: (val: boolean) => void,
+    setDropPosition: (pos: "top" | "bottom" | null) => void,
+  ) => {
+    setIsDragOver(false);
+    setIsForbiddenDrop(false);
+    setDropPosition(null);
+    setOverForbiddenZone(false);
+  };
+
+  const handleDrop = async (
+    event: DragEvent,
+    collection: any,
+    folder: any,
+    api: any,
+    setDropPosition: (pos: "top" | "bottom" | null) => void,
+    setIsDragOver: (val: boolean) => void,
+    setIsForbiddenDrop: (val: boolean) => void,
+    currentDropPosition: "top" | "bottom" | null,
+  ) => {
+    event.preventDefault();
+    setIsDragOver(false);
+    setIsForbiddenDrop(false);
+    setDropPosition(null);
+
+    // Reject all drops if this collection has activeSync enabled
+    if (collection.activeSync) {
+      return;
+    }
+
+    try {
+      const data = event.dataTransfer?.getData("text/plain");
+      if (!data) return;
+      const dragData = JSON.parse(data);
+      const targetIsMock =
+        collection?.collectionType === CollectionTypeBaseEnum.MOCK ||
+        collection?.isMockCollection === true;
+
+      // Restrict moving between mock and non-mock collections
+      if (
+        (dragData.isMockCollection || targetIsMock) &&
+        dragData.collectionId !== collection.id
+      ) {
+        return;
+      }
+
+      // Reject drops from activeSync collections
+      if (dragData.collectionActiveSync) {
+        return;
+      }
+
+      // Don't allow forbidden drops
+      if (dragData.requestId === api.id) return;
+      if (
+        dragData.folderId &&
+        dragData.folderId === folder?.id &&
+        dragData.collectionId === collection.id
+      )
+        return;
+      if (
+        !dragData.folderId &&
+        !folder?.id &&
+        dragData.collectionId === collection.id
+      )
+        return;
+
+      // Only allow dropping requests
+      if (dragData.requestId) {
+        onItemMoved &&
+          onItemMoved({
+            oldCollectionId: dragData.collectionId,
+            newCollectionId: collection.id,
+            oldFolderId: dragData.folderId,
+            newFolderId: folder?.id ?? "",
+            requestId: dragData.requestId,
+            targetRequestId: api.id,
+            insertPosition:
+              currentDropPosition === "bottom" ? "after" : "before", // Top half = before, bottom half = after
+          });
+      }
+    } catch (e) {
+      console.error("Error handling drop:", e);
+    }
+  };
 </script>
 
 <svelte:window
@@ -733,6 +1006,7 @@
                   {onItemDeleted}
                   {onItemRenamed}
                   {onItemOpened}
+                  {onItemMoved}
                   {onBranchSwitched}
                   {onRefetchCollection}
                   {userRoleInWorkspace}
@@ -758,6 +1032,7 @@
                   {onItemRenamed}
                   {onItemDeleted}
                   {onItemOpened}
+                  {onItemMoved}
                   {activeTabPath}
                   {searchData}
                   {activeTabType}
@@ -772,10 +1047,16 @@
                     name: data.parentCollection.name,
                     workspaceId: data.parentCollection.workspaceId,
                     activeSync: data.parentCollection.activeSync,
+                    collectionType: data.parentCollection.collectionType,
                   }}
                   {activeTabId}
                   {isWebApp}
                   expand={data.expand}
+                  {dragStart}
+                  {dragStop}
+                  {handleDragOver}
+                  {handleDragLeave}
+                  {handleDrop}
                 />
               {:else if data.type === CollectionItemTypeBaseEnum.WEBSOCKET}
                 <div style="cursor:pointer;">
@@ -786,6 +1067,7 @@
                     {onItemRenamed}
                     {onItemDeleted}
                     {onItemOpened}
+                    {onItemMoved}
                     folder={data?.parentFolder?.id
                       ? {
                           id: data.parentFolder.id,
@@ -797,8 +1079,14 @@
                       name: data.parentCollection.name,
                       workspaceId: data.parentCollection.workspaceId,
                       activeSync: data.parentCollection.activeSync,
+                      collectionType: data.parentCollection.collectionType,
                     }}
                     {activeTabId}
+                    {dragStart}
+                    {dragStop}
+                    {handleDragOver}
+                    {handleDragLeave}
+                    {handleDrop}
                   />
                 </div>
               {:else if data.type === CollectionItemTypeBaseEnum.SOCKETIO}
@@ -810,6 +1098,7 @@
                     {onItemRenamed}
                     {onItemDeleted}
                     {onItemOpened}
+                    {onItemMoved}
                     folder={data?.parentFolder?.id
                       ? {
                           id: data.parentFolder.id,
@@ -821,8 +1110,14 @@
                       name: data.parentCollection.name,
                       workspaceId: data.parentCollection.workspaceId,
                       activeSync: data.parentCollection.activeSync,
+                      collectionType: data.parentCollection.collectionType,
                     }}
                     {activeTabId}
+                    {dragStart}
+                    {dragStop}
+                    {handleDragOver}
+                    {handleDragLeave}
+                    {handleDrop}
                   />
                 </div>
               {:else if data.type === CollectionItemTypeBaseEnum.GRAPHQL}
@@ -834,6 +1129,7 @@
                     {onItemRenamed}
                     {onItemDeleted}
                     {onItemOpened}
+                    {onItemMoved}
                     folder={data?.parentFolder?.id
                       ? {
                           id: data.parentFolder.id,
@@ -845,8 +1141,14 @@
                       name: data.parentCollection.name,
                       workspaceId: data.parentCollection.workspaceId,
                       activeSync: data.parentCollection.activeSync,
+                      collectionType: data.parentCollection.collectionType,
                     }}
                     {activeTabId}
+                    {dragStart}
+                    {dragStop}
+                    {handleDragOver}
+                    {handleDragLeave}
+                    {handleDrop}
                   />
                 </div>
               {:else if data.type === CollectionItemTypeBaseEnum.MOCK_REQUEST}
@@ -858,6 +1160,7 @@
                     {onItemRenamed}
                     {onItemDeleted}
                     {onItemOpened}
+                    {onItemMoved}
                     {activeTabPath}
                     {searchData}
                     {activeTabType}
@@ -872,9 +1175,15 @@
                       name: data.parentCollection.name,
                       workspaceId: data.parentCollection.workspaceId,
                       activeSync: data.parentCollection.activeSync,
+                      collectionType: data.parentCollection.collectionType,
                     }}
                     {activeTabId}
                     {isWebApp}
+                    {dragStart}
+                    {dragStop}
+                    {handleDragOver}
+                    {handleDragLeave}
+                    {handleDrop}
                   />
                 </div>
               {:else if data.type === CollectionItemTypeBaseEnum.FOLDER}
@@ -889,11 +1198,13 @@
                   {onItemDeleted}
                   {onItemRenamed}
                   {onItemOpened}
+                  {onItemMoved}
                   collection={{
                     id: data.parentCollection.id,
                     name: data.parentCollection.name,
                     workspaceId: data.parentCollection.workspaceId,
                     activeSync: data.parentCollection.activeSync,
+                    collectionType: data.parentCollection.collectionType,
                   }}
                   {userRoleInWorkspace}
                   {activeTabPath}
@@ -913,6 +1224,7 @@
                     {onItemRenamed}
                     {onItemDeleted}
                     {onItemOpened}
+                    {onItemMoved}
                     {activeTabPath}
                     {searchData}
                     {activeTabType}
@@ -927,9 +1239,15 @@
                       name: data.parentCollection.name,
                       workspaceId: data.parentCollection.workspaceId,
                       activeSync: data.parentCollection.activeSync,
+                      collectionType: data.parentCollection.collectionType,
                     }}
                     {activeTabId}
                     {isWebApp}
+                    {dragStart}
+                    {dragStop}
+                    {handleDragOver}
+                    {handleDragLeave}
+                    {handleDrop}
                   />
                 </div>
               {:else if data.type === CollectionItemTypeBaseEnum.SAVED_REQUEST}
@@ -950,6 +1268,7 @@
                     name: data.parentCollection.name,
                     workspaceId: data.parentCollection.workspaceId,
                     activeSync: data.parentCollection.activeSync,
+                    collectionType: data.parentCollection.collectionType,
                   }}
                   request={{
                     id: data.parentRequest.id,
