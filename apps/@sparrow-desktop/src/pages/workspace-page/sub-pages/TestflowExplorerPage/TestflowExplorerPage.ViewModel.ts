@@ -2145,4 +2145,32 @@ export class TestflowExplorerPageViewModel {
     this.tabRepository.createTab(initEnvironmentTab.getValue());
     scrollToTab(initEnvironmentTab.getValue().id);
   };
+
+  /**
+   * @description - This function will provide the downgraded status of the team.
+   * @returns {Promise<boolean>} - Returns true if the team is downgraded, otherwise false or undefined.
+   */
+  public getTeamDowngradeStatus = async () => {
+    const response = await this.workspaceRepository.getActiveWorkspaceDoc();
+    const teamId = response?._data?.team?.teamId || "";
+    const teamData = await this.teamRepository.getTeamDoc(teamId);
+    const teamDoc = teamData.toMutableJSON();
+    if (teamDoc) {
+      return teamDoc?.isDowngraded;
+    }
+  };
+
+  /**
+   * @description - This function will provide the full team details for the active workspace.
+   */
+  public getTeamDetails = async () => {
+    const response = await this.workspaceRepository.getActiveWorkspaceDoc();
+    const teamId = response?._data?.team?.teamId || "";
+    const teamData = await this.teamRepository.getTeamDoc(teamId);
+    const teamDoc = teamData.toMutableJSON();
+    if (teamDoc) {
+      return teamDoc;
+    }
+    return null;
+  };
 }

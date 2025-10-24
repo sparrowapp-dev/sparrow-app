@@ -570,6 +570,9 @@ export class RxDB {
           9: function (oldDoc: TeamDocument) {
             return oldDoc;
           },
+          10: function (oldDoc: TeamDocument) {
+            return oldDoc;
+          },
         },
       },
       environment: {
@@ -597,10 +600,8 @@ export class RxDB {
 
               if (nodes.length > 0) {
                 const updatedNodes = [];
-
                 for (const item of nodes) {
                   let updatedItem = { ...item };
-
                   if (item?.id === "1") {
                     const data = {
                       blockName: "startBlock",

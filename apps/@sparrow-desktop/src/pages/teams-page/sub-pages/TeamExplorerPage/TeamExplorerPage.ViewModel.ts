@@ -35,7 +35,10 @@ import constants from "@app/constants/constants";
 import { RecentWorkspaceRepository } from "@app/repositories/recent-workspace.repository";
 import { PlanRepository } from "@app/repositories/plan.repository";
 import { open } from "@tauri-apps/plugin-shell";
-import { isSubscriptionOverDue, isSubscriptionOverTeamId } from "@sparrow/common/store";
+import {
+  isSubscriptionOverDue,
+  isSubscriptionOverTeamId,
+} from "@sparrow/common/store";
 import { get } from "svelte/store";
 
 export class TeamExplorerPageViewModel {
@@ -170,6 +173,7 @@ export class TeamExplorerPageViewModel {
           updatedBy,
           isNewInvite,
           isRestricted,
+          isDowngraded,
         } = elem;
         const updatedWorkspaces = workspaces.map((workspace) => ({
           workspaceId: workspace.id,
@@ -199,6 +203,7 @@ export class TeamExplorerPageViewModel {
           isNewInvite,
           isOpen: isOpenTeam,
           isRestricted,
+          isDowngraded,
         };
         if (isRestricted === true && !get(isSubscriptionOverDue)) {
           isSubscriptionOverDue.set(true);
@@ -1083,15 +1088,17 @@ export class TeamExplorerPageViewModel {
     options?: { toWorkspace?: boolean },
   ) => {
     const [authToken] = getAuthJwt();
-    const [,,selfhostAdminUrl] = getSelfhostUrls();
+    const [, , selfhostAdminUrl] = getSelfhostUrls();
     if (options?.toWorkspace) {
       await open(
-        `${selfhostAdminUrl ? selfhostAdminUrl : constants.ADMIN_URL}/hubs/workspace/${teamId}?xid=${authToken}`,
+        `${
+          selfhostAdminUrl ? selfhostAdminUrl : constants.ADMIN_URL
+        }/hubs/workspace/${teamId}?xid=${authToken}`,
       );
     } else {
-      if(selfhostAdminUrl){
+      if (selfhostAdminUrl) {
         await open(selfhostAdminUrl);
-      }else{
+      } else {
         await open(
           `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
         );

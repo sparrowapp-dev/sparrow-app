@@ -24,7 +24,12 @@ import {
   type TeamDocument,
   type WorkspaceDocument,
 } from "../../database/database";
-import { clearAuthJwt, getAuthJwt, getClientUser, getSelfhostUrls } from "@app/utils/jwt";
+import {
+  clearAuthJwt,
+  getAuthJwt,
+  getClientUser,
+  getSelfhostUrls,
+} from "@app/utils/jwt";
 import { userLogout } from "../../services/auth.service";
 import { FeatureSwitchService } from "../../services/feature-switch.service";
 import { FeatureSwitchRepository } from "../../repositories/feature-switch.repository";
@@ -163,8 +168,12 @@ export class DashboardViewModel {
 
   public onAdminRedirect = async () => {
     const [authToken] = getAuthJwt();
-    const [,,selfhostAdminUrl] = getSelfhostUrls();
-    await open(`${selfhostAdminUrl ? selfhostAdminUrl : constants.ADMIN_URL}/hubs?xid=${authToken}`);
+    const [, , selfhostAdminUrl] = getSelfhostUrls();
+    await open(
+      `${
+        selfhostAdminUrl ? selfhostAdminUrl : constants.ADMIN_URL
+      }/hubs?xid=${authToken}`,
+    );
     return;
   };
 
@@ -230,7 +239,7 @@ export class DashboardViewModel {
           isNewInvite,
           billing,
           isRestricted,
-          isDowngraded
+          isDowngraded,
         } = elem;
         const updatedWorkspaces = workspaces?.map((workspace) => ({
           workspaceId: workspace.id,
@@ -262,7 +271,7 @@ export class DashboardViewModel {
           isOpen: isOpenTeam,
           billing,
           isRestricted,
-          isDowngraded
+          isDowngraded,
         };
         data.push(item);
       }
@@ -450,7 +459,7 @@ export class DashboardViewModel {
 
     const [selfhostBackendUrl] = getSelfhostUrls();
     if (selfhostBackendUrl) {
-        return selfhostBackendUrl;
+      return selfhostBackendUrl;
     }
 
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
@@ -1254,11 +1263,11 @@ export class DashboardViewModel {
    */
   public handleRedirectToAdminPanel = async (teamId: string) => {
     const [authToken] = getAuthJwt();
-    const [,,selfhostAdminUrl] = getSelfhostUrls();
+    const [, , selfhostAdminUrl] = getSelfhostUrls();
 
-    if(selfhostAdminUrl){
-       await open(selfhostAdminUrl);
-    }else{
+    if (selfhostAdminUrl) {
+      await open(selfhostAdminUrl);
+    } else {
       await open(
         `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
       );

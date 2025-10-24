@@ -207,6 +207,7 @@ export class TeamsViewModel {
           updatedAt,
           updatedBy,
           isNewInvite,
+          isDowngraded,
         } = elem;
         const isActiveWorkspace =
           await this.workspaceRepository.checkActiveWorkspace(_id);
@@ -231,6 +232,7 @@ export class TeamsViewModel {
           updatedAt,
           updatedBy,
           isNewInvite,
+          isDowngraded,
         };
         data.push(item);
       }
