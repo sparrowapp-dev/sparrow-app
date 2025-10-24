@@ -615,7 +615,7 @@
   }
 
   $: {
-    if ($isSubscriptionOverDue) {
+    if ($isSubscriptionOverDue && (userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER)) {
       isSubscriptionOverDueOpen = true;
     }
   }

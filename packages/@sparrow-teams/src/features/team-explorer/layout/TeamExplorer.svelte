@@ -295,6 +295,7 @@
   });
 
   let filteredWorkspaces = [];
+  let teamRestricted = false;
   $: {
     if (selectedFilter !== "All") {
       filteredWorkspaces = workspaces.filter(
@@ -327,6 +328,12 @@
     upgradePlanModal = false;
     upgradePlanModalInvite = false;
   };
+
+  $: {
+    if (openTeam?.isRestricted) {
+      teamRestricted = true;
+    }
+  }
 </script>
 
 {#if openTeam}
@@ -334,7 +341,7 @@
     class="teams-content h-100"
     style="background-color: var(--bg-ds-surface-900);"
   >
-    {#if openTeam.owner}
+    {#if openTeam.owner && !teamRestricted}
       <div class="content-teams d-flex flex-column h-100 px-3 pt-3 pb-2">
         <div class="" style="">
           <div
@@ -658,7 +665,7 @@
           {/if}
         </div>
       </div>
-    {:else if openTeam.isRestricted}
+    {:else if teamRestricted}
       <div
         style="padding:16px; gap:24px; min-height:100vh"
         class="d-flex flex-column justify-content-center"
@@ -716,13 +723,20 @@
             style="max-width: 492px; color:var(--bg-ds-neutral-100);"
           >
             <div class="text-center">
-              Access to the {openTeam?.name} is restricted for you and your team
-              due to a <br /> payment failure.
-              <a
-                on:click={handleRedirectToAdminPanel}
-                style="color:var(--bg-ds-primary-400); cursor:pointer;"
-                >Restore Hub Access</a
-              >
+              {#if userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN}
+                Access to the {openTeam?.name} is restricted for you and your team
+                due to a <br /> payment failure.
+                <a
+                  on:click={handleRedirectToAdminPanel}
+                  style="color:var(--bg-ds-primary-400); cursor:pointer;"
+                  >Restore Hub Access</a
+                >
+              {:else}
+                Access to the Rapid API Suite Hub is restricted due to a payment
+                issue with the subscription. Please contact your Hub Owner, and
+                ask them to update the Hub's billing information to restore
+                access for the team.
+              {/if}
             </div>
           </div>
         </div>
