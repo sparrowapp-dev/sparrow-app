@@ -602,7 +602,6 @@ export class RxDB {
                 const updatedNodes = [];
                 for (const item of nodes) {
                   let updatedItem = { ...item };
-
                   if (item?.id === "1") {
                     const data = {
                       blockName: "startBlock",
