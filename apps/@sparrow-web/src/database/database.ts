@@ -346,6 +346,17 @@ export class RxDB {
           20: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          21: function (oldDoc: TabDocument) {
+            if (oldDoc?.property?.testflow) {
+              oldDoc.property.testflow.state = {
+                testflowNavigator: "Testflow",
+              };
+            }
+            return oldDoc;
+          },
+          22: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
         },
       },
       collection: {
@@ -384,6 +395,9 @@ export class RxDB {
           11: function (oldDoc: CollectionDocument) {
             return oldDoc;
           },
+          12: function (oldDoc: CollectionDocument) {
+            return oldDoc;
+          },
         },
       },
       activesidebartab: {
@@ -405,6 +419,9 @@ export class RxDB {
             return oldDoc;
           },
           4: function (oldDoc: TeamDocument) {
+            return oldDoc;
+          },
+          5: function (oldDoc: TeamDocument) {
             return oldDoc;
           },
         },

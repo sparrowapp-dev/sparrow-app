@@ -283,484 +283,515 @@
   </div></Modal
 >
 
-<!-- Container -->
-<div class="border border-top-0 text-light p-2 h-100 rounded-bottom">
-  {#if localTest.noCode.length === 0}
-    <!-- Empty state -->
-    <div
-      class="d-flex flex-column align-items-center justify-content-center h-100"
-      style="overflow: auto;"
-    >
-      <p class="w-50 text-muted text-center text-fs-14 mb-3">
-        No test Added. Please click ‘+ Add Test’ to create one. You can test
-        status code, response time, body content, and more.
-      </p>
-      <Button
-        startIcon={AddRegular}
-        title={"Add Tests"}
-        type="primary"
-        size="small"
-        onClick={addTest}
-      />
+<div
+  class="d-flex flex-column w-100 h-100"
+  style="position: relative;"
+  id="request-tab-test"
+>
+  <div class="border rounded-top">
+    <div class="d-flex align-items-center justify-content-between px-3 py-2">
+      <p class="text-fs-12 mb-0 text-muted">Build tests using form fields</p>
+      <!-- <Button
+        title="Read Documentation"
+        type="link-secondary"
+        onClick={() => {}}
+      /> -->
     </div>
-  {:else}
-    <!-- Main layout -->
-    <div
-      class="d-flex h-100 {tabSplitDirection === 'vertical'
-        ? 'flex-column'
-        : 'flex-row'}"
-    >
-      <!-- Left Sidebar -->
-      <div
-        class="h-100"
-        style="width: {tabSplitDirection === 'vertical'
-          ? '100%'
-          : '25%'}; overflow: auto;"
-      >
-        <div class="pb-2">
-          {#each localTest.noCode as test, index}
-            <TestListItem
-              {test}
-              {selectTest}
-              {deleteTest}
-              {duplicateTest}
-              {index}
-              {testResults}
-            />
-          {/each}
+  </div>
+  <div style="flex:1; overflow:auto;">
+    <!-- Container -->
+    <div class="border border-top-0 text-light p-2 h-100 rounded-bottom">
+      {#if localTest.noCode.length === 0}
+        <!-- Empty state -->
+        <div
+          class="d-flex flex-column align-items-center justify-content-center h-100"
+          style="overflow: auto;"
+        >
+          <p class="w-50 text-muted text-center text-fs-14 mb-3">
+            No test Added. Please click ‘+ Add Test’ to create one. You can test
+            status code, response time, body content, and more.
+          </p>
+          <Button
+            startIcon={AddRegular}
+            title={"Add Tests"}
+            type="primary"
+            size="small"
+            onClick={addTest}
+          />
         </div>
+      {:else}
+        <!-- Main layout -->
+        <div
+          class="d-flex h-100 {tabSplitDirection === 'vertical'
+            ? 'flex-column'
+            : 'flex-row'}"
+        >
+          <!-- Left Sidebar -->
+          <div
+            class="h-100"
+            style="width: {tabSplitDirection === 'vertical'
+              ? '100%'
+              : '25%'}; overflow: auto;"
+          >
+            <div class="pb-2">
+              {#each localTest.noCode as test, index}
+                <TestListItem
+                  {test}
+                  {selectTest}
+                  {deleteTest}
+                  {duplicateTest}
+                  {index}
+                  {testResults}
+                />
+              {/each}
+            </div>
 
-        <div class="d-flex gap-2 pb-2" style="flex-wrap:wrap;">
-          <div class="">
-            <Button
-              startIcon={AddRegular}
-              title={"Add Test"}
-              type="primary"
-              size="small"
-              onClick={addTest}
-            />
+            <div class="d-flex gap-2 pb-2" style="flex-wrap:wrap;">
+              <div class="">
+                <Button
+                  startIcon={AddRegular}
+                  title={"Add Test"}
+                  type="primary"
+                  size="small"
+                  onClick={addTest}
+                />
+              </div>
+              <div class="">
+                <Button
+                  title={"Remove All"}
+                  startIcon={DeleteRegular}
+                  type="secondary"
+                  size="small"
+                  onClick={() => {
+                    isDeletePopup = true;
+                  }}
+                />
+              </div>
+            </div>
           </div>
-          <div class="">
-            <Button
-              title={"Remove All"}
-              startIcon={DeleteRegular}
-              type="secondary"
-              size="small"
-              onClick={() => {
-                isDeletePopup = true;
-              }}
-            />
-          </div>
-        </div>
-      </div>
 
-      <!-- Right Form -->
-      <div
-        class="h-100 gap-2 d-flex {tabSplitDirection === 'vertical'
-          ? 'border-top pt-2'
-          : 'border-start ms-2 ps-2'}"
-        style="width: {tabSplitDirection === 'vertical'
-          ? '100%'
-          : '75%'}; overflow: auto; flex-flow:wrap; align-content:flex-start;"
-      >
-        {#if localTest.noCode.some((t) => t.isActive)}
-          {#each localTest.noCode as test}
-            {#if test.isActive}
-              <div
-                style="display: flex; flex-wrap: wrap; gap: 1rem; width: 100%;"
-              >
-                <div style="flex: 1 1 45%; min-width: 0;">
-                  <label class="form-label text-fs-12"
-                    >Name <span style="color: var(--text-ds-danger-300)">*</span
-                    ></label
+          <!-- Right Form -->
+          <div
+            class="h-100 gap-2 d-flex {tabSplitDirection === 'vertical'
+              ? 'border-top pt-2'
+              : 'border-start ms-2 ps-2'}"
+            style="width: {tabSplitDirection === 'vertical'
+              ? '100%'
+              : '75%'}; overflow: auto; flex-flow:wrap; align-content:flex-start;"
+          >
+            {#if localTest.noCode.some((t) => t.isActive)}
+              {#each localTest.noCode as test}
+                {#if test.isActive}
+                  <div
+                    style="display: flex; flex-wrap: wrap; gap: 1rem; width: 100%;"
                   >
-                  <input
-                    type="text"
-                    class="form-control text-light"
-                    bind:value={test.name}
-                    on:blur={() => {
-                      if (!test.name) {
-                        setByDefaultTestName(test);
-                      }
-                    }}
-                    placeholder="Enter Test Name"
-                  />
-                </div>
-                <div style="flex: 1 1 45%; min-width: 0;">
-                  <label class="form-label text-fs-12"
-                    >Test Target <span style="color: var(--text-ds-danger-300)"
-                      >*</span
-                    ></label
-                  >
-                  <WithSelectV4
-                    id={"hdre89fhrbej"}
-                    data={[
-                      {
-                        name: "Response Header",
-                        id: TestCaseSelectionTypeEnum.RESPONSE_HEADER,
-                      },
-                      {
-                        name: "Response JSON",
-                        id: TestCaseSelectionTypeEnum.RESPONSE_JSON,
-                      },
-                      {
-                        name: "Response Text",
-                        id: TestCaseSelectionTypeEnum.RESPONSE_TEXT,
-                      },
-                      {
-                        name: "Response XML",
-                        id: TestCaseSelectionTypeEnum.RESPONSE_XML,
-                      },
-                      {
-                        name: "Time Consuming",
-                        id: TestCaseSelectionTypeEnum.TIME_CONSUMING,
-                      },
-                    ]}
-                    titleId={test?.testTarget}
-                    onclick={(testTargetItem) => {
-                      handleTestTargetDropdown(testTargetItem, test);
-                    }}
-                    placeholder="Select Test Target"
-                    zIndex={499}
-                    disabled={false}
-                    isError={errors && !test.testTarget}
-                  />
-                  {#if errors && !test.testTarget}
-                    <div
-                      class="text-fs-12 mt-1"
-                      style="color: var(--text-ds-danger-300)"
-                    >
-                      Please select a test target
+                    <div style="flex: 1 1 45%; min-width: 0;">
+                      <label class="form-label text-fs-12"
+                        >Name <span style="color: var(--text-ds-danger-300)"
+                          >*</span
+                        ></label
+                      >
+                      <input
+                        type="text"
+                        class="form-control text-light"
+                        bind:value={test.name}
+                        on:blur={() => {
+                          if (!test.name) {
+                            setByDefaultTestName(test);
+                          }
+                        }}
+                        placeholder="Enter Test Name"
+                      />
                     </div>
-                  {/if}
-                </div>
-                <div style="flex: 1 1 45%; min-width: 0;">
-                  <label class="form-label text-fs-12"
-                    >Condition <span style="color: var(--text-ds-danger-300)"
-                      >*</span
-                    ></label
-                  >
-                  <WithSelectV4
-                    id={"hdregtrgt89fhrbej"}
-                    data={test.testTarget === "Time Consuming"
-                      ? [
+                    <div style="flex: 1 1 45%; min-width: 0;">
+                      <label class="form-label text-fs-12"
+                        >Test Target <span
+                          style="color: var(--text-ds-danger-300)">*</span
+                        ></label
+                      >
+                      <WithSelectV4
+                        id={"hdre89fhrbej"}
+                        data={[
                           {
-                            name: "Equals",
-                            id: TestCaseConditionOperatorEnum.EQUALS,
+                            name: "Response Header",
+                            id: TestCaseSelectionTypeEnum.RESPONSE_HEADER,
                           },
                           {
-                            name: "Not Equal",
-                            id: TestCaseConditionOperatorEnum.NOT_EQUAL,
-                          },
-
-                          {
-                            name: "Less Than",
-                            id: TestCaseConditionOperatorEnum.LESS_THAN,
+                            name: "Response JSON",
+                            id: TestCaseSelectionTypeEnum.RESPONSE_JSON,
                           },
                           {
-                            name: "Less Than Or Equal",
-                            id: TestCaseConditionOperatorEnum.LESS_THAN_OR_EQUAL,
+                            name: "Response Text",
+                            id: TestCaseSelectionTypeEnum.RESPONSE_TEXT,
                           },
                           {
-                            name: "Greater Than",
-                            id: TestCaseConditionOperatorEnum.GREATER_THAN,
+                            name: "Response XML",
+                            id: TestCaseSelectionTypeEnum.RESPONSE_XML,
                           },
                           {
-                            name: "Greater Than Or Equal",
-                            id: TestCaseConditionOperatorEnum.GREATER_THAN_OR_EQUAL,
-                          },
-                        ]
-                      : [
-                          {
-                            name: "Equals",
-                            id: TestCaseConditionOperatorEnum.EQUALS,
-                          },
-                          {
-                            name: "Not Equal",
-                            id: TestCaseConditionOperatorEnum.NOT_EQUAL,
-                          },
-                          {
-                            name: "Exists",
-                            id: TestCaseConditionOperatorEnum.EXISTS,
-                          },
-                          {
-                            name: "Does Not Exist",
-                            id: TestCaseConditionOperatorEnum.DOES_NOT_EXIST,
-                          },
-                          {
-                            name: "Less Than",
-                            id: TestCaseConditionOperatorEnum.LESS_THAN,
-                          },
-                          {
-                            name: "Greater Than",
-                            id: TestCaseConditionOperatorEnum.GREATER_THAN,
-                          },
-                          {
-                            name: "Contains",
-                            id: TestCaseConditionOperatorEnum.CONTAINS,
-                          },
-                          {
-                            name: "Does Not Contain",
-                            id: TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN,
-                          },
-                          {
-                            name: "Is Empty",
-                            id: TestCaseConditionOperatorEnum.IS_EMPTY,
-                          },
-                          {
-                            name: "Is Not Empty",
-                            id: TestCaseConditionOperatorEnum.IS_NOT_EMPTY,
-                          },
-                          {
-                            name: "In List",
-                            id: TestCaseConditionOperatorEnum.IN_LIST,
-                          },
-                          {
-                            name: "Not In List",
-                            id: TestCaseConditionOperatorEnum.NOT_IN_LIST,
+                            name: "Time Consuming",
+                            id: TestCaseSelectionTypeEnum.TIME_CONSUMING,
                           },
                         ]}
-                    titleId={test?.condition}
-                    onclick={(conditionItem) => {
-                      handleConditionDropdown(conditionItem, test);
-                    }}
-                    placeholder="Select Condition"
-                    zIndex={499}
-                    disabled={false}
-                    isError={errors && !test.condition}
-                  />
-                  {#if errors && !test.condition}
-                    <div
-                      class="text-fs-12 mt-1"
-                      style="color: var(--text-ds-danger-300)"
-                    >
-                      Please select a condition
+                        titleId={test?.testTarget}
+                        onclick={(testTargetItem) => {
+                          handleTestTargetDropdown(testTargetItem, test);
+                        }}
+                        placeholder="Select Test Target"
+                        zIndex={499}
+                        disabled={false}
+                        isError={errors && !test.testTarget}
+                      />
+                      {#if errors && !test.testTarget}
+                        <div
+                          class="text-fs-12 mt-1"
+                          style="color: var(--text-ds-danger-300)"
+                        >
+                          Please select a test target
+                        </div>
+                      {/if}
                     </div>
-                  {/if}
-                </div>
-                {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER || test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON || test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
-                  <div style="flex: 1 1 45%; min-width: 0;">
-                    <label class="form-label text-fs-12">
-                      {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
-                        Header
-                      {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON}
-                        JSON
-                      {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
-                        XML
-                      {/if}
-                      Path
-                      <span style="color: var(--text-ds-danger-300">*</span
-                      ></label
-                    >
-                    <input
-                      type="text"
-                      class="form-control text-light"
-                      bind:value={test.testPath}
-                      placeholder={test?.testTarget ===
-                      TestCaseSelectionTypeEnum.RESPONSE_JSON
-                        ? "E.g. $.user.name"
-                        : test?.testTarget ===
-                            TestCaseSelectionTypeEnum.RESPONSE_XML
-                          ? "E.g. /root/user/name"
-                          : test?.testTarget ===
-                              TestCaseSelectionTypeEnum.RESPONSE_HEADER
-                            ? "E.g. Content-Type"
-                            : "Enter path"}
-                      style={errors &&
-                      (!test.testPath ||
-                        (test.testPath &&
-                          test?.testTarget ===
-                            TestCaseSelectionTypeEnum.RESPONSE_JSON &&
-                          !isValidJsonPath(test.testPath)) ||
-                        (test.testPath &&
-                          test?.testTarget ===
-                            TestCaseSelectionTypeEnum.RESPONSE_XML &&
-                          !isValidXPath(test.testPath)) ||
-                        (test.testPath &&
-                          test?.testTarget ===
-                            TestCaseSelectionTypeEnum.RESPONSE_HEADER &&
-                          !isValidHeaderKey(test.testPath)))
-                        ? "border: 1px solid var(--text-ds-danger-300)"
-                        : ""}
-                    />
-                    {#if errors && !test.testPath}
-                      <div
-                        class="text-fs-12 mt-1"
-                        style="color: var(--text-ds-danger-300)"
+                    <div style="flex: 1 1 45%; min-width: 0;">
+                      <label class="form-label text-fs-12"
+                        >Condition <span
+                          style="color: var(--text-ds-danger-300)">*</span
+                        ></label
                       >
-                        Please enter a {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
-                          Header
-                        {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON}
-                          JSON
-                        {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
-                          XML
-                        {/if} Path
+                      <WithSelectV4
+                        id={"hdregtrgt89fhrbej"}
+                        data={test.testTarget === "Time Consuming"
+                          ? [
+                              {
+                                name: "Equals",
+                                id: TestCaseConditionOperatorEnum.EQUALS,
+                              },
+                              {
+                                name: "Not Equal",
+                                id: TestCaseConditionOperatorEnum.NOT_EQUAL,
+                              },
+
+                              {
+                                name: "Less Than",
+                                id: TestCaseConditionOperatorEnum.LESS_THAN,
+                              },
+                              {
+                                name: "Less Than Or Equal",
+                                id: TestCaseConditionOperatorEnum.LESS_THAN_OR_EQUAL,
+                              },
+                              {
+                                name: "Greater Than",
+                                id: TestCaseConditionOperatorEnum.GREATER_THAN,
+                              },
+                              {
+                                name: "Greater Than Or Equal",
+                                id: TestCaseConditionOperatorEnum.GREATER_THAN_OR_EQUAL,
+                              },
+                            ]
+                          : [
+                              {
+                                name: "Equals",
+                                id: TestCaseConditionOperatorEnum.EQUALS,
+                              },
+                              {
+                                name: "Not Equal",
+                                id: TestCaseConditionOperatorEnum.NOT_EQUAL,
+                              },
+                              {
+                                name: "Exists",
+                                id: TestCaseConditionOperatorEnum.EXISTS,
+                              },
+                              {
+                                name: "Does Not Exist",
+                                id: TestCaseConditionOperatorEnum.DOES_NOT_EXIST,
+                              },
+                              {
+                                name: "Less Than",
+                                id: TestCaseConditionOperatorEnum.LESS_THAN,
+                              },
+                              {
+                                name: "Greater Than",
+                                id: TestCaseConditionOperatorEnum.GREATER_THAN,
+                              },
+                              {
+                                name: "Contains",
+                                id: TestCaseConditionOperatorEnum.CONTAINS,
+                              },
+                              {
+                                name: "Does Not Contain",
+                                id: TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN,
+                              },
+                              {
+                                name: "Is Empty",
+                                id: TestCaseConditionOperatorEnum.IS_EMPTY,
+                              },
+                              {
+                                name: "Is Not Empty",
+                                id: TestCaseConditionOperatorEnum.IS_NOT_EMPTY,
+                              },
+                              {
+                                name: "In List",
+                                id: TestCaseConditionOperatorEnum.IN_LIST,
+                              },
+                              {
+                                name: "Not In List",
+                                id: TestCaseConditionOperatorEnum.NOT_IN_LIST,
+                              },
+                            ]}
+                        titleId={test?.condition}
+                        onclick={(conditionItem) => {
+                          handleConditionDropdown(conditionItem, test);
+                        }}
+                        placeholder="Select Condition"
+                        zIndex={499}
+                        disabled={false}
+                        isError={errors && !test.condition}
+                      />
+                      {#if errors && !test.condition}
+                        <div
+                          class="text-fs-12 mt-1"
+                          style="color: var(--text-ds-danger-300)"
+                        >
+                          Please select a condition
+                        </div>
+                      {/if}
+                    </div>
+                    {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER || test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON || test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
+                      <div style="flex: 1 1 45%; min-width: 0;">
+                        <label class="form-label text-fs-12">
+                          {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
+                            Header
+                          {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON}
+                            JSON
+                          {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
+                            XML
+                          {/if}
+                          Path
+                          <span style="color: var(--text-ds-danger-300">*</span
+                          ></label
+                        >
+                        <input
+                          type="text"
+                          class="form-control text-light"
+                          bind:value={test.testPath}
+                          placeholder={test?.testTarget ===
+                          TestCaseSelectionTypeEnum.RESPONSE_JSON
+                            ? "E.g. $.user.name"
+                            : test?.testTarget ===
+                                TestCaseSelectionTypeEnum.RESPONSE_XML
+                              ? "E.g. /root/user/name"
+                              : test?.testTarget ===
+                                  TestCaseSelectionTypeEnum.RESPONSE_HEADER
+                                ? "E.g. Content-Type"
+                                : "Enter path"}
+                          style={errors &&
+                          (!test.testPath ||
+                            (test.testPath &&
+                              test?.testTarget ===
+                                TestCaseSelectionTypeEnum.RESPONSE_JSON &&
+                              !isValidJsonPath(test.testPath)) ||
+                            (test.testPath &&
+                              test?.testTarget ===
+                                TestCaseSelectionTypeEnum.RESPONSE_XML &&
+                              !isValidXPath(test.testPath)) ||
+                            (test.testPath &&
+                              test?.testTarget ===
+                                TestCaseSelectionTypeEnum.RESPONSE_HEADER &&
+                              !isValidHeaderKey(test.testPath)))
+                            ? "border: 1px solid var(--text-ds-danger-300)"
+                            : ""}
+                        />
+                        {#if errors && !test.testPath}
+                          <div
+                            class="text-fs-12 mt-1"
+                            style="color: var(--text-ds-danger-300)"
+                          >
+                            Please enter a {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
+                              Header
+                            {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON}
+                              JSON
+                            {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
+                              XML
+                            {/if} Path
+                          </div>
+                        {:else if test.testPath && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON}
+                          {#if !isValidJsonPath(test.testPath)}
+                            <div
+                              class="text-fs-12 mt-1"
+                              style="color: var(--text-ds-danger-300)"
+                            >
+                              Invalid Path syntax. Please check your path
+                              format.
+                            </div>
+                          {:else if !responseBody}
+                            <div
+                              class="text-fs-12 mt-1 d-flex"
+                              style="color: var(--text-ds-neutral-300)"
+                            >
+                              <span class="me-1">
+                                <InfoRegular
+                                  size={"16px"}
+                                  color={"var(--icon-ds-neutral-300)"}
+                                />
+                              </span>
+                              <span class="">
+                                Response not available. Path cannot be validated
+                                yet.
+                              </span>
+                            </div>
+                          {:else if getJsonPathValue(test.testPath, responseBody)}
+                            <div
+                              class="text-fs-12 d-flex mt-1 ellipsis text-muted"
+                            >
+                              <span class="me-1">
+                                <CheckmarkCircleFilled
+                                  size={"16px"}
+                                  color={"var(--icon-ds-success-500)"}
+                                />
+                              </span>
+                              <span
+                                class="ellipsis"
+                                style="color: var(--text-ds-neutral-300);"
+                              >
+                                Path valid. Sample value: {test.testPath}
+                                = {getJsonPathValue(
+                                  test.testPath,
+                                  responseBody,
+                                )}
+                              </span>
+                            </div>
+                          {/if}
+                        {:else if test.testPath && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
+                          {#if !isValidXPath(test.testPath)}
+                            <div
+                              class="text-fs-12 mt-1"
+                              style="color: var(--text-ds-danger-300)"
+                            >
+                              Invalid Path syntax. Please check your path
+                              format.
+                            </div>
+                          {:else if !responseBody}
+                            <div
+                              class="text-fs-12 mt-1 d-flex"
+                              style="color: var(--text-ds-neutral-300)"
+                            >
+                              <span class="me-1">
+                                <InfoRegular
+                                  size={"16px"}
+                                  color={"var(--icon-ds-neutral-300)"}
+                                />
+                              </span>
+                              <span>
+                                Response not available. Path cannot be validated
+                                yet.
+                              </span>
+                            </div>
+                          {:else if getXPathValue(test.testPath, responseBody)}
+                            <div
+                              class="text-fs-12 d-flex mt-1 ellipsis text-muted"
+                            >
+                              <span class="me-1">
+                                <CheckmarkCircleFilled
+                                  size={"16px"}
+                                  color={"var(--icon-ds-success-500)"}
+                                />
+                              </span>
+                              <span
+                                class="ellipsis"
+                                style="color: var(--text-ds-neutral-300);"
+                              >
+                                Path valid. Sample value: {test.testPath}
+                                = {getXPathValue(test.testPath, responseBody)}
+                              </span>
+                            </div>
+                          {/if}
+                        {:else if test.testPath && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
+                          {#if !isValidHeaderKey(test.testPath)}
+                            <div
+                              class="text-fs-12 mt-1"
+                              style="color: var(--text-ds-danger-300)"
+                            >
+                              Invalid Path syntax. Please check your path
+                              format.
+                            </div>
+                          {:else if !responseHeader}
+                            <div
+                              class="text-fs-12 mt-1 d-flex"
+                              style="color: var(--text-ds-neutral-300)"
+                            >
+                              <span class="me-1">
+                                <InfoRegular
+                                  size={"16px"}
+                                  color={"var(--icon-ds-neutral-300)"}
+                                />
+                              </span>
+                              <span>
+                                Response not available. Path cannot be validated
+                                yet.
+                              </span>
+                            </div>
+                          {:else if getHeaderPathValue(test.testPath, responseHeader)}
+                            <div
+                              class="text-fs-12 d-flex mt-1 ellipsis text-muted"
+                            >
+                              <span class="me-1">
+                                <CheckmarkCircleFilled
+                                  size={"16px"}
+                                  color={"var(--icon-ds-success-500)"}
+                                />
+                              </span>
+                              <span
+                                class="ellipsis"
+                                style="color: var(--text-ds-neutral-300);"
+                              >
+                                Path valid. Sample value: {test.testPath}
+                                = {getHeaderPathValue(
+                                  test.testPath,
+                                  responseHeader,
+                                )}
+                              </span>
+                            </div>
+                          {/if}
+                        {/if}
                       </div>
-                    {:else if test.testPath && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON}
-                      {#if !isValidJsonPath(test.testPath)}
-                        <div
-                          class="text-fs-12 mt-1"
-                          style="color: var(--text-ds-danger-300)"
-                        >
-                          Invalid Path syntax. Please check your path format.
-                        </div>
-                      {:else if !responseBody}
-                        <div
-                          class="text-fs-12 mt-1 d-flex"
-                          style="color: var(--text-ds-neutral-300)"
-                        >
-                          <span class="me-1">
-                            <InfoRegular
-                              size={"16px"}
-                              color={"var(--icon-ds-neutral-300)"}
-                            />
-                          </span>
-                          <span class="">
-                            Response not available. Path cannot be validated
-                            yet.
-                          </span>
-                        </div>
-                      {:else if getJsonPathValue(test.testPath, responseBody)}
-                        <div class="text-fs-12 d-flex mt-1 ellipsis text-muted">
-                          <span class="me-1">
-                            <CheckmarkCircleFilled
-                              size={"16px"}
-                              color={"var(--icon-ds-success-500)"}
-                            />
-                          </span>
-                          <span
-                            class="ellipsis"
-                            style="color: var(--text-ds-neutral-300);"
-                          >
-                            Path valid. Sample value: {test.testPath}
-                            = {getJsonPathValue(test.testPath, responseBody)}
-                          </span>
-                        </div>
-                      {/if}
-                    {:else if test.testPath && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
-                      {#if !isValidXPath(test.testPath)}
-                        <div
-                          class="text-fs-12 mt-1"
-                          style="color: var(--text-ds-danger-300)"
-                        >
-                          Invalid Path syntax. Please check your path format.
-                        </div>
-                      {:else if !responseBody}
-                        <div
-                          class="text-fs-12 mt-1 d-flex"
-                          style="color: var(--text-ds-neutral-300)"
-                        >
-                          <span class="me-1">
-                            <InfoRegular
-                              size={"16px"}
-                              color={"var(--icon-ds-neutral-300)"}
-                            />
-                          </span>
-                          <span>
-                            Response not available. Path cannot be validated
-                            yet.
-                          </span>
-                        </div>
-                      {:else if getXPathValue(test.testPath, responseBody)}
-                        <div class="text-fs-12 d-flex mt-1 ellipsis text-muted">
-                          <span class="me-1">
-                            <CheckmarkCircleFilled
-                              size={"16px"}
-                              color={"var(--icon-ds-success-500)"}
-                            />
-                          </span>
-                          <span
-                            class="ellipsis"
-                            style="color: var(--text-ds-neutral-300);"
-                          >
-                            Path valid. Sample value: {test.testPath}
-                            = {getXPathValue(test.testPath, responseBody)}
-                          </span>
-                        </div>
-                      {/if}
-                    {:else if test.testPath && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
-                      {#if !isValidHeaderKey(test.testPath)}
-                        <div
-                          class="text-fs-12 mt-1"
-                          style="color: var(--text-ds-danger-300)"
-                        >
-                          Invalid Path syntax. Please check your path format.
-                        </div>
-                      {:else if !responseHeader}
-                        <div
-                          class="text-fs-12 mt-1 d-flex"
-                          style="color: var(--text-ds-neutral-300)"
-                        >
-                          <span class="me-1">
-                            <InfoRegular
-                              size={"16px"}
-                              color={"var(--icon-ds-neutral-300)"}
-                            />
-                          </span>
-                          <span>
-                            Response not available. Path cannot be validated
-                            yet.
-                          </span>
-                        </div>
-                      {:else if getHeaderPathValue(test.testPath, responseHeader)}
-                        <div class="text-fs-12 d-flex mt-1 ellipsis text-muted">
-                          <span class="me-1">
-                            <CheckmarkCircleFilled
-                              size={"16px"}
-                              color={"var(--icon-ds-success-500)"}
-                            />
-                          </span>
-                          <span
-                            class="ellipsis"
-                            style="color: var(--text-ds-neutral-300);"
-                          >
-                            Path valid. Sample value: {test.testPath}
-                            = {getHeaderPathValue(
-                              test.testPath,
-                              responseHeader,
-                            )}
-                          </span>
-                        </div>
-                      {/if}
                     {/if}
+                    {#if test?.condition === TestCaseConditionOperatorEnum.EQUALS || test?.condition === TestCaseConditionOperatorEnum.NOT_EQUAL || test?.condition === TestCaseConditionOperatorEnum.EXISTS || test?.condition === TestCaseConditionOperatorEnum.DOES_NOT_EXIST || test?.condition === TestCaseConditionOperatorEnum.LESS_THAN || test?.condition === TestCaseConditionOperatorEnum.GREATER_THAN || test?.condition === TestCaseConditionOperatorEnum.CONTAINS || test?.condition === TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN || test?.condition === TestCaseConditionOperatorEnum.IN_LIST || test?.condition === TestCaseConditionOperatorEnum.NOT_IN_LIST || test?.condition === TestCaseConditionOperatorEnum.GREATER_THAN_OR_EQUAL || test?.condition === TestCaseConditionOperatorEnum.LESS_THAN_OR_EQUAL}
+                      <div style="flex: 1 1 45%; min-width: 0;">
+                        <label class="form-label text-fs-12"
+                          >Comparison Value <span
+                            style="color: var(--text-ds-danger-300)">*</span
+                          ></label
+                        >
+                        <input
+                          type="text"
+                          class="form-control text-light"
+                          bind:value={test.expectedResult}
+                          placeholder="Enter Comparison Value"
+                          style={errors && !test.expectedResult
+                            ? "border: 1px solid var(--text-ds-danger-300)"
+                            : ""}
+                        />
+                        {#if errors && !test.expectedResult}
+                          <div
+                            class="text-fs-12 mt-1"
+                            style="color: var(--text-ds-danger-300)"
+                          >
+                            Please enter comparison value
+                          </div>
+                        {/if}
+                      </div>
+                    {/if}
+                    <div style="flex: 1 1 45%; min-width: 0;"></div>
                   </div>
                 {/if}
-                {#if test?.condition === TestCaseConditionOperatorEnum.EQUALS || test?.condition === TestCaseConditionOperatorEnum.NOT_EQUAL || test?.condition === TestCaseConditionOperatorEnum.EXISTS || test?.condition === TestCaseConditionOperatorEnum.DOES_NOT_EXIST || test?.condition === TestCaseConditionOperatorEnum.LESS_THAN || test?.condition === TestCaseConditionOperatorEnum.GREATER_THAN || test?.condition === TestCaseConditionOperatorEnum.CONTAINS || test?.condition === TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN || test?.condition === TestCaseConditionOperatorEnum.IN_LIST || test?.condition === TestCaseConditionOperatorEnum.NOT_IN_LIST || test?.condition === TestCaseConditionOperatorEnum.GREATER_THAN_OR_EQUAL || test?.condition === TestCaseConditionOperatorEnum.LESS_THAN_OR_EQUAL}
-                  <div style="flex: 1 1 45%; min-width: 0;">
-                    <label class="form-label text-fs-12"
-                      >Comparison Value <span
-                        style="color: var(--text-ds-danger-300)">*</span
-                      ></label
-                    >
-                    <input
-                      type="text"
-                      class="form-control text-light"
-                      bind:value={test.expectedResult}
-                      placeholder="Enter Comparison Value"
-                      style={errors && !test.expectedResult
-                        ? "border: 1px solid var(--text-ds-danger-300)"
-                        : ""}
-                    />
-                    {#if errors && !test.expectedResult}
-                      <div
-                        class="text-fs-12 mt-1"
-                        style="color: var(--text-ds-danger-300)"
-                      >
-                        Please enter comparison value
-                      </div>
-                    {/if}
-                  </div>
-                {/if}
-                <div style="flex: 1 1 45%; min-width: 0;"></div>
-              </div>
+              {/each}
+            {:else}
+              <p class="text-muted">No test selected</p>
             {/if}
-          {/each}
-        {:else}
-          <p class="text-muted">No test selected</p>
-        {/if}
-      </div>
+          </div>
+        </div>
+      {/if}
     </div>
-  {/if}
+  </div>
 </div>
 
 <style>

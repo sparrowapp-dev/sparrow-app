@@ -1,15 +1,15 @@
 export const RequestTabTestsScriptTourContent = [
   {
-    Title: "Start Your Testing Journey!",
+    Title: "Write Your Post scripts here!",
     description:
-      "You can write tests your way, pick No-Code for a quick and easy setup, or Script Mode if you prefer full control. Switch anytime with just a click.",
+      "Tests help you confirm your API results. Add custom test logic using code and check exactly what you need.",
     stepCount: 1,
     targetId: "request-tab-test-script",
   },
   {
-    Title: "Write Your Own Tests!",
+    Title: "Generate Tests with AI!",
     description:
-      "Tests help you confirm your API results. Add custom test logic using code and check exactly what you need.",
+      "You can use AI to quickly create tests. Just describe what you want to check, and AI writes the test for you.",
     stepCount: 2,
     targetId: "request-tab-test",
   },

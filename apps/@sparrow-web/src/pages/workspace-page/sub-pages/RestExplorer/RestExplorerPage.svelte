@@ -18,6 +18,7 @@
   import type { CollectionDocType } from "@app/models/collection.model";
   import { RequestDatasetEnum } from "@sparrow/common/types/workspace";
   import type { KeyValuePair } from "@sparrow/common/interfaces/request.interface";
+  import { aiChatBotModelByTeam } from "@sparrow/common/store";
 
   export let tab;
   export let isTourGuideOpen = false;
@@ -54,7 +55,11 @@
   let isMergeViewLoading = false;
   let newModifiedContent: string | KeyValuePair[];
   let mergeViewRequestDatasetType: RequestDatasetEnum;
+  let planName: string = "";
   let scriptComponent = null;
+  let teamId: string = "";
+  let selectedAIModel: string = "deepseek";
+  let preScriptComponent = null;
 
   const restExplorerDataStoreSubscriber = restExplorerDataStore.subscribe(
     (_webSocketMap) => {
@@ -71,6 +76,10 @@
       userId = value._id;
     }
   });
+
+  $: teamId = currentWorkspace ? currentWorkspace?.team?.teamId : "";
+
+  $: selectedAIModel = teamId ? $aiChatBotModelByTeam.get(teamId) : "deepseek";
 
   $: {
     restExplorerData = webSocketMap?.get(tab?.tabId);
@@ -90,6 +99,13 @@
     });
   };
 
+  /**
+   * Find the plan of the hub
+   */
+  const getPlanName = async () => {
+    planName = await _viewModel.getPlanName();
+  };
+
   let activeWorkspaceSubscriber;
   let collectionSubscriber;
 
@@ -98,6 +114,9 @@
       if (prevTabId !== tab?.tabId) {
         if (scriptComponent?.handleTabChange) {
           scriptComponent.handleTabChange();
+        }
+        if (preScriptComponent?.handleTabChange) {
+          preScriptComponent.handleTabChange();
         }
         isMergeViewEnableForRequestBody = false;
         isMergeViewEnableForParams = false;
@@ -151,6 +170,7 @@
       }
       debouncedAPIUpdater(tab);
       findUserRole();
+      getPlanName();
       prevTabName = tab?.name || "";
       prevTabId = tab?.tabId || "";
     }
@@ -231,12 +251,14 @@
   bind:newModifiedContent
   bind:mergeViewRequestDatasetType
   bind:scriptComponent
+  bind:preScriptComponent
   {collection}
   storeData={restExplorerData}
   {environmentVariables}
   {isGuestUser}
   {isSharedWorkspace}
   {isLoginBannerActive}
+  {planName}
   onOpenCollection={_viewModel.openCollection}
   onSendRequest={_viewModel.sendRequest}
   onCancelRequest={_viewModel.cancelRequest}
@@ -282,7 +304,13 @@
   InsertGenerateTrialFlow={_viewModel.InsertGenerateTrialFlow}
   isCloseRequestTestDemo={_viewModel.updateIsRequestTabDemo}
   requestTabTestsDemoCompleted={_viewModel.handleRequestTestNoCodeDemoCompleted}
+  requestTabAssertionsDemoCompleted={_viewModel.handleRequestAssertionsDemoCompleted}
+  isCloseRequestAssertionsDemo={_viewModel.updateIsRequestTabAssertionsDemo}
   isCloseRequestTestScriptDemo={_viewModel.updateIsRequestTabScriptDemo}
   requestTabTestScriptDemoCompleted={_viewModel.handleRequestTestScriptDemoCompleted}
   onGenerateTestCases={_viewModel.generateTestCases}
+  selectedModel={selectedAIModel}
+  onGeneratePreScript={_viewModel.generatePreScript}
+  updateRequestStatAiChatBot={_viewModel.updateRequestStateAiChatBot}
+  upgradePlanRedirect={_viewModel.handleRedirectToAdminPanel}
 />
