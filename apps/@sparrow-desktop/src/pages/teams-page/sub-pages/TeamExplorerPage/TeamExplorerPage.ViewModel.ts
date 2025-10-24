@@ -35,7 +35,7 @@ import constants from "@app/constants/constants";
 import { RecentWorkspaceRepository } from "@app/repositories/recent-workspace.repository";
 import { PlanRepository } from "@app/repositories/plan.repository";
 import { open } from "@tauri-apps/plugin-shell";
-import { isSubscriptionOverDue } from "@sparrow/common/store";
+import { isSubscriptionOverDue, isSubscriptionOverTeamId } from "@sparrow/common/store";
 import { get } from "svelte/store";
 
 export class TeamExplorerPageViewModel {
@@ -202,6 +202,7 @@ export class TeamExplorerPageViewModel {
         };
         if (isRestricted === true && !get(isSubscriptionOverDue)) {
           isSubscriptionOverDue.set(true);
+          isSubscriptionOverTeamId.set(_id);
         }
         data.push(item);
       }

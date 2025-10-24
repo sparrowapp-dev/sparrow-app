@@ -52,6 +52,7 @@
   import { planInfoByRole } from "@sparrow/common/utils";
   import {
     isSubscriptionOverDue,
+    isSubscriptionOverTeamId,
     planBannerisOpen,
     shouldRunThrottled,
   } from "@sparrow/common/store";
@@ -62,6 +63,7 @@
     isExpandTestflow,
   } from "@sparrow/workspaces/stores";
   import { getSelfhostUrls } from "@app/utils/jwt";
+  import { get } from "svelte/store";
 
   const _viewModel = new DashboardViewModel();
   const osDetector = new OSDetector();
@@ -945,7 +947,8 @@
         type="primary"
         size="medium"
         onClick={async () => {
-          await _viewModel.handleRedirectToAdminPanel(currentTeamId);
+          const teamId = get(isSubscriptionOverTeamId);
+          await _viewModel.handleRedirectToAdminPanel(teamId);
           isSubscriptionOverDueOpen = false;
         }}
       />

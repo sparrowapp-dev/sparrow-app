@@ -46,6 +46,7 @@
   import { ResponseMessage, TeamRole } from "@sparrow/common/enums";
   import {
     isSubscriptionOverDue,
+    isSubscriptionOverTeamId,
     planBannerisOpen,
     shouldRunThrottled,
   } from "@sparrow/common/store";
@@ -55,6 +56,7 @@
     isExpandEnvironment,
     isExpandTestflow,
   } from "../../../../../packages/@sparrow-workspaces/src/stores/recent-left-panel";
+  import { get } from "svelte/store";
 
   const _viewModel = new DashboardViewModel();
   const location = useLocation();
@@ -615,7 +617,10 @@
   }
 
   $: {
-    if ($isSubscriptionOverDue && (userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER)) {
+    if (
+      $isSubscriptionOverDue &&
+      (userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER)
+    ) {
       isSubscriptionOverDueOpen = true;
     }
   }
@@ -776,7 +781,8 @@
           type="primary"
           size="medium"
           onClick={async () => {
-            await _viewModel.handleRedirectToAdminPanel(currentTeamId);
+            const teamId = get(isSubscriptionOverTeamId);
+            await _viewModel.handleRedirectToAdminPanel(teamId);
             isSubscriptionOverDueOpen = false;
             isSubscriptionOverDue.set(false);
           }}

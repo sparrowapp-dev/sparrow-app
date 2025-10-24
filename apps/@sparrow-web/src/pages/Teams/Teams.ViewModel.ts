@@ -24,7 +24,7 @@ import { TestflowRepository } from "src/repositories/testflow.repository";
 import { PlanRepository } from "src/repositories/plan.repository";
 import { PlanService } from "src/services/plan.service";
 import constants from "src/constants/constants";
-import { isSubscriptionOverDue, planBannerisOpen } from "@sparrow/common/store";
+import { isSubscriptionOverDue, isSubscriptionOverTeamId, planBannerisOpen } from "@sparrow/common/store";
 import { getClientUser } from "src/utils/jwt";
 import { get } from "svelte/store";
 
@@ -161,6 +161,7 @@ export class TeamsViewModel {
         };
         if (isRestricted === true && !get(isSubscriptionOverDue)) {
           isSubscriptionOverDue.set(true);
+          isSubscriptionOverTeamId.set(_id);
         }
         data.push(item);
       }

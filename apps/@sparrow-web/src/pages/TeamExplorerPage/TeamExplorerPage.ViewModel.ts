@@ -29,7 +29,7 @@ import constants from "src/constants/constants";
 import { Sleep } from "@sparrow/common/utils";
 import { RecentWorkspaceRepository } from "src/repositories/recent-workspace.repository";
 import { PlanRepository } from "src/repositories/plan.repository";
-import { isSubscriptionOverDue } from "@sparrow/common/store";
+import { isSubscriptionOverDue, isSubscriptionOverTeamId } from "@sparrow/common/store";
 import { get } from "svelte/store";
 
 export class TeamExplorerPageViewModel {
@@ -227,6 +227,7 @@ export class TeamExplorerPageViewModel {
         };
         if(isRestricted === true && !get(isSubscriptionOverDue)){
           isSubscriptionOverDue.set(true);
+          isSubscriptionOverTeamId.set(_id);
         }
         data.push(item);
       }

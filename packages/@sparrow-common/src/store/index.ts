@@ -16,4 +16,4 @@ export {
   updateAiChatBotModelforTeam,
   getAiChatBotModelForTeam,
 } from "./aiModel";
-export { isSubscriptionOverDue } from "./subscriptionOverdue";
+export { isSubscriptionOverDue,isSubscriptionOverTeamId } from "./subscriptionOverdue";
