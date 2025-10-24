@@ -30,6 +30,7 @@ import { Sleep } from "@sparrow/common/utils";
 import { RecentWorkspaceRepository } from "src/repositories/recent-workspace.repository";
 import { PlanRepository } from "src/repositories/plan.repository";
 import { isSubscriptionOverDue } from "@sparrow/common/store";
+import { get } from "svelte/store";
 
 export class TeamExplorerPageViewModel {
   constructor() {}
@@ -224,7 +225,7 @@ export class TeamExplorerPageViewModel {
           isOpen: isOpenTeam,
           isRestricted
         };
-        if(isRestricted === true){
+        if(isRestricted === true && !get(isSubscriptionOverDue)){
           isSubscriptionOverDue.set(true);
         }
         data.push(item);

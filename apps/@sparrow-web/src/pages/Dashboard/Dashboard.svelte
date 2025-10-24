@@ -765,7 +765,10 @@
           title="Access Other Hubs"
           type="secondary"
           size="medium"
-          onClick={() => (isSubscriptionOverDueOpen = false)}
+          onClick={() => {
+            isSubscriptionOverDueOpen = false;
+            isSubscriptionOverDue.set(false);
+          }}
         />
         <!-- Proceed button -->
         <Button
@@ -775,6 +778,7 @@
           onClick={async () => {
             await _viewModel.handleRedirectToAdminPanel(currentTeamId);
             isSubscriptionOverDueOpen = false;
+            isSubscriptionOverDue.set(false);
           }}
         />
       </div>
