@@ -32,6 +32,7 @@ export class TeamAdapter {
       plan,
       billing,
       isNewInvite,
+      isRestricted
     } = team;
     const updatedWorkspaces = workspaces.map((workspace) => ({
       workspaceId: workspace.id,
@@ -59,6 +60,7 @@ export class TeamAdapter {
       billing,
       isNewInvite,
       isOpen: false,
+      isRestricted
     };
     return this;
   }
