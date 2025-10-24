@@ -64,6 +64,7 @@
       startIcon={BroomRegular}
       title="Clear Query"
       onClick={onClearQuery}
+      disable={!value}
     />
   </div>
 </div>

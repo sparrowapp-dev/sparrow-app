@@ -7,10 +7,16 @@ export const requestTabTestNoCodeStep = writable(0);
 
 export const requestTabTestTourCompleted = writable(false);
 
-
-// store for Request Tab no Script. 
+// store for Request Tab no Script.
 export const requestTabTestScriptDemo = writable(false);
 
 export const requestTabTestScriptStep = writable(0);
 
 export const requestTabTestScriptTourCompleted = writable(false);
+
+// Store for Request Tab Assertions demo only
+export const requestTabAssertionsDemo = writable(false);
+
+export const requestTabAssertionsStep = writable(0);
+
+export const requestTabAssertionsTourCompleted = writable(false);

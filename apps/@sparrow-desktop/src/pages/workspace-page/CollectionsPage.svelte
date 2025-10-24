@@ -12,6 +12,8 @@
     isDefaultTourGuideClose,
     updateActiveSyncStates,
     requestTabTestNoCodeStep,
+    requestTabAssertionsStep,
+    requestTabAssertionsDemo,
   } from "@sparrow/workspaces/stores";
 
   // ---- Animation
@@ -101,13 +103,25 @@
   import { ResponseMessage } from "@sparrow/common/enums";
   import { shouldRunThrottled } from "@sparrow/common/store";
   import { TourGuideCard } from "@sparrow/workspaces/features";
-  import { requestTabNocodeCardPosition } from "@sparrow/workspaces/features";
+  import {
+    requestTabNocodeCardPosition,
+    requestTabAssertionsCardPosition,
+  } from "@sparrow/workspaces/features";
   import {
     handleNextStep,
     handleCloseTour,
   } from "@sparrow/workspaces/features";
   import { RequestTabTourGuide } from "@sparrow/workspaces/features";
-  import { RequestTabTestsTourContent } from "@sparrow/workspaces/features";
+  import {
+    RequestTabTestsTourContent,
+    RequestTabAssertionsTourContent,
+  } from "@sparrow/workspaces/features";
+  import { ScheduleRunPopUp } from "@sparrow/common/features";
+  import TestflowScheduleExplorerPage from "./sub-pages/TestflowScheduleExplorerPage/TestflowScheduleExplorerPage.svelte";
+  import { WorkspaceEnvironmentTypeBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
+  import { getClientUser } from "@app/utils/jwt";
+
+  import TestflowScheduleRVExplorerPage from "./sub-pages/TestflowScheduleRVExplorerPage.svelte/TestflowScheduleRVExplorerPage.svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -118,6 +132,8 @@
     _viewModel.getActiveWorkspace();
   let collectionList: Observable<CollectionDocument[]> =
     _viewModel.getCollectionList();
+
+  const userEmail = getClientUser().email;
 
   let totalTeamCount: number | undefined = 0;
 
@@ -870,6 +886,7 @@
           onItemDeleted={_viewModel.handleDeleteItem}
           onItemRenamed={_viewModel.handleRenameItem}
           onItemOpened={_viewModel.handleOpenItem}
+          onItemMoved={_viewModel.handleMoveItem}
           onBranchSwitched={_viewModel.handleBranchSwitch}
           onRefetchCollection={_viewModel.handleRefetchCollection}
           onSearchCollection={_viewModel.handleSearchCollection}
@@ -1021,6 +1038,18 @@
                         <MockHistoryExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.TESTFLOW_SCHEDULE_RUN_VIEW}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100">
+                        <TestflowScheduleRVExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.TESTFLOW_SCHEDULE}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100">
+                        <TestflowScheduleExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.HUB}
                     <Motion {...scaleMotionProps} let:motion>
                       <div class="h-100">
@@ -1064,6 +1093,25 @@
                 rightButtonName=""
                 onNext={handleNextStep}
                 onClose={handleCloseTour}
+                width={352}
+              />
+            </RequestTabTourGuide>
+          {/if}
+          {#if $requestTabAssertionsStep === 3}
+            <RequestTabTourGuide
+              targetId={RequestTabAssertionsTourContent[2].targetId}
+              isVisible={true}
+              cardPosition={requestTabAssertionsCardPosition(3)}
+            >
+              <TourGuideCard
+                titleName={RequestTabAssertionsTourContent[2].Title}
+                descriptionContent={RequestTabAssertionsTourContent[2]
+                  .description}
+                cardNumber={3}
+                totalsCards={RequestTabAssertionsTourContent.length}
+                rightButtonName=""
+                onNext={() => requestTabAssertionsStep.set(4)}
+                onClose={() => requestTabAssertionsDemo.set(false)}
                 width={352}
               />
             </RequestTabTourGuide>
@@ -1795,6 +1843,7 @@
     />
   </div>
 </Modal>
+
 <PlanUpgradeModal
   bind:isOpen={upgradePlanModel}
   title={planContent?.title}

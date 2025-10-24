@@ -87,7 +87,6 @@
     }
   });
 
-  // Function to search and filter APIs
   const searchApis = () => {
     isOpen = true;
     filteredApis = allApis.filter((api: any) =>
@@ -151,16 +150,50 @@
       dropdownRef &&
       !dropdownRef.contains(event.target as Node)
     ) {
+      // Don't close dropdown during tour guide step 5
       if ($currentStep == 5 && $isTestFlowTourGuideOpen) {
-        isOpen = true;
-      } else {
-        isOpen = false;
+        return;
       }
+
+      isOpen = false;
       arrayData = collections;
       selectedCollection = null;
       selectedFolder = null;
+      selectApiName = name || "";
     }
     ignoreClickOutside = false;
+  };
+
+  // Handle drag start - close dropdown when dragging starts outside
+  const handleDragStart = (event: DragEvent) => {
+    if (isOpen && dropdownRef && !dropdownRef.contains(event.target as Node)) {
+      // Don't close dropdown during tour guide step 5
+      if ($currentStep == 5 && $isTestFlowTourGuideOpen) {
+        return;
+      }
+
+      isOpen = false;
+      arrayData = collections;
+      selectedCollection = null;
+      selectedFolder = null;
+      selectApiName = name || "";
+    }
+  };
+
+  // Handle drag end - ensure dropdown closes after drag operations
+  const handleDragEnd = (event: DragEvent) => {
+    if (isOpen && dropdownRef && !dropdownRef.contains(event.target as Node)) {
+      // Don't close dropdown during tour guide step 5
+      if ($currentStep == 5 && $isTestFlowTourGuideOpen) {
+        return;
+      }
+
+      isOpen = false;
+      arrayData = collections;
+      selectedCollection = null;
+      selectedFolder = null;
+      selectApiName = name || "";
+    }
   };
 
   $: {
@@ -177,10 +210,14 @@
 
   onMount(() => {
     document.addEventListener("click", handleClickOutside);
+    document.addEventListener("dragstart", handleDragStart);
+    document.addEventListener("dragend", handleDragEnd);
   });
 
   onDestroy(() => {
     document.removeEventListener("click", handleClickOutside);
+    document.removeEventListener("dragstart", handleDragStart);
+    document.removeEventListener("dragend", handleDragEnd);
   });
 
   const dummyCollection = [

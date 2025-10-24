@@ -8,6 +8,7 @@ import { ReduceAuthHeader } from ".";
 import { createDeepCopy } from "@sparrow/common/utils";
 import { SetDataStructure } from "@sparrow/common/utils";
 import type { GraphqlRequestTabInterface } from "@sparrow/common/types/workspace/graphql-request-tab";
+import { GraphqlRequestOperationTabEnum } from "@sparrow/common/types/workspace/graphql-request-tab";
 import { type EnvironmentFilteredVariableBaseInterface } from "@sparrow/common/types/workspace/environment-base";
 
 class DecodeGraphql {
@@ -214,6 +215,20 @@ class DecodeGraphql {
     request: GraphqlRequestTabInterface,
     environmentVariables: EnvironmentFilteredVariableBaseInterface[] = [],
   ): string[] {
+    // Decide which operation (query vs mutation) should be executed based on current navigation state.
+    let activeOperation;
+    if (
+      request?.state?.operationNavigation ===
+      GraphqlRequestOperationTabEnum.MUTATION
+    ) {
+      activeOperation = request.mutation;
+    } else if (
+      request?.state?.operationNavigation ===
+      GraphqlRequestOperationTabEnum.QUERY
+    ) {
+      activeOperation = request.query;
+    }
+
     return [
       this.extractURL(
         this.setEnvironmentVariables(request.url, environmentVariables),
@@ -227,7 +242,7 @@ class DecodeGraphql {
         ),
         environmentVariables,
       ),
-      this.extractQuery(request.query),
+      this.extractQuery(activeOperation),
       this.extractVariables(request.variables),
     ];
   }

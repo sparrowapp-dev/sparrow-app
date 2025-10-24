@@ -23,7 +23,7 @@ export {
   removeCollectionItem,
 } from "./recent-left-panel";
 
-export { tabsSplitterDirection } from "./tabs-view";
+export { tabsSplitterDirection, aiChatBotPanelClose } from "./tabs-view";
 export { isChatbotOpenInCurrTab } from "./chatbot-state";
 
 export { updateActiveSyncStates } from "./active-sync";
@@ -40,4 +40,7 @@ export {
   requestTabTestScriptDemo,
   requestTabTestScriptStep,
   requestTabTestScriptTourCompleted,
+  requestTabAssertionsDemo,
+  requestTabAssertionsStep,
+  requestTabAssertionsTourCompleted,
 } from "./request-tab-test-tour-guide";

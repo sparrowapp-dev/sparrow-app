@@ -36,6 +36,7 @@ export interface GenerateMockDataRequestDto {
 export interface fixTestScriptRequestDto {
   testScript: string;
   teamId: string;
+  type: "pre-script" | "post-script"
 }
 
 export interface GenerateTestCasesRequestDto {

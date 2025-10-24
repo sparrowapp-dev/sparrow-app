@@ -2456,7 +2456,6 @@ class RestExplorerMockViewModel {
       ...(componentData?.property?.request?.ai?.conversations || []),
       {
         message: errorMessage || "Something went wrong. Please try again",
-        message: errorMessage || "Something went wrong. Please try again",
         messageId: uuidv4(),
         type: MessageTypeEnum.RECEIVER,
         isLiked: false,

@@ -227,6 +227,7 @@
     teamName={currentTeam?.name}
     plan={currentTeam?.plan}
     onInviteUserToWorkspace={handleInviteWorkspace}
+    isSelfHost={constants.APP_EDITION === "SELFHOSTED" ? true : false}
   />
 </Modal>
 

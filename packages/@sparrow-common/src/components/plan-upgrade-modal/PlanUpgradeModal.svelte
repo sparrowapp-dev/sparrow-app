@@ -11,7 +11,8 @@
     | "Test flow blocks"
     | "Selective Runs"
     | "Run History"
-    | "Active Sync" = "Workspaces";
+    | "Active Sync"
+    | "Test Schedule" = "Workspaces";
   export let planLimitValue: number = 3;
   export let currentPlanValue: number;
   export let activePlan: "active" | "disabled" = "disabled";

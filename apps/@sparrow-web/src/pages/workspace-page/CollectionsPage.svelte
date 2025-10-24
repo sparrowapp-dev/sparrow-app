@@ -9,6 +9,8 @@
     leftPanelCollapse,
     updateActiveSyncStates,
     requestTabTestNoCodeStep,
+    requestTabAssertionsStep,
+    requestTabAssertionsDemo,
   } from "@sparrow/workspaces/stores";
 
   // ---- Animation
@@ -101,13 +103,27 @@
   import { ResponseMessage } from "@sparrow/common/enums";
   import { shouldRunThrottled } from "@sparrow/common/store";
   import { TourGuideCard } from "@sparrow/workspaces/features";
-  import { requestTabNocodeCardPosition } from "@sparrow/workspaces/features";
+  import {
+    requestTabNocodeCardPosition,
+    requestTabAssertionsCardPosition,
+  } from "@sparrow/workspaces/features";
   import {
     handleNextStep,
     handleCloseTour,
   } from "@sparrow/workspaces/features";
   import { RequestTabTourGuide } from "@sparrow/workspaces/features";
-  import { RequestTabTestsTourContent } from "@sparrow/workspaces/features";
+  import {
+    RequestTabTestsTourContent,
+    RequestTabAssertionsTourContent,
+  } from "@sparrow/workspaces/features";
+  import { ScheduleRunPopUp } from "@sparrow/common/features";
+  import { WorkspaceEnvironmentTypeBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
+
+  import { getClientUser } from "src/utils/jwt";
+
+  import TestflowScheduleRVExplorerPage from "./sub-pages/TestflowScheduleRVExplorerPage.svelte/TestflowScheduleRVExplorerPage.svelte";
+  import TestflowScheduleExplorerPage from "./sub-pages/TestflowScheduleExplorerPage/TestflowScheduleExplorerPage.svelte";
+
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
@@ -117,6 +133,8 @@
     _viewModel.getActiveWorkspace();
   let collectionList: Observable<CollectionDocument[]> =
     _viewModel.getCollectionList();
+
+  const userEmail = getClientUser().email;
 
   let removeTab: Tab;
   let isPopupClosed: boolean = false;
@@ -155,6 +173,8 @@
   let environmentsValues;
   let currentWOrkspaceValue: Observable<WorkspaceDocument>;
   const externalSparrowGithub = constants.SPARROW_GITHUB;
+
+  let isScheduleRunPopupOpen: boolean = false;
 
   const environmentSubscriber = environments.subscribe((value) => {
     if (value) {
@@ -897,6 +917,7 @@
         <WorkspaceActions
           bind:scrollList
           bind:userRole
+          bind:isScheduleRunPopupOpen
           userCount={totalTeamCount}
           {refreshWorkspace}
           {refreshLoad}
@@ -1087,6 +1108,18 @@
                         <HubExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.TESTFLOW_SCHEDULE_RUN_VIEW}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100">
+                        <TestflowScheduleRVExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.TESTFLOW_SCHEDULE}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100">
+                        <TestflowScheduleExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
                   {:else if !$tabList?.length}
                     <Motion {...scaleMotionProps} let:motion>
                       <div class="h-100">
@@ -1125,6 +1158,26 @@
                 rightButtonName=""
                 onNext={handleNextStep}
                 onClose={handleCloseTour}
+                width={352}
+              />
+            </RequestTabTourGuide>
+          {/if}
+
+          {#if $requestTabAssertionsStep === 3}
+            <RequestTabTourGuide
+              targetId={RequestTabAssertionsTourContent[2].targetId}
+              isVisible={true}
+              cardPosition={requestTabAssertionsCardPosition(3)}
+            >
+              <TourGuideCard
+                titleName={RequestTabAssertionsTourContent[2].Title}
+                descriptionContent={RequestTabAssertionsTourContent[2]
+                  .description}
+                cardNumber={3}
+                totalsCards={RequestTabAssertionsTourContent.length}
+                rightButtonName=""
+                onNext={() => requestTabAssertionsStep.set(4)}
+                onClose={() => requestTabAssertionsDemo.set(false)}
                 width={352}
               />
             </RequestTabTourGuide>
@@ -1898,6 +1951,31 @@
     />
   </div>
 </Modal>
+
+<Modal
+  title="Set Schedule Run"
+  type="dark"
+  width="35%"
+  zIndex={1000}
+  isOpen={isScheduleRunPopupOpen}
+  handleModalState={() => {
+    isScheduleRunPopupOpen = false;
+  }}
+>
+  <ScheduleRunPopUp
+    bind:isScheduleRunPopupOpen
+    testFlowName={$activeTab?.name}
+    workspaceUsers={currentWOrkspaceValue?._data?.users || []}
+    environments={environmentsValues?.filter(
+      (env) =>
+        env.workspaceId === currentWOrkspaceValue?._id &&
+        env.type !== WorkspaceEnvironmentTypeBaseEnum.GLOBAL,
+    ) || []}
+    handleScheduleTestFlowRun={_viewModel3.scheduleTestFlowRun}
+    creatorEmail={userEmail}
+  />
+</Modal>
+
 <PlanUpgradeModal
   bind:isOpen={upgradePlanModel}
   title={planContent?.title}
