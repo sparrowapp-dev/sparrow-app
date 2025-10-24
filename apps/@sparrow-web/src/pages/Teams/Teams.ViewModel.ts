@@ -26,6 +26,7 @@ import { PlanService } from "src/services/plan.service";
 import constants from "src/constants/constants";
 import { isSubscriptionOverDue, planBannerisOpen } from "@sparrow/common/store";
 import { getClientUser } from "src/utils/jwt";
+import { get } from "svelte/store";
 
 export class TeamsViewModel {
   constructor() {}
@@ -158,7 +159,7 @@ export class TeamsViewModel {
           billing,
           isRestricted,
         };
-        if (isRestricted === true) {
+        if (isRestricted === true && !get(isSubscriptionOverDue)) {
           isSubscriptionOverDue.set(true);
         }
         data.push(item);

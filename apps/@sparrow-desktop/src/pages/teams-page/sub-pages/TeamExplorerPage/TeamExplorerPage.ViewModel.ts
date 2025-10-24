@@ -36,6 +36,7 @@ import { RecentWorkspaceRepository } from "@app/repositories/recent-workspace.re
 import { PlanRepository } from "@app/repositories/plan.repository";
 import { open } from "@tauri-apps/plugin-shell";
 import { isSubscriptionOverDue } from "@sparrow/common/store";
+import { get } from "svelte/store";
 
 export class TeamExplorerPageViewModel {
   constructor() {}
@@ -199,7 +200,7 @@ export class TeamExplorerPageViewModel {
           isOpen: isOpenTeam,
           isRestricted,
         };
-        if (isRestricted === true) {
+        if (isRestricted === true && !get(isSubscriptionOverDue)) {
           isSubscriptionOverDue.set(true);
         }
         data.push(item);
