@@ -600,7 +600,6 @@ export class RxDB {
 
               if (nodes.length > 0) {
                 const updatedNodes = [];
-                10;
                 for (const item of nodes) {
                   let updatedItem = { ...item };
 
