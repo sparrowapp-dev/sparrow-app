@@ -149,9 +149,7 @@
   let isInviteAcceptProgress = false;
   let userLimits: any;
   let planContent: any;
-
-  let isTeamDowngraded = true;
-
+  let isTeamDowngraded = openTeam?._data?.isDowngraded
   let selectedFilter = "All";
 
   const addButtonData = [
@@ -181,11 +179,6 @@
       }
     });
   };
-
-  function handleUpgradePlan() {
-    // redirect or open modal, e.g.:
-    navigate("/billing/upgrade"); // or your own route
-  }
   /**
    *
    */
@@ -666,7 +659,7 @@
             </div>
           {/if}
         </div>
-        {#if isTeamDowngraded}
+        {#if isTeamDowngraded && (userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER)}
           <div
             class="downgrade-card position-fixed"
             style="
@@ -928,96 +921,95 @@
     border: none;
   }
   .downgrade-card {
-  width: 340px;
-  max-width: 480px;
-  background: linear-gradient(
-    135deg,
-    rgba(17, 173, 240, 1),
-    rgba(49, 108, 246, 1),
-    rgba(97, 71, 255, 1)
-  );
-  padding: 1px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  overflow: hidden;
-}
+    width: 340px;
+    max-width: 480px;
+    background: linear-gradient(
+      135deg,
+      rgba(17, 173, 240, 1),
+      rgba(49, 108, 246, 1),
+      rgba(97, 71, 255, 1)
+    );
+    padding: 1px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+  }
 
-.downgrade-card-inner {
-  background-color: rgba(24, 28, 38, 1);
-  border-radius: 7px;
-  width: 100%;
-  height: 100%;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  color: var(--text-primary);
-  box-sizing: border-box;
-}
+  .downgrade-card-inner {
+    background-color: rgba(24, 28, 38, 1);
+    border-radius: 7px;
+    width: 100%;
+    height: 100%;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: var(--text-primary);
+    box-sizing: border-box;
+  }
 
-.downgrade-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: nowrap;
-}
+  .downgrade-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
 
-.downgrade-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--bg-ds-surface-200);
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
-}
+  .downgrade-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-ds-surface-200);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
 
-.downgrade-title {
-  color: var(--text-ds-neutral-50);
-  font-size: 12px;
-  font-weight: 500;
-  margin: 0;
-  white-space: nowrap;
-  flex: 1;
-}
+  .downgrade-title {
+    color: var(--text-ds-neutral-50);
+    font-size: 12px;
+    font-weight: 500;
+    margin: 0;
+    white-space: nowrap;
+    flex: 1;
+  }
 
-.downgrade-close {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--text-ds-neutral-400);
-  font-size: 14px;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  .downgrade-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-ds-neutral-400);
+    font-size: 14px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-.downgrade-description {
-  font-size: 12px;
-  color: var(--text-ds-neutral-300);
-  line-height: 1.5;
-  margin: 8px 0 16px 0;
-  font-weight: 400;
-  flex: 1;
-  overflow-wrap: break-word;
-}
+  .downgrade-description {
+    font-size: 12px;
+    color: var(--text-ds-neutral-300);
+    line-height: 1.5;
+    margin: 8px 0 16px 0;
+    font-weight: 400;
+    flex: 1;
+    overflow-wrap: break-word;
+  }
 
-.downgrade-upgrade-btn {
-  background-color: var(--accent-primary);
-  border: none;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s ease-in-out;
-}
+  .downgrade-upgrade-btn {
+    background-color: var(--accent-primary);
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s ease-in-out;
+  }
 
-.downgrade-upgrade-btn:hover {
-  opacity: 0.9;
-}
-
+  .downgrade-upgrade-btn:hover {
+    opacity: 0.9;
+  }
 </style>
