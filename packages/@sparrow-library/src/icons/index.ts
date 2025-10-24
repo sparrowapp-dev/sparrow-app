@@ -1,6 +1,7 @@
 import DeleteFilled from "./DeleteFilled.svelte";
 
 export { default as ClockIcon } from "./clock.svelte";
+export {default as AlertOnIcon} from "./AlertOn.svelte"
 export { default as DotIcon } from "./dot.svelte";
 export { default as BoxIcon } from "./box.svelte";
 export { default as DiskIcon } from "./disk.svelte";
