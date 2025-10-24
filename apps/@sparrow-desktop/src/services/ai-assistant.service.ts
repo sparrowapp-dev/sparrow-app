@@ -11,11 +11,10 @@ import { getSelfhostUrls } from "@app/utils/jwt";
 
 export class AiAssistantService {
   constructor() {
-     const [selfhostBackendUrl] = getSelfhostUrls();
+    const [selfhostBackendUrl] = getSelfhostUrls();
     if (selfhostBackendUrl) {
       this.apiUrl = selfhostBackendUrl;
-    }
-    else{
+    } else {
       this.apiUrl = constants.API_URL;
     }
   }
@@ -99,6 +98,18 @@ export class AiAssistantService {
     const response = await makeRequest(
       "POST",
       `${this.apiUrl}/api/assistant/generate-test-cases`,
+      {
+        body: data,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public generatePreScript = async (data: GenerateTestCasesRequestDto) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/assistant/generate-pre-script`,
       {
         body: data,
         headers: getAuthHeaders(),

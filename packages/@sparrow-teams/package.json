@@ -1,6 +1,6 @@
 {
   "name": "@sparrow/teams",
-  "version": "2.32.1",
+  "version": "2.33.0",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
@@ -58,8 +58,7 @@
   },
   "lint-staged": {
     "*.{js,ts,svelte,css,json}": [
-      "prettier --write",
-      "eslint --fix"
+      "prettier --write"
     ]
   }
 }

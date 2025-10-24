@@ -8,6 +8,7 @@
   export let onItemDeleted: (entityType: string, args: any) => void;
   export let onItemRenamed: (entityType: string, args: any) => void;
   export let onItemOpened: (entityType: string, args: any) => void;
+  export let onItemMoved: (args: any) => void;
   export let onBranchSwitched: (collection: CollectionBaseInterface) => any;
   export let onRefetchCollection: (
     workspaceId: string,
@@ -42,6 +43,7 @@
     addCollectionItem,
     removeCollectionItem,
   } from "../../../../stores/recent-left-panel";
+  import { setOverForbiddenZone } from "../../../../stores/drag-state";
 
   import { angleRightV2Icon as angleRight } from "@sparrow/library/assets";
   import { dot3Icon as threedotIcon } from "@sparrow/library/assets";
@@ -341,6 +343,141 @@
   let deleteLoader: boolean = false;
   let refreshCollectionLoader = false;
   let newCollectionName: string = "";
+  let isDragOver = false;
+  let isForbiddenDrop = false;
+
+  // Drag and Drop Handlers for Request
+  function handleDragOver(event: DragEvent) {
+    event.preventDefault();
+
+    // Reject all drops if this collection has activeSync enabled
+    if (collection.activeSync) {
+      isDragOver = false;
+      isForbiddenDrop = true;
+      setOverForbiddenZone(true);
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = "none";
+      }
+      return;
+    }
+
+    try {
+      // getData doesn't work in dragover, use sessionStorage
+      const dataStr =
+        typeof sessionStorage !== "undefined"
+          ? sessionStorage.getItem("sparrow-drag-data")
+          : null;
+      if (!dataStr) {
+        isDragOver = false;
+        isForbiddenDrop = false;
+        return;
+      }
+
+      const dragData = JSON.parse(dataStr);
+      const targetIsMock = isMockCollection === true;
+
+      // Restrict mock collection cross-moves: cannot move into or out of a mock collection except within same collection
+      if (
+        (dragData.isMockCollection || targetIsMock) &&
+        dragData.collectionId !== collection.id
+      ) {
+        isDragOver = false;
+        isForbiddenDrop = true;
+        setOverForbiddenZone(true);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "none";
+        }
+        return;
+      }
+
+      // Reject drops from activeSync collections
+      if (dragData.collectionActiveSync) {
+        isDragOver = false;
+        isForbiddenDrop = true;
+        setOverForbiddenZone(true);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "none";
+        }
+        return;
+      }
+
+      // Check if dropping from same collection root to same collection root (forbidden)
+      if (dragData.collectionId === collection.id && !dragData.folderId) {
+        isDragOver = false;
+        isForbiddenDrop = true;
+        setOverForbiddenZone(true);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "none";
+        }
+      } else {
+        isDragOver = true;
+        isForbiddenDrop = false;
+        setOverForbiddenZone(false);
+        if (event.dataTransfer) {
+          event.dataTransfer.dropEffect = "move";
+        }
+      }
+    } catch (e) {
+      isDragOver = false;
+      isForbiddenDrop = false;
+    }
+  }
+
+  function handleDragLeave(event: DragEvent) {
+    isDragOver = false;
+    isForbiddenDrop = false;
+    setOverForbiddenZone(false);
+  }
+
+  async function handleDrop(event: DragEvent) {
+    event.preventDefault();
+    isDragOver = false;
+    isForbiddenDrop = false;
+
+    // Reject all drops if this collection has activeSync enabled
+    if (collection.activeSync) {
+      return;
+    }
+
+    try {
+      const data = event.dataTransfer?.getData("text/plain");
+      if (!data) return;
+      const dragData = JSON.parse(data);
+      const targetIsMock = isMockCollection === true;
+
+      if (
+        (dragData.isMockCollection || targetIsMock) &&
+        dragData.collectionId !== collection.id
+      ) {
+        return; // Block cross-collection mock moves
+      }
+
+      // Reject drops from activeSync collections
+      if (dragData.collectionActiveSync) {
+        return;
+      }
+
+      // Don't allow dropping from same collection root to same collection root
+      if (dragData.collectionId === collection.id && !dragData.folderId) {
+        return;
+      }
+
+      // Only allow dropping requests (not folders)
+      if (dragData.requestId) {
+        // Call parent handler to move the request to collection root (no folder)
+        onItemMoved &&
+          onItemMoved({
+            oldCollectionId: dragData.collectionId,
+            newCollectionId: collection.id,
+            oldFolderId: dragData.folderId,
+            newFolderId: "", // Moving to collection root
+            requestId: dragData.requestId,
+          });
+      }
+    } catch (e) {
+      // Optionally handle error
+    }
+  }
 
   const handleRenameInput = (event: Event) => {
     const target = event.target as HTMLInputElement;
@@ -773,7 +910,12 @@
       class="btn-primary d-flex w-100 align-items-center justify-content-between border-0 my-button {collection.id ===
       activeTabId
         ? 'active-collection-tab'
+        : ''} {isDragOver ? 'valid-drop-zone' : ''} {isForbiddenDrop
+        ? 'drag-forbidden'
         : ''}"
+      on:dragover={handleDragOver}
+      on:dragleave={handleDragLeave}
+      on:drop={handleDrop}
     >
       <button
         tabindex="-1"
@@ -1036,7 +1178,15 @@
     <!-- {#if !collection?.activeSync || isBranchSynced} -->
 
     {#if visibility}
-      <div class="z-1" style=" padding-left: 0; padding-right:0;">
+      <div
+        class="z-1 collection-items-area {isForbiddenDrop
+          ? 'drag-forbidden'
+          : ''}"
+        style="padding-left: 0; padding-right:0;"
+        on:dragover={handleDragOver}
+        on:dragleave={handleDragLeave}
+        on:drop={handleDrop}
+      >
         <div
           class=" ps-0 position-relative"
           style={`background-color: ${collection.id === activeTabId ? "var(--bg-ds-surface-600)" : "transparent"}; margin-bottom: ${collection.id === activeTabId ? "0px" : "0px"};`}
@@ -1343,5 +1493,38 @@
     left: 40px;
     width: 1px;
     background-color: var(--bg-ds-surface-100);
+  }
+
+  .collection-items-area {
+    position: relative;
+  }
+
+  /* Forbidden drop cursor and styling */
+  .drag-forbidden {
+    cursor: not-allowed !important;
+  }
+
+  .drag-forbidden * {
+    cursor: not-allowed !important;
+  }
+
+  /* Valid drop zone styling - blue dashed border overlay */
+  .valid-drop-zone {
+    position: relative;
+  }
+
+  .valid-drop-zone::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(59, 130, 246, 0.1);
+    border: 2px dashed rgba(59, 130, 246, 0.6);
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.2s;
+    border-radius: 4px;
   }
 </style>

@@ -24,9 +24,10 @@ import { TestflowRepository } from "@app/repositories/testflow.repository";
 import { PlanRepository } from "@app/repositories/plan.repository";
 import { PlanService } from "@app/services/plan.service";
 import constants from "@app/constants/constants";
-import { planBannerisOpen } from "@sparrow/common/store";
+import { isSubscriptionOverDue, isSubscriptionOverTeamId, planBannerisOpen } from "@sparrow/common/store";
 import { getClientUser, getSelfhostUrls } from "@app/utils/jwt";
 import { open } from "@tauri-apps/plugin-shell";
+import { get } from "svelte/store";
 
 export class TeamsViewModel {
   constructor() {}
@@ -103,6 +104,8 @@ export class TeamsViewModel {
           isNewInvite,
           invites,
           billing,
+          isRestricted,
+          isDowngraded
         } = elem;
         const updatedWorkspaces = workspaces?.map((workspace) => ({
           workspaceId: workspace.id,
@@ -133,7 +136,13 @@ export class TeamsViewModel {
           isOpen: isOpenTeam,
           invites,
           billing,
+          isRestricted,
+          isDowngraded
         };
+        if(isRestricted === true && !get(isSubscriptionOverDue)){
+          isSubscriptionOverDue.set(true);
+          isSubscriptionOverTeamId.set(_id);
+        }
         data.push(item);
       }
 

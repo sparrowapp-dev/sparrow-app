@@ -74,6 +74,9 @@
     requestTabTestNoCodeStep,
     requestTabTestScriptDemo,
     requestTabTestScriptStep,
+    aiChatBotPanelClose,
+    requestTabAssertionsDemo,
+    requestTabAssertionsStep,
   } from "../../../stores";
   import { Popover } from "@sparrow/library/ui";
   import { onDestroy, onMount } from "svelte";
@@ -119,6 +122,8 @@
     requestTabScriptCardPosition,
     RequestTabTestsScriptTourContent,
     RequestTabTestsTourContent,
+    RequestTabAssertionsTourContent,
+    requestTabAssertionsCardPosition,
   } from "../../request-tab-tour-guide/utils";
   import { requestTabNocodeCardPosition } from "../../request-tab-tour-guide/utils";
   import {
@@ -168,8 +173,11 @@
   export let onToggleLike;
   export let isCloseRequestTestDemo: (value: boolean) => void;
   export let requestTabTestsDemoCompleted: () => void;
+  export let requestTabAssertionsDemoCompleted: () => void;
+  export let isCloseRequestAssertionsDemo: (value: boolean) => void;
   export let isCloseRequestTestScriptDemo: (value: boolean) => void;
   export let requestTabTestScriptDemoCompleted: () => void;
+  export let upgradePlanRedirect;
 
   // export let isLoginBannerActive = false;
   export let isPopoverContainer = true;
@@ -182,6 +190,7 @@
   export let onGenerateDocumentation;
   export let onStopGeneratingAIResponse;
   export let generateMockData: () => any;
+  export let updateRequestStatAiChatBot: () => any;
 
   /**
    * Role of user in active workspace
@@ -197,6 +206,7 @@
   export let isSharedWorkspace = false;
   export let onFixTestScript;
   const isTestCasesGenerating = writable<boolean>(false);
+  const isPreScriptGenerating = writable<boolean>(false);
 
   const loading = writable<boolean>(false);
   // Props for showing merge/diff view in RequestBody, Headers and Params
@@ -208,9 +218,19 @@
   export let newModifiedContent: string | KeyValuePair[];
   export let mergeViewRequestDatasetType: RequestDatasetEnum;
 
+  /**
+   * Plan name of hub
+   */
+  export let planName;
   //props for generating test cases function
   export let onGenerateTestCases;
   export let scriptComponent = null;
+  export let preScriptComponent = null;
+
+  //prop for generating pre-script function
+  export let onGeneratePreScript;
+
+  export let selectedModel;
 
   // Reference to the splitpane container element
   let splitpaneContainer;
@@ -304,6 +324,12 @@
   $: {
     loadingState.subscribe((tab) => {
       isTestCasesGenerating.set(tab.get($tab.tabId + "generatingTestCases"));
+    });
+  }
+
+  $: {
+    loadingState.subscribe((tab) => {
+      isPreScriptGenerating.set(tab.get($tab.tabId + "generatingPreScript"));
     });
   }
   let isGuidePopup = false;
@@ -407,16 +433,9 @@
   const handleModeChange = (newMode: TestCaseModeEnum) => {
     const currentTestMode =
       $tab?.property?.request?.tests?.testCaseMode || TestCaseModeEnum.NO_CODE;
-
     if (newMode === currentTestMode) return;
-
     // Check if there's existing data that would be lost
-    if (hasExistingData(currentTestMode)) {
-      pendingMode = newMode;
-      isModeChangeModalOpen = true;
-    } else {
-      switchMode(newMode);
-    }
+    switchMode(newMode);
   };
 
   /**
@@ -427,30 +446,6 @@
       ...$tab?.property?.request?.tests,
       testCaseMode: newMode,
     });
-  }; /**
-   * Confirm mode switch and proceed
-   */
-  const confirmModeSwitch = () => {
-    if (pendingMode) {
-      switchMode(pendingMode);
-    }
-    isModeChangeModalOpen = false;
-    pendingMode = null;
-  };
-
-  /**
-   * Cancel mode switch
-   */
-  const cancelModeSwitch = () => {
-    isModeChangeModalOpen = false;
-    pendingMode = null;
-  };
-
-  /**
-   * Get the display name for the mode
-   */
-  const getModeDisplayName = (mode: TestCaseModeEnum) => {
-    return mode === TestCaseModeEnum.NO_CODE ? "No Code" : "Script Mode";
   };
 
   /**
@@ -957,6 +952,7 @@
                       {:else if $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.TESTS}
                         <RequestTests
                           bind:scriptComponent
+                          bind:preScriptComponent
                           tests={$tab?.property?.request.tests}
                           onTestsChange={onUpdateTests}
                           tabSplitDirection={$tabsSplitterDirection}
@@ -965,6 +961,8 @@
                           onShowModeChangeModal={handleModeChange}
                           responseHeader={storeData?.response?.headers}
                           {onGenerateTestCases}
+                          {onGeneratePreScript}
+                          isPreScriptGenerating={$isPreScriptGenerating}
                           isTestCasesGenerating={$isTestCasesGenerating}
                           {isGuestUser}
                           {userRole}
@@ -1023,8 +1021,11 @@
                             .description}
                           cardNumber={4}
                           totalsCards={RequestTabTestsTourContent.length}
-                          rightButtonName=""
-                          onNext={handleNextStep}
+                          rightButtonName="Finish"
+                          onNext={async () => {
+                            handleNextStep();
+                            await requestTabTestsDemoCompleted();
+                          }}
                           onClose={handleCloseTour}
                           width={352}
                         />
@@ -1064,6 +1065,45 @@
                           rightButtonName=""
                           onNext={handleNextStep}
                           onClose={handleCloseTour}
+                          width={352}
+                        />
+                      </RequestTabTourGuide>
+                    {/if}
+                    {#if $requestTabAssertionsDemo && $requestTabAssertionsStep === 1}
+                      <RequestTabTourGuide
+                        targetId={RequestTabAssertionsTourContent[0].targetId}
+                        isVisible={true}
+                        cardPosition={requestTabAssertionsCardPosition(1)}
+                      >
+                        <TourGuideCard
+                          titleName={RequestTabAssertionsTourContent[0].Title}
+                          descriptionContent={RequestTabAssertionsTourContent[0]
+                            .description}
+                          cardNumber={1}
+                          totalsCards={RequestTabAssertionsTourContent.length}
+                          rightButtonName=""
+                          onNext={() => requestTabAssertionsStep.set(2)}
+                          onClose={() => requestTabAssertionsDemo.set(false)}
+                          width={352}
+                        />
+                      </RequestTabTourGuide>
+                    {/if}
+
+                    {#if $requestTabAssertionsDemo && $requestTabAssertionsStep === 4}
+                      <RequestTabTourGuide
+                        targetId={RequestTabAssertionsTourContent[3].targetId}
+                        isVisible={true}
+                        cardPosition={requestTabAssertionsCardPosition(4)}
+                      >
+                        <TourGuideCard
+                          titleName={RequestTabAssertionsTourContent[3].Title}
+                          descriptionContent={RequestTabAssertionsTourContent[3]
+                            .description}
+                          cardNumber={4}
+                          totalsCards={RequestTabAssertionsTourContent.length}
+                          rightButtonName=""
+                          onNext={() => requestTabAssertionsStep.set(5)}
+                          onClose={() => requestTabAssertionsDemo.set(false)}
                           width={352}
                         />
                       </RequestTabTourGuide>
@@ -1235,8 +1275,8 @@
                               : '0px'}; z-index:10;"
                           >
                             <RequestTourGuideCard
-                              title={"Make Your APIs Smarter!"}
-                              message={"Writing tests ensures your APIs do exactly what you expect. With our no-code and script options, you can easily check responses, validate data, and catch issues early, without extra effort."}
+                              title={"Get Your Request Ready First!"}
+                              message={"Pre-request scripts let you prepare your requests before they run. Set dynamic values, add authentication, or generate data on the fly, so every request is ready, accurate, and smarter without manual effort."}
                               onAction={() => {
                                 onUpdateRequestState({
                                   isChatbotActive: false,
@@ -1263,8 +1303,8 @@
                               : '0px'}; z-index:10;"
                           >
                             <RequestTourGuideCard
-                              title={"Make Your APIs Smarter!"}
-                              message={"Writing tests ensures your APIs do exactly what you expect. With our no-code and script options, you can easily check responses, validate data, and catch issues early, without extra effort."}
+                              title={"Make Sure Everything Went Right!"}
+                              message={"Post-scripts run after your API request gets a response. They help you check if the response is correct and validate data. You can use them to make sure everything works just the way you expect."}
                               onAction={() => {
                                 onUpdateRequestState({
                                   isChatbotActive: false,
@@ -1279,6 +1319,34 @@
                               onClose={() => {
                                 isCloseRequestTestScriptDemo(false);
                                 requestTabTestScriptDemo.set(false);
+                              }}
+                            />
+                          </div>
+                        {/if}
+                        {#if $tab?.property?.request?.isRequestAssertionsDemoCompleted && $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.ASSERTIONS && !$requestTabAssertionsDemo}
+                          <div
+                            style="position:absolute; bottom:0px; right:{!$tab
+                              ?.property?.request?.state?.isChatbotActive
+                              ? '56px'
+                              : '0px'}; z-index:10;"
+                          >
+                            <RequestTourGuideCard
+                              title="Make Your APIs Smarter!"
+                              message="Writing tests ensures your APIs do exactly what you expect. With our no-code option, you can easily check responses, validate data, and catch issues early, without extra effort."
+                              onAction={() => {
+                                onUpdateRequestState({
+                                  isChatbotActive: false,
+                                });
+                                isChatbotOpenInCurrTab.set(false);
+                                requestTabAssertionsDemo.set(true);
+                                onUpdateResponseState("Assertions");
+                                isCloseRequestAssertionsDemo(false);
+                                tabsSplitterDirection.set("horizontal");
+                                requestTabAssertionsStep.set(1);
+                              }}
+                              onClose={() => {
+                                isCloseRequestAssertionsDemo(false);
+                                requestTabAssertionsDemo.set(false);
                               }}
                             />
                           </div>
@@ -1304,7 +1372,7 @@
                         />
                       </RequestTabTourGuide>
                     {/if}
-                    {#if $requestTabTestDemo && $requestTabTestNoCodeStep === 5}
+                    <!-- {#if $requestTabTestDemo && $requestTabTestNoCodeStep === 5}
                       <RequestTabTourGuide
                         targetId={RequestTabTestsTourContent[4].targetId}
                         isVisible={true}
@@ -1325,7 +1393,7 @@
                           width={352}
                         />
                       </RequestTabTourGuide>
-                    {/if}
+                    {/if} -->
                     {#if $requestTabTestScriptDemo && $requestTabTestScriptStep === 2}
                       <RequestTabTourGuide
                         targetId={RequestTabTestsScriptTourContent[1].targetId}
@@ -1367,6 +1435,47 @@
                         />
                       </RequestTabTourGuide>
                     {/if}
+                    {#if $requestTabAssertionsDemo && $requestTabAssertionsStep === 2}
+                      <RequestTabTourGuide
+                        targetId={RequestTabAssertionsTourContent[1].targetId}
+                        isVisible={true}
+                        cardPosition={requestTabAssertionsCardPosition(2)}
+                      >
+                        <TourGuideCard
+                          titleName={RequestTabAssertionsTourContent[1].Title}
+                          descriptionContent={RequestTabAssertionsTourContent[1]
+                            .description}
+                          cardNumber={2}
+                          totalsCards={RequestTabAssertionsTourContent.length}
+                          rightButtonName=""
+                          onNext={() => requestTabAssertionsStep.set(3)}
+                          onClose={() => requestTabAssertionsDemo.set(false)}
+                          width={352}
+                        />
+                      </RequestTabTourGuide>
+                    {/if}
+                    {#if $requestTabAssertionsDemo && $requestTabAssertionsStep === 5}
+                      <RequestTabTourGuide
+                        targetId={RequestTabAssertionsTourContent[4].targetId}
+                        isVisible={true}
+                        cardPosition={requestTabAssertionsCardPosition(5)}
+                      >
+                        <TourGuideCard
+                          titleName={RequestTabAssertionsTourContent[4].Title}
+                          descriptionContent={RequestTabAssertionsTourContent[4]
+                            .description}
+                          cardNumber={5}
+                          totalsCards={RequestTabAssertionsTourContent.length}
+                          rightButtonName="Finish"
+                          onNext={async () => {
+                            handleNextStep();
+                            await requestTabAssertionsDemoCompleted();
+                          }}
+                          onClose={handleCloseTour}
+                          width={352}
+                        />
+                      </RequestTabTourGuide>
+                    {/if}
                   </div>
                 </Pane>
               </Splitpanes>
@@ -1395,6 +1504,10 @@
                     {onStopGeneratingAIResponse}
                     {onToggleLike}
                     {handleApplyChangeOnAISuggestion}
+                    {planName}
+                    {selectedModel}
+                    {updateRequestStatAiChatBot}
+                    {upgradePlanRedirect}
                   />
                 {/if}
               </div>
@@ -1430,42 +1543,6 @@
     /> -->
   </div>
 </div>
-
-<Modal
-  title={`Switching to ${getModeDisplayName(pendingMode)}`}
-  type={"dark"}
-  width={"40%"}
-  zIndex={10000}
-  isOpen={isModeChangeModalOpen}
-  handleModalState={(flag = false) => {
-    if (!flag) cancelModeSwitch();
-  }}
->
-  <div class="d-flex flex-column">
-    <p
-      class="mode-change-modal-text mb-3"
-      style="padding-top: 20px; font-size:13px; padding-bottom:10px;"
-    >
-      {@html `The test cases you have created in ${getModeDisplayName(currentMode)} mode will not be carried over to  ${getModeDisplayName(pendingMode)}. Do you still want to continue?`}
-    </p>
-    <div class="d-flex justify-content-end gap-2">
-      <!-- Cancel button -->
-      <Button
-        title="Cancel"
-        type="secondary"
-        size="medium"
-        onClick={cancelModeSwitch}
-      />
-      <!-- Confirm button -->
-      <Button
-        title={`Switch to ${getModeDisplayName(pendingMode)}`}
-        type="primary"
-        size="medium"
-        onClick={confirmModeSwitch}
-      />
-    </div>
-  </div>
-</Modal>
 
 <Modal
   title={"Save Request"}
@@ -1595,7 +1672,7 @@
         onUpdateRequestState({
           isChatbotActive: !$tab?.property?.request?.state?.isChatbotActive,
         });
-
+        aiChatBotPanelClose.set(true);
         MixpanelEvent(Events.AI_Chat_Initiation);
       }}
     >

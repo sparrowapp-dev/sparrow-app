@@ -146,7 +146,8 @@ export class AppViewModel {
           updatedAt,
           updatedBy,
           isNewInvite,
-          billing
+          billing,
+          isRestricted
         } = elem;
         const updatedWorkspaces = workspaces?.map((workspace) => ({
           workspaceId: workspace.id,
@@ -175,7 +176,8 @@ export class AppViewModel {
           updatedBy,
           isNewInvite,
           isOpen: isOpenTeam,
-          billing
+          billing,
+          isRestricted
         };
         data.push(item);
       }

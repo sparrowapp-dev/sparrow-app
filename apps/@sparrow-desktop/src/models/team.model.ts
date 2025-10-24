@@ -8,7 +8,7 @@ export const teamSchemaLiteral = {
   title: "team",
   primaryKey: "teamId",
   type: "object",
-  version: 7,
+  version: 9,
   properties: {
     teamId: {
       type: "string",
@@ -86,6 +86,10 @@ export const teamSchemaLiteral = {
       default: false,
     },
     isNewInvite: {
+      type: "boolean",
+      default: false,
+    },
+    isRestricted: {
       type: "boolean",
       default: false,
     },
@@ -175,6 +179,17 @@ export const teamSchemaLiteral = {
                 },
               },
               testflowRunHistory: {
+                type: "object",
+                properties: {
+                  area: {
+                    type: "string",
+                  },
+                  value: {
+                    type: "number",
+                  },
+                },
+              },
+              aiRequestsPerMonth:{
                 type: "object",
                 properties: {
                   area: {

@@ -97,4 +97,16 @@ export class AiAssistantService {
     );
     return response;
   };
+
+  public generatePreScript = async (data: GenerateTestCasesRequestDto) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/assistant/generate-pre-script`,
+      {
+        body: data,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }

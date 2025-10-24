@@ -29,6 +29,8 @@ import constants from "src/constants/constants";
 import { Sleep } from "@sparrow/common/utils";
 import { RecentWorkspaceRepository } from "src/repositories/recent-workspace.repository";
 import { PlanRepository } from "src/repositories/plan.repository";
+import { isSubscriptionOverDue, isSubscriptionOverTeamId } from "@sparrow/common/store";
+import { get } from "svelte/store";
 
 export class TeamExplorerPageViewModel {
   constructor() {}
@@ -192,6 +194,7 @@ export class TeamExplorerPageViewModel {
           updatedAt,
           updatedBy,
           isNewInvite,
+          isRestricted
         } = elem;
         const updatedWorkspaces = workspaces.map((workspace) => ({
           workspaceId: workspace.id,
@@ -220,7 +223,12 @@ export class TeamExplorerPageViewModel {
           updatedBy,
           isNewInvite,
           isOpen: isOpenTeam,
+          isRestricted
         };
+        if(isRestricted === true && !get(isSubscriptionOverDue)){
+          isSubscriptionOverDue.set(true);
+          isSubscriptionOverTeamId.set(_id);
+        }
         data.push(item);
       }
 

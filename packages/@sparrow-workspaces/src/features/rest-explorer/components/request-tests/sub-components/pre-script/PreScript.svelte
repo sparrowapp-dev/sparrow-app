@@ -30,13 +30,13 @@
 
   export let onTestsChange;
   export let tests;
-  export let onGenerateTestCases;
-  export let isTestCasesGenerating;
+  export let onGeneratePreScript;
+  export let isPreScriptGenerating;
   export let isGuestUser;
   export let userRole;
 
   type SplitDirection = "vertical" | "horizontal";
-  type EditorLanguage = "TestJavaScript";
+  type EditorLanguage = "PreTestJavaScript";
 
   // Snippet type (based on your utils/common-snippets.ts)
   interface Snippet {
@@ -45,7 +45,7 @@
   }
 
   export let tabSplitDirection: SplitDirection = "vertical";
-  export let lang: EditorLanguage = "TestJavaScript";
+  export let lang: EditorLanguage = "PreTestJavaScript";
 
   export let isBodyBeautified: boolean = false;
 
@@ -62,6 +62,8 @@
   let originalTestContent = "";
   let currentPrompt = "";
   let originalLineCount = 0;
+  let temporaryDisplayContent = ""; // Added for temporary content display
+  let contentAddedDuringGeneration = ""; // Added to track snippets during generation
 
   // Persistent highlighting variables
   let observer: MutationObserver | null = null;
@@ -93,16 +95,119 @@
   };
 
   const handleCodeMirrorChange = (e: any) => {
-    onTestsChange({ ...tests, preScript: e.detail });
+    const newContent = e.detail;
 
-    // Re-apply highlights immediately after any content change if we have generated content
+    // If we have generated test actions showing, protect the generated content
+    if (showGeneratedTestActions) {
+      const newLines = newContent.split("\n");
+
+      // Check if lines in the generated range have been modified
+      let generatedContentModified = false;
+      const originalGeneratedLines = generatedTestContent.split("\n");
+
+      for (let i = 0; i < originalGeneratedLines.length; i++) {
+        const lineIndex = generatedContentStartLine + i;
+        if (lineIndex < newLines.length) {
+          if (newLines[lineIndex] !== originalGeneratedLines[i]) {
+            generatedContentModified = true;
+            break;
+          }
+        } else {
+          // Generated content was deleted
+          generatedContentModified = true;
+          break;
+        }
+      }
+
+      if (generatedContentModified) {
+        // Generated content was modified - block the change
+        tick().then(() => {
+          // Force revert by not updating temporaryDisplayContent
+          temporaryDisplayContent = temporaryDisplayContent;
+          recalculateGeneratedContentLines();
+          highlightGeneratedContent();
+        });
+        return;
+      }
+
+      // Generated content is intact - allow the change
+      temporaryDisplayContent = newContent;
+
+      // Extract only the non-generated content for saving
+      const nonGeneratedLines = [];
+      const allLines = newContent.split("\n");
+
+      for (let i = 0; i < allLines.length; i++) {
+        // Only include lines that are NOT in the generated range
+        if (i < generatedContentStartLine || i > generatedContentEndLine) {
+          nonGeneratedLines.push(allLines[i]);
+        }
+      }
+
+      const nonGeneratedContent = nonGeneratedLines.join("\n");
+      onTestsChange({ ...tests, preScript: nonGeneratedContent });
+    } else {
+      // Normal behavior when no generated content is protected
+      onTestsChange({ ...tests, preScript: newContent });
+    }
+
+    // Re-apply highlights if we have generated content
     if (showGeneratedTestActions) {
       if (rafId) cancelAnimationFrame(rafId);
       rafId = requestAnimationFrame(() => {
         highlightGeneratedContent();
-        // Double-check after a tiny delay
-        setTimeout(() => highlightGeneratedContent(), 1);
       });
+    }
+  };
+
+  // Helper function to recalculate line positions after content changes
+  const recalculateGeneratedContentLines = () => {
+    if (!generatedTestContent || !temporaryDisplayContent) return;
+
+    const allLines = temporaryDisplayContent.split("\n");
+    const generatedLines = generatedTestContent.split("\n");
+
+    // Only look for generated content in a very narrow range around the expected position
+    // This prevents matching similar content elsewhere
+    let foundStart = -1;
+
+    // Search in a very small window around the current position
+    const searchStart = Math.max(0, generatedContentStartLine - 1);
+    const searchEnd = Math.min(
+      allLines.length - generatedLines.length + 1,
+      generatedContentStartLine + 3, // Very narrow search window
+    );
+
+    for (let i = searchStart; i < searchEnd; i++) {
+      let matches = true;
+
+      // Check if ALL lines match exactly
+      for (let j = 0; j < generatedLines.length; j++) {
+        if (i + j >= allLines.length || allLines[i + j] !== generatedLines[j]) {
+          matches = false;
+          break;
+        }
+      }
+
+      // Additional check: make sure we're not matching content that was there before
+      if (matches) {
+        // Verify this is actually the generated content block by checking context
+        // The generated content should be preceded by original content + separator
+        const hasProperContext =
+          i === 0 || // At the beginning
+          (originalTestContent && i > 0) || // After original content
+          (!originalTestContent && i === 0); // No original content, starts at beginning
+
+        if (hasProperContext) {
+          foundStart = i;
+          break;
+        }
+      }
+    }
+
+    if (foundStart >= 0) {
+      generatedContentStartLine = foundStart;
+      generatedContentEndLine = foundStart + generatedLines.length - 1;
     }
   };
 
@@ -111,9 +216,42 @@
   };
 
   const selectSnippet = (data: string): void => {
-    let value = tests?.preScript || "";
-    value += value ? `\n${data}` : data;
-    onTestsChange({ ...tests, preScript: value });
+    let value = showGeneratedTestActions
+      ? temporaryDisplayContent
+      : tests?.preScript || "";
+
+    const newValue = value ? `${value}\n${data}` : data;
+
+    if (showGeneratedTestActions) {
+      const snippetLines = data.split("\n").length;
+      const addedNewlines = value ? 1 : 0;
+
+      // Update the content first
+      temporaryDisplayContent = newValue;
+
+      // Calculate where the snippet was inserted
+      const oldLines = value.split("\n");
+      const insertionPoint = oldLines.length;
+
+      // Only adjust if snippet was inserted before generated content
+      if (insertionPoint <= generatedContentStartLine) {
+        generatedContentStartLine += snippetLines + addedNewlines;
+        generatedContentEndLine += snippetLines + addedNewlines;
+      }
+
+      // Track the snippet added during generation
+      contentAddedDuringGeneration = contentAddedDuringGeneration
+        ? `${contentAddedDuringGeneration}\n${data}`
+        : data;
+
+      // Reapply highlights
+      setTimeout(() => {
+        highlightGeneratedContent();
+      }, 0);
+    } else {
+      // Normal behavior when no generated content is active
+      onTestsChange({ ...tests, preScript: newValue });
+    }
   };
 
   const highlightMatch = (text: string, searchTerm: string): string => {
@@ -137,12 +275,13 @@
   const handleGenerateTestCases = async () => {
     // Store the original content and current prompt
     originalTestContent = tests?.preScript || "";
+    contentAddedDuringGeneration = "";
     originalLineCount = originalTestContent.trim()
       ? originalTestContent.split("\n").length
       : 0;
     currentPrompt = testCasePrompt;
 
-    const result = await onGenerateTestCases(testCasePrompt);
+    const result = await onGeneratePreScript(testCasePrompt);
     if (result?.error) {
       if (result?.message === "Limit reached. Please try again later.") {
         isUserLimitReached = true;
@@ -156,8 +295,8 @@
       testCasePrompt = "";
       generatedTestContent = result.generatedContent;
 
-      // Directly insert the generated content into the editor
-      await insertGeneratedContentDirectly();
+      // Show generated content temporarily (don't save to tests object)
+      await showGeneratedContentTemporarily();
 
       // Show the action buttons
       showGeneratedTestActions = true;
@@ -167,28 +306,32 @@
       testCasePrompt = "";
     }
   };
-  const insertGeneratedContentDirectly = async () => {
-    // Insert the generated test content into the current script
-    const currentScript = tests?.preScript || "";
 
-    // Calculate the exact line positions where generated content will be placed
-    const currentLines = currentScript ? currentScript.split("\n") : [];
+  const showGeneratedContentTemporarily = async () => {
+    // Calculate line positions for highlighting
+    const currentScript = originalTestContent;
     const separator = currentScript ? "\n\n" : "";
 
-    // Store where generated content starts
-    generatedContentStartLine = currentLines.length + (currentScript ? 2 : 0);
+    // Create the temporary display content
+    temporaryDisplayContent = currentScript + separator + generatedTestContent;
 
-    // Store where generated content ends
-    const generatedContentLines = generatedTestContent.split("\n");
+    // Calculate exact line positions based on the original content length
+    const originalLines = currentScript ? currentScript.split("\n") : [];
+    const separatorLines = separator ? separator.split("\n") : [];
+
+    // Calculate start position: original content + separator
+    generatedContentStartLine =
+      originalLines.length + separatorLines.length - 1;
+    if (currentScript && separator) {
+      generatedContentStartLine = originalLines.length + 1; // +1 for the empty line from separator
+    } else if (!currentScript) {
+      generatedContentStartLine = 0;
+    }
+
+    // Calculate end position
+    const generatedLines = generatedTestContent.split("\n");
     generatedContentEndLine =
-      generatedContentStartLine + generatedContentLines.length - 1;
-
-    const newScript = currentScript + separator + generatedTestContent;
-
-    onTestsChange({
-      ...tests,
-      preScript: newScript,
-    });
+      generatedContentStartLine + generatedLines.length - 1;
 
     await tick();
 
@@ -320,6 +463,7 @@
       }
     });
   };
+
   const removeHighlight = () => {
     if (observer) {
       observer.disconnect();
@@ -369,26 +513,47 @@
   const acceptGeneratedTest = () => {
     removeHighlight();
 
-    // Keep the generated content that's already in the editor
+    // Save the complete content (original + snippets + generated)
+    onTestsChange({ ...tests, preScript: temporaryDisplayContent });
+
+    // Clear temporary state
     showGeneratedTestActions = false;
     generatedTestContent = "";
     originalTestContent = "";
+    temporaryDisplayContent = "";
     currentPrompt = "";
     originalLineCount = 0;
     generatedContentStartLine = 0;
     generatedContentEndLine = 0;
+    contentAddedDuringGeneration = ""; // Clear snippets tracker
   };
 
   const rejectGeneratedTest = () => {
     removeHighlight();
 
-    // Revert to original content
-    onTestsChange({ ...tests, preScript: originalTestContent });
+    // Calculate what content to revert to:
+    // Original content + any snippets added during generation
+    let revertedContent = originalTestContent || "";
+
+    if (contentAddedDuringGeneration) {
+      revertedContent = revertedContent
+        ? `${revertedContent}\n${contentAddedDuringGeneration}`
+        : contentAddedDuringGeneration;
+    }
+
+    // Save the reverted content (original + snippets, but no AI generation)
+    onTestsChange({ ...tests, preScript: revertedContent });
+
+    // Clear all temporary state
     showGeneratedTestActions = false;
     generatedTestContent = "";
     originalTestContent = "";
+    temporaryDisplayContent = "";
     currentPrompt = "";
     originalLineCount = 0;
+    generatedContentStartLine = 0;
+    generatedContentEndLine = 0;
+    contentAddedDuringGeneration = "";
   };
 
   const regenerateTest = async () => {
@@ -399,10 +564,10 @@
     showGeneratedTestActions = false;
 
     // Revert to original content first
-    onTestsChange({ ...tests, preScript: originalTestContent });
+    temporaryDisplayContent = originalTestContent;
 
     // Use the same prompt to regenerate
-    const result = await onGenerateTestCases(currentPrompt);
+    const result = await onGeneratePreScript(currentPrompt);
     if (result?.error) {
       isError = true;
       errorMessage =
@@ -412,8 +577,8 @@
       errorMessage = "";
       generatedTestContent = result.generatedContent;
 
-      // Insert the new generated content
-      await insertGeneratedContentDirectly();
+      // Show the new generated content temporarily
+      await showGeneratedContentTemporarily();
 
       // Show the action buttons again
       showGeneratedTestActions = true;
@@ -549,11 +714,13 @@
       >
         <Editor
           bind:lang
-          value={tests?.preScript || ""}
+          value={showGeneratedTestActions
+            ? temporaryDisplayContent
+            : tests?.preScript || ""}
           on:change={handleCodeMirrorChange}
           isEditable={true}
           autofocus={true}
-          placeholder={`// What are the Pre-Request tests?\n// It runs before your request is sent. Use them to set variables, headers, prepare data.\n// For example: Need a timestamp for every request?\n// sp.environment.set("timestamp", Date.now());\n//     sp.request.headers.add({ key: "Auth-Token", value: "12345" });\n// });\n\n// You can:\n// - Use "Snippets" to insert common Pre-Requests\n// - Type a prompt and click "Generate" to create a Pre-Requests using AI\n// - Or, write Pre-Requests manually using scripting`}
+          placeholder={`// What are the Pre-Request tests?\n// It runs before your request is sent. Use them to set variables, headers, prepare data.\n// For example: Need a timestamp for every request?\n// sp.environment.set("timestamp", new Date());\n// sp.request.headers.set("Auth-Token", "12345");\n\n// You can:\n// - Use "Snippets" to insert common Pre-Requests\n// - Type a prompt and click "Generate" to create a Pre-Requests using AI\n// - Or, write Pre-Requests manually using scripting`}
           {isBodyBeautified}
           beautifySyntaxCallback={updateBeautifiedState}
         />
@@ -610,7 +777,7 @@
               </div>
             {/if}
 
-            {#if isTestCasesGenerating}
+            {#if isPreScriptGenerating}
               <p
                 class="text-primary-300 generating-img d-flex justify-content-center align-items-center"
                 in:fade={{ duration: 200 }}
@@ -653,7 +820,7 @@
                 <Button
                   size="small"
                   type="outline-secondary"
-                  startIcon={isTestCasesGenerating ||
+                  startIcon={isPreScriptGenerating ||
                   showGeneratedTestActions ||
                   isUserLimitReached ||
                   isError
@@ -664,7 +831,7 @@
                     isUserLimitReached ||
                     isError}
                   onClick={() => {
-                    if (!isTestCasesGenerating) {
+                    if (!isPreScriptGenerating) {
                       if (testCasePrompt.trim()) {
                         handleGenerateTestCases();
                       } else {

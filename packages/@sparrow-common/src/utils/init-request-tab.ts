@@ -171,6 +171,7 @@ class InitRequestTab {
           isGeneratedVariable: false,
           isRequestTestsNoCodeDemoCompleted: false,
           isRequestTestsScriptDemoCompleted: false,
+          isRequestAssertionsDemoCompleted: false,
         },
       },
       path: {
@@ -274,6 +275,11 @@ class InitRequestTab {
   public updateIsRequestTestScriptGuide(_value: boolean) {
     if (this._tab.property.request) {
       this._tab.property.request.isRequestTestsScriptDemoCompleted = _value;
+    }
+  }
+  public updateIsRequestAssertionsGuide(_value: boolean) {
+    if (this._tab.property.request) {
+      this._tab.property.request.isRequestAssertionsDemoCompleted = _value;
     }
   }
 }

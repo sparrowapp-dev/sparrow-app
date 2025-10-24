@@ -574,19 +574,25 @@ const disconnectSocketIo = async (tab_id: string) => {
     });
 };
 
-const convertWebSocketUrl = (url: string) => {
-  // Check if the URL starts with 'wss://'
-  if (url.startsWith("wss://")) {
-    return "https:/" + url.slice(5); // Replace 'wss://' with 'https://'
+/**
+ * Ensures the URL has the correct WebSocket protocol.
+ * - If the URL starts with "http://" or "https://", it is converted to "ws://" or "wss://".
+ * - If the URL already starts with "ws://" or "wss://", it is returned as is.
+ * - If the URL has no protocol, "ws://" is prepended.
+ * @param url - The input URL string.
+ * @returns The URL with the correct WebSocket protocol.
+ */
+const ensureWebSocketProtocol = (url: string): string => {
+  if (url.startsWith("ws://") || url.startsWith("wss://")) {
+    return url;
   }
-
-  // Check if the URL starts with 'ws://'
-  if (url.startsWith("ws://")) {
-    return "http:/" + url.slice(4); // Replace 'ws://' with 'http://'
+  if (url.startsWith("https://")) {
+    return "wss://" + url.slice(8);
   }
-
-  // If the URL does not start with 'wss://' or 'ws://', return it unchanged
-  return url;
+  if (url.startsWith("http://")) {
+    return "ws://" + url.slice(7);
+  }
+  return "ws://" + url;
 };
 
 /**
@@ -604,135 +610,138 @@ const connectWebSocket = async (
   tabId: string,
   requestHeaders: string,
 ) => {
-  const httpurl = convertWebSocketUrl(url);
   const abortController = new AbortController();
-  console.table({ url, httpurl, tabId, requestHeaders });
+  const { signal } = abortController;
+  let wsUrl = ensureWebSocketProtocol(url);
+  let triedWss = false;
+
+  console.table({ url, tabId, requestHeaders });
+
+  // Initialize WebSocket data store
   webSocketDataStore.update((webSocketDataMap) => {
     webSocketDataMap.set(tabId, {
-      abortController: abortController,
+      abortController,
       messages: [],
       status: "connecting",
       search: "",
       contentType: RequestDataTypeEnum.TEXT,
       body: "",
       filter: "All Messages",
-      url: url,
+      url,
       listener: null,
     });
-
     return webSocketDataMap;
   });
 
-  const { signal } = abortController; // Extract the signal for the request
-
-  await invoke("connect_websocket", {
-    url: url,
-    httpurl: httpurl,
-    tabid: tabId,
-    headers: requestHeaders,
-  })
-    .then(async () => {
-      try {
-        if (signal?.aborted) {
-          // Ignore response if request was cancelled
-          return;
-        }
-        // Store the WebSocket and initialize data
-        webSocketDataStore.update((webSocketDataMap) => {
-          const wsData = webSocketDataMap.get(tabId);
-          if (wsData) {
-            wsData.messages.unshift({
-              data: `Connected to ${url}`,
-              transmitter: "connecter",
-              timestamp: formatTime(new Date()),
-              uuid: uuidv4(),
-            });
-            wsData.status = "connected";
-            webSocketDataMap.set(tabId, wsData);
-          }
-          return webSocketDataMap;
-        });
-        notifications.success("WebSocket connected successfully.");
-
-        // All the response of particular web socket can be listened here. (Can be shifted to another place)
-        const listener = await listen(`ws_message_${tabId}`, (event) => {
-          if (event?.payload?.type === "disconnect") {
-            let disconnectListener;
-            webSocketDataStore.update((webSocketDataMap) => {
-              const wsData = webSocketDataMap.get(tabId);
-              if (wsData) {
-                disconnectListener = wsData.listener;
-                wsData.messages.unshift({
-                  data: `Disconnected from ${url}`,
-                  transmitter: "disconnector",
-                  timestamp: formatTime(new Date()),
-                  uuid: uuidv4(),
-                });
-                wsData.status = "disconnected";
-                webSocketDataMap.set(tabId, wsData);
-                if (disconnectListener) {
-                  disconnectListener();
-                }
-              }
-              return webSocketDataMap;
-            });
-          } else {
-            webSocketDataStore.update((webSocketDataMap) => {
-              const wsData = webSocketDataMap.get(tabId);
-              if (wsData) {
-                wsData.messages.unshift({
-                  data: event?.payload?.data,
-                  transmitter: "receiver",
-                  timestamp: formatTime(new Date()),
-                  uuid: uuidv4(),
-                });
-                webSocketDataMap.set(tabId, wsData);
-              }
-              return webSocketDataMap;
-            });
-          }
-        });
-        webSocketDataStore.update((webSocketDataMap) => {
-          const wsData = webSocketDataMap.get(tabId);
-          if (wsData) {
-            wsData.listener = listener;
-            webSocketDataMap.set(tabId, wsData);
-          }
-          return webSocketDataMap;
-        });
-      } catch (e) {
-        console.error(e);
-        notifications.error(
-          "Failed to fetch WebSocket response. Please try again.",
-        );
-        return error("error");
+  // Helper to update store
+  const updateStore = (updater: (wsData: any) => void) => {
+    webSocketDataStore.update((webSocketDataMap) => {
+      const wsData = webSocketDataMap.get(tabId);
+      if (wsData) {
+        updater(wsData);
+        webSocketDataMap.set(tabId, wsData);
       }
-    })
-    .catch((e) => {
-      console.error(e);
-      // Store the error state in websocket
-      webSocketDataStore.update((webSocketDataMap) => {
-        const wsData = webSocketDataMap.get(tabId);
-        if (wsData) {
-          wsData.messages.unshift({
-            data: e,
-            transmitter: "disconnector",
-            timestamp: formatTime(new Date()),
-            uuid: uuidv4(),
-          });
-          wsData.status = "disconnected";
-          webSocketDataMap.set(tabId, wsData);
-        }
-        return webSocketDataMap;
+      return webSocketDataMap;
+    });
+  };
+
+  // Helper to add message
+  const addMessage = (data: string, transmitter: string) => {
+    updateStore((wsData) => {
+      wsData.messages.unshift({
+        data,
+        transmitter,
+        timestamp: formatTime(new Date()),
+        uuid: uuidv4(),
+      });
+    });
+  };
+
+  // Handle disconnect event
+  const handleDisconnect = () => {
+    updateStore((wsData) => {
+      const disconnectListener = wsData.listener;
+      wsData.status = "disconnected";
+      wsData.messages.unshift({
+        data: `Disconnected from ${url}`,
+        transmitter: "disconnector",
+        timestamp: formatTime(new Date()),
+        uuid: uuidv4(),
       });
 
-      // webSocketDataStore.update((webSocketDataMap) => {
-      //   webSocketDataMap.delete(tabId);
-      //   return webSocketDataMap;
-      // });
-      // notifications.error("Failed to connect WebSocket. Please try again.");
-      return error(e);
+      if (disconnectListener) {
+        disconnectListener();
+        wsData.listener = null;
+      }
     });
+  };
+
+  // Attempt connection
+  const attemptConnection = async (): Promise<void> => {
+    try {
+      await invoke("connect_websocket", {
+        url: wsUrl,
+        tabid: tabId,
+        headers: requestHeaders,
+      });
+
+      if (signal?.aborted) {
+        return;
+      }
+
+      // Update status and add success message
+      updateStore((wsData) => {
+        wsData.status = "connected";
+      });
+      addMessage(`Connected to ${url}`, "connecter");
+      notifications.success("WebSocket connected successfully.");
+
+      // Setup message listener
+      const listener = await listen(`ws_message_${tabId}`, (event) => {
+        if (event?.payload?.type === "disconnect") {
+          handleDisconnect();
+        } else {
+          addMessage(event?.payload?.data, "receiver");
+        }
+      });
+
+      // Store listener reference
+      updateStore((wsData) => {
+        wsData.listener = listener;
+      });
+    } catch (e) {
+      const errorMessage = typeof e === "string" ? e : String(e);
+
+      // Retry with wss:// if we got a 307 redirect
+      if (
+        errorMessage.includes("307") &&
+        !triedWss &&
+        wsUrl.startsWith("ws://")
+      ) {
+        wsUrl = wsUrl.replace("ws://", "wss://");
+        triedWss = true;
+        return attemptConnection(); // Recursive retry
+      }
+      console.error("WebSocket connection error:", e);
+
+      // Handle connection failure
+      updateStore((wsData) => {
+        wsData.status = "disconnected";
+      });
+      addMessage(errorMessage, "disconnector");
+
+      throw e;
+    }
+  };
+
+  // Execute connection
+  try {
+    await attemptConnection();
+  } catch (error) {
+    console.error("Failed to establish WebSocket connection:", error);
+    // Error already logged in store, just propagate
+    throw error;
+  }
 };
 
 /**

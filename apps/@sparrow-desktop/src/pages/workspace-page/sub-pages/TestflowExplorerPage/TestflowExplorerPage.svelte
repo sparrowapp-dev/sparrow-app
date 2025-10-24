@@ -302,7 +302,12 @@
 
   onMount(() => {
     handleBlockLimitTestflow();
-    collectionsSubscriber.unsubscribe();
+  });
+
+  onDestroy(() => {
+    if (collectionsSubscriber) {
+      collectionsSubscriber.unsubscribe();
+    }
   });
 
   let isCreateTestflowScheduleLimitReachedModalOpen = false;
@@ -419,6 +424,7 @@
     onOpenTestflowScheduleConfigurationsTab={_viewModel.openTestflowScheduleConfigurationsTab}
     bind:isCreateTestflowScheduleLimitReachedModalOpen
     onOpenEnvironment={_viewModel.handleOpenEnvironment}
+    onFetchTestflow={_viewModel.fetchTestflow}
   />
 {/if}
 

@@ -1,6 +1,5 @@
 <script lang="ts">
   import { TestCaseModeEnum } from "@sparrow/common/types/workspace";
-  import { NoCode } from "./sub-components";
   import { Tooltip, Button } from "@sparrow/library/ui";
   import Script from "./sub-components/script/Script.svelte";
   import { PreScript } from "./sub-components";
@@ -11,12 +10,15 @@
   export let testResults;
   export let responseBody;
   export let responseHeader;
-  export let onShowModeChangeModal: (newMode: TestCaseModeEnum) => void;
+  export let onShowModeChangeModal;
   export let onGenerateTestCases;
   export let isTestCasesGenerating;
   export let isGuestUser;
   export let userRole;
   export let scriptComponent = null;
+  export let preScriptComponent = null;
+  export let onGeneratePreScript;
+  export let isPreScriptGenerating;
 </script>
 
 <div
@@ -83,12 +85,12 @@
     {:else if tests?.testCaseMode === TestCaseModeEnum.NO_CODE}
       <div class="d-flex align-items-center justify-content-between px-3 py-2">
         <p class="text-fs-12 mb-0 text-muted">JavaScript Code</p>
-        <Button
+        <!-- <Button
           title="Read Documentation"
           size={"extra-small"}
           type="link-secondary"
           onClick={() => {}}
-        />
+        /> -->
       </div>
     {/if}
   </div>
@@ -109,11 +111,11 @@
         {tabSplitDirection}
         {tests}
         {onTestsChange}
-        {onGenerateTestCases}
-        {isTestCasesGenerating}
+        {onGeneratePreScript}
+        {isPreScriptGenerating}
         {isGuestUser}
         {userRole}
-        bind:this={scriptComponent}
+        bind:this={preScriptComponent}
       />
     {/if}
   </div>
