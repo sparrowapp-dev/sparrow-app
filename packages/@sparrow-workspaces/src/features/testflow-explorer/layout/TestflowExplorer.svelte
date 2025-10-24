@@ -2736,7 +2736,7 @@
   userEmail={teamDetails?.teamOwnerEmail}
   submitButtonName={planContent?.buttonName}
 />
-{#if isTeamDowngraded && !$isTeamDowngradePopupDismissed && !testflowBlocksPlanModalOpen && !runHistoryPlanModalOpen && !selectiveRunModalOpen && !isCreateTestflowScheduleLimitReachedModalOpen}
+{#if isTeamDowngraded && !$isTeamDowngradePopupDismissed && !testflowBlocksPlanModalOpen && !runHistoryPlanModalOpen && !selectiveRunModalOpen && !isCreateTestflowScheduleLimitReachedModalOpen && userRole != WorkspaceRole.WORKSPACE_VIEWER}
   <div class="downgrade-card position-fixed">
     <div class="downgrade-card-inner" style="padding: 24px;">
       <div
@@ -2790,12 +2790,17 @@
     bottom: 30px;
     right: 20px;
     z-index: 500;
-    border-radius: 12px;
+    border-radius: 8px;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
     background: #181a20;
     width: 340px;
     max-width: 400px;
+    border: 0.5px solid transparent;
+    background:
+      linear-gradient(#181a20, #181a20) padding-box,
+      linear-gradient(90deg, #11adf0, #316cf6, #6147ff) border-box;
   }
+
   .downgrade-card-inner {
     background-color: rgba(24, 28, 38, 1);
     border-radius: 7px;
