@@ -229,6 +229,7 @@ export class DashboardViewModel {
           invites,
           isNewInvite,
           billing,
+          isDowngraded
         } = elem;
         const updatedWorkspaces = workspaces?.map((workspace) => ({
           workspaceId: workspace.id,
@@ -259,6 +260,7 @@ export class DashboardViewModel {
           isNewInvite,
           isOpen: isOpenTeam,
           billing,
+          isDowngraded
         };
         data.push(item);
       }

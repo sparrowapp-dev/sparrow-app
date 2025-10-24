@@ -125,6 +125,7 @@ export class TeamsViewModel {
           isNewInvite,
           invites,
           billing,
+          isDowngraded
         } = elem;
         const updatedWorkspaces = workspaces?.map((workspace) => ({
           workspaceId: workspace.id,
@@ -155,6 +156,7 @@ export class TeamsViewModel {
           isOpen: isOpenTeam,
           invites,
           billing,
+          isDowngraded
         };
         data.push(item);
       }
