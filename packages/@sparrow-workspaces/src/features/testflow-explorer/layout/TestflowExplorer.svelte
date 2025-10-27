@@ -1240,6 +1240,34 @@
 
     if (_requestData) {
       // create a new node object using existing request (meta and core data)
+      // First, ensure that the referenced request is of an allowed type (only REST API requests).
+      try {
+        const reqMetaCollectionId = _requestData?.collectionId;
+        const reqMetaRequestId = _requestData?.requestId;
+        const reqMetaFolderId = _requestData?.folderId;
+        if (reqMetaCollectionId && reqMetaRequestId) {
+          const reqData = await onSelectRequest(
+            reqMetaCollectionId,
+            reqMetaRequestId,
+            reqMetaFolderId,
+          );
+          debugger;
+          const reqType = reqData?.type;
+          // If type exists and is not REQUEST, block node creation
+          if (reqType && reqType !== "REQUEST") {
+            notifications.error(
+              "Only REST API requests can be added to Test Flows.",
+            );
+            return; // Abort creating this node
+          }
+        }
+      } catch (err) {
+        // In case of any failure determining the type, fail safe and block to avoid inconsistent nodes.
+        notifications.error(
+          "Unable to validate request type. This item cannot be added to the Test Flow.",
+        );
+        return;
+      }
       requestCoreData = await createCustomRequestObject(
         _requestData?.collectionId,
         _requestData?.requestId,
