@@ -52,6 +52,8 @@
     ChevronUpRegular,
     ChevronDownRegular,
     ArrowClockWiseRegular,
+    AlertOnIcon,
+    DismissRegular,
   } from "@sparrow/library/icons";
 
   import "@xyflow/svelte/dist/style.css";
@@ -133,6 +135,7 @@
     stopLoading,
     loadingState,
   } from "@sparrow/common/store";
+  import { isTeamDowngradePopupDismissed } from "../store";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -189,6 +192,8 @@
   export let onOpenTestflowScheduleConfigurationsTab;
   export let isCreateTestflowScheduleLimitReachedModalOpen;
   export let onFetchTestflow;
+  export let isTeamDowngraded: boolean = false;
+  export let teamPlanName;
 
   export let onUpdateScheduleStatus: (
     scheduleId: string,
@@ -648,6 +653,7 @@
     collectionId: string,
     requestId: string,
     folderId: string,
+    requestName?: string,
   ) => {
     const response: any = {};
     const tempTab = new InitRequestTab("uuid", "uuid").getValue().property
@@ -701,7 +707,10 @@
     } else {
       response.method = tempTab?.method;
     }
-    if (data?.name) {
+    // Use the provided requestName parameter first, then fallback to data.name, then "Untitled"
+    if (requestName) {
+      response.name = requestName;
+    } else if (data?.name) {
       response.name = data.name;
     } else {
       response.name = "Untitled";
@@ -782,6 +791,46 @@
   };
 
   /**
+   * Gets the current collection and folder location for a given request ID
+   * This ensures we always use the most up-to-date location even after drag-and-drop operations
+   */
+  const getCurrentApiLocation = (
+    requestId: string,
+    fallbackCollectionId: string,
+    fallbackFolderId: string,
+  ) => {
+    let currentCollectionId = fallbackCollectionId;
+    let currentFolderId = fallbackFolderId;
+
+    // If we have a requestId, find its current location in collections
+    if (requestId && collectionListDocument) {
+      for (const collection of collectionListDocument) {
+        const findInItems = (items: any[], parentFolderId: string = "") => {
+          for (const item of items || []) {
+            if (item.id === requestId) {
+              currentCollectionId = collection.id;
+              currentFolderId = parentFolderId;
+              return true;
+            }
+            if (item.items && item.items.length > 0) {
+              if (findInItems(item.items, item.id)) {
+                return true;
+              }
+            }
+          }
+          return false;
+        };
+
+        if (findInItems(collection.items)) {
+          break;
+        }
+      }
+    }
+
+    return { currentCollectionId, currentFolderId };
+  };
+
+  /**
    * Updates the selected API in a specific node.
    * @param id - Node ID.
    * @param name - Name of the API.
@@ -801,11 +850,23 @@
   ) => {
     let response: any = {};
     if (collectionId) {
-      response = await createCustomRequestObject(
-        collectionId,
+      // Get the most current location for this API
+      const { currentCollectionId, currentFolderId } = getCurrentApiLocation(
         requestId,
-        folderId as string,
+        collectionId,
+        folderId || "",
       );
+
+      response = await createCustomRequestObject(
+        currentCollectionId,
+        requestId,
+        currentFolderId,
+        name,
+      );
+
+      // Update the node with current location info
+      collectionId = currentCollectionId;
+      folderId = currentFolderId;
     } else {
       // create custom API Request.
       response = await createBlankRequestObject(url as string, method, name);
@@ -1183,6 +1244,7 @@
         _requestData?.collectionId,
         _requestData?.requestId,
         _requestData?.folderId,
+        _requestData?.name,
       );
       requestMetaData = {
         collectionId: _requestData?.collectionId,
@@ -2675,8 +2737,108 @@
   userEmail={teamDetails?.teamOwnerEmail}
   submitButtonName={planContent?.buttonName}
 />
+{#if isTeamDowngraded && !$isTeamDowngradePopupDismissed && !testflowBlocksPlanModalOpen && !runHistoryPlanModalOpen && !selectiveRunModalOpen && !isCreateTestflowScheduleLimitReachedModalOpen && userRole != WorkspaceRole.WORKSPACE_VIEWER}
+  <div class="downgrade-card position-fixed">
+    <div class="downgrade-card-inner" style="padding: 24px;">
+      <div
+        class="downgrade-header"
+        style="display: flex; align-items: center; gap: 10px;"
+      >
+        <div class="downgrade-icon">
+          <AlertOnIcon />
+        </div>
+        <p class="downgrade-title">Your Hub Has Been Downgraded</p>
+        <Button
+          type="teritiary-regular"
+          size="small"
+          startIcon={DismissRegular}
+          onClick={() => isTeamDowngradePopupDismissed.set(true)}
+          style="margin-left: 4px;"
+        />
+      </div>
+
+      <p class="text-ds-font-size-12" style="color:var(--text-ds-neutral-100)">
+        Your Hub is now on the {teamPlanName} edition, which has a limit of {planLimitTestFlows}
+        active Test Flows per workspace.
+      </p>
+      <ul class="text-ds-font-size-12" style="color:var(--text-ds-neutral-100)">
+        <li>
+          To meet this limit, your least-active Test Flows have been archived.
+        </li>
+        <li>Archived Test Flows will be permanently deleted after 60 days.</li>
+      </ul>
+      <p class="text-ds-font-size-12" style="color:var(--text-ds-neutral-100)">
+        To restore full access and permissions, you can upgrade your plan at any
+        time.
+      </p>
+      <div class="d-flex justify-content-center">
+        <Button
+          title="Upgrade Plan"
+          type="secondary"
+          size="medium"
+          onClick={userRole === TeamRole.TEAM_OWNER ||
+          userRole === TeamRole.TEAM_ADMIN
+            ? handleRedirectToAdminPanel
+            : handleRequestOwner}
+        />
+      </div>
+    </div>
+  </div>
+{/if}
 
 <style>
+  .downgrade-card {
+    bottom: 30px;
+    right: 20px;
+    z-index: 500;
+    border-radius: 8px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+    background: #181a20;
+    width: 340px;
+    max-width: 400px;
+    border: 0.5px solid transparent;
+    background:
+      linear-gradient(#181a20, #181a20) padding-box,
+      linear-gradient(90deg, #11adf0, #316cf6, #6147ff) border-box;
+  }
+
+  .downgrade-card-inner {
+    background-color: rgba(24, 28, 38, 1);
+    border-radius: 7px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: var(--text-primary);
+    box-sizing: border-box;
+  }
+  .downgrade-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+    margin-bottom: 12px;
+  }
+  .downgrade-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-ds-surface-200);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+  .downgrade-title {
+    color: var(--text-ds-neutral-50);
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 0;
+    white-space: nowrap;
+    flex: 1;
+  }
+
   :global(.svelte-flow__attribution) {
     display: none;
   }

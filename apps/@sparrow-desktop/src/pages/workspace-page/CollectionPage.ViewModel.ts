@@ -79,6 +79,7 @@ import {
   type CollectionBaseInterface as CollectionDto,
   type CollectionArgsBaseInterface as CollectionArgsDto,
   type CollectionItemBaseInterface as CollectionItemsDto,
+  type MoveRequestArgsDto as MoveRequestArgsDto,
   CollectionItemTypeBaseEnum,
   CollectionTypeBaseEnum,
 } from "@sparrow/common/types/workspace/collection-base";
@@ -1370,6 +1371,184 @@ export default class CollectionsViewModel {
     }
 
     return null;
+  };
+
+  /**
+   * Update tabs after moving a request
+   */
+  private updateTabsAfterMove = async (
+    collectionId: string,
+    folderId: string,
+    requestId: string,
+  ): Promise<void> => {
+    const tabsToUpdate = await this.tabRepository.getTabsByRequestId(requestId);
+    for (const tab of tabsToUpdate) {
+      await this.tabRepository.updateTabByMongoId(tab.id, {
+        collectionId,
+        folderId,
+      });
+    }
+  };
+
+  /**
+   * Handle moving request for guest users (local only)
+   */
+  private handleGuestUserMove = async (
+    oldCollectionId: string,
+    newCollectionId: string,
+    oldFolderId: string,
+    newFolderId: string,
+    requestId: string,
+    targetRequestId?: string,
+    insertPosition?: "before" | "after",
+  ): Promise<void> => {
+    const oldCollection = await this.readCollection(oldCollectionId);
+    const workspaceId = oldCollection?.workspaceId;
+
+    if (!workspaceId) {
+      throw new Error("Workspace not found");
+    }
+
+    let newCollection = oldCollection;
+
+    if (newCollectionId !== oldCollectionId) {
+      newCollection = await this.readCollection(newCollectionId);
+    }
+    let targetName = newCollection?.name || "collection";
+
+    if (newFolderId) {
+      const folderDetails = await this.readRequestOrFolderInCollection(
+        newCollectionId,
+        newFolderId,
+      );
+      targetName = folderDetails?.name || "folder";
+    }
+    // Move the request using the repository method
+    await this.collectionRepository.moveRequest(
+      oldCollectionId,
+      newCollectionId,
+      oldFolderId,
+      newFolderId,
+      requestId,
+      targetRequestId,
+      insertPosition,
+    );
+
+    await this.updateTabsAfterMove(newCollectionId, newFolderId, requestId);
+
+    // Dynamic notification based on whether moved to folder or collection root
+    const notificationMessage = newFolderId
+      ? `Request moved to folder "${targetName}"`
+      : `Request moved to collection "${targetName}"`;
+    notifications.success(notificationMessage);
+  };
+
+  /**
+   * Handle moving request for logged-in users (API + local)
+   */
+  private handleLoggedInUserMove = async (
+    oldCollectionId: string,
+    newCollectionId: string,
+    oldFolderId: string,
+    newFolderId: string,
+    requestId: string,
+    targetRequestId?: string,
+    insertPosition?: "before" | "after",
+  ): Promise<void> => {
+    const oldCollection = await this.readCollection(oldCollectionId);
+    const workspaceId = oldCollection?.workspaceId;
+
+    if (!workspaceId) {
+      throw new Error("Workspace not found");
+    }
+
+    let newCollection = oldCollection;
+
+    if (newCollectionId !== oldCollectionId) {
+      newCollection = await this.readCollection(newCollectionId);
+    }
+    let targetName = newCollection?.name || "collection";
+
+    if (newFolderId) {
+      const folderDetails = await this.readRequestOrFolderInCollection(
+        newCollectionId,
+        newFolderId,
+      );
+      targetName = folderDetails?.name || "folder";
+    }
+
+    const baseUrl = await this.constructBaseUrl(workspaceId);
+
+    const response = await this.collectionService.moveRequest(
+      oldCollectionId,
+      newCollectionId,
+      oldFolderId,
+      newFolderId,
+      requestId,
+      workspaceId,
+      baseUrl,
+      targetRequestId,
+      insertPosition,
+    );
+    if (response.isSuccessful) {
+      await this.collectionRepository.moveRequest(
+        oldCollectionId,
+        newCollectionId,
+        oldFolderId,
+        newFolderId,
+        requestId,
+        targetRequestId,
+        insertPosition,
+      );
+      await this.updateTabsAfterMove(oldCollectionId, newFolderId, requestId);
+
+      const notificationMessage = newFolderId
+        ? `Request moved to folder "${targetName}"`
+        : `Request moved to collection "${targetName}"`;
+      notifications.success(notificationMessage);
+    }
+  };
+
+  public handleMoveRequest = async (
+    oldCollectionId: string,
+    newCollectionId: string,
+    oldFolderId: string,
+    newFolderId: string,
+    requestId: string,
+    targetRequestId?: string,
+    insertPosition?: "before" | "after",
+  ) => {
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    try {
+      if (isGuestUser === true) {
+        await this.handleGuestUserMove(
+          oldCollectionId,
+          newCollectionId,
+          oldFolderId,
+          newFolderId,
+          requestId,
+          targetRequestId,
+          insertPosition,
+        );
+      } else {
+        await this.handleLoggedInUserMove(
+          oldCollectionId,
+          newCollectionId,
+          oldFolderId,
+          newFolderId,
+          requestId,
+          targetRequestId,
+          insertPosition,
+        );
+      }
+    } catch (error) {
+      console.error("Error in handleMoveRequest:", error);
+      throw error;
+    }
   };
 
   /**
@@ -5789,6 +5968,23 @@ export default class CollectionsViewModel {
       }
       MixpanelEvent(Events.SAVE_API_REQUEST);
     }
+  };
+
+  /**
+   * Handle control of moving items
+   * @param args :object - arguments depending on entity type
+   */
+
+  public handleMoveItem = async (args: MoveRequestArgsDto) => {
+    return await this.handleMoveRequest(
+      args.oldCollectionId,
+      args.newCollectionId,
+      args.oldFolderId,
+      args.newFolderId,
+      args.requestId,
+      args.targetRequestId,
+      args.insertPosition,
+    );
   };
 
   /**

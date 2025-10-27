@@ -66,16 +66,10 @@
     </span>
   </div>
 
-  <div
-    class="d-flex gap-0"
-    style="width: calc(100% - {dynamicExpression ? '120px' : '86px'});"
-  >
-    <div class="w-50 d-flex align-items-center">
+  <div class="d-flex gap-0" style="height: 27px; width: calc(100% - 140px);">
+    <div class="w-50 d-flex align-items-center position-relative">
       <!-- <div class="position-absolute top-0" style="width: calc(50% - 48px);"> -->
-      <div
-        class="position-absolute top-0"
-        style="width: calc(50% - {isInputBoxEditable ? '90px' : '60px'});"
-      >
+      <div class="position-absolute top-0 w-100" style="">
         <CodeMirrorInput
           bind:value={element.key}
           onUpdateInput={() => updateParam(index)}
@@ -113,11 +107,8 @@
         </div>
       </div>
     {:else}
-      <div class="w-50 d-flex align-items-center">
-        <div
-          class="position-absolute top-0 left-6"
-          style="width: calc(50% - 60px);"
-        >
+      <div class="w-50 d-flex align-items-center position-relative">
+        <div class="position-absolute top-0 w-100">
           <CodeMirrorInput
             bind:value={element.value}
             onUpdateInput={() => updateParam(index)}
@@ -153,30 +144,37 @@
   >
     {#if pairs.length - 1 != index}
       {#if isInputBoxEditable}
-        {#if dynamicExpression && element.type !== "file"}
-          <Tooltip
-            title="Insert dynamic"
-            placement="bottom-center"
-            distance={10}
+        <Tooltip
+          title="Insert dynamic"
+          placement="bottom-center"
+          distance={10}
+          show={isInputBoxEditable &&
+            dynamicExpression &&
+            element.type == "text"}
+        >
+          <div
+            class="button-container {isInputBoxEditable &&
+            dynamicExpression &&
+            element.type == 'text'
+              ? 'opacity-1'
+              : 'opacity-0'}"
           >
-            <div class="button-container">
-              <Button
-                size="extra-small"
-                type="teritiary-regular"
-                startIcon={MathFormulaRegular}
-                onClick={() => {
-                  handleOpenCurrentDynamicExpression({
-                    destination: {
-                      row: "value",
-                      index: index,
-                    },
-                    dispatch: dispatcher,
-                  });
-                }}
-              />
-            </div>
-          </Tooltip>
-        {/if}
+            <Button
+              size="extra-small"
+              type="teritiary-regular"
+              startIcon={MathFormulaRegular}
+              onClick={() => {
+                handleOpenCurrentDynamicExpression({
+                  destination: {
+                    row: "value",
+                    index: index,
+                  },
+                  dispatch: dispatcher,
+                });
+              }}
+            />
+          </div>
+        </Tooltip>
         <Tooltip
           title="Attach"
           show={isInputBoxEditable &&
@@ -186,7 +184,7 @@
         >
           <button
             class="button-container d-flex align-items-center justify-content-center border-0
-          {isInputBoxEditable && element.type !== 'file' && element.value === ''
+          {isInputBoxEditable && element.type == 'text' && element.value === ''
               ? 'opacity-1'
               : 'opacity-0 pe-none'}"
             style="width: 16px; height: 16px; padding: 2px; background: transparent;"

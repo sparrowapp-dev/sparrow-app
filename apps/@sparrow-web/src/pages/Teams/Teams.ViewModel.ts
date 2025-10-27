@@ -24,8 +24,9 @@ import { TestflowRepository } from "src/repositories/testflow.repository";
 import { PlanRepository } from "src/repositories/plan.repository";
 import { PlanService } from "src/services/plan.service";
 import constants from "src/constants/constants";
-import { planBannerisOpen } from "@sparrow/common/store";
+import { isSubscriptionOverDue, isSubscriptionOverTeamId, planBannerisOpen } from "@sparrow/common/store";
 import { getClientUser } from "src/utils/jwt";
+import { get } from "svelte/store";
 
 export class TeamsViewModel {
   constructor() {}
@@ -125,6 +126,8 @@ export class TeamsViewModel {
           isNewInvite,
           invites,
           billing,
+          isRestricted,
+          isDowngraded
         } = elem;
         const updatedWorkspaces = workspaces?.map((workspace) => ({
           workspaceId: workspace.id,
@@ -155,10 +158,15 @@ export class TeamsViewModel {
           isOpen: isOpenTeam,
           invites,
           billing,
+          isRestricted,
+          isDowngraded
         };
+        if (isRestricted === true && !get(isSubscriptionOverDue)) {
+          isSubscriptionOverDue.set(true);
+          isSubscriptionOverTeamId.set(_id);
+        }
         data.push(item);
       }
-
       await this.teamRepository.bulkInsertData(data);
       await this.teamRepository.deleteOrphanTeams(
         data.map((_team) => {
@@ -199,6 +207,7 @@ export class TeamsViewModel {
           updatedAt,
           updatedBy,
           isNewInvite,
+          isDowngraded,
         } = elem;
         const isActiveWorkspace =
           await this.workspaceRepository.checkActiveWorkspace(_id);
@@ -223,6 +232,7 @@ export class TeamsViewModel {
           updatedAt,
           updatedBy,
           isNewInvite,
+          isDowngraded,
         };
         data.push(item);
       }

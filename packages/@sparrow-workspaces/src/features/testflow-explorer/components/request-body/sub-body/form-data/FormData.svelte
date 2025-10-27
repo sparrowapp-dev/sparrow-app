@@ -5,6 +5,7 @@
   export let onUpdateRequestBody;
   export let environmentVariables;
   export let onUpdateEnvironment;
+  export let isWebApp;
 
   const handleFormDataChange = (pairs: any) => {
     onUpdateRequestBody(pairs);
@@ -25,5 +26,6 @@
     handleOpenCurrentDynamicExpression={(obj) => {
       handleOpenCurrentDynamicExpression({ ...obj, type: "formdata" });
     }}
+    {isWebApp}
   />
 </section>

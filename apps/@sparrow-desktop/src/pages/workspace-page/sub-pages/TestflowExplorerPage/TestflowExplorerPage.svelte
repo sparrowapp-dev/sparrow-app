@@ -4,6 +4,7 @@
   import { TestflowExplorer } from "@sparrow/workspaces/features";
   import type {
     CollectionDocument,
+    TeamDocument,
     WorkspaceDocument,
   } from "@app/database/database";
   import { testFlowDataStore } from "@sparrow/workspaces/features/testflow-explorer/store";
@@ -58,6 +59,10 @@
 
   //schedule run popup state
   let isScheduleRunPopupOpen: boolean = false;
+
+  let isTeamDowngraded: boolean = false;
+
+  let currentTeam: TeamDocument;
 
   const userEmail = getClientUser().email;
 
@@ -248,6 +253,7 @@
             1000,
           );
           handleBlockLimitTestflow();
+          isTeamDowngraded = await _viewModel.getTeamDowngradeStatus();
         })();
       } else if (tab?.name && prevTabName !== tab?.name) {
         renameWithTestFlowList(tab.name);
@@ -300,9 +306,15 @@
     }
   };
 
-  onMount(() => {
+  onMount(async () => {
     handleBlockLimitTestflow();
-    collectionsSubscriber.unsubscribe();
+    currentTeam = await _viewModel.getTeamDetails();
+  });
+
+  onDestroy(() => {
+    if (collectionsSubscriber) {
+      collectionsSubscriber.unsubscribe();
+    }
   });
 
   let isCreateTestflowScheduleLimitReachedModalOpen = false;
@@ -420,6 +432,8 @@
     bind:isCreateTestflowScheduleLimitReachedModalOpen
     onOpenEnvironment={_viewModel.handleOpenEnvironment}
     onFetchTestflow={_viewModel.fetchTestflow}
+    {isTeamDowngraded}
+    teamPlanName={currentTeam?.plan?.name}
   />
 {/if}
 

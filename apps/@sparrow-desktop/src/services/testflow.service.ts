@@ -191,4 +191,19 @@ export class TestflowService {
     );
     return response;
   };
+
+  public validateTestFlowRun = async (
+    workspaceId: string,
+    testflowId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "GET",
+      `${baseUrl}/api/workspace/${workspaceId}/testflow/${testflowId}/validate-run`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }
