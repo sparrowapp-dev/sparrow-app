@@ -7,6 +7,7 @@
 
   export let disable = false;
   export let loader = false;
+  export let loaderText = "";
 
   export let buttonClassProp = "";
 
@@ -230,8 +231,11 @@
   {/if}
 
   {#if loader}
-    <span class="d-flex justify-content-center">
+    <span class="d-flex justify-content-center gap-1 align-items-center">
       <Spinner size={`${iconSize}px`} />
+      {#if loaderText}
+        <span class={`loader-text ${btnTextStyle}`}>{loaderText}</span>
+      {/if}
     </span>
   {:else if title}
     <span class={`btn-title ${btnTextStyle}`}>
@@ -254,6 +258,16 @@
   .button-wrapper {
     position: relative;
     display: inline-block;
+  }
+  .loader {
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 143%;
+    letter-spacing: 0;
+    vertical-align: middle;
+    color: var(--text-ds-neutral-400);
   }
 
   .custom-btn-primary {

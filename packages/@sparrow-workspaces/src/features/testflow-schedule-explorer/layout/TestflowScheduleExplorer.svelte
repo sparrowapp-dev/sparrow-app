@@ -159,25 +159,32 @@
                 />
               {/if}
             </div>
-            <Button
+            <Tooltip
+              title={"Run Scheduled Flow Now"}
+              placement={"top-center"}
+              size="small"
+            >
+              <Button
               title={"Run Now"}
-              type={"primary"}
-              loader={$loadingState.get("schedule-run-" + schedule?.id)}
-              disable={$loadingState.get("schedule-run-" + schedule?.id)}
-              onClick={async () => {
-                startLoading("schedule-run-" + schedule?.id);
-                scheduleRunValidateData = await onValidateTestflowRun();
-                if (
-                  scheduleRunValidateData?.hasLocalhostUrls ||
-                  scheduleRunValidateData?.hasFormdataFiles
-                ) {
-                  isRunScheduleModalOpen = true;
-                } else {
-                  await onScheduleRun();
-                }
-                stopLoading("schedule-run-" + schedule?.id);
-              }}
-            />
+                type={"primary"}
+                loader={$loadingState.get("schedule-run-" + schedule?.id)}
+                disable={$loadingState.get("schedule-run-" + schedule?.id)}
+                onClick={async () => {
+                  startLoading("schedule-run-" + schedule?.id);
+                  scheduleRunValidateData = await onValidateTestflowRun();
+                  if (
+                    scheduleRunValidateData?.hasLocalhostUrls ||
+                    scheduleRunValidateData?.hasFormdataFiles
+                  ) {
+                    isRunScheduleModalOpen = true;
+                  } else {
+                    await onScheduleRun();
+                  }
+                  stopLoading("schedule-run-" + schedule?.id);
+                }}
+                loaderText={"Running"}
+              />
+            </Tooltip>
           {/if}
           <Button
             title={""}
