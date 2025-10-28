@@ -711,10 +711,9 @@ const connectWebSocket = async (
       });
     } catch (e) {
       const errorMessage = typeof e === "string" ? e : String(e);
-
-      // Retry with wss:// if we got a 307 redirect
+      // Retry with wss:// if we got a 307 temp redirect or 301 perm redirect
       if (
-        errorMessage.includes("307") &&
+        (errorMessage.includes("307") || errorMessage.includes("301")) &&
         !triedWss &&
         wsUrl.startsWith("ws://")
       ) {
