@@ -149,7 +149,7 @@
   let isInviteAcceptProgress = false;
   let userLimits: any;
   let planContent: any;
-  let isTeamDowngraded = openTeam?._data?.isDowngraded
+  let isTeamDowngraded = openTeam?._data?.isDowngraded;
   let selectedFilter = "All";
 
   const addButtonData = [
@@ -900,7 +900,7 @@
             </div>
           </div>
 
-          <div class="d-flex;" style="gap:12px;">
+          <div class="d-flex" style="gap:12px;">
             <Button
               type="primary"
               title="Accept"
