@@ -149,7 +149,7 @@
   let isInviteAcceptProgress = false;
   let userLimits: any;
   let planContent: any;
-  let isTeamDowngraded = openTeam?._data?.isDowngraded;
+  let isTeamDowngraded = openTeam?._data?.isDowngraded
   let selectedFilter = "All";
 
   const addButtonData = [
