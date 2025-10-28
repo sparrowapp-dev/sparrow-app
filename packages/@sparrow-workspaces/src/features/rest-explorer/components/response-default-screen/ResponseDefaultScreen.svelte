@@ -139,7 +139,7 @@
       <div class="d-flex flex-column align-items-center">
         <p class="text-fs-12 mb-5" style="color: var(--text-ds-neutral-400);">
           {#if !$requestTabTestDemo}
-            Click Send To Get A Response
+            Click Send To Get A Response kkkkkk
           {:else}
             No test cases available. Start by adding your own test cases, select
             from smart suggestions or generate them with AI.
@@ -151,59 +151,44 @@
 
   <!-- Shortcuts section at bottom -->
   <div class="mt-auto">
-    <div
-      class="shortcuts-container d-flex flex-wrap justify-content-center"
-      style={isUpAnimation ? "max-width: 600px;" : "max-width: 100%;"}
-    >
-      {#each Object.entries(ctrlCommands) as [key, value], index}
-        {#if key === "Save Request" || key === "New Request" || key === "Send Request"}
-          <div
-            class="px-3 flex items-center shortcut-item existing-shortcut {isUpAnimation
+    <div class="shortcuts-wrapper">
+      <!-- Row 1: Ctrl shortcuts -->
+      <div class="shortcuts-row">
+        {#each Object.entries(ctrlCommands) as [key, value], index}
+          {#if key === "Save Request" || key === "New Request" || key === "Send Request"}
+            <div class="shortcut-item existing-shortcut {isUpAnimation
               ? 'up-animation'
               : ''}"
-            data-index={index}
-          >
-            <ComboText {key} {value} type="combo" bind:isExpandShortcuts />
-          </div>
-        {/if}
-      {/each}
-
-      <div
-        class="px-3 shortcut-item existing-shortcut {isUpAnimation
-          ? 'up-animation'
-          : ''}"
-        data-index="3"
-      >
-        <ComboText
-          key="Add Parameter"
-          value={altCommands["Add Parameter"]}
-          type="combo"
-          bind:isExpandShortcuts
-        />
-      </div>
-
-      {#each Object.entries(altCommands) as [key, value], index}
-        {#if key !== "Add Parameter"}
-          {#if isExpandShortcuts}
-            <div
-              class="px-3 shortcut-item new-shortcut"
-              in:fly={{
-                ...(isUpAnimation ? { y: 80 } : { x: 80 }),
-                duration: 500,
-                easing: slowCurve,
-              }}
-              out:fly={{
-                ...(isUpAnimation ? { y: 80 } : { x: 80 }),
-                duration: 400,
-                easing: slowCurve,
-              }}
-            >
+              data-index={index}
+              >
               <ComboText {key} {value} type="combo" bind:isExpandShortcuts />
             </div>
           {/if}
-        {/if}
-      {/each}
+        {/each}
+      </div>
+    
+      {#if isExpandShortcuts}
+        <div class="shortcuts-row">
+        {#each Object.entries(altCommands) as [key, value]}
+          <div 
+          class="shortcut-item new-shortcut"
+          in:fly={{
+            ...(isUpAnimation ? { y: 80 } : { x: 80 }),
+            duration: 500,
+            easing: slowCurve,
+          }}
+          out:fly={{
+            ...(isUpAnimation ? { y: 80 } : { x: 80 }),
+            duration: 400,
+            easing: slowCurve,
+          }}>
+            <ComboText {key} {value} type="combo" bind:isExpandShortcuts />
+          </div>
+        {/each} 
+      </div>
+      {/if}
     </div>
+    
 
     {#if !isExpandShortcuts}
       <div class="d-flex justify-content-center mt-2">
@@ -236,16 +221,10 @@
     cursor: pointer;
   }
 
-  .shortcuts-container {
-    position: relative;
-    overflow: visible;
-    margin: 0 auto;
-    max-width: 100%;
-  }
 
   .existing-shortcut {
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateX(0);
+    transform: translate(0, 0);
     will-change: transform;
   }
 
@@ -255,6 +234,7 @@
 
   .new-shortcut {
     will-change: transform;
+    height: 36px;
   }
 
   .shortcut-item {
@@ -262,5 +242,27 @@
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     transform: translateZ(0);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+    min-width: 150px;
+    height: 36px;
   }
+
+  .shortcuts-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .shortcuts-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 24px;
+  }
+
 </style>
