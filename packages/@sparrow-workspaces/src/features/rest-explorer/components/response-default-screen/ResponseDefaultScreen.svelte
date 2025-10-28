@@ -139,7 +139,7 @@
       <div class="d-flex flex-column align-items-center">
         <p class="text-fs-12 mb-5" style="color: var(--text-ds-neutral-400);">
           {#if !$requestTabTestDemo}
-            Click Send To Get A Response kkkkkk
+            Click Send To Get A Response
           {:else}
             No test cases available. Start by adding your own test cases, select
             from smart suggestions or generate them with AI.
