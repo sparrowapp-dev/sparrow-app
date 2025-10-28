@@ -641,12 +641,11 @@
   const currentWorkspaceSubscriber = currentWorkspace.subscribe(
     async (value) => {
       if (value) {
-        debugger;
         currentWOrkspaceValue = value;
         if (prevWorkspaceId !== value._id) {
           isInitialDataLoading = true;
           activeTab = undefined;
-          if (value?._data?._id && shouldRunThrottled(value?._data?._id)) {
+          if (value?._id && shouldRunThrottled(value?._id)) {
             handleRefreshApicalls(value?._id);
           } else {
             console.error(`Throttled for ${value?._id}`);
