@@ -1755,7 +1755,6 @@ class RestExplorerViewModel {
    * @description send request
    */
   public sendRequest = async (environmentVariables = []) => {
-    debugger;
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const abortController = new AbortController();
     restExplorerDataStore.update((restApiDataMap) => {
@@ -2083,7 +2082,6 @@ class RestExplorerViewModel {
   }
 
   private async executePreScriptTestcases(request, env, auth) {
-    debugger;
     return new Promise((resolve) => {
       const worker = new Worker(
         new URL(
