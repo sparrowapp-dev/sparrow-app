@@ -36,6 +36,7 @@
   import { open } from "@tauri-apps/plugin-shell";
   import { PlanUpgradeModal } from "@sparrow/common/components";
   import { navigate } from "svelte-navigator";
+  import {isTeamDowngradePopupDismissed, setTeamDowngradePopupDismissed} from "@sparrow/workspaces/stores"
 
   export let isWebApp = false;
 
@@ -149,9 +150,12 @@
   let isInviteAcceptProgress = false;
   let userLimits: any;
   let planContent: any;
-  let isTeamDowngraded = openTeam?._data?.isDowngraded;
+  let isTeamDowngraded: boolean | undefined;
+  let planName: string
   let selectedFilter = "All";
-
+  let hubId: string
+  $: hubId = openTeam?.teamId
+  $: planName = openTeam?._data?.plan?.name;
   const addButtonData = [
     {
       name: "Leave Hub",
@@ -253,6 +257,17 @@
         planContent = planInfoByRole(userRole);
       }
     }
+  }
+
+  $: isTeamDowngraded = openTeam?._data?.isDowngraded ?? false;
+  $: isDismissed = $isTeamDowngradePopupDismissed.get(hubId) ?? false;
+  async function handleUpgradeClick() {
+    setTeamDowngradePopupDismissed(hubId, true);
+    await handleRedirectToAdminPanel();
+  }
+
+  function handleClosePopup() {
+    setTeamDowngradePopupDismissed(hubId, true);
   }
 
   /**
@@ -666,7 +681,7 @@
             </div>
           {/if}
         </div>
-        {#if isTeamDowngraded && (userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER)}
+        {#if isTeamDowngraded && (userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER) && !isDismissed}
           <div
             class="downgrade-card position-fixed"
             style="
@@ -683,14 +698,14 @@
                 <p class="downgrade-title">Your Hub Has Been Downgraded</p>
                 <button
                   class="downgrade-close"
-                  on:click={() => (isTeamDowngraded = false)}
+                  on:click={handleClosePopup}
                 >
                   ✕
                 </button>
               </div>
 
               <p class="downgrade-description">
-                As scheduled, your Hub is now on the Community edition.
+                As scheduled, your Hub is now on the {planName} edition.
                 <br /><br />
                 Based on your previous selections, your excess workspaces have been
                 archived and team members removed from the Hub.
@@ -704,7 +719,7 @@
                   title="Upgrade Plan"
                   type="secondary"
                   size="small"
-                  onClick={handleRedirectToAdminPanel}
+                  onClick={handleUpgradeClick}
                 />
               </div>
             </div>
