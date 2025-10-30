@@ -37,7 +37,6 @@
   import { PlanUpgradeModal } from "@sparrow/common/components";
   import { navigate } from "svelte-navigator";
   import {isTeamDowngradePopupDismissed, setTeamDowngradePopupDismissed} from "@sparrow/workspaces/stores"
-  import {get} from "svelte/store";
 
   export let isWebApp = false;
 
