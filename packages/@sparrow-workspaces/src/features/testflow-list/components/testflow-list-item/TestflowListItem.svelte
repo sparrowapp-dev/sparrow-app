@@ -53,6 +53,7 @@
 
   export let isGuestUser;
   export let isWebApp = false;
+  export let isScheduleRunPopupOpen: boolean = false;
 
   let showMenu: boolean = false;
   let isTestflowPopup: boolean = false;
@@ -152,8 +153,7 @@
           onClick: async () => {
             handleEventClickScheduleRun();
             await openTestflow();
-            await new Sleep().setTime(200).exec();
-            document.getElementById("create-new-schedule")?.click();
+            isScheduleRunPopupOpen = true;
           },
           displayText: "Schedule Run",
           disabled: false,
