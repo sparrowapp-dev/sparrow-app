@@ -462,7 +462,11 @@
       if (lastRun.status === "pass") {
         lastResult = "Success";
       } else if (lastRun.status === "fail") {
-        lastResult = "Fail";
+        if (lastRun.successRequests > 0) {
+          lastResult = "Partial Fail";
+        } else {
+          lastResult = "Fail";
+        }
       } else if (lastRun.status === "pending") {
         lastResult = "Pending";
       } else {
