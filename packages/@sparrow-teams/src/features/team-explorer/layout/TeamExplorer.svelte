@@ -36,7 +36,7 @@
   import { open } from "@tauri-apps/plugin-shell";
   import { PlanUpgradeModal } from "@sparrow/common/components";
   import { navigate } from "svelte-navigator";
-  import {isTeamDowngradePopupDismissed, setTeamDowngradePopupDismissed} from "../../../../../@sparrow-workspaces/src/stores/downgrade-popup"
+  import {isTeamDowngradePopupDismissed, setTeamDowngradePopupDismissed} from "@sparrow/workspaces/stores"
   import {get} from "svelte/store";
 
   export let isWebApp = false;
@@ -261,7 +261,7 @@
   }
 
   $: isTeamDowngraded = openTeam?._data?.isDowngraded ?? false;
-  $: `isDismissed = $isTeamDowngradePopupDismissed.get(hubId) ?? false;
+  $: isDismissed = $isTeamDowngradePopupDismissed.get(hubId) ?? false;
   async function handleUpgradeClick() {
     setTeamDowngradePopupDismissed(hubId, true);
     await handleRedirectToAdminPanel();
