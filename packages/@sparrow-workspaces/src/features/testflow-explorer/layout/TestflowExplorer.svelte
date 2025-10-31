@@ -2039,6 +2039,17 @@
   };
 
   let runButtonMenu = false;
+
+  const openScheduleRun = () => {
+    if (isGuestUser) {
+      notifications.error(
+        "To access the feature, you need to login/signup on Sparrow.",
+      );
+      return;
+    }
+    handleEventClickScheduleRun();
+    isScheduleRunPopupOpen = true;
+  };
 </script>
 
 <div
@@ -2119,16 +2130,7 @@
             <div
               id="create-new-schedule"
               style="display:none;"
-              on:click={() => {
-                if (isGuestUser) {
-                  notifications.error(
-                    "To access the feature, you need to login/signup on Sparrow.",
-                  );
-                } else {
-                  handleEventClickScheduleRun();
-                  isScheduleRunPopupOpen = true;
-                }
-              }}
+              on:click={openScheduleRun}
             ></div>
             <Dropdown
               zIndex={600}
@@ -2143,16 +2145,7 @@
                   icon: AddRegular,
                   iconColor: "var(--icon-secondary-130)",
                   iconSize: "13px",
-                  onclick: () => {
-                    if (isGuestUser) {
-                      notifications.error(
-                        "To access the feature, you need to login/signup on Sparrow.",
-                      );
-                    } else {
-                      handleEventClickScheduleRun();
-                      isScheduleRunPopupOpen = true;
-                    }
-                  },
+                  onclick: openScheduleRun,
                 },
               ]}
             >
