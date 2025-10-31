@@ -1965,20 +1965,34 @@ export class TestflowExplorerPageViewModel {
       } else {
         if (response?.message !== "Plan limit reached") {
           notifications.error(
-            `${response.message || "Failed to schedule test flow"}`,
+            `${
+              response.message || "Failed to create schedule. Please try again."
+            }`,
           );
         }
         return {
           isSuccessful: false,
-          message: response.message || "Failed to schedule test flow",
+          message:
+            response.message || "Failed to create schedule. Please try again.",
         };
       }
     } catch (error) {
       Sentry.captureException(error);
-      notifications.error("Failed to schedule test flow");
+      const isNetworkOrServerError =
+        error?.message === "Network Error" ||
+        error?.code === "ECONNABORTED" ||
+        (error?.response && error.response.status >= 500) ||
+        !error?.response;
+
+      const errorMessage = isNetworkOrServerError
+        ? "Unable to create schedule due to an internal server error. Please try again."
+        : "Failed to create schedule. Please try again.";
+
+      notifications.error(errorMessage);
       return {
         isSuccessful: false,
-        message: error?.message || "Failed to schedule test flow",
+        message:
+          error?.message || "Failed to create schedule. Please try again.",
       };
     }
   };
