@@ -2039,6 +2039,17 @@
   };
 
   let runButtonMenu = false;
+
+  const openScheduleRun = () => {
+    if (isGuestUser) {
+      notifications.error(
+        "To access the feature, you need to login/signup on Sparrow.",
+      );
+      return;
+    }
+    handleEventClickScheduleRun();
+    isScheduleRunPopupOpen = true;
+  };
 </script>
 
 <div
@@ -2119,54 +2130,45 @@
             <div
               id="create-new-schedule"
               style="display:none;"
-              on:click={() => {
-                if (isGuestUser) {
-                  notifications.error(
-                    "To access the feature, you need to login/signup on Sparrow.",
-                  );
-                } else {
-                  handleEventClickScheduleRun();
-                  isScheduleRunPopupOpen = true;
-                }
-              }}
+              on:click={openScheduleRun}
+            ></div>
+            <Dropdown
+              zIndex={600}
+              buttonId="test-run-button"
+              isBackgroundClickable={true}
+              bind:isMenuOpen={runButtonMenu}
+              horizontalPosition={"left"}
+              minWidth={165}
+              options={[
+                {
+                  name: "Schedule Run",
+                  icon: AddRegular,
+                  iconColor: "var(--icon-secondary-130)",
+                  iconSize: "13px",
+                  onclick: openScheduleRun,
+                },
+              ]}
             >
-              <Dropdown
-                zIndex={600}
-                buttonId="test-run-button"
-                isBackgroundClickable={true}
-                bind:isMenuOpen={runButtonMenu}
-                horizontalPosition={"left"}
-                minWidth={165}
-                options={[
-                  {
-                    name: "Schedule Run",
-                    icon: AddRegular,
-                    iconColor: "var(--icon-secondary-130)",
-                    iconSize: "13px",
-                  },
-                ]}
-              >
-                <!-- <Tooltip
+              <!-- <Tooltip
                 title={"Add Options"}
                 placement={"bottom-center"}
                 distance={12}
                 show={!runButtonMenu}
                 zIndex={10}
               > -->
-                <Button
-                  type="primary"
-                  id="test-run-button"
-                  size={"medium"}
-                  startIcon={runButtonMenu
-                    ? ChevronUpRegular
-                    : ChevronDownRegular}
-                  onClick={() => {
-                    runButtonMenu = !runButtonMenu;
-                  }}
-                />
-                <!-- </Tooltip> -->
-              </Dropdown>
-            </div>
+              <Button
+                type="primary"
+                id="test-run-button"
+                size={"medium"}
+                startIcon={runButtonMenu
+                  ? ChevronUpRegular
+                  : ChevronDownRegular}
+                onClick={() => {
+                  runButtonMenu = !runButtonMenu;
+                }}
+              />
+              <!-- </Tooltip> -->
+            </Dropdown>
           {/if}
         </div>
 
