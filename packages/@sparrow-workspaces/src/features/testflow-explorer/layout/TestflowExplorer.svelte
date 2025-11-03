@@ -356,24 +356,38 @@
         // Once: use executeAt directly
         nextRunDate = new Date(config.executeAt);
       } else if (config.runCycle === "hourly" && config.intervalHours) {
-        // Handle hourly schedules specifically
+        const intervalMs = config.intervalHours * 60 * 60 * 1000;
+
         if (config.executeAt) {
           const executeAt = new Date(config.executeAt);
+          // Get precise time difference using getTime()
+          const timeSinceStart = now.getTime() - executeAt.getTime();
 
           if (executeAt > now) {
             nextRunDate = executeAt;
           } else {
-            const intervalMs = config.intervalHours * 60 * 60 * 1000;
-            const timeSinceStart = now - executeAt;
+            // Calculate cycles passed since start time
             const cyclesPassed = Math.floor(timeSinceStart / intervalMs);
+            // Get next run by adding one more interval after last completed cycle
             nextRunDate = new Date(
               executeAt.getTime() + (cyclesPassed + 1) * intervalMs,
             );
           }
         } else {
-          // For hourly
-          const intervalMs = config.intervalHours * 60 * 60 * 1000;
-          nextRunDate = new Date(now.getTime() + intervalMs);
+          // No executeAt - use creation time as anchor
+          const createdAt =
+            schedule.originalData?.createdAt || schedule.createdAt;
+          if (createdAt) {
+            const anchorTime = new Date(createdAt);
+            const timeSinceStart = now.getTime() - anchorTime.getTime();
+            const cyclesPassed = Math.floor(timeSinceStart / intervalMs);
+            nextRunDate = new Date(
+              anchorTime.getTime() + (cyclesPassed + 1) * intervalMs,
+            );
+          } else {
+            // Fallback if no creation time available
+            nextRunDate = new Date(now.getTime() + intervalMs);
+          }
         }
       } else if (config.runCycle === "daily" && config.time) {
         // Daily
