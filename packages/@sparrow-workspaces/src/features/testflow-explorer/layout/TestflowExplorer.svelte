@@ -1251,7 +1251,6 @@
             reqMetaRequestId,
             reqMetaFolderId,
           );
-          debugger;
           const reqType = reqData?.type;
           // If type exists and is not REQUEST, block node creation
           if (reqType && reqType !== "REQUEST") {
