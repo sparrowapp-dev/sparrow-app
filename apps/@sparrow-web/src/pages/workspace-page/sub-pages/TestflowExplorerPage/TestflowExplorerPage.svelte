@@ -303,7 +303,7 @@
   onMount(async () => {
     handleBlockLimitTestflow();
     collectionsSubscriber.unsubscribe();
-    currentTeam = await viewModel.getTeamDetails();
+    currentTeam = await _viewModel.getTeamDetails();
   });
 
   let isCreateTestflowScheduleLimitReachedModalOpen = false;

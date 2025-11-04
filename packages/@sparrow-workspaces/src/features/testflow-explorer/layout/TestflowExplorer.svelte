@@ -170,7 +170,7 @@
   export let planLimitRunHistoryCount: number = 5;
   export let planLimitTestScheduleCount: number = 5;
   export let planLimitTestFlowBlocks: number = 5;
-  export let planLimitTestFlows: number = 3;
+  export let planLimitTestflow: number = 3;
   export let testflowCount: number = 1;
   export let teamDetails: any;
   export let testflowBlocksPlanModalOpen: boolean = false;
@@ -462,7 +462,11 @@
       if (lastRun.status === "pass") {
         lastResult = "Success";
       } else if (lastRun.status === "fail") {
-        lastResult = "Fail";
+        if (lastRun.successRequests > 0) {
+          lastResult = "Partial Fail";
+        } else {
+          lastResult = "Fail";
+        }
       } else if (lastRun.status === "pending") {
         lastResult = "Pending";
       } else {
@@ -2116,52 +2120,57 @@
             {/if}
           {/if}
           {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-            <Dropdown
-              zIndex={600}
-              buttonId="test-run-button"
-              isBackgroundClickable={true}
-              bind:isMenuOpen={runButtonMenu}
-              horizontalPosition={"left"}
-              minWidth={165}
-              options={[
-                {
-                  name: "Schedule Run",
-                  icon: AddRegular,
-                  iconColor: "var(--icon-secondary-130)",
-                  iconSize: "13px",
-                  onclick: () => {
-                    if (isGuestUser) {
-                      notifications.error(
-                        "To access the feature, you need to login/signup on Sparrow.",
-                      );
-                    } else {
-                      handleEventClickScheduleRun();
-                      isScheduleRunPopupOpen = true;
-                    }
-                  },
-                },
-              ]}
+            <div
+              id="create-new-schedule"
+              style="display:none;"
+              on:click={() => {
+                if (isGuestUser) {
+                  notifications.error(
+                    "To access the feature, you need to login/signup on Sparrow.",
+                  );
+                } else {
+                  handleEventClickScheduleRun();
+                  isScheduleRunPopupOpen = true;
+                }
+              }}
             >
-              <!-- <Tooltip
+              <Dropdown
+                zIndex={600}
+                buttonId="test-run-button"
+                isBackgroundClickable={true}
+                bind:isMenuOpen={runButtonMenu}
+                horizontalPosition={"left"}
+                minWidth={165}
+                options={[
+                  {
+                    name: "Schedule Run",
+                    icon: AddRegular,
+                    iconColor: "var(--icon-secondary-130)",
+                    iconSize: "13px",
+                  },
+                ]}
+              >
+                <!-- <Tooltip
                 title={"Add Options"}
                 placement={"bottom-center"}
                 distance={12}
                 show={!runButtonMenu}
                 zIndex={10}
               > -->
-              <Button
-                type="primary"
-                id="test-run-button"
-                size={"medium"}
-                startIcon={runButtonMenu
-                  ? ChevronUpRegular
-                  : ChevronDownRegular}
-                onClick={() => {
-                  runButtonMenu = !runButtonMenu;
-                }}
-              />
-              <!-- </Tooltip> -->
-            </Dropdown>
+                <Button
+                  type="primary"
+                  id="test-run-button"
+                  size={"medium"}
+                  startIcon={runButtonMenu
+                    ? ChevronUpRegular
+                    : ChevronDownRegular}
+                  onClick={() => {
+                    runButtonMenu = !runButtonMenu;
+                  }}
+                />
+                <!-- </Tooltip> -->
+              </Dropdown>
+            </div>
           {/if}
         </div>
 
@@ -2540,7 +2549,7 @@
   <!-- Help Section -->
   {#if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.TESTFLOW}
     <div class="p-3" style="position:absolute; z-index:3; bottom:0; right:0;">
-      {#if testflowCount <= planLimitTestFlows || isGuestUser}
+      {#if testflowCount <= planLimitTestflow || isGuestUser}
         <p
           class="mb-0 pb-0 text-fs-14"
           style="color: var(--text-primary-300); font-weight:500; cursor:pointer;"
@@ -2569,8 +2578,9 @@
 >
   <div class="modal-content">
     <p class="mb-3" style="margin-top: 13px; padding-bottom:20px;">
-      "{$tab?.name}" flow has active schedules. Saving will update all upcoming
-      runs with your latest changes, which may impact their results.
+      "<span style="font-weight:700 !important;">{$tab?.name}</span>" flow has
+      active schedules. Saving will update all upcoming runs with your latest
+      changes, which may impact their results.
     </p>
     <div class="d-flex justify-content-end gap-3">
       <Button
@@ -2582,7 +2592,7 @@
       <Button
         type="primary"
         size="medium"
-        title="Save"
+        title="Save & Apply"
         onClick={handleSaveConfirm}
       />
     </div>
@@ -2786,7 +2796,7 @@
       </div>
 
       <p class="text-ds-font-size-12" style="color:var(--text-ds-neutral-100)">
-        Your Hub is now on the {teamPlanName} edition, which has a limit of {planLimitTestFlows}
+        Your Hub is now on the {teamPlanName} edition, which has a limit of {planLimitTestflow}
         active Test Flows per workspace.
       </p>
       <ul class="text-ds-font-size-12" style="color:var(--text-ds-neutral-100)">

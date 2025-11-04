@@ -655,10 +655,27 @@
         loader={isScheduling}
       />
     </div>
+    <p
+      class="schedule-pop-warning-text d-flex align-items-center justify-content-center"
+      style="margin-top: 20px;"
+    >
+      Only deployed APIs are supported for cloud execution; local APIs will not
+      execute.
+    </p>
   </div>
 </div>
 
 <style lang="scss">
+  .schedule-pop-warning-text {
+    font-family: "Inter", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 12px;
+    line-height: 150%;
+    letter-spacing: 0;
+    text-align: center;
+    color: var(--text-ds-neutral-300);
+  }
   .schedule-popup-container {
     display: flex;
     flex-direction: column;
