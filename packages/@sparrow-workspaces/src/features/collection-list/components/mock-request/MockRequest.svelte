@@ -79,6 +79,14 @@
   export let activeTabType;
   export let isWebApp;
   export let isSharedWorkspace = false;
+  export let onItemMoved: (args: any) => void;
+
+  // Drag handler functions passed from parent
+  export let dragStart: (event: DragEvent, collection: any, folder: any, api: any) => void;
+  export let dragStop: () => void;
+  export let handleDragOver: (event: DragEvent, collection: any, folder: any, api: any, requestTabWrapper: HTMLElement, setDropPosition: (pos: "top" | "bottom" | null) => void, setIsDragOver: (val: boolean) => void, setIsForbiddenDrop: (val: boolean) => void) => void;
+  export let handleDragLeave: (setIsDragOver: (val: boolean) => void, setIsForbiddenDrop: (val: boolean) => void, setDropPosition: (pos: "top" | "bottom" | null) => void) => void;
+  export let handleDrop: (event: DragEvent, collection: any, folder: any, api: any, setDropPosition: (pos: "top" | "bottom" | null) => void, setIsDragOver: (val: boolean) => void, setIsForbiddenDrop: (val: boolean) => void, currentDropPosition: "top" | "bottom" | null) => void;
 
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
@@ -87,8 +95,15 @@
   let isRenaming = false;
   let deleteLoader: boolean = false;
   let isDragging: boolean = false;
+  let isDragOver: boolean = false;
+  let isForbiddenDrop: boolean = false;
+  let dropPosition: "top" | "bottom" | null = null;
 
   let requestTabWrapper: HTMLElement;
+
+  import {
+    dragState,
+  } from "../../../../stores/drag-state";
 
   function rightClickContextMenu(e: Event) {
     setTimeout(() => {
@@ -133,19 +148,6 @@
     }
   };
 
-  const dragStart = (event: DragEvent, collection: CollectionBaseInterface) => {
-    isDragging = true;
-    const data = {
-      workspaceId: collection.workspaceId,
-      collectionId: collection.id,
-      folderId: folder?.id ?? "",
-      requestId: api.id,
-      name: api.name,
-      method: api?.mockRequest?.method,
-    };
-    event.dataTransfer?.setData("text/plain", JSON.stringify(data));
-  };
-
   let httpMethodUIStyle = "";
   $: {
     httpMethodUIStyle = getMethodStyle(
@@ -177,9 +179,6 @@
     //   }
     // }
   }
-  const dragStop = () => {
-    isDragging = false;
-  };
 </script>
 
 <svelte:window
@@ -297,16 +296,34 @@
 
 <div
   tabindex="0"
-  draggable={false}
+  draggable={!collection.activeSync}
   on:dragstart={(event) => {
-    dragStart(event, collection);
+    if (!collection.activeSync) {
+      isDragging = true;
+      dragStart(event, collection, folder, api);
+    }
   }}
-  on:dragleave={dragStop}
+  on:dragend={() => {
+    isDragging = false;
+    dragStop();
+  }}
+  on:dragover={(event) => handleDragOver(event, collection, folder, api, requestTabWrapper, (pos) => dropPosition = pos, (val) => isDragOver = val, (val) => isForbiddenDrop = val)}
+  on:dragleave={() => handleDragLeave((val) => isDragOver = val, (val) => isForbiddenDrop = val, (pos) => dropPosition = pos)}
+  on:drop={(event) => handleDrop(event, collection, folder, api, (pos) => dropPosition = pos, (val) => isDragOver = val, (val) => isForbiddenDrop = val, dropPosition)}
   bind:this={requestTabWrapper}
   class="d-flex draggable align-items-center justify-content-between my-button btn-primary {api.id ===
   activeTabId
     ? 'active-request-tab'
-    : ''}"
+    : ''} {isDragOver
+    ? 'drag-over-request valid-drop-zone'
+    : ''} {isForbiddenDrop
+    ? 'drag-forbidden'
+    : ''} {$dragState.isOverForbiddenZone && isDragging
+    ? 'dragging-over-forbidden'
+    : ''} {dropPosition === 'top' ? 'drop-indicator-top' : ''} {dropPosition ===
+  'bottom'
+    ? 'drop-indicator-bottom'
+    : ''} {collection.activeSync ? 'active-sync-no-drag' : ''}"
   style={`height:32px; padding-left:3px; gap:4px; {margin-bottom :2px;}`}
 >
   <button
@@ -656,5 +673,93 @@
     width: 1px;
     // background-color: var(--bg-ds-surface-100);
     z-index: 150;
+  }
+
+  /* Drag-over highlight for request drop target */
+  .drag-over-request {
+    outline: 2px solid var(--bg-ds-primary-300);
+    background-color: var(--bg-ds-surface-400) !important;
+    transition:
+      outline 0.1s,
+      background-color 0.1s;
+  }
+
+  /* Insertion line indicators */
+  .drop-indicator-top {
+    position: relative;
+  }
+
+  .drop-indicator-top::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--bg-ds-primary-300);
+    z-index: 100;
+  }
+
+  .drop-indicator-bottom {
+    position: relative;
+  }
+
+  .drop-indicator-bottom::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--bg-ds-primary-300);
+    z-index: 100;
+  }
+
+  /* Forbidden drop cursor and styling */
+  .drag-forbidden {
+    cursor: not-allowed !important;
+  }
+
+  .drag-forbidden * {
+    cursor: not-allowed !important;
+  }
+
+  /* Apply forbidden cursor to the dragged element itself */
+  .dragging-over-forbidden {
+    cursor: not-allowed !important;
+    opacity: 0.6;
+  }
+
+  .dragging-over-forbidden * {
+    cursor: not-allowed !important;
+  }
+
+  /* ActiveSync collections - non-draggable styling */
+  .active-sync-no-drag {
+    cursor: default !important;
+  }
+
+  .active-sync-no-drag * {
+    cursor: default !important;
+  }
+
+  /* Valid drop zone styling - blue dashed border overlay */
+  .valid-drop-zone {
+    position: relative;
+  }
+
+  .valid-drop-zone::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(59, 130, 246, 0.1);
+    border: 2px dashed rgba(59, 130, 246, 0.6);
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.2s;
+    border-radius: 4px;
   }
 </style>

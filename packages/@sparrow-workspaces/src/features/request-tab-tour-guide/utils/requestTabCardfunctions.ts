@@ -4,9 +4,12 @@ import {
   requestTabTestNoCodeStep,
   requestTabTestScriptDemo,
   requestTabTestScriptStep,
+  requestTabAssertionsDemo,
+  requestTabAssertionsStep,
 } from "../../../stores";
 
 const MAX_STEP = 5;
+const MAX_NO_CODE_STEP = 4;
 
 const resetNoCodeTour = () => {
   requestTabTestNoCodeStep.set(0);
@@ -18,11 +21,16 @@ const resetScriptTour = () => {
   requestTabTestScriptDemo.set(false);
 };
 
+const resetAssertionsTour = () => {
+  requestTabAssertionsStep.set(0);
+  requestTabAssertionsDemo.set(false);
+};
+
 export const handleNextStep = () => {
   // Check if No Code tour is active
   if (get(requestTabTestDemo)) {
     const currentStep = get(requestTabTestNoCodeStep);
-    if (currentStep < MAX_STEP) {
+    if (currentStep < MAX_NO_CODE_STEP) {
       requestTabTestNoCodeStep.set(currentStep + 1);
     } else {
       resetNoCodeTour();
@@ -40,6 +48,17 @@ export const handleNextStep = () => {
     }
     return;
   }
+
+  // Check if Assertions tour is active
+  if (get(requestTabAssertionsDemo)) {
+    const currentStep = get(requestTabAssertionsStep);
+    if (currentStep < MAX_STEP) {
+      requestTabAssertionsStep.set(currentStep + 1);
+    } else {
+      resetAssertionsTour();
+    }
+    return;
+  }
 };
 
 export const handleCloseTour = () => {
@@ -48,5 +67,9 @@ export const handleCloseTour = () => {
   }
   if (get(requestTabTestScriptDemo)) {
     resetScriptTour();
+  }
+
+  if (get(requestTabAssertionsDemo)) {
+    resetAssertionsTour();
   }
 };

@@ -15,6 +15,7 @@
   export let method;
   export let onUpdateRequestState;
   export let onUpdateEnvironment;
+  export let isWebApp;
 
   let isBodyBeautified = false;
 
@@ -76,13 +77,28 @@
       <Binary />
     {:else if requestState.requestBodyNavigation === RequestDataset.FORMDATA}
       <FormData
-        keyValue={body?.formdata?.text}
+        keyValue={[
+          ...(body?.formdata?.file?.map((f) => ({ ...f, type: "file" })) || []),
+          ...(body?.formdata?.text?.map((t) => ({ ...t, type: "text" })) || []),
+        ]}
         {environmentVariables}
         onUpdateRequestBody={(pairs) => {
-          onUpdateRequestState("formdata", { text: pairs, file: [] });
+          const fileLength = body?.formdata?.file?.length || 0;
+          const filePairs = pairs
+            .slice(0, fileLength)
+            .map(({ type, ...rest }) => rest);
+          const textPairs = pairs
+            .slice(fileLength)
+            .map(({ type, ...rest }) => rest);
+
+          onUpdateRequestState("formdata", {
+            file: filePairs,
+            text: textPairs,
+          });
         }}
         {handleOpenCurrentDynamicExpression}
         {onUpdateEnvironment}
+        {isWebApp}
       />
     {/if}
   </div>

@@ -1,6 +1,6 @@
 {
   "name": "@sparrow/web",
-  "version": "2.33.0",
+  "version": "2.34.0",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 1422",
     "build": "vite build",
@@ -55,8 +55,7 @@
   },
   "lint-staged": {
     "*.{js,ts,svelte,css,json}": [
-      "prettier --write",
-      "eslint --fix"
+      "prettier --write"
     ]
   }
 }

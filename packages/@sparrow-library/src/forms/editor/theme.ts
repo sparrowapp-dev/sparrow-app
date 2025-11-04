@@ -465,9 +465,45 @@ export const jsonSetup: Extension = [
   linter(jsonSchemaLinter(), {
     needsRefresh: handleRefresh,
   }),
-  json5Language.data.of({
-    autocomplete: jsonCompletion(),
-  }),
+  // Safeguard the JSON schema based completion source so that it never
+  // produces an object without a valid `options` array. Some upstream
+  // edge cases (empty or transient schema states) can yield a promise
+  // that resolves to an object missing `options`, which causes the
+  // core autocomplete extension to attempt to access `result.options`
+  // and throw a TypeError. We normalize here.
+  (() => {
+    const base = jsonCompletion();
+    const safe = (ctx: any) => {
+      try {
+        const out: any = base(ctx);
+        const isPromiseLike =
+          out && typeof out === "object" && typeof out.then === "function";
+        if (isPromiseLike) {
+          return (out as Promise<any>)
+            .then((res: any) => {
+              if (!res) return null; // no completions
+              if (!Array.isArray(res.options)) {
+                return {
+                  ...res,
+                  options: Array.isArray(res.options) ? res.options : [],
+                };
+              }
+              return res;
+            })
+            .catch(() => null);
+        }
+        if (!out) return null;
+        if (!Array.isArray((out as any).options)) {
+          return { ...(out as any), options: [] };
+        }
+        return out;
+      } catch (e) {
+        // Swallow and return no completions on unexpected failure
+        return null;
+      }
+    };
+    return json5Language.data.of({ autocomplete: safe });
+  })(),
   hoverTooltip(jsonSchemaHover()),
   stateExtensions(),
 ];

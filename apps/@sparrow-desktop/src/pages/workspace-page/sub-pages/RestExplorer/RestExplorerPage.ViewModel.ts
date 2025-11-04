@@ -6,16 +6,19 @@ import {
   ReduceAuthHeader,
   ReduceAuthParameter,
 } from "@sparrow/workspaces/features/rest-explorer/utils";
-import { createDeepCopy, scrollToTab } from "@sparrow/common/utils";
+import { createDeepCopy, scrollToTab, Sleep } from "@sparrow/common/utils";
 import {
   startLoading,
   stopLoading,
+  updateAiChatBotModelforTeam,
+  getAiChatBotModelForTeam,
 } from "../../../../../../../packages/@sparrow-common/src/store";
 import {
   CompareArray,
   Debounce,
   InitRequestTab,
   MarkdownFormatter,
+  FormatCurl,
 } from "@sparrow/common/utils";
 
 // ---- DB
@@ -92,7 +95,10 @@ import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explore
 import { InitTab } from "@sparrow/common/factory";
 import { CollectionTabAdapter, RequestSavedTabAdapter } from "@app/adapter";
 import type { Tab } from "@sparrow/common/types/workspace/tab";
-import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
+import {
+  TabPersistenceTypeEnum,
+  TabTypeEnum,
+} from "@sparrow/common/types/workspace/tab";
 import {
   CollectionAuthTypeBaseEnum,
   CollectionItemTypeBaseEnum,
@@ -103,14 +109,16 @@ import {
 } from "@sparrow/common/types/workspace/collection-base";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 import {
+  aiChatBotPanelClose,
   generatedVariableDemo,
   generateVariableStep,
 } from "@sparrow/workspaces/stores";
 import { UserService } from "@app/services/user.service";
 
-import { getClientUser, getSelfhostUrls } from "@app/utils/jwt";
+import { getAuthJwt, getClientUser, getSelfhostUrls } from "@app/utils/jwt";
 import constants from "@app/constants/constants";
 import * as curlconverter from "curlconverter";
+import { TeamRepository } from "@app/repositories/team.repository";
 
 import * as Sentry from "@sentry/svelte";
 import { CollectionNavigationTabEnum } from "@sparrow/common/types/workspace/collection-tab";
@@ -119,7 +127,6 @@ import { DOMParser } from "xmldom";
 import { JSONPath } from "jsonpath-plus";
 import { captureEvent } from "@app/utils/posthog/posthogConfig";
 import { size } from "@tauri-apps/plugin-fs";
-
 class RestExplorerViewModel {
   /**
    * Repository
@@ -133,6 +140,7 @@ class RestExplorerViewModel {
   private guestUserRepository = new GuestUserRepository();
   private compareArray = new CompareArray();
   private initTab = new InitTab();
+  private teamRepository = new TeamRepository();
 
   /**
    * Service
@@ -146,6 +154,7 @@ class RestExplorerViewModel {
    * Utils
    */
   private _decodeRequest = new DecodeRequest();
+  private _formatCurl = new FormatCurl();
   /**
    * Rest tools
    */
@@ -224,6 +233,10 @@ class RestExplorerViewModel {
 
           await this.updateIsRequestTabScriptDemo(
             collectionDoc?.isRequestTestsScriptDemoCompleted,
+          );
+
+          await this.updateIsRequestTabAssertionsDemo(
+            collectionDoc?.isRequestAssertionsDemoCompleted,
           );
         }
 
@@ -548,6 +561,11 @@ class RestExplorerViewModel {
     } else if (
       requestServer.request.tests.script !==
       progressiveTab.property.request.tests.script
+    ) {
+      result = false;
+    } else if (
+      requestServer.request.tests.preScript !==
+      progressiveTab.property.request.tests.preScript
     ) {
       result = false;
     } else if (
@@ -902,58 +920,7 @@ class RestExplorerViewModel {
   };
 
   public handleFormatCurl = (curlCommand: string): string => {
-    const rawLiteralRegex = /(\$'[\s\S]*?')$/m;
-    let rawLiteral = "";
-    const rawMatch = curlCommand.match(rawLiteralRegex);
-    if (rawMatch) {
-      rawLiteral = rawMatch[0];
-      curlCommand = curlCommand.slice(0, rawMatch.index).trim();
-    }
-    const heredocRegex = /(<<\s*EOF[\s\S]*?^EOF\s*)$/m;
-    const heredocMatch = curlCommand.match(heredocRegex);
-    let heredoc = "";
-    if (heredocMatch) {
-      heredoc = heredocMatch[0]
-        .replace(/\r\n/g, "\n")
-        .replace(/^\s+|\s+$/g, "");
-      curlCommand = curlCommand.slice(0, heredocMatch.index).trim();
-    }
-    curlCommand = curlCommand.replace(/\\\s*\n\s*/g, " ");
-    curlCommand = curlCommand.replace(/\\\s*/g, " ");
-    curlCommand = curlCommand.replace(/\s+/g, " ").trim();
-    const parts = curlCommand.match(/"[^"]*"|'[^']*'|\S+/g) || [];
-    let formatted = "";
-    for (let i = 0; i < parts.length; i++) {
-      const part = parts[i];
-      if (i === 0) {
-        formatted += part;
-      } else if (
-        part.startsWith("--") ||
-        (part.startsWith("-") && !/^-\d/.test(part))
-      ) {
-        formatted += " \\\n  " + part;
-      } else if (
-        /^https?:\/\//.test(part) ||
-        /^\$\{.*\}/.test(part) ||
-        /^[\w\/:.?&=%-]+$/.test(part)
-      ) {
-        if (parts[i - 1] && parts[i - 1].startsWith("--request")) {
-          formatted += " " + part;
-        } else {
-          formatted += " \\\n  " + part;
-        }
-      } else {
-        formatted += " " + part;
-      }
-    }
-    if (heredoc) {
-      const [firstLine, ...restLines] = heredoc.split("\n");
-      formatted += " \\\n  " + firstLine + "\n" + restLines.join("\n");
-    }
-    if (rawLiteral && !formatted.includes(rawLiteral)) {
-      formatted += ` \\\n  ${rawLiteral}`;
-    }
-    return formatted.trim();
+    return this._formatCurl.handleFormatCurl(curlCommand);
   };
 
   public handleFormatUrl = (url: string) => {
@@ -1271,7 +1238,6 @@ class RestExplorerViewModel {
 
     const updatedCurl = this.handleFormatCurl(curl);
     const stringifiedCurl = curlconverter.toJsonString(updatedCurl);
-
     const parsedCurl = JSON.parse(stringifiedCurl);
 
     // Use the same regex as ImportCurl.svelte
@@ -1445,9 +1411,24 @@ class RestExplorerViewModel {
    */
   public updateAIModel = async (_modelName: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
+    // update tab's ai model
     progressiveTab.property.request.ai.aiModelName = _modelName;
     this.tab = progressiveTab;
-    this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+
+    // persist selection globally mapped by teamId
+    try {
+      const workspaceId = progressiveTab.path?.workspaceId;
+      if (!workspaceId) return;
+
+      const workspaceDoc = await this.readWorkspace(workspaceId);
+      const teamId = workspaceDoc?.team?.teamId || "";
+      if (teamId) {
+        updateAiChatBotModelforTeam(teamId, _modelName);
+      }
+    } catch (err) {
+      console.error("updateAIModel: failed to update model store", err);
+    }
   };
 
   /**
@@ -1643,6 +1624,38 @@ class RestExplorerViewModel {
   };
 
   /**
+   * This function will close all AI chatbot instances except the one currently in use.
+   */
+  public updateRequestStateAiChatBot = async () => {
+    // Current tab from BehaviorSubject
+    const currentTab = createDeepCopy(this._tab.getValue());
+    // Get all tabs from repository
+    const allTabs = await this.tabRepository.getTabLs();
+    if (!allTabs || allTabs.length === 0) return;
+    for (const tab of allTabs) {
+      if (tab.id !== currentTab.id && tab.type === TabTypeEnum.REQUEST) {
+        let progressiveTab = createDeepCopy(tab);
+        const conversationLength =
+          progressiveTab.property?.request?.ai?.conversations?.length ?? 0;
+        if (conversationLength === 0) {
+          progressiveTab.property.request.state.isChatbotActive = false;
+          await this.tabRepository.updateTab(
+            progressiveTab.tabId,
+            progressiveTab,
+          );
+        }
+      }
+    }
+    // Always deactivate current tab AI chatbot panel.
+    aiChatBotPanelClose.set(false);
+    currentTab.property.request.state.isChatbotActive = false;
+    this.tab = currentTab;
+    await this.tabRepository.updateTab(currentTab.tabId, currentTab);
+    // Re-sync state with server
+    this.compareRequestWithServer();
+  };
+
+  /**
    *
    * @param  - response state
    */
@@ -1779,8 +1792,7 @@ class RestExplorerViewModel {
       return restApiDataMap;
     });
     const start = Date.now();
-
-    const decodeData = this._decodeRequest.init(
+    const preRequest = await this.executePreScriptTestcases(
       this._tab.getValue().property.request,
       environmentVariables.filtered || [],
       this._tab.getValue().property.request.state.requestAuthNavigation ===
@@ -1791,6 +1803,12 @@ class RestExplorerViewModel {
               this._collectionAuthProfile.getValue().authType,
           } as HttpRequestCollectionLevelAuthTabInterface)
         : this._collectionAuth.getValue(),
+    );
+
+    const decodeData = this._decodeRequest.init(
+      preRequest.request,
+      preRequest.env || [],
+      preRequest.auth,
     );
     makeHttpRequestV2(...decodeData, signal)
       .then(async (response) => {
@@ -1808,7 +1826,8 @@ class RestExplorerViewModel {
             restApiDataMap.set(progressiveTab.tabId, data);
             return restApiDataMap;
           });
-          await this.executeTestcases();
+          await this.executeScriptTestcases();
+          await this.executeNoCodeTestcases();
         } else {
           const end = Date.now();
           const byteLength = new TextEncoder().encode(
@@ -1845,7 +1864,8 @@ class RestExplorerViewModel {
             restApiDataMap.set(progressiveTab.tabId, data);
             return restApiDataMap;
           });
-          await this.executeTestcases();
+          await this.executeScriptTestcases();
+          await this.executeNoCodeTestcases();
         }
       })
       .catch(async (error) => {
@@ -1868,24 +1888,9 @@ class RestExplorerViewModel {
           restApiDataMap.set(progressiveTab.tabId, data);
           return restApiDataMap;
         });
-        await this.executeTestcases();
+        await this.executeScriptTestcases();
+        await this.executeNoCodeTestcases();
       });
-  };
-
-  /**
-   * Executes test cases for the current tab based on the selected test case mode.
-   * If the mode is NO_CODE, it delegates to executeNoCodeTestcases.
-   *
-   */
-  private executeTestcases = async () => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-
-    const testcaseMode = progressiveTab.property.request.tests.testCaseMode;
-    if (testcaseMode === TestCaseModeEnum.NO_CODE) {
-      await this.executeNoCodeTestcases();
-    } else {
-      await this.executeScriptTestcases();
-    }
   };
 
   /**
@@ -1898,7 +1903,7 @@ class RestExplorerViewModel {
     restExplorerDataStore.update((restApiDataMap) => {
       const response = restApiDataMap.get(progressiveTab?.tabId);
       if (response) {
-        response.response.testResults = [];
+        // response.response.testResults = [];
         const testCases = progressiveTab.property.request.tests.noCode || [];
         testCases.map((test) => {
           let actual: any;
@@ -1999,6 +2004,7 @@ class RestExplorerViewModel {
             testId: test.id,
             testName: test.name,
             testStatus: testCasePassed,
+            initiator: "Assertions",
             testMessage: error || testCaseStatusMessage,
           };
 
@@ -2012,54 +2018,132 @@ class RestExplorerViewModel {
   };
 
   private async executeScriptTestcases() {
-    const worker = new Worker(
-      new URL("../../../../workers/test-script-worker.ts", import.meta.url),
-      {
-        type: "module",
-      },
-    );
-    // minimal chai-like expect (you can replace with a real lib like chai)
+    return new Promise((resolve) => {
+      const worker = new Worker(
+        new URL("../../../../workers/test-script-worker.ts", import.meta.url),
+        {
+          type: "module",
+        },
+      );
+      // minimal chai-like expect (you can replace with a real lib like chai)
 
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    const javaScriptTestCases =
-      progressiveTab.property.request.tests.script || "";
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const javaScriptTestCases =
+        progressiveTab.property.request.tests.script || "";
 
-    restExplorerDataStore.update((restApiDataMap) => {
-      const r = restApiDataMap.get(progressiveTab?.tabId);
-      if (r) {
-        r.response.testResults = [];
-        r.response.testMessage = "";
-        restApiDataMap.set(progressiveTab.tabId, r);
-        worker.postMessage({
-          javaScriptTestCases,
-          response: r.response,
-        });
-      }
-      return restApiDataMap;
-    });
-
-    worker.onmessage = (e) => {
-      const { success, tests, error } = e.data;
       restExplorerDataStore.update((restApiDataMap) => {
         const r = restApiDataMap.get(progressiveTab?.tabId);
         if (r) {
-          if (success) {
-            r.response.testResults = tests.map((t) => ({
-              testId: "",
-              testName: t.name,
-              testStatus: t.passed,
-              testMessage: t.error || "",
-            }));
-          } else {
-            r.response.testMessage = error;
-          }
-
+          // r.response.testResults = [];
+          // r.response.testMessage = "";
           restApiDataMap.set(progressiveTab.tabId, r);
+          worker.postMessage({
+            javaScriptTestCases,
+            response: r.response,
+          });
         }
         return restApiDataMap;
       });
-      worker.terminate(); // cleanup
-    };
+
+      worker.onmessage = (e) => {
+        const { success, tests, error } = e.data;
+        restExplorerDataStore.update((restApiDataMap) => {
+          const r = restApiDataMap.get(progressiveTab?.tabId);
+          if (r) {
+            if (success) {
+              r.response.testResults = [
+                ...r.response.testResults,
+                ...tests.map((t) => ({
+                  testId: "",
+                  testName: t.name,
+                  testStatus: t.passed,
+                  testMessage: t.error || "",
+                  initiator: "Post Script",
+                })),
+              ];
+            } else {
+              r.response.testMessage = [
+                ...r.response.testMessage,
+                {
+                  error: error,
+                  initiator: "Post-Request",
+                },
+              ];
+            }
+
+            restApiDataMap.set(progressiveTab.tabId, r);
+          }
+          return restApiDataMap;
+        });
+        worker.terminate(); // cleanup
+        resolve("resolved");
+      };
+    });
+  }
+
+  private async executePreScriptTestcases(request, env, auth) {
+    return new Promise((resolve) => {
+      const worker = new Worker(
+        new URL(
+          "../../../../workers/test-pre-script-worker.ts",
+          import.meta.url,
+        ),
+        {
+          type: "module",
+        },
+      );
+      // minimal chai-like expect (you can replace with a real lib like chai)
+
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const javaScriptTestCases =
+        progressiveTab.property.request.tests.preScript || "";
+
+      restExplorerDataStore.update((restApiDataMap) => {
+        const r = restApiDataMap.get(progressiveTab?.tabId);
+        if (r) {
+          r.response.testResults = [];
+          r.response.testMessage = [];
+          restApiDataMap.set(progressiveTab.tabId, r);
+          worker.postMessage({
+            javaScriptTestCases,
+            request,
+            env,
+            auth,
+          });
+        }
+        return restApiDataMap;
+      });
+
+      worker.onmessage = (e) => {
+        const { success, tests, error, request, env, auth } = e.data;
+        restExplorerDataStore.update((restApiDataMap) => {
+          const r = restApiDataMap.get(progressiveTab?.tabId);
+          if (r) {
+            if (success) {
+              r.response.testResults = tests.map((t) => ({
+                testId: "",
+                testName: t.name,
+                testStatus: t.passed,
+                testMessage: t.error || "",
+                initiator: "Pre Script",
+              }));
+            } else {
+              r.response.testMessage = [
+                {
+                  error: error,
+                  initiator: "Pre-Request",
+                },
+              ];
+            }
+
+            restApiDataMap.set(progressiveTab.tabId, r);
+          }
+          return restApiDataMap;
+        });
+        worker.terminate(); // cleanup
+        resolve({ request, env, auth });
+      };
+    });
   }
 
   /**
@@ -2270,6 +2354,12 @@ class RestExplorerViewModel {
   public updateIsRequestTabScriptDemo = async (value: boolean) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     progressiveTab.property.request.isRequestTestsScriptDemoCompleted = value;
+    this.tab = progressiveTab;
+  };
+
+  public updateIsRequestTabAssertionsDemo = async (value: boolean) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    progressiveTab.property.request.isRequestAssertionsDemoCompleted = value;
     this.tab = progressiveTab;
   };
 
@@ -3244,9 +3334,9 @@ class RestExplorerViewModel {
 
     const [selfhostBackendUrl] = getSelfhostUrls();
     if (selfhostBackendUrl) {
-        return selfhostBackendUrl;
+      return selfhostBackendUrl;
     }
-    
+
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;
@@ -3667,7 +3757,6 @@ class RestExplorerViewModel {
       ...(componentData?.property?.request?.ai?.conversations || []),
       {
         message: errorMessage || "Something went wrong. Please try again",
-        message: errorMessage || "Something went wrong. Please try again",
         messageId: uuidv4(),
         type: MessageTypeEnum.RECEIVER,
         isLiked: false,
@@ -3715,6 +3804,7 @@ class RestExplorerViewModel {
    * @param Prompt - Prompt from the user
    */
   public generateAIResponseWS = async (prompt = "") => {
+    debugger;
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
 
@@ -3750,6 +3840,7 @@ class RestExplorerViewModel {
       let responseMessageId = uuidv4(); // Generate a single message ID for the entire response
       let accumulatedMessage = ""; // Track the accumulated message content
       let messageCreated = false; // Flag to track if we've created the initial message
+      let selectedAIModel = getAiChatBotModelForTeam(teamId) || "deepseek";
 
       const socketResponse = await this.aiAssistentWebSocketService.sendMessage(
         componentData.tabId,
@@ -3758,7 +3849,7 @@ class RestExplorerViewModel {
         prompt,
         JSON.stringify(apiData),
         formattedConversations,
-        "deepseek",
+        selectedAIModel,
         "chat",
         teamId,
       );
@@ -3824,9 +3915,16 @@ class RestExplorerViewModel {
               events.forEach((event) =>
                 this.aiAssistentWebSocketService.removeListener(event),
               );
-
+              let teamData;
+              if (teamId) {
+                teamData = await this.teamRepository.getTeamDoc(teamId);
+              }
               const errorMessage = response.messages.includes("Limit Reached")
-                ? "Oh, snap! You have reached your limit for this month. You can resume using Sparrow AI from the next month. Please share your feedback through the community section."
+                ? `You have used all ${teamData?.toMutableJSON().plan?.limits
+                    ?.aiRequestsPerMonth
+                    ?.value} of your Sparrow AI requests for the month on the ${teamData?.toMutableJSON()
+                    .plan
+                    ?.name} Plan. To continue getting instant help with debugging, suggestions, and analysis, please upgrade your plan.`
                 : "Some issue occurred while processing your request, please try again.";
 
               await this.updateRequestAIConversation([
@@ -3980,6 +4078,7 @@ class RestExplorerViewModel {
    * @returns A promise that resolves to the response from the AI assistant service.
    */
   public generateAiResponse = async (prompt = "") => {
+    debugger;
     // Set the request state to indicate that a response is being generated
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
@@ -4225,6 +4324,53 @@ class RestExplorerViewModel {
     } catch (error) {
       stopLoading(tabId + "generatingTestCases");
       notifications.error("Failed to generate test. Please try again.");
+    }
+  };
+
+  /**
+   * Generates pre-request script for the particular API Request Tab.
+   *
+   * @param prompt - The prompt to be used for generating the pre-request script.
+   * @returns - The response from the AI assistant service.
+   */
+  public generatePreScript = async (prompt = "") => {
+    const isGuestUser = await this.getGuestUserState();
+    if (isGuestUser) {
+      return;
+    }
+    const componentData = this._tab.getValue();
+    const tabId = componentData?.tabId;
+    startLoading(tabId + "generatingPreScript");
+
+    let workspaceId = componentData.path.workspaceId;
+    let workspaceVal = await this.readWorkspace(workspaceId);
+    let teamId = workspaceVal.team?.teamId;
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const testCases = progressiveTab.property.request.tests;
+    const originalPreScript = testCases.preScript || "";
+
+    try {
+      const response = await this.aiAssistentService.generatePreScript({
+        text: prompt,
+        teamId: teamId,
+      });
+      if (response.isSuccessful) {
+        stopLoading(tabId + "generatingPreScript");
+        const generatedContent = response?.data?.data.result;
+        notifications.success("Pre-request script is generated successfully.");
+        return {
+          generatedContent: generatedContent,
+          originalContent: originalPreScript,
+        };
+      } else {
+        stopLoading(tabId + "generatingPreScript");
+        return response?.data;
+      }
+    } catch (error) {
+      stopLoading(tabId + "generatingPreScript");
+      notifications.error(
+        "Failed to generate pre-request script. Please try again.",
+      );
     }
   };
 
@@ -4771,11 +4917,19 @@ class RestExplorerViewModel {
     }
   };
 
+  public handleRequestAssertionsDemoCompleted = async () => {
+    const response = await this.userService.requestTabAssertionsDemoCompleted();
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    if (response.isSuccessful) {
+      await this.fetchCollections(progressiveTab?.path?.workspaceId);
+    }
+  };
+
   /**
    * Fixes the test script for the current request tab using AI assistance.
    * It retrieves the active workspace and team ID, then sends the current test script to the AI service for fixing.
    */
-  public fixTestScript = async (): Promise<void> => {
+  public fixTestScript = async (type: string): Promise<void> => {
     const isGuestUser = await this.getGuestUserState();
     if (isGuestUser) {
       return;
@@ -4785,29 +4939,72 @@ class RestExplorerViewModel {
     const teamId = workspaceData.toMutableJSON().team?.teamId || "";
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const testCases = progressiveTab.property.request.tests;
-    const response = await this.aiAssistentService.fixTestScript({
-      teamId: teamId,
-      testScript: testCases.script,
-    });
-    if (response.isSuccessful) {
-      this.updateRequestTests({
-        ...testCases,
-        script: response?.data?.data.result,
+    if (type === "Post-Request") {
+      const response = await this.aiAssistentService.fixTestScript({
+        teamId: teamId,
+        testScript: testCases.script,
+        type: "post-script",
       });
-      restExplorerDataStore.update((restApiDataMap) => {
-        const r = restApiDataMap.get(progressiveTab?.tabId);
-        if (r) {
-          r.response.testMessage = "";
-        }
-        return restApiDataMap;
+      if (response.isSuccessful) {
+        this.updateRequestTests({
+          ...testCases,
+          script: response?.data?.data.result,
+        });
+        restExplorerDataStore.update((restApiDataMap) => {
+          const r = restApiDataMap.get(progressiveTab?.tabId);
+          if (r) {
+            r.response.testMessage =
+              r?.response?.testMessage?.filter((error) => {
+                if (error.initiator === "Post-Request") {
+                  return false;
+                } else {
+                  return true;
+                }
+              }) || [];
+          }
+          return restApiDataMap;
+        });
+        notifications.success("Test script fixed successfully.");
+      } else if (
+        response?.data?.message === "Limit reached. Please try again later."
+      ) {
+        notifications.error("AI Limit has Reached.please upgrade plan.");
+      } else {
+        notifications.error("Failed to fix test script.");
+      }
+    } else if (type === "Pre-Request") {
+      const response = await this.aiAssistentService.fixTestScript({
+        teamId: teamId,
+        testScript: testCases.preScript,
+        type: "pre-script",
       });
-      notifications.success("Test script fixed successfully.");
-    } else if (
-      response?.data?.message === "Limit reached. Please try again later."
-    ) {
-      notifications.error("AI Limit has Reached.please upgrade plan.");
-    } else {
-      notifications.error("Failed to fix test script.");
+      if (response.isSuccessful) {
+        this.updateRequestTests({
+          ...testCases,
+          preScript: response?.data?.data.result,
+        });
+        restExplorerDataStore.update((restApiDataMap) => {
+          const r = restApiDataMap.get(progressiveTab?.tabId);
+          if (r) {
+            r.response.testMessage =
+              r?.response?.testMessage?.filter((error) => {
+                if (error.initiator === "Pre-Request") {
+                  return false;
+                } else {
+                  return true;
+                }
+              }) || [];
+          }
+          return restApiDataMap;
+        });
+        notifications.success("Test script fixed successfully.");
+      } else if (
+        response?.data?.message === "Limit reached. Please try again later."
+      ) {
+        notifications.error("AI Limit has Reached.please upgrade plan.");
+      } else {
+        notifications.error("Failed to fix test script.");
+      }
     }
   };
 
@@ -4817,6 +5014,34 @@ class RestExplorerViewModel {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     if (response.isSuccessful) {
       await this.fetchCollections(progressiveTab?.path?.workspaceId);
+    }
+  };
+
+  public handleRedirectToAdminPanel = async () => {
+    const workspace = await this.workspaceRepository.getActiveWorkspaceDoc();
+    const teamId = workspace.toMutableJSON().team?.teamId;
+    const [authToken] = getAuthJwt();
+    const [, , selfhostAdminUrl] = getSelfhostUrls();
+
+    if (selfhostAdminUrl) {
+      await open(selfhostAdminUrl);
+    } else {
+      await open(
+        `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+      );
+    }
+  };
+
+  /**
+   * @description - This function will provide the plan name for hub.
+   */
+  public getPlanName = async () => {
+    const response = await this.workspaceRepository.getActiveWorkspaceDoc();
+    const teamId = response?._data?.team?.teamId || "";
+    const teamData = await this.teamRepository.getTeamDoc(teamId);
+    const teamDoc = teamData.toMutableJSON();
+    if (teamDoc) {
+      return teamDoc?.plan?.name;
     }
   };
 }

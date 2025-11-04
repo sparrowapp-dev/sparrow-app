@@ -10,7 +10,7 @@
     SvelteFlowProvider,
   } from "@xyflow/svelte";
 
-  import { Tag } from "@sparrow/library/ui";
+  import { notifications, Tag } from "@sparrow/library/ui";
 
   import {
     StartBlock,
@@ -45,7 +45,16 @@
   import { type Tab } from "@sparrow/common/types/workspace/tab";
   import "@xyflow/svelte/dist/style.css";
   import { onDestroy, onMount } from "svelte";
-  import { ToastIcon, ErrorWithText } from "@sparrow/library/icons";
+  import {
+    ToastIcon,
+    ErrorWithText,
+    AddRegular,
+    ChevronUpRegular,
+    ChevronDownRegular,
+    ArrowClockWiseRegular,
+    AlertOnIcon,
+    DismissRegular,
+  } from "@sparrow/library/icons";
 
   import "@xyflow/svelte/dist/style.css";
   import type { Observable } from "rxjs";
@@ -60,7 +69,7 @@
     StopFilled,
     Clock,
   } from "@sparrow/library/icons";
-  import { Button, Modal, notifications } from "@sparrow/library/ui";
+  import { Button, Modal, Dropdown } from "@sparrow/library/ui";
   import { BroomRegular } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
   import DeleteNode from "../../../components/delete-node/DeleteNode.svelte";
@@ -121,6 +130,13 @@
     FormatDays,
   } from "@sparrow/common/utils";
 
+  import {
+    startLoading,
+    stopLoading,
+    loadingState,
+  } from "@sparrow/common/store";
+  import { isTeamDowngradePopupDismissed } from "../store";
+
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
   export let onUpdateNodes;
@@ -154,7 +170,7 @@
   export let planLimitRunHistoryCount: number = 5;
   export let planLimitTestScheduleCount: number = 5;
   export let planLimitTestFlowBlocks: number = 5;
-  export let planLimitTestFlows: number = 3;
+  export let planLimitTestflow: number = 3;
   export let testflowCount: number = 1;
   export let teamDetails: any;
   export let testflowBlocksPlanModalOpen: boolean = false;
@@ -175,6 +191,9 @@
   export let onPerformTestflowScheduleOperations;
   export let onOpenTestflowScheduleConfigurationsTab;
   export let isCreateTestflowScheduleLimitReachedModalOpen;
+  export let onFetchTestflow;
+  export let isTeamDowngraded: boolean = false;
+  export let teamPlanName;
 
   export let onUpdateScheduleStatus: (
     scheduleId: string,
@@ -634,6 +653,7 @@
     collectionId: string,
     requestId: string,
     folderId: string,
+    requestName?: string,
   ) => {
     const response: any = {};
     const tempTab = new InitRequestTab("uuid", "uuid").getValue().property
@@ -687,7 +707,10 @@
     } else {
       response.method = tempTab?.method;
     }
-    if (data?.name) {
+    // Use the provided requestName parameter first, then fallback to data.name, then "Untitled"
+    if (requestName) {
+      response.name = requestName;
+    } else if (data?.name) {
       response.name = data.name;
     } else {
       response.name = "Untitled";
@@ -768,6 +791,46 @@
   };
 
   /**
+   * Gets the current collection and folder location for a given request ID
+   * This ensures we always use the most up-to-date location even after drag-and-drop operations
+   */
+  const getCurrentApiLocation = (
+    requestId: string,
+    fallbackCollectionId: string,
+    fallbackFolderId: string,
+  ) => {
+    let currentCollectionId = fallbackCollectionId;
+    let currentFolderId = fallbackFolderId;
+
+    // If we have a requestId, find its current location in collections
+    if (requestId && collectionListDocument) {
+      for (const collection of collectionListDocument) {
+        const findInItems = (items: any[], parentFolderId: string = "") => {
+          for (const item of items || []) {
+            if (item.id === requestId) {
+              currentCollectionId = collection.id;
+              currentFolderId = parentFolderId;
+              return true;
+            }
+            if (item.items && item.items.length > 0) {
+              if (findInItems(item.items, item.id)) {
+                return true;
+              }
+            }
+          }
+          return false;
+        };
+
+        if (findInItems(collection.items)) {
+          break;
+        }
+      }
+    }
+
+    return { currentCollectionId, currentFolderId };
+  };
+
+  /**
    * Updates the selected API in a specific node.
    * @param id - Node ID.
    * @param name - Name of the API.
@@ -787,11 +850,23 @@
   ) => {
     let response: any = {};
     if (collectionId) {
-      response = await createCustomRequestObject(
-        collectionId,
+      // Get the most current location for this API
+      const { currentCollectionId, currentFolderId } = getCurrentApiLocation(
         requestId,
-        folderId as string,
+        collectionId,
+        folderId || "",
       );
+
+      response = await createCustomRequestObject(
+        currentCollectionId,
+        requestId,
+        currentFolderId,
+        name,
+      );
+
+      // Update the node with current location info
+      collectionId = currentCollectionId;
+      folderId = currentFolderId;
     } else {
       // create custom API Request.
       response = await createBlankRequestObject(url as string, method, name);
@@ -1165,10 +1240,39 @@
 
     if (_requestData) {
       // create a new node object using existing request (meta and core data)
+      // First, ensure that the referenced request is of an allowed type (only REST API requests).
+      try {
+        const reqMetaCollectionId = _requestData?.collectionId;
+        const reqMetaRequestId = _requestData?.requestId;
+        const reqMetaFolderId = _requestData?.folderId;
+        if (reqMetaCollectionId && reqMetaRequestId) {
+          const reqData = await onSelectRequest(
+            reqMetaCollectionId,
+            reqMetaRequestId,
+            reqMetaFolderId,
+          );
+          debugger;
+          const reqType = reqData?.type;
+          // If type exists and is not REQUEST, block node creation
+          if (reqType && reqType !== "REQUEST") {
+            notifications.error(
+              "Only REST API requests can be added to Test Flows.",
+            );
+            return; // Abort creating this node
+          }
+        }
+      } catch (err) {
+        // In case of any failure determining the type, fail safe and block to avoid inconsistent nodes.
+        notifications.error(
+          "Unable to validate request type. This item cannot be added to the Test Flow.",
+        );
+        return;
+      }
       requestCoreData = await createCustomRequestObject(
         _requestData?.collectionId,
         _requestData?.requestId,
         _requestData?.folderId,
+        _requestData?.name,
       );
       requestMetaData = {
         collectionId: _requestData?.collectionId,
@@ -1933,6 +2037,19 @@
     itemsPerPage = newItemsPerPage;
     currentPage = 1; // Reset to first page
   };
+
+  let runButtonMenu = false;
+
+  const openScheduleRun = () => {
+    if (isGuestUser) {
+      notifications.error(
+        "To access the feature, you need to login/signup on Sparrow.",
+      );
+      return;
+    }
+    handleEventClickScheduleRun();
+    isScheduleRunPopupOpen = true;
+  };
 </script>
 
 <div
@@ -2010,40 +2127,48 @@
             {/if}
           {/if}
           {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-            {#if isGuestUser}
-              <Tooltip
-                title={isGuestUser
-                  ? "To access the feature, you need to login/signup on Sparrow."
-                  : "Schedule Run"}
-              >
-                <Button
-                  type="secondary"
-                  size="medium"
-                  title="Schedule Run"
-                  style="margin-left: 0;"
-                  id="create-new-schedule"
-                  disable={isGuestUser}
-                  buttonType="button"
-                  onClick={() => {
-                    handleEventClickScheduleRun();
-                    isScheduleRunPopupOpen = true;
-                  }}
-                />
-              </Tooltip>
-            {:else}
+            <div
+              id="create-new-schedule"
+              style="display:none;"
+              on:click={openScheduleRun}
+            ></div>
+            <Dropdown
+              zIndex={600}
+              buttonId="test-run-button"
+              isBackgroundClickable={true}
+              bind:isMenuOpen={runButtonMenu}
+              horizontalPosition={"left"}
+              minWidth={165}
+              options={[
+                {
+                  name: "Schedule Run",
+                  icon: AddRegular,
+                  iconColor: "var(--icon-secondary-130)",
+                  iconSize: "13px",
+                  onclick: openScheduleRun,
+                },
+              ]}
+            >
+              <!-- <Tooltip
+                title={"Add Options"}
+                placement={"bottom-center"}
+                distance={12}
+                show={!runButtonMenu}
+                zIndex={10}
+              > -->
               <Button
-                type="secondary"
-                size="medium"
-                title="Schedule Run"
-                style="margin-left: 0;"
-                id="create-new-schedule"
-                buttonType="button"
+                type="primary"
+                id="test-run-button"
+                size={"medium"}
+                startIcon={runButtonMenu
+                  ? ChevronUpRegular
+                  : ChevronDownRegular}
                 onClick={() => {
-                  handleEventClickScheduleRun();
-                  isScheduleRunPopupOpen = true;
+                  runButtonMenu = !runButtonMenu;
                 }}
               />
-            {/if}
+              <!-- </Tooltip> -->
+            </Dropdown>
           {/if}
         </div>
 
@@ -2237,7 +2362,7 @@
         <div class="d-flex flex-column h-100">
           <!-- Search Bar -->
           <div class="mb-3">
-            <div class="d-flex align-items-center">
+            <div class="d-flex align-items-center justify-content-between">
               <div class="search-container">
                 <Search
                   type="text"
@@ -2247,6 +2372,20 @@
                   on:input={handleSearchSchedules}
                 />
               </div>
+
+              <Button
+                title={"Refresh"}
+                startIcon={ArrowClockWiseRegular}
+                type={"secondary"}
+                size={"small"}
+                loader={$loadingState?.get("schedule-refresh-" + $tab?.id)}
+                disable={$loadingState?.get("schedule-refresh-" + $tab?.id)}
+                onClick={async () => {
+                  startLoading("schedule-refresh-" + $tab?.id);
+                  await onFetchTestflow();
+                  stopLoading("schedule-refresh-" + $tab?.id);
+                }}
+              />
             </div>
           </div>
 
@@ -2293,7 +2432,7 @@
             {#if filteredSchedules.length === 0}
               <div class="empty-state text-center py-5">
                 <Clock />
-                <p class="text-costum">No results found</p>
+                <p class="text-costum text-fs-14">No results found</p>
               </div>
             {/if}
           </div>
@@ -2408,7 +2547,7 @@
   <!-- Help Section -->
   {#if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.TESTFLOW}
     <div class="p-3" style="position:absolute; z-index:3; bottom:0; right:0;">
-      {#if testflowCount <= planLimitTestFlows || isGuestUser}
+      {#if testflowCount <= planLimitTestflow || isGuestUser}
         <p
           class="mb-0 pb-0 text-fs-14"
           style="color: var(--text-primary-300); font-weight:500; cursor:pointer;"
@@ -2633,8 +2772,108 @@
   userEmail={teamDetails?.teamOwnerEmail}
   submitButtonName={planContent?.buttonName}
 />
+{#if isTeamDowngraded && !$isTeamDowngradePopupDismissed && !testflowBlocksPlanModalOpen && !runHistoryPlanModalOpen && !selectiveRunModalOpen && !isCreateTestflowScheduleLimitReachedModalOpen && userRole != WorkspaceRole.WORKSPACE_VIEWER}
+  <div class="downgrade-card position-fixed">
+    <div class="downgrade-card-inner" style="padding: 24px;">
+      <div
+        class="downgrade-header"
+        style="display: flex; align-items: center; gap: 10px;"
+      >
+        <div class="downgrade-icon">
+          <AlertOnIcon />
+        </div>
+        <p class="downgrade-title">Your Hub Has Been Downgraded</p>
+        <Button
+          type="teritiary-regular"
+          size="small"
+          startIcon={DismissRegular}
+          onClick={() => isTeamDowngradePopupDismissed.set(true)}
+          style="margin-left: 4px;"
+        />
+      </div>
+
+      <p class="text-ds-font-size-12" style="color:var(--text-ds-neutral-100)">
+        Your Hub is now on the {teamPlanName} edition, which has a limit of {planLimitTestflow}
+        active Test Flows per workspace.
+      </p>
+      <ul class="text-ds-font-size-12" style="color:var(--text-ds-neutral-100)">
+        <li>
+          To meet this limit, your least-active Test Flows have been archived.
+        </li>
+        <li>Archived Test Flows will be permanently deleted after 60 days.</li>
+      </ul>
+      <p class="text-ds-font-size-12" style="color:var(--text-ds-neutral-100)">
+        To restore full access and permissions, you can upgrade your plan at any
+        time.
+      </p>
+      <div class="d-flex justify-content-center">
+        <Button
+          title="Upgrade Plan"
+          type="secondary"
+          size="medium"
+          onClick={userRole === TeamRole.TEAM_OWNER ||
+          userRole === TeamRole.TEAM_ADMIN
+            ? handleRedirectToAdminPanel
+            : handleRequestOwner}
+        />
+      </div>
+    </div>
+  </div>
+{/if}
 
 <style>
+  .downgrade-card {
+    bottom: 30px;
+    right: 20px;
+    z-index: 500;
+    border-radius: 8px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+    background: #181a20;
+    width: 340px;
+    max-width: 400px;
+    border: 0.5px solid transparent;
+    background:
+      linear-gradient(#181a20, #181a20) padding-box,
+      linear-gradient(90deg, #11adf0, #316cf6, #6147ff) border-box;
+  }
+
+  .downgrade-card-inner {
+    background-color: rgba(24, 28, 38, 1);
+    border-radius: 7px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: var(--text-primary);
+    box-sizing: border-box;
+  }
+  .downgrade-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+    margin-bottom: 12px;
+  }
+  .downgrade-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg-ds-surface-200);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+  .downgrade-title {
+    color: var(--text-ds-neutral-50);
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 0;
+    white-space: nowrap;
+    flex: 1;
+  }
+
   :global(.svelte-flow__attribution) {
     display: none;
   }

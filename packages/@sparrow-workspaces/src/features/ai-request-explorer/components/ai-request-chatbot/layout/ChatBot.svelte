@@ -40,6 +40,7 @@
   export let environmentVariables;
   export let onUpdateEnvironment;
   export let isSelfHost;
+  export let selectedModel: string = "deepseek";
 
   let scrollList: ScrollList;
 

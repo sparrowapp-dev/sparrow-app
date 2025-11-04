@@ -451,12 +451,15 @@ export class RxDB {
           36: function (oldDoc: TabDocument) {
             return oldDoc;
           },
-          37: function (oldDoc: TabDocument) {            
+          37: function (oldDoc: TabDocument) {
             if (oldDoc?.property?.testflow) {
               oldDoc.property.testflow.state = {
-                testflowNavigator : "Testflow"
+                testflowNavigator: "Testflow",
               };
             }
+            return oldDoc;
+          },
+          38: function (oldDoc: TabDocument) {
             return oldDoc;
           },
         },
@@ -525,6 +528,9 @@ export class RxDB {
           20: function (oldDoc: CollectionDocument) {
             return oldDoc;
           },
+          21: function (oldDoc: CollectionDocument) {
+            return oldDoc;
+          },
         },
       },
       activesidebartab: {
@@ -558,6 +564,15 @@ export class RxDB {
           7: function (oldDoc: TeamDocument) {
             return oldDoc;
           },
+          8: function (oldDoc: TeamDocument) {
+            return oldDoc;
+          },
+          9: function (oldDoc: TeamDocument) {
+            return oldDoc;
+          },
+          10: function (oldDoc: TeamDocument) {
+            return oldDoc;
+          },
         },
       },
       environment: {
@@ -585,10 +600,8 @@ export class RxDB {
 
               if (nodes.length > 0) {
                 const updatedNodes = [];
-
                 for (const item of nodes) {
                   let updatedItem = { ...item };
-
                   if (item?.id === "1") {
                     const data = {
                       blockName: "startBlock",

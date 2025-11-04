@@ -29,7 +29,7 @@
   const _viewModel = new TeamExplorerPageViewModel();
   let upgradePlanModalInvite = false;
   let upgradePlanModal = false;
-  let usersInvitePlanCount: number = 5;
+  let usersInvitePlanCount: number = 5; 
 
   let isWorkspaceInviteModalOpen = false;
   let isWebEnvironment = true;

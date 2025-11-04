@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Editor } from "@sparrow/library/forms";
+  import { BroomRegular } from "@sparrow/library/icons";
   import { Button } from "@sparrow/library/ui";
   export let lang: "HTML" | "JSON" | "XML" | "JavaScript" | "Text" | "Graphql" =
     "JSON";
@@ -9,7 +10,7 @@
     onUpdateRequestVariable(e.detail);
   };
   let isBodyBeautified = false;
-  export let onClearQuery;
+  export let onClearVariables;
 </script>
 
 <div class="ps-0 pe-0 d-flex flex-column rounded w-100 h-100 position-relative">
@@ -34,8 +35,10 @@
     <Button
       size="small"
       type="teritiary-regular"
-      title="Clear Query"
-      onClick={onClearQuery}
+      startIcon={BroomRegular}
+      title="Clear Variables"
+      onClick={onClearVariables}
+      disable={!value}
     />
   </div>
 </div>

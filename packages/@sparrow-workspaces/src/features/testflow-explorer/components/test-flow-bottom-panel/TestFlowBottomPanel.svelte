@@ -342,6 +342,7 @@
               onUpdateRequestState={handleUpdateRequestData}
               {handleOpenCurrentDynamicExpression}
               {onUpdateEnvironment}
+              {isWebApp}
             />
           {:else if requestNavigation === RequestSectionEnum.HEADERS}
             <RequestHeaderTestFlow

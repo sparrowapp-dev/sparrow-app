@@ -9,6 +9,8 @@
     leftPanelCollapse,
     updateActiveSyncStates,
     requestTabTestNoCodeStep,
+    requestTabAssertionsStep,
+    requestTabAssertionsDemo,
   } from "@sparrow/workspaces/stores";
 
   // ---- Animation
@@ -101,13 +103,19 @@
   import { ResponseMessage } from "@sparrow/common/enums";
   import { shouldRunThrottled } from "@sparrow/common/store";
   import { TourGuideCard } from "@sparrow/workspaces/features";
-  import { requestTabNocodeCardPosition } from "@sparrow/workspaces/features";
+  import {
+    requestTabNocodeCardPosition,
+    requestTabAssertionsCardPosition,
+  } from "@sparrow/workspaces/features";
   import {
     handleNextStep,
     handleCloseTour,
   } from "@sparrow/workspaces/features";
   import { RequestTabTourGuide } from "@sparrow/workspaces/features";
-  import { RequestTabTestsTourContent } from "@sparrow/workspaces/features";
+  import {
+    RequestTabTestsTourContent,
+    RequestTabAssertionsTourContent,
+  } from "@sparrow/workspaces/features";
   import { ScheduleRunPopUp } from "@sparrow/common/features";
   import { WorkspaceEnvironmentTypeBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
 
@@ -1150,6 +1158,26 @@
                 rightButtonName=""
                 onNext={handleNextStep}
                 onClose={handleCloseTour}
+                width={352}
+              />
+            </RequestTabTourGuide>
+          {/if}
+
+          {#if $requestTabAssertionsStep === 3}
+            <RequestTabTourGuide
+              targetId={RequestTabAssertionsTourContent[2].targetId}
+              isVisible={true}
+              cardPosition={requestTabAssertionsCardPosition(3)}
+            >
+              <TourGuideCard
+                titleName={RequestTabAssertionsTourContent[2].Title}
+                descriptionContent={RequestTabAssertionsTourContent[2]
+                  .description}
+                cardNumber={3}
+                totalsCards={RequestTabAssertionsTourContent.length}
+                rightButtonName=""
+                onNext={() => requestTabAssertionsStep.set(4)}
+                onClose={() => requestTabAssertionsDemo.set(false)}
                 width={352}
               />
             </RequestTabTourGuide>

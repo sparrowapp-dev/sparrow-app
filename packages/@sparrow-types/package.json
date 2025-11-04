@@ -1,6 +1,6 @@
 {
   "name": "@sparrow/types",
-  "version": "2.33.0",
+  "version": "2.34.0",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
@@ -48,8 +48,7 @@
   },
   "lint-staged": {
     "*.{js,ts,svelte,css,json}": [
-      "prettier --write",
-      "eslint --fix"
+      "prettier --write"
     ]
   }
 }
