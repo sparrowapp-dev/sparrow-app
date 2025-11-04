@@ -2116,52 +2116,57 @@
             {/if}
           {/if}
           {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-            <Dropdown
-              zIndex={600}
-              buttonId="test-run-button"
-              isBackgroundClickable={true}
-              bind:isMenuOpen={runButtonMenu}
-              horizontalPosition={"left"}
-              minWidth={165}
-              options={[
-                {
-                  name: "Schedule Run",
-                  icon: AddRegular,
-                  iconColor: "var(--icon-secondary-130)",
-                  iconSize: "13px",
-                  onclick: () => {
-                    if (isGuestUser) {
-                      notifications.error(
-                        "To access the feature, you need to login/signup on Sparrow.",
-                      );
-                    } else {
-                      handleEventClickScheduleRun();
-                      isScheduleRunPopupOpen = true;
-                    }
-                  },
-                },
-              ]}
+            <div
+              id="create-new-schedule"
+              style="display:none;"
+              on:click={() => {
+                if (isGuestUser) {
+                  notifications.error(
+                    "To access the feature, you need to login/signup on Sparrow.",
+                  );
+                } else {
+                  handleEventClickScheduleRun();
+                  isScheduleRunPopupOpen = true;
+                }
+              }}
             >
-              <!-- <Tooltip
+              <Dropdown
+                zIndex={600}
+                buttonId="test-run-button"
+                isBackgroundClickable={true}
+                bind:isMenuOpen={runButtonMenu}
+                horizontalPosition={"left"}
+                minWidth={165}
+                options={[
+                  {
+                    name: "Schedule Run",
+                    icon: AddRegular,
+                    iconColor: "var(--icon-secondary-130)",
+                    iconSize: "13px",
+                  },
+                ]}
+              >
+                <!-- <Tooltip
                 title={"Add Options"}
                 placement={"bottom-center"}
                 distance={12}
                 show={!runButtonMenu}
                 zIndex={10}
               > -->
-              <Button
-                type="primary"
-                id="test-run-button"
-                size={"medium"}
-                startIcon={runButtonMenu
-                  ? ChevronUpRegular
-                  : ChevronDownRegular}
-                onClick={() => {
-                  runButtonMenu = !runButtonMenu;
-                }}
-              />
-              <!-- </Tooltip> -->
-            </Dropdown>
+                <Button
+                  type="primary"
+                  id="test-run-button"
+                  size={"medium"}
+                  startIcon={runButtonMenu
+                    ? ChevronUpRegular
+                    : ChevronDownRegular}
+                  onClick={() => {
+                    runButtonMenu = !runButtonMenu;
+                  }}
+                />
+                <!-- </Tooltip> -->
+              </Dropdown>
+            </div>
           {/if}
         </div>
 
@@ -2569,8 +2574,9 @@
 >
   <div class="modal-content">
     <p class="mb-3" style="margin-top: 13px; padding-bottom:20px;">
-      "{$tab?.name}" flow has active schedules. Saving will update all upcoming
-      runs with your latest changes, which may impact their results.
+      "<span style="font-weight:700 !important;">{$tab?.name}</span>" flow has
+      active schedules. Saving will update all upcoming runs with your latest
+      changes, which may impact their results.
     </p>
     <div class="d-flex justify-content-end gap-3">
       <Button
@@ -2582,7 +2588,7 @@
       <Button
         type="primary"
         size="medium"
-        title="Save"
+        title="Save & Apply"
         onClick={handleSaveConfirm}
       />
     </div>
