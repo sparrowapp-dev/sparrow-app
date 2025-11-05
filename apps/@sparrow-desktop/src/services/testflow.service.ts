@@ -219,4 +219,32 @@ export class TestflowService {
     );
     return response;
   };
+
+  public deleteTestDataSet = async (
+    _testflowId: string,
+    testflowDataSetId: string,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${this.apiUrl}/api/workspace/${_testflowId}/dataset/${testflowDataSetId}`,
+      { headers: getAuthHeaders() },
+    );
+    return response;
+  };
+
+  public renameTestDataSet = async (
+    _testflowId: string,
+    testflowDataSetId: string,
+    updatedDataSetName: string,
+  ) => {
+    const response = await makeRequest(
+      "PUT",
+      `${this.apiUrl}/api/workspace/${_testflowId}/dataset/${testflowDataSetId}`,
+      {
+        body: { updatedDataSetName: updatedDataSetName },
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }

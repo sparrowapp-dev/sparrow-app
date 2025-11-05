@@ -2,10 +2,11 @@
   import { Options, Button, Modal } from "@sparrow/library/ui";
   import { MoreVerticalRegular } from "@sparrow/library/icons";
   import { startLoading, stopLoading } from "@sparrow/common/store";
+  // import { testflow } from "../../../testflow-schedule-explorer/layout/TestflowScheduleExplorer.svelte";
 
   export let dataset: any;
   export let onOpenDataset: (ds: any) => void;
-  export let onPerformDatasetOperation: (
+  export let onPerformDatasetOperations: (
     op: string,
     id: string,
     name?: string,
@@ -24,11 +25,7 @@
 
   async function handleDelete() {
     deleteLoader = true;
-    await onPerformDatasetOperation(
-      "delete",
-      dataset.id,
-      dataset.item?.dataSet?.[0]?.name,
-    );
+    await onPerformDatasetOperations("delete", dataset?.id);
     deleteLoader = false;
     isDeletePopup = false;
     showMenu = false;
@@ -40,7 +37,6 @@
     return d.toLocaleString();
   }
   $: {
-    debugger;
     console.log("Dataset Row Rendered:", dataset);
   }
 </script>
@@ -55,12 +51,13 @@
   isOpen={isDeletePopup}
   handleModalState={() => (isDeletePopup = false)}
 >
-  <div class="text-lightGray mb-1">
+  <div class="text-lightGray mb-1 text-fs-14">
     <p>
       Are you sure you want to delete <strong
         style="color:var(--text-ds-neutral-50)"
-        >{dataset?.item?.dataSet?.[0]?.name || dataset?.id}</strong
-      >? This cannot be undone.
+        >"{dataset?.item?.dataSet?.[0]?.name || dataset?.id}"</strong
+      >? This file might be linked to one or more scheduled test executions.
+      Deleting it could impact their results.
     </p>
   </div>
 
@@ -106,7 +103,7 @@
         menuItems={[
           {
             onClick: async () =>
-              onPerformDatasetOperation(
+              onPerformDatasetOperations(
                 "rename",
                 dataset.id,
                 dataset.item?.dataSet?.[0]?.name,
@@ -117,7 +114,7 @@
           },
           {
             onClick: async () =>
-              onPerformDatasetOperation("export", dataset.id),
+              onPerformDatasetOperations("export", dataset.id),
             displayText: "Export",
             disabled: false,
             hidden: false,
