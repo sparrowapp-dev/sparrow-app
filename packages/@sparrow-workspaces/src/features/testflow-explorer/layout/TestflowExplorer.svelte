@@ -136,6 +136,7 @@
     loadingState,
   } from "@sparrow/common/store";
   import { isTeamDowngradePopupDismissed } from "../store";
+  import TestDataRow from "../components/test-data-row/TestDataRow.svelte";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -194,6 +195,8 @@
   export let onFetchTestflow;
   export let isTeamDowngraded: boolean = false;
   export let teamPlanName;
+  export let testflowDataSetStore = [];
+  export let onFetchTestflowDataSets;
 
   export let onUpdateScheduleStatus: (
     scheduleId: string,
@@ -304,6 +307,7 @@
   let hasActiveSchedules = true; // This should come from your data
   let searchQuery = "";
   let filteredSchedules = [];
+  let filteredTestData = [];
 
   function mapScheduleData(schedule) {
     // Determine status based on isActive and executeAt
@@ -521,7 +525,34 @@
     };
   }
 
+  function mapTestDataRow(ds) {
+    // ds: a dataset object from testflowDataSetStore (see your sample structure)
+    return {
+      id: ds.id,
+      name: ds?.item?.dataSet?.[0]?.name || ds.id || "Untitled",
+      formatType: ds.formatType || "-",
+      fileSize: ds.fileSize || "-",
+      lastUpdated: ds.createdAt
+        ? new Date(ds.createdAt).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          }) +
+          " " +
+          new Date(ds.createdAt).toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+          })
+        : "-",
+      originalData: ds,
+      createdBy: ds.createdBy || "",
+      // Add more fields if needed for actions/menus
+    };
+  }
+
   $: {
+    debugger;
     const mappedSchedules = testflowScheduleStore.map(mapScheduleData);
 
     if (searchQuery.trim() === "") {
@@ -533,6 +564,24 @@
           schedule.name.toLowerCase().includes(query) ||
           schedule.environment.toLowerCase().includes(query) ||
           schedule.description.toLowerCase().includes(query),
+      );
+    }
+  }
+
+  $: {
+    debugger;
+    let testDataRows = [];
+
+    const mappedTestData = testflowDataSetStore.map(mapTestDataRow);
+
+    if (searchQuery.trim() === "") {
+      filteredTestData = [...mappedTestData];
+    } else {
+      const query = searchQuery.toLowerCase();
+      filteredTestData = mappedTestData.filter(
+        (ds) =>
+          ds.name.toLowerCase().includes(query) ||
+          ds.formatType.toLowerCase().includes(query),
       );
     }
   }
@@ -2002,6 +2051,10 @@
   let currentPage = 1;
   let itemsPerPage = 10;
 
+  // Pagination state for test data
+  let currentTestDataPage = 1;
+  let testDataItemsPerPage = 10;
+
   // Reset page when search changes
   $: {
     searchQuery;
@@ -2029,6 +2082,12 @@
     currentPage * itemsPerPage,
   );
 
+  // Get paginated test data
+  $: paginatedTestData = filteredTestData.slice(
+    (currentTestDataPage - 1) * testDataItemsPerPage,
+    currentTestDataPage * testDataItemsPerPage,
+  );
+
   const handlePageChange = (newPage: number) => {
     currentPage = newPage;
   };
@@ -2037,6 +2096,22 @@
     itemsPerPage = newItemsPerPage;
     currentPage = 1; // Reset to first page
   };
+
+  // Handlers for test data pagination
+  const handleTestDataPageChange = (newPage: number) => {
+    currentTestDataPage = newPage;
+  };
+
+  const handleTestDataItemsPerPageChange = (newItemsPerPage: number) => {
+    testDataItemsPerPage = newItemsPerPage;
+    currentTestDataPage = 1; // Reset to first page when changing items per page
+  };
+
+  // Reset page when search changes
+  $: {
+    searchQuery;
+    currentTestDataPage = 1;
+  }
 
   let runButtonMenu = false;
 </script>
@@ -2443,6 +2518,84 @@
               totalItems={filteredSchedules.length}
               onPageChange={handlePageChange}
               onItemsPerPageChange={handleItemsPerPageChange}
+              itemsPerPageOptions={[10, 20, 30, 40, 50]}
+              showItemCount={true}
+              containerWidth="100%"
+            />
+          {/if}
+        </div>
+      </div>
+    {:else if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.TESTDATA}
+      <!-- Test Data Navigator: table similar to schedules -->
+      <div class="testdata-container h-100">
+        <div class="flex-grow-1 d-flex flex-column h-100 p-3">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <div class="search-container">
+              <Search
+                type="text"
+                placeholder="Search data"
+                class="form-control search-input"
+                bind:value={searchQuery}
+                on:input={handleSearchSchedules}
+              />
+            </div>
+
+            <Button
+              title={"Refresh"}
+              startIcon={ArrowClockWiseRegular}
+              type={"secondary"}
+              size={"small"}
+              loader={$loadingState?.get("testdata-refresh-" + $tab?.id)}
+              disable={$loadingState?.get("testdata-refresh-" + $tab?.id)}
+              onClick={async () => {
+                startLoading("testdata-refresh-" + $tab?.id);
+                await onFetchTestflowDataSets();
+                stopLoading("testdata-refresh-" + $tab?.id);
+              }}
+            />
+          </div>
+
+          <div class="table-container flex-grow-1" style="overflow:auto;">
+            <table
+              class="scheduled-table"
+              style="background-color: transparent !important;"
+            >
+              <thead>
+                <tr class="text-fs-12">
+                  <th>Test Data Name</th>
+                  <th>Type</th>
+                  <th>Size</th>
+                  <th>Last Updated</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {#each paginatedTestData as TestData}
+                  <TestDataRow dataset={TestData} />
+                {/each}
+              </tbody>
+            </table>
+
+            {#if filteredTestData.length === 0}
+              <div class="empty-state text-center py-5">
+                <p class="text-costum text-fs-14">No test data found</p>
+                <p
+                  class="text-costum text-fs-12"
+                  style="color:var(--text-ds-neutral-400);"
+                >
+                  Import or create test data to see it here.
+                </p>
+              </div>
+            {/if}
+          </div>
+          <!-- Pagination Component -->
+          {#if filteredTestData.length > 0}
+            <Pagination
+              currentPage={currentTestDataPage}
+              itemsPerPage={testDataItemsPerPage}
+              totalItems={filteredTestData.length}
+              onPageChange={handleTestDataPageChange}
+              onItemsPerPageChange={handleTestDataItemsPerPageChange}
               itemsPerPageOptions={[10, 20, 30, 40, 50]}
               showItemCount={true}
               containerWidth="100%"

@@ -20,7 +20,7 @@
   import constants from "@app/constants/constants";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
 
-  import { testflowSchedules } from "@sparrow/common/store";
+  import { testflowSchedules, testflowDataSets } from "@sparrow/common/store";
 
   import { ScheduleRunPopUp } from "@sparrow/common/features";
   import { Modal } from "@sparrow/library/ui";
@@ -130,13 +130,16 @@
 
   let testflowStoreMap;
   let testflowScheduleStoreMap;
+  let testflowDataSetStoreMap;
 
   let testflowScheduleStore = [];
+  let testflowDataSetStore = [];
 
   $: {
     testflowStore = testflowStoreMap?.get(tab?.tabId) as TFDataStoreType;
 
     testflowScheduleStore = testflowScheduleStoreMap?.get(tab?.id);
+    testflowDataSetStore = testflowDataSetStoreMap?.get(tab?.id);
 
     const nodes = testflowStore?.nodes ?? [];
     const hasEmptyResponseStatus = nodes.some(
@@ -159,6 +162,12 @@
   testflowSchedules.subscribe((_testflowScheduleStoreMap) => {
     if (_testflowScheduleStoreMap) {
       testflowScheduleStoreMap = _testflowScheduleStoreMap;
+    }
+  });
+
+  testflowDataSets.subscribe((_testflowDataSetStoreMap) => {
+    if (_testflowDataSetStoreMap) {
+      testflowDataSetStoreMap = _testflowDataSetStoreMap;
     }
   });
 
@@ -383,6 +392,7 @@
     {isTestflowEditable}
     {testflowStore}
     testflowScheduleStore={testflowScheduleStore || []}
+    testflowDataSetStore={testflowDataSetStore || []}
     onUpdateNodes={_viewModel.updateNodes}
     onUpdateEdges={_viewModel.updateEdges}
     {collectionListDocument}
@@ -432,6 +442,7 @@
     bind:isCreateTestflowScheduleLimitReachedModalOpen
     onOpenEnvironment={_viewModel.handleOpenEnvironment}
     onFetchTestflow={_viewModel.fetchTestflow}
+    onFetchTestflowDataSets={_viewModel.fetchTestflowDataSets}
     {isTeamDowngraded}
     teamPlanName={currentTeam?.plan?.name}
   />
