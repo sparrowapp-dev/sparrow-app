@@ -36,6 +36,10 @@
   import { open } from "@tauri-apps/plugin-shell";
   import { PlanUpgradeModal } from "@sparrow/common/components";
   import { navigate } from "svelte-navigator";
+  import {
+    isTeamDowngradePopupDismissed,
+    setTeamDowngradePopupDismissed,
+  } from "@sparrow/workspaces/stores";
 
   export let isWebApp = false;
 
@@ -149,9 +153,12 @@
   let isInviteAcceptProgress = false;
   let userLimits: any;
   let planContent: any;
-  let isTeamDowngraded = openTeam?._data?.isDowngraded
+  let isTeamDowngraded: boolean | undefined;
+  let planName: string;
   let selectedFilter = "All";
-
+  let hubId: string;
+  $: hubId = openTeam?.teamId;
+  $: planName = openTeam?._data?.plan?.name;
   const addButtonData = [
     {
       name: "Leave Hub",
@@ -253,6 +260,17 @@
         planContent = planInfoByRole(userRole);
       }
     }
+  }
+
+  $: isTeamDowngraded = openTeam?._data?.isDowngraded ?? false;
+  $: isDismissed = $isTeamDowngradePopupDismissed.get(hubId) ?? false;
+  async function handleUpgradeClick() {
+    setTeamDowngradePopupDismissed(hubId, true);
+    await handleRedirectToAdminPanel();
+  }
+
+  function handleClosePopup() {
+    setTeamDowngradePopupDismissed(hubId, true);
   }
 
   /**
@@ -666,7 +684,7 @@
             </div>
           {/if}
         </div>
-        {#if isTeamDowngraded && (userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER)}
+        {#if isTeamDowngraded && (userRole === TeamRole.TEAM_ADMIN || userRole === TeamRole.TEAM_OWNER) && !isDismissed}
           <div
             class="downgrade-card position-fixed"
             style="
@@ -681,16 +699,13 @@
                   <AlertOnIcon />
                 </div>
                 <p class="downgrade-title">Your Hub Has Been Downgraded</p>
-                <button
-                  class="downgrade-close"
-                  on:click={() => (isTeamDowngraded = false)}
-                >
+                <button class="downgrade-close" on:click={handleClosePopup}>
                   ✕
                 </button>
               </div>
 
               <p class="downgrade-description">
-                As scheduled, your Hub is now on the Community edition.
+                As scheduled, your Hub is now on the {planName} edition.
                 <br /><br />
                 Based on your previous selections, your excess workspaces have been
                 archived and team members removed from the Hub.
@@ -704,88 +719,12 @@
                   title="Upgrade Plan"
                   type="secondary"
                   size="small"
-                  onClick={handleRedirectToAdminPanel}
+                  onClick={handleUpgradeClick}
                 />
               </div>
             </div>
           </div>
         {/if}
-      </div>
-    {:else if teamRestricted}
-      <div
-        style="padding:16px; gap:24px; min-height:100vh"
-        class="d-flex flex-column justify-content-center"
-      >
-        <div class="d-flex flex-row align-items-center">
-          <h2 class="d-flex ellipsis overflow-visible team-title">
-            <Avatar
-              type="letter"
-              size="large"
-              letter={openTeam?.name[0] ? openTeam?.name[0] : ""}
-              bgColor="var(--bg-ds-secondary-400)"
-            />
-            <span
-              class="my-auto ellipsis overflow-hidden heading text-ds-font-size-28 text-ds-line-height-120 text-ds-font-weight-semi-bold"
-              style="margin-left:12px"
-              >{openTeam?.name || ""}
-            </span>
-          </h2>
-
-          <div class="d-flex justify-content-end gap-4" style="">
-            <Button
-              title={`Invite collaborators`}
-              type={"secondary"}
-              startIcon={PeopleRegular}
-              onClick={() => {}}
-              disable={true}
-            />
-            <Button
-              title={`New Workspace`}
-              type={`primary`}
-              startIcon={AddRegular}
-              onClick={() => {}}
-              loader={false}
-              disable={true}
-            />
-          </div>
-        </div>
-
-        <div class="d-flex flex-row justfi-content-start">
-          <div class="d-flex" style="gap:10px; margin-left: 16px;">
-            <p class="text-restricted-headers">workspaces</p>
-            <p class="text-restricted-headers">members</p>
-          </div>
-        </div>
-
-        <div
-          class="d-flex justify-content-center align-items-center flex-column"
-          style="gap:10px; flex:1"
-        >
-          <p class="text-ds-font-size-20 text-ds-font-weight-semi-bold">
-            Action Required to Restore This Hub
-          </p>
-          <div
-            class="d-flex flex-column w-100 mx-auto text-ds-font-weight-regular text-ds-line-height-143 text-ds-font-size-14 d-flex justify-content-center align-items-center"
-            style="max-width: 492px; color:var(--bg-ds-neutral-100);"
-          >
-            <div class="text-center">
-              {#if userRole === TeamRole.TEAM_OWNER || userRole === TeamRole.TEAM_ADMIN}
-                Access to the {openTeam?.name} is restricted for you and your team
-                due to a <br /> payment failure.
-                <a
-                  on:click={handleRedirectToAdminPanel}
-                  style="color:var(--bg-ds-primary-400); cursor:pointer;"
-                  >Restore Hub Access</a
-                >
-              {:else}
-                Access to the Rapid API Suite Hub is restricted due to a payment
-                issue with the subscription. Please contact your Hub Owner, and
-                ask them to update the Hub's billing information to restore
-                access for the team.
-              {/if}
-            </div>
-          </div>
-        </div>
       </div>
     {:else if teamRestricted}
       <div
@@ -900,7 +839,7 @@
             </div>
           </div>
 
-          <div class="d-flex;" style="gap:12px;">
+          <div class="d-flex flex-row" style="gap:12px;">
             <Button
               type="primary"
               title="Accept"

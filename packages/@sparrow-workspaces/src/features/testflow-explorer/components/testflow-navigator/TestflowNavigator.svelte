@@ -27,6 +27,11 @@
         id: TestflowNavigatorEnum.SCHEDULE,
         count: 0,
       },
+      {
+        name: "Test Data",
+        id: TestflowNavigatorEnum.TESTDATA,
+        count: 0,
+      },
     ];
   };
 

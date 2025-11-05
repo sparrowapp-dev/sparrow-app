@@ -129,11 +129,14 @@
   let testflowStoreMap;
   let testflowScheduleStoreMap;
   let testflowScheduleStore = [];
+  let testflowDataSetStoreMap;
+  let testflowDataSetStore = [];
 
   $: {
     testflowStore = testflowStoreMap?.get(tab?.tabId) as TFDataStoreType;
 
     testflowScheduleStore = testflowScheduleStoreMap?.get(tab?.id);
+    testflowDataSetStore = testflowDataSetStoreMap?.get(tab?.id);
 
     const nodes = testflowStore?.nodes ?? [];
     const hasEmptyResponseStatus = nodes.some(
@@ -156,6 +159,12 @@
   testflowSchedules.subscribe((_testflowScheduleStoreMap) => {
     if (_testflowScheduleStoreMap) {
       testflowScheduleStoreMap = _testflowScheduleStoreMap;
+    }
+  });
+
+  testflowDataSets.subscribe((_testflowDataSetStoreMap) => {
+    if (_testflowDataSetStoreMap) {
+      testflowDataSetStoreMap = _testflowDataSetStoreMap;
     }
   });
 
@@ -336,6 +345,7 @@
     {isTestflowEditable}
     {testflowStore}
     testflowScheduleStore={testflowScheduleStore || []}
+    testflowDataSetStore={testflowDataSetStore || []}
     onUpdateNodes={_viewModel.updateNodes}
     onUpdateEdges={_viewModel.updateEdges}
     {collectionListDocument}
@@ -387,6 +397,7 @@
     onFetchTestflow={_viewModel.fetchTestflow}
     {isTeamDowngraded}
     teamPlanName={currentTeam?.plan?.name}
+    onFetchTestflowDataSets={_viewModel.fetchTestflowDataSets}
   />
 {/if}
 

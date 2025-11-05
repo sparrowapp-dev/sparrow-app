@@ -69,7 +69,10 @@ import { ReduceAuthHeader } from "@sparrow/workspaces/features/rest-explorer/uti
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 import { getAuthJwt, getSelfhostUrls } from "@app/utils/jwt";
 import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
-import { updateTestflowSchedules } from "@sparrow/common/store";
+import {
+  updateTestflowDataSets,
+  updateTestflowSchedules,
+} from "@sparrow/common/store";
 import { captureEvent } from "@app/utils/posthog/posthogConfig";
 import { TestflowScheduleNavigatorEnum } from "@sparrow/common/types/workspace/testflow-schedule-tab";
 
@@ -107,6 +110,7 @@ export class TestflowExplorerPageViewModel {
         delete t.index;
         this.tab = t;
         this.fetchTestflow();
+        this.fetchTestflowDataSets();
       }, 0);
     }
   }
@@ -184,6 +188,23 @@ export class TestflowExplorerPageViewModel {
     if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
       updateTestflowSchedules(progressiveTab.id as string, schedules);
+    }
+  };
+
+  private fetchTestflowDataSets = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) return;
+    const response = await this.testflowService.fetchTestflowDataSets(
+      progressiveTab.path.workspaceId as string,
+      progressiveTab.id as string,
+    );
+    if (response?.isSuccessful) {
+      const datasets = response.data?.data.datasets;
+      updateTestflowDataSets(progressiveTab.id as string, datasets || []);
     }
   };
 

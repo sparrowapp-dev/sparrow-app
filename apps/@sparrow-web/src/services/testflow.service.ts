@@ -162,7 +162,8 @@ export class TestflowService {
       `${baseUrl}/api/workspace/${workspaceId}/testflow/${_testflowId}/schedule/${_scheduleId}`,
       {
         body: _schedule,
-        headers: getAuthHeaders() },
+        headers: getAuthHeaders(),
+      },
     );
     return response;
   };
@@ -195,6 +196,18 @@ export class TestflowService {
       {
         headers: getAuthHeaders(),
       },
+    );
+    return response;
+  };
+
+  public fetchTestflowDataSets = async (
+    workspaceId: string,
+    testflowId: string,
+  ) => {
+    const response = await makeRequest(
+      "GET",
+      `${this.apiUrl}/api/workspace/${workspaceId}/testflow/${testflowId}/DataSets`,
+      { headers: getAuthHeaders() },
     );
     return response;
   };

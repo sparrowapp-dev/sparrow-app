@@ -44,3 +44,8 @@ export {
   requestTabAssertionsStep,
   requestTabAssertionsTourCompleted,
 } from "./request-tab-test-tour-guide";
+
+export {
+  isTeamDowngradePopupDismissed,
+  setTeamDowngradePopupDismissed,
+} from "./downgrade-popup";
