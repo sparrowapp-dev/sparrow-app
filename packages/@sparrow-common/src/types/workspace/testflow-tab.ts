@@ -56,6 +56,7 @@ export interface HttpRequestMetaDataTestFlowDtoInterface {
 export enum TestflowNavigatorEnum {
   TESTFLOW = "Testflow",
   SCHEDULE = "Schedule",
+  TESTDATA = "TestData",
 }
 /**
  * TF (Test FLow) Default Type

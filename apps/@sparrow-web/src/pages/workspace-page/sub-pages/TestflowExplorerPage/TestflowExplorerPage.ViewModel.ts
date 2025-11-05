@@ -69,7 +69,10 @@ import { TeamService } from "src/services/team.service";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 import { getAuthJwt } from "src/utils/jwt";
 import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
-import { updateTestflowSchedules } from "@sparrow/common/store";
+import {
+  updateTestflowDataSets,
+  updateTestflowSchedules,
+} from "@sparrow/common/store";
 import { TestflowScheduleNavigatorEnum } from "@sparrow/common/types/workspace/testflow-schedule-tab";
 import { captureEvent } from "src/utils/posthog/posthogConfig";
 
@@ -107,6 +110,7 @@ export class TestflowExplorerPageViewModel {
         this.tab = t;
 
         this.fetchTestflow();
+        this.fetchTestflowDataSets();
       }, 0);
     }
   }
@@ -1881,6 +1885,23 @@ export class TestflowExplorerPageViewModel {
     if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
       updateTestflowSchedules(progressiveTab.id as string, schedules);
+    }
+  };
+
+  private fetchTestflowDataSets = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) return;
+    const response = await this.testflowService.fetchTestflowDataSets(
+      progressiveTab.path.workspaceId as string,
+      progressiveTab.id as string,
+    );
+    if (response?.isSuccessful) {
+      const datasets = response.data?.data.datasets;
+      updateTestflowDataSets(progressiveTab.id as string, datasets || []);
     }
   };
 
