@@ -169,7 +169,7 @@
   }
 
   // Formatted date string for the DatePicker
-  let formattedDate = "";
+  let formattedDate = formatDateString(new Date()); // Today's date by default
 
   // Initialize form with schedule data
   onMount(() => {

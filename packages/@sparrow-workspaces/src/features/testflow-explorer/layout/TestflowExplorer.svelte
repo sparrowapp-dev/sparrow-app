@@ -462,7 +462,11 @@
       if (lastRun.status === "pass") {
         lastResult = "Success";
       } else if (lastRun.status === "fail") {
-        lastResult = "Fail";
+        if (lastRun.successRequests > 0) {
+          lastResult = "Partial Fail";
+        } else {
+          lastResult = "Fail";
+        }
       } else if (lastRun.status === "pending") {
         lastResult = "Pending";
       } else {
@@ -2576,8 +2580,9 @@
 >
   <div class="modal-content">
     <p class="mb-3" style="margin-top: 13px; padding-bottom:20px;">
-      "{$tab?.name}" flow has active schedules. Saving will update all upcoming
-      runs with your latest changes, which may impact their results.
+      "<span style="font-weight:700 !important;">{$tab?.name}</span>" flow has
+      active schedules. Saving will update all upcoming runs with your latest
+      changes, which may impact their results.
     </p>
     <div class="d-flex justify-content-end gap-3">
       <Button
@@ -2589,7 +2594,7 @@
       <Button
         type="primary"
         size="medium"
-        title="Save"
+        title="Save & Apply"
         onClick={handleSaveConfirm}
       />
     </div>
