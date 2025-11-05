@@ -692,7 +692,7 @@
 
     /* Styling for the scrollbar */
     &::-webkit-scrollbar {
-      width: 8px;
+      width: 4px;
     }
 
     &::-webkit-scrollbar-track {
