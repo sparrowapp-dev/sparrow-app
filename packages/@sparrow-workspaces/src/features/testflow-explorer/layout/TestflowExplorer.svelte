@@ -10,7 +10,7 @@
     SvelteFlowProvider,
   } from "@xyflow/svelte";
 
-  import { notifications, Tag } from "@sparrow/library/ui";
+  import { Loader, notifications, Tag } from "@sparrow/library/ui";
 
   import {
     StartBlock,
@@ -54,6 +54,8 @@
     ArrowClockWiseRegular,
     AlertOnIcon,
     DismissRegular,
+    ExpandIcon,
+    DocumentRegular,
   } from "@sparrow/library/icons";
 
   import "@xyflow/svelte/dist/style.css";
@@ -68,6 +70,8 @@
     RunIcon,
     StopFilled,
     Clock,
+    ArrowUploadFilled,
+    ArrowDownloadRegular,
   } from "@sparrow/library/icons";
   import { Button, Modal, Dropdown } from "@sparrow/library/ui";
   import { BroomRegular } from "@sparrow/library/icons";
@@ -270,6 +274,14 @@
   let blockName = `Block ${nodesValue}`;
   // List to store collection documents and filtered collections
   let filteredCollections = writable<CollectionDto[]>([]);
+  let runButtonMenu = false;
+  let importDropdownOpen = false;
+  let importFileInput: HTMLInputElement | null = null;
+  let importedFileContent: string | null = null;
+  let importedFileName: string | null = null;
+  let isImporting = false;
+  let isImportLoadingModalOpen = false;
+  let isImportCancelled = false;
 
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
@@ -2038,7 +2050,150 @@
     currentPage = 1; // Reset to first page
   };
 
-  let runButtonMenu = false;
+  const handleImportClick = () => {
+    importFileInput?.click();
+  };
+
+  const handleImportFileChange = async (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    const file = input?.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.name.match(/\.(json|csv)$/i)) {
+      notifications.error(
+        "Failed to import. Please select a valid JSON or CSV file.",
+      );
+      input.value = "";
+      return;
+    }
+
+    try {
+      isImportCancelled = false;
+
+      // Open modal only once
+      if (!isImportLoadingModalOpen) {
+        isImportLoadingModalOpen = true;
+      }
+
+      // Show loader
+      isImporting = true;
+      importedFileContent = null;
+      importedFileName = null;
+
+      // Simulate loading delay
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      // Read file
+      const text = await file.text();
+      if (isImportCancelled) return;
+
+      // Replace loader with file preview
+      importedFileContent = text;
+      importedFileName = file.name;
+      isImporting = false;
+
+      notifications.success("Test Data imported successfully");
+    } catch (err) {
+      console.error("Failed to import file", err);
+      notifications.error("Failed to import test data. Please try again.");
+      isImportLoadingModalOpen = false;
+      isImporting = false;
+      importedFileContent = null;
+      importedFileName = null;
+    } finally {
+      input.value = "";
+    }
+  };
+
+  function syntaxHighlightJSON(json) {
+    let jsonString;
+    let parsed;
+
+    try {
+      if (typeof json === "string") {
+        const trimmed = json.trim();
+        // This is when we have multiple JSON objects separated by newlines
+        const lines = trimmed.split("\n").filter((line) => line.trim());
+
+        const looksLikeJSONL =
+          lines.length > 1 &&
+          lines.every((line) => {
+            const trimmedLine = line.trim();
+            return (
+              (trimmedLine.startsWith("{") || trimmedLine.startsWith("[")) &&
+              (trimmedLine.endsWith("}") || trimmedLine.endsWith("]"))
+            );
+          });
+
+        if (looksLikeJSONL) {
+          // Parse as JSONL - each line is a separate JSON object
+          try {
+            parsed = lines.map((line) => JSON.parse(line.trim()));
+          } catch (jsonlError) {
+            // If JSONL parsing fails, try as regular JSON
+            parsed = JSON.parse(trimmed);
+          }
+        } else {
+          // Parse as regular JSON (could be object, array, or primitive)
+          parsed = JSON.parse(trimmed);
+        }
+      } else {
+        // Already a JavaScript object
+        parsed = json;
+      }
+
+      jsonString = JSON.stringify(parsed, null, 2);
+    } catch (e) {
+      console.error("JSON parse error:", e);
+
+      const errorMsg = e.message || "Unknown parsing error";
+      const position = e.message.match(/position (\d+)/)?.[1] || "unknown";
+
+      return `<span style="color: #f48771;">Error parsing JSON: ${errorMsg}<br/>Position: ${position}</span>`;
+    }
+
+    jsonString = jsonString
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      // Property keys (blue)
+      .replace(/"([^"\\]*(\\.[^"\\]*)*)"\s*:/g, (match, key) => {
+        return `<span class="json-key">"${key}"</span><span class="json-punctuation">:</span>`;
+      })
+      // String values (orange)
+      .replace(/:\s*"([^"\\]*(\\.[^"\\]*)*)"/g, (match, value) => {
+        return `: <span class="json-string">"${value}"</span>`;
+      })
+      // Standalone strings in arrays
+      .replace(/\[\s*"([^"\\]*(\\.[^"\\]*)*)"/g, (match, value) => {
+        return `[<span class="json-string">"${value}"</span>`;
+      })
+      .replace(/,\s*"([^"\\]*(\\.[^"\\]*)*)"/g, (match, value) => {
+        return `,<span class="json-string">"${value}"</span>`;
+      })
+      // Boolean values (blue)
+      .replace(/\b(true|false)\b/g, '<span class="json-boolean">$1</span>')
+      // Null values (blue)
+      .replace(/\bnull\b/g, '<span class="json-null">null</span>')
+      // Number values (green)
+      .replace(/:\s*(-?\d+\.?\d*([eE][+-]?\d+)?)/g, (match, num) => {
+        return `: <span class="json-number">${num}</span>`;
+      })
+      // Numbers in arrays
+      .replace(/\[\s*(-?\d+\.?\d*([eE][+-]?\d+)?)/g, (match, num) => {
+        return `[<span class="json-number">${num}</span>`;
+      })
+      .replace(/,\s*(-?\d+\.?\d*([eE][+-]?\d+)?)/g, (match, num) => {
+        return `,<span class="json-number">${num}</span>`;
+      })
+      // Structural characters (brackets, braces)
+      .replace(/([{}\[\]])/g, '<span class="json-punctuation">$1</span>')
+      // Commas
+      .replace(/,(?![^<]*>)/g, '<span class="json-punctuation">,</span>');
+
+    return jsonString;
+  }
 </script>
 
 <div
@@ -2162,6 +2317,62 @@
               />
               <!-- </Tooltip> -->
             </Dropdown>
+            <div class="d-flex" style="gap:8px; align-items:center;">
+              <input
+                bind:this={importFileInput}
+                type="file"
+                accept=".csv,application/json,text/csv"
+                on:change={handleImportFileChange}
+                style="display:none"
+              />
+              <Button
+                type="secondary"
+                size="medium"
+                startIcon={ArrowUploadFilled}
+                title={"Import Data"}
+                onClick={handleImportClick}
+              />
+              <Dropdown
+                zIndex={600}
+                buttonId="import-data-dropdown"
+                isBackgroundClickable={true}
+                bind:isMenuOpen={importDropdownOpen}
+                horizontalPosition={"left"}
+                minWidth={165}
+                options={[
+                  {
+                    name: "Export JSON Template",
+                    icon: ArrowDownloadRegular,
+                    iconColor: "var(--icon-secondary-130)",
+                    iconSize: "13px",
+                    onclick: () => {
+                      console.log("export json");
+                    },
+                  },
+                  {
+                    name: "Export CSV Template",
+                    icon: ArrowDownloadRegular,
+                    iconColor: "var(--icon-secondary-130)",
+                    iconSize: "13px",
+                    onclick: () => {
+                      console.log("export csv");
+                    },
+                  },
+                ]}
+              >
+                <Button
+                  type="secondary"
+                  id="import-data-dropdown"
+                  size={"medium"}
+                  startIcon={importDropdownOpen
+                    ? ChevronUpRegular
+                    : ChevronDownRegular}
+                  onClick={() => {
+                    importDropdownOpen = !importDropdownOpen;
+                  }}
+                />
+              </Dropdown>
+            </div>
           {/if}
         </div>
 
@@ -2814,7 +3025,209 @@
   </div>
 {/if}
 
+<Modal
+  title=""
+  type="dark"
+  width="855px"
+  zIndex={1000}
+  isOpen={isImportLoadingModalOpen}
+  canClose={false}
+  handleModalState={() => {
+    isImportCancelled = true;
+    isImportLoadingModalOpen = false;
+    importedFileContent = null;
+    importedFileName = null;
+    isImporting = false;
+  }}
+>
+  <div class="import-loading-container">
+    {#if isImporting}
+      <!-- Loader section -->
+      <div class="loading-content">
+        <div class="loading-spinner">
+          <Loader loaderSize="32px" />
+        </div>
+        <p class="loading-text">Importing test data...</p>
+        <Button
+          title="Cancel"
+          type="secondary"
+          size="medium"
+          onClick={() => {
+            isImportLoadingModalOpen = false;
+            importedFileContent = null;
+            importedFileName = null;
+            isImporting = false;
+          }}
+        />
+      </div>
+    {:else if importedFileContent}
+      <!-- File preview section -->
+      <div class="file-preview-container">
+        <div class="file-preview-header">
+          <div class="file-header-left">
+            <div class="file-name">
+              <DocumentRegular />
+              {importedFileName}
+            </div>
+            <div class="file-meta">
+              Last updated a few seconds ago • Size {Math.round(
+                importedFileContent.length / 1024,
+              )} KB
+            </div>
+          </div>
+
+          <div class="file-header-actions">
+            <Button type="secondary" size="small" startIcon={ExpandIcon} />
+            <Button
+              type="secondary"
+              size="small"
+              startIcon={DismissRegular}
+              onClick={() => {
+                isImportLoadingModalOpen = false;
+                importedFileContent = null;
+                importedFileName = null;
+                isImporting = false;
+              }}
+            />
+          </div>
+        </div>
+
+        <div class="file-preview">
+          <pre class="preview-content">{@html syntaxHighlightJSON(
+              importedFileContent,
+            )}</pre>
+        </div>
+      </div>
+    {/if}
+  </div>
+</Modal>
+
 <style>
+  .file-preview-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    padding-right: 0;
+    overflow: visible;
+  }
+
+  .file-preview-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    height: 48px;
+    margin-bottom: 16px;
+    background-color: var(--bg-ds-surface-600);
+  }
+
+  .file-header-left {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .file-name {
+    font-weight: 600;
+    font-size: 20px;
+    color: var(--text-ds-neutral-50);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .file-meta {
+    font-size: 12px;
+    color: var(--text-ds-neutral-300);
+    margin-top: 4px;
+  }
+
+  .file-header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .file-preview {
+    width: 780px;
+    height: 528px;
+    overflow: auto;
+    background: var(--bg-ds-surface-600);
+    border: 1px solid #2e2e2e;
+    border-radius: 6px;
+    padding: 16px;
+    font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Code", "Consolas",
+      monospace;
+    box-sizing: border-box;
+    margin: 0 auto;
+  }
+
+  .preview-content {
+    font-family: inherit;
+    font-size: 12px;
+    color: var(--text-ds-neutral-50);
+    background: transparent;
+    margin: 0;
+    padding: 0;
+    white-space: pre;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+  }
+
+  /* JSON Syntax Highlighting - adjusted for Figma look */
+  :global(.preview-content .json-key) {
+    color: #5ec5ed;
+  }
+  :global(.json-string) {
+    color: #ef9765;
+  }
+  :global(.preview-content .json-number) {
+    color: #b5cea8;
+  }
+  :global(.preview-content .json-boolean),
+  :global(.preview-content .json-null) {
+    color: #6ce096;
+  }
+
+  /* Scrollbar styling */
+  .file-preview::-webkit-scrollbar {
+    width: 4px;
+    height: 150px;
+  }
+  .file-preview::-webkit-scrollbar-thumb {
+    background: #9b9da1;
+    border-radius: 6px;
+  }
+  .file-preview::-webkit-scrollbar-thumb:hover {
+    background: #505050;
+  }
+
+  .import-loading-container {
+    height: 648px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .loading-text {
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 150%;
+    margin-bottom: 16px;
+  }
+
+  .loading-spinner {
+    margin-bottom: 10px;
+  }
   .downgrade-card {
     bottom: 30px;
     right: 20px;
