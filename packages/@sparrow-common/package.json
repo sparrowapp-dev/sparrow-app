@@ -65,6 +65,7 @@
     "./types/workspace/testflow-dto": "./src/types/workspace/testflow-dto.ts",
     "./types/workspace/web-socket": "./src/types/workspace/websocket-request-tab.ts",
     "./types/workspace/workspace": "./src/types/workspace/workspace-tab.ts",
+    "./types/workspace/testflow-dateset-tab": "./src/types/workspace/testflow-dateset-tab.ts",
     "./types/editorjs": "./src/types/editorjs/index.ts",
     "./interfaces": "./src/interfaces/index.ts",
     "./interfaces/collection.interface": "./src/interfaces/collection.interface.ts",

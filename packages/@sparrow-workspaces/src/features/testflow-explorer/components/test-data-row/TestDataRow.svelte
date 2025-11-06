@@ -3,9 +3,10 @@
   import { MoreVerticalRegular } from "@sparrow/library/icons";
   import { startLoading, stopLoading } from "@sparrow/common/store";
   import { Input } from "@sparrow/library/forms";
+  import type { TestflowDataSetItem } from "../../../../../../@sparrow-common/src/types/workspace/testflow-dateset-tab";
 
   export let dataset: any;
-  export let onOpenDataset: (ds: any) => void;
+  export let onOpenDataset: (data: TestflowDataSetItem) => void;
   export let onPerformDatasetOperations: (
     op: string,
     id: string,
@@ -114,7 +115,10 @@
   </div>
 </Modal>
 
-<tr class="data-row" on:click={() => onOpenDataset && onOpenDataset(dataset)}>
+<tr
+  class="data-row"
+  on:click={async () => await onOpenDataset(dataset.originalData)}
+>
   <td>
     <div class="d-flex flex-column">
       {#if isEditingName}

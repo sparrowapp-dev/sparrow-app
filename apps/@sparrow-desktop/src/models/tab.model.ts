@@ -284,7 +284,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 38,
+  version: 39,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -1873,6 +1873,33 @@ export const tabSchemaLiteral = {
             "runConfiguration",
             "notifications",
           ],
+        },
+        testflowDataSet: {
+          type: "object",
+          properties: {
+            name: { type: "string" },
+            formatType: { type: "string" },
+            fileSize: { type: "string" },
+            fileUrl: { type: "string" },
+            createdAt: { type: "string" },
+            updatedAt: { type: "string" },
+            createdBy: { type: "string" },
+            updatedBy: { type: "string" },
+            item: {
+              type: "object",
+              properties: {
+                dataSet: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    additionalProperties: true,
+                  },
+                },
+              },
+              required: ["dataSet"],
+            },
+          },
+          required: ["name", "formatType", "fileSize", "item"],
         },
       },
     },

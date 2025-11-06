@@ -447,6 +447,7 @@
     {isTeamDowngraded}
     teamPlanName={currentTeam?.plan?.name}
     importTestflowDataSet={_viewModel.importTestflowDataSet}
+    openTestflowDataSetTab={_viewModel.openTestflowDataSetTab}
   />
 {/if}
 

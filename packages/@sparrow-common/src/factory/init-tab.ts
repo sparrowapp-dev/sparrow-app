@@ -15,6 +15,7 @@ import { InitWorkspaceTab } from "../utils/init-workspace-tab";
 import { InitMockHistoryTab } from "../utils/init-mock-history-tab";
 import { InitHubTab } from "../utils/init-hub-tab";
 import { InitTestflowScheduleRunViewTab } from "../utils/init-testflow-schedule-run-view-tab";
+import { InitTestflowScheduleTab } from "../utils/init-testflow-schedule-tab";
 
 class InitTab {
   constructor() {}
@@ -57,8 +58,7 @@ class InitTab {
     return new InitTestflowTab(_id, _workspaceId);
   };
 
-  
-   /**
+  /**
    * @param _id - testflow mongo document id
    * @param _workspaceId - Workspace mongo id to which testflow belongs to
    */
@@ -66,6 +66,13 @@ class InitTab {
     return new InitTestflowScheduleRunViewTab(_id, _workspaceId);
   };
 
+  /**
+   * @param _id - testflow mongo document id
+   * @param _workspaceId - Workspace mongo id to which testflow belongs to
+   */
+  public testflowDataSet = (_id: string, _workspaceId: string) => {
+    return new InitTestflowScheduleTab(_id, _workspaceId);
+  };
 
   /**
    * @param _id - request mongo document id
