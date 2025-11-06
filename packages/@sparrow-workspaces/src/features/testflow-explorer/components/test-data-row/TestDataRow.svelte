@@ -52,7 +52,13 @@
 
   const handleBlur = async () => {
     if (isEditingName) {
-      await onPerformDatasetOperations("rename", dataset?.id, dataSetName);
+      const trimmedNewName = dataSetName.trim();
+      const trimmedOldName = (dataset?.name || dataset?.id || "").trim();
+
+      if (trimmedNewName !== trimmedOldName && trimmedNewName.length > 0) {
+        await onPerformDatasetOperations("rename", dataset?.id, trimmedNewName);
+      }
+
       isEditingName = false;
     }
   };
@@ -117,7 +123,7 @@
             id={`dataset-name-${dataset?.id}`}
             variant="inline"
             size="small"
-            width="auto"
+            width="130px"
             placeholder="Enter dataset name"
             bind:value={dataSetName}
             on:input={handleNameChange}
@@ -194,6 +200,18 @@
     border-bottom: 1px solid var(--border-ds-neutral-700);
     background-color: var(--bg-ds-neutral-900);
   }
+  .data-row td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border-ds-neutral-700);
+    background-color: var(--bg-ds-neutral-900);
+    transition: background-color 0.2s ease;
+  }
+
+  .data-row:hover td {
+    background-color: var(--bg-ds-surface-400);
+    cursor: pointer;
+  }
+
   .data-name.truncate {
     max-width: 260px;
     white-space: nowrap;
@@ -207,7 +225,26 @@
     margin-top: 2px;
   }
   /* Ensure consistent height when editing */
-  .d-flex.flex-column :global(input) {
+  .input-wrapper {
+    display: inline-flex;
+    align-items: center;
+    max-width: 126px;
+  }
+
+  .input-wrapper :global(input) {
     margin: -2px -8px;
+    width: auto !important;
+    min-width: 20px;
+    max-width: 126px;
+    font-size: 12px;
+    background-color: transparent;
+    border: 1px solid var(--border-ds-neutral-700);
+    border-radius: 4px;
+    transition: width 0.1s ease;
+  }
+
+  /* make input width auto-adjust based on content */
+  .input-wrapper :global(input) {
+    width: fit-content !important;
   }
 </style>
