@@ -45,22 +45,6 @@
     const d = new Date(iso);
     return d.toLocaleString();
   }
-
-  const handleNameChange = (e: CustomEvent<string>) => {
-    dataSetName = e.detail;
-  };
-
-  const handleBlur = async () => {
-    if (isEditingName) {
-      await onPerformDatasetOperations("rename", dataset?.id, dataSetName);
-      isEditingName = false;
-    }
-  };
-
-  const startRename = () => {
-    isEditingName = true;
-    showMenu = false;
-  };
 </script>
 
 <svelte:window on:click={() => (showMenu = false)} />

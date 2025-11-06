@@ -1,7 +1,10 @@
 import { getAuthHeaders, makeRequest } from "@app/containers/api/api.common";
 import constants from "@app/constants/constants";
 import { getSelfhostUrls } from "@app/utils/jwt";
-import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
+import type {
+  ScheduleTestFlowRunDto,
+  TestflowDataSetImportDto,
+} from "@sparrow/common/types/workspace/testflow-dto";
 
 export class TestflowService {
   constructor() {
@@ -242,6 +245,21 @@ export class TestflowService {
       `${this.apiUrl}/api/workspace/${_testflowId}/dataset/${testflowDataSetId}`,
       {
         body: { name: updatedDataSetName },
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public importTestflowDataSet = async (
+    testflowId: string,
+    payload: TestflowDataSetImportDto,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/workspace/testflow/${testflowId}/import-dataset`,
+      {
+        body: payload,
         headers: getAuthHeaders(),
       },
     );

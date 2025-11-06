@@ -68,8 +68,12 @@ import { PlanRepository } from "@app/repositories/plan.repository";
 import { TeamService } from "src/services/team.service";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 import { getAuthJwt } from "src/utils/jwt";
-import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
+import type {
+  ScheduleTestFlowRunDto,
+  TestflowDataSetImportDto,
+} from "@sparrow/common/types/workspace/testflow-dto";
 import {
+  testflowDataSets,
   updateTestflowDataSets,
   updateTestflowSchedules,
 } from "@sparrow/common/store";
@@ -2197,5 +2201,30 @@ export class TestflowExplorerPageViewModel {
       return teamDoc;
     }
     return null;
+  };
+
+  public importTestflowDataSet = async (
+    dataSet: any,
+    dataSetType: string,
+    name: string,
+  ) => {
+    try {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const payload = {
+        item: dataSet,
+        formatType: dataSetType,
+        name,
+      } as TestflowDataSetImportDto;
+      const response = await this.testflowService.importTestflowDataSet(
+        progressiveTab.id as string,
+        payload,
+      );
+      if (response?.isSuccessful) {
+        notifications.success(`Data set imported successfully.`);
+      }
+      return response;
+    } catch (err) {
+      console.log("Error importing dataset: ", err);
+    }
   };
 }
