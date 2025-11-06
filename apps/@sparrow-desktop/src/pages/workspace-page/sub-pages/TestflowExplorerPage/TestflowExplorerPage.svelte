@@ -438,6 +438,7 @@
     onOpenTestflowScheduleTab={_viewModel.openTestflowScheduleTab}
     onUpdateScheduleStatus={_viewModel.updateTestflowScheduleStatus}
     onPerformTestflowScheduleOperations={_viewModel.performTestflowScheduleOperations}
+    onPerformTestDataSetOperations={_viewModel.performTestDataSetOperations}
     onOpenTestflowScheduleConfigurationsTab={_viewModel.openTestflowScheduleConfigurationsTab}
     bind:isCreateTestflowScheduleLimitReachedModalOpen
     onOpenEnvironment={_viewModel.handleOpenEnvironment}

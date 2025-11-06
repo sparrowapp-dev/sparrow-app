@@ -56,6 +56,7 @@
     DismissRegular,
     ExpandIcon,
     DocumentRegular,
+    ArrowExpandRegular,
   } from "@sparrow/library/icons";
 
   import "@xyflow/svelte/dist/style.css";
@@ -195,6 +196,7 @@
   export let testflowScheduleStore = [];
 
   export let onPerformTestflowScheduleOperations;
+  export let onPerformTestDataSetOperations;
   export let onOpenTestflowScheduleConfigurationsTab;
   export let isCreateTestflowScheduleLimitReachedModalOpen;
   export let onFetchTestflow;
@@ -550,7 +552,7 @@
     // ds: a dataset object from testflowDataSetStore (see your sample structure)
     return {
       id: ds.id,
-      name: ds?.item?.dataSet?.[0]?.name || ds.id || "Untitled",
+      name: ds.name || "Untitled",
       formatType: ds.formatType || "-",
       fileSize: ds.fileSize || "-",
       lastUpdated: ds.createdAt
@@ -2229,92 +2231,80 @@
   };
 
   function syntaxHighlightJSON(json) {
-    let jsonString;
-    let parsed;
-
+    let obj;
     try {
       if (typeof json === "string") {
         const trimmed = json.trim();
-        // This is when we have multiple JSON objects separated by newlines
-        const lines = trimmed.split("\n").filter((line) => line.trim());
-
+        // Try JSONL fallback first: if multiple lines and each line is JSON object/array
+        const lines = trimmed.split("\n").filter((l) => l.trim());
         const looksLikeJSONL =
           lines.length > 1 &&
           lines.every((line) => {
-            const trimmedLine = line.trim();
+            const t = line.trim();
             return (
-              (trimmedLine.startsWith("{") || trimmedLine.startsWith("[")) &&
-              (trimmedLine.endsWith("}") || trimmedLine.endsWith("]"))
+              (t.startsWith("{") || t.startsWith("[")) &&
+              (t.endsWith("}") || t.endsWith("]"))
             );
           });
 
         if (looksLikeJSONL) {
-          // Parse as JSONL - each line is a separate JSON object
-          try {
-            parsed = lines.map((line) => JSON.parse(line.trim()));
-          } catch (jsonlError) {
-            // If JSONL parsing fails, try as regular JSON
-            parsed = JSON.parse(trimmed);
-          }
+          obj = lines.map((l) => JSON.parse(l));
         } else {
-          // Parse as regular JSON (could be object, array, or primitive)
-          parsed = JSON.parse(trimmed);
+          obj = JSON.parse(trimmed);
         }
       } else {
-        // Already a JavaScript object
-        parsed = json;
+        obj = json;
       }
-
-      jsonString = JSON.stringify(parsed, null, 2);
     } catch (e) {
-      console.error("JSON parse error:", e);
-
       const errorMsg = e.message || "Unknown parsing error";
-      const position = e.message.match(/position (\d+)/)?.[1] || "unknown";
-
+      const position =
+        (e &&
+          e.message &&
+          e.message.match &&
+          e.message.match(/position (\d+)/)?.[1]) ||
+        "unknown";
       return `<span style="color: #f48771;">Error parsing JSON: ${errorMsg}<br/>Position: ${position}</span>`;
     }
 
-    jsonString = jsonString
+    // Pretty print
+    const jsonString = JSON.stringify(obj, null, 2);
+
+    // Escape HTML
+    const escaped = jsonString
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      // Property keys (blue)
-      .replace(/"([^"\\]*(\\.[^"\\]*)*)"\s*:/g, (match, key) => {
-        return `<span class="json-key">"${key}"</span><span class="json-punctuation">:</span>`;
-      })
-      // String values (orange)
-      .replace(/:\s*"([^"\\]*(\\.[^"\\]*)*)"/g, (match, value) => {
-        return `: <span class="json-string">"${value}"</span>`;
-      })
-      // Standalone strings in arrays
-      .replace(/\[\s*"([^"\\]*(\\.[^"\\]*)*)"/g, (match, value) => {
-        return `[<span class="json-string">"${value}"</span>`;
-      })
-      .replace(/,\s*"([^"\\]*(\\.[^"\\]*)*)"/g, (match, value) => {
-        return `,<span class="json-string">"${value}"</span>`;
-      })
-      // Boolean values (blue)
-      .replace(/\b(true|false)\b/g, '<span class="json-boolean">$1</span>')
-      // Null values (blue)
-      .replace(/\bnull\b/g, '<span class="json-null">null</span>')
-      // Number values (green)
-      .replace(/:\s*(-?\d+\.?\d*([eE][+-]?\d+)?)/g, (match, num) => {
-        return `: <span class="json-number">${num}</span>`;
-      })
-      // Numbers in arrays
-      .replace(/\[\s*(-?\d+\.?\d*([eE][+-]?\d+)?)/g, (match, num) => {
-        return `[<span class="json-number">${num}</span>`;
-      })
-      .replace(/,\s*(-?\d+\.?\d*([eE][+-]?\d+)?)/g, (match, num) => {
-        return `,<span class="json-number">${num}</span>`;
-      })
-      // Structural characters (brackets, braces)
+      .replace(/>/g, "&gt;");
+
+    // Single regex to capture all token types
+    const highlighted = escaped.replace(
+      /("(\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(\.\d+)?([eE][+\-]?\d+)?)/g,
+      function (match) {
+        // Property key (ends with colon)
+        if (/^".*"\s*:$/g.test(match)) {
+          return `<span class="json-key">${match.replace(/:$/, "")}</span><span class="json-punctuation">:</span>`;
+        }
+        // String literal
+        if (/^"/.test(match)) {
+          return `<span class="json-string">${match}</span>`;
+        }
+        // Boolean / null
+        if (/^(true|false|null)$/.test(match)) {
+          if (match === "null")
+            return `<span class="json-null">${match}</span>`;
+          return `<span class="json-boolean">${match}</span>`;
+        }
+        // Number
+        return `<span class="json-number">${match}</span>`;
+      },
+    );
+
+    // Add punctuation and comma styling (optional)
+    // Commas and bracket/brace punctuation remain in the string; we can wrap them:
+    const withPunctuation = highlighted
       .replace(/([{}\[\]])/g, '<span class="json-punctuation">$1</span>')
-      // Commas
       .replace(/,(?![^<]*>)/g, '<span class="json-punctuation">,</span>');
 
-    return jsonString;
+    return withPunctuation;
   }
 
   const handleCellClick = (content: any, event: MouseEvent) => {
@@ -2849,7 +2839,10 @@
               </thead>
               <tbody>
                 {#each paginatedTestData as TestData}
-                  <TestDataRow dataset={TestData} />
+                  <TestDataRow
+                    dataset={TestData}
+                    onPerformDatasetOperations={onPerformTestDataSetOperations}
+                  />
                 {/each}
               </tbody>
             </table>
@@ -3273,17 +3266,6 @@
           <Loader loaderSize="32px" />
         </div>
         <p class="loading-text">Importing test data...</p>
-        <Button
-          title="Cancel"
-          type="secondary"
-          size="medium"
-          onClick={() => {
-            isImportLoadingModalOpen = false;
-            importedFileContent = null;
-            importedFileName = null;
-            isImporting = false;
-          }}
-        />
       </div>
     {:else if importedFileContent}
       <!-- Unified table display for both JSON and CSV -->
@@ -3295,6 +3277,7 @@
               {importedFileName}
             </div>
             <div class="file-meta">
+<<<<<<< HEAD
               Last updated a few seconds ago • Size {Math.round(
                 importedFileContent.length / 1024,
               )} KB • {(() => {
@@ -3306,11 +3289,22 @@
                   return 0;
                 }
               })()} rows
+=======
+              Last updated <span class="bold-text">a few seconds ago</span> •
+              Size
+              <span class="bold-text"
+                >{Math.round(importedFileContent.length / 1024)} KB</span
+              >
+>>>>>>> release/2.35.0
             </div>
           </div>
 
           <div class="file-header-actions">
-            <Button type="secondary" size="small" startIcon={ExpandIcon} />
+            <Button
+              type="secondary"
+              size="small"
+              startIcon={ArrowExpandRegular}
+            />
             <Button
               type="secondary"
               size="small"
@@ -3559,6 +3553,33 @@
   .table-container::-webkit-scrollbar-thumb:hover {
     background: #505050;
   }
+  .bold-text {
+    font-weight: 700;
+    color: var(--text-ds-neutral-200);
+  }
+
+  /* scope to the pre with preview-content */
+  :global(pre.preview-content .json-key) {
+    color: #5ec5ed;
+  }
+  :global(pre.preview-content .json-string) {
+    color: #ef9765;
+  }
+  :global(pre.preview-content .json-boolean),
+  :global(pre.preview-content .json-null) {
+    color: #6ce096;
+  }
+
+  /* If something still overrides color, make the string rule more specific/or force it */
+  :global(pre.preview-content .json-string) {
+    color: #ef9765 !important;
+  }
+
+  /* ensure the pre doesn't override children color with higher specificity later */
+  :global(pre.preview-content) {
+    color: inherit; /* allow children to define colors */
+  }
+
   .file-preview-container {
     display: flex;
     flex-direction: column;
@@ -3606,12 +3627,13 @@
   }
 
   .file-preview {
-    width: 780px;
-    height: 528px;
+    width: 100%;
+    height: 100%;
     overflow: auto;
     background: var(--bg-ds-surface-600);
     border: 1px solid #2e2e2e;
     border-radius: 6px;
+    padding-right: 8px;
     padding: 16px;
     font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Code", "Consolas",
       monospace;
@@ -3635,43 +3657,47 @@
   .preview-content {
     font-family: inherit;
     font-size: 12px;
-    color: var(--text-ds-neutral-50);
+    font-weight: 400;
     background: transparent;
     margin: 0;
     padding: 0;
+    padding-right: 4px;
     white-space: pre;
     line-height: 1.6;
     letter-spacing: 0.01em;
   }
 
-  /* JSON Syntax Highlighting - adjusted for Figma look */
-  :global(.preview-content .json-key) {
-    color: #5ec5ed;
-  }
-  :global(.json-string) {
-    color: #ef9765;
-  }
-  :global(.preview-content .json-number) {
-    color: #b5cea8;
-  }
-  :global(.preview-content .json-boolean),
-  :global(.preview-content .json-null) {
-    color: #6ce096;
-  }
-
   /* Scrollbar styling */
   .file-preview::-webkit-scrollbar {
-    width: 4px;
-    height: 150px;
-  }
-  .file-preview::-webkit-scrollbar-thumb {
-    background: #9b9da1;
-    border-radius: 6px;
-  }
-  .file-preview::-webkit-scrollbar-thumb:hover {
-    background: #505050;
+    width: 12px;
+    height: auto;
   }
 
+  .file-preview::-webkit-scrollbar-track {
+    background: transparent;
+    margin-top: 16px;
+    margin-bottom: 20px;
+  }
+
+  .file-preview::-webkit-scrollbar-thumb {
+    background: #9b9da1;
+    border-radius: 8px;
+    height: 150px;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .file-preview::-webkit-scrollbar-thumb:hover {
+    background: #9b9da1;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .file-preview::-webkit-scrollbar-button {
+    display: none;
+  }
   .import-loading-container {
     max-height: 648px;
     padding: 10px;

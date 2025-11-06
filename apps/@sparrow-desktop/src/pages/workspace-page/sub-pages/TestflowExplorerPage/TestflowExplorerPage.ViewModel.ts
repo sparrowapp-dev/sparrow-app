@@ -212,6 +212,34 @@ export class TestflowExplorerPageViewModel {
     }
   };
 
+  private deleteTestDataSet = async (testflowDataSetId: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const response = await this.testflowService.deleteTestDataSet(
+      progressiveTab.id as string,
+      testflowDataSetId,
+    );
+    if (response?.isSuccessful) {
+      const datasets = response.data?.data.datasets;
+      updateTestflowDataSets(progressiveTab.id as string, datasets || []);
+    }
+  };
+
+  public renameTestDataSet = async (
+    testflowDataSetId: string,
+    updatedDataSetName: string,
+  ) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const response = await this.testflowService.renameTestDataSet(
+      progressiveTab.id as string,
+      testflowDataSetId,
+      updatedDataSetName,
+    );
+    if (response?.isSuccessful) {
+      const datasets = response.data?.data.result;
+      updateTestflowDataSets(progressiveTab.id as string, datasets || []);
+    }
+  };
+
   /**
    * Debounced method for updating testflow nodes
    */
@@ -2118,6 +2146,18 @@ export class TestflowExplorerPageViewModel {
       this.editTestflowSchedule(_scheduleId);
     } else if (_type === "delete") {
       this.deleteTestflowSchedule(_scheduleId, _scheduleName);
+    }
+  };
+
+  public performTestDataSetOperations = async (
+    _type: "delete" | "export" | "rename",
+    testflowDataSetId: string,
+    updatedDataSetName?: string,
+  ) => {
+    if (_type === "delete") {
+      this.deleteTestDataSet(testflowDataSetId);
+    } else if (_type === "rename") {
+      this.renameTestDataSet(testflowDataSetId, updatedDataSetName);
     }
   };
 
