@@ -7,6 +7,7 @@ import {
   InitTestflowScheduleTab,
   scrollToTab,
   InitEnvironmentTab,
+  InitTestflowDataSetTab,
 } from "@sparrow/common/utils";
 import { RequestTabAdapter, TestflowTabAdapter } from "../../../../adapter";
 import type {
@@ -79,6 +80,7 @@ import {
 } from "@sparrow/common/store";
 import { captureEvent } from "@app/utils/posthog/posthogConfig";
 import { TestflowScheduleNavigatorEnum } from "@sparrow/common/types/workspace/testflow-schedule-tab";
+import type { TestflowDataSetItem } from "@sparrow/common/types/workspace/testflow-dateset-tab";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -2263,5 +2265,26 @@ export class TestflowExplorerPageViewModel {
     } catch (err) {
       console.log("Error importing dataset: ", err);
     }
+  };
+
+  public openTestflowDataSetTab = async (dataSet: TestflowDataSetItem) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const initTestflowDataSetTab = new InitTestflowDataSetTab(
+      dataSet.id,
+      progressiveTab.path.workspaceId,
+      progressiveTab.id,
+    )
+      .updateName(dataSet.name)
+      .updateDataSet(dataSet?.item)
+      .updateFormatType(dataSet.formatType)
+      .updateTimestamps(dataSet.createdAt, dataSet.updatedAt)
+      .updateFileDetails({
+        fileSize: dataSet.fileSize,
+        fileUrl: dataSet.fileUrl,
+        updatedBy: dataSet.updatedBy,
+      })
+      .updateUpdatedAt(dataSet?.updatedAt || "")
+      .getValue();
+    await this.tabRepository.createTab(initTestflowDataSetTab);
   };
 }

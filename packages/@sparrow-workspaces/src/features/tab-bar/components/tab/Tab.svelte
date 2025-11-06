@@ -33,6 +33,7 @@
     DatabaseStackRegular,
     ClockRegular,
     ClockAlarmRegular,
+    DocumentRegular,
   } from "@sparrow/library/icons";
   import {
     TabPersistenceTypeEnum,
@@ -324,6 +325,10 @@
             size={"14px"}
             color={"var(--icon-ds-neutral-100)"}
           />
+        </span>
+      {:else if tab.type === TabTypeEnum.TESTFLOW_DATASET}
+        <span class="d-inline-block" style="transform: translateY(2px);">
+          <DocumentRegular size={"14px"} color={"var(--icon-ds-neutral-100)"} />
         </span>
       {:else if tab.type === TabTypeEnum.AI_REQUEST}
         <span>

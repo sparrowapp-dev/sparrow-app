@@ -400,6 +400,7 @@
     teamPlanName={currentTeam?.plan?.name}
     onFetchTestflowDataSets={_viewModel.fetchTestflowDataSets}
     importTestflowDataSet={_viewModel.importTestflowDataSet}
+    openTestflowDataSetTab={_viewModel.openTestflowDataSetTab}
   />
 {/if}
 

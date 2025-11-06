@@ -209,6 +209,7 @@
     dataSetType: string,
     name: string,
   ) => Promise<void>;
+  export let openTestflowDataSetTab: (dataSet: any) => void;
 
   export let onUpdateScheduleStatus: (
     scheduleId: string,
@@ -2842,6 +2843,7 @@
                   <TestDataRow
                     dataset={TestData}
                     onPerformDatasetOperations={onPerformTestDataSetOperations}
+                    onOpenDataset={openTestflowDataSetTab}
                   />
                 {/each}
               </tbody>
