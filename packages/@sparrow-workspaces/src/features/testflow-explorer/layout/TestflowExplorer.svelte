@@ -141,6 +141,7 @@
   } from "@sparrow/common/store";
   import { isTeamDowngradePopupDismissed } from "../store";
   import TestDataRow from "../components/test-data-row/TestDataRow.svelte";
+  import Papa from "papaparse";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -201,6 +202,11 @@
   export let teamPlanName;
   export let testflowDataSetStore = [];
   export let onFetchTestflowDataSets;
+  export let importTestflowDataSet: (
+    dataSet: any,
+    dataSetType: string,
+    name: string,
+  ) => Promise<void>;
 
   export let onUpdateScheduleStatus: (
     scheduleId: string,
@@ -282,6 +288,9 @@
   let importFileInput: HTMLInputElement | null = null;
   let importedFileContent: string | null = null;
   let importedFileName: string | null = null;
+  let importFileFormatType: string | null = null;
+  let selectedCellContent: string | null = null;
+  let cellModalPosition = { x: 0, y: 0 };
   let isImporting = false;
   let isImportLoadingModalOpen = false;
   let isImportCancelled = false;
@@ -1310,7 +1319,6 @@
             reqMetaRequestId,
             reqMetaFolderId,
           );
-          debugger;
           const reqType = reqData?.type;
           // If type exists and is not REQUEST, block node creation
           if (reqType && reqType !== "REQUEST") {
@@ -2127,13 +2135,20 @@
     importFileInput?.click();
   };
 
+  const convertCsvToJsonFormat = (csvData: any[]): Record<string, any>[] => {
+    return csvData.map((row) => {
+      const { no: _, ...data } = row;
+      return data;
+    });
+  };
+
+  // Updated handleImportFileChange function - shows table from response
   const handleImportFileChange = async (event: Event) => {
     const input = event.target as HTMLInputElement;
     const file = input?.files?.[0];
     if (!file) return;
-
-    // Validate file type
-    if (!file.name.match(/\.(json|csv)$/i)) {
+    const fileExtension = file.name.match(/\.(json|csv)$/i)?.[1]?.toLowerCase();
+    if (!fileExtension) {
       notifications.error(
         "Failed to import. Please select a valid JSON or CSV file.",
       );
@@ -2143,39 +2158,73 @@
 
     try {
       isImportCancelled = false;
-
-      // Open modal only once
-      if (!isImportLoadingModalOpen) {
-        isImportLoadingModalOpen = true;
-      }
-
-      // Show loader
+      if (!isImportLoadingModalOpen) isImportLoadingModalOpen = true;
       isImporting = true;
       importedFileContent = null;
       importedFileName = null;
 
-      // Simulate loading delay
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      // Read file
       const text = await file.text();
       if (isImportCancelled) return;
 
-      // Replace loader with file preview
-      importedFileContent = text;
-      importedFileName = file.name;
-      isImporting = false;
+      let jsonData: Record<string, any>[];
+      const fileType = fileExtension as "json" | "csv";
 
-      notifications.success("Test Data imported successfully");
+      if (fileType === "csv") {
+        const parseResult = await new Promise<Papa.ParseResult<any>>(
+          (resolve, reject) => {
+            Papa.parse(text, {
+              header: true,
+              skipEmptyLines: true,
+              dynamicTyping: true,
+              complete: resolve,
+              error: reject,
+            });
+          },
+        );
+
+        if (parseResult.errors.length > 0) {
+          throw new Error(
+            `CSV parsing error: ${parseResult.errors[0].message}`,
+          );
+        }
+        // Convert CSV to clean JSON format (without 'no' field)
+        jsonData = convertCsvToJsonFormat(parseResult.data);
+      } else {
+        // Handle JSON input - extract dataSet if wrapped
+        const parsed = JSON.parse(text);
+        jsonData = parsed?.dataSet || parsed;
+      }
+
+      const formatType = fileType.toUpperCase();
+      const wrappedData = { dataSet: jsonData };
+
+      // Send wrapped data to backend
+      const response = await importTestflowDataSet(
+        wrappedData,
+        formatType,
+        file.name,
+      );
+
+      // Extract the dataset from the nested response structure
+
+      if (response?.isSuccessful) {
+        // Success case - show the preview modal
+        isImporting = false;
+        importFileFormatType = fileType;
+        importedFileName = file.name;
+        importedFileContent = JSON.stringify(jsonData, null, 2);
+        isImportLoadingModalOpen = true;
+      } else if (response?.data?.message === "Dataset already exists") {
+        console.warn("Import skipped: Dataset already exists.");
+        isImporting = false;
+        isImportLoadingModalOpen = false;
+      } else {
+        console.error("Invalid response structure:", response);
+        throw new Error("Invalid response structure from server");
+      }
     } catch (err) {
       console.error("Failed to import file", err);
-      notifications.error("Failed to import test data. Please try again.");
-      isImportLoadingModalOpen = false;
       isImporting = false;
-      importedFileContent = null;
-      importedFileName = null;
-    } finally {
-      input.value = "";
     }
   };
 
@@ -2267,6 +2316,26 @@
 
     return jsonString;
   }
+
+  const handleCellClick = (content: any, event: MouseEvent) => {
+    const cellElement = event.currentTarget as HTMLElement;
+    const rect = cellElement.getBoundingClientRect();
+    // Check if content is actually truncated
+    if (
+      cellElement.scrollWidth > cellElement.clientWidth ||
+      String(content).length > 50
+    ) {
+      selectedCellContent = String(content);
+      cellModalPosition = {
+        x: rect.left,
+        y: rect.bottom + 8,
+      };
+    }
+  };
+
+  const closeCellModal = () => {
+    selectedCellContent = null;
+  };
 </script>
 
 <div
@@ -3217,7 +3286,7 @@
         />
       </div>
     {:else if importedFileContent}
-      <!-- File preview section -->
+      <!-- Unified table display for both JSON and CSV -->
       <div class="file-preview-container">
         <div class="file-preview-header">
           <div class="file-header-left">
@@ -3228,7 +3297,15 @@
             <div class="file-meta">
               Last updated a few seconds ago • Size {Math.round(
                 importedFileContent.length / 1024,
-              )} KB
+              )} KB • {(() => {
+                try {
+                  const parsed = JSON.parse(importedFileContent);
+                  const data = parsed.dataSet || parsed;
+                  return Array.isArray(data) ? data.length : 0;
+                } catch {
+                  return 0;
+                }
+              })()} rows
             </div>
           </div>
 
@@ -3248,17 +3325,240 @@
           </div>
         </div>
 
-        <div class="file-preview">
-          <pre class="preview-content">{@html syntaxHighlightJSON(
-              importedFileContent,
-            )}</pre>
+        <div class="file-preview-csv">
+          <div class="table-container">
+            {#if importedFileContent}
+              {@const parsed = JSON.parse(importedFileContent)}
+              {@const data = parsed.dataSet || parsed}
+              {@const columns =
+                Array.isArray(data) && data.length > 0
+                  ? Object.keys(data[0])
+                  : []}
+
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th class="row-number">#</th>
+                    {#each columns as column}
+                      <th>{column}</th>
+                    {/each}
+                  </tr>
+                </thead>
+                <tbody>
+                  {#each data as row, index}
+                    <tr>
+                      <td class="row-number">{index + 1}</td>
+                      {#each columns as column}
+                        <td
+                          class="table-cell-clickable"
+                          on:click={(e) => handleCellClick(row[column], e)}
+                          title="Click to view full content"
+                        >
+                          {row[column] ?? "-"}
+                        </td>
+                      {/each}
+                    </tr>
+                  {/each}
+                </tbody>
+              </table>
+            {/if}
+          </div>
         </div>
+        {#if selectedCellContent !== null}
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <div class="cell-modal-overlay" on:click={closeCellModal}>
+            <div
+              class="cell-modal"
+              style="left: {cellModalPosition.x}px; top: {cellModalPosition.y}px;"
+              on:click|stopPropagation
+            >
+              <div class="cell-modal-header">
+                <button class="cell-modal-close" on:click={closeCellModal}>
+                  <DismissRegular />
+                </button>
+              </div>
+              <div class="cell-modal-content">
+                {selectedCellContent}
+              </div>
+            </div>
+          </div>
+        {/if}
       </div>
     {/if}
   </div>
 </Modal>
 
 <style>
+  .file-preview-csv {
+    flex: 1;
+    overflow: auto;
+    padding: 16px;
+    background: var(--bg-ds-surface-600);
+    border: 1px solid #2e2e2e;
+    border-radius: 6px;
+    width: 780px;
+    height: 528px;
+    box-sizing: border-box;
+    margin: 0 auto;
+  }
+
+  .table-container {
+    overflow: auto;
+    max-height: 480px;
+    width: 100%;
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--text-ds-neutral-100);
+    background-color: var(--bg-ds-neutral-900);
+    font-size: 12px;
+  }
+
+  .data-table thead {
+    position: sticky;
+    top: 0;
+    background-color: var(--bg-ds-neutral-900);
+    z-index: 1;
+  }
+
+  .data-table th {
+    background-color: var(--bg-ds-neutral-900);
+    padding: 12px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--text-ds-neutral-300);
+    border-bottom: 1px solid var(--border-ds-neutral-700);
+  }
+
+  .data-table td {
+    padding: 12px;
+    border-bottom: none;
+    font-size: 12px;
+    background-color: var(--bg-ds-neutral-900);
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .table-cell-clickable {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .row-number {
+    width: 50px;
+    text-align: center;
+    font-weight: 500;
+    color: var(--text-ds-neutral-400);
+    background-color: var(--bg-ds-neutral-900);
+  }
+
+  /* Cell Modal Styles */
+  .cell-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .cell-modal {
+    position: fixed;
+    background-color: var(--bg-ds-surface-600);
+    border: 1px solid var(--border-ds-neutral-400);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    max-width: 500px;
+    max-height: 400px;
+    min-width: 300px;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .cell-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-ds-neutral-700);
+    background-color: var(--bg-ds-surface-400);
+  }
+
+  .cell-modal-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-ds-neutral-50);
+  }
+
+  .cell-modal-close {
+    background: none;
+    border: none;
+    color: var(--text-ds-neutral-300);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+
+  .cell-modal-close:hover {
+    background-color: var(--bg-ds-surface-600);
+    color: var(--text-ds-neutral-100);
+  }
+
+  .cell-modal-content {
+    padding: 16px;
+    overflow: auto;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--text-ds-neutral-100);
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Code", "Consolas",
+      monospace;
+  }
+
+  .cell-modal-content::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  .cell-modal-content::-webkit-scrollbar-thumb {
+    background: #9b9da1;
+    border-radius: 6px;
+  }
+
+  .cell-modal-content::-webkit-scrollbar-thumb:hover {
+    background: #505050;
+  }
+
+  /* Scrollbar styling for table */
+  .table-container::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  .table-container::-webkit-scrollbar-thumb {
+    background: #9b9da1;
+    border-radius: 6px;
+  }
+
+  .table-container::-webkit-scrollbar-thumb:hover {
+    background: #505050;
+  }
   .file-preview-container {
     display: flex;
     flex-direction: column;
@@ -3318,6 +3618,19 @@
     box-sizing: border-box;
     margin: 0 auto;
   }
+  .file-preview-csv {
+    width: 780px;
+    max-height: 528px;
+    overflow: auto;
+    background: var(--bg-ds-surface-600);
+    border: 1px solid #2e2e2e;
+    border-radius: 6px;
+    padding: 16px;
+    font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Code", "Consolas",
+      monospace;
+    box-sizing: border-box;
+    margin: 0 auto;
+  }
 
   .preview-content {
     font-family: inherit;
@@ -3360,7 +3673,7 @@
   }
 
   .import-loading-container {
-    height: 648px;
+    max-height: 648px;
     padding: 10px;
     display: flex;
     align-items: center;

@@ -39,10 +39,6 @@
     const d = new Date(iso);
     return d.toLocaleString();
   }
-  $: {
-    debugger;
-    console.log("Dataset Row Rendered:", dataset);
-  }
 </script>
 
 <svelte:window on:click={() => (showMenu = false)} />

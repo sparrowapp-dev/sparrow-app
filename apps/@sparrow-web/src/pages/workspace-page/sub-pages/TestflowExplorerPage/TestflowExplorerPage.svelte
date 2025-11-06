@@ -23,6 +23,7 @@
   import { ScheduleRunPopUp } from "@sparrow/common/features";
   import { Modal } from "@sparrow/library/ui";
   import { getClientUser } from "src/utils/jwt";
+  import { testflowDataSets } from "@sparrow/common/store";
   export let tab;
   export let teamDetails;
   export let upgradePlanModel;
@@ -398,6 +399,7 @@
     {isTeamDowngraded}
     teamPlanName={currentTeam?.plan?.name}
     onFetchTestflowDataSets={_viewModel.fetchTestflowDataSets}
+    importTestflowDataSet={_viewModel.importTestflowDataSet}
   />
 {/if}
 

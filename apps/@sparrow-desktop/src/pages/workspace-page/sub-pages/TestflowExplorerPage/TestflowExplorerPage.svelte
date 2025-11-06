@@ -445,6 +445,7 @@
     onFetchTestflowDataSets={_viewModel.fetchTestflowDataSets}
     {isTeamDowngraded}
     teamPlanName={currentTeam?.plan?.name}
+    importTestflowDataSet={_viewModel.importTestflowDataSet}
   />
 {/if}
 
