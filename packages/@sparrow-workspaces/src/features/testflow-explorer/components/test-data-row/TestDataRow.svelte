@@ -60,6 +60,16 @@
   const startRename = () => {
     isEditingName = true;
     showMenu = false;
+    // Focus the input after the DOM updates
+    setTimeout(() => {
+      const input = document.getElementById(
+        `dataset-name-${dataset?.id}`,
+      ) as HTMLInputElement;
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    }, 0);
   };
 </script>
 
@@ -102,15 +112,18 @@
   <td>
     <div class="d-flex flex-column">
       {#if isEditingName}
-        <Input
-          id="dataset-name"
-          variant="inline"
-          size="small"
-          placeholder="Enter dataset name"
-          bind:value={dataSetName}
-          on:input={handleNameChange}
-          on:blur={handleBlur}
-        />
+        <div class="input-wrapper">
+          <Input
+            id={`dataset-name-${dataset?.id}`}
+            variant="inline"
+            size="small"
+            width="auto"
+            placeholder="Enter dataset name"
+            bind:value={dataSetName}
+            on:input={handleNameChange}
+            on:blur={handleBlur}
+          />
+        </div>
       {:else}
         <span class="data-name text-fs-12 truncate">{dataSetName}</span>
       {/if}
@@ -192,5 +205,9 @@
     font-size: 12px;
     color: var(--text-ds-neutral-400);
     margin-top: 2px;
+  }
+  /* Ensure consistent height when editing */
+  .d-flex.flex-column :global(input) {
+    margin: -2px -8px;
   }
 </style>
