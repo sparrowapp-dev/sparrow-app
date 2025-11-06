@@ -231,7 +231,7 @@ export class TestflowExplorerPageViewModel {
       updatedDataSetName,
     );
     if (response?.isSuccessful) {
-      const datasets = response.data?.data.datasets;
+      const datasets = response.data?.data.result;
       updateTestflowDataSets(progressiveTab.id as string, datasets || []);
     }
   };

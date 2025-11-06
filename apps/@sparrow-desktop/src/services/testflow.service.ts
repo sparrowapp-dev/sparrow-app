@@ -238,10 +238,10 @@ export class TestflowService {
     updatedDataSetName: string,
   ) => {
     const response = await makeRequest(
-      "PUT",
+      "PATCH",
       `${this.apiUrl}/api/workspace/${_testflowId}/dataset/${testflowDataSetId}`,
       {
-        body: { updatedDataSetName: updatedDataSetName },
+        body: { name: updatedDataSetName },
         headers: getAuthHeaders(),
       },
     );

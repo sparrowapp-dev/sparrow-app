@@ -2,7 +2,7 @@
   import { Options, Button, Modal } from "@sparrow/library/ui";
   import { MoreVerticalRegular } from "@sparrow/library/icons";
   import { startLoading, stopLoading } from "@sparrow/common/store";
-  // import { testflow } from "../../../testflow-schedule-explorer/layout/TestflowScheduleExplorer.svelte";
+  import { Input } from "@sparrow/library/forms";
 
   export let dataset: any;
   export let onOpenDataset: (ds: any) => void;
@@ -16,6 +16,15 @@
   let activeWrapper: HTMLElement;
   let isDeletePopup = false;
   let deleteLoader = false;
+  let isEditingName = false;
+  let dataSetName = dataset?.name || dataset?.id;
+
+  $: {
+    console.log("Dataset Row Rendered:", dataset);
+    if (!isEditingName) {
+      dataSetName = dataset?.name || dataset?.id;
+    }
+  }
 
   function rightClickContextMenu() {
     setTimeout(() => {
@@ -36,9 +45,22 @@
     const d = new Date(iso);
     return d.toLocaleString();
   }
-  $: {
-    console.log("Dataset Row Rendered:", dataset);
-  }
+
+  const handleNameChange = (e: CustomEvent<string>) => {
+    dataSetName = e.detail;
+  };
+
+  const handleBlur = async () => {
+    if (isEditingName) {
+      await onPerformDatasetOperations("rename", dataset?.id, dataSetName);
+      isEditingName = false;
+    }
+  };
+
+  const startRename = () => {
+    isEditingName = true;
+    showMenu = false;
+  };
 </script>
 
 <svelte:window on:click={() => (showMenu = false)} />
@@ -53,11 +75,11 @@
 >
   <div class="text-lightGray mb-1 text-fs-14">
     <p>
-      Are you sure you want to delete <strong
-        style="color:var(--text-ds-neutral-50)"
-        >"{dataset?.item?.dataSet?.[0]?.name || dataset?.id}"</strong
-      >? This file might be linked to one or more scheduled test executions.
-      Deleting it could impact their results.
+      Are you sure you want to delete
+      <strong style="color:var(--text-ds-neutral-50)">
+        "{dataset?.item?.dataSet?.[0]?.name || dataset?.id}"
+      </strong>? This file might be linked to one or more scheduled test
+      executions. Deleting it could impact their results.
     </p>
   </div>
 
@@ -79,9 +101,20 @@
 <tr class="data-row" on:click={() => onOpenDataset && onOpenDataset(dataset)}>
   <td>
     <div class="d-flex flex-column">
-      <span class="data-name text-fs-12 truncate"
-        >{dataset?.item?.dataSet?.[0]?.name || dataset?.id}</span
-      >
+      {#if isEditingName}
+        <Input
+          id="dataset-name"
+          variant="inline"
+          size="small"
+          placeholder="Enter dataset name"
+          bind:value={dataSetName}
+          on:input={handleNameChange}
+          on:blur={handleBlur}
+        />
+      {:else}
+        <span class="data-name text-fs-12 truncate">{dataSetName}</span>
+      {/if}
+
       <span class="data-sub text-fs-12 text-muted"
         >{dataset?.item?.description || ""}</span
       >
@@ -102,12 +135,7 @@
         width="120px"
         menuItems={[
           {
-            onClick: async () =>
-              onPerformDatasetOperations(
-                "rename",
-                dataset.id,
-                dataset.item?.dataSet?.[0]?.name,
-              ),
+            onClick: startRename,
             displayText: "Rename",
             disabled: false,
             hidden: false,
