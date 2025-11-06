@@ -3277,7 +3277,6 @@
               {importedFileName}
             </div>
             <div class="file-meta">
-<<<<<<< HEAD
               Last updated a few seconds ago • Size {Math.round(
                 importedFileContent.length / 1024,
               )} KB • {(() => {
@@ -3289,13 +3288,6 @@
                   return 0;
                 }
               })()} rows
-=======
-              Last updated <span class="bold-text">a few seconds ago</span> •
-              Size
-              <span class="bold-text"
-                >{Math.round(importedFileContent.length / 1024)} KB</span
-              >
->>>>>>> release/2.35.0
             </div>
           </div>
 
