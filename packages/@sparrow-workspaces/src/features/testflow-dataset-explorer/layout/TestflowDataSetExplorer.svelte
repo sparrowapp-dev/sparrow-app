@@ -138,7 +138,7 @@
       />
 
       <div class="d-flex gap-2">
-        {#if isWebApp}
+        {#if !isWebApp}
           <Button
             id="export-file"
             disable={false}
@@ -146,7 +146,7 @@
             type="secondary"
             size="medium"
             startIcon={ArrowDownloadRegular}
-            onClick={handleExport}
+            onClick={handleExportDownload}
           />
         {:else}
           <Button
@@ -156,7 +156,7 @@
             type="secondary"
             size="medium"
             startIcon={ArrowDownloadRegular}
-            onClick={handleExportDownload}
+            onClick={handleExport}
           />
         {/if}
         <Button
