@@ -56,8 +56,10 @@
     RunIcon,
     StopFilled,
     Clock,
+    ChevronDownRegular,
+    CheckMarkIcon,
   } from "@sparrow/library/icons";
-  import { Button, Modal, notifications } from "@sparrow/library/ui";
+  import { Button, Modal, notifications, Dropdown } from "@sparrow/library/ui";
   import { BroomRegular } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
   import DeleteNode from "../../../components/delete-node/DeleteNode.svelte";
@@ -387,6 +389,82 @@
   function dismissWarning() {
     dismissed = true;
   }
+
+  // Dataset dropdown (sample data shown in the UI mock)
+  let datasetMenuOpen: boolean = false;
+  let selectedDataset: string = "Dataset 1";
+
+  function getDatasetIconProps(datasetName: string, selectedDataset: string) {
+    return {
+      endIcon: selectedDataset === datasetName ? CheckMarkIcon : undefined,
+      iconSize: "16px",
+      iconColor: "var(--text-ds-primary-300)",
+    };
+  }
+
+  // Recompute options so endIcon updates when selectedDataset changes
+  $: datasetOptions = [
+    {
+      name: "Dataset 1",
+      color:
+        selectedDataset === "Dataset 1"
+          ? "var(--text-ds-primary-300)"
+          : "var(--text-ds-neutral-50)",
+      onclick: () => {
+        selectedDataset = "Dataset 1";
+        datasetMenuOpen = false;
+      },
+      ...getDatasetIconProps("Dataset 1", selectedDataset),
+    },
+    {
+      name: "Dataset 2",
+      color:
+        selectedDataset === "Dataset 2"
+          ? "var(--text-ds-primary-300)"
+          : "var(--text-ds-neutral-50)",
+      onclick: () => {
+        selectedDataset = "Dataset 2";
+        datasetMenuOpen = false;
+      },
+      ...getDatasetIconProps("Dataset 2", selectedDataset),
+    },
+    {
+      name: "Dataset 3",
+      color:
+        selectedDataset === "Dataset 3"
+          ? "var(--text-ds-primary-300)"
+          : "var(--text-ds-neutral-50)",
+      onclick: () => {
+        selectedDataset = "Dataset 3";
+        datasetMenuOpen = false;
+      },
+      ...getDatasetIconProps("Dataset 3", selectedDataset),
+    },
+    {
+      name: "Dataset 4",
+      color:
+        selectedDataset === "Dataset 4"
+          ? "var(--text-ds-primary-300)"
+          : "var(--text-ds-neutral-50)",
+      onclick: () => {
+        selectedDataset = "Dataset 4";
+        datasetMenuOpen = false;
+      },
+      ...getDatasetIconProps("Dataset 4", selectedDataset),
+    },
+    {
+      name: "Dataset 5",
+      color:
+        selectedDataset === "Dataset 5"
+          ? "var(--text-ds-primary-300)"
+          : "var(--text-ds-neutral-50)",
+      onclick: () => {
+        selectedDataset = "Dataset 5";
+        datasetMenuOpen = false;
+      },
+      ...getDatasetIconProps("Dataset 5", selectedDataset),
+    },
+  ];
 
   function handleSearchSchedules(event) {
     searchQuery = event.target.value;
@@ -1836,6 +1914,35 @@
         {$tab.property?.testflowScheduleRunView?.result?.successRequests ?? 0} Passed,
         {$tab.property?.testflowScheduleRunView?.result?.failedRequests ?? 0} Failed)
       </span>
+    </div>
+
+    <div style="position:absolute; top:12px; right:16px; z-index:4;">
+      <Dropdown
+        buttonId="datasetDropdownBtn"
+        bind:isMenuOpen={datasetMenuOpen}
+        options={datasetOptions}
+        horizontalPosition="left"
+        minWidth={180}
+      >
+        <button
+          id="datasetDropdownBtn"
+          class="d-flex align-items-center gap-2 border-0"
+          on:click={() => (datasetMenuOpen = !datasetMenuOpen)}
+          style="padding:6px 12px; border-radius:6px; background:var(--bg-ds-surface-600); color:var(--text-ds-neutral-50); font-size:13px; font-weight:500;"
+        >
+          {selectedDataset}
+          <span
+            style="display:flex; transition: transform 0.2s ease; transform: rotate({datasetMenuOpen
+              ? '180deg'
+              : '0deg'});"
+          >
+            <ChevronDownRegular
+              size="16px"
+              color="var(--text-ds-neutral-300)"
+            />
+          </span>
+        </button>
+      </Dropdown>
     </div>
   </div>
 
