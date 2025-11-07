@@ -16,5 +16,5 @@
 </script>
 
 {#if tab}
-  <TestflowDataSetExplorer tab={_viewModel.tab} />
+  <TestflowDataSetExplorer tab={_viewModel.tab} isWebApp={false} />
 {/if}
