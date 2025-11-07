@@ -332,12 +332,14 @@
     _environemntId: any,
     _runConfigurations: any,
     _notifications: any,
+    _testflowDataSetId: any,
   ) => {
     const response = await _viewModel.scheduleTestFlowRun(
       _testflowScheduleName,
       _environemntId,
       _runConfigurations,
       _notifications,
+      _testflowDataSetId,
     );
     if (response.message === "Plan limit reached") {
       isCreateTestflowScheduleLimitReachedModalOpen = true;
@@ -472,5 +474,9 @@
     ) || []}
     onScheduleTestFlowRun={createNewTestflowSchedule}
     creatorEmail={userEmail}
+    testDataFiles={testflowDataSetStore?.map((dataset) => ({
+      id: dataset.id,
+      name: dataset.name,
+    })) || []}
   />
 </Modal>

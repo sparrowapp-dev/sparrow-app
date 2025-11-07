@@ -41,6 +41,7 @@
   export let onSaveSchedule;
   export let userRole;
   export let onValidateTestflowRun;
+  export let testflowDataSetStore;
 
   let scheduleRunValidateData: {
     hasLocalhostUrls?: boolean;
@@ -165,7 +166,7 @@
               size="small"
             >
               <Button
-              title={"Run Now"}
+                title={"Run Now"}
                 type={"primary"}
                 loader={$loadingState.get("schedule-run-" + schedule?.id)}
                 disable={$loadingState.get("schedule-run-" + schedule?.id)}
@@ -269,6 +270,10 @@
             {onSaveSchedule}
             isSaved={$tab?.isSaved}
             {userRole}
+            testDataFiles={testflowDataSetStore?.map((dataset) => ({
+              id: dataset.id,
+              name: dataset.name,
+            })) || []}
           />
         {/if}
       </div>

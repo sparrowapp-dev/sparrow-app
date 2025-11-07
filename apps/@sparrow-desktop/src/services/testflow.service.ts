@@ -123,11 +123,12 @@ export class TestflowService {
     _testflowId: string,
     _scheduleId: string,
     baseUrl: string,
+    payload?: { testflowDataSetId: string },
   ) => {
     const response = await makeRequest(
       "POST",
       `${baseUrl}/api/workspace/${_workspaceId}/testflow/${_testflowId}/schedule/${_scheduleId}/run`,
-      { headers: getAuthHeaders() },
+      { headers: getAuthHeaders(), body: payload },
     );
     return response;
   };

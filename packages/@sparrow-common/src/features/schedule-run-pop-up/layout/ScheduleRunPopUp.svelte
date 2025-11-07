@@ -15,12 +15,14 @@
   export let environments = [];
   export let onScheduleTestFlowRun;
   export let creatorEmail;
+  export let testDataFiles = [];
 
   // Form data
   let scheduleName = "";
   let selectedEnvironment = "none";
   let isError = false;
   let isScheduling = false;
+  let selectedTestData = "none";
 
   // Run Configuration
   let selectedCycle = "Once"; // Once, Daily, Hourly, Weekly
@@ -302,6 +304,7 @@
         emails: notificationEmails,
         receiveNotifications: notificationPreference,
       },
+      selectedTestData === "none" ? "" : selectedTestData,
     );
 
     if (result?.isSuccessful || result.message === "Plan limit reached") {
@@ -309,6 +312,10 @@
     }
     isScheduling = false;
   }
+
+  const handleTestDataSelect = (testDataId: string) => {
+    selectedTestData = testDataId;
+  };
 </script>
 
 <div class="schedule-popup-container">
@@ -573,6 +580,47 @@
           {/if}
         {/if}
       </div>
+      <div class="form-group mb-4">
+        <label
+          class="form-label text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-medium mb-2"
+          style="color: var(--text-ds-neutral-200);"
+        >
+          Select Test Data
+        </label>
+        <p
+          class="helper-text text-ds-font-size-12 mb-2"
+          style="color: var(--text-ds-neutral-400);"
+        >
+          Select a test data file to execute tests with dynamic inputs.
+        </p>
+        <Select
+          id="testdata-select"
+          data={[{ id: "none", name: "None" }, ...testDataFiles]}
+          titleId={selectedTestData === "none" ? "" : selectedTestData}
+          onclick={handleTestDataSelect}
+          size="medium"
+          minHeaderWidth="100%"
+          placeholderText="Select"
+          menuItem="v2"
+          showDescription={false}
+          bodyTheme={"violet"}
+          headerTheme={"violet2"}
+          variant={"tertiary"}
+          zIndex={10}
+        />
+        <div class="preview-button">
+          <Button
+            title="Preview File"
+            type="link-primary"
+            size="small"
+            onClick={() => {
+              // Add your preview logic here, e.g. open modal or file viewer
+              // Example: previewTestData(selectedTestData);
+            }}
+            buttonClassProp="mt-2"
+          />
+        </div>
+      </div>
       <div
         style="height: 1px; background-color: var(--bg-ds-surface-100); margin: 20px 0;"
       ></div>
@@ -682,6 +730,9 @@
     height: 100%;
     max-height: 80vh;
     overflow: hidden;
+  }
+  .preview-button {
+    margin-left: -16px;
   }
 
   .schedule-run-form-container {

@@ -25,6 +25,7 @@ export interface ScheduleTestFlowRunDto {
   workspaceId: string;
   testflowId: string;
   runConfiguration: RunConfigurationDTO;
+  testflowDataSetId?: string;
   notification?: NotificationDTO;
 }
 

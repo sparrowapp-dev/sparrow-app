@@ -8,7 +8,7 @@
   // Component
   import { TestflowScheduleExplorer } from "@sparrow/workspaces/features";
   import { user } from "@app/store/auth.store";
-  import { testflowSchedules } from "@sparrow/common/store";
+  import { testflowSchedules, testflowDataSets } from "@sparrow/common/store";
   import { environmentType } from "@sparrow/common/enums";
   import { WorkspaceRole } from "@sparrow/common/enums";
   import { onDestroy } from "svelte";
@@ -30,6 +30,7 @@
   let currentWorkspace;
   let isTestflowScheduleEditable;
   let userRole = "";
+  let testflowDataSetStore = [];
 
   /**
    * Find the role of user in active workspace
@@ -59,12 +60,19 @@
   let testflow;
 
   let testflowScheduleStoreMap;
+  let testflowDataSetStoreMap;
 
   let testflowScheduleStore;
 
   testflowSchedules.subscribe((_testflowScheduleStoreMap) => {
     if (_testflowScheduleStoreMap) {
       testflowScheduleStoreMap = _testflowScheduleStoreMap;
+    }
+  });
+
+  testflowDataSets.subscribe((_testflowDataSetStoreMap) => {
+    if (_testflowDataSetStoreMap) {
+      testflowDataSetStoreMap = _testflowDataSetStoreMap;
     }
   });
 
@@ -75,6 +83,7 @@
     testflowScheduleStore = testflowScheduleStoreMap?.get(
       tab?.path?.testflowId,
     );
+    testflowDataSetStore = testflowDataSetStoreMap?.get(tab?.path?.testflowId);
 
     let storeSchedule = testflowScheduleStore?.find((s) => s.id === tab?.id);
 
@@ -167,4 +176,5 @@
   onOpenTestflow={_viewModel.handleOpenTestflow}
   onOpenEnvironment={_viewModel.handleOpenEnvironment}
   onValidateTestflowRun={_viewModel.validateTestflowRun}
+  testflowDataSetStore={testflowDataSetStore || []}
 />

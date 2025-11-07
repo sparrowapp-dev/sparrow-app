@@ -576,6 +576,7 @@
   }
 
   $: {
+    debugger;
     const mappedSchedules = testflowScheduleStore.map(mapScheduleData);
 
     if (searchQuery.trim() === "") {
@@ -2745,6 +2746,7 @@
                   <th class="text-fs-12">Schedule Name</th>
                   <th>Status</th>
                   <th>Environment</th>
+                  <th>Test Data</th>
                   <th>Next Run</th>
                   <th>Last Run Result</th>
                   {#if isTestflowEditable}
@@ -3392,7 +3394,6 @@
 
   .table-container {
     overflow: auto;
-    max-height: 480px;
     width: 100%;
   }
 

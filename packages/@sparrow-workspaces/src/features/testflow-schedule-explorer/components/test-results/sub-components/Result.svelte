@@ -11,9 +11,9 @@
   export let formatDate: (date: string) => string;
   export let getRunType: (flowName: string) => string;
   export let isScheduled: boolean;
-  export let onDeleteTestflowScheduleHistory;
+  export let onDeleteResult;
   export let onScheduleRunview;
-  export let isTestflowScheduleEditable;
+  export let isEditable;
 
   let deleteLoader = false;
   let isDeleteModalOpen: boolean = false;
@@ -24,7 +24,7 @@
 
   async function handleDeleteConfirm() {
     deleteLoader = true;
-    await onDeleteTestflowScheduleHistory(r?.id);
+    await onDeleteResult(r?.id);
     isDeleteModalOpen = false;
     deleteLoader = false;
   }
@@ -114,7 +114,7 @@
 
   <td bind:this={activeWrapper}>
     <span class="threedot-icon-container d-flex">
-      {#if isTestflowScheduleEditable}
+      {#if isEditable}
         <Button
           tabindex={-1}
           id={`show-more-schedule-result-${r.id}`}

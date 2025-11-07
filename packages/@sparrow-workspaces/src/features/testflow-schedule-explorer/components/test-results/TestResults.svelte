@@ -11,8 +11,6 @@
   let itemsPerPage = 10;
   let sortDirection: "asc" | "desc" = "desc";
 
-  $: totalItems = schedule?.schedularRunHistory?.length || 0;
-
   function parseRunTime(time: string | number): number {
     if (!time) return 0;
     if (typeof time === "number") return time;
@@ -27,16 +25,56 @@
     }
   }
 
-  $: sortedHistory = schedule?.schedularRunHistory
+  function aggregateDataRunHistory(dataSetEntry) {
+    const runs = dataSetEntry.schedularDataRunHistory || [];
+    const totals = runs.reduce(
+      (acc, run) => {
+        acc.successRequests += Number(run.successRequests) || 0;
+        acc.failedRequests += Number(run.failedRequests) || 0;
+        acc.totalTimeMs += parseRunTime(run.totalTime);
+        return acc;
+      },
+      { successRequests: 0, failedRequests: 0, totalTimeMs: 0 },
+    );
+
+    return {
+      id: dataSetEntry.id,
+      createdAt: dataSetEntry.createdAt,
+      updatedAt: dataSetEntry.updatedAt,
+      status: dataSetEntry.status,
+      isScheduled: dataSetEntry.isScheduled,
+      successRequests: totals.successRequests,
+      failedRequests: totals.failedRequests,
+      totalTime: `${(totals.totalTimeMs / 1000).toFixed(2)} sec`,
+      // Keep original data for reference
+      originalDataSet: dataSetEntry,
+    };
+  }
+
+  $: computedHistory = (() => {
+    if (schedule?.schedularRunHistory?.length > 0) {
+      return schedule.schedularRunHistory;
+    }
+    if (schedule?.schedularDataSetHistory?.length > 0) {
+      return schedule.schedularDataSetHistory.map(aggregateDataRunHistory);
+    }
+    return [];
+  })();
+
+  $: sortedHistory = computedHistory
     ? sortDirection === "asc"
-      ? [...schedule.schedularRunHistory].slice().reverse()
-      : [...schedule.schedularRunHistory]
+      ? [...computedHistory].slice().reverse()
+      : [...computedHistory]
     : [];
 
   $: paginatedHistory = sortedHistory.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
+
+  $: totalItems = computedHistory?.length || 0;
+
+  $: hasResults = computedHistory?.length > 0;
 
   function toggleSort() {
     sortDirection = sortDirection === "asc" ? "desc" : "asc";
@@ -68,7 +106,7 @@
   }
 </script>
 
-{#if schedule?.schedularRunHistory && schedule.schedularRunHistory.length > 0}
+{#if hasResults}
   <div class="d-flex flex-column h-100 content-wrapper">
     <div class="table-area" style="flex:1; overflow:auto;">
       <div class="table-container">
@@ -91,12 +129,12 @@
             {#each paginatedHistory as r}
               <Result
                 {onScheduleRunview}
-                {onDeleteTestflowScheduleHistory}
+                onDeleteResult={onDeleteTestflowScheduleHistory}
                 {r}
                 {schedule}
                 {formatDate}
                 {getRunType}
-                {isTestflowScheduleEditable}
+                isEditable={isTestflowScheduleEditable}
               />
             {/each}
           </tbody>

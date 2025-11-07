@@ -54,6 +54,7 @@
   }
 
   function handleSelectClick(event: MouseEvent) {
+    debugger;
     const selectElement = document.getElementById(
       `show-more-schedule-${schedule?.id}`,
     );
@@ -269,6 +270,11 @@
         None
       </span>
     {/if}
+  </td>
+  <td>
+    <span class="text-fs-12" style="color: var(--text-ds-neutral-300);">
+      None
+    </span>
   </td>
   <td>
     <Tooltip
