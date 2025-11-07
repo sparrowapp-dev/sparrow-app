@@ -3,11 +3,28 @@
   import { Button } from "@sparrow/library/ui";
   import { Input } from "@sparrow/library/forms";
   import { ArrowDownloadRegular } from "@sparrow/library/icons";
+  import {
+    handleTestDataDownloadDesktop,
+    handleTestDataDownloadWeb,
+  } from "../utils";
 
   export let tab: any;
+  export let isWebApp;
 
-  const handleExport = () => {
-    console.log("Export clicked for file:", tab?.name);
+  const handleExport = async () => {
+    await handleTestDataDownloadWeb(
+      $tab?.property?.testflowDataSet?.item?.dataSet,
+      $tab?.property?.testflowDataSet?.formatType,
+      $tab?.property?.testflowDataSet?.name,
+    );
+  };
+
+  const handleExportDownload = async () => {
+    await handleTestDataDownloadDesktop(
+      $tab?.property?.testflowDataSet?.item?.dataSet,
+      $tab?.property?.testflowDataSet?.formatType,
+      $tab?.property?.testflowDataSet?.name,
+    );
   };
 
   // Convert UTC date string → local date-time
@@ -121,15 +138,27 @@
       />
 
       <div class="d-flex gap-2">
-        <Button
-          id="export-file"
-          disable={false}
-          title="Export"
-          type="secondary"
-          size="medium"
-          startIcon={ArrowDownloadRegular}
-          on:click={handleExport}
-        />
+        {#if isWebApp}
+          <Button
+            id="export-file"
+            disable={false}
+            title="Export"
+            type="secondary"
+            size="medium"
+            startIcon={ArrowDownloadRegular}
+            onClick={handleExport}
+          />
+        {:else}
+          <Button
+            id="export-file"
+            disable={false}
+            title="Export"
+            type="secondary"
+            size="medium"
+            startIcon={ArrowDownloadRegular}
+            onClick={handleExportDownload}
+          />
+        {/if}
         <Button
           disable={false}
           startIcon={SaveRegular}
