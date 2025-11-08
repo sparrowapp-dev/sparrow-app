@@ -21,6 +21,7 @@
   export let isSaved;
   export let userRole;
   export let testDataFiles = [];
+  export let onPreviewTestData = null;
 
   const extractTimeFromISOString = new TimeISOExtractor()
     .extractTimeFromISOString;
@@ -441,6 +442,12 @@
     }
   };
 
+  const handlePreviewTestData = () => {
+    if (selectedTestData && selectedTestData !== "none" && onPreviewTestData) {
+      onPreviewTestData(selectedTestData);
+    }
+  };
+
   // Keep selectedDate in sync with formattedDate
   $: if (formattedDate) {
     selectedDate = parseDateString(formattedDate);
@@ -750,9 +757,7 @@
             title="Preview File"
             type="link-primary"
             size="small"
-            onClick={() => {
-              // Preview file logic here
-            }}
+            onClick={handlePreviewTestData}
             buttonClassProp="mt-2"
           />
         </div>

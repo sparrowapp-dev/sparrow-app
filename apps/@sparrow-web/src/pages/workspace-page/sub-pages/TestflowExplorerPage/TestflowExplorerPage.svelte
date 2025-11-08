@@ -24,6 +24,8 @@
   import { Modal } from "@sparrow/library/ui";
   import { getClientUser } from "src/utils/jwt";
   import { testflowDataSets } from "@sparrow/common/store";
+  import { TestDataPreviewModal } from "@sparrow/common/features";
+
   export let tab;
   export let teamDetails;
   export let upgradePlanModel;
@@ -63,6 +65,12 @@
 
   //schedule run popup state
   let isScheduleRunPopupOpen: boolean = false;
+  let selectedTestDataId = "none";
+
+  // Test data preview modal state
+  let isTestDataPreviewModalOpen: boolean = false;
+  let selectedTestDataForPreview = null;
+  let wasSchedulePopupOpen = false;
 
   let isTeamDowngraded: boolean = false;
   let currentTeam: TeamDocument;
@@ -338,6 +346,45 @@
     }
     return response;
   };
+
+  // Function to handle test data selection
+  function handleTestDataSelection(testDataId) {
+    selectedTestDataId = testDataId;
+  }
+
+  // Function to open test data preview
+  const openTestDataPreview = (testDataId) => {
+    if (testDataId && testDataId !== "none") {
+      // Update the selected test data
+      selectedTestDataId = testDataId;
+
+      // Find the test data from the store
+      const testData = testflowDataSetStore?.find(
+        (dataset) => dataset.id === testDataId,
+      );
+      if (testData) {
+        selectedTestDataForPreview = testData;
+
+        // Hide schedule popup and remember its state
+        wasSchedulePopupOpen = isScheduleRunPopupOpen;
+        isScheduleRunPopupOpen = false;
+
+        // Show preview modal
+        isTestDataPreviewModalOpen = true;
+      }
+    }
+  };
+
+  const closeTestDataPreview = () => {
+    isTestDataPreviewModalOpen = false;
+    selectedTestDataForPreview = null;
+
+    // Restore schedule popup if it was open before
+    if (wasSchedulePopupOpen) {
+      isScheduleRunPopupOpen = true;
+      wasSchedulePopupOpen = false;
+    }
+  };
 </script>
 
 {#if render && _viewModel}
@@ -427,5 +474,23 @@
     ) || []}
     onScheduleTestFlowRun={createNewTestflowSchedule}
     creatorEmail={userEmail}
+    testDataFiles={testflowDataSetStore?.map((dataset) => ({
+      id: dataset.id,
+      name: dataset.name,
+      ...dataset,
+    })) || []}
+    onPreviewTestData={openTestDataPreview}
+    onTestDataSelection={handleTestDataSelection}
+    {selectedTestDataId}
   />
 </Modal>
+
+<!-- Test Data Preview Modal -->
+<TestDataPreviewModal
+  isOpen={isTestDataPreviewModalOpen}
+  testDataSet={selectedTestDataForPreview}
+  onClose={closeTestDataPreview}
+  onTestDataSelection={handleTestDataSelection}
+  {selectedTestDataId}
+  onOpenTestflowDataSetTab={_viewModel.openTestflowDataSetTab}
+/>

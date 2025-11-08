@@ -42,6 +42,8 @@
   export let userRole;
   export let onValidateTestflowRun;
   export let testflowDataSetStore;
+  export let onOpenTestDataPreview = null;
+  export let openTestflowDataSetTab = null;
 
   let scheduleRunValidateData: {
     hasLocalhostUrls?: boolean;
@@ -273,7 +275,9 @@
             testDataFiles={testflowDataSetStore?.map((dataset) => ({
               id: dataset.id,
               name: dataset.name,
+              ...dataset,
             })) || []}
+            onPreviewTestData={onOpenTestDataPreview}
           />
         {/if}
       </div>

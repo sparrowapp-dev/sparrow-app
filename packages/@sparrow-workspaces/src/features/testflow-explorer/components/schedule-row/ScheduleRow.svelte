@@ -72,6 +72,7 @@
   let deleteLoader = false;
 
   $: isDeletedEnvironment = schedule?.isDeletedEnvironment || false;
+  $: isDeletedTestData = schedule?.isDeletedTestData || false;
 
   // Handle environment click
   const handleEnvironmentClick = () => {
@@ -271,10 +272,27 @@
       </span>
     {/if}
   </td>
+  <!-- Test Data Column - UPDATE THIS -->
   <td>
-    <span class="text-fs-12" style="color: var(--text-ds-neutral-300);">
-      None
-    </span>
+    {#if isDeletedTestData}
+      <Tooltip
+        title="Selected test data was removed and may impact the  run results."
+        placement="bottom-left"
+        size="small"
+      >
+        <span class="text-fs-12" style="color: var(--text-ds-neutral-500);"
+          >{schedule.testflowDataSetName}</span
+        ><WarningIconNew />
+      </Tooltip>
+    {:else if schedule.testflowDataSetName && schedule.testflowDataSetName.toLowerCase() !== "none"}
+      <span class="text-fs-12" style="color: var(--text-ds-neutral-50);">
+        {schedule.testflowDataSetName}
+      </span>
+    {:else}
+      <span class="text-fs-12" style="color: var(--text-ds-neutral-300);">
+        None
+      </span>
+    {/if}
   </td>
   <td>
     <Tooltip

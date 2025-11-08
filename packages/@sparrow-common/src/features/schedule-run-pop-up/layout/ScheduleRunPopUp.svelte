@@ -16,13 +16,16 @@
   export let onScheduleTestFlowRun;
   export let creatorEmail;
   export let testDataFiles = [];
+  export let onPreviewTestData;
+  export let onTestDataSelection = null;
+  export let selectedTestDataId = "none";
 
   // Form data
   let scheduleName = "";
   let selectedEnvironment = "none";
   let isError = false;
   let isScheduling = false;
-  let selectedTestData = "none";
+  let selectedTestData = selectedTestDataId;
 
   // Run Configuration
   let selectedCycle = "Once"; // Once, Daily, Hourly, Weekly
@@ -48,6 +51,8 @@
     { label: "Sat", value: "saturday", dayNumber: 6 },
     { label: "Sun", value: "sunday", dayNumber: 0 },
   ];
+
+  $: selectedTestData = selectedTestDataId;
 
   // Set default schedule name when component loads or testflow name changes
   $: if (testFlowName) {
@@ -313,9 +318,20 @@
     isScheduling = false;
   }
 
-  const handleTestDataSelect = (testDataId: string) => {
-    selectedTestData = testDataId;
-  };
+  function handleTestDataSelect(data) {
+    debugger;
+    selectedTestData = data;
+    // Notify parent about the selection
+    if (onTestDataSelection) {
+      onTestDataSelection(data);
+    }
+  }
+
+  function handlePreviewTestData() {
+    if (selectedTestData && selectedTestData !== "none" && onPreviewTestData) {
+      onPreviewTestData(selectedTestData);
+    }
+  }
 </script>
 
 <div class="schedule-popup-container">
@@ -608,18 +624,17 @@
           variant={"tertiary"}
           zIndex={10}
         />
-        <div class="preview-button">
-          <Button
-            title="Preview File"
-            type="link-primary"
-            size="small"
-            onClick={() => {
-              // Add your preview logic here, e.g. open modal or file viewer
-              // Example: previewTestData(selectedTestData);
-            }}
-            buttonClassProp="mt-2"
-          />
-        </div>
+        {#if selectedTestData && selectedTestData !== "none"}
+          <div class="preview-button">
+            <Button
+              title="Preview File"
+              type="link-primary"
+              size="small"
+              onClick={handlePreviewTestData}
+              buttonClassProp="mt-2"
+            />
+          </div>
+        {/if}
       </div>
       <div
         style="height: 1px; background-color: var(--bg-ds-surface-100); margin: 20px 0;"

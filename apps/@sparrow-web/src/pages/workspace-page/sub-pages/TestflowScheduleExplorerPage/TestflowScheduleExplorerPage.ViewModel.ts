@@ -135,6 +135,16 @@ class MockHistoryExplorerPage {
         result = false;
       }
 
+      // Compare testflowDataSetId
+      const tabTestflowDataSetId =
+        progressiveTab.property.testflowSchedule.testflowDataSetId;
+      const serverTestflowDataSetId =
+        this.testflowScheduleStore.testflowDataSetId;
+
+      if (tabTestflowDataSetId !== serverTestflowDataSetId) {
+        result = false;
+      }
+
       // Update the isSaved property based on comparison result
       if (result) {
         progressiveTab.isSaved = true;
@@ -288,11 +298,16 @@ class MockHistoryExplorerPage {
         this.getTestflow();
       }, i * 500);
     }
+    const payload = {
+      testflowDataSetId:
+        progressiveTab.property.testflowSchedule.testflowDataSetId,
+    };
     const response = await this.testflowService.runTestflowSchedule(
       progressiveTab.path.workspaceId,
       progressiveTab.path.testflowId,
       progressiveTab.id,
       baseUrl,
+      payload,
     );
     if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
@@ -541,10 +556,11 @@ class MockHistoryExplorerPage {
       testflowJSON.workspaceId,
     );
 
-    const testflowTabRxDoc = await  this.tabRepository.getTabById(_id);
+    const testflowTabRxDoc = await this.tabRepository.getTabById(_id);
     let testflowTabJson = testflowTabRxDoc?.toMutableJSON();
-    if(testflowTabJson){
-      testflowTabJson.property.testflow.state.testflowNavigator = TestflowNavigatorEnum.TESTFLOW;
+    if (testflowTabJson) {
+      testflowTabJson.property.testflow.state.testflowNavigator =
+        TestflowNavigatorEnum.TESTFLOW;
       await this.tabRepository.updateTabByMongoId(_id, testflowTabJson);
     }
 

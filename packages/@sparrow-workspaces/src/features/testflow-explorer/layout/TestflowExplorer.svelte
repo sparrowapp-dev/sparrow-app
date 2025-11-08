@@ -517,6 +517,27 @@
     let environment = "None";
     let isDeletedEnvironment = false;
     let environmentData = null;
+    let testflowDataSetName = "None";
+    let isDeletedTestData = false;
+
+    if (
+      schedule.testflowDataSetId &&
+      schedule.testflowDataSetId.trim() !== ""
+    ) {
+      // Find the dataset in testflowDataSetStore
+      const dataset = testflowDataSetStore?.find(
+        (ds) => ds.id === schedule.testflowDataSetId,
+      );
+      if (dataset) {
+        testflowDataSetName = dataset.name;
+        isDeletedTestData = false;
+      } else {
+        // Dataset not found in current list → might be deleted
+        testflowDataSetName =
+          schedule?.testflowDataSetName || "Deleted Dataset";
+        isDeletedTestData = true;
+      }
+    }
 
     if (schedule.environmentId && schedule.environmentId.trim() !== "") {
       // Find environment by ID in the environments array
@@ -546,6 +567,8 @@
       isActive: schedule.isActive,
       originalData: schedule,
       isDeletedEnvironment: isDeletedEnvironment,
+      testflowDataSetName: testflowDataSetName,
+      isDeletedTestData: isDeletedTestData,
     };
   }
 
