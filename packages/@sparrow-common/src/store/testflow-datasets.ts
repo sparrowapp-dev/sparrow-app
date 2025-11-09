@@ -18,3 +18,30 @@ export const updateTestflowDataSets = (
     return updated;
   });
 };
+
+export const addTestflowDataSet = (_id: string | number, _dataset: any) => {
+  let updatedList: any[] = [];
+  testflowDataSets.update((current) => {
+    const updated = new Map(current);
+    const existingDatasets = updated.get(_id) || [];
+    updatedList = [...existingDatasets, _dataset];
+    updated.set(_id, updatedList);
+    return updated;
+  });
+  return updatedList;
+};
+
+export const replaceTestflowDataSet = (_id: string | number, _dataset: any) => {
+  debugger;
+  let updatedList: any[] = [];
+  testflowDataSets.update((current) => {
+    const updated = new Map(current);
+    const existingDatasets = updated.get(_id) || [];
+    updatedList = existingDatasets.map((ds: any) =>
+      ds.name === _dataset.name ? _dataset : ds,
+    );
+    updated.set(_id, updatedList);
+    return updated;
+  });
+  return updatedList;
+};

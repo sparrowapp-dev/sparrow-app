@@ -209,6 +209,16 @@
     dataSetType: string,
     name: string,
   ) => Promise<void>;
+  export let importTestflowDataSetFileChange: (
+    dataSet: any,
+    dataSetType: string,
+    name: string,
+  ) => Promise<void>;
+  export let updateDatasetByName: (
+    dataSet: any,
+    dataSetType: string,
+    name: string,
+  ) => Promise<void>;
   export let openTestflowDataSetTab: (dataSet: any) => void;
 
   export let onUpdateScheduleStatus: (
@@ -221,6 +231,7 @@
   let planContent: any;
   let planContentNonActive: any;
   let selectedAuthHeader: any;
+  let datasetId: string;
 
   const checkRequestExistInNode = (_id: string) => {
     let result = false;
@@ -297,6 +308,16 @@
   let isImporting = false;
   let isImportLoadingModalOpen = false;
   let isImportCancelled = false;
+  let isDuplicateModalOpen = false;
+  let pendingImportData: {
+    jsonData: Record<string, any>[];
+    fileType: "json" | "csv";
+    fileName: string;
+    formatType: string;
+    wrappedData: { dataSet: Record<string, any>[] };
+  } | null = null;
+  let datasetContent;
+  let activeMenuId: string | null = null;
 
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
@@ -2076,6 +2097,9 @@
   let currentTestDataPage = 1;
   let testDataItemsPerPage = 10;
 
+  let currentTestDataPreviewPage = 1;
+  let testDataPreviewItemsPerPage = 10;
+
   // Reset page when search changes
   $: {
     searchQuery;
@@ -2123,9 +2147,18 @@
     currentTestDataPage = newPage;
   };
 
+  const handleTestDataPreviewPageChange = (newPage: number) => {
+    currentTestDataPreviewPage = newPage;
+  };
+
   const handleTestDataItemsPerPageChange = (newItemsPerPage: number) => {
     testDataItemsPerPage = newItemsPerPage;
     currentTestDataPage = 1; // Reset to first page when changing items per page
+  };
+
+  const handleTestDataPreviewItemsPerPageChange = (newItemsPerPage: number) => {
+    testDataPreviewItemsPerPage = newItemsPerPage;
+    currentTestDataPreviewPage = 1; // Reset to first page when changing items per page
   };
 
   // Reset page when search changes
@@ -2144,6 +2177,86 @@
       return data;
     });
   };
+
+  async function handleKeepBoth() {
+    if (!pendingImportData) return;
+
+    try {
+      isImporting = true;
+      isDuplicateModalOpen = false;
+
+      const response = await importTestflowDataSetFileChange(
+        pendingImportData.wrappedData,
+        pendingImportData.formatType,
+        pendingImportData.fileName,
+      );
+
+      if (response?.isSuccessful) {
+        const newFileName =
+          response?.data?.data?.data?.name || pendingImportData.fileName;
+        datasetId = response.data.data.data.id;
+        datasetContent = response.data.data.data.item.dataSet;
+        isImporting = false;
+        importFileFormatType = pendingImportData.fileType;
+        importedFileName = newFileName;
+        importedFileContent = JSON.stringify(
+          pendingImportData.jsonData,
+          null,
+          2,
+        );
+        isImportLoadingModalOpen = true;
+        pendingImportData = null;
+      } else {
+        console.error("Invalid response structure:", response);
+        notifications.error("Failed to import file. Please try again.");
+        isImporting = false;
+      }
+    } catch (err) {
+      console.error("Failed to import file", err);
+      notifications.error("Failed to import file. Please try again.");
+      isImporting = false;
+      pendingImportData = null;
+    }
+  }
+
+  async function handleReplace() {
+    if (!pendingImportData) return;
+
+    try {
+      isImporting = true;
+      isDuplicateModalOpen = false;
+
+      const response = await updateDatasetByName(
+        pendingImportData.wrappedData,
+        pendingImportData.formatType,
+        pendingImportData.fileName,
+      );
+
+      if (response?.isSuccessful) {
+        datasetId = response.data.data.id;
+        datasetContent = response.data.data.item.dataSet;
+        isImporting = false;
+        importFileFormatType = pendingImportData.fileType;
+        importedFileName = pendingImportData.fileName;
+        importedFileContent = JSON.stringify(
+          pendingImportData.jsonData,
+          null,
+          2,
+        );
+        isImportLoadingModalOpen = true;
+        pendingImportData = null;
+      } else {
+        console.error("Invalid response structure:", response);
+        notifications.error("Failed to replace file. Please try again.");
+        isImporting = false;
+      }
+    } catch (err) {
+      console.error("Failed to replace file", err);
+      notifications.error("Failed to replace file. Please try again.");
+      isImporting = false;
+      pendingImportData = null;
+    }
+  }
 
   // Updated handleImportFileChange function - shows table from response
   const handleImportFileChange = async (event: Event) => {
@@ -2212,20 +2325,35 @@
 
       if (response?.isSuccessful) {
         // Success case - show the preview modal
+        datasetId = response.data.data.data.id;
+        datasetContent = response.data.data.data.item.dataSet;
         isImporting = false;
         importFileFormatType = fileType;
         importedFileName = file.name;
         importedFileContent = JSON.stringify(jsonData, null, 2);
         isImportLoadingModalOpen = true;
       } else if (response?.data?.message === "Dataset already exists") {
-        console.warn("Import skipped: Dataset already exists.");
+        pendingImportData = {
+          jsonData,
+          fileType,
+          fileName: file.name,
+          formatType,
+          wrappedData,
+        };
+        isDuplicateModalOpen = true;
         isImporting = false;
         isImportLoadingModalOpen = false;
       } else {
+        isImporting = false;
+        isImportLoadingModalOpen = false;
+        notifications.error("Failed to import Data. Please try again.");
         console.error("Invalid response structure:", response);
         throw new Error("Invalid response structure from server");
       }
     } catch (err) {
+      isImporting = false;
+      isImportLoadingModalOpen = false;
+      notifications.error("Failed to import Data. Please try again.");
       console.error("Failed to import file", err);
       isImporting = false;
     }
@@ -2327,6 +2455,28 @@
   const closeCellModal = () => {
     selectedCellContent = null;
   };
+
+  let previewData = null;
+
+  function handlePreviewDataset(originalData) {
+    previewData = originalData;
+    importedFileContent = JSON.stringify(originalData.item.dataSet ?? {});
+    importedFileName = originalData.name;
+    isImporting = false;
+    isImportLoadingModalOpen = true;
+  }
+
+  function handleRedirectTestDataPage() {
+    const datasetObj = {
+      id: previewData?.id || datasetId,
+      name: importedFileName,
+      item: {
+        dataSet: previewData?.item.dataSet || datasetContent,
+      },
+    };
+    isImportLoadingModalOpen = false;
+    openTestflowDataSetTab(datasetObj);
+  }
 </script>
 
 <div
@@ -2463,53 +2613,18 @@
                 on:change={handleImportFileChange}
                 style="display:none"
               />
-              <Button
-                type="secondary"
-                size="medium"
-                startIcon={ArrowUploadFilled}
-                title={"Import Data"}
-                onClick={handleImportClick}
-              />
-              <Dropdown
-                zIndex={600}
-                buttonId="import-data-dropdown"
-                isBackgroundClickable={true}
-                bind:isMenuOpen={importDropdownOpen}
-                horizontalPosition={"left"}
-                minWidth={165}
-                options={[
-                  {
-                    name: "Export JSON Template",
-                    icon: ArrowDownloadRegular,
-                    iconColor: "var(--icon-secondary-130)",
-                    iconSize: "13px",
-                    onclick: () => {
-                      console.log("export json");
-                    },
-                  },
-                  {
-                    name: "Export CSV Template",
-                    icon: ArrowDownloadRegular,
-                    iconColor: "var(--icon-secondary-130)",
-                    iconSize: "13px",
-                    onclick: () => {
-                      console.log("export csv");
-                    },
-                  },
-                ]}
+              <Tooltip
+                title="Only JSON or CSV files are supported."
+                position="top-center"
               >
                 <Button
                   type="secondary"
-                  id="import-data-dropdown"
-                  size={"medium"}
-                  startIcon={importDropdownOpen
-                    ? ChevronUpRegular
-                    : ChevronDownRegular}
-                  onClick={() => {
-                    importDropdownOpen = !importDropdownOpen;
-                  }}
+                  size="medium"
+                  startIcon={ArrowUploadFilled}
+                  title={"Import Data"}
+                  onClick={handleImportClick}
                 />
-              </Dropdown>
+              </Tooltip>
             </div>
           {/if}
         </div>
@@ -2824,7 +2939,7 @@
             />
           </div>
 
-          <div class="table-container flex-grow-1" style="overflow:auto;">
+          <div class=" flex-grow-1" style="overflow:auto;">
             <table
               class="scheduled-table"
               style="background-color: transparent !important;"
@@ -2842,6 +2957,9 @@
                 {#each paginatedTestData as TestData}
                   <TestDataRow
                     dataset={TestData}
+                    {activeMenuId}
+                    setActiveMenuId={(id) => (activeMenuId = id)}
+                    onPreviewDataset={handlePreviewDataset}
                     onPerformDatasetOperations={onPerformTestDataSetOperations}
                     onOpenDataset={openTestflowDataSetTab}
                   />
@@ -2851,12 +2969,16 @@
 
             {#if filteredTestData.length === 0}
               <div class="empty-state text-center py-5">
-                <p class="text-costum text-fs-14">No test data found</p>
+                <DocumentRegular
+                  color="var(--text-ds-neutral-500)"
+                  size="28px"
+                />
                 <p
                   class="text-costum text-fs-12"
                   style="color:var(--text-ds-neutral-400);"
                 >
-                  Import or create test data to see it here.
+                  No test data imported yet. Use the Import button to upload
+                  JSON or CSV files for testing.
                 </p>
               </div>
             {/if}
@@ -3015,6 +3137,45 @@
         size="medium"
         title="Save"
         onClick={handleSaveConfirm}
+      />
+    </div>
+  </div>
+</Modal>
+
+<Modal
+  title={"Duplicate File Detected"}
+  type={"dark"}
+  width={"540px"}
+  zIndex={1000}
+  isOpen={isDuplicateModalOpen}
+  handleModalState={(flag = false) => {
+    isDuplicateModalOpen = flag;
+  }}
+>
+  <div class="modal-content">
+    <p class="mb-3" style="margin-top: 13px; padding-bottom:20px;">
+      A file with the same name or content already exists. Do you want to
+      replace the existing file or keep both?
+    </p>
+    <div class="d-flex justify-content-end gap-3">
+      <Tooltip
+        title="Keeping both will rename the new file automatically."
+        placement="bottom-center"
+        size="small"
+      >
+        <Button
+          type="secondary"
+          size="medium"
+          title="Keep Both"
+          disable={isImporting}
+          onClick={handleKeepBoth}
+        />
+      </Tooltip>
+      <Button
+        type="primary"
+        size="medium"
+        title="Replace"
+        onClick={handleReplace}
       />
     </div>
   </div>
@@ -3279,7 +3440,7 @@
               {importedFileName}
             </div>
             <div class="file-meta">
-              Last updated a few seconds ago • Size {Math.round(
+              Last updated a <span style="x">few seconds ago</span> • Size {Math.round(
                 importedFileContent.length / 1024,
               )} KB • {(() => {
                 try {
@@ -3298,6 +3459,7 @@
               type="secondary"
               size="small"
               startIcon={ArrowExpandRegular}
+              onClick={handleRedirectTestDataPage}
             />
             <Button
               type="secondary"
@@ -3313,16 +3475,13 @@
           </div>
         </div>
 
-        <div class="file-preview-csv">
-          <div class="table-container">
-            {#if importedFileContent}
-              {@const parsed = JSON.parse(importedFileContent)}
-              {@const data = parsed.dataSet || parsed}
-              {@const columns =
-                Array.isArray(data) && data.length > 0
-                  ? Object.keys(data[0])
-                  : []}
-
+        {#if importedFileContent}
+          {@const parsed = JSON.parse(importedFileContent)}
+          {@const data = parsed.dataSet || parsed}
+          {@const columns =
+            Array.isArray(data) && data.length > 0 ? Object.keys(data[0]) : []}
+          <div class="file-preview-csv">
+            <div class="table-container">
               <table class="data-table">
                 <thead>
                   <tr>
@@ -3349,9 +3508,23 @@
                   {/each}
                 </tbody>
               </table>
+            </div>
+          </div>
+          <div class="pagination-footer">
+            {#if data?.length > 0}
+              <Pagination
+                currentPage={currentTestDataPreviewPage}
+                itemsPerPage={testDataPreviewItemsPerPage}
+                totalItems={data.length}
+                onPageChange={handleTestDataPreviewPageChange}
+                onItemsPerPageChange={handleTestDataPreviewItemsPerPageChange}
+                itemsPerPageOptions={[10, 20, 30, 40, 50]}
+                showItemCount={true}
+                containerWidth="100%"
+              />
             {/if}
           </div>
-        </div>
+        {/if}
         {#if selectedCellContent !== null}
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <div class="cell-modal-overlay" on:click={closeCellModal}>
@@ -3377,12 +3550,14 @@
 </Modal>
 
 <style>
+  .pagination-footer {
+    position: relative;
+    bottom: 0;
+  }
   .file-preview-csv {
     flex: 1;
     overflow: auto;
-    padding: 16px;
     background: var(--bg-ds-surface-600);
-    border: 1px solid #2e2e2e;
     border-radius: 6px;
     width: 780px;
     height: 528px;
@@ -3392,7 +3567,7 @@
 
   .table-container {
     overflow: auto;
-    max-height: 480px;
+    min-height: 480px;
     width: 100%;
   }
 
@@ -3400,32 +3575,30 @@
     width: 100%;
     border-collapse: collapse;
     color: var(--text-ds-neutral-100);
-    background-color: var(--bg-ds-neutral-900);
+    background-color: var(--bg-ds-surface-600);
     font-size: 12px;
   }
 
   .data-table thead {
     position: sticky;
     top: 0;
-    background-color: var(--bg-ds-neutral-900);
     z-index: 1;
   }
 
   .data-table th {
-    background-color: var(--bg-ds-neutral-900);
     padding: 12px;
     text-align: left;
     font-weight: 500;
     font-size: 12px;
     color: var(--text-ds-neutral-300);
-    border-bottom: 1px solid var(--border-ds-neutral-700);
+    border-bottom: 1px solid var(--border-ds-neutral-600);
   }
 
   .data-table td {
-    padding: 12px;
-    border-bottom: none;
+    font-weight: 500;
+    padding: 16px;
+    border-bottom: 0.4px solid var(--border-ds-neutral-700);
     font-size: 12px;
-    background-color: var(--bg-ds-neutral-900);
     max-width: 300px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3442,7 +3615,6 @@
     text-align: center;
     font-weight: 500;
     color: var(--text-ds-neutral-400);
-    background-color: var(--bg-ds-neutral-900);
   }
 
   /* Cell Modal Styles */
@@ -3579,9 +3751,8 @@
     flex-direction: column;
     flex: 1;
     width: 100%;
-    height: 100%;
+    height: 600px;
     background: transparent;
-    padding-right: 0;
     overflow: visible;
   }
 
@@ -3620,7 +3791,19 @@
     align-items: flex-start;
   }
 
-  .file-preview {
+  .file-preview-csv {
+    width: 780px;
+    max-height: 528px;
+    overflow: auto;
+    background: var(--bg-ds-surface-600);
+    border-radius: 6px;
+    font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Code", "Consolas",
+      monospace;
+    box-sizing: border-box;
+    margin: 0 auto;
+  }
+
+  /* .file-preview {
     width: 100%;
     height: 100%;
     overflow: auto;
@@ -3633,20 +3816,7 @@
       monospace;
     box-sizing: border-box;
     margin: 0 auto;
-  }
-  .file-preview-csv {
-    width: 780px;
-    max-height: 528px;
-    overflow: auto;
-    background: var(--bg-ds-surface-600);
-    border: 1px solid #2e2e2e;
-    border-radius: 6px;
-    padding: 16px;
-    font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Code", "Consolas",
-      monospace;
-    box-sizing: border-box;
-    margin: 0 auto;
-  }
+  } */
 
   .preview-content {
     font-family: inherit;
@@ -3693,8 +3863,8 @@
     display: none;
   }
   .import-loading-container {
-    max-height: 648px;
-    padding: 10px;
+    height: 648px;
+    padding: 6px;
     display: flex;
     align-items: center;
     justify-content: center;

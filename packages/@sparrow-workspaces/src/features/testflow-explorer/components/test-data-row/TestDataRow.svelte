@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Options, Button, Modal } from "@sparrow/library/ui";
+  import { Options, Button, Modal, notifications } from "@sparrow/library/ui";
   import { MoreVerticalRegular } from "@sparrow/library/icons";
   import { startLoading, stopLoading } from "@sparrow/common/store";
   import { Input } from "@sparrow/library/forms";
@@ -12,8 +12,11 @@
     id: string,
     name?: string,
   ) => Promise<any>;
-
-  let showMenu = false;
+  export let onPreviewDataset: (data: any) => void;
+  export let activeMenuId;
+  export let setActiveMenuId;
+  let showMenu;
+  $: showMenu = activeMenuId === dataset.id;
   let activeWrapper: HTMLElement;
   let isDeletePopup = false;
   let deleteLoader = false;
@@ -21,21 +24,41 @@
   let dataSetName = dataset?.name || dataset?.id;
 
   $: {
-    console.log("Dataset Row Rendered:", dataset);
     if (!isEditingName) {
       dataSetName = dataset?.name || dataset?.id;
     }
   }
 
-  function rightClickContextMenu() {
-    setTimeout(() => {
-      showMenu = !showMenu;
-    }, 50);
+  function handleSelectClick(event: MouseEvent) {
+    const selectElement = document.getElementById(
+      `show-more-dataset-${dataset?.id}`,
+    );
+    if (selectElement && !selectElement.contains(event.target as Node)) {
+      setActiveMenuId(null);
+    }
+  }
+
+  function toggleMenu() {
+    if (activeMenuId === dataset.id) {
+      setActiveMenuId(null);
+    } else {
+      setActiveMenuId(dataset.id);
+    }
   }
 
   async function handleDelete() {
     deleteLoader = true;
-    await onPerformDatasetOperations("delete", dataset?.id);
+
+    const deletedName = dataset?.name;
+
+    const res = await onPerformDatasetOperations("delete", dataset?.id);
+
+    if (res.isSuccessful) {
+      notifications.success(`"${deletedName}" test data deleted successfully.`);
+    } else {
+      notifications.error("Failed to delete test data. Please try again.");
+    }
+
     deleteLoader = false;
     isDeletePopup = false;
     showMenu = false;
@@ -80,7 +103,10 @@
   };
 </script>
 
-<svelte:window on:click={() => (showMenu = false)} />
+<svelte:window
+  on:click={handleSelectClick}
+  on:contextmenu|preventDefault={handleSelectClick}
+/>
 
 <Modal
   title={"Delete Test Data?"}
@@ -93,8 +119,8 @@
   <div class="text-lightGray mb-1 text-fs-14">
     <p>
       Are you sure you want to delete
-      <strong style="color:var(--text-ds-neutral-50)">
-        "{dataset?.item?.dataSet?.[0]?.name || dataset?.id}"
+      <strong style="color:var(--text-ds-neutral-100)">
+        "{dataset?.name}"
       </strong>? This file might be linked to one or more scheduled test
       executions. Deleting it could impact their results.
     </p>
@@ -110,6 +136,7 @@
       title={"Delete"}
       type={"danger"}
       loader={deleteLoader}
+      loaderText="Deleting..."
       onClick={handleDelete}
     />
   </div>
@@ -117,7 +144,9 @@
 
 <tr
   class="data-row"
-  on:click={async () => await onOpenDataset(dataset.originalData)}
+  on:click={() => {
+    onPreviewDataset(dataset.originalData);
+  }}
 >
   <td>
     <div class="d-flex flex-column">
@@ -147,37 +176,42 @@
   <td><span class="text-fs-12">{dataset?.fileSize || "-"}</span></td>
   <td><span class="text-fs-12">{formatDate(dataset?.lastUpdated)}</span></td>
   <td bind:this={activeWrapper}>
-    {#if showMenu}
-      <Options
-        xAxis={activeWrapper.getBoundingClientRect().right - 165}
-        yAxis={[
-          activeWrapper.getBoundingClientRect().top - 5,
-          activeWrapper.getBoundingClientRect().bottom + 5,
-        ]}
-        zIndex={700}
-        width="120px"
-        menuItems={[
-          {
-            onClick: startRename,
-            displayText: "Rename",
-            disabled: false,
-            hidden: false,
-          },
-          {
-            onClick: async () =>
-              onPerformDatasetOperations("export", dataset.id),
-            displayText: "Export",
-            disabled: false,
-            hidden: false,
-          },
-          {
-            onClick: () => (isDeletePopup = true),
-            displayText: "Delete",
-            disabled: false,
-            hidden: false,
-          },
-        ]}
-      />
+    {#if showMenu && !isDeletePopup}
+      <div on:click|stopPropagation on:contextmenu|stopPropagation>
+        <Options
+          xAxis={activeWrapper.getBoundingClientRect().right - 165}
+          yAxis={[
+            activeWrapper.getBoundingClientRect().top - 5,
+            activeWrapper.getBoundingClientRect().bottom + 5,
+          ]}
+          zIndex={700}
+          width="120px"
+          menuItems={[
+            {
+              onClick: startRename,
+              displayText: "Rename",
+              disabled: false,
+              hidden: false,
+            },
+            {
+              onClick: async () =>
+                onPerformDatasetOperations("export", dataset.id),
+              displayText: "Export",
+              disabled: false,
+              hidden: false,
+            },
+            {
+              onClick: () => {
+                showMenu = false;
+                isDeletePopup = true;
+              },
+              displayText: "Delete",
+              disabled: false,
+              hidden: false,
+            },
+          ]}
+        />
+      </div>
     {/if}
 
     <div class="d-flex align-items-center gap-2">
@@ -191,7 +225,7 @@
         onClick={(e) => {
           e.stopPropagation();
           e.preventDefault();
-          rightClickContextMenu();
+          toggleMenu();
         }}
       />
     </div>

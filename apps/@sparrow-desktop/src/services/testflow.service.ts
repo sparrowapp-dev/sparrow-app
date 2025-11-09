@@ -265,4 +265,34 @@ export class TestflowService {
     );
     return response;
   };
+
+  public importTestflowDataSetFileChange = async (
+    testflowId: string,
+    payload: TestflowDataSetImportDto,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/workspace/testflow/${testflowId}/import-dataset/file`,
+      {
+        body: payload,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public updateDatasetByName = async (
+    testflowId: string,
+    payload: TestflowDataSetImportDto,
+  ) => {
+    const response = await makeRequest(
+      "PATCH",
+      `${this.apiUrl}/api/workspace/${testflowId}/dataset`,
+      {
+        body: payload,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }

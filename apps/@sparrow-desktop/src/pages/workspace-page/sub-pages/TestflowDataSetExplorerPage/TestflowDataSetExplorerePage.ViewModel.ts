@@ -1,15 +1,21 @@
 import type { TabDocument } from "@app/database/database";
-import { createDeepCopy } from "@sparrow/common/utils";
-import { Observable } from "rxjs";
+import { CompareArray, createDeepCopy, Debounce } from "@sparrow/common/utils";
+import { Observable, BehaviorSubject } from "rxjs";
 import type { Tab } from "@sparrow/common/types/workspace/tab";
-import { BehaviorSubject } from "rxjs";
+import { TestflowRepository } from "@app/repositories/testflow.repository";
+import { TabRepository } from "@app/repositories/tab.repository";
+
+export enum TabPersistenceTypeEnum {
+  PERMANENT = "permanent",
+  TEMPORARY = "temporary",
+}
 
 export class TestflowDataSetExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
-  /**
-   * Constructor to initialize the TestflowExplorerPageViewModel class
-   * @param doc - TabDocument that contains information about the active tab
-   */
+  private testflowRepository = new TestflowRepository();
+  private tabRepository = new TabRepository();
+  private compareArray = new CompareArray();
+
   public constructor(doc: TabDocument) {
     if (doc?.isActive) {
       setTimeout(() => {
@@ -21,18 +27,93 @@ export class TestflowDataSetExplorerPageViewModel {
     }
   }
 
-  /**
-   * Returns an observable that emits the current state of the tab
-   */
   public get tab(): Observable<Partial<Tab>> {
     return this._tab.asObservable();
   }
 
-  /**
-   * Sets the value of the tab and updates the observable
-   * @param value - the updated tab value
-   */
   private set tab(value: Tab) {
     this._tab.next(value);
   }
+
+  public saveDataset = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+
+    // Mark as saved
+    progressiveTab.isSaved = true;
+    progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
+
+    this.tab = progressiveTab;
+
+    // Update tab in database with saved state
+    await this.tabRepository.updateTab(progressiveTab.tabId, {
+      isSaved: true,
+      persistence: TabPersistenceTypeEnum.PERMANENT,
+    });
+  };
+
+  public updateName = async (_name: any, event = "") => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const trimmedName = _name.trim();
+
+    if (event === "blur" && trimmedName === "") {
+      const data = await this.testflowRepository.readTestflow(
+        progressiveTab.path.testflowId,
+      );
+      const matching = data._data?.datasets?.find(
+        (d: any) => d.id === progressiveTab.id,
+      );
+      progressiveTab.name = matching?.name || progressiveTab.name;
+    } else if (event === "") {
+      progressiveTab.name = _name;
+    }
+
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    if (event === "") {
+      this.compareRequestWithServer();
+    }
+  };
+
+  private compareEnvironmentWithServerDebounced = async () => {
+    let result = true;
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+
+    const testFlowServer = await this.testflowRepository.readTestflow(
+      progressiveTab.path.testflowId,
+    );
+
+    if (!testFlowServer) {
+      result = false;
+    } else {
+      const serverDataset = testFlowServer._data?.datasets?.find(
+        (ds: any) => ds.id === progressiveTab.id,
+      );
+
+      if (!serverDataset || serverDataset.name !== progressiveTab.name) {
+        result = false;
+      }
+    }
+
+    if (result) {
+      this.tabRepository.updateTab(progressiveTab.tabId, {
+        isSaved: true,
+        persistence: TabPersistenceTypeEnum.PERMANENT,
+      });
+      progressiveTab.isSaved = true;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
+    } else {
+      this.tabRepository.updateTab(progressiveTab.tabId, {
+        isSaved: false,
+        persistence: TabPersistenceTypeEnum.PERMANENT,
+      });
+      progressiveTab.isSaved = false;
+      progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
+    }
+
+    this.tab = progressiveTab;
+  };
+  private compareRequestWithServer = new Debounce().debounce(
+    this.compareEnvironmentWithServerDebounced,
+    0,
+  );
 }
