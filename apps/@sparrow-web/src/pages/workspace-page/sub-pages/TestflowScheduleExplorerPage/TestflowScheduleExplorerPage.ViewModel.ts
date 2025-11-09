@@ -12,7 +12,12 @@ import type {
 } from "../../../../database/database";
 
 // Utils
-import { createDeepCopy, Debounce, scrollToTab } from "@sparrow/common/utils";
+import {
+  createDeepCopy,
+  Debounce,
+  InitTestflowDataSetTab,
+  scrollToTab,
+} from "@sparrow/common/utils";
 
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import {
@@ -39,6 +44,7 @@ import { v4 as uuidv4 } from "uuid";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
 import { captureEvent } from "src/utils/posthog/posthogConfig";
 import { TestflowNavigatorEnum } from "@sparrow/common/types/workspace/testflow";
+import type { TestflowDataSetItem } from "@sparrow/common/types/workspace/testflow-dateset-tab";
 // import { InitRequestTab } from "@sparrow/common/utils";
 
 class MockHistoryExplorerPage {
@@ -628,6 +634,27 @@ class MockHistoryExplorerPage {
 
     this.tabRepository.createTab(initEnvironmentTab.getValue());
     scrollToTab(initEnvironmentTab.getValue().id);
+  };
+
+  public openTestflowDataSetTab = async (dataSet: TestflowDataSetItem) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const initTestflowDataSetTab = new InitTestflowDataSetTab(
+      dataSet.id,
+      progressiveTab.path.workspaceId,
+      progressiveTab.id,
+    )
+      .updateName(dataSet.name)
+      .updateDataSet(dataSet?.item)
+      .updateFormatType(dataSet.formatType)
+      .updateTimestamps(dataSet.createdAt, dataSet.updatedAt)
+      .updateFileDetails({
+        fileSize: dataSet.fileSize,
+        fileUrl: dataSet.fileUrl,
+        updatedBy: dataSet.updatedBy,
+      })
+      .updateUpdatedAt(dataSet?.updatedAt || "")
+      .getValue();
+    await this.tabRepository.createTab(initTestflowDataSetTab);
   };
 }
 
