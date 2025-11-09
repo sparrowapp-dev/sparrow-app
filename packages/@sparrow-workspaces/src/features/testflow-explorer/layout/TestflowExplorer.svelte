@@ -987,7 +987,7 @@
 
   function getTooltipMessage(schedule) {
     if (schedule.status === "Expired") {
-      return "This schedule has completed all its runs and cannot be reactivated.";
+      return "This schedule has completed all its runs. You can edit it to reactivate.";
     } else if (schedule.status === "Inactive") {
       return "This schedule is currently paused. Resume to enable future runs.";
     } else if (schedule.status === "Active") {
