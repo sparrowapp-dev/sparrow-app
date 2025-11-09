@@ -2874,14 +2874,15 @@
             </table>
 
             {#if filteredTestData.length === 0}
-              <div class="empty-state text-center py-5">
-                <p class="text-costum text-fs-14">No test data found</p>
-                <p
-                  class="text-costum text-fs-12"
-                  style="color:var(--text-ds-neutral-400);"
-                >
-                  Import or create test data to see it here.
-                </p>
+              <div class="empty-state-centered">
+                <div class="empty-icon">
+                  <DocumentRegular size="32px" color="#6b6b6b" />
+                </div>
+                <div class="empty-message">
+                  No test data imported yet. Use the <span
+                    style="font-weight: 700;">Import</span
+                  > button to upload JSON or CSV files for testing.
+                </div>
               </div>
             {/if}
           </div>
@@ -3401,6 +3402,28 @@
 </Modal>
 
 <style>
+  .empty-state-centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+    background: var(--bg-ds-neutral-900);
+    color: var(--text-ds-neutral-400);
+    border-radius: 8px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .empty-icon {
+    margin-bottom: 18px;
+    opacity: 0.7;
+  }
+  .empty-message {
+    font-size: 12px;
+    color: var(--text-ds-neutral-400);
+    text-align: center;
+    max-width: 420px;
+  }
   .file-preview-csv {
     flex: 1;
     overflow: auto;

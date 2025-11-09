@@ -9,6 +9,7 @@
   import { Configurations, TestResults } from "../components";
   import {
     ArrowClockWiseRegular,
+    DocumentRegular,
     FlowChartRegular,
     LayerRegular,
   } from "@sparrow/library/icons";
@@ -42,8 +43,8 @@
   export let userRole;
   export let onValidateTestflowRun;
   export let testflowDataSetStore;
-  export let onOpenTestDataPreview = null;
-  export let openTestflowDataSetTab = null;
+  export let onOpenTestDataPreview;
+  export let openTestflowDataSetTab;
   export let onDeleteTestflowScheduleTestDataHistory;
 
   let scheduleRunValidateData: {
@@ -236,6 +237,29 @@
               }}
             />
           </div>
+        {/if}
+        {#if schedule?.testflowDataSetId}
+          {#if testflowDataSetStore}
+            {#each testflowDataSetStore as dataSet}
+              {#if dataSet.id === schedule.testflowDataSetId}
+                <div class="d-flex gap-2 align-items-center">
+                  <span
+                    class="dot"
+                    style="transform: translateX(12px) translateY(2px);"
+                  ></span>
+                  <Button
+                    title={dataSet.name?.length > 30
+                      ? dataSet.name.slice(0, 30) + "..."
+                      : dataSet.name}
+                    startIcon={DocumentRegular}
+                    type={"link-secondary"}
+                    size={"extra-small"}
+                    onClick={() => openTestflowDataSetTab(dataSet)}
+                  />
+                </div>
+              {/if}
+            {/each}
+          {/if}
         {/if}
         {#if description}
           <div class="d-flex gap-2 align-items-center pt-1">
