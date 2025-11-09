@@ -462,7 +462,11 @@
       if (lastRun.status === "pass") {
         lastResult = "Success";
       } else if (lastRun.status === "fail") {
-        lastResult = "Fail";
+        if (lastRun.successRequests > 0) {
+          lastResult = "Partial Fail";
+        } else {
+          lastResult = "Fail";
+        }
       } else if (lastRun.status === "pending") {
         lastResult = "Pending";
       } else {
@@ -983,7 +987,7 @@
 
   function getTooltipMessage(schedule) {
     if (schedule.status === "Expired") {
-      return "This schedule has completed all its runs and cannot be reactivated.";
+      return "This schedule has completed all its runs. You can edit it to reactivate.";
     } else if (schedule.status === "Inactive") {
       return "This schedule is currently paused. Resume to enable future runs.";
     } else if (schedule.status === "Active") {
@@ -2039,6 +2043,17 @@
   };
 
   let runButtonMenu = false;
+
+  const openScheduleRun = () => {
+    if (isGuestUser) {
+      notifications.error(
+        "To access the feature, you need to login/signup on Sparrow.",
+      );
+      return;
+    }
+    handleEventClickScheduleRun();
+    isScheduleRunPopupOpen = true;
+  };
 </script>
 
 <div
@@ -2116,6 +2131,11 @@
             {/if}
           {/if}
           {#if userRole !== WorkspaceRole.WORKSPACE_VIEWER}
+            <div
+              id="create-new-schedule"
+              style="display:none;"
+              on:click={openScheduleRun}
+            ></div>
             <Dropdown
               zIndex={600}
               buttonId="test-run-button"
@@ -2129,16 +2149,7 @@
                   icon: AddRegular,
                   iconColor: "var(--icon-secondary-130)",
                   iconSize: "13px",
-                  onclick: () => {
-                    if (isGuestUser) {
-                      notifications.error(
-                        "To access the feature, you need to login/signup on Sparrow.",
-                      );
-                    } else {
-                      handleEventClickScheduleRun();
-                      isScheduleRunPopupOpen = true;
-                    }
-                  },
+                  onclick: openScheduleRun,
                 },
               ]}
             >
@@ -2574,8 +2585,9 @@
 >
   <div class="modal-content">
     <p class="mb-3" style="margin-top: 13px; padding-bottom:20px;">
-      "{$tab?.name}" flow has active schedules. Saving will update all upcoming
-      runs with your latest changes, which may impact their results.
+      "<span style="font-weight:700 !important;">{$tab?.name}</span>" flow has
+      active schedules. Saving will update all upcoming runs with your latest
+      changes, which may impact their results.
     </p>
     <div class="d-flex justify-content-end gap-3">
       <Button
@@ -2587,7 +2599,7 @@
       <Button
         type="primary"
         size="medium"
-        title="Save"
+        title="Save & Apply"
         onClick={handleSaveConfirm}
       />
     </div>
