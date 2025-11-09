@@ -41,6 +41,10 @@
   export let onSaveSchedule;
   export let userRole;
   export let onValidateTestflowRun;
+  export let testflowDataSetStore;
+  export let onOpenTestDataPreview = null;
+  export let openTestflowDataSetTab = null;
+  export let onDeleteTestflowScheduleTestDataHistory;
 
   let scheduleRunValidateData: {
     hasLocalhostUrls?: boolean;
@@ -165,7 +169,7 @@
               size="small"
             >
               <Button
-              title={"Run Now"}
+                title={"Run Now"}
                 type={"primary"}
                 loader={$loadingState.get("schedule-run-" + schedule?.id)}
                 disable={$loadingState.get("schedule-run-" + schedule?.id)}
@@ -259,6 +263,7 @@
             {onScheduleRunview}
             {onDeleteTestflowScheduleHistory}
             {isTestflowScheduleEditable}
+            {onDeleteTestflowScheduleTestDataHistory}
           />
         {:else if $tab?.property?.testflowSchedule?.state?.scheduleNavigator === TestflowScheduleNavigatorEnum.CONFIGURATION}
           <Configurations
@@ -269,6 +274,12 @@
             {onSaveSchedule}
             isSaved={$tab?.isSaved}
             {userRole}
+            testDataFiles={testflowDataSetStore?.map((dataset) => ({
+              id: dataset.id,
+              name: dataset.name,
+              ...dataset,
+            })) || []}
+            onPreviewTestData={onOpenTestDataPreview}
           />
         {/if}
       </div>

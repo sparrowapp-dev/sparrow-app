@@ -1912,6 +1912,7 @@ export class TestflowExplorerPageViewModel {
         emails: _schedule.notification.emails,
         receiveNotifications: _schedule.notification.receiveNotifications,
       })
+      .updateTestflowDataSetId(_schedule.testflowDataSetId)
       .getValue();
     await this.tabRepository.createTab(initTestflowScheduleTab);
   };
@@ -1939,6 +1940,7 @@ export class TestflowExplorerPageViewModel {
       .updateState({
         scheduleNavigator: TestflowScheduleNavigatorEnum.CONFIGURATION,
       })
+      .updateTestflowDataSetId(_schedule.testflowDataSetId)
       .getValue();
     await this.tabRepository.createTab(initTestflowScheduleTab);
   };
@@ -1968,6 +1970,7 @@ export class TestflowExplorerPageViewModel {
     environmentId: string,
     runConfiguration: ScheduleTestFlowRunDto["runConfiguration"],
     notification: ScheduleTestFlowRunDto["notification"],
+    testflowDataSetId?: string,
   ) => {
     captureEvent("set_schedule_run_cta_clicked", {
       event_source: "desktop_app",
@@ -1992,6 +1995,7 @@ export class TestflowExplorerPageViewModel {
         testflowId,
         runConfiguration,
         notification,
+        testflowDataSetId,
       };
 
       const response = await this.testflowService.scheduleTestFlowRun(
