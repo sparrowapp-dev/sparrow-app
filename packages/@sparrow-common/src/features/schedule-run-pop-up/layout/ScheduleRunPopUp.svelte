@@ -319,7 +319,6 @@
   }
 
   function handleTestDataSelect(data) {
-    debugger;
     selectedTestData = data;
     // Notify parent about the selection
     if (onTestDataSelection) {

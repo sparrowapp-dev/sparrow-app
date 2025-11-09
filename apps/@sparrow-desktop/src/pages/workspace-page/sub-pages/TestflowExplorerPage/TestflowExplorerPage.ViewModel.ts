@@ -2272,7 +2272,6 @@ export class TestflowExplorerPageViewModel {
   };
 
   public openTestflowDataSetTab = async (dataSet: TestflowDataSetItem) => {
-    debugger;
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const initTestflowDataSetTab = new InitTestflowDataSetTab(
       dataSet.id,
