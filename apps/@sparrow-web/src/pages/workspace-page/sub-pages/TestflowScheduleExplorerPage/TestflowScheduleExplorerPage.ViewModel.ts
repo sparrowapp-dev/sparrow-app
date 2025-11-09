@@ -362,7 +362,7 @@ class MockHistoryExplorerPage {
     );
     if (response?.isSuccessful) {
       captureEvent("schedule_history_deleted", {
-        event_source: "desktop_app",
+        event_source: "web_app",
         schedule_id: progressiveTab.id,
         testflow_id: progressiveTab.path.testflowId,
         schedule_run_frequency:
@@ -375,6 +375,39 @@ class MockHistoryExplorerPage {
         schedules,
       );
       this.tabRepository.removeTab(_scheduleHistoryId);
+    }
+  };
+
+  public deleteTestflowScheduleTestDataHistory = async (
+    _runHistoryTestDataId: string,
+  ) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab.path.workspaceId,
+    );
+    const response =
+      await this.testflowService.deleteScheduleRunTestDataHistory(
+        progressiveTab.path.workspaceId,
+        progressiveTab.path.testflowId,
+        progressiveTab.id,
+        _runHistoryTestDataId,
+        baseUrl,
+      );
+    if (response?.isSuccessful) {
+      captureEvent("schedule_history_deleted", {
+        event_source: "web_app",
+        schedule_id: progressiveTab.id,
+        testflow_id: progressiveTab.path.testflowId,
+        schedule_run_frequency:
+          progressiveTab.property.testflowSchedule.runConfiguration.runCycle,
+        status: progressiveTab.property.testflowSchedule.isActive,
+      });
+      const schedules = response.data.data.schedules;
+      updateTestflowSchedules(
+        progressiveTab?.path?.testflowId as string,
+        schedules,
+      );
+      this.tabRepository.removeTab(_runHistoryTestDataId);
     }
   };
 

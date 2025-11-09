@@ -599,7 +599,6 @@
   }
 
   $: {
-    debugger;
     const mappedSchedules = testflowScheduleStore.map(mapScheduleData);
 
     if (searchQuery.trim() === "") {

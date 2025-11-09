@@ -84,6 +84,7 @@
   export let onDeleteTestflowScheduleHistory;
   export let onScheduleRunview;
   export let isTestflowScheduleEditable;
+  export let onDeleteTestflowScheduleTestDataHistory;
 
   function formatDate(dateStr: string) {
     const date = new Date(dateStr);
@@ -129,7 +130,9 @@
             {#each paginatedHistory as r}
               <Result
                 {onScheduleRunview}
-                onDeleteResult={onDeleteTestflowScheduleHistory}
+                onDeleteResult={schedule?.schedularDataSetHistory?.length > 0
+                  ? onDeleteTestflowScheduleTestDataHistory
+                  : onDeleteTestflowScheduleHistory}
                 {r}
                 {schedule}
                 {formatDate}

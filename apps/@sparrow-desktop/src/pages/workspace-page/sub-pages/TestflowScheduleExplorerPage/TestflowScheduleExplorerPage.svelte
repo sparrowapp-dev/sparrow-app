@@ -205,6 +205,7 @@
   testflowDataSetStore={testflowDataSetStore || []}
   onOpenTestDataPreview={openTestDataPreview}
   openTestflowDataSetTab={_viewModel.openTestflowDataSetTab}
+  onDeleteTestflowScheduleTestDataHistory={_viewModel.deleteTestflowScheduleTestDataHistory}
 />
 
 <!-- Test Data Preview Modal -->

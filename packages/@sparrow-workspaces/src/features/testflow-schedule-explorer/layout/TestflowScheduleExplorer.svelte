@@ -44,6 +44,7 @@
   export let testflowDataSetStore;
   export let onOpenTestDataPreview = null;
   export let openTestflowDataSetTab = null;
+  export let onDeleteTestflowScheduleTestDataHistory;
 
   let scheduleRunValidateData: {
     hasLocalhostUrls?: boolean;
@@ -262,6 +263,7 @@
             {onScheduleRunview}
             {onDeleteTestflowScheduleHistory}
             {isTestflowScheduleEditable}
+            {onDeleteTestflowScheduleTestDataHistory}
           />
         {:else if $tab?.property?.testflowSchedule?.state?.scheduleNavigator === TestflowScheduleNavigatorEnum.CONFIGURATION}
           <Configurations

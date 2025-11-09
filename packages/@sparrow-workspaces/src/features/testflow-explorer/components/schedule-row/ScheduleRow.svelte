@@ -54,7 +54,6 @@
   }
 
   function handleSelectClick(event: MouseEvent) {
-    debugger;
     const selectElement = document.getElementById(
       `show-more-schedule-${schedule?.id}`,
     );

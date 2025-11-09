@@ -148,6 +148,21 @@ export class TestflowService {
     return response;
   };
 
+  public deleteScheduleRunTestDataHistory = async (
+    _workspaceId: string,
+    _testflowId: string,
+    _scheduleId: string,
+    _runHistoryTestDataId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${baseUrl}/api/workspace/${_workspaceId}/testflow/${_testflowId}/schedule/${_scheduleId}/run-history-dataset/${_runHistoryTestDataId}`,
+      { headers: getAuthHeaders() },
+    );
+    return response;
+  };
+
   public deleteTestflowSchedule = async (
     workspaceId: string,
     _testflowId: string,
