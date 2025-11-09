@@ -2194,18 +2194,23 @@
           </div>
         {/if}
       </div>
-
-      <div style="margin-right: 5px;">
-        <Tooltip title="Clear Response" placement="bottom-center" size="small">
-          <Button
-            type="secondary"
-            size="medium"
-            disable={testflowStore?.isTestFlowRunning || isTestFlowEmpty}
-            startIcon={BroomRegular}
-            onClick={onClearTestflow}
-          />
-        </Tooltip>
-      </div>
+      {#if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.TESTFLOW}
+        <div style="margin-right: 5px;">
+          <Tooltip
+            title="Clear Response"
+            placement="bottom-center"
+            size="small"
+          >
+            <Button
+              type="secondary"
+              size="medium"
+              disable={testflowStore?.isTestFlowRunning || isTestFlowEmpty}
+              startIcon={BroomRegular}
+              onClick={onClearTestflow}
+            />
+          </Tooltip>
+        </div>
+      {/if}
       {#if !(userRole === WorkspaceRole.WORKSPACE_VIEWER)}
         <div>
           <SaveTestflow
