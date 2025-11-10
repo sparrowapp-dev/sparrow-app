@@ -18,6 +18,7 @@
     name?: string,
   ) => Promise<any>;
   export let onSaveDataset;
+  export let onRenameDataset;
 
   let testDataName: string;
 
@@ -82,11 +83,7 @@
   }
 
   async function handleSave() {
-    const res = await onPerformDatasetOperations(
-      "rename",
-      $tab?.id,
-      testDataName,
-    );
+    const res = await onRenameDataset($tab?.id, testDataName);
     if (res?.isSuccessful) {
       notifications.success(`Changes Saved for "${testDataName}" test data.`);
       if (onSaveDataset) {

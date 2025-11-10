@@ -245,4 +245,62 @@ export class TestflowService {
     );
     return response;
   };
+
+  public deleteTestDataSet = async (
+    _testflowId: string,
+    testflowDataSetId: string,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${this.apiUrl}/api/workspace/${_testflowId}/dataset/${testflowDataSetId}`,
+      { headers: getAuthHeaders() },
+    );
+    return response;
+  };
+
+  public renameTestDataSet = async (
+    _testflowId: string,
+    testflowDataSetId: string,
+    updatedDataSetName: string,
+  ) => {
+    const response = await makeRequest(
+      "PATCH",
+      `${this.apiUrl}/api/workspace/${_testflowId}/dataset/${testflowDataSetId}`,
+      {
+        body: { name: updatedDataSetName },
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public importTestflowDataSetFileChange = async (
+    testflowId: string,
+    payload: TestflowDataSetImportDto,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/workspace/testflow/${testflowId}/import-dataset/file`,
+      {
+        body: payload,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public updateDatasetByName = async (
+    testflowId: string,
+    payload: TestflowDataSetImportDto,
+  ) => {
+    const response = await makeRequest(
+      "PATCH",
+      `${this.apiUrl}/api/workspace/${testflowId}/dataset`,
+      {
+        body: payload,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
 }

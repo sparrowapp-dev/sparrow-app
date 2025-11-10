@@ -32,7 +32,6 @@ export const addTestflowDataSet = (_id: string | number, _dataset: any) => {
 };
 
 export const replaceTestflowDataSet = (_id: string | number, _dataset: any) => {
-  debugger;
   let updatedList: any[] = [];
   testflowDataSets.update((current) => {
     const updated = new Map(current);

@@ -81,6 +81,10 @@ import {
 import { TestflowScheduleNavigatorEnum } from "@sparrow/common/types/workspace/testflow-schedule-tab";
 import { captureEvent } from "src/utils/posthog/posthogConfig";
 import type { TestflowDataSetItem } from "@sparrow/common/types/workspace/testflow-dateset-tab";
+import {
+  addTestflowDataSet,
+  replaceTestflowDataSet,
+} from "../../../../../../../packages/@sparrow-common/src/store/testflow-datasets";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -2131,6 +2135,18 @@ export class TestflowExplorerPageViewModel {
     }
   };
 
+  public performTestDataSetOperations = async (
+    _type: "delete" | "export" | "rename",
+    testflowDataSetId: string,
+    updatedDataSetName?: string,
+  ) => {
+    if (_type === "delete") {
+      return this.deleteTestDataSet(testflowDataSetId);
+    } else if (_type === "rename") {
+      return this.renameTestDataSet(testflowDataSetId, updatedDataSetName);
+    }
+  };
+
   public updateTestflowScheduleStatus = async (
     _scheduleId: string,
     isChecked: any,
@@ -2228,8 +2244,93 @@ export class TestflowExplorerPageViewModel {
       }
       return response;
     } catch (err) {
-      console.log("Error importing dataset: ", err);
+      notifications.error("Failed to import dataset. Please try again.");
     }
+  };
+
+  public importTestflowDataSetFileChange = async (
+    dataSet: any,
+    dataSetType: string,
+    name: string,
+  ) => {
+    try {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const payload = {
+        item: dataSet,
+        formatType: dataSetType,
+        name,
+      } as TestflowDataSetImportDto;
+      const response =
+        await this.testflowService.importTestflowDataSetFileChange(
+          progressiveTab.id as string,
+          payload,
+        );
+      if (response?.isSuccessful) {
+        const dataset = response.data?.data.data;
+        addTestflowDataSet(progressiveTab.id as string, dataset || []);
+        notifications.success(`Data set imported successfully.`);
+      }
+      return response;
+    } catch (err) {
+      notifications.error("Failed to import dataset. Please try again.");
+    }
+  };
+
+  public updateDatasetByName = async (
+    dataSet: any,
+    dataSetType: string,
+    name: string,
+  ) => {
+    try {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const payload = {
+        item: dataSet,
+        formatType: dataSetType,
+        name,
+      } as TestflowDataSetImportDto;
+      const response = await this.testflowService.updateDatasetByName(
+        progressiveTab.id as string,
+        payload,
+      );
+      if (response?.isSuccessful) {
+        const dataset = response.data?.data.data;
+        replaceTestflowDataSet(progressiveTab.id as string, dataset || []);
+        notifications.success(`Data set imported successfully.`);
+      }
+      return response;
+    } catch (err) {
+      notifications.error("Failed to import dataset. Please try again.");
+    }
+  };
+
+  private deleteTestDataSet = async (testflowDataSetId: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const response = await this.testflowService.deleteTestDataSet(
+      progressiveTab.id as string,
+      testflowDataSetId,
+    );
+    if (response?.isSuccessful) {
+      const datasets = response.data?.data.result;
+      updateTestflowDataSets(progressiveTab.id as string, datasets || []);
+    }
+    return response;
+  };
+
+  public renameTestDataSet = async (
+    testflowDataSetId: string,
+    updatedDataSetName: string,
+  ) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const response = await this.testflowService.renameTestDataSet(
+      progressiveTab.id as string,
+      testflowDataSetId,
+      updatedDataSetName,
+    );
+    if (response?.isSuccessful) {
+      const datasets = response.data?.data.result;
+      updateTestflowDataSets(progressiveTab.id as string, datasets || []);
+    }
+    return response;
   };
 
   public openTestflowDataSetTab = async (dataSet: TestflowDataSetItem) => {

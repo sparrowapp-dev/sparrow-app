@@ -3,6 +3,10 @@
   import { MoreVerticalRegular } from "@sparrow/library/icons";
   import { startLoading, stopLoading } from "@sparrow/common/store";
   import { Input } from "@sparrow/library/forms";
+  import {
+    handleTestDataDownloadDesktop,
+    handleTestDataDownloadWeb,
+  } from "../../../testflow-dataset-explorer/utils";
   import type { TestflowDataSetItem } from "../../../../../../@sparrow-common/src/types/workspace/testflow-dateset-tab";
 
   export let dataset: any;
@@ -15,6 +19,7 @@
   export let onPreviewDataset: (data: any) => void;
   export let activeMenuId;
   export let setActiveMenuId;
+  export let isWebApp;
   let showMenu;
   $: showMenu = activeMenuId === dataset.id;
   let activeWrapper: HTMLElement;
@@ -85,6 +90,26 @@
 
       isEditingName = false;
     }
+  };
+
+  const handleExportDownload = async () => {
+    showMenu = false;
+    setActiveMenuId(null);
+    await handleTestDataDownloadDesktop(
+      dataset?.originalData?.item?.dataSet,
+      dataset?.originalData?.formatType,
+      dataset?.name,
+    );
+  };
+
+  const handleExport = async () => {
+    showMenu = false;
+    setActiveMenuId(null);
+    await handleTestDataDownloadWeb(
+      dataset?.originalData?.item?.dataSet,
+      dataset?.originalData?.formatType,
+      dataset?.name,
+    );
   };
 
   const startRename = () => {
@@ -194,8 +219,7 @@
               hidden: false,
             },
             {
-              onClick: async () =>
-                onPerformDatasetOperations("export", dataset.id),
+              onClick: isWebApp ? handleExport : handleExportDownload,
               displayText: "Export",
               disabled: false,
               hidden: false,

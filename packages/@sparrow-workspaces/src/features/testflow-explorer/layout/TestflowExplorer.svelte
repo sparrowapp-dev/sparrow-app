@@ -2986,6 +2986,7 @@
                     onPreviewDataset={handlePreviewDataset}
                     onPerformDatasetOperations={onPerformTestDataSetOperations}
                     onOpenDataset={openTestflowDataSetTab}
+                    {isWebApp}
                   />
                 {/each}
               </tbody>

@@ -2275,7 +2275,6 @@ export class TestflowExplorerPageViewModel {
       return response;
     } catch (err) {
       notifications.error("Failed to import data set. Please try again.");
-      console.log("Error importing dataset: ", err);
     }
   };
 
@@ -2285,7 +2284,6 @@ export class TestflowExplorerPageViewModel {
     name: string,
   ) => {
     try {
-      debugger;
       const progressiveTab = createDeepCopy(this._tab.getValue());
       const payload = {
         item: dataSet,
@@ -2304,7 +2302,7 @@ export class TestflowExplorerPageViewModel {
       }
       return response;
     } catch (err) {
-      console.log("Error importing dataset: ", err);
+      notifications.error("Failed to import data set.");
     }
   };
 
@@ -2314,7 +2312,6 @@ export class TestflowExplorerPageViewModel {
     name: string,
   ) => {
     try {
-      debugger;
       const progressiveTab = createDeepCopy(this._tab.getValue());
       const payload = {
         item: dataSet,
@@ -2332,7 +2329,7 @@ export class TestflowExplorerPageViewModel {
       }
       return response;
     } catch (err) {
-      console.log("Error importing dataset: ", err);
+      notifications.error("Failed to import data set.");
     }
   };
 

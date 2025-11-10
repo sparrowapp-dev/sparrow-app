@@ -23,6 +23,7 @@
     bind:tab={_viewModel.tab}
     isWebApp={false}
     onUpdateName={_viewModel.updateName}
+    onRenameDataset={_viewModel.renameTestDataSet}
     onPerformDatasetOperations={_viewModel2.performTestDataSetOperations}
     onSaveDataset={_viewModel.saveDataset}
   />

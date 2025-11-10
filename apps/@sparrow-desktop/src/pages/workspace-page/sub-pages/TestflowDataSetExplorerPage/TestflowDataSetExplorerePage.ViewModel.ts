@@ -138,7 +138,7 @@ export class TestflowDataSetExplorerPageViewModel {
   ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const response = await this.testflowService.renameTestDataSet(
-      progressiveTab.id as string,
+      progressiveTab.path.testflowId as string,
       testflowDataSetId,
       updatedDataSetName,
     );
