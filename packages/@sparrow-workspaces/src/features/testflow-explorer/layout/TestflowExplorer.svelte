@@ -536,10 +536,18 @@
     }
   }
 
-  let dismissed = false;
+  let dismissedMap: Record<string, boolean> = {};
+  let currentNavigator: TestflowNavigatorEnum | null = null;
+  let currentDismissKey: string | null = null;
+  $: currentNavigator =
+    $tab?.property?.testflow?.state?.testflowNavigator || null;
+  $: currentDismissKey =
+    $tab?.id && currentNavigator ? `${$tab.id}:${currentNavigator}` : null;
 
   function dismissWarning() {
-    dismissed = true;
+    if (currentDismissKey) {
+      dismissedMap = { ...dismissedMap, [currentDismissKey]: true };
+    }
   }
 
   function handleSearchSchedules(event) {
@@ -2240,7 +2248,7 @@
   </div>
 
   <!-- Warning Message -->
-  {#if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.SCHEDULE && testflowScheduleStore.some((schedule) => schedule.isActive) && !dismissed}
+  {#if currentNavigator && [TestflowNavigatorEnum.SCHEDULE, TestflowNavigatorEnum.TESTFLOW].includes(currentNavigator) && testflowScheduleStore.some((schedule) => schedule.isActive) && !(currentDismissKey && dismissedMap[currentDismissKey])}
     <div
       class="mx-3 warning-banner px-4 d-flex align-items-center mb-3 p-2 position-relative"
     >
