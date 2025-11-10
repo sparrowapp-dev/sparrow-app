@@ -21,6 +21,7 @@
 {#if tab && _viewModel}
   <TestflowDataSetExplorer
     bind:tab={_viewModel.tab}
+    isWebApp={false}
     onUpdateName={_viewModel.updateName}
     onPerformDatasetOperations={_viewModel2.performTestDataSetOperations}
     onSaveDataset={_viewModel.saveDataset}

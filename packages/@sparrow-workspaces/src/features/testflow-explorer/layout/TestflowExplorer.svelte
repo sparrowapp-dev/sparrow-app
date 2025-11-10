@@ -538,6 +538,27 @@
     let environment = "None";
     let isDeletedEnvironment = false;
     let environmentData = null;
+    let testflowDataSetName = "None";
+    let isDeletedTestData = false;
+
+    if (
+      schedule.testflowDataSetId &&
+      schedule.testflowDataSetId.trim() !== ""
+    ) {
+      // Find the dataset in testflowDataSetStore
+      const dataset = testflowDataSetStore?.find(
+        (ds) => ds.id === schedule.testflowDataSetId,
+      );
+      if (dataset) {
+        testflowDataSetName = dataset.name;
+        isDeletedTestData = false;
+      } else {
+        // Dataset not found in current list → might be deleted
+        testflowDataSetName =
+          schedule?.testflowDataSetName || "Deleted Dataset";
+        isDeletedTestData = true;
+      }
+    }
 
     if (schedule.environmentId && schedule.environmentId.trim() !== "") {
       // Find environment by ID in the environments array
@@ -567,6 +588,8 @@
       isActive: schedule.isActive,
       originalData: schedule,
       isDeletedEnvironment: isDeletedEnvironment,
+      testflowDataSetName: testflowDataSetName,
+      isDeletedTestData: isDeletedTestData,
     };
   }
 
@@ -2860,6 +2883,7 @@
                   <th class="text-fs-12">Schedule Name</th>
                   <th>Status</th>
                   <th>Environment</th>
+                  <th>Test Data</th>
                   <th>Next Run</th>
                   <th>Last Run Result</th>
                   {#if isTestflowEditable}
@@ -2968,18 +2992,15 @@
             </table>
 
             {#if filteredTestData.length === 0}
-              <div class="empty-state text-center py-5">
-                <DocumentRegular
-                  color="var(--text-ds-neutral-500)"
-                  size="28px"
-                />
-                <p
-                  class="text-costum text-fs-12"
-                  style="color:var(--text-ds-neutral-400);"
-                >
-                  No test data imported yet. Use the Import button to upload
-                  JSON or CSV files for testing.
-                </p>
+              <div class="empty-state-centered">
+                <div class="empty-icon">
+                  <DocumentRegular size="32px" color="#6b6b6b" />
+                </div>
+                <div class="empty-message">
+                  No test data imported yet. Use the <span
+                    style="font-weight: 700;">Import</span
+                  > button to upload JSON or CSV files for testing.
+                </div>
               </div>
             {/if}
           </div>
@@ -3550,6 +3571,28 @@
 </Modal>
 
 <style>
+  .empty-state-centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+    background: var(--bg-ds-neutral-900);
+    color: var(--text-ds-neutral-400);
+    border-radius: 8px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .empty-icon {
+    margin-bottom: 18px;
+    opacity: 0.7;
+  }
+  .empty-message {
+    font-size: 12px;
+    color: var(--text-ds-neutral-400);
+    text-align: center;
+    max-width: 420px;
+  }
   .pagination-footer {
     position: relative;
     bottom: 0;

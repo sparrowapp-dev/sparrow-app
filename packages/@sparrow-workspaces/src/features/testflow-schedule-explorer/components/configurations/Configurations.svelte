@@ -20,6 +20,8 @@
   export let onSaveSchedule;
   export let isSaved;
   export let userRole;
+  export let testDataFiles = [];
+  export let onPreviewTestData = null;
 
   const extractTimeFromISOString = new TimeISOExtractor()
     .extractTimeFromISOString;
@@ -78,6 +80,7 @@
           emails: notificationEmails,
           receiveNotifications,
         },
+        testflowDataSetId: selectedTestData === "none" ? "" : selectedTestData,
       };
 
       // Call the update function from parent
@@ -90,6 +93,7 @@
   let selectedEnvironment = "";
   let isError = false;
   let isUpdating = false;
+  let selectedTestData = "none";
 
   // Run Configuration
   let selectedCycle = "once"; // once, daily, hourly, weekly
@@ -177,6 +181,7 @@
       scheduleName = schedule.name || "";
       selectedEnvironment = schedule.environmentId || "none";
       selectedCycle = schedule.runConfiguration?.runCycle || "once";
+      selectedTestData = schedule.testflowDataSetId || "none";
 
       if (selectedCycle === "once" && schedule.runConfiguration?.executeAt) {
         const executeAtDate = new Date(schedule.runConfiguration.executeAt);
@@ -287,6 +292,11 @@
   // Handle time change
   const handleTimeChange = (event) => {
     selectedTime = event.detail;
+    updateScheduleRealtime();
+  };
+
+  const handleTestDataSelect = (testDataId: string) => {
+    selectedTestData = testDataId;
     updateScheduleRealtime();
   };
 
@@ -429,6 +439,12 @@
       notificationEmails = [...initialFormData.notificationEmails];
       receiveNotifications = initialFormData.receiveNotifications;
       updateScheduleRealtime();
+    }
+  };
+
+  const handlePreviewTestData = () => {
+    if (selectedTestData && selectedTestData !== "none" && onPreviewTestData) {
+      onPreviewTestData(selectedTestData);
     }
   };
 
@@ -708,6 +724,44 @@
           {/if}
         {/if}
       </div>
+      <div class="form-group mb-4">
+        <label
+          class="form-label text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-medium mb-2"
+          style="color: var(--text-ds-neutral-200);"
+        >
+          Select Test Data
+        </label>
+        <p
+          class="helper-text text-ds-font-size-12 mb-2"
+          style="color: var(--text-ds-neutral-400);"
+        >
+          Select a test data file to execute tests with dynamic inputs.
+        </p>
+        <Select
+          id="testdata-select"
+          data={[{ id: "none", name: "None" }, ...testDataFiles]}
+          titleId={selectedTestData === "none" ? "" : selectedTestData}
+          onclick={handleTestDataSelect}
+          size="medium"
+          minHeaderWidth="100%"
+          placeholderText="Select"
+          menuItem="v2"
+          showDescription={false}
+          bodyTheme={"violet"}
+          headerTheme={"violet2"}
+          variant={"tertiary"}
+          zIndex={10}
+        />
+        <div class="preview-button">
+          <Button
+            title="Preview File"
+            type="link-primary"
+            size="small"
+            onClick={handlePreviewTestData}
+            buttonClassProp="mt-2"
+          />
+        </div>
+      </div>
       <div
         style="height: 1px; background-color: var(--bg-ds-surface-100); margin: 20px 0;"
       ></div>
@@ -793,6 +847,9 @@
 </div>
 
 <style lang="scss">
+  .preview-button {
+    margin-left: -16px;
+  }
   .configurations-container {
     display: flex;
     flex-direction: column;

@@ -1852,6 +1852,7 @@ export class TestflowExplorerPageViewModel {
         emails: _schedule.notification.emails,
         receiveNotifications: _schedule.notification.receiveNotifications,
       })
+      .updateTestflowDataSetId(_schedule.testflowDataSetId)
       .getValue();
     await this.tabRepository.createTab(initTestflowScheduleTab);
   };
@@ -1934,6 +1935,7 @@ export class TestflowExplorerPageViewModel {
       .updateState({
         scheduleNavigator: TestflowScheduleNavigatorEnum.CONFIGURATION,
       })
+      .updateTestflowDataSetId(_schedule.testflowDataSetId)
       .getValue();
     await this.tabRepository.createTab(initTestflowScheduleTab);
   };

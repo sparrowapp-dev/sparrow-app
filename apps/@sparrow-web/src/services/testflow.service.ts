@@ -115,11 +115,12 @@ export class TestflowService {
     _testflowId: string,
     _scheduleId: string,
     baseUrl: string,
+    payload?: { testflowDataSetId: string },
   ) => {
     const response = await makeRequest(
       "POST",
       `${baseUrl}/api/workspace/${_workspaceId}/testflow/${_testflowId}/schedule/${_scheduleId}/run`,
-      { headers: getAuthHeaders() },
+      { headers: getAuthHeaders(), body: payload },
     );
     return response;
   };
@@ -134,6 +135,21 @@ export class TestflowService {
     const response = await makeRequest(
       "DELETE",
       `${baseUrl}/api/workspace/${_workspaceId}/testflow/${_testflowId}/schedule/${_scheduleId}/run-history/${_runHistoryId}`,
+      { headers: getAuthHeaders() },
+    );
+    return response;
+  };
+
+  public deleteScheduleRunTestDataHistory = async (
+    _workspaceId: string,
+    _testflowId: string,
+    _scheduleId: string,
+    _runHistoryTestDataId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${baseUrl}/api/workspace/${_workspaceId}/testflow/${_testflowId}/schedule/${_scheduleId}/run-history-dataset/${_runHistoryTestDataId}`,
       { headers: getAuthHeaders() },
     );
     return response;

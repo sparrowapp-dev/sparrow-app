@@ -3,9 +3,14 @@
   import { Button, notifications, Tooltip } from "@sparrow/library/ui";
   import { Input } from "@sparrow/library/forms";
   import { ArrowDownloadRegular } from "@sparrow/library/icons";
+  import {
+    handleTestDataDownloadDesktop,
+    handleTestDataDownloadWeb,
+  } from "../utils";
   import { Pagination } from "@sparrow/library/ui";
 
   export let tab: any;
+  export let isWebApp;
   export let onUpdateName;
   export let onPerformDatasetOperations: (
     op: string,
@@ -19,8 +24,20 @@
   $: testDataName = $tab?.name || "";
   $: console.log("tab", tab);
 
-  const handleExport = () => {
-    console.log("Export clicked for file:", tab?.name);
+  const handleExport = async () => {
+    await handleTestDataDownloadWeb(
+      $tab?.property?.testflowDataSet?.item?.dataSet,
+      $tab?.property?.testflowDataSet?.formatType,
+      $tab?.property?.testflowDataSet?.name,
+    );
+  };
+
+  const handleExportDownload = async () => {
+    await handleTestDataDownloadDesktop(
+      $tab?.property?.testflowDataSet?.item?.dataSet,
+      $tab?.property?.testflowDataSet?.formatType,
+      $tab?.property?.testflowDataSet?.name,
+    );
   };
 
   // Convert UTC date string → local date-time
@@ -154,15 +171,27 @@
       />
 
       <div class="d-flex gap-2">
-        <Button
-          id="export-file"
-          disable={false}
-          title="Export"
-          type="secondary"
-          size="medium"
-          startIcon={ArrowDownloadRegular}
-          on:click={handleExport}
-        />
+        {#if !isWebApp}
+          <Button
+            id="export-file"
+            disable={false}
+            title="Export"
+            type="secondary"
+            size="medium"
+            startIcon={ArrowDownloadRegular}
+            onClick={handleExportDownload}
+          />
+        {:else}
+          <Button
+            id="export-file"
+            disable={false}
+            title="Export"
+            type="secondary"
+            size="medium"
+            startIcon={ArrowDownloadRegular}
+            onClick={handleExport}
+          />
+        {/if}
         <Tooltip title="Save" placement="top-center">
           <Button
             disable={$tab?.isSaved}
