@@ -124,6 +124,23 @@
   // Store initial values to track changes
   let initialFormData = null;
 
+  $: currentForm = {
+    scheduleName,
+    selectedEnvironment,
+    selectedCycle,
+    formattedDate,
+    selectedTime,
+    intervalHours,
+    days: [...days],
+    notificationEmails: [...notificationEmails],
+    receiveNotifications,
+  };
+
+  $: isModified =
+    initialFormData == null
+      ? true
+      : JSON.stringify(currentForm) !== JSON.stringify(initialFormData);
+
   // Format environments for Select component
   $: formattedEnvironments = [
     {
@@ -774,7 +791,8 @@
         <Button
           title="Save Changes"
           onClick={handleSaveChanges}
-          disable={isSaved ||
+          disable={!isModified ||
+            isSaved ||
             !scheduleName.trim() ||
             (selectedCycle === "once" && (!formattedDate || !selectedTime)) ||
             (selectedCycle === "daily" && !selectedTime) ||
@@ -784,7 +802,7 @@
           type="primary"
           loader={isUpdating}
         />
-        {#if !isSaved}
+        {#if !isSaved && isModified}
           <Button title="Cancel" onClick={handleCancel} type="secondary" />
         {/if}
       {/if}
