@@ -11,7 +11,12 @@ export {
   testflowSchedules,
   updateTestflowSchedules,
 } from "./testflow-schedules";
-export { testflowDataSets, updateTestflowDataSets } from "./testflow-datasets";
+export {
+  testflowDataSets,
+  updateTestflowDataSets,
+  addTestflowDataSet,
+  replaceTestflowDataSet,
+} from "./testflow-datasets";
 export {
   aiChatBotModelByTeam,
   updateAiChatBotModelforTeam,

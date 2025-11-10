@@ -84,7 +84,7 @@ import type { TestflowDataSetItem } from "@sparrow/common/types/workspace/testfl
 import {
   addTestflowDataSet,
   replaceTestflowDataSet,
-} from "../../../../../../../packages/@sparrow-common/src/store/testflow-datasets";
+} from "@sparrow/common/store";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -2247,6 +2247,8 @@ export class TestflowExplorerPageViewModel {
         payload,
       );
       if (response?.isSuccessful) {
+        const dataset = response.data?.data.data;
+        addTestflowDataSet(progressiveTab.id as string, dataset || []);
         notifications.success(`Data set imported successfully.`);
       }
       return response;

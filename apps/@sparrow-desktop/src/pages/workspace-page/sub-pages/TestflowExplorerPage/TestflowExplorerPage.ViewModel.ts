@@ -84,7 +84,7 @@ import type { TestflowDataSetItem } from "@sparrow/common/types/workspace/testfl
 import {
   addTestflowDataSet,
   replaceTestflowDataSet,
-} from "../../../../../../../packages/@sparrow-common/src/store/testflow-datasets";
+} from "@sparrow/common/store";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
