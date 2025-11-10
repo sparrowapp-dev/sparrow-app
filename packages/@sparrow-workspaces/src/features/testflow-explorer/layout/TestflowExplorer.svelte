@@ -2460,13 +2460,6 @@
                 },
               ]}
             >
-              <!-- <Tooltip
-                title={"Add Options"}
-                placement={"bottom-center"}
-                distance={12}
-                show={!runButtonMenu}
-                zIndex={10}
-              > -->
               <Button
                 type="primary"
                 id="test-run-button"
@@ -2478,7 +2471,6 @@
                   runButtonMenu = !runButtonMenu;
                 }}
               />
-              <!-- </Tooltip> -->
             </Dropdown>
             <div class="d-flex" style="gap:8px; align-items:center;">
               <input
@@ -2488,13 +2480,21 @@
                 on:change={handleImportFileChange}
                 style="display:none"
               />
-              <Button
-                type="secondary"
-                size="medium"
-                startIcon={ArrowUploadFilled}
-                title={"Import Data"}
-                onClick={handleImportClick}
-              />
+              <Tooltip
+                title={"Only JSON or CSV files are supported"}
+                placement={"top-center"}
+                distance={12}
+                show={!runButtonMenu}
+                zIndex={10}
+              >
+                <Button
+                  type="secondary"
+                  size="medium"
+                  startIcon={ArrowUploadFilled}
+                  title={"Import Data"}
+                  onClick={handleImportClick}
+                />
+              </Tooltip>
             </div>
           {/if}
         </div>
