@@ -1,4 +1,4 @@
-import { writable } from "svelte/store";
+import { writable, get } from "svelte/store";
 
 /**
  * Map key: string | number (e.g. testflow id, workspace id, tab id)
@@ -43,4 +43,25 @@ export const replaceTestflowDataSet = (_id: string | number, _dataset: any) => {
     return updated;
   });
   return updatedList;
+};
+
+/**
+ * Get a dataset by its ID
+ * @param datasetId - The ID of the dataset to find
+ * @returns The dataset object if found, null otherwise
+ */
+export const getDatasetById = (datasetId: string): any | null => {
+  const currentStore = get(testflowDataSets);
+
+  // Search through all dataset arrays in the map
+  for (const [, datasets] of currentStore) {
+    if (Array.isArray(datasets)) {
+      const foundDataset = datasets.find((dataset) => dataset.id === datasetId);
+      if (foundDataset) {
+        return foundDataset;
+      }
+    }
+  }
+
+  return null;
 };

@@ -500,6 +500,7 @@ class MockHistoryExplorerPage {
   public handleCreateTestflowSingleScheduleTab = (
     _scheduleResult: any,
     schedule: any,
+    selectedDataset?: any,
   ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const x = new TestflowScheduleRunViewTabAdapter().adapt(
@@ -508,6 +509,7 @@ class MockHistoryExplorerPage {
       schedule.name,
       progressiveTab.id,
       progressiveTab.path.testflowId,
+      selectedDataset,
     );
 
     this.tabRepository.createTab(x);
