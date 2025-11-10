@@ -150,6 +150,7 @@ export class TestflowDataSetExplorerPageViewModel {
       progressiveTab.path.testflowId as string,
       testflowDataSetId,
       updatedDataSetName,
+      progressiveTab?.path?.workspaceId,
     );
     if (response?.isSuccessful) {
       const datasets = response.data?.data.result;

@@ -242,10 +242,11 @@ export class TestflowService {
   public deleteTestDataSet = async (
     _testflowId: string,
     testflowDataSetId: string,
+    workspaceId: string,
   ) => {
     const response = await makeRequest(
       "DELETE",
-      `${this.apiUrl}/api/workspace/${_testflowId}/dataset/${testflowDataSetId}`,
+      `${this.apiUrl}/api/workspace/${workspaceId}/testflow/${_testflowId}/dataset/${testflowDataSetId}`,
       { headers: getAuthHeaders() },
     );
     return response;
@@ -255,10 +256,11 @@ export class TestflowService {
     _testflowId: string,
     testflowDataSetId: string,
     updatedDataSetName: string,
+    workspaceId: string,
   ) => {
     const response = await makeRequest(
       "PATCH",
-      `${this.apiUrl}/api/workspace/${_testflowId}/dataset/${testflowDataSetId}`,
+      `${this.apiUrl}/api/workspace/${workspaceId}/testflow/${_testflowId}/dataset/${testflowDataSetId}`,
       {
         body: { name: updatedDataSetName },
         headers: getAuthHeaders(),
@@ -270,10 +272,11 @@ export class TestflowService {
   public importTestflowDataSet = async (
     testflowId: string,
     payload: TestflowDataSetImportDto,
+    workspaceId: string,
   ) => {
     const response = await makeRequest(
       "POST",
-      `${this.apiUrl}/api/workspace/testflow/${testflowId}/import-dataset`,
+      `${this.apiUrl}/api/workspace/${workspaceId}/testflow/${testflowId}/import-dataset`,
       {
         body: payload,
         headers: getAuthHeaders(),
@@ -285,10 +288,11 @@ export class TestflowService {
   public importTestflowDataSetFileChange = async (
     testflowId: string,
     payload: TestflowDataSetImportDto,
+    workspaceId: string,
   ) => {
     const response = await makeRequest(
       "POST",
-      `${this.apiUrl}/api/workspace/testflow/${testflowId}/import-dataset/file`,
+      `${this.apiUrl}/api/workspace/${workspaceId}/testflow/${testflowId}/import-dataset/file`,
       {
         body: payload,
         headers: getAuthHeaders(),
@@ -300,10 +304,11 @@ export class TestflowService {
   public updateDatasetByName = async (
     testflowId: string,
     payload: TestflowDataSetImportDto,
+    workspaceId: string,
   ) => {
     const response = await makeRequest(
       "PATCH",
-      `${this.apiUrl}/api/workspace/${testflowId}/dataset`,
+      `${this.apiUrl}/api/workspace/${workspaceId}/testflow/${testflowId}/dataset`,
       {
         body: payload,
         headers: getAuthHeaders(),
