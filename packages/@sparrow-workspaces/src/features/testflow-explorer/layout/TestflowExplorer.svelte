@@ -2301,7 +2301,11 @@
       importedFileName = null;
 
       const text = await file.text();
-      if (isImportCancelled) return;
+      if (isImportCancelled) {
+        isImporting = false;
+        isImportLoadingModalOpen = false;
+        return;
+      }
 
       let jsonData: Record<string, any>[];
       const fileType = fileExtension as "json" | "csv";
@@ -2511,6 +2515,18 @@
     isImportLoadingModalOpen = false;
     openTestflowDataSetTab(datasetObj);
   }
+
+  const formatLocalDate = (utcDate: string) => {
+    if (!utcDate) return "";
+    const date = new Date(utcDate);
+    return date.toLocaleString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 </script>
 
 <div
@@ -3459,9 +3475,19 @@
               {importedFileName}
             </div>
             <div class="file-meta">
-              Last updated a <span style="x">few seconds ago</span> • Size {Math.round(
-                importedFileContent.length / 1024,
-              )} KB • {(() => {
+              Last updated <span style="x">
+                {datasetContent
+                  ? formatLocalDate(datasetContent.updatedAt)
+                  : previewData
+                    ? formatLocalDate(previewData.updatedAt)
+                    : "few seconds ago"}
+              </span>
+              • Size
+              {datasetContent
+                ? datasetContent.fileSize
+                : previewData
+                  ? previewData.fileSize
+                  : "few seconds ago"}, KB • {(() => {
                 try {
                   const parsed = JSON.parse(importedFileContent);
                   const data = parsed.dataSet || parsed;
