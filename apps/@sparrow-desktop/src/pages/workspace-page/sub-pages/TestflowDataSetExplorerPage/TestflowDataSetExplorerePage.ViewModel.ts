@@ -4,6 +4,9 @@ import { Observable, BehaviorSubject } from "rxjs";
 import type { Tab } from "@sparrow/common/types/workspace/tab";
 import { TestflowRepository } from "@app/repositories/testflow.repository";
 import { TabRepository } from "@app/repositories/tab.repository";
+import { get } from "svelte/store";
+import { updateTestflowDataSets } from "@sparrow/common/store";
+import { TestflowService } from "@app/services/testflow.service";
 
 export enum TabPersistenceTypeEnum {
   PERMANENT = "permanent",
@@ -15,6 +18,7 @@ export class TestflowDataSetExplorerPageViewModel {
   private testflowRepository = new TestflowRepository();
   private tabRepository = new TabRepository();
   private compareArray = new CompareArray();
+  private testflowService = new TestflowService();
 
   public constructor(doc: TabDocument) {
     if (doc?.isActive) {
@@ -56,7 +60,7 @@ export class TestflowDataSetExplorerPageViewModel {
     const trimmedName = _name.trim();
 
     if (event === "blur" && trimmedName === "") {
-      const data = await this.testflowRepository.readTestflow(
+      const data = await this.getTestflowDataSetsById(
         progressiveTab.path.testflowId,
       );
       const matching = data._data?.datasets?.find(
@@ -69,31 +73,41 @@ export class TestflowDataSetExplorerPageViewModel {
 
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
-    if (event === "") {
-      this.compareRequestWithServer();
-    }
+    this.compareDatasetWithServer();
   };
 
-  private compareEnvironmentWithServerDebounced = async () => {
-    let result = true;
+  /**
+   * Get datasets for a specific testflow/tab by ID
+   *
+   * @param id - The testflow ID, workspace ID, or tab ID
+   * @returns Array of datasets for the given ID, or empty array if not found
+   *
+   * @example
+   * const datasets = getTestflowDataSetsById(progressiveTab.id);
+   */
+  getTestflowDataSetsById = async (id: string | number): any => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-
-    const testFlowServer = await this.testflowRepository.readTestflow(
+    const testflowDataSetStore = await this.testflowRepository.readTestflow(
       progressiveTab.path.testflowId,
     );
+    const datasets = testflowDataSetStore.get(id);
+    return datasets || {};
+  };
 
-    if (!testFlowServer) {
+  private compareDatasetWithServerDebounced = async () => {
+    let result = true;
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const currentItem = this.getTestflowDataSetsById(progressiveTab.id);
+    if (!currentItem) result = false;
+    // name
+    else if (currentItem.name != progressiveTab?.property?.name) {
       result = false;
-    } else {
-      const serverDataset = testFlowServer._data?.datasets?.find(
-        (ds: any) => ds.id === progressiveTab.id,
-      );
-
-      if (!serverDataset || serverDataset.name !== progressiveTab.name) {
-        result = false;
-      }
+    } else if (
+      currentItem.item !== progressiveTab?.property?.testflowDataSet?.item
+    ) {
+      result = false;
     }
-
+    // result
     if (result) {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: true,
@@ -101,6 +115,7 @@ export class TestflowDataSetExplorerPageViewModel {
       });
       progressiveTab.isSaved = true;
       progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
+      this.tab = progressiveTab;
     } else {
       this.tabRepository.updateTab(progressiveTab.tabId, {
         isSaved: false,
@@ -108,12 +123,33 @@ export class TestflowDataSetExplorerPageViewModel {
       });
       progressiveTab.isSaved = false;
       progressiveTab.persistence = TabPersistenceTypeEnum.PERMANENT;
+      this.tab = progressiveTab;
     }
-
-    this.tab = progressiveTab;
   };
-  private compareRequestWithServer = new Debounce().debounce(
-    this.compareEnvironmentWithServerDebounced,
+
+  private compareDatasetWithServer = new Debounce().debounce(
+    this.compareDatasetWithServerDebounced,
     0,
   );
+
+  public renameTestDataSet = async (
+    testflowDataSetId: string,
+    updatedDataSetName: string,
+  ) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const response = await this.testflowService.renameTestDataSet(
+      progressiveTab.id as string,
+      testflowDataSetId,
+      updatedDataSetName,
+    );
+    if (response?.isSuccessful) {
+      const datasets = response.data?.data.result;
+      updateTestflowDataSets(progressiveTab.id as string, datasets || []);
+      progressiveTab.name = updatedDataSetName;
+      progressiveTab.isSaved = true;
+      await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+      this.tab = progressiveTab;
+    }
+    return response;
+  };
 }

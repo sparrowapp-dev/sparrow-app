@@ -22,7 +22,6 @@
   let testDataName: string;
 
   $: testDataName = $tab?.name || "";
-  $: console.log("tab", tab);
 
   const handleExport = async () => {
     await handleTestDataDownloadWeb(

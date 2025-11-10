@@ -236,34 +236,14 @@ export class TestflowExplorerPageViewModel {
     updatedDataSetName: string,
   ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    const isDatasetTab = !!progressiveTab.property?.testflowDataSet;
-    const isTestflowTab = !!progressiveTab.property?.testflow;
-    let testflowId = "";
-
-    if (isTestflowTab) {
-      testflowId = progressiveTab.id;
-    }
-
-    if (isDatasetTab) {
-      testflowId = progressiveTab.path.testflowId;
-    }
     const response = await this.testflowService.renameTestDataSet(
-      testflowId,
+      progressiveTab.id as string,
       testflowDataSetId,
       updatedDataSetName,
     );
     if (response?.isSuccessful) {
       const datasets = response.data?.data.result;
       updateTestflowDataSets(progressiveTab.id as string, datasets || []);
-      if (isDatasetTab) {
-        progressiveTab.name = updatedDataSetName;
-        progressiveTab.isSaved = true;
-        await this.tabRepository.updateTab(
-          progressiveTab.tabId,
-          progressiveTab,
-        );
-        this.tab = progressiveTab;
-      }
     }
     return response;
   };

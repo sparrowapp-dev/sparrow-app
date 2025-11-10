@@ -2217,8 +2217,7 @@
       if (response?.isSuccessful) {
         const newFileName =
           response?.data?.data?.data?.name || pendingImportData.fileName;
-        datasetId = response.data.data.data.id;
-        datasetContent = response.data.data.data.item.dataSet;
+        datasetContent = response?.data?.data?.data;
         isImporting = false;
         importFileFormatType = pendingImportData.fileType;
         importedFileName = newFileName;
@@ -2256,8 +2255,7 @@
       );
 
       if (response?.isSuccessful) {
-        datasetId = response.data.data.id;
-        datasetContent = response.data.data.item.dataSet;
+        datasetContent = response?.data?.data;
         isImporting = false;
         importFileFormatType = pendingImportData.fileType;
         importedFileName = pendingImportData.fileName;
@@ -2347,9 +2345,7 @@
       // Extract the dataset from the nested response structure
 
       if (response?.isSuccessful) {
-        // Success case - show the preview modal
-        datasetId = response.data.data.data.id;
-        datasetContent = response.data.data.data.item.dataSet;
+        datasetContent = response?.data?.data?.data;
         isImporting = false;
         importFileFormatType = fileType;
         importedFileName = file.name;
@@ -2491,11 +2487,15 @@
 
   function handleRedirectTestDataPage() {
     const datasetObj = {
-      id: previewData?.id || datasetId,
+      id: previewData?.id || datasetContent?.id,
       name: importedFileName,
       item: {
-        dataSet: previewData?.item.dataSet || datasetContent,
+        dataSet: previewData?.item.dataSet || datasetContent?.item.dataSet,
       },
+      formatType: previewData?.formatType || datasetContent?.formatType,
+      createdAt: previewData?.createdAt || datasetContent?.createdAt,
+      updatedAt: previewData?.updatedAt || datasetContent?.updatedAt,
+      fileSize: previewData?.fileSize || datasetContent?.fileSize,
     };
     isImportLoadingModalOpen = false;
     openTestflowDataSetTab(datasetObj);
