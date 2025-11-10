@@ -151,8 +151,6 @@ const handleTestDataDownloadWeb = async (
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     }, 100);
-
-    notifications.success(`${dataSetFormatType} file downloaded successfully.`);
   } catch (error) {
     console.error("Error while exporting file:", error);
     const errorMessage =

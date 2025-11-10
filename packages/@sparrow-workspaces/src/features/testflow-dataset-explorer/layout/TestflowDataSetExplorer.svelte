@@ -1,15 +1,28 @@
 <script lang="ts">
   import { SaveRegular } from "@sparrow/library/icons";
-  import { Button } from "@sparrow/library/ui";
+  import { Button, notifications, Tooltip } from "@sparrow/library/ui";
   import { Input } from "@sparrow/library/forms";
   import { ArrowDownloadRegular } from "@sparrow/library/icons";
   import {
     handleTestDataDownloadDesktop,
     handleTestDataDownloadWeb,
   } from "../utils";
+  import { Pagination } from "@sparrow/library/ui";
 
   export let tab: any;
   export let isWebApp;
+  export let onUpdateName;
+  export let onPerformDatasetOperations: (
+    op: string,
+    id: string,
+    name?: string,
+  ) => Promise<any>;
+  export let onSaveDataset;
+  export let onRenameDataset;
+
+  let testDataName: string;
+
+  $: testDataName = $tab?.name || "";
 
   const handleExport = async () => {
     await handleTestDataDownloadWeb(
@@ -63,6 +76,22 @@
   // Reset to first page when data changes
   $: if (datasets) {
     currentPage = 1;
+  }
+
+  function handleTestDataHeadingChange(_name, event) {
+    onUpdateName(_name, event);
+  }
+
+  async function handleSave() {
+    const res = await onRenameDataset($tab?.id, testDataName);
+    if (res?.isSuccessful) {
+      notifications.success(`Changes Saved for "${testDataName}" test data.`);
+      if (onSaveDataset) {
+        await onSaveDataset();
+      }
+    } else {
+      notifications.error("Failed to save changes. Please try again.");
+    }
   }
 
   function handleRowClick(row: any, rowIndex: number) {
@@ -119,22 +148,22 @@
 <!-- Header -->
 <div
   class="d-flex justify-content-between align-items-center"
-  style="margin: 16px;"
+  style="margin: 16px; padding-bottom: 8px;"
 >
   <div class="d-flex flex-column h-100 w-100">
     <div class="d-flex justify-content-between align-items-center h-100 w-100">
       <Input
         type="text"
-        size="medium"
+        size="large"
         maxlength={100}
         width="398px"
         id="renameInputFieldTestdata"
-        value={$tab?.name || ""}
+        bind:value={testDataName}
         variant="inline"
         placeholder="Enter dataset name"
         disabled={false}
-        on:input={(e) => console.log("Input changed:", e.target.value)}
-        on:blur={() => console.log("Input blur event")}
+        on:input={() => handleTestDataHeadingChange(testDataName, "")}
+        on:blur={() => handleTestDataHeadingChange(testDataName, "blur")}
       />
 
       <div class="d-flex gap-2">
@@ -159,13 +188,15 @@
             onClick={handleExport}
           />
         {/if}
-        <Button
-          disable={false}
-          startIcon={SaveRegular}
-          type="secondary"
-          size="medium"
-          on:click={() => console.log("Save clicked")}
-        />
+        <Tooltip title="Save" placement="top-center">
+          <Button
+            disable={$tab?.isSaved}
+            startIcon={SaveRegular}
+            type="secondary"
+            size="medium"
+            onClick={handleSave}
+          />
+        </Tooltip>
       </div>
     </div>
 
@@ -190,91 +221,54 @@
 
 <div class="table-wrapper" style="margin: 16px;">
   {#if datasets.length > 0}
-    <div class="table-container">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th class="row-number" style="color: var(--text-ds-neutral-400);"
-              >Dataset</th
-            >
-            {#each columns as column}
-              <th class="column-header">
-                {formatColumnHeader(column)}
+    <div class="table-area">
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th
+                class="row-number"
+                style="color: var(--text-ds-neutral-400); font-size: 12px;"
+              >
+                Dataset
               </th>
-            {/each}
-          </tr>
-        </thead>
-        <tbody>
-          {#each paginatedData as row, index}
-            <tr class="data-row" on:click={() => handleRowClick(row, index)}>
-              <td class="row-number">
-                {startItem + index}
-              </td>
               {#each columns as column}
-                <td class="data-cell">
-                  <span class="cell-content" title={formatValue(row[column])}>
-                    {truncateText(formatValue(row[column]))}
-                  </span>
-                </td>
+                <th class="column-header">
+                  {formatColumnHeader(column)}
+                </th>
               {/each}
             </tr>
-          {/each}
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Pagination Footer -->
-    <div class="pagination-footer">
-      <div class="pagination-info">
-        Showing {startItem}-{endItem} of {datasets.length}
+          </thead>
+          <tbody>
+            {#each paginatedData as row, index}
+              <tr class="data-row" on:click={() => handleRowClick(row, index)}>
+                <td class="row-number">{startItem + index}</td>
+                {#each columns as column}
+                  <td class="data-cell">
+                    <span class="cell-content" title={formatValue(row[column])}>
+                      {truncateText(formatValue(row[column]))}
+                    </span>
+                  </td>
+                {/each}
+              </tr>
+            {/each}
+          </tbody>
+        </table>
       </div>
-
-      <div class="pagination-controls">
-        <select
-          class="items-per-page"
-          on:change={changeItemsPerPage}
-          value={itemsPerPage}
-        >
-          <option value="10">10 per page</option>
-          <option value="25">25 per page</option>
-          <option value="50">50 per page</option>
-          <option value="100">100 per page</option>
-        </select>
-
-        <div class="pagination-buttons">
-          <button
-            class="page-btn"
-            on:click={goToFirstPage}
-            disabled={currentPage === 1}
-            aria-label="First page"
-          >
-            «
-          </button>
-          <button
-            class="page-btn"
-            on:click={goToPreviousPage}
-            disabled={currentPage === 1}
-            aria-label="Previous page"
-          >
-            ‹
-          </button>
-          <button
-            class="page-btn"
-            on:click={goToNextPage}
-            disabled={currentPage === totalPages}
-            aria-label="Next page"
-          >
-            ›
-          </button>
-          <button
-            class="page-btn"
-            on:click={goToLastPage}
-            disabled={currentPage === totalPages}
-            aria-label="Last page"
-          >
-            »
-          </button>
-        </div>
+      <div class="pagination-wrapper">
+        <Pagination
+          {currentPage}
+          {itemsPerPage}
+          totalItems={datasets.length}
+          onPageChange={(page) => (currentPage = page)}
+          onItemsPerPageChange={(newLimit) => {
+            itemsPerPage = newLimit;
+            currentPage = 1;
+          }}
+          itemsPerPageOptions={[10, 25, 50, 100]}
+          showItemCount={true}
+          containerWidth="100%"
+        />
       </div>
     </div>
   {:else}
@@ -303,16 +297,35 @@
     color: var(--text-ds-neutral-200);
   }
   .table-wrapper {
+    display: flex;
+    flex-direction: column;
     background-color: var(--bg-ds-surface-900);
     border-radius: 8px;
-    overflow: hidden;
     font-family: "Inter", sans-serif;
     min-height: 400px;
+    height: calc(100vh - 190px);
+    overflow: hidden;
+  }
+
+  .table-area {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
   }
 
   .table-container {
-    overflow-x: auto;
-    max-height: 600px;
+    flex: 1;
+    overflow: auto;
+  }
+
+  .pagination-wrapper {
+    flex-shrink: 0;
+    background: var(--bg-ds-surface-900);
+    padding: 4px 4px;
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
   }
 
   .data-table {
@@ -339,11 +352,14 @@
   }
 
   .row-number {
+    font-size: 12px;
+    font-weight: 600;
     width: 80px;
     text-align: center;
   }
 
   .column-header {
+    font-size: 12px;
     color: var(--text-ds-neutral-400);
     min-width: 120px;
   }
@@ -367,10 +383,13 @@
   }
 
   .data-cell {
+    padding: 16px;
     max-width: 300px;
   }
 
   .cell-content {
+    font-size: 12px;
+    font-weight: 600;
     display: block;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -404,86 +423,5 @@
     font-size: 14px;
     color: #666;
     text-align: center;
-  }
-
-  /* Pagination Footer */
-  .pagination-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    background: #1f1f1f;
-    border-top: 1px solid #333;
-    color: #b0b0b0;
-    font-size: 13px;
-  }
-
-  .pagination-controls {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-  }
-
-  .items-per-page {
-    background: #2a2a2a;
-    color: #e0e0e0;
-    border: 1px solid #3a3a3a;
-    border-radius: 4px;
-    padding: 6px 10px;
-    font-size: 13px;
-    cursor: pointer;
-    outline: none;
-  }
-
-  .items-per-page:hover {
-    border-color: #4a4a4a;
-  }
-
-  .pagination-buttons {
-    display: flex;
-    gap: 4px;
-  }
-
-  .page-btn {
-    background: #2a2a2a;
-    color: #e0e0e0;
-    border: 1px solid #3a3a3a;
-    border-radius: 4px;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.2s ease;
-  }
-
-  .page-btn:hover:not(:disabled) {
-    background: #3a3a3a;
-    border-color: #4a4a4a;
-  }
-
-  .page-btn:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-  }
-
-  /* Responsive */
-  @media (max-width: 768px) {
-    .pagination-footer {
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .pagination-info {
-      width: 100%;
-      text-align: center;
-    }
-
-    .pagination-controls {
-      width: 100%;
-      justify-content: space-between;
-    }
   }
 </style>

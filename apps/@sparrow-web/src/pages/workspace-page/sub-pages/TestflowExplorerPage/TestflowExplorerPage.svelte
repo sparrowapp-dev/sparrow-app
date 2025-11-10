@@ -439,6 +439,7 @@
     onUpdateScheduleStatus={_viewModel.updateTestflowScheduleStatus}
     onOpenTestflowScheduleTab={_viewModel.openTestflowScheduleTab}
     onPerformTestflowScheduleOperations={_viewModel.performTestflowScheduleOperations}
+    onPerformTestDataSetOperations={_viewModel.performTestDataSetOperations}
     onOpenTestflowScheduleConfigurationsTab={_viewModel.openTestflowScheduleConfigurationsTab}
     bind:isCreateTestflowScheduleLimitReachedModalOpen
     onUpdateTestflowState={_viewModel.updateTestflowState}
@@ -449,6 +450,8 @@
     teamPlanName={currentTeam?.plan?.name}
     onFetchTestflowDataSets={_viewModel.fetchTestflowDataSets}
     importTestflowDataSet={_viewModel.importTestflowDataSet}
+    importTestflowDataSetFileChange={_viewModel.importTestflowDataSetFileChange}
+    updateDatasetByName={_viewModel.updateDatasetByName}
     openTestflowDataSetTab={_viewModel.openTestflowDataSetTab}
   />
 {/if}
