@@ -2113,11 +2113,16 @@ export class TestflowExplorerPageViewModel {
         this.fetchTestflow();
       }, i * 500);
     }
+    const payload = {
+      testflowDataSetId:
+        progressiveTab?.property?.testflowSchedule?.testflowDataSetId || "",
+    };
     const response = await this.testflowService.runTestflowSchedule(
       progressiveTab.path.workspaceId,
       progressiveTab.id,
       _scheduleId,
       baseUrl,
+      payload,
     );
     if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
