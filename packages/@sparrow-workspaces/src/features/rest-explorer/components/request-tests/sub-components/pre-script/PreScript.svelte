@@ -67,7 +67,7 @@
 
   // Persistent highlighting variables
   let observer: MutationObserver | null = null;
-  let highlightInterval: number | null = null;
+  let highlightInterval: ReturnType<typeof setInterval> | null = null;
   let rafId: number | null = null;
   let clickHandlers: (() => void)[] = [];
   let isUserLimitReached: boolean = false;
@@ -97,8 +97,32 @@
   const handleCodeMirrorChange = (e: any) => {
     const newContent = e.detail;
 
-    // If we have generated test actions showing, protect the generated content
+    // If we have generated test actions showing, check if generated content still exists
     if (showGeneratedTestActions) {
+      const generatedText = generatedTestContent.trim().replace(/\s+/g, "");
+      const newContentNormalized = newContent.replace(/\s+/g, "");
+
+      // Check if the generated content was completely removed by the user
+      if (
+        generatedText.length > 0 &&
+        !newContentNormalized.includes(generatedText)
+      ) {
+        // User has deleted the generated content - hide buttons and reset
+        showGeneratedTestActions = false;
+        removeHighlight();
+        generatedTestContent = "";
+        temporaryDisplayContent = "";
+        currentPrompt = "";
+        originalLineCount = 0;
+        generatedContentStartLine = 0;
+        generatedContentEndLine = 0;
+        contentAddedDuringGeneration = "";
+
+        // Save the new content normally
+        onTestsChange({ ...tests, preScript: newContent });
+        return;
+      }
+
       const newLines = newContent.split("\n");
 
       // Check if lines in the generated range have been modified
@@ -273,15 +297,26 @@
   $: rightPanelWidth = isLeftPanelCollapsed ? "calc(100% - 60px)" : "75%";
 
   const handleGenerateTestCases = async () => {
+    // Validate input: trim and check for empty or special characters only
+    const trimmedPrompt = testCasePrompt.trim();
+
+    // Check if prompt is empty or contains only special characters (no alphanumeric)
+    if (!trimmedPrompt || !/[a-zA-Z0-9]/.test(trimmedPrompt)) {
+      isError = true;
+      errorMessage =
+        "Please enter a valid prompt with alphanumeric characters.";
+      return;
+    }
+
     // Store the original content and current prompt
     originalTestContent = tests?.preScript || "";
     contentAddedDuringGeneration = "";
     originalLineCount = originalTestContent.trim()
       ? originalTestContent.split("\n").length
       : 0;
-    currentPrompt = testCasePrompt;
+    currentPrompt = trimmedPrompt;
 
-    const result = await onGeneratePreScript(testCasePrompt);
+    const result = await onGeneratePreScript(trimmedPrompt);
     if (result?.error) {
       if (result?.message === "Limit reached. Please try again later.") {
         isUserLimitReached = true;
@@ -513,8 +548,13 @@
   const acceptGeneratedTest = () => {
     removeHighlight();
 
+    // Ensure we're only working with the current displayed content
+    const contentToSave = showGeneratedTestActions
+      ? temporaryDisplayContent
+      : tests?.preScript || "";
+
     // Save the complete content (original + snippets + generated)
-    onTestsChange({ ...tests, preScript: temporaryDisplayContent });
+    onTestsChange({ ...tests, preScript: contentToSave });
 
     // Clear temporary state
     showGeneratedTestActions = false;
@@ -531,18 +571,22 @@
   const rejectGeneratedTest = () => {
     removeHighlight();
 
-    // Calculate what content to revert to:
-    // Original content + any snippets added during generation
-    let revertedContent = originalTestContent || "";
+    // If buttons are showing, revert to original + snippets
+    // Otherwise, just clear the state (shouldn't happen, but safety check)
+    if (showGeneratedTestActions) {
+      // Calculate what content to revert to:
+      // Original content + any snippets added during generation
+      let revertedContent = originalTestContent || "";
 
-    if (contentAddedDuringGeneration) {
-      revertedContent = revertedContent
-        ? `${revertedContent}\n${contentAddedDuringGeneration}`
-        : contentAddedDuringGeneration;
+      if (contentAddedDuringGeneration) {
+        revertedContent = revertedContent
+          ? `${revertedContent}\n${contentAddedDuringGeneration}`
+          : contentAddedDuringGeneration;
+      }
+
+      // Save the reverted content (original + snippets, but no AI generation)
+      onTestsChange({ ...tests, preScript: revertedContent });
     }
-
-    // Save the reverted content (original + snippets, but no AI generation)
-    onTestsChange({ ...tests, preScript: revertedContent });
 
     // Clear all temporary state
     showGeneratedTestActions = false;
@@ -886,12 +930,6 @@
     color: var(--text-ds-neutral-50);
   }
 
-  .results-count {
-    font-weight: 400;
-    color: var(--text-ds-neutral-400);
-    font-size: 11px;
-  }
-
   .snippet-suggestion-container {
     padding: 8px;
     cursor: pointer;
@@ -934,13 +972,6 @@
     font-size: 12px;
     color: var(--text-ds-neutral-300);
     margin: 0 0 8px 0;
-  }
-
-  .no-results-suggestion {
-    font-weight: 400;
-    font-size: 11px;
-    color: var(--text-ds-neutral-400);
-    margin: 0;
   }
 
   :global(.search-highlight) {
