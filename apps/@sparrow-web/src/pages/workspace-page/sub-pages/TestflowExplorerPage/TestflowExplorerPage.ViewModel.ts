@@ -2245,6 +2245,7 @@ export class TestflowExplorerPageViewModel {
       const response = await this.testflowService.importTestflowDataSet(
         progressiveTab.id as string,
         payload,
+        progressiveTab?.path?.workspaceId,
       );
       if (response?.isSuccessful) {
         const dataset = response.data?.data.data;
@@ -2273,6 +2274,7 @@ export class TestflowExplorerPageViewModel {
         await this.testflowService.importTestflowDataSetFileChange(
           progressiveTab.id as string,
           payload,
+          progressiveTab?.path?.workspaceId,
         );
       if (response?.isSuccessful) {
         const dataset = response.data?.data.data;
@@ -2300,6 +2302,7 @@ export class TestflowExplorerPageViewModel {
       const response = await this.testflowService.updateDatasetByName(
         progressiveTab.id as string,
         payload,
+        progressiveTab?.path?.workspaceId,
       );
       if (response?.isSuccessful) {
         const dataset = response.data?.data.data;
@@ -2317,6 +2320,7 @@ export class TestflowExplorerPageViewModel {
     const response = await this.testflowService.deleteTestDataSet(
       progressiveTab.id as string,
       testflowDataSetId,
+      progressiveTab?.path?.workspaceId,
     );
     if (response?.isSuccessful) {
       const datasets = response.data?.data.result;
@@ -2334,6 +2338,7 @@ export class TestflowExplorerPageViewModel {
       progressiveTab.id as string,
       testflowDataSetId,
       updatedDataSetName,
+      progressiveTab?.path?.workspaceId,
     );
     if (response?.isSuccessful) {
       const datasets = response.data?.data.result;
