@@ -128,6 +128,11 @@
     const parts = flowName.split("-");
     return parts.length > 1 ? parts[parts.length - 1].trim() : "";
   }
+  function getDeleteHandler(resultType: string) {
+    return resultType === "dataset"
+      ? onDeleteTestflowScheduleTestDataHistory
+      : onDeleteTestflowScheduleHistory;
+  }
 </script>
 
 {#if hasResults}
@@ -153,9 +158,7 @@
             {#each paginatedHistory as r}
               <Result
                 {onScheduleRunview}
-                onDeleteResult={schedule?.schedularDataSetHistory?.length > 0
-                  ? onDeleteTestflowScheduleTestDataHistory
-                  : onDeleteTestflowScheduleHistory}
+                onDeleteResult={getDeleteHandler(r.type)}
                 {r}
                 {schedule}
                 {formatDate}
