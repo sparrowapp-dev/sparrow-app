@@ -46,19 +46,43 @@
       successRequests: totals.successRequests,
       failedRequests: totals.failedRequests,
       totalTime: `${(totals.totalTimeMs / 1000).toFixed(2)} sec`,
-      // Keep original data for reference
+      type: "dataset", // Add type to distinguish dataset entries
       originalDataSet: dataSetEntry,
     };
   }
 
+  function normalizeRunHistory(runEntry) {
+    return {
+      ...runEntry,
+      type: "regular", // Add type to distinguish regular entries
+    };
+  }
+
   $: computedHistory = (() => {
+    debugger;
+    let mergedHistory = [];
+
+    // Add regular run history
     if (schedule?.schedularRunHistory?.length > 0) {
-      return schedule.schedularRunHistory;
+      const normalizedRunHistory =
+        schedule.schedularRunHistory.map(normalizeRunHistory);
+      mergedHistory = [...mergedHistory, ...normalizedRunHistory];
     }
+
+    // Add dataset history
     if (schedule?.schedularDataSetHistory?.length > 0) {
-      return schedule.schedularDataSetHistory.map(aggregateDataRunHistory);
+      const aggregatedDataSetHistory = schedule.schedularDataSetHistory.map(
+        aggregateDataRunHistory,
+      );
+      mergedHistory = [...mergedHistory, ...aggregatedDataSetHistory];
     }
-    return [];
+
+    // Sort by createdAt or updatedAt to maintain chronological order
+    return mergedHistory.sort((a, b) => {
+      const dateA = new Date(a.createdAt || a.updatedAt);
+      const dateB = new Date(b.createdAt || b.updatedAt);
+      return dateB.getTime() - dateA.getTime(); // Most recent first
+    });
   })();
 
   $: sortedHistory = computedHistory
