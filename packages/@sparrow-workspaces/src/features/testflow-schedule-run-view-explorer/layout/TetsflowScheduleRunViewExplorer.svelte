@@ -390,81 +390,59 @@
     dismissed = true;
   }
 
-  // Dataset dropdown (sample data shown in the UI mock)
-  let datasetMenuOpen: boolean = false;
-  let selectedDataset: string = "Dataset 1";
+  // Dataset selection state
+  let selectedDatasetIndex: number = 0;
+  let selectedTestDataItem: any = null;
+  let testDataMenuOpen: boolean = false;
 
-  function getDatasetIconProps(datasetName: string, selectedDataset: string) {
+  // Get the selected dataset from tab property
+  $: tabSelectedDataset =
+    $tab.property?.testflowScheduleRunView?.selectedDataset;
+
+  // Get results array from tab property
+  $: resultsArray = $tab.property?.testflowScheduleRunView?.results || [];
+
+  // Set default selected result when tab loads - for both dataset and non-dataset modes
+  $: if (resultsArray.length > 0 && selectedTestDataItem === null) {
+    selectedTestDataItem = resultsArray[0];
+    selectedDatasetIndex = 0;
+  }
+
+  // Update test data options based on results array
+  $: testDataOptions = resultsArray.map((result, index) => ({
+    name: `Dataset ${index + 1}`,
+    color:
+      selectedDatasetIndex === index
+        ? "var(--text-ds-primary-300)"
+        : "var(--text-ds-neutral-50)",
+    onclick: () => handleTestDataSelection(result, index),
+    ...getTestDataIconProps(index, selectedDatasetIndex),
+  }));
+
+  function getTestDataIconProps(dataIndex: number, selectedIndex: number) {
     return {
-      endIcon: selectedDataset === datasetName ? CheckMarkIcon : undefined,
+      endIcon: selectedIndex === dataIndex ? CheckMarkIcon : undefined,
       iconSize: "16px",
       iconColor: "var(--text-ds-primary-300)",
     };
   }
 
-  // Recompute options so endIcon updates when selectedDataset changes
-  $: datasetOptions = [
-    {
-      name: "Dataset 1",
-      color:
-        selectedDataset === "Dataset 1"
-          ? "var(--text-ds-primary-300)"
-          : "var(--text-ds-neutral-50)",
-      onclick: () => {
-        selectedDataset = "Dataset 1";
-        datasetMenuOpen = false;
-      },
-      ...getDatasetIconProps("Dataset 1", selectedDataset),
-    },
-    {
-      name: "Dataset 2",
-      color:
-        selectedDataset === "Dataset 2"
-          ? "var(--text-ds-primary-300)"
-          : "var(--text-ds-neutral-50)",
-      onclick: () => {
-        selectedDataset = "Dataset 2";
-        datasetMenuOpen = false;
-      },
-      ...getDatasetIconProps("Dataset 2", selectedDataset),
-    },
-    {
-      name: "Dataset 3",
-      color:
-        selectedDataset === "Dataset 3"
-          ? "var(--text-ds-primary-300)"
-          : "var(--text-ds-neutral-50)",
-      onclick: () => {
-        selectedDataset = "Dataset 3";
-        datasetMenuOpen = false;
-      },
-      ...getDatasetIconProps("Dataset 3", selectedDataset),
-    },
-    {
-      name: "Dataset 4",
-      color:
-        selectedDataset === "Dataset 4"
-          ? "var(--text-ds-primary-300)"
-          : "var(--text-ds-neutral-50)",
-      onclick: () => {
-        selectedDataset = "Dataset 4";
-        datasetMenuOpen = false;
-      },
-      ...getDatasetIconProps("Dataset 4", selectedDataset),
-    },
-    {
-      name: "Dataset 5",
-      color:
-        selectedDataset === "Dataset 5"
-          ? "var(--text-ds-primary-300)"
-          : "var(--text-ds-neutral-50)",
-      onclick: () => {
-        selectedDataset = "Dataset 5";
-        datasetMenuOpen = false;
-      },
-      ...getDatasetIconProps("Dataset 5", selectedDataset),
-    },
-  ];
+  // Handle test data item selection
+  function handleTestDataSelection(dataItem, index) {
+    selectedTestDataItem = dataItem;
+    selectedDatasetIndex = index;
+    testDataMenuOpen = false;
+  }
+
+  // Set default selected result when tab loads
+  $: if (
+    tabSelectedDataset &&
+    resultsArray.length > 0 &&
+    selectedTestDataItem === null
+  ) {
+    selectedTestDataItem = resultsArray[0];
+    selectedDatasetIndex = 0;
+  }
 
   function handleSearchSchedules(event) {
     searchQuery = event.target.value;
@@ -1291,22 +1269,30 @@
   let testflowViewRequestItems: any;
 
   const allocationNodeWithRequest = () => {
+    debugger;
     let nodes = $tab.property?.testflowScheduleRunView?.nodes || [];
     let edges = $tab.property?.testflowScheduleRunView?.edges || [];
-    let runResult = $tab.property?.testflowScheduleRunView?.result;
+
+    // Use the selected result instead of the first result
+    let runResult = selectedTestDataItem || resultsArray[0];
+
     // Find max node ID for graph size
     let maxNodeId = 1;
     for (let i = 0; i < nodes.length; i++) {
       maxNodeId = Math.max(maxNodeId, Number(nodes[i].id));
     }
+
     // Initialize adjacency list for graph traversal
     const graph = Array.from({ length: maxNodeId + 1 }, () => []);
+
     // Populate adjacency list with edges
     for (let i = 0; i < edges.length; i++) {
       graph[Number(edges[i].source)].push(Number(edges[i].target));
     }
+
     // Find all connected nodes in sequential order starting from node "1"
     let connectedNodes = [];
+
     // Inner function to find connected nodes
     const findNodes = (start: number, visited = new Set()) => {
       if (visited.has(start)) return;
@@ -1320,16 +1306,19 @@
         findNodes(neighbor, visited);
       }
     };
+
     findNodes(Number("1"));
-    // Create array of objects with request, response, and node
+
+    // Create array of objects with request, response, and node using selected result
     let testflowStoreItems = [];
     for (let i = 1; i < connectedNodes.length; i++) {
       const node = connectedNodes[i];
-      // Get corresponding request and response from runResult
+
+      // Get corresponding request and response from selected runResult
       const request =
         runResult?.requests?.[i - 1] || node?.data?.requestData || null;
       const response =
-        runResult?.response?.[i - 1] || node?.data?.response || null;
+        runResult?.responses?.[i - 1] || node?.data?.response || null;
       testflowStoreItems.push({
         request: request,
         response: response,
@@ -1339,15 +1328,61 @@
     return testflowStoreItems;
   };
 
+  function updateNodesWithSelectedResult() {
+    if (!$tab.property?.testflowScheduleRunView?.nodes) return;
+
+    nodes.update((_nodes) => {
+      return _nodes.map((node) => {
+        // Skip start block (id "1")
+        if (node.id === "1") return node;
+
+        // Calculate the proper currentItem based on selected result
+        const nodeIndex = parseInt(node.id);
+        const requestIndex = nodeIndex - 1;
+
+        let currentItem = null;
+        if (selectedTestDataItem && requestIndex >= 0) {
+          currentItem = {
+            id: nodeIndex.toString(),
+            request: selectedTestDataItem.requests?.[requestIndex] || null,
+            response: selectedTestDataItem.responses?.[requestIndex] || null,
+          };
+        }
+
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            currentItem: currentItem,
+          },
+        };
+      });
+    });
+  }
+
+  $: if (selectedTestDataItem) {
+    updateNodesWithSelectedResult();
+    testflowViewRequestItems = allocationNodeWithRequest();
+  }
+
   function getScheduleRunItemByIndex(
     runResult: TestFlowScheduleRunResult | undefined,
     index: number,
   ): { id: string; request: any; response: any } | undefined {
-    const requests = runResult?.requests ?? [];
-    const responses = runResult?.response ?? [];
     if (index <= 0) {
       return undefined;
     }
+
+    // Always use selected result if available
+    const selectedResult = selectedTestDataItem || resultsArray[0] || runResult;
+
+    if (!selectedResult) {
+      return undefined;
+    }
+
+    const requests = selectedResult?.requests ?? [];
+    const responses = selectedResult?.responses ?? [];
+
     return {
       id: index.toString(),
       request: requests[index - 1],
@@ -1355,6 +1390,30 @@
     };
   }
 
+  // $: if (selectedTestDataItem) {
+  //   debugger;
+  //   nodes.update((_nodes) => {
+  //     return _nodes.map((node) => {
+  //       // Skip start block
+  //       if (node.id === "1") return node;
+
+  //       const nodeIndex = parseInt(node.id);
+  //       const requestIndex = nodeIndex - 1;
+
+  //       return {
+  //         ...node,
+  //         data: {
+  //           ...node.data,
+  //           currentItem: {
+  //             id: nodeIndex.toString(),
+  //             request: selectedTestDataItem.requests?.[requestIndex] || null,
+  //             response: selectedTestDataItem.responses?.[requestIndex] || null,
+  //           },
+  //         },
+  //       };
+  //     });
+  //   });
+  // }
   /**
    * Initializes nodes and edges on component mount.
    */
@@ -1436,7 +1495,7 @@
                   collections: filteredCollections,
                   tabId: $tab.tabId,
                   currentItem: getScheduleRunItemByIndex(
-                    $tab.property?.testflowScheduleRunView?.result,
+                    selectedTestDataItem,
                     i,
                   ),
                 },
@@ -1846,6 +1905,7 @@
     currentPage = 1;
   }
 
+  // Reactive statement to update view when selected result changes
   $: {
     if ($tab.property?.testflowScheduleRunView) {
       testflowViewRequestItems = allocationNodeWithRequest();
@@ -1905,44 +1965,48 @@
           ? "Auto Run"
           : "Manual Run"}
       </span>
-      <span>{$tab.property?.testflowScheduleRunView?.result?.status}</span>
+      <!-- Show status from selected result -->
+      <span>{selectedTestDataItem?.status || "Unknown"}</span>
       <span>
-        {($tab.property?.testflowScheduleRunView?.result?.successRequests ??
-          0) +
-          ($tab.property?.testflowScheduleRunView?.result?.failedRequests ?? 0)}
-        Requests (
-        {$tab.property?.testflowScheduleRunView?.result?.successRequests ?? 0} Passed,
-        {$tab.property?.testflowScheduleRunView?.result?.failedRequests ?? 0} Failed)
+        {(selectedTestDataItem?.successRequests ?? 0) +
+          (selectedTestDataItem?.failedRequests ?? 0)}
+        Requests ({selectedTestDataItem?.successRequests ?? 0} Passed, {selectedTestDataItem?.failedRequests ??
+          0} Failed)
       </span>
     </div>
 
     <div style="position:absolute; top:12px; right:16px; z-index:4;">
-      <Dropdown
-        buttonId="datasetDropdownBtn"
-        bind:isMenuOpen={datasetMenuOpen}
-        options={datasetOptions}
-        horizontalPosition="left"
-        minWidth={180}
-      >
-        <button
-          id="datasetDropdownBtn"
-          class="d-flex align-items-center gap-2 border-0"
-          on:click={() => (datasetMenuOpen = !datasetMenuOpen)}
-          style="padding:6px 12px; border-radius:6px; background:var(--bg-ds-surface-600); color:var(--text-ds-neutral-50); font-size:13px; font-weight:500;"
+      <!-- Dataset Results Selection -->
+      {#if tabSelectedDataset}
+        <Dropdown
+          buttonId="datasetDropdownBtn"
+          bind:isMenuOpen={testDataMenuOpen}
+          options={testDataOptions}
+          horizontalPosition="left"
+          minWidth={150}
         >
-          {selectedDataset}
-          <span
-            style="display:flex; transition: transform 0.2s ease; transform: rotate({datasetMenuOpen
-              ? '180deg'
-              : '0deg'});"
+          <button
+            id="datasetDropdownBtn"
+            class="d-flex align-items-center gap-2 border-0"
+            on:click={() => (testDataMenuOpen = !testDataMenuOpen)}
+            style="padding:6px 12px; border-radius:6px; background:var(--bg-ds-surface-600); color:var(--text-ds-neutral-50); font-size:13px; font-weight:500;"
           >
-            <ChevronDownRegular
-              size="16px"
-              color="var(--text-ds-neutral-300)"
-            />
-          </span>
-        </button>
-      </Dropdown>
+            {selectedTestDataItem
+              ? `Dataset ${selectedDatasetIndex + 1}`
+              : "Select Dataset"}
+            <span
+              style="display:flex; transition: transform 0.2s ease; transform: rotate({testDataMenuOpen
+                ? '180deg'
+                : '0deg'});"
+            >
+              <ChevronDownRegular
+                size="16px"
+                color="var(--text-ds-neutral-300)"
+              />
+            </span>
+          </button>
+        </Dropdown>
+      {/if}
     </div>
   </div>
 

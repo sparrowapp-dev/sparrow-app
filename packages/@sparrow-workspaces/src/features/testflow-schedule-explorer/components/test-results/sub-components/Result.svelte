@@ -5,6 +5,7 @@
     MoreVerticalRegular,
     ThreeDotIcon,
   } from "@sparrow/library/icons";
+  import { testflowDataSets, getDatasetById } from "@sparrow/common/store";
 
   export let r;
   export let schedule;
@@ -17,6 +18,30 @@
 
   let deleteLoader = false;
   let isDeleteModalOpen: boolean = false;
+
+  // Get selected dataset from store using the getDatasetById function
+  $: selectedTestData = (() => {
+    // First try to get dataset ID from originalDataSet
+    const testflowDataSetId = schedule?.testflowDataSetId;
+    if (testflowDataSetId) {
+      // Use the getDatasetById function to find the dataset
+      return getDatasetById(testflowDataSetId);
+    }
+
+    // Fallback: return null if no dataset ID found
+    return null;
+  })();
+
+  // Create selectedDataset object from store data
+  $: selectedDataset = selectedTestData
+    ? {
+        id: selectedTestData.id || "",
+        name: selectedTestData.name || "Dataset Execution",
+        formatType: selectedTestData.formatType || "JSON",
+        fileSize: selectedTestData.fileSize || "",
+        item: selectedTestData.item || null,
+      }
+    : null;
 
   function handleDeleteCancel() {
     isDeleteModalOpen = false;
@@ -62,7 +87,7 @@
 <tr
   on:click={() => {
     if (r?.status === "pending" || r?.status === "error") return;
-    onScheduleRunview(r, schedule);
+    onScheduleRunview(r, schedule, selectedDataset);
   }}
   style={r?.status === "pending" ? "pointer-events: none;" : ""}
 >
