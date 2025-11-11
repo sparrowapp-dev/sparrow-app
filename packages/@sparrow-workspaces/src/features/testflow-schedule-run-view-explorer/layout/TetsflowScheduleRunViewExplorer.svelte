@@ -392,7 +392,7 @@
 
   // Get the selected dataset from tab property
   $: tabSelectedDataset =
-    $tab.property?.testflowScheduleRunView?.selectedDataset;
+    $tab.property?.testflowScheduleRunView?.selectedDataset?.id;
 
   // Get results array from tab property
   $: resultsArray = $tab.property?.testflowScheduleRunView?.results || [];

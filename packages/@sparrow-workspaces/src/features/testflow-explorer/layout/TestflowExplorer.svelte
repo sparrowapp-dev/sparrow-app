@@ -2303,17 +2303,12 @@
 
     try {
       isImportCancelled = false;
-      if (!isImportLoadingModalOpen) isImportLoadingModalOpen = true;
+      isImportLoadingModalOpen = true;
       isImporting = true;
       importedFileContent = null;
       importedFileName = null;
 
       const text = await file.text();
-      if (isImportCancelled) {
-        isImporting = false;
-        isImportLoadingModalOpen = false;
-        return;
-      }
 
       let jsonData: Record<string, any>[];
       const fileType = fileExtension as "json" | "csv";
@@ -2354,14 +2349,14 @@
         file.name,
       );
 
-      // Extract the dataset from the nested response structure
-
+      // Handle the response
       if (response?.isSuccessful) {
         datasetContent = response?.data?.data?.data;
         isImporting = false;
         importFileFormatType = fileType;
         importedFileName = file.name;
         importedFileContent = JSON.stringify(jsonData, null, 2);
+        // Keep modal open to show preview
         isImportLoadingModalOpen = true;
       } else if (response?.data?.message === "Dataset already exists") {
         pendingImportData = {
@@ -2372,22 +2367,24 @@
           wrappedData,
         };
         isDuplicateModalOpen = true;
-        isImporting = false;
-        isImportLoadingModalOpen = false;
+        resetImportState();
       } else {
-        isImporting = false;
-        isImportLoadingModalOpen = false;
+        resetImportState();
         notifications.error("Failed to import Data. Please try again.");
-        console.error("Invalid response structure:", response);
-        throw new Error("Invalid response structure from server");
       }
     } catch (err) {
-      isImporting = false;
-      isImportLoadingModalOpen = false;
-      notifications.error("Failed to import Data. Please try again.");
-      console.error("Failed to import file", err);
-      isImporting = false;
+      resetImportState();
+      notifications.error(`Failed to import Data. Please try again.`);
+    } finally {
+      input.value = "";
     }
+  };
+
+  const resetImportState = () => {
+    isImporting = false;
+    isImportLoadingModalOpen = false;
+    importedFileContent = null;
+    importedFileName = null;
   };
 
   function syntaxHighlightJSON(json) {
@@ -2654,21 +2651,23 @@
                 on:change={handleImportFileChange}
                 style="display:none"
               />
-              <Tooltip
-                title={"Only JSON or CSV files are supported"}
-                placement={"top-center"}
-                distance={12}
-                show={!runButtonMenu}
-                zIndex={10}
-              >
-                <Button
-                  type="secondary"
-                  size="medium"
-                  startIcon={ArrowUploadFilled}
-                  title={"Import Data"}
-                  onClick={handleImportClick}
-                />
-              </Tooltip>
+              {#if !(userRole === WorkspaceRole.WORKSPACE_VIEWER) && !isGuestUser}
+                <Tooltip
+                  title={"Only JSON or CSV files are supported"}
+                  placement={"top-center"}
+                  distance={12}
+                  show={!runButtonMenu}
+                  zIndex={10}
+                >
+                  <Button
+                    type="secondary"
+                    size="medium"
+                    startIcon={ArrowUploadFilled}
+                    title={"Import Data"}
+                    onClick={handleImportClick}
+                  />
+                </Tooltip>
+              {/if}
             </div>
           {/if}
         </div>
@@ -2962,7 +2961,7 @@
     {:else if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.TESTDATA}
       <!-- Test Data Navigator: table similar to schedules -->
       <div class="testdata-container h-100">
-        <div class="flex-grow-1 d-flex flex-column h-100 p-3">
+        <div class="flex-grow-1 d-flex flex-column h-100">
           <div class="d-flex align-items-center justify-content-between mb-3">
             <div class="search-container">
               <Search
@@ -3013,6 +3012,8 @@
                     onPerformDatasetOperations={onPerformTestDataSetOperations}
                     onOpenDataset={openTestflowDataSetTab}
                     {isWebApp}
+                    isWorkspaceViewer={userRole ===
+                      WorkspaceRole.WORKSPACE_VIEWER}
                   />
                 {/each}
               </tbody>
@@ -3832,7 +3833,7 @@
     flex-direction: column;
     flex: 1;
     width: 100%;
-    height: 600px;
+    height: 638px;
     background: transparent;
     overflow: visible;
   }
@@ -3945,7 +3946,6 @@
   }
   .import-loading-container {
     height: 648px;
-    padding: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
