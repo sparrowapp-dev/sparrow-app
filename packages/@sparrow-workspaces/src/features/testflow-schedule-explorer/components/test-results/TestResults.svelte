@@ -59,7 +59,6 @@
   }
 
   $: computedHistory = (() => {
-    debugger;
     let mergedHistory = [];
 
     // Add regular run history
