@@ -7,14 +7,15 @@ import type { TFTabEdgesWrapperType } from "./testflow-tab";
 export interface TestFlowScheduleRunViewResultItem
   extends TFTabNodesWrapperType,
     TFTabEdgesWrapperType,
-    TestFlowScheduleRunResultType,TestflowScheduleDetailsView {}
+    TestFlowScheduleRunResultType,
+    TestflowScheduleDetailsView {}
 
 export interface TestflowScheduleRunViewWrapperTabInterface {
   testflowScheduleRunView: TestFlowScheduleRunViewResultItem;
 }
 
 export interface TestFlowScheduleRunResultType {
-  result: TestFlowScheduleRunResult;
+  results: TestFlowScheduleRunResult;
 }
 
 export interface TestflowScheduleDetailsView {
