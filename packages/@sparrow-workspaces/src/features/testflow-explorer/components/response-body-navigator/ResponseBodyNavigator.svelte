@@ -200,7 +200,7 @@
         </Tooltip>
         <!-- Download button -->
         {#if !isWebApp}
-          <Tooltip title={"Exporttt"}>
+          <Tooltip title={"Export"}>
             <WithButtonV6
               icon={ArrowDownloadRegular}
               onClick={handleDownloaded}

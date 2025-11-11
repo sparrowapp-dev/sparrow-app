@@ -8,12 +8,14 @@
     handleTestDataDownloadWeb,
   } from "../utils";
   import { Pagination } from "@sparrow/library/ui";
+  import { onDestroy, onMount } from "svelte";
 
   export let tab: any;
   export let isWebApp;
   export let onUpdateName;
   export let onSaveDataset;
   export let onRenameDataset;
+  export let isWorkspaceViewer;
 
   let testDataName: string;
 
@@ -72,14 +74,22 @@
   $: if (datasets) {
     currentPage = 1;
   }
+  let originalName = "";
+  $: if ($tab?.name && originalName === "" && $tab.isSaved) {
+    originalName = $tab?.name;
+  }
 
-  function handleTestDataHeadingChange(_name, event) {
-    onUpdateName(_name, event);
+  $: isSaveDisabled = $tab?.isSaved;
+
+  function handleTestDataHeadingChange(_name) {
+    onUpdateName(_name);
   }
 
   async function handleSave() {
     const res = await onRenameDataset($tab?.id, testDataName);
     if (res?.isSuccessful) {
+      isSaveDisabled = true;
+      originalName = $tab.name;
       notifications.success(`Changes Saved for "${testDataName}" test data.`);
       if (onSaveDataset) {
         await onSaveDataset();
@@ -88,6 +98,26 @@
       notifications.error("Failed to save changes. Please try again.");
     }
   }
+
+  onMount(() => {
+    window.addEventListener("keydown", handleKeyDown);
+  });
+
+  onDestroy(() => {
+    window.removeEventListener("keydown", handleKeyDown);
+  });
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "s") {
+      event.preventDefault();
+      const canSave =
+        !isSaveDisabled && !$tab?.isSaved && !isWorkspaceViewer && $tab?.tabId;
+
+      if (canSave && $tab?.tabId) {
+        handleSave();
+      }
+    }
+  };
 
   function handleRowClick(row: any, rowIndex: number) {
     console.log("Row clicked:", row);
@@ -156,9 +186,9 @@
         bind:value={testDataName}
         variant="inline"
         placeholder="Enter dataset name"
-        disabled={false}
-        on:input={() => handleTestDataHeadingChange(testDataName, "")}
-        on:blur={() => handleTestDataHeadingChange(testDataName, "blur")}
+        disabled={isWorkspaceViewer}
+        on:input={() => handleTestDataHeadingChange(testDataName)}
+        on:blur={() => handleTestDataHeadingChange(testDataName)}
       />
 
       <div class="d-flex gap-2">
@@ -183,15 +213,17 @@
             onClick={handleExport}
           />
         {/if}
-        <Tooltip title="Save" placement="top-center">
-          <Button
-            disable={$tab?.isSaved}
-            startIcon={SaveRegular}
-            type="secondary"
-            size="medium"
-            onClick={handleSave}
-          />
-        </Tooltip>
+        {#if !isWorkspaceViewer}
+          <Tooltip title="Save" placement="top-center">
+            <Button
+              disable={isSaveDisabled}
+              startIcon={SaveRegular}
+              type="secondary"
+              size="medium"
+              onClick={handleSave}
+            />
+          </Tooltip>
+        {/if}
       </div>
     </div>
 

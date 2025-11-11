@@ -7,6 +7,7 @@ import { TabRepository } from "@app/repositories/tab.repository";
 import { get } from "svelte/store";
 import { updateTestflowDataSets } from "@sparrow/common/store";
 import { TestflowService } from "@app/services/testflow.service";
+import { WorkspaceRepository } from "@app/repositories/workspace.repository";
 
 export enum TabPersistenceTypeEnum {
   PERMANENT = "permanent",
@@ -16,6 +17,7 @@ export enum TabPersistenceTypeEnum {
 export class TestflowDataSetExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
   private testflowRepository = new TestflowRepository();
+  private workspaceRepository = new WorkspaceRepository();
   private tabRepository = new TabRepository();
   private compareArray = new CompareArray();
   private testflowService = new TestflowService();
@@ -55,11 +57,15 @@ export class TestflowDataSetExplorerPageViewModel {
     });
   };
 
-  public updateName = async (_name: any, event = "") => {
+  public getWorkspaceById = async (workspaceId: string) => {
+    return await this.workspaceRepository.readWorkspace(workspaceId);
+  };
+
+  public updateName = async (_name: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const trimmedName = _name.trim();
 
-    if (event === "blur" && trimmedName === "") {
+    if (trimmedName === "") {
       const data = await this.getTestflowDataSetsById(
         progressiveTab.path.testflowId,
       );
@@ -67,8 +73,12 @@ export class TestflowDataSetExplorerPageViewModel {
         (d: any) => d.id === progressiveTab.id,
       );
       progressiveTab.name = matching?.name || progressiveTab.name;
-    } else if (event === "") {
-      progressiveTab.name = _name;
+    } else {
+      progressiveTab.name = trimmedName;
+    }
+
+    if (progressiveTab.name === this._tab.getValue().name) {
+      return;
     }
 
     this.tab = progressiveTab;

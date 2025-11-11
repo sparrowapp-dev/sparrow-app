@@ -20,6 +20,7 @@
   export let activeMenuId;
   export let setActiveMenuId;
   export let isWebApp;
+  export let isWorkspaceViewer;
   let showMenu;
   $: showMenu = activeMenuId === dataset.id;
   let activeWrapper: HTMLElement;
@@ -199,7 +200,11 @@
   </td>
   <td><span class="text-fs-12">{dataset?.formatType || "-"}</span></td>
   <td><span class="text-fs-12">{dataset?.fileSize || "-"}</span></td>
-  <td><span class="text-fs-12">{formatDate(dataset?.lastUpdated)}</span></td>
+  <td
+    ><span class="text-fs-12"
+      >{formatDate(dataset?.originalData?.updatedAt)}</span
+    ></td
+  >
   <td bind:this={activeWrapper}>
     {#if showMenu && !isDeletePopup}
       <div on:click|stopPropagation on:contextmenu|stopPropagation>
@@ -216,7 +221,7 @@
               onClick: startRename,
               displayText: "Rename",
               disabled: false,
-              hidden: false,
+              hidden: isWorkspaceViewer,
             },
             {
               onClick: isWebApp ? handleExport : handleExportDownload,
@@ -231,7 +236,7 @@
               },
               displayText: "Delete",
               disabled: false,
-              hidden: false,
+              hidden: isWorkspaceViewer,
             },
           ]}
         />
