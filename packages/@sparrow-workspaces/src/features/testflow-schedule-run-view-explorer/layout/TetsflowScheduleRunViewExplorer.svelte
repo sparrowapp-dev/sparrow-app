@@ -1269,7 +1269,6 @@
   let testflowViewRequestItems: any;
 
   const allocationNodeWithRequest = () => {
-    debugger;
     let nodes = $tab.property?.testflowScheduleRunView?.nodes || [];
     let edges = $tab.property?.testflowScheduleRunView?.edges || [];
 
