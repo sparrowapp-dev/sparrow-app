@@ -405,23 +405,18 @@
         // Once: use executeAt directly
         nextRunDate = new Date(config.executeAt);
       } else if (config.runCycle === "hourly" && config.intervalHours) {
-        // Handle hourly schedules specifically
-        if (config.executeAt) {
-          const executeAt = new Date(config.executeAt);
-
-          if (executeAt > now) {
-            nextRunDate = executeAt;
-          } else {
-            const intervalMs = config.intervalHours * 60 * 60 * 1000;
-            const timeSinceStart = now - executeAt;
-            const cyclesPassed = Math.floor(timeSinceStart / intervalMs);
-            nextRunDate = new Date(
-              executeAt.getTime() + (cyclesPassed + 1) * intervalMs,
-            );
-          }
+        const intervalMs = config.intervalHours * 60 * 60 * 1000;
+        const createdAt =
+          schedule.originalData?.createdAt || schedule.createdAt;
+        if (createdAt) {
+          const anchorTime = new Date(createdAt);
+          const timeSinceStart = now.getTime() - anchorTime.getTime();
+          const cyclesPassed = Math.floor(timeSinceStart / intervalMs);
+          nextRunDate = new Date(
+            anchorTime.getTime() + (cyclesPassed + 1) * intervalMs,
+          );
         } else {
-          // For hourly
-          const intervalMs = config.intervalHours * 60 * 60 * 1000;
+          // Fallback if no creation time available
           nextRunDate = new Date(now.getTime() + intervalMs);
         }
       } else if (config.runCycle === "daily" && config.time) {
@@ -511,7 +506,11 @@
       if (lastRun.status === "pass") {
         lastResult = "Success";
       } else if (lastRun.status === "fail") {
-        lastResult = "Fail";
+        if (lastRun.successRequests > 0) {
+          lastResult = "Partial Fail";
+        } else {
+          lastResult = "Fail";
+        }
       } else if (lastRun.status === "pending") {
         lastResult = "Pending";
       } else {
@@ -653,9 +652,18 @@
   }
 
   let dismissed = false;
+  let dismissedMap: Record<string, boolean> = {};
+  let currentNavigator: TestflowNavigatorEnum | null = null;
+  let currentDismissKey: string | null = null;
+  $: currentNavigator =
+    $tab?.property?.testflow?.state?.testflowNavigator || null;
+  $: currentDismissKey =
+    $tab?.id && currentNavigator ? `${$tab.id}:${currentNavigator}` : null;
 
   function dismissWarning() {
-    dismissed = true;
+    if (currentDismissKey) {
+      dismissedMap = { ...dismissedMap, [currentDismissKey]: true };
+    }
   }
 
   function handleSearchSchedules(event) {
@@ -1098,7 +1106,7 @@
 
   function getTooltipMessage(schedule) {
     if (schedule.status === "Expired") {
-      return "This schedule has completed all its runs and cannot be reactivated.";
+      return "This schedule has completed all its runs. You can edit it to reactivate.";
     } else if (schedule.status === "Inactive") {
       return "This schedule is currently paused. Resume to enable future runs.";
     } else if (schedule.status === "Active") {
@@ -2301,7 +2309,11 @@
       importedFileName = null;
 
       const text = await file.text();
-      if (isImportCancelled) return;
+      if (isImportCancelled) {
+        isImporting = false;
+        isImportLoadingModalOpen = false;
+        return;
+      }
 
       let jsonData: Record<string, any>[];
       const fileType = fileExtension as "json" | "csv";
@@ -2511,6 +2523,18 @@
     isImportLoadingModalOpen = false;
     openTestflowDataSetTab(datasetObj);
   }
+
+  const formatLocalDate = (utcDate: string) => {
+    if (!utcDate) return "";
+    const date = new Date(utcDate);
+    return date.toLocaleString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 </script>
 
 <div
@@ -2667,18 +2691,23 @@
           </div>
         {/if}
       </div>
-
-      <div style="margin-right: 5px;">
-        <Tooltip title="Clear Response" placement="bottom-center" size="small">
-          <Button
-            type="secondary"
-            size="medium"
-            disable={testflowStore?.isTestFlowRunning || isTestFlowEmpty}
-            startIcon={BroomRegular}
-            onClick={onClearTestflow}
-          />
-        </Tooltip>
-      </div>
+      {#if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.TESTFLOW}
+        <div style="margin-right: 5px;">
+          <Tooltip
+            title="Clear Response"
+            placement="bottom-center"
+            size="small"
+          >
+            <Button
+              type="secondary"
+              size="medium"
+              disable={testflowStore?.isTestFlowRunning || isTestFlowEmpty}
+              startIcon={BroomRegular}
+              onClick={onClearTestflow}
+            />
+          </Tooltip>
+        </div>
+      {/if}
       {#if !(userRole === WorkspaceRole.WORKSPACE_VIEWER)}
         <div>
           <SaveTestflow
@@ -2713,7 +2742,7 @@
   </div>
 
   <!-- Warning Message -->
-  {#if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.SCHEDULE && testflowScheduleStore.some((schedule) => schedule.isActive) && !dismissed}
+  {#if currentNavigator && [TestflowNavigatorEnum.SCHEDULE, TestflowNavigatorEnum.TESTFLOW].includes(currentNavigator) && testflowScheduleStore.some((schedule) => schedule.isActive) && !(currentDismissKey && dismissedMap[currentDismissKey])}
     <div
       class="mx-3 warning-banner px-4 d-flex align-items-center mb-3 p-2 position-relative"
     >
@@ -3141,8 +3170,9 @@
 >
   <div class="modal-content">
     <p class="mb-3" style="margin-top: 13px; padding-bottom:20px;">
-      "{$tab?.name}" flow has active schedules. Saving will update all upcoming
-      runs with your latest changes, which may impact their results.
+      "<span style="font-weight:700 !important;">{$tab?.name}</span>" flow has
+      active schedules. Saving will update all upcoming runs with your latest
+      changes, which may impact their results.
     </p>
     <div class="d-flex justify-content-end gap-3">
       <Button
@@ -3154,7 +3184,7 @@
       <Button
         type="primary"
         size="medium"
-        title="Save"
+        title="Save & Apply"
         onClick={handleSaveConfirm}
       />
     </div>
@@ -3459,9 +3489,19 @@
               {importedFileName}
             </div>
             <div class="file-meta">
-              Last updated a <span style="x">few seconds ago</span> • Size {Math.round(
-                importedFileContent.length / 1024,
-              )} KB • {(() => {
+              Last updated <span style="x">
+                {datasetContent
+                  ? formatLocalDate(datasetContent.updatedAt)
+                  : previewData
+                    ? formatLocalDate(previewData.updatedAt)
+                    : "few seconds ago"}
+              </span>
+              • Size
+              {datasetContent
+                ? datasetContent.fileSize
+                : previewData
+                  ? previewData.fileSize
+                  : "few seconds ago"} • {(() => {
                 try {
                   const parsed = JSON.parse(importedFileContent);
                   const data = parsed.dataSet || parsed;

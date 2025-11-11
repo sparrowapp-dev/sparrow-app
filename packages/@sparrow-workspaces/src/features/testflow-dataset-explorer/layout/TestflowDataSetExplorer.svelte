@@ -12,11 +12,6 @@
   export let tab: any;
   export let isWebApp;
   export let onUpdateName;
-  export let onPerformDatasetOperations: (
-    op: string,
-    id: string,
-    name?: string,
-  ) => Promise<any>;
   export let onSaveDataset;
   export let onRenameDataset;
 
