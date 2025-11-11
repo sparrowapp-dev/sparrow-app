@@ -102,13 +102,8 @@
     HttpRequestAuthTypeBaseEnum,
     HttpRequestContentTypeBaseEnum,
   } from "@sparrow/common/types/workspace/http-request-base";
-  import TestflowDynamicExpression from "../../testflow-dynamic-expressions/layout/TestflowDynamicExpression.svelte";
   // import { isDynamicExpressionModalOpen } from "../store/testflow";
-  import { selectedRequestTypes } from "../store/testflow";
-  import {
-    isDynamicExpressionContent,
-    updateDynamicExpressionValue,
-  } from "../store/testflow";
+  import { testflowDataSetIndex } from "../store/testflow";
   import { WorkspaceRole } from "@sparrow/common/enums";
   import { PlanUpgradeModal } from "@sparrow/common/components";
   import { planInfoByRole } from "@sparrow/common/utils";
@@ -118,7 +113,6 @@
     TimeISOExtractor,
     FormatDays,
   } from "@sparrow/common/utils";
-  import type { TestFlowScheduleRunResult } from "../../../../../@sparrow-common/src/types/workspace/testflow-schedule-run-view-tab";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -231,6 +225,7 @@
   let blockName = `Block ${nodesValue}`;
   // List to store collection documents and filtered collections
   let filteredCollections = writable<CollectionDto[]>([]);
+  let transformedResults = [{}];
 
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
@@ -406,6 +401,7 @@
   $: if (resultsArray.length > 0 && selectedTestDataItem === null) {
     selectedTestDataItem = resultsArray[0];
     selectedDatasetIndex = 0;
+    testflowDataSetIndex.set(0);
   }
 
   // Update test data options based on results array
@@ -429,6 +425,7 @@
 
   // Handle test data item selection
   function handleTestDataSelection(dataItem, index) {
+    testflowDataSetIndex.set(index);
     selectedTestDataItem = dataItem;
     selectedDatasetIndex = index;
     testDataMenuOpen = false;
@@ -1271,7 +1268,7 @@
   const allocationNodeWithRequest = () => {
     let nodes = $tab.property?.testflowScheduleRunView?.nodes || [];
     let edges = $tab.property?.testflowScheduleRunView?.edges || [];
-
+    let resultsArray = $tab.property?.testflowScheduleRunView?.results;
     // Use the selected result instead of the first result
     let runResult = selectedTestDataItem || resultsArray[0];
 
@@ -1327,92 +1324,46 @@
     return testflowStoreItems;
   };
 
-  function updateNodesWithSelectedResult() {
-    if (!$tab.property?.testflowScheduleRunView?.nodes) return;
-
-    nodes.update((_nodes) => {
-      return _nodes.map((node) => {
-        // Skip start block (id "1")
-        if (node.id === "1") return node;
-
-        // Calculate the proper currentItem based on selected result
-        const nodeIndex = parseInt(node.id);
-        const requestIndex = nodeIndex - 1;
-
-        let currentItem = null;
-        if (selectedTestDataItem && requestIndex >= 0) {
-          currentItem = {
-            id: nodeIndex.toString(),
-            request: selectedTestDataItem.requests?.[requestIndex] || null,
-            response: selectedTestDataItem.responses?.[requestIndex] || null,
-          };
-        }
-
-        return {
-          ...node,
-          data: {
-            ...node.data,
-            currentItem: currentItem,
-          },
-        };
-      });
-    });
-  }
-
   $: if (selectedTestDataItem) {
-    updateNodesWithSelectedResult();
     testflowViewRequestItems = allocationNodeWithRequest();
   }
 
+  $: {
+    transformedResults = [];
+    const results = $tab.property?.testflowScheduleRunView?.results || [];
+    if (results.length > 0) {
+      // Find the maximum number of requests/responses
+      const maxLength = Math.max(
+        ...results.map((r) =>
+          Math.max(r.requests?.length || 0, r.responses?.length || 0),
+        ),
+      );
+
+      // Create grouped objects for each index
+      for (let i = 0; i < maxLength; i++) {
+        transformedResults.push({
+          requests: results.map((r) => r.requests?.[i]).filter(Boolean),
+          responses: results.map((r) => r.responses?.[i]).filter(Boolean),
+        });
+      }
+    }
+  }
+
   function getScheduleRunItemByIndex(
-    runResult: TestFlowScheduleRunResult | undefined,
     index: number,
   ): { id: string; request: any; response: any } | undefined {
     if (index <= 0) {
       return undefined;
     }
-
-    // Always use selected result if available
-    const selectedResult = selectedTestDataItem || resultsArray[0] || runResult;
-
-    if (!selectedResult) {
-      return undefined;
+    if (transformedResults.length > 0) {
+      return {
+        id: index.toString(),
+        request: transformedResults[index - 1].requests,
+        response: transformedResults[index - 1].responses,
+      };
     }
-
-    const requests = selectedResult?.requests ?? [];
-    const responses = selectedResult?.responses ?? [];
-
-    return {
-      id: index.toString(),
-      request: requests[index - 1],
-      response: responses[index - 1],
-    };
   }
 
-  // $: if (selectedTestDataItem) {
-  //   debugger;
-  //   nodes.update((_nodes) => {
-  //     return _nodes.map((node) => {
-  //       // Skip start block
-  //       if (node.id === "1") return node;
-
-  //       const nodeIndex = parseInt(node.id);
-  //       const requestIndex = nodeIndex - 1;
-
-  //       return {
-  //         ...node,
-  //         data: {
-  //           ...node.data,
-  //           currentItem: {
-  //             id: nodeIndex.toString(),
-  //             request: selectedTestDataItem.requests?.[requestIndex] || null,
-  //             response: selectedTestDataItem.responses?.[requestIndex] || null,
-  //           },
-  //         },
-  //       };
-  //     });
-  //   });
-  // }
   /**
    * Initializes nodes and edges on component mount.
    */
@@ -1493,10 +1444,7 @@
                   requestData: dbNodes[i].data?.requestData,
                   collections: filteredCollections,
                   tabId: $tab.tabId,
-                  currentItem: getScheduleRunItemByIndex(
-                    selectedTestDataItem,
-                    i,
-                  ),
+                  currentItem: getScheduleRunItemByIndex(i),
                 },
                 position: {
                   x: dbNodes[i].position.x,
@@ -1819,14 +1767,6 @@
       }
     }
   }
-
-  // const setIsCurrentOpenFalse = () => {
-  //   isDynamicExpressionContent.update((items) =>
-  //     items.map((item) =>
-  //       item.isCurrentOpen ? { ...item, isCurrentOpen: false } : item,
-  //     ),
-  //   );
-  // };
 
   let isDynamicExpressionModalOpen = false;
 
@@ -2153,7 +2093,7 @@
   </div>
 </Modal>
 
-<Modal
+<!-- <Modal
   title={"Insert Dynamic Content"}
   type={"dark"}
   width={"851px"}
@@ -2179,7 +2119,7 @@
     {onPreviewExpression}
     {dynamicExpressionPath}
   />
-</Modal>
+</Modal> -->
 
 <Modal
   title={"Delete Block?"}
