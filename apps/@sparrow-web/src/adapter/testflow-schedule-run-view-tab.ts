@@ -169,8 +169,8 @@ export class TestflowScheduleRunViewTabAdapter {
       historyArray = scheduleHistory.originalDataSet.schedularDataRunHistory;
 
       // Get nodes/edges from the first dataset run result or from the parent
-      nodes = historyArray[0]?.nodes || [];
-      edges = historyArray[0]?.edges || [];
+      nodes = scheduleHistory?.originalDataSet?.nodes || [];
+      edges = scheduleHistory?.originalDataSet?.edges || [];
     } else {
       // FALLBACK: Single schedule history object - wrap it in an array for consistent processing
       actualScheduleData = scheduleHistory;
