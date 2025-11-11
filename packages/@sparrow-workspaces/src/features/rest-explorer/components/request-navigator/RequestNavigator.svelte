@@ -120,14 +120,14 @@
   };
 </script>
 
-<div style="padding-bottom: 12px; position:relative;" class="z-5">
+<div
+  style="padding-bottom: 12px; padding-top: 6px; position:relative;"
+  class="z-5"
+>
   <div class="d-flex justify-content-between">
     <Navigator {tabs} {onTabClick} currentTabId={requestStateSection} />
     {#if ((requestStateSection === RequestSectionEnum.HEADERS && !bulkEditHeadersActive) || (requestStateSection === RequestSectionEnum.PARAMETERS && !bulkEditParamsActive) || requestStateSection === RequestSectionEnum.REQUEST_BODY) && !isGuestUser && (userRole === WorkspaceRole.WORKSPACE_ADMIN || userRole === WorkspaceRole.WORKSPACE_EDITOR)}
-      <div
-        class="button-container ms-2 me-1 mt-1 z-4"
-        style="position: relative;"
-      >
+      <div class="button-container ms-2 me-1 z-4">
         <button
           class="generate-mock-button"
           tabindex="0"
@@ -150,6 +150,10 @@
 <svelte:window on:keydown={handleKeyPress} />
 
 <style>
+  .button-container {
+    position: relative;
+  }
+
   .generate-mock-button {
     font-family: "Inter", sans-serif;
     font-weight: 500;
@@ -211,7 +215,7 @@
   }
   .beta-badge {
     position: absolute;
-    top: -5px;
+    top: -3px;
     right: -2px;
     width: 29px;
     height: 14px;
@@ -228,8 +232,5 @@
     align-items: center;
     justify-content: center;
     z-index: 2;
-  }
-  .generate-mock-button {
-    position: relative;
   }
 </style>

@@ -94,7 +94,7 @@ export class TestflowDataSetExplorerPageViewModel {
    * @example
    * const datasets = getTestflowDataSetsById(progressiveTab.id);
    */
-  getTestflowDataSetsById = async (id: string | number): any => {
+  private getTestflowDataSetsById = async (id: string | number): any => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const testflowDataSetStore = await this.testflowRepository.readTestflow(
       progressiveTab.path.testflowId,

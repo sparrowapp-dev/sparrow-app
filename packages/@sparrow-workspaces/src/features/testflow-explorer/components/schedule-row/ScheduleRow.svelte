@@ -315,6 +315,14 @@
         placement="bottom-center"
         size="small"
       >
+        <Tag text="Failed" type={getTagType("Failed")} />
+      </Tooltip>
+    {:else if schedule.lastResult === "Partial Fail"}
+      <Tooltip
+        title={getFailTooltip(schedule)}
+        placement="bottom-center"
+        size="small"
+      >
         <Tag text="Partially Failed" type={getTagType("Partially Failed")} />
       </Tooltip>
     {:else}

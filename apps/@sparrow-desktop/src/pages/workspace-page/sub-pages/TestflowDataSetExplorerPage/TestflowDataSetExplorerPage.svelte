@@ -8,7 +8,6 @@
   export let tab: TabDocument;
   let prevTabId = "";
   let _viewModel: TestflowDataSetExplorerPageViewModel | null = null;
-  const _viewModel2 = new TestflowExplorerPageViewModel(tab);
 
   $: {
     if (tab && prevTabId !== tab?.tabId) {
@@ -24,7 +23,6 @@
     isWebApp={false}
     onUpdateName={_viewModel.updateName}
     onRenameDataset={_viewModel.renameTestDataSet}
-    onPerformDatasetOperations={_viewModel2.performTestDataSetOperations}
     onSaveDataset={_viewModel.saveDataset}
   />
 {/if}
