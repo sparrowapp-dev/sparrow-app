@@ -12,7 +12,12 @@ import type {
 } from "../../../../database/database";
 
 // Utils
-import { createDeepCopy, Debounce, scrollToTab } from "@sparrow/common/utils";
+import {
+  createDeepCopy,
+  Debounce,
+  InitTestflowDataSetTab,
+  scrollToTab,
+} from "@sparrow/common/utils";
 
 import { WorkspaceRepository } from "../../../../repositories/workspace.repository";
 import {
@@ -39,6 +44,7 @@ import { v4 as uuidv4 } from "uuid";
 import { EnvironmentRepository } from "@app/repositories/environment.repository";
 import { captureEvent } from "src/utils/posthog/posthogConfig";
 import { TestflowNavigatorEnum } from "@sparrow/common/types/workspace/testflow";
+import type { TestflowDataSetItem } from "@sparrow/common/types/workspace/testflow-dateset-tab";
 // import { InitRequestTab } from "@sparrow/common/utils";
 
 class MockHistoryExplorerPage {
@@ -132,6 +138,16 @@ class MockHistoryExplorerPage {
       const serverNotification = this.testflowScheduleStore.notification;
 
       if (!this.deepEqual(tabNotification, serverNotification)) {
+        result = false;
+      }
+
+      // Compare testflowDataSetId
+      const tabTestflowDataSetId =
+        progressiveTab.property.testflowSchedule.testflowDataSetId;
+      const serverTestflowDataSetId =
+        this.testflowScheduleStore.testflowDataSetId;
+
+      if (tabTestflowDataSetId !== serverTestflowDataSetId) {
         result = false;
       }
 
@@ -288,11 +304,16 @@ class MockHistoryExplorerPage {
         this.getTestflow();
       }, i * 500);
     }
+    const payload = {
+      testflowDataSetId:
+        progressiveTab.property.testflowSchedule.testflowDataSetId,
+    };
     const response = await this.testflowService.runTestflowSchedule(
       progressiveTab.path.workspaceId,
       progressiveTab.path.testflowId,
       progressiveTab.id,
       baseUrl,
+      payload,
     );
     if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
@@ -347,7 +368,7 @@ class MockHistoryExplorerPage {
     );
     if (response?.isSuccessful) {
       captureEvent("schedule_history_deleted", {
-        event_source: "desktop_app",
+        event_source: "web_app",
         schedule_id: progressiveTab.id,
         testflow_id: progressiveTab.path.testflowId,
         schedule_run_frequency:
@@ -360,6 +381,39 @@ class MockHistoryExplorerPage {
         schedules,
       );
       this.tabRepository.removeTab(_scheduleHistoryId);
+    }
+  };
+
+  public deleteTestflowScheduleTestDataHistory = async (
+    _runHistoryTestDataId: string,
+  ) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const baseUrl = await this.constructBaseUrl(
+      progressiveTab.path.workspaceId,
+    );
+    const response =
+      await this.testflowService.deleteScheduleRunTestDataHistory(
+        progressiveTab.path.workspaceId,
+        progressiveTab.path.testflowId,
+        progressiveTab.id,
+        _runHistoryTestDataId,
+        baseUrl,
+      );
+    if (response?.isSuccessful) {
+      captureEvent("schedule_history_deleted", {
+        event_source: "web_app",
+        schedule_id: progressiveTab.id,
+        testflow_id: progressiveTab.path.testflowId,
+        schedule_run_frequency:
+          progressiveTab.property.testflowSchedule.runConfiguration.runCycle,
+        status: progressiveTab.property.testflowSchedule.isActive,
+      });
+      const schedules = response.data.data.schedules;
+      updateTestflowSchedules(
+        progressiveTab?.path?.testflowId as string,
+        schedules,
+      );
+      this.tabRepository.removeTab(_runHistoryTestDataId);
     }
   };
 
@@ -437,6 +491,7 @@ class MockHistoryExplorerPage {
   public handleCreateTestflowSingleScheduleTab = (
     _scheduleResult: any,
     schedule: any,
+    selectedDataset?: any,
   ) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const x = new TestflowScheduleRunViewTabAdapter().adapt(
@@ -445,6 +500,7 @@ class MockHistoryExplorerPage {
       schedule.name,
       progressiveTab.id,
       progressiveTab.path.testflowId,
+      selectedDataset,
     );
 
     this.tabRepository.createTab(x);
@@ -541,10 +597,11 @@ class MockHistoryExplorerPage {
       testflowJSON.workspaceId,
     );
 
-    const testflowTabRxDoc = await  this.tabRepository.getTabById(_id);
+    const testflowTabRxDoc = await this.tabRepository.getTabById(_id);
     let testflowTabJson = testflowTabRxDoc?.toMutableJSON();
-    if(testflowTabJson){
-      testflowTabJson.property.testflow.state.testflowNavigator = TestflowNavigatorEnum.TESTFLOW;
+    if (testflowTabJson) {
+      testflowTabJson.property.testflow.state.testflowNavigator =
+        TestflowNavigatorEnum.TESTFLOW;
       await this.tabRepository.updateTabByMongoId(_id, testflowTabJson);
     }
 
@@ -579,6 +636,27 @@ class MockHistoryExplorerPage {
 
     this.tabRepository.createTab(initEnvironmentTab.getValue());
     scrollToTab(initEnvironmentTab.getValue().id);
+  };
+
+  public openTestflowDataSetTab = async (dataSet: TestflowDataSetItem) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const initTestflowDataSetTab = new InitTestflowDataSetTab(
+      dataSet.id,
+      progressiveTab.path.workspaceId,
+      progressiveTab.id,
+    )
+      .updateName(dataSet.name)
+      .updateDataSet(dataSet?.item)
+      .updateFormatType(dataSet.formatType)
+      .updateTimestamps(dataSet.createdAt, dataSet.updatedAt)
+      .updateFileDetails({
+        fileSize: dataSet.fileSize,
+        fileUrl: dataSet.fileUrl,
+        updatedBy: dataSet.updatedBy,
+      })
+      .updateUpdatedAt(dataSet?.updatedAt || "")
+      .getValue();
+    await this.tabRepository.createTab(initTestflowDataSetTab);
   };
 }
 

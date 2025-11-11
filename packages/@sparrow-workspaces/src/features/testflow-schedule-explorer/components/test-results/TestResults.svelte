@@ -11,8 +11,6 @@
   let itemsPerPage = 10;
   let sortDirection: "asc" | "desc" = "desc";
 
-  $: totalItems = schedule?.schedularRunHistory?.length || 0;
-
   function parseRunTime(time: string | number): number {
     if (!time) return 0;
     if (typeof time === "number") return time;
@@ -27,16 +25,79 @@
     }
   }
 
-  $: sortedHistory = schedule?.schedularRunHistory
+  function aggregateDataRunHistory(dataSetEntry) {
+    const runs = dataSetEntry.schedularDataRunHistory || [];
+    const totals = runs.reduce(
+      (acc, run) => {
+        acc.successRequests += Number(run.successRequests) || 0;
+        acc.failedRequests += Number(run.failedRequests) || 0;
+        acc.totalTimeMs += parseRunTime(run.totalTime);
+        return acc;
+      },
+      { successRequests: 0, failedRequests: 0, totalTimeMs: 0 },
+    );
+
+    return {
+      id: dataSetEntry.id,
+      createdAt: dataSetEntry.createdAt,
+      updatedAt: dataSetEntry.updatedAt,
+      status: dataSetEntry.status,
+      isScheduled: dataSetEntry.isScheduled,
+      successRequests: totals.successRequests,
+      failedRequests: totals.failedRequests,
+      totalTime: `${(totals.totalTimeMs / 1000).toFixed(2)} sec`,
+      type: "dataset", // Add type to distinguish dataset entries
+      originalDataSet: dataSetEntry,
+    };
+  }
+
+  function normalizeRunHistory(runEntry) {
+    return {
+      ...runEntry,
+      type: "regular", // Add type to distinguish regular entries
+    };
+  }
+
+  $: computedHistory = (() => {
+    let mergedHistory = [];
+
+    // Add regular run history
+    if (schedule?.schedularRunHistory?.length > 0) {
+      const normalizedRunHistory =
+        schedule.schedularRunHistory.map(normalizeRunHistory);
+      mergedHistory = [...mergedHistory, ...normalizedRunHistory];
+    }
+
+    // Add dataset history
+    if (schedule?.schedularDataSetHistory?.length > 0) {
+      const aggregatedDataSetHistory = schedule.schedularDataSetHistory.map(
+        aggregateDataRunHistory,
+      );
+      mergedHistory = [...mergedHistory, ...aggregatedDataSetHistory];
+    }
+
+    // Sort by createdAt or updatedAt to maintain chronological order
+    return mergedHistory.sort((a, b) => {
+      const dateA = new Date(a.createdAt || a.updatedAt);
+      const dateB = new Date(b.createdAt || b.updatedAt);
+      return dateB.getTime() - dateA.getTime(); // Most recent first
+    });
+  })();
+
+  $: sortedHistory = computedHistory
     ? sortDirection === "asc"
-      ? [...schedule.schedularRunHistory].slice().reverse()
-      : [...schedule.schedularRunHistory]
+      ? [...computedHistory].slice().reverse()
+      : [...computedHistory]
     : [];
 
   $: paginatedHistory = sortedHistory.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
+
+  $: totalItems = computedHistory?.length || 0;
+
+  $: hasResults = computedHistory?.length > 0;
 
   function toggleSort() {
     sortDirection = sortDirection === "asc" ? "desc" : "asc";
@@ -46,6 +107,7 @@
   export let onDeleteTestflowScheduleHistory;
   export let onScheduleRunview;
   export let isTestflowScheduleEditable;
+  export let onDeleteTestflowScheduleTestDataHistory;
 
   function formatDate(dateStr: string) {
     const date = new Date(dateStr);
@@ -66,9 +128,14 @@
     const parts = flowName.split("-");
     return parts.length > 1 ? parts[parts.length - 1].trim() : "";
   }
+  function getDeleteHandler(resultType: string) {
+    return resultType === "dataset"
+      ? onDeleteTestflowScheduleTestDataHistory
+      : onDeleteTestflowScheduleHistory;
+  }
 </script>
 
-{#if schedule?.schedularRunHistory && schedule.schedularRunHistory.length > 0}
+{#if hasResults}
   <div class="d-flex flex-column h-100 content-wrapper">
     <div class="table-area" style="flex:1; overflow:auto;">
       <div class="table-container">
@@ -91,12 +158,12 @@
             {#each paginatedHistory as r}
               <Result
                 {onScheduleRunview}
-                {onDeleteTestflowScheduleHistory}
+                onDeleteResult={getDeleteHandler(r.type)}
                 {r}
                 {schedule}
                 {formatDate}
                 {getRunType}
-                {isTestflowScheduleEditable}
+                isEditable={isTestflowScheduleEditable}
               />
             {/each}
           </tbody>

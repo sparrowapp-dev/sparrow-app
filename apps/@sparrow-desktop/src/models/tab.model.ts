@@ -284,7 +284,7 @@ export const tabSchemaLiteral = {
   title: "Opened tabs that will be shown on dashboard",
   primaryKey: "tabId",
   type: "object",
-  version: 38,
+  version: 39,
   properties: {
     tabId: {
       // ---- RxDocumentId
@@ -1762,58 +1762,86 @@ export const tabSchemaLiteral = {
                 required: ["id", "source", "target"],
               },
             },
-            result: {
-              type: "object",
-              properties: {
-                failedRequests: { type: "number" },
-                requests: {
-                  type: "array",
-                  items: {
-                    type: "object",
-                    properties: {
-                      method: { type: "string" },
-                      name: { type: "string" },
-                      status: { type: "string" },
-                      time: { type: "string" },
-                      errorMessage: { type: "string" },
-                      error: { type: "string" },
-                    },
-                  },
-                },
-                status: { type: "string" },
-                successRequests: { type: "number" },
-                totalTime: { type: "string" },
-                response: {
-                  type: "object",
-                  properties: {
-                    headers: {
-                      type: "array",
-                      items: {
-                        type: "object",
-                        properties: {
-                          key: { type: "string" },
-                          value: { type: "string" },
-                        },
-                        required: ["key", "value"],
+            results: {
+              type: "array",
+              default: [],
+              items: {
+                type: "object",
+                properties: {
+                  datasetItemIndex: { type: "number" },
+                  failedRequests: { type: "number" },
+                  successRequests: { type: "number" },
+                  totalTime: { type: "string" },
+                  status: { type: "string" },
+                  createdAt: { type: "string" },
+                  updatedAt: { type: "string" },
+                  requests: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        method: { type: "string" },
+                        name: { type: "string" },
+                        status: { type: "string" },
+                        time: { type: "string" },
+                        errorMessage: { type: "string" },
+                        error: { type: "string" },
                       },
                     },
-                    status: { type: "string" },
-                    body: { type: "string" },
-                    time: { type: "number" },
-                    size: { type: "number" },
-                    responseContentType: {
-                      type: "string",
-                      enum: [
-                        "JSON",
-                        "XML",
-                        "HTML",
-                        "Text",
-                        "JavaScript",
-                        "Image",
-                      ],
+                  },
+                  responses: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        headers: {
+                          type: "array",
+                          items: {
+                            type: "object",
+                            properties: {
+                              key: { type: "string" },
+                              value: { type: "string" },
+                            },
+                            required: ["key", "value"],
+                          },
+                        },
+                        status: { type: "string" },
+                        body: { type: "string" },
+                        time: { type: "number" },
+                        size: { type: "number" },
+                        responseContentType: {
+                          type: "string",
+                          enum: [
+                            "JSON",
+                            "XML",
+                            "HTML",
+                            "Text",
+                            "JavaScript",
+                            "Image",
+                          ],
+                        },
+                      },
                     },
                   },
                 },
+                required: [
+                  "datasetItemIndex",
+                  "failedRequests",
+                  "requests",
+                  "responses",
+                  "status",
+                  "successRequests",
+                  "totalTime",
+                ],
+              },
+            },
+            selectedDataset: {
+              type: "object",
+              properties: {
+                id: { type: "string" },
+                name: { type: "string" },
+                formatType: { type: "string" },
+                fileSize: { type: "string" },
               },
             },
             isScheduled: { type: "boolean" },
@@ -1823,7 +1851,7 @@ export const tabSchemaLiteral = {
           required: [
             "nodes",
             "edges",
-            "result",
+            "results",
             "isScheduled",
             "scheduleName",
             "lastestExecuted",
@@ -1866,13 +1894,42 @@ export const tabSchemaLiteral = {
               },
             },
             environmentId: { type: "string" },
+            testflowDataSetId: { type: "string" },
           },
           required: [
             "state",
             "environmentId",
             "runConfiguration",
             "notifications",
+            "testflowDataSetId",
           ],
+        },
+        testflowDataSet: {
+          type: "object",
+          properties: {
+            name: { type: "string" },
+            formatType: { type: "string" },
+            fileSize: { type: "string" },
+            fileUrl: { type: "string" },
+            createdAt: { type: "string" },
+            updatedAt: { type: "string" },
+            createdBy: { type: "string" },
+            updatedBy: { type: "string" },
+            item: {
+              type: "object",
+              properties: {
+                dataSet: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    additionalProperties: true,
+                  },
+                },
+              },
+              required: ["dataSet"],
+            },
+          },
+          required: ["name", "formatType", "fileSize", "item"],
         },
       },
     },

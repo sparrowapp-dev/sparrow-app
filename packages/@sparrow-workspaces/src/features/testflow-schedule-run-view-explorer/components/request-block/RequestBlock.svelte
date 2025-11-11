@@ -273,7 +273,7 @@
 
 <div
   class="request-block position-relative"
-  style={selected && !currentBlock?.response.status
+  style={selected && !currentBlock?.response?.status
     ? "outline: 1px solid var(--border-ds-primary-300);"
     : (selected && currentBlock && checkIfRequestSucceed(currentBlock)) ||
         ($currentStep > 6 && $isTestFlowTourGuideOpen)

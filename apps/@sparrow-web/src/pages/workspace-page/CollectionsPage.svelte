@@ -123,6 +123,7 @@
 
   import TestflowScheduleRVExplorerPage from "./sub-pages/TestflowScheduleRVExplorerPage.svelte/TestflowScheduleRVExplorerPage.svelte";
   import TestflowScheduleExplorerPage from "./sub-pages/TestflowScheduleExplorerPage/TestflowScheduleExplorerPage.svelte";
+  import TestflowDataSetExplorerPage from "./sub-pages/TestflowDataSetExplorerPage/TestflowDataSetExplorerPage.svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -1118,6 +1119,12 @@
                     <Motion {...scaleMotionProps} let:motion>
                       <div class="h-100">
                         <TestflowScheduleExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.TESTFLOW_DATASET}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100">
+                        <TestflowDataSetExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if !$tabList?.length}
