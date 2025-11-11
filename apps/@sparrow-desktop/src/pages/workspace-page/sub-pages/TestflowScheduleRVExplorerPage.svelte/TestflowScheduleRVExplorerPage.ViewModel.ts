@@ -166,7 +166,7 @@ export class TestflowScheduleRVExplorerPageViewModel {
    */
   public updateNodes = new Debounce().debounce(
     this.updateNodesDebounce as any,
-    300,
+    50,
   );
 
   /**
@@ -193,7 +193,7 @@ export class TestflowScheduleRVExplorerPageViewModel {
    */
   public updateEdges = new Debounce().debounce(
     this.updateEdgesDebounce as any,
-    300,
+    50,
   );
 
   /**
