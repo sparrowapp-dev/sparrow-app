@@ -187,7 +187,7 @@ const makeRequest = async (
       const _viewModel = new DashboardViewModel();
       await _viewModel.clientLogout();
       return error("Unauthorized");
-    }  else if (e.response?.data?.statusCode === 401) {
+    } else if (e.response?.data?.statusCode === 401) {
       return error("Unauthorized");
     }
     if (e.code === "ERR_NETWORK") {
@@ -325,25 +325,24 @@ const disconnectWebSocket = async (tab_id: string) => {
 };
 
 /**
- * Disconnects a WebSocket connection for a specific tab and handles the response.
- *
- * @param tab_id - The ID of the tab for which the WebSocket connection should be disconnected.
- *
+ * Ensures the URL has the correct WebSocket protocol.
+ * - If the URL starts with "http://" or "https://", it is converted to "ws://" or "wss://".
+ * - If the URL already starts with "ws://" or "wss://", it is returned as is.
+ * - If the URL has no protocol, "ws://" is prepended.
+ * @param url - The input URL string.
+ * @returns The URL with the correct WebSocket protocol.
  */
-
-const convertWebSocketUrl = (url: string) => {
-  // Check if the URL starts with 'wss://'
-  if (url.startsWith("wss://")) {
-    return "https:/" + url.slice(5); // Replace 'wss://' with 'https://'
+const ensureWebSocketProtocol = (url: string): string => {
+  if (url.startsWith("ws://") || url.startsWith("wss://")) {
+    return url;
   }
-
-  // Check if the URL starts with 'ws://'
-  if (url.startsWith("ws://")) {
-    return "http:/" + url.slice(4); // Replace 'ws://' with 'http://'
+  if (url.startsWith("https://")) {
+    return "wss://" + url.slice(8);
   }
-
-  // If the URL does not start with 'wss://' or 'ws://', return it unchanged
-  return url;
+  if (url.startsWith("http://")) {
+    return "ws://" + url.slice(7);
+  }
+  return "ws://" + url;
 };
 
 /**
@@ -365,6 +364,9 @@ const connectWebSocket = async (
   const selectedAgent = localStorage.getItem(
     "selectedAgent",
   ) as WorkspaceUserAgentBaseEnum;
+  let wsUrl = ensureWebSocketProtocol(url);
+  let triedWss = false;
+
   // Initialize WebSocket store
   webSocketDataStore.update((webSocketDataMap) => {
     webSocketDataMap.set(tabId, {
@@ -387,117 +389,157 @@ const connectWebSocket = async (
     selectedAgent === WorkspaceUserAgentBaseEnum.BROWSER_AGENT ||
     !isEnableWebSocketCloud
   ) {
-    try {
-      const ws = new WebSocket(url);
-      // Update store with WebSocket instance
-      webSocketDataStore.update((webSocketDataMap) => {
-        const wsData = webSocketDataMap.get(tabId);
-        if (wsData) {
-          wsData.listener = ws;
-          webSocketDataMap.set(tabId, wsData);
+    const attemptConnection = async (): Promise<void> => {
+      try {
+        const ws = new WebSocket(wsUrl);
+        // Update store with WebSocket instance
+        webSocketDataStore.update((webSocketDataMap) => {
+          const wsData = webSocketDataMap.get(tabId);
+          if (wsData) {
+            wsData.listener = ws;
+            webSocketDataMap.set(tabId, wsData);
+          }
+          return webSocketDataMap;
+        });
+
+        return new Promise((resolve) => {
+          let hasErrorOccurred = false;
+          ws.onopen = () => {
+            if (signal?.aborted) {
+              return;
+            }
+            webSocketDataStore.update((webSocketDataMap) => {
+              const wsData = webSocketDataMap.get(tabId);
+              if (wsData) {
+                wsData.messages.unshift({
+                  data: `Connected to ${url}`,
+                  transmitter: "connecter",
+                  timestamp: formatTime(new Date()),
+                  uuid: uuidv4(),
+                });
+                wsData.status = "connected";
+
+                webSocketDataMap.set(tabId, wsData);
+              }
+              return webSocketDataMap;
+            });
+            notifications.success("WebSocket connected successfully.");
+            resolve("");
+          };
+
+          ws.onmessage = async (event) => {
+            if (signal?.aborted) {
+              return;
+            }
+            let result: string;
+
+            if (event.data instanceof Blob) {
+              // Convert Blob to text
+              result = await event.data.text();
+            } else if (typeof event.data === "string") {
+              // Use directly if it's already a string
+              result = event.data;
+            } else if (typeof event.data === "object" && event.data !== null) {
+              // Convert object to string (JSON.stringify)
+              result = JSON.stringify(event.data);
+            } else {
+              result = "";
+            }
+
+            webSocketDataStore.update((webSocketDataMap) => {
+              const wsData = webSocketDataMap.get(tabId);
+              if (wsData) {
+                wsData.messages.unshift({
+                  data: result,
+                  transmitter: "receiver",
+                  timestamp: formatTime(new Date()),
+                  uuid: uuidv4(),
+                });
+                webSocketDataMap.set(tabId, wsData);
+              }
+              return webSocketDataMap;
+            });
+          };
+
+          ws.onerror = (error) => {
+            if (signal?.aborted) {
+              return;
+            }
+            console.error("WebSocket error:", error);
+            hasErrorOccurred = true;
+          };
+
+          ws.onclose = (event) => {
+            if (signal?.aborted) {
+              return;
+            }
+
+            // Check for 307/301 redirect responses and retry with wss://
+            if (
+              (event.code === 1006 ||
+                event.reason?.includes("307") ||
+                event.reason?.includes("301")) &&
+              !triedWss &&
+              wsUrl.startsWith("ws://")
+            ) {
+              wsUrl = wsUrl.replace("ws://", "wss://");
+              triedWss = true;
+              attemptConnection().catch((err) => {
+                console.error("Retry failed:", err);
+              });
+              return;
+            }
+
+            webSocketDataStore.update((webSocketDataMap) => {
+              const wsData = webSocketDataMap.get(tabId);
+              if (wsData) {
+                wsData.messages.unshift({
+                  data: hasErrorOccurred
+                    ? "Error: Failed to connect Websocket"
+                    : `Disconnected from ${url}`,
+                  transmitter: "disconnector",
+                  timestamp: formatTime(new Date()),
+                  uuid: uuidv4(),
+                });
+                wsData.status = "disconnected";
+                webSocketDataMap.set(tabId, wsData);
+              }
+              return webSocketDataMap;
+            });
+          };
+        });
+      } catch (error) {
+        if (signal?.aborted) {
+          return;
         }
-        return webSocketDataMap;
-      });
 
-      return new Promise((resolve) => {
-        let hasErrorOccurred = false;
-        ws.onopen = () => {
-          if (signal?.aborted) {
-            return;
-          }
-          webSocketDataStore.update((webSocketDataMap) => {
-            const wsData = webSocketDataMap.get(tabId);
-            if (wsData) {
-              wsData.messages.unshift({
-                data: `Connected to ${url}`,
-                transmitter: "connecter",
-                timestamp: formatTime(new Date()),
-                uuid: uuidv4(),
-              });
-              wsData.status = "connected";
+        const errorMessage = typeof error === "string" ? error : String(error);
+        // Retry with wss:// if we got a 307 temp redirect or 301 perm redirect
+        if (
+          (errorMessage.includes("307") || errorMessage.includes("301")) &&
+          !triedWss &&
+          wsUrl.startsWith("ws://")
+        ) {
+          wsUrl = wsUrl.replace("ws://", "wss://");
+          triedWss = true;
+          return attemptConnection();
+        }
 
-              webSocketDataMap.set(tabId, wsData);
-            }
-            return webSocketDataMap;
-          });
-          notifications.success("WebSocket connected successfully.");
-          resolve("");
-        };
-
-        ws.onmessage = async (event) => {
-          if (signal?.aborted) {
-            return;
-          }
-          let result: string;
-
-          if (event.data instanceof Blob) {
-            // Convert Blob to text
-            result = await event.data.text();
-          } else if (typeof event.data === "string") {
-            // Use directly if it's already a string
-            result = event.data;
-          } else if (typeof event.data === "object" && event.data !== null) {
-            // Convert object to string (JSON.stringify)
-            result = JSON.stringify(event.data);
-          } else {
-            result = "";
-          }
-
-          webSocketDataStore.update((webSocketDataMap) => {
-            const wsData = webSocketDataMap.get(tabId);
-            if (wsData) {
-              wsData.messages.unshift({
-                data: result,
-                transmitter: "receiver",
-                timestamp: formatTime(new Date()),
-                uuid: uuidv4(),
-              });
-              webSocketDataMap.set(tabId, wsData);
-            }
-            return webSocketDataMap;
-          });
-        };
-
-        ws.onerror = (error) => {
-          if (signal?.aborted) {
-            return;
-          }
-          console.error("WebSocket error:", error);
-          hasErrorOccurred = true;
-        };
-
-        ws.onclose = () => {
-          if (signal?.aborted) {
-            return;
-          }
-          webSocketDataStore.update((webSocketDataMap) => {
-            const wsData = webSocketDataMap.get(tabId);
-            if (wsData) {
-              wsData.messages.unshift({
-                data: hasErrorOccurred
-                  ? "Error: Failed to connect Websocket"
-                  : `Disconnected from ${url}`,
-                transmitter: "disconnector",
-                timestamp: formatTime(new Date()),
-                uuid: uuidv4(),
-              });
-              wsData.status = "disconnected";
-              webSocketDataMap.set(tabId, wsData);
-            }
-            return webSocketDataMap;
-          });
-        };
-      });
-    } catch (error) {
-      if (signal?.aborted) {
-        return;
+        console.error("WebSocket connection error:", error);
+        webSocketDataStore.update((webSocketDataMap) => {
+          webSocketDataMap.delete(tabId);
+          return webSocketDataMap;
+        });
+        notifications.error("Failed to connect WebSocket");
+        throw error;
       }
-      console.error("WebSocket connection error:", error);
-      webSocketDataStore.update((webSocketDataMap) => {
-        webSocketDataMap.delete(tabId);
-        return webSocketDataMap;
-      });
-      notifications.error("Failed to connect WebSocket");
+    };
+
+    // Execute connection
+    try {
+      await attemptConnection();
+    } catch (error) {
+      console.error("Failed to establish WebSocket connection:", error);
       throw error;
     }
   } else if (selectedAgent === WorkspaceUserAgentBaseEnum.CLOUD_AGENT) {
@@ -632,11 +674,15 @@ const waitForAbort = (signal: AbortSignal): Promise<never> => {
       return reject(new Error("Aborted before starting"));
     }
 
-    signal?.addEventListener("abort", () => {
+    signal?.addEventListener(
+      "abort",
+      () => {
         reject(new Error("Aborted during request"));
-    }, { once: true });
+      },
+      { once: true },
+    );
   });
-}
+};
 
 /**
  *
@@ -663,11 +709,14 @@ const makeHttpRequestV2 = async (
     let response;
     if (selectedAgent === "Cloud Agent") {
       const proxyUrl = constants.PROXY_SERVICE + "/proxy/http-request";
-      response = await Promise.race([axios({
+      response = await Promise.race([
+        axios({
           data: { url, method, headers, body, contentType },
           url: proxyUrl,
           method: "POST",
-      }), waitForAbort(signal)]); 
+        }),
+        waitForAbort(signal),
+      ]);
     } else {
       try {
         let jsonHeader;
@@ -728,45 +777,52 @@ const makeHttpRequestV2 = async (
           headersObject["Content-Type"] = contentType;
         }
 
-        const axiosResponse = await Promise.race([axios({
-          method,
-          url,
-          data: requestData || {},
-          headers: { ...headersObject },
-          responseType: 'arraybuffer',
-          validateStatus: function (status) {
-            return true;
-          },
-        }), waitForAbort(signal)]);
+        const axiosResponse = await Promise.race([
+          axios({
+            method,
+            url,
+            data: requestData || {},
+            headers: { ...headersObject },
+            responseType: "arraybuffer",
+            validateStatus: function (status) {
+              return true;
+            },
+          }),
+          waitForAbort(signal),
+        ]);
         let responseData = "";
-        const responseContentType = axiosResponse.headers['content-type'] || '';
-        if(responseContentType.startsWith('image/')){
+        const responseContentType = axiosResponse.headers["content-type"] || "";
+        if (responseContentType.startsWith("image/")) {
           const base64 = btoa(
-            new Uint8Array(axiosResponse.data)
-              .reduce((data, byte) => data + String.fromCharCode(byte), '')
+            new Uint8Array(axiosResponse.data).reduce(
+              (data, byte) => data + String.fromCharCode(byte),
+              "",
+            ),
           );
-      
+
           responseData = `data:${contentType};base64,${base64}`;
 
           response = {
             data: {
               status: `${axiosResponse.status} ${axiosResponse.statusText || new StatusCode().getText(axiosResponse.status)}`,
               data: `${responseData}`,
-              headers: Object.fromEntries(Object.entries(axiosResponse.headers)),
+              headers: Object.fromEntries(
+                Object.entries(axiosResponse.headers),
+              ),
             },
           };
-        }else{
-          responseData = new TextDecoder('utf-8').decode(axiosResponse.data);
+        } else {
+          responseData = new TextDecoder("utf-8").decode(axiosResponse.data);
           response = {
             data: {
               status: `${axiosResponse.status} ${new StatusCode().getText(axiosResponse.status)}`,
               data: responseData,
-              headers: Object.fromEntries(Object.entries(axiosResponse.headers)),
+              headers: Object.fromEntries(
+                Object.entries(axiosResponse.headers),
+              ),
             },
           };
         }
-
-        
       } catch (axiosError: any) {
         if (signal?.aborted) {
           throw new Error();
@@ -1323,25 +1379,25 @@ const makeGraphQLRequest = async (
       });
     } else {
       let jsonHeader;
-        try {
-          jsonHeader = JSON.parse(_headers);
-        } catch (error) {
-          jsonHeader = [];
-        }
-        const headersObject = jsonHeader.reduce(
-          (
-            acc: Record<string, string>,
-            header: { key: string; value: string },
-          ) => {
-            acc[header.key] = header.value;
-            return acc;
-          },
-          {},
-        );
+      try {
+        jsonHeader = JSON.parse(_headers);
+      } catch (error) {
+        jsonHeader = [];
+      }
+      const headersObject = jsonHeader.reduce(
+        (
+          acc: Record<string, string>,
+          header: { key: string; value: string },
+        ) => {
+          acc[header.key] = header.value;
+          return acc;
+        },
+        {},
+      );
       const axiosResponse = await axios({
         method: "POST",
         url: _url,
-        headers: {...headersObject},
+        headers: { ...headersObject },
         data: { query: _query, variables: _variables || {} } || {},
       });
 
