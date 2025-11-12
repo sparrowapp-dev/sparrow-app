@@ -147,7 +147,7 @@
     handleTestDataDownloadDesktop,
     handleTestDataDownloadWeb,
   } from "../../testflow-dataset-explorer/utils";
-  import { importTestDateJsonTemplate } from "../utils";
+  import { importTestDateTemplate } from "../utils";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -2295,20 +2295,20 @@
 
   const handleExportSampleJSONTemplate = () => {
     if (isWebApp) {
-      const sampleData = importTestDateJsonTemplate;
+      const sampleData = importTestDateTemplate;
       handleTestDataDownloadWeb(sampleData, "JSON", "sample-template.json");
     } else {
-      const sampleData = importTestDateJsonTemplate;
+      const sampleData = importTestDateTemplate;
       handleTestDataDownloadDesktop(sampleData, "JSON", "sample-template.json");
     }
   };
 
   const handleExportSampleCSVTemplate = () => {
     if (isWebApp) {
-      const sampleData = importTestDateJsonTemplate;
+      const sampleData = importTestDateTemplate;
       handleTestDataDownloadWeb(sampleData, "CSV", "sample-template.csv");
     } else {
-      const sampleData = importTestDateJsonTemplate;
+      const sampleData = importTestDateTemplate;
       handleTestDataDownloadDesktop(sampleData, "CSV", "sample-template.csv");
     }
   };

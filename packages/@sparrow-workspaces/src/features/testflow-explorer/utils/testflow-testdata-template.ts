@@ -1,4 +1,4 @@
-export const importTestDateJsonTemplate = [
+export const importTestDateTemplate = [
   {
     name: "Enter name here",
     id: "Enter unique ID here",
