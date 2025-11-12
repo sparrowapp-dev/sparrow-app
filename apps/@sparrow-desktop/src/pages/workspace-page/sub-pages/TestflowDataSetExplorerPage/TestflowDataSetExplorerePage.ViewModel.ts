@@ -4,15 +4,11 @@ import { Observable, BehaviorSubject } from "rxjs";
 import type { Tab } from "@sparrow/common/types/workspace/tab";
 import { TestflowRepository } from "@app/repositories/testflow.repository";
 import { TabRepository } from "@app/repositories/tab.repository";
-import { get } from "svelte/store";
-import { updateTestflowDataSets } from "@sparrow/common/store";
+import { getDatasetById, updateTestflowDataSets } from "@sparrow/common/store";
 import { TestflowService } from "@app/services/testflow.service";
 import { WorkspaceRepository } from "@app/repositories/workspace.repository";
-
-export enum TabPersistenceTypeEnum {
-  PERMANENT = "permanent",
-  TEMPORARY = "temporary",
-}
+import { TabPersistenceTypeEnum } from "@sparrow/common/types/workspace/tab";
+import { notifications } from "@sparrow/library/ui";
 
 export class TestflowDataSetExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -57,18 +53,12 @@ export class TestflowDataSetExplorerPageViewModel {
     });
   };
 
-  public getWorkspaceById = async (workspaceId: string) => {
-    return await this.workspaceRepository.readWorkspace(workspaceId);
-  };
-
   public updateName = async (_name: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const trimmedName = _name.trim();
 
     if (trimmedName === "") {
-      const data = await this.getTestflowDataSetsById(
-        progressiveTab.path.testflowId,
-      );
+      const data = await getDatasetById(progressiveTab.path.testflowId);
       const matching = data._data?.datasets?.find(
         (d: any) => d.id === progressiveTab.id,
       );
@@ -76,14 +66,35 @@ export class TestflowDataSetExplorerPageViewModel {
     } else {
       progressiveTab.name = trimmedName;
     }
-
-    if (progressiveTab.name === this._tab.getValue().name) {
-      return;
-    }
-
     this.tab = progressiveTab;
     await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
     this.compareDatasetWithServer();
+  };
+
+  public saveTestflowDataset = async (_tab) => {
+    const currentDataset = _tab;
+    const response = await this.testflowService.renameTestDataSet(
+      currentDataset.path.testflowId,
+      currentDataset.id,
+      currentDataset.name,
+      currentDataset.path.workspaceId,
+    );
+    if (response) {
+      const datasets = response.data?.data.result;
+      updateTestflowDataSets(
+        currentDataset.path.testflowId as string,
+        datasets || [],
+      );
+      notifications.success(
+        `Changes saved for "${currentDataset.name}" test data.`,
+      );
+      return true;
+    } else {
+      notifications.error(
+        `Failed to save changes for "${currentDataset.name}"`,
+      );
+      return false;
+    }
   };
 
   /**
@@ -95,26 +106,21 @@ export class TestflowDataSetExplorerPageViewModel {
    * @example
    * const datasets = getTestflowDataSetsById(progressiveTab.id);
    */
-  private getTestflowDataSetsById = async (id: string | number): any => {
-    const progressiveTab = createDeepCopy(this._tab.getValue());
-    const testflowDataSetStore = await this.testflowRepository.readTestflow(
-      progressiveTab.path.testflowId,
-    );
-    const datasets = testflowDataSetStore.get(id);
-    return datasets || {};
-  };
+  // private getTestflowDataSetsById = async (id: string | number): any => {
+  //   const progressiveTab = createDeepCopy(this._tab.getValue());
+  //   const testflowDataSetStore = await this.testflowRepository.readTestflow(
+  //     progressiveTab.path.testflowId,
+  //   );
+  //   const datasets = testflowDataSetStore.get(id);
+  //   return datasets || {};
+  // };
 
   private compareDatasetWithServerDebounced = async () => {
     let result = true;
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    const currentItem = this.getTestflowDataSetsById(progressiveTab.id);
+    const currentItem = getDatasetById(progressiveTab.id);
     if (!currentItem) result = false;
-    // name
-    else if (currentItem.name != progressiveTab?.property?.name) {
-      result = false;
-    } else if (
-      currentItem.item !== progressiveTab?.property?.testflowDataSet?.item
-    ) {
+    else if (currentItem.name != progressiveTab?.name) {
       result = false;
     }
     // result
@@ -155,7 +161,10 @@ export class TestflowDataSetExplorerPageViewModel {
     );
     if (response?.isSuccessful) {
       const datasets = response.data?.data.result;
-      updateTestflowDataSets(progressiveTab.id as string, datasets || []);
+      updateTestflowDataSets(
+        progressiveTab.path.testflowId as string,
+        datasets || [],
+      );
       progressiveTab.name = updatedDataSetName;
       progressiveTab.isSaved = true;
       await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);

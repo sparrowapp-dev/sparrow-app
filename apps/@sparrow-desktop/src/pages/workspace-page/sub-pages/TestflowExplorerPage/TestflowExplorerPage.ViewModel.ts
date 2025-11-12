@@ -226,6 +226,13 @@ export class TestflowExplorerPageViewModel {
       progressiveTab?.path?.workspaceId,
     );
     if (response?.isSuccessful) {
+      const tabsIdsToDelete = [];
+      const mainTabId = await this.tabRepository.getTabById(testflowDataSetId);
+      if (mainTabId) tabsIdsToDelete.push(mainTabId.tabId);
+      await this.tabRepository.deleteTabsWithTabIdInAWorkspace(
+        progressiveTab.path.workspaceId,
+        tabsIdsToDelete,
+      );
       const datasets = response.data?.data.result;
       updateTestflowDataSets(progressiveTab.id as string, datasets || []);
     }
@@ -246,6 +253,12 @@ export class TestflowExplorerPageViewModel {
     if (response?.isSuccessful) {
       const datasets = response.data?.data.result;
       updateTestflowDataSets(progressiveTab.id as string, datasets || []);
+      const mainTab = await this.tabRepository.getTabById(testflowDataSetId);
+      if (mainTab) {
+        await this.tabRepository.updateTab(mainTab.tabId, {
+          name: updatedDataSetName,
+        });
+      }
     }
     return response;
   };

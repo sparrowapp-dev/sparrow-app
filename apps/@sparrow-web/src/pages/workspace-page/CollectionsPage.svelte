@@ -124,11 +124,13 @@
   import TestflowScheduleRVExplorerPage from "./sub-pages/TestflowScheduleRVExplorerPage.svelte/TestflowScheduleRVExplorerPage.svelte";
   import TestflowScheduleExplorerPage from "./sub-pages/TestflowScheduleExplorerPage/TestflowScheduleExplorerPage.svelte";
   import TestflowDataSetExplorerPage from "./sub-pages/TestflowDataSetExplorerPage/TestflowDataSetExplorerPage.svelte";
+  import { TestflowDataSetExplorerPageViewModel } from "@app/pages/workspace-page/sub-pages/TestflowDataSetExplorerPage/TestflowDataSetExplorerePage.ViewModel";
 
   const _viewModel = new CollectionsViewModel();
 
   const _viewModel2 = new EnvironmentViewModel();
   const _viewModel3 = new TestflowViewModel();
+  const _viewmodel4 = new TestflowDataSetExplorerPageViewModel();
 
   let currentWorkspace: Observable<WorkspaceDocument> =
     _viewModel.getActiveWorkspace();
@@ -281,6 +283,7 @@
         tab?.type === TabTypeEnum.WEB_SOCKET ||
         tab?.type === TabTypeEnum.ENVIRONMENT ||
         tab?.type === TabTypeEnum.TESTFLOW ||
+        tab?.type === TabTypeEnum.TESTFLOW_DATASET ||
         tab?.type === TabTypeEnum.SOCKET_IO ||
         tab?.type === TabTypeEnum.SAVED_REQUEST ||
         tab?.type === TabTypeEnum.MOCK_REQUEST ||
@@ -412,6 +415,7 @@
     if (
       removeTab.type === TabTypeEnum.ENVIRONMENT ||
       removeTab.type === TabTypeEnum.TESTFLOW ||
+      removeTab.type === TabTypeEnum.TESTFLOW_DATASET ||
       removeTab.type === TabTypeEnum.COLLECTION ||
       removeTab.type === TabTypeEnum.WORKSPACE
     ) {
@@ -427,6 +431,13 @@
           }
         } else if (removeTab.type === TabTypeEnum.TESTFLOW) {
           const res = await _viewModel3.saveTestflow(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+          }
+        } else if (removeTab.type === TabTypeEnum.TESTFLOW_DATASET) {
+          const res = await _viewmodel4.saveTestflowDataset(removeTab);
           if (res) {
             loader = false;
             _viewModel.handleRemoveTab(id);
