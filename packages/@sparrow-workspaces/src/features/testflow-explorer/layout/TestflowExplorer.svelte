@@ -3062,7 +3062,8 @@
               type={"secondary"}
               size={"small"}
               loader={$loadingState?.get("testdata-refresh-" + $tab?.id)}
-              disable={$loadingState?.get("testdata-refresh-" + $tab?.id)}
+              disable={$loadingState?.get("testdata-refresh-" + $tab?.id) ||
+                isGuestUser}
               onClick={async () => {
                 startLoading("testdata-refresh-" + $tab?.id);
                 await onFetchTestflowDataSets();
