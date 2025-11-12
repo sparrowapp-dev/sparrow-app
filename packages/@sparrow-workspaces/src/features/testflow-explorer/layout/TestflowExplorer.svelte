@@ -2691,7 +2691,7 @@
               {#if !(userRole === WorkspaceRole.WORKSPACE_VIEWER) && !isGuestUser}
                 <Tooltip
                   title={"Import Data"}
-                  subtext={`Accepted formats: JSON, CSV (max 10 MB).
+                  subtext={`Accepted formats: JSON, CSV (max 500 kb).
                   Ensure your file contains valid key–value pairs. 
                   The key refers to the variable declared in test flow nodes {{key}}.
                   Use Export Template for format reference.`}
