@@ -143,6 +143,11 @@
   import { isTeamDowngradePopupDismissed } from "../store";
   import TestDataRow from "../components/test-data-row/TestDataRow.svelte";
   import Papa from "papaparse";
+  import {
+    handleTestDataDownloadDesktop,
+    handleTestDataDownloadWeb,
+  } from "../../testflow-dataset-explorer/utils";
+  import { importTestDateTemplate } from "../utils";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -298,6 +303,7 @@
   // List to store collection documents and filtered collections
   let filteredCollections = writable<CollectionDto[]>([]);
   let runButtonMenu = false;
+  let importTemplateMenu = false;
   let importDropdownOpen = false;
   let importFileInput: HTMLInputElement | null = null;
   let importedFileContent: string | null = null;
@@ -2287,12 +2293,43 @@
     }
   }
 
+  const handleExportSampleJSONTemplate = () => {
+    if (isWebApp) {
+      const sampleData = importTestDateTemplate;
+      handleTestDataDownloadWeb(sampleData, "JSON", "sample-template.json");
+    } else {
+      const sampleData = importTestDateTemplate;
+      handleTestDataDownloadDesktop(sampleData, "JSON", "sample-template.json");
+    }
+  };
+
+  const handleExportSampleCSVTemplate = () => {
+    if (isWebApp) {
+      const sampleData = importTestDateTemplate;
+      handleTestDataDownloadWeb(sampleData, "CSV", "sample-template.csv");
+    } else {
+      const sampleData = importTestDateTemplate;
+      handleTestDataDownloadDesktop(sampleData, "CSV", "sample-template.csv");
+    }
+  };
+
   // Updated handleImportFileChange function - shows table from response
   const handleImportFileChange = async (event: Event) => {
     const input = event.target as HTMLInputElement;
     const file = input?.files?.[0];
     if (!file) return;
     const fileExtension = file.name.match(/\.(json|csv)$/i)?.[1]?.toLowerCase();
+    // Validate file size - must not exceed 500KB
+    const MAX_FILE_SIZE_KB = 500;
+    const fileSizeKB = file.size / 1024;
+
+    if (fileSizeKB > MAX_FILE_SIZE_KB) {
+      notifications.error(
+        `File size exceeds the maximum limit of ${MAX_FILE_SIZE_KB}KB.`,
+      );
+      input.value = "";
+      return;
+    }
     if (!fileExtension) {
       notifications.error(
         "Failed to import. Please select a valid JSON or CSV file.",
@@ -2368,9 +2405,9 @@
         };
         isDuplicateModalOpen = true;
         resetImportState();
-      } else {
+      } else if (response?.data?.message) {
         resetImportState();
-        notifications.error("Failed to import Data. Please try again.");
+        notifications.error(response?.data?.message);
       }
     } catch (err) {
       resetImportState();
@@ -2653,10 +2690,15 @@
               />
               {#if !(userRole === WorkspaceRole.WORKSPACE_VIEWER) && !isGuestUser}
                 <Tooltip
-                  title={"Only JSON or CSV files are supported"}
-                  placement={"top-center"}
+                  title={"Import Data"}
+                  subtext={`Accepted formats: JSON, CSV (max 500 kb).
+                  Ensure your file contains valid key–value pairs. 
+                  The key refers to the variable declared in test flow nodes {{key}}.
+                  Use Export Template for format reference.`}
+                  placement={"bottom-left"}
                   distance={12}
                   show={!runButtonMenu}
+                  size="medium"
                   zIndex={10}
                 >
                   <Button
@@ -2669,6 +2711,42 @@
                 </Tooltip>
               {/if}
             </div>
+            <Dropdown
+              zIndex={600}
+              buttonId="export-template-button"
+              isBackgroundClickable={true}
+              bind:isMenuOpen={importTemplateMenu}
+              horizontalPosition={"left"}
+              minWidth={185}
+              options={[
+                {
+                  name: "Export JSON Template",
+                  icon: ArrowDownloadRegular,
+                  iconColor: "var(--icon-secondary-130)",
+                  iconSize: "13px",
+                  onclick: handleExportSampleJSONTemplate,
+                },
+                {
+                  name: "Export CSV Template",
+                  icon: ArrowDownloadRegular,
+                  iconColor: "var(--icon-secondary-130)",
+                  iconSize: "13px",
+                  onclick: handleExportSampleCSVTemplate,
+                },
+              ]}
+            >
+              <Button
+                type="secondary"
+                id="export-template-button"
+                size={"medium"}
+                startIcon={importTemplateMenu
+                  ? ChevronUpRegular
+                  : ChevronDownRegular}
+                onClick={() => {
+                  importTemplateMenu = !importTemplateMenu;
+                }}
+              />
+            </Dropdown>
           {/if}
         </div>
 
@@ -3571,7 +3649,7 @@
             </div>
           </div>
           <div class="pagination-footer">
-            {#if data?.length > 0}
+            {#if data?.length > 10}
               <Pagination
                 currentPage={currentTestDataPreviewPage}
                 itemsPerPage={testDataPreviewItemsPerPage}
