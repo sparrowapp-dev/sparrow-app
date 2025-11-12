@@ -43,3 +43,4 @@ export { InitTestflowScheduleRunViewTab } from "./init-testflow-schedule-run-vie
 export { TimeISOExtractor } from "./extractTimefromISO";
 export { FormatDays } from "./formatDays";
 export { FormatCurl } from "./formatCurl";
+export { FormatCount } from "./formatCount";
