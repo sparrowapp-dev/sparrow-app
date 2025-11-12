@@ -2319,6 +2319,17 @@
     const file = input?.files?.[0];
     if (!file) return;
     const fileExtension = file.name.match(/\.(json|csv)$/i)?.[1]?.toLowerCase();
+    // Validate file size - must not exceed 500KB
+    const MAX_FILE_SIZE_KB = 500;
+    const fileSizeKB = file.size / 1024;
+
+    if (fileSizeKB > MAX_FILE_SIZE_KB) {
+      notifications.error(
+        `File size exceeds the maximum limit of ${MAX_FILE_SIZE_KB}KB.`,
+      );
+      input.value = "";
+      return;
+    }
     if (!fileExtension) {
       notifications.error(
         "Failed to import. Please select a valid JSON or CSV file.",
