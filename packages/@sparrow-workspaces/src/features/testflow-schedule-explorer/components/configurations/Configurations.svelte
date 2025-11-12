@@ -240,6 +240,7 @@
         days: [...days],
         notificationEmails: [...notificationEmails],
         receiveNotifications,
+        selectedTestData,
       };
     }
   });
