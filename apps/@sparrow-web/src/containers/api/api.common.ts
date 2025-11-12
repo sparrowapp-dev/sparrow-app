@@ -328,7 +328,7 @@ const disconnectWebSocket = async (tab_id: string) => {
  * Ensures the URL has the correct WebSocket protocol.
  * - If the URL starts with "http://" or "https://", it is converted to "ws://" or "wss://".
  * - If the URL already starts with "ws://" or "wss://", it is returned as is.
- * - If the URL has no protocol, "ws://" is prepended.
+ * - If the URL has no protocol, it uses "wss://" if the page is served over HTTPS, otherwise "ws://".
  * @param url - The input URL string.
  * @returns The URL with the correct WebSocket protocol.
  */
@@ -342,7 +342,11 @@ const ensureWebSocketProtocol = (url: string): string => {
   if (url.startsWith("http://")) {
     return "ws://" + url.slice(7);
   }
-  return "ws://" + url;
+
+  // For schemaless URLs, check if the current page is served over HTTPS
+  // If so, use wss:// to avoid mixed content errors, otherwise use ws://
+  const isSecure = window.location.protocol === "https:";
+  return (isSecure ? "wss://" : "ws://") + url;
 };
 
 /**
