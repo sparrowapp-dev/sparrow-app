@@ -36,7 +36,10 @@
   import { open } from "@tauri-apps/plugin-shell";
   import { PlanUpgradeModal } from "@sparrow/common/components";
   import { navigate } from "svelte-navigator";
-  import {isTeamDowngradePopupDismissed, setTeamDowngradePopupDismissed} from "@sparrow/workspaces/stores"
+  import {
+    isTeamDowngradePopupDismissed,
+    setTeamDowngradePopupDismissed,
+  } from "@sparrow/workspaces/stores";
 
   export let isWebApp = false;
 
@@ -151,10 +154,10 @@
   let userLimits: any;
   let planContent: any;
   let isTeamDowngraded: boolean | undefined;
-  let planName: string
+  let planName: string;
   let selectedFilter = "All";
-  let hubId: string
-  $: hubId = openTeam?.teamId
+  let hubId: string;
+  $: hubId = openTeam?.teamId;
   $: planName = openTeam?._data?.plan?.name;
   const addButtonData = [
     {
@@ -696,10 +699,7 @@
                   <AlertOnIcon />
                 </div>
                 <p class="downgrade-title">Your Hub Has Been Downgraded</p>
-                <button
-                  class="downgrade-close"
-                  on:click={handleClosePopup}
-                >
+                <button class="downgrade-close" on:click={handleClosePopup}>
                   ✕
                 </button>
               </div>

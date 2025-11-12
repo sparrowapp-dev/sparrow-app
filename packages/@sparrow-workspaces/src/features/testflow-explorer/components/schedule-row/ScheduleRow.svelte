@@ -71,6 +71,7 @@
   let deleteLoader = false;
 
   $: isDeletedEnvironment = schedule?.isDeletedEnvironment || false;
+  $: isDeletedTestData = schedule?.isDeletedTestData || false;
 
   // Handle environment click
   const handleEnvironmentClick = () => {
@@ -270,6 +271,28 @@
       </span>
     {/if}
   </td>
+  <!-- Test Data Column - UPDATE THIS -->
+  <td>
+    {#if isDeletedTestData}
+      <Tooltip
+        title="Selected test data was removed and may impact the  run results."
+        placement="bottom-left"
+        size="small"
+      >
+        <span class="text-fs-12" style="color: var(--text-ds-neutral-500);"
+          >{schedule.testflowDataSetName}</span
+        ><WarningIconNew />
+      </Tooltip>
+    {:else if schedule.testflowDataSetName && schedule.testflowDataSetName.toLowerCase() !== "none"}
+      <span class="text-fs-12" style="color: var(--text-ds-neutral-50);">
+        {schedule.testflowDataSetName}
+      </span>
+    {:else}
+      <span class="text-fs-12" style="color: var(--text-ds-neutral-300);">
+        None
+      </span>
+    {/if}
+  </td>
   <td>
     <Tooltip
       title={getNextRunTooltip(schedule)}
@@ -287,6 +310,14 @@
     {:else if schedule.lastResult === "Success"}
       <Tag text="Success" type={getTagType("Success")} />
     {:else if schedule.lastResult === "Fail"}
+      <Tooltip
+        title={getFailTooltip(schedule)}
+        placement="bottom-center"
+        size="small"
+      >
+        <Tag text="Failed" type={getTagType("Failed")} />
+      </Tooltip>
+    {:else if schedule.lastResult === "Partial Fail"}
       <Tooltip
         title={getFailTooltip(schedule)}
         placement="bottom-center"

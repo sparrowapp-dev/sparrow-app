@@ -13,6 +13,7 @@ import type { MockHistoryWrapper } from "./mock-history-tab";
 import type { HubWrapper } from "./hub-tab";
 import type { TestflowScheduleWrapperTabInterface } from "./testflow-schedule-tab";
 import type { TestflowScheduleRunViewWrapperTabInterface } from "./testflow-schedule-run-view-tab";
+import type { TestflowDataSetWrapperTabInterface } from "./testflow-dateset-tab";
 
 export enum TabTypeEnum {
   FOLDER = "FOLDER",
@@ -31,6 +32,7 @@ export enum TabTypeEnum {
   MOCK_HISTORY = "MOCK_HISTORY",
   TESTFLOW_SCHEDULE = "TESTFLOW_SCHEDULE",
   TESTFLOW_SCHEDULE_RUN_VIEW = "TESTFLOW_SCHEDULE_RUN_VIEW",
+  TESTFLOW_DATASET = "TESTFLOW_DATASET",
   HUB = "HUB",
 }
 
@@ -127,6 +129,7 @@ export interface Property
     Partial<HttpRequestMockWrapperTabInterface>,
     Partial<HttpRequestSavedWrapperTabInterface>,
     Partial<TestflowScheduleWrapperTabInterface>,
+    Partial<TestflowDataSetWrapperTabInterface>,
     Partial<TestflowScheduleRunViewWrapperTabInterface>,
     Partial<AiRequestWrapper>,
     Partial<HubWrapper> {}
