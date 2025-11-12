@@ -25,6 +25,7 @@
   export let handleToggleStatus;
   export let getNextRunTooltip;
   export let getTagType;
+  export let onOpenDataset;
 
   function getFailTooltip(schedule) {
     const runHistory = schedule.originalData?.schedularRunHistory;
@@ -284,9 +285,22 @@
         ><WarningIconNew />
       </Tooltip>
     {:else if schedule.testflowDataSetName && schedule.testflowDataSetName.toLowerCase() !== "none"}
-      <span class="text-fs-12" style="color: var(--text-ds-neutral-50);">
-        {schedule.testflowDataSetName}
-      </span>
+      <div class="environment-link">
+        <Button
+          title={schedule?.testflowDataSetName?.length > 30
+            ? schedule?.testflowDataSetName?.slice(0, 30) + "..."
+            : schedule?.testflowDataSetName || ""}
+          type="link-primary"
+          size="extra-small"
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            if (onOpenDataset) {
+              onOpenDataset(schedule?.testflowDataSet);
+            }
+          }}
+        />
+      </div>
     {:else}
       <span class="text-fs-12" style="color: var(--text-ds-neutral-300);">
         None

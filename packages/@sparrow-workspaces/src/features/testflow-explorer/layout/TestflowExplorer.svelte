@@ -545,6 +545,7 @@
     let environmentData = null;
     let testflowDataSetName = "None";
     let isDeletedTestData = false;
+    let testflowDataSet = null;
 
     if (
       schedule.testflowDataSetId &&
@@ -557,6 +558,7 @@
       if (dataset) {
         testflowDataSetName = dataset.name;
         isDeletedTestData = false;
+        testflowDataSet = dataset;
       } else {
         // Dataset not found in current list → might be deleted
         testflowDataSetName =
@@ -595,6 +597,7 @@
       isDeletedEnvironment: isDeletedEnvironment,
       testflowDataSetName: testflowDataSetName,
       isDeletedTestData: isDeletedTestData,
+      testflowDataSet: testflowDataSet,
     };
   }
 
@@ -3007,6 +3010,7 @@
                     {onOpenTestflowScheduleConfigurationsTab}
                     {onOpenTestflowScheduleTab}
                     {onOpenEnvironment}
+                    onOpenDataset={openTestflowDataSetTab}
                   />
                 {/each}
               </tbody>
