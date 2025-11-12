@@ -457,6 +457,7 @@
       days = [...initialFormData.days];
       notificationEmails = [...initialFormData.notificationEmails];
       receiveNotifications = initialFormData.receiveNotifications;
+      selectedTestData=initialFormData.selectedTestData;
       updateScheduleRealtime();
     }
   };
