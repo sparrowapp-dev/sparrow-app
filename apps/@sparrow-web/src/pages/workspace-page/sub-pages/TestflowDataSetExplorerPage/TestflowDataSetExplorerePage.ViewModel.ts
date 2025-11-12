@@ -64,6 +64,10 @@ export class TestflowDataSetExplorerPageViewModel {
     });
   };
 
+  public getWorkspaceById = async (workspaceId: string) => {
+    return await this.workspaceRepository.readWorkspace(workspaceId);
+  };
+
   public saveTestflowDataset = async (_tab) => {
     const currentDataset = _tab;
     const response = await this.testflowService.renameTestDataSet(

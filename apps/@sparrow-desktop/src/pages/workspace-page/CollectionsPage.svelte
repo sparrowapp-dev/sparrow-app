@@ -129,7 +129,6 @@
 
   const _viewModel2 = new EnvironmentViewModel();
   const _viewModel3 = new TestflowViewModel();
-  const _viewmodel4 = new TestflowDataSetExplorerPageViewModel();
 
   let currentWorkspace: Observable<WorkspaceDocument> =
     _viewModel.getActiveWorkspace();
@@ -414,7 +413,7 @@
             isPopupClosed = false;
           }
         } else if (removeTab.type === TabTypeEnum.TESTFLOW_DATASET) {
-          const res = await _viewmodel4.saveTestflowDataset(removeTab);
+          const res = await _viewModel3.saveTestflowDataset(removeTab);
           if (res) {
             loader = false;
             _viewModel.handleRemoveTab(id);
