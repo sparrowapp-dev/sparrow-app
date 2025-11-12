@@ -240,6 +240,7 @@
         days: [...days],
         notificationEmails: [...notificationEmails],
         receiveNotifications,
+        selectedTestData,
       };
     }
   });
@@ -430,6 +431,7 @@
           days: [...days],
           notificationEmails: [...notificationEmails],
           receiveNotifications,
+          selectedTestData,
         };
       } else {
         console.error("Failed to save schedule:", result?.error);
@@ -455,6 +457,7 @@
       days = [...initialFormData.days];
       notificationEmails = [...initialFormData.notificationEmails];
       receiveNotifications = initialFormData.receiveNotifications;
+      selectedTestData=initialFormData.selectedTestData;
       updateScheduleRealtime();
     }
   };
@@ -770,13 +773,15 @@
           zIndex={10}
         />
         <div class="preview-button">
-          <Button
-            title="Preview File"
-            type="link-primary"
-            size="small"
-            onClick={handlePreviewTestData}
-            buttonClassProp="mt-2"
-          />
+          {#if selectedTestData && selectedTestData !== "none"}
+            <Button
+              title="Preview File"
+              type="link-primary"
+              size="small"
+              onClick={handlePreviewTestData}
+              buttonClassProp="mt-2"
+            />
+          {/if}
         </div>
       </div>
       <div

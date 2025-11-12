@@ -435,6 +435,8 @@ class MockHistoryExplorerPage {
         runConfiguration:
           progressiveTab.property.testflowSchedule.runConfiguration,
         notification: progressiveTab.property.testflowSchedule.notification,
+        testflowDataSetId:
+          progressiveTab.property.testflowSchedule.testflowDataSetId,
       };
 
       // Send to server
@@ -545,6 +547,14 @@ class MockHistoryExplorerPage {
           ...progressiveTab.property.testflowSchedule.notification,
           ...updatedSchedule.notification,
         };
+      }
+    }
+
+    // Update testflowDataSetId if provided
+    if (updatedSchedule.testflowDataSetId !== undefined) {
+      if (progressiveTab.property.testflowSchedule) {
+        progressiveTab.property.testflowSchedule.testflowDataSetId =
+          updatedSchedule.testflowDataSetId;
       }
     }
 
