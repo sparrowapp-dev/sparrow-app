@@ -164,7 +164,6 @@
         placeholder="Enter dataset name"
         disabled={isWorkspaceViewer}
         on:input={() => handleTestDataHeadingChange(testDataName)}
-        on:blur={() => handleTestDataHeadingChange(testDataName)}
       />
 
       <div class="d-flex gap-2">
