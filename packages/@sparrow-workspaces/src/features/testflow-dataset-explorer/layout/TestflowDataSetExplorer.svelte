@@ -120,31 +120,7 @@
   };
 
   function handleRowClick(row: any, rowIndex: number) {
-    console.log("Row clicked:", row);
-    console.log("Row index:", startItem + rowIndex);
     // Handle row click - navigate or open details
-  }
-
-  function goToFirstPage() {
-    currentPage = 1;
-  }
-
-  function goToPreviousPage() {
-    if (currentPage > 1) currentPage--;
-  }
-
-  function goToNextPage() {
-    if (currentPage < totalPages) currentPage++;
-  }
-
-  function goToLastPage() {
-    currentPage = totalPages;
-  }
-
-  function changeItemsPerPage(event: Event) {
-    const select = event.target as HTMLSelectElement;
-    itemsPerPage = parseInt(select.value);
-    currentPage = 1; // Reset to first page
   }
 
   // Format value for display
