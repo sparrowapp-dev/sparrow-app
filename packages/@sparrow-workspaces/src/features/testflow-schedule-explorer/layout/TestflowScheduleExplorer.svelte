@@ -9,6 +9,7 @@
   import { Configurations, TestResults } from "../components";
   import {
     ArrowClockWiseRegular,
+    DocumentRegular,
     FlowChartRegular,
     LayerRegular,
   } from "@sparrow/library/icons";
@@ -41,6 +42,10 @@
   export let onSaveSchedule;
   export let userRole;
   export let onValidateTestflowRun;
+  export let testflowDataSetStore;
+  export let onOpenTestDataPreview;
+  export let openTestflowDataSetTab;
+  export let onDeleteTestflowScheduleTestDataHistory;
 
   let scheduleRunValidateData: {
     hasLocalhostUrls?: boolean;
@@ -165,7 +170,7 @@
               size="small"
             >
               <Button
-              title={"Run Now"}
+                title={"Run Now"}
                 type={"primary"}
                 loader={$loadingState.get("schedule-run-" + schedule?.id)}
                 disable={$loadingState.get("schedule-run-" + schedule?.id)}
@@ -233,6 +238,29 @@
             />
           </div>
         {/if}
+        {#if schedule?.testflowDataSetId}
+          {#if testflowDataSetStore}
+            {#each testflowDataSetStore as dataSet}
+              {#if dataSet.id === schedule.testflowDataSetId}
+                <div class="d-flex gap-2 align-items-center">
+                  <span
+                    class="dot"
+                    style="transform: translateX(12px) translateY(2px);"
+                  ></span>
+                  <Button
+                    title={dataSet.name?.length > 30
+                      ? dataSet.name.slice(0, 30) + "..."
+                      : dataSet.name}
+                    startIcon={DocumentRegular}
+                    type={"link-secondary"}
+                    size={"extra-small"}
+                    onClick={() => openTestflowDataSetTab(dataSet)}
+                  />
+                </div>
+              {/if}
+            {/each}
+          {/if}
+        {/if}
         {#if description}
           <div class="d-flex gap-2 align-items-center pt-1">
             <span class="dot"></span>
@@ -259,6 +287,7 @@
             {onScheduleRunview}
             {onDeleteTestflowScheduleHistory}
             {isTestflowScheduleEditable}
+            {onDeleteTestflowScheduleTestDataHistory}
           />
         {:else if $tab?.property?.testflowSchedule?.state?.scheduleNavigator === TestflowScheduleNavigatorEnum.CONFIGURATION}
           <Configurations
@@ -269,6 +298,12 @@
             {onSaveSchedule}
             isSaved={$tab?.isSaved}
             {userRole}
+            testDataFiles={testflowDataSetStore?.map((dataset) => ({
+              id: dataset.id,
+              name: dataset.name,
+              ...dataset,
+            })) || []}
+            onPreviewTestData={onOpenTestDataPreview}
           />
         {/if}
       </div>

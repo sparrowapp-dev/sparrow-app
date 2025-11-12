@@ -48,17 +48,16 @@ class InitTestflowScheduleRunViewTab {
             },
           ],
           edges: [],
-          result: {
-            failedRequests: 0,
-            successRequests: 0,
-            totalTime: "0ms",
-            status: "IDLE",
-            requests: [],
-            response: [],
+          results: [],
+          selectedDataset: {
+            id: "",
+            name: "",
+            formatType: "",
+            fileSize: "",
           },
-          isScheduled:false,
-          scheduleName:"",
-          lastestExecuted:"",
+          isScheduled: false,
+          scheduleName: "",
+          lastestExecuted: "",
         },
       },
       path: {
@@ -66,7 +65,7 @@ class InitTestflowScheduleRunViewTab {
         collectionId: "",
         folderId: "",
         testflowId: "",
-        testflowScheduleId: ""
+        testflowScheduleId: "",
       },
       isSaved: true,
       index: 0,
@@ -99,31 +98,35 @@ class InitTestflowScheduleRunViewTab {
       ..._path,
     };
   }
+
   public updateActiveSync(_activeSync: boolean) {
     this._tab.activeSync = _activeSync;
   }
+
   public updateIsSave(_isSave: boolean) {
     this._tab.isSaved = _isSave;
   }
+
   public setName(_name: string) {
     this._tab.name = _name;
   }
 
-  public setScheduleName(_scheduleName:string){
+  public setScheduleName(_scheduleName: string) {
     if (this._tab?.property?.testflowScheduleRunView) {
       this._tab.property.testflowScheduleRunView.scheduleName = _scheduleName;
     }
   }
 
-  public setIsScheduled(_isScheduled:boolean){
+  public setIsScheduled(_isScheduled: boolean) {
     if (this._tab?.property?.testflowScheduleRunView) {
       this._tab.property.testflowScheduleRunView.isScheduled = _isScheduled;
     }
   }
 
-  public setLastestTime(_lastedExecuted:string){
+  public setLastestTime(_lastedExecuted: string) {
     if (this._tab?.property?.testflowScheduleRunView) {
-      this._tab.property.testflowScheduleRunView.lastestExecuted = _lastedExecuted;
+      this._tab.property.testflowScheduleRunView.lastestExecuted =
+        _lastedExecuted;
     }
   }
 
@@ -132,18 +135,35 @@ class InitTestflowScheduleRunViewTab {
       this._tab.property.testflowScheduleRunView.nodes = _nodes;
     }
   }
+
   public setEdges(_edges: TFTabEdgeType[]) {
     if (this._tab?.property?.testflowScheduleRunView?.edges) {
       this._tab.property.testflowScheduleRunView.edges = _edges;
     }
   }
-  public setResult(_result:TestFlowScheduleRunResult){
-    if (this._tab?.property?.testflowScheduleRunView?.edges) {
-      this._tab.property.testflowScheduleRunView.result = _result;
+
+  // CHANGED: Updated to handle results array instead of single result
+  public setResults(_results: TestFlowScheduleRunResult[]) {
+    if (this._tab?.property?.testflowScheduleRunView) {
+      this._tab.property.testflowScheduleRunView.results = _results;
+    }
+  }
+
+  public setSelectedDataset(_dataset: {
+    id: string;
+    name: string;
+    formatType?: string;
+    fileSize?: string;
+  }) {
+    if (this._tab?.property?.testflowScheduleRunView) {
+      this._tab.property.testflowScheduleRunView.selectedDataset = {
+        id: _dataset.id,
+        name: _dataset.name,
+        formatType: _dataset.formatType || "",
+        fileSize: _dataset.fileSize || "",
+      };
     }
   }
 }
-
-
 
 export { InitTestflowScheduleRunViewTab };

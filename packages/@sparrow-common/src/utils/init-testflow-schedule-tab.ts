@@ -41,6 +41,7 @@ class InitTestflowScheduleTab {
             intervalHours: 1,
             days: [],
           },
+          testflowDataSetId: "",
           notification: {
             emails: [],
             receiveNotifications: "failure",
@@ -146,6 +147,14 @@ class InitTestflowScheduleTab {
   public updateNotificationEmails(_emails: string[]) {
     if (this._tab.property.testflowSchedule?.notification) {
       this._tab.property.testflowSchedule.notification.emails = _emails;
+    }
+    return this;
+  }
+
+  public updateTestflowDataSetId(_testflowDataSetId: string) {
+    if (this._tab.property.testflowSchedule) {
+      this._tab.property.testflowSchedule.testflowDataSetId =
+        _testflowDataSetId;
     }
     return this;
   }

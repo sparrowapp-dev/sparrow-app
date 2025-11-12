@@ -33,9 +33,10 @@
     TFDataStoreType,
     TFNodeStoreType,
   } from "@sparrow/common/types/workspace/testflow";
-  import type { Unsubscriber } from "svelte/store";
+  import { get, type Unsubscriber } from "svelte/store";
   import { Button } from "@sparrow/library/ui";
   import { currentStep, isTestFlowTourGuideOpen } from "../../../../stores";
+  import { testflowDataSetIndex } from "../../store";
 
   /**
    * The data object containing various handlers and data stores.
@@ -122,6 +123,34 @@
     );
   };
 
+  const setCurrentBlockFromDataset = () => {
+    const index = get(testflowDataSetIndex);
+    const current = data?.currentItem;
+    if (!current || !current.request || !current.response) return null;
+    // Fetch request/response per index safely
+    const request = Array.isArray(current.request)
+      ? (current.request[index] ?? current.request[current.request.length - 1])
+      : current.request;
+    const response = Array.isArray(current.response)
+      ? (current.response[index] ??
+        current.response[current.response.length - 1])
+      : current.response;
+
+    return {
+      id: current.id,
+      request,
+      response,
+    };
+  };
+
+  // Reactively update currentBlock based on currentItem + dataset index
+  $: if (data?.currentItem && $testflowDataSetIndex !== undefined) {
+    const datasetBlock = setCurrentBlockFromDataset();
+    if (datasetBlock) {
+      currentBlock = datasetBlock;
+    }
+  }
+
   /**
    * Testflow store subscriber to get current node status
    */
@@ -138,10 +167,10 @@
           }
         });
       } else {
-        currentBlock = data.currentItem;
+        currentBlock = setCurrentBlockFromDataset();
       }
     } else {
-      currentBlock = data.currentItem;
+      currentBlock = setCurrentBlockFromDataset();
     }
   });
 
@@ -273,7 +302,7 @@
 
 <div
   class="request-block position-relative"
-  style={selected && !currentBlock?.response.status
+  style={selected && !currentBlock?.response?.status
     ? "outline: 1px solid var(--border-ds-primary-300);"
     : (selected && currentBlock && checkIfRequestSucceed(currentBlock)) ||
         ($currentStep > 6 && $isTestFlowTourGuideOpen)

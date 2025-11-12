@@ -10,7 +10,7 @@
     SvelteFlowProvider,
   } from "@xyflow/svelte";
 
-  import { notifications, Tag } from "@sparrow/library/ui";
+  import { Loader, notifications, Tag } from "@sparrow/library/ui";
 
   import {
     StartBlock,
@@ -54,6 +54,9 @@
     ArrowClockWiseRegular,
     AlertOnIcon,
     DismissRegular,
+    ExpandIcon,
+    DocumentRegular,
+    ArrowExpandRegular,
   } from "@sparrow/library/icons";
 
   import "@xyflow/svelte/dist/style.css";
@@ -68,6 +71,8 @@
     RunIcon,
     StopFilled,
     Clock,
+    ArrowUploadFilled,
+    ArrowDownloadRegular,
   } from "@sparrow/library/icons";
   import { Button, Modal, Dropdown } from "@sparrow/library/ui";
   import { BroomRegular } from "@sparrow/library/icons";
@@ -136,6 +141,8 @@
     loadingState,
   } from "@sparrow/common/store";
   import { isTeamDowngradePopupDismissed } from "../store";
+  import TestDataRow from "../components/test-data-row/TestDataRow.svelte";
+  import Papa from "papaparse";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -189,11 +196,30 @@
   export let testflowScheduleStore = [];
 
   export let onPerformTestflowScheduleOperations;
+  export let onPerformTestDataSetOperations;
   export let onOpenTestflowScheduleConfigurationsTab;
   export let isCreateTestflowScheduleLimitReachedModalOpen;
   export let onFetchTestflow;
   export let isTeamDowngraded: boolean = false;
   export let teamPlanName;
+  export let testflowDataSetStore = [];
+  export let onFetchTestflowDataSets;
+  export let importTestflowDataSet: (
+    dataSet: any,
+    dataSetType: string,
+    name: string,
+  ) => Promise<void>;
+  export let importTestflowDataSetFileChange: (
+    dataSet: any,
+    dataSetType: string,
+    name: string,
+  ) => Promise<void>;
+  export let updateDatasetByName: (
+    dataSet: any,
+    dataSetType: string,
+    name: string,
+  ) => Promise<void>;
+  export let openTestflowDataSetTab: (dataSet: any) => void;
 
   export let onUpdateScheduleStatus: (
     scheduleId: string,
@@ -205,6 +231,7 @@
   let planContent: any;
   let planContentNonActive: any;
   let selectedAuthHeader: any;
+  let datasetId: string;
 
   const checkRequestExistInNode = (_id: string) => {
     let result = false;
@@ -270,6 +297,27 @@
   let blockName = `Block ${nodesValue}`;
   // List to store collection documents and filtered collections
   let filteredCollections = writable<CollectionDto[]>([]);
+  let runButtonMenu = false;
+  let importDropdownOpen = false;
+  let importFileInput: HTMLInputElement | null = null;
+  let importedFileContent: string | null = null;
+  let importedFileName: string | null = null;
+  let importFileFormatType: string | null = null;
+  let selectedCellContent: string | null = null;
+  let cellModalPosition = { x: 0, y: 0 };
+  let isImporting = false;
+  let isImportLoadingModalOpen = false;
+  let isImportCancelled = false;
+  let isDuplicateModalOpen = false;
+  let pendingImportData: {
+    jsonData: Record<string, any>[];
+    fileType: "json" | "csv";
+    fileName: string;
+    formatType: string;
+    wrappedData: { dataSet: Record<string, any>[] };
+  } | null = null;
+  let datasetContent;
+  let activeMenuId: string | null = null;
 
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
@@ -304,6 +352,7 @@
   let hasActiveSchedules = true; // This should come from your data
   let searchQuery = "";
   let filteredSchedules = [];
+  let filteredTestData = [];
 
   function mapScheduleData(schedule) {
     // Determine status based on isActive and executeAt
@@ -356,23 +405,18 @@
         // Once: use executeAt directly
         nextRunDate = new Date(config.executeAt);
       } else if (config.runCycle === "hourly" && config.intervalHours) {
-        // Handle hourly schedules specifically
-        if (config.executeAt) {
-          const executeAt = new Date(config.executeAt);
-
-          if (executeAt > now) {
-            nextRunDate = executeAt;
-          } else {
-            const intervalMs = config.intervalHours * 60 * 60 * 1000;
-            const timeSinceStart = now - executeAt;
-            const cyclesPassed = Math.floor(timeSinceStart / intervalMs);
-            nextRunDate = new Date(
-              executeAt.getTime() + (cyclesPassed + 1) * intervalMs,
-            );
-          }
+        const intervalMs = config.intervalHours * 60 * 60 * 1000;
+        const createdAt =
+          schedule.originalData?.createdAt || schedule.createdAt;
+        if (createdAt) {
+          const anchorTime = new Date(createdAt);
+          const timeSinceStart = now.getTime() - anchorTime.getTime();
+          const cyclesPassed = Math.floor(timeSinceStart / intervalMs);
+          nextRunDate = new Date(
+            anchorTime.getTime() + (cyclesPassed + 1) * intervalMs,
+          );
         } else {
-          // For hourly
-          const intervalMs = config.intervalHours * 60 * 60 * 1000;
+          // Fallback if no creation time available
           nextRunDate = new Date(now.getTime() + intervalMs);
         }
       } else if (config.runCycle === "daily" && config.time) {
@@ -493,6 +537,27 @@
     let environment = "None";
     let isDeletedEnvironment = false;
     let environmentData = null;
+    let testflowDataSetName = "None";
+    let isDeletedTestData = false;
+
+    if (
+      schedule.testflowDataSetId &&
+      schedule.testflowDataSetId.trim() !== ""
+    ) {
+      // Find the dataset in testflowDataSetStore
+      const dataset = testflowDataSetStore?.find(
+        (ds) => ds.id === schedule.testflowDataSetId,
+      );
+      if (dataset) {
+        testflowDataSetName = dataset.name;
+        isDeletedTestData = false;
+      } else {
+        // Dataset not found in current list → might be deleted
+        testflowDataSetName =
+          schedule?.testflowDataSetName || "Deleted Dataset";
+        isDeletedTestData = true;
+      }
+    }
 
     if (schedule.environmentId && schedule.environmentId.trim() !== "") {
       // Find environment by ID in the environments array
@@ -522,6 +587,34 @@
       isActive: schedule.isActive,
       originalData: schedule,
       isDeletedEnvironment: isDeletedEnvironment,
+      testflowDataSetName: testflowDataSetName,
+      isDeletedTestData: isDeletedTestData,
+    };
+  }
+
+  function mapTestDataRow(ds) {
+    // ds: a dataset object from testflowDataSetStore (see your sample structure)
+    return {
+      id: ds.id,
+      name: ds.name || "Untitled",
+      formatType: ds.formatType || "-",
+      fileSize: ds.fileSize || "-",
+      lastUpdated: ds.createdAt
+        ? new Date(ds.createdAt).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          }) +
+          " " +
+          new Date(ds.createdAt).toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+          })
+        : "-",
+      originalData: ds,
+      createdBy: ds.createdBy || "",
+      // Add more fields if needed for actions/menus
     };
   }
 
@@ -541,10 +634,36 @@
     }
   }
 
+  $: {
+    let testDataRows = [];
+
+    const mappedTestData = testflowDataSetStore.map(mapTestDataRow);
+
+    if (searchQuery.trim() === "") {
+      filteredTestData = [...mappedTestData];
+    } else {
+      const query = searchQuery.toLowerCase();
+      filteredTestData = mappedTestData.filter(
+        (ds) =>
+          ds.name.toLowerCase().includes(query) ||
+          ds.formatType.toLowerCase().includes(query),
+      );
+    }
+  }
+
   let dismissed = false;
+  let dismissedMap: Record<string, boolean> = {};
+  let currentNavigator: TestflowNavigatorEnum | null = null;
+  let currentDismissKey: string | null = null;
+  $: currentNavigator =
+    $tab?.property?.testflow?.state?.testflowNavigator || null;
+  $: currentDismissKey =
+    $tab?.id && currentNavigator ? `${$tab.id}:${currentNavigator}` : null;
 
   function dismissWarning() {
-    dismissed = true;
+    if (currentDismissKey) {
+      dismissedMap = { ...dismissedMap, [currentDismissKey]: true };
+    }
   }
 
   function handleSearchSchedules(event) {
@@ -987,7 +1106,7 @@
 
   function getTooltipMessage(schedule) {
     if (schedule.status === "Expired") {
-      return "This schedule has completed all its runs and cannot be reactivated.";
+      return "This schedule has completed all its runs. You can edit it to reactivate.";
     } else if (schedule.status === "Inactive") {
       return "This schedule is currently paused. Resume to enable future runs.";
     } else if (schedule.status === "Active") {
@@ -1255,7 +1374,6 @@
             reqMetaRequestId,
             reqMetaFolderId,
           );
-          debugger;
           const reqType = reqData?.type;
           // If type exists and is not REQUEST, block node creation
           if (reqType && reqType !== "REQUEST") {
@@ -2006,6 +2124,13 @@
   let currentPage = 1;
   let itemsPerPage = 10;
 
+  // Pagination state for test data
+  let currentTestDataPage = 1;
+  let testDataItemsPerPage = 10;
+
+  let currentTestDataPreviewPage = 1;
+  let testDataPreviewItemsPerPage = 10;
+
   // Reset page when search changes
   $: {
     searchQuery;
@@ -2033,6 +2158,12 @@
     currentPage * itemsPerPage,
   );
 
+  // Get paginated test data
+  $: paginatedTestData = filteredTestData.slice(
+    (currentTestDataPage - 1) * testDataItemsPerPage,
+    currentTestDataPage * testDataItemsPerPage,
+  );
+
   const handlePageChange = (newPage: number) => {
     currentPage = newPage;
   };
@@ -2042,7 +2173,296 @@
     currentPage = 1; // Reset to first page
   };
 
-  let runButtonMenu = false;
+  // Handlers for test data pagination
+  const handleTestDataPageChange = (newPage: number) => {
+    currentTestDataPage = newPage;
+  };
+
+  const handleTestDataPreviewPageChange = (newPage: number) => {
+    currentTestDataPreviewPage = newPage;
+  };
+
+  const handleTestDataItemsPerPageChange = (newItemsPerPage: number) => {
+    testDataItemsPerPage = newItemsPerPage;
+    currentTestDataPage = 1; // Reset to first page when changing items per page
+  };
+
+  const handleTestDataPreviewItemsPerPageChange = (newItemsPerPage: number) => {
+    testDataPreviewItemsPerPage = newItemsPerPage;
+    currentTestDataPreviewPage = 1; // Reset to first page when changing items per page
+  };
+
+  // Reset page when search changes
+  $: {
+    searchQuery;
+    currentTestDataPage = 1;
+  }
+
+  const handleImportClick = () => {
+    importFileInput?.click();
+  };
+
+  const convertCsvToJsonFormat = (csvData: any[]): Record<string, any>[] => {
+    return csvData.map((row) => {
+      const { no: _, ...data } = row;
+      return data;
+    });
+  };
+
+  async function handleKeepBoth() {
+    if (!pendingImportData) return;
+
+    try {
+      isImporting = true;
+      isDuplicateModalOpen = false;
+
+      const response = await importTestflowDataSetFileChange(
+        pendingImportData.wrappedData,
+        pendingImportData.formatType,
+        pendingImportData.fileName,
+      );
+
+      if (response?.isSuccessful) {
+        const newFileName =
+          response?.data?.data?.data?.name || pendingImportData.fileName;
+        datasetContent = response?.data?.data?.data;
+        isImporting = false;
+        importFileFormatType = pendingImportData.fileType;
+        importedFileName = newFileName;
+        importedFileContent = JSON.stringify(
+          pendingImportData.jsonData,
+          null,
+          2,
+        );
+        isImportLoadingModalOpen = true;
+        pendingImportData = null;
+      } else {
+        console.error("Invalid response structure:", response);
+        notifications.error("Failed to import file. Please try again.");
+        isImporting = false;
+      }
+    } catch (err) {
+      console.error("Failed to import file", err);
+      notifications.error("Failed to import file. Please try again.");
+      isImporting = false;
+      pendingImportData = null;
+    }
+  }
+
+  async function handleReplace() {
+    if (!pendingImportData) return;
+
+    try {
+      isImporting = true;
+      isDuplicateModalOpen = false;
+
+      const response = await updateDatasetByName(
+        pendingImportData.wrappedData,
+        pendingImportData.formatType,
+        pendingImportData.fileName,
+      );
+
+      if (response?.isSuccessful) {
+        datasetContent = response?.data?.data;
+        isImporting = false;
+        importFileFormatType = pendingImportData.fileType;
+        importedFileName = pendingImportData.fileName;
+        importedFileContent = JSON.stringify(
+          pendingImportData.jsonData,
+          null,
+          2,
+        );
+        isImportLoadingModalOpen = true;
+        pendingImportData = null;
+      } else {
+        console.error("Invalid response structure:", response);
+        notifications.error("Failed to replace file. Please try again.");
+        isImporting = false;
+      }
+    } catch (err) {
+      console.error("Failed to replace file", err);
+      notifications.error("Failed to replace file. Please try again.");
+      isImporting = false;
+      pendingImportData = null;
+    }
+  }
+
+  // Updated handleImportFileChange function - shows table from response
+  const handleImportFileChange = async (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    const file = input?.files?.[0];
+    if (!file) return;
+    const fileExtension = file.name.match(/\.(json|csv)$/i)?.[1]?.toLowerCase();
+    if (!fileExtension) {
+      notifications.error(
+        "Failed to import. Please select a valid JSON or CSV file.",
+      );
+      input.value = "";
+      return;
+    }
+
+    try {
+      isImportCancelled = false;
+      isImportLoadingModalOpen = true;
+      isImporting = true;
+      importedFileContent = null;
+      importedFileName = null;
+
+      const text = await file.text();
+
+      let jsonData: Record<string, any>[];
+      const fileType = fileExtension as "json" | "csv";
+
+      if (fileType === "csv") {
+        const parseResult = await new Promise<Papa.ParseResult<any>>(
+          (resolve, reject) => {
+            Papa.parse(text, {
+              header: true,
+              skipEmptyLines: true,
+              dynamicTyping: true,
+              complete: resolve,
+              error: reject,
+            });
+          },
+        );
+
+        if (parseResult.errors.length > 0) {
+          throw new Error(
+            `CSV parsing error: ${parseResult.errors[0].message}`,
+          );
+        }
+        // Convert CSV to clean JSON format (without 'no' field)
+        jsonData = convertCsvToJsonFormat(parseResult.data);
+      } else {
+        // Handle JSON input - extract dataSet if wrapped
+        const parsed = JSON.parse(text);
+        jsonData = parsed?.dataSet || parsed;
+      }
+
+      const formatType = fileType.toUpperCase();
+      const wrappedData = { dataSet: jsonData };
+
+      // Send wrapped data to backend
+      const response = await importTestflowDataSet(
+        wrappedData,
+        formatType,
+        file.name,
+      );
+
+      // Handle the response
+      if (response?.isSuccessful) {
+        datasetContent = response?.data?.data?.data;
+        isImporting = false;
+        importFileFormatType = fileType;
+        importedFileName = file.name;
+        importedFileContent = JSON.stringify(jsonData, null, 2);
+        // Keep modal open to show preview
+        isImportLoadingModalOpen = true;
+      } else if (response?.data?.message === "Dataset already exists") {
+        pendingImportData = {
+          jsonData,
+          fileType,
+          fileName: file.name,
+          formatType,
+          wrappedData,
+        };
+        isDuplicateModalOpen = true;
+        resetImportState();
+      } else {
+        resetImportState();
+        notifications.error("Failed to import Data. Please try again.");
+      }
+    } catch (err) {
+      resetImportState();
+      notifications.error(`Failed to import Data. Please try again.`);
+    } finally {
+      input.value = "";
+    }
+  };
+
+  const resetImportState = () => {
+    isImporting = false;
+    isImportLoadingModalOpen = false;
+    importedFileContent = null;
+    importedFileName = null;
+  };
+
+  function syntaxHighlightJSON(json) {
+    let obj;
+    try {
+      if (typeof json === "string") {
+        const trimmed = json.trim();
+        // Try JSONL fallback first: if multiple lines and each line is JSON object/array
+        const lines = trimmed.split("\n").filter((l) => l.trim());
+        const looksLikeJSONL =
+          lines.length > 1 &&
+          lines.every((line) => {
+            const t = line.trim();
+            return (
+              (t.startsWith("{") || t.startsWith("[")) &&
+              (t.endsWith("}") || t.endsWith("]"))
+            );
+          });
+
+        if (looksLikeJSONL) {
+          obj = lines.map((l) => JSON.parse(l));
+        } else {
+          obj = JSON.parse(trimmed);
+        }
+      } else {
+        obj = json;
+      }
+    } catch (e) {
+      const errorMsg = e.message || "Unknown parsing error";
+      const position =
+        (e &&
+          e.message &&
+          e.message.match &&
+          e.message.match(/position (\d+)/)?.[1]) ||
+        "unknown";
+      return `<span style="color: #f48771;">Error parsing JSON: ${errorMsg}<br/>Position: ${position}</span>`;
+    }
+
+    // Pretty print
+    const jsonString = JSON.stringify(obj, null, 2);
+
+    // Escape HTML
+    const escaped = jsonString
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+
+    // Single regex to capture all token types
+    const highlighted = escaped.replace(
+      /("(\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(\.\d+)?([eE][+\-]?\d+)?)/g,
+      function (match) {
+        // Property key (ends with colon)
+        if (/^".*"\s*:$/g.test(match)) {
+          return `<span class="json-key">${match.replace(/:$/, "")}</span><span class="json-punctuation">:</span>`;
+        }
+        // String literal
+        if (/^"/.test(match)) {
+          return `<span class="json-string">${match}</span>`;
+        }
+        // Boolean / null
+        if (/^(true|false|null)$/.test(match)) {
+          if (match === "null")
+            return `<span class="json-null">${match}</span>`;
+          return `<span class="json-boolean">${match}</span>`;
+        }
+        // Number
+        return `<span class="json-number">${match}</span>`;
+      },
+    );
+
+    // Add punctuation and comma styling (optional)
+    // Commas and bracket/brace punctuation remain in the string; we can wrap them:
+    const withPunctuation = highlighted
+      .replace(/([{}\[\]])/g, '<span class="json-punctuation">$1</span>')
+      .replace(/,(?![^<]*>)/g, '<span class="json-punctuation">,</span>');
+
+    return withPunctuation;
+  }
 
   const openScheduleRun = () => {
     if (isGuestUser) {
@@ -2053,6 +2473,64 @@
     }
     handleEventClickScheduleRun();
     isScheduleRunPopupOpen = true;
+  };
+
+  const handleCellClick = (content: any, event: MouseEvent) => {
+    const cellElement = event.currentTarget as HTMLElement;
+    const rect = cellElement.getBoundingClientRect();
+    // Check if content is actually truncated
+    if (
+      cellElement.scrollWidth > cellElement.clientWidth ||
+      String(content).length > 50
+    ) {
+      selectedCellContent = String(content);
+      cellModalPosition = {
+        x: rect.left,
+        y: rect.bottom + 8,
+      };
+    }
+  };
+
+  const closeCellModal = () => {
+    selectedCellContent = null;
+  };
+
+  let previewData = null;
+
+  function handlePreviewDataset(originalData) {
+    previewData = originalData;
+    importedFileContent = JSON.stringify(originalData.item.dataSet ?? {});
+    importedFileName = originalData.name;
+    isImporting = false;
+    isImportLoadingModalOpen = true;
+  }
+
+  function handleRedirectTestDataPage() {
+    const datasetObj = {
+      id: previewData?.id || datasetContent?.id,
+      name: importedFileName,
+      item: {
+        dataSet: previewData?.item.dataSet || datasetContent?.item.dataSet,
+      },
+      formatType: previewData?.formatType || datasetContent?.formatType,
+      createdAt: previewData?.createdAt || datasetContent?.createdAt,
+      updatedAt: previewData?.updatedAt || datasetContent?.updatedAt,
+      fileSize: previewData?.fileSize || datasetContent?.fileSize,
+    };
+    isImportLoadingModalOpen = false;
+    openTestflowDataSetTab(datasetObj);
+  }
+
+  const formatLocalDate = (utcDate: string) => {
+    if (!utcDate) return "";
+    const date = new Date(utcDate);
+    return date.toLocaleString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 </script>
 
@@ -2153,13 +2631,6 @@
                 },
               ]}
             >
-              <!-- <Tooltip
-                title={"Add Options"}
-                placement={"bottom-center"}
-                distance={12}
-                show={!runButtonMenu}
-                zIndex={10}
-              > -->
               <Button
                 type="primary"
                 id="test-run-button"
@@ -2171,8 +2642,33 @@
                   runButtonMenu = !runButtonMenu;
                 }}
               />
-              <!-- </Tooltip> -->
             </Dropdown>
+            <div class="d-flex" style="gap:8px; align-items:center;">
+              <input
+                bind:this={importFileInput}
+                type="file"
+                accept=".csv,application/json,text/csv"
+                on:change={handleImportFileChange}
+                style="display:none"
+              />
+              {#if !(userRole === WorkspaceRole.WORKSPACE_VIEWER) && !isGuestUser}
+                <Tooltip
+                  title={"Only JSON or CSV files are supported"}
+                  placement={"top-center"}
+                  distance={12}
+                  show={!runButtonMenu}
+                  zIndex={10}
+                >
+                  <Button
+                    type="secondary"
+                    size="medium"
+                    startIcon={ArrowUploadFilled}
+                    title={"Import Data"}
+                    onClick={handleImportClick}
+                  />
+                </Tooltip>
+              {/if}
+            </div>
           {/if}
         </div>
 
@@ -2194,18 +2690,23 @@
           </div>
         {/if}
       </div>
-
-      <div style="margin-right: 5px;">
-        <Tooltip title="Clear Response" placement="bottom-center" size="small">
-          <Button
-            type="secondary"
-            size="medium"
-            disable={testflowStore?.isTestFlowRunning || isTestFlowEmpty}
-            startIcon={BroomRegular}
-            onClick={onClearTestflow}
-          />
-        </Tooltip>
-      </div>
+      {#if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.TESTFLOW}
+        <div style="margin-right: 5px;">
+          <Tooltip
+            title="Clear Response"
+            placement="bottom-center"
+            size="small"
+          >
+            <Button
+              type="secondary"
+              size="medium"
+              disable={testflowStore?.isTestFlowRunning || isTestFlowEmpty}
+              startIcon={BroomRegular}
+              onClick={onClearTestflow}
+            />
+          </Tooltip>
+        </div>
+      {/if}
       {#if !(userRole === WorkspaceRole.WORKSPACE_VIEWER)}
         <div>
           <SaveTestflow
@@ -2240,7 +2741,7 @@
   </div>
 
   <!-- Warning Message -->
-  {#if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.SCHEDULE && testflowScheduleStore.some((schedule) => schedule.isActive) && !dismissed}
+  {#if currentNavigator && [TestflowNavigatorEnum.SCHEDULE, TestflowNavigatorEnum.TESTFLOW].includes(currentNavigator) && testflowScheduleStore.some((schedule) => schedule.isActive) && !(currentDismissKey && dismissedMap[currentDismissKey])}
     <div
       class="mx-3 warning-banner px-4 d-flex align-items-center mb-3 p-2 position-relative"
     >
@@ -2407,6 +2908,7 @@
                   <th class="text-fs-12">Schedule Name</th>
                   <th>Status</th>
                   <th>Environment</th>
+                  <th>Test Data</th>
                   <th>Next Run</th>
                   <th>Last Run Result</th>
                   {#if isTestflowEditable}
@@ -2449,6 +2951,95 @@
               totalItems={filteredSchedules.length}
               onPageChange={handlePageChange}
               onItemsPerPageChange={handleItemsPerPageChange}
+              itemsPerPageOptions={[10, 20, 30, 40, 50]}
+              showItemCount={true}
+              containerWidth="100%"
+            />
+          {/if}
+        </div>
+      </div>
+    {:else if $tab?.property?.testflow?.state?.testflowNavigator === TestflowNavigatorEnum.TESTDATA}
+      <!-- Test Data Navigator: table similar to schedules -->
+      <div class="testdata-container h-100">
+        <div class="flex-grow-1 d-flex flex-column h-100">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <div class="search-container">
+              <Search
+                type="text"
+                placeholder="Search data"
+                class="form-control search-input"
+                bind:value={searchQuery}
+                on:input={handleSearchSchedules}
+              />
+            </div>
+
+            <Button
+              title={"Refresh"}
+              startIcon={ArrowClockWiseRegular}
+              type={"secondary"}
+              size={"small"}
+              loader={$loadingState?.get("testdata-refresh-" + $tab?.id)}
+              disable={$loadingState?.get("testdata-refresh-" + $tab?.id)}
+              onClick={async () => {
+                startLoading("testdata-refresh-" + $tab?.id);
+                await onFetchTestflowDataSets();
+                stopLoading("testdata-refresh-" + $tab?.id);
+              }}
+            />
+          </div>
+
+          <div class=" flex-grow-1" style="overflow:auto;">
+            <table
+              class="scheduled-table"
+              style="background-color: transparent !important;"
+            >
+              <thead>
+                <tr class="text-fs-12">
+                  <th>Test Data Name</th>
+                  <th>Type</th>
+                  <th>Size</th>
+                  <th>Last Updated</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {#each paginatedTestData as TestData}
+                  <TestDataRow
+                    dataset={TestData}
+                    {activeMenuId}
+                    setActiveMenuId={(id) => (activeMenuId = id)}
+                    onPreviewDataset={handlePreviewDataset}
+                    onPerformDatasetOperations={onPerformTestDataSetOperations}
+                    onOpenDataset={openTestflowDataSetTab}
+                    {isWebApp}
+                    isWorkspaceViewer={userRole ===
+                      WorkspaceRole.WORKSPACE_VIEWER}
+                  />
+                {/each}
+              </tbody>
+            </table>
+
+            {#if filteredTestData.length === 0}
+              <div class="empty-state-centered">
+                <div class="empty-icon">
+                  <DocumentRegular size="32px" color="#6b6b6b" />
+                </div>
+                <div class="empty-message">
+                  No test data imported yet. Use the <span
+                    style="font-weight: 700;">Import</span
+                  > button to upload JSON or CSV files for testing.
+                </div>
+              </div>
+            {/if}
+          </div>
+          <!-- Pagination Component -->
+          {#if filteredTestData.length > 0}
+            <Pagination
+              currentPage={currentTestDataPage}
+              itemsPerPage={testDataItemsPerPage}
+              totalItems={filteredTestData.length}
+              onPageChange={handleTestDataPageChange}
+              onItemsPerPageChange={handleTestDataItemsPerPageChange}
               itemsPerPageOptions={[10, 20, 30, 40, 50]}
               showItemCount={true}
               containerWidth="100%"
@@ -2596,6 +3187,45 @@
         size="medium"
         title="Save & Apply"
         onClick={handleSaveConfirm}
+      />
+    </div>
+  </div>
+</Modal>
+
+<Modal
+  title={"Duplicate File Detected"}
+  type={"dark"}
+  width={"540px"}
+  zIndex={1000}
+  isOpen={isDuplicateModalOpen}
+  handleModalState={(flag = false) => {
+    isDuplicateModalOpen = flag;
+  }}
+>
+  <div class="modal-content">
+    <p class="mb-3" style="margin-top: 13px; padding-bottom:20px;">
+      A file with the same name or content already exists. Do you want to
+      replace the existing file or keep both?
+    </p>
+    <div class="d-flex justify-content-end gap-3">
+      <Tooltip
+        title="Keeping both will rename the new file automatically."
+        placement="bottom-center"
+        size="small"
+      >
+        <Button
+          type="secondary"
+          size="medium"
+          title="Keep Both"
+          disable={isImporting}
+          onClick={handleKeepBoth}
+        />
+      </Tooltip>
+      <Button
+        type="primary"
+        size="medium"
+        title="Replace"
+        onClick={handleReplace}
       />
     </div>
   </div>
@@ -2826,7 +3456,518 @@
   </div>
 {/if}
 
+<Modal
+  title=""
+  type="dark"
+  width="855px"
+  zIndex={1000}
+  isOpen={isImportLoadingModalOpen}
+  canClose={false}
+  handleModalState={() => {
+    isImportCancelled = true;
+    isImportLoadingModalOpen = false;
+    importedFileContent = null;
+    importedFileName = null;
+    isImporting = false;
+  }}
+>
+  <div class="import-loading-container">
+    {#if isImporting}
+      <!-- Loader section -->
+      <div class="loading-content">
+        <div class="loading-spinner">
+          <Loader loaderSize="32px" />
+        </div>
+        <p class="loading-text">Importing test data...</p>
+      </div>
+    {:else if importedFileContent}
+      <!-- Unified table display for both JSON and CSV -->
+      <div class="file-preview-container">
+        <div class="file-preview-header">
+          <div class="file-header-left">
+            <div class="file-name">
+              <DocumentRegular />
+              {importedFileName}
+            </div>
+            <div class="file-meta">
+              Last updated <span style="x">
+                {datasetContent
+                  ? formatLocalDate(datasetContent.updatedAt)
+                  : previewData
+                    ? formatLocalDate(previewData.updatedAt)
+                    : "few seconds ago"}
+              </span>
+              • Size
+              {datasetContent
+                ? datasetContent.fileSize
+                : previewData
+                  ? previewData.fileSize
+                  : "few seconds ago"} • {(() => {
+                try {
+                  const parsed = JSON.parse(importedFileContent);
+                  const data = parsed.dataSet || parsed;
+                  return Array.isArray(data) ? data.length : 0;
+                } catch {
+                  return 0;
+                }
+              })()} rows
+            </div>
+          </div>
+
+          <div class="file-header-actions">
+            <Button
+              type="secondary"
+              size="small"
+              startIcon={ArrowExpandRegular}
+              onClick={handleRedirectTestDataPage}
+            />
+            <Button
+              type="secondary"
+              size="small"
+              startIcon={DismissRegular}
+              onClick={() => {
+                isImportLoadingModalOpen = false;
+                importedFileContent = null;
+                importedFileName = null;
+                isImporting = false;
+              }}
+            />
+          </div>
+        </div>
+
+        {#if importedFileContent}
+          {@const parsed = JSON.parse(importedFileContent)}
+          {@const data = parsed.dataSet || parsed}
+          {@const columns =
+            Array.isArray(data) && data.length > 0 ? Object.keys(data[0]) : []}
+          <div class="file-preview-csv">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th class="row-number">#</th>
+                    {#each columns as column}
+                      <th>{column}</th>
+                    {/each}
+                  </tr>
+                </thead>
+                <tbody>
+                  {#each data as row, index}
+                    <tr>
+                      <td class="row-number">{index + 1}</td>
+                      {#each columns as column}
+                        <td
+                          class="table-cell-clickable"
+                          on:click={(e) => handleCellClick(row[column], e)}
+                          title="Click to view full content"
+                        >
+                          {row[column] ?? "-"}
+                        </td>
+                      {/each}
+                    </tr>
+                  {/each}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="pagination-footer">
+            {#if data?.length > 0}
+              <Pagination
+                currentPage={currentTestDataPreviewPage}
+                itemsPerPage={testDataPreviewItemsPerPage}
+                totalItems={data.length}
+                onPageChange={handleTestDataPreviewPageChange}
+                onItemsPerPageChange={handleTestDataPreviewItemsPerPageChange}
+                itemsPerPageOptions={[10, 20, 30, 40, 50]}
+                showItemCount={true}
+                containerWidth="100%"
+              />
+            {/if}
+          </div>
+        {/if}
+        {#if selectedCellContent !== null}
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
+          <div class="cell-modal-overlay" on:click={closeCellModal}>
+            <div
+              class="cell-modal"
+              style="left: {cellModalPosition.x}px; top: {cellModalPosition.y}px;"
+              on:click|stopPropagation
+            >
+              <div class="cell-modal-header">
+                <button class="cell-modal-close" on:click={closeCellModal}>
+                  <DismissRegular />
+                </button>
+              </div>
+              <div class="cell-modal-content">
+                {selectedCellContent}
+              </div>
+            </div>
+          </div>
+        {/if}
+      </div>
+    {/if}
+  </div>
+</Modal>
+
 <style>
+  .empty-state-centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+    background: var(--bg-ds-neutral-900);
+    color: var(--text-ds-neutral-400);
+    border-radius: 8px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .empty-icon {
+    margin-bottom: 18px;
+    opacity: 0.7;
+  }
+  .empty-message {
+    font-size: 12px;
+    color: var(--text-ds-neutral-400);
+    text-align: center;
+    max-width: 420px;
+  }
+  .pagination-footer {
+    position: relative;
+    bottom: 0;
+  }
+  .file-preview-csv {
+    flex: 1;
+    overflow: auto;
+    background: var(--bg-ds-surface-600);
+    border-radius: 6px;
+    width: 780px;
+    height: 528px;
+    box-sizing: border-box;
+    margin: 0 auto;
+  }
+
+  .table-container {
+    overflow: auto;
+    min-height: 480px;
+    width: 100%;
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--text-ds-neutral-100);
+    background-color: var(--bg-ds-surface-600);
+    font-size: 12px;
+  }
+
+  .data-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .data-table th {
+    padding: 12px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 12px;
+    color: var(--text-ds-neutral-300);
+    border-bottom: 1px solid var(--border-ds-neutral-600);
+  }
+
+  .data-table td {
+    font-weight: 500;
+    padding: 16px;
+    border-bottom: 0.4px solid var(--border-ds-neutral-700);
+    font-size: 12px;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .table-cell-clickable {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .row-number {
+    width: 50px;
+    text-align: center;
+    font-weight: 500;
+    color: var(--text-ds-neutral-400);
+  }
+
+  /* Cell Modal Styles */
+  .cell-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .cell-modal {
+    position: fixed;
+    background-color: var(--bg-ds-surface-600);
+    border: 1px solid var(--border-ds-neutral-400);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    max-width: 500px;
+    max-height: 400px;
+    min-width: 300px;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .cell-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-ds-neutral-700);
+    background-color: var(--bg-ds-surface-400);
+  }
+
+  .cell-modal-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-ds-neutral-50);
+  }
+
+  .cell-modal-close {
+    background: none;
+    border: none;
+    color: var(--text-ds-neutral-300);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+
+  .cell-modal-close:hover {
+    background-color: var(--bg-ds-surface-600);
+    color: var(--text-ds-neutral-100);
+  }
+
+  .cell-modal-content {
+    padding: 16px;
+    overflow: auto;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--text-ds-neutral-100);
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Code", "Consolas",
+      monospace;
+  }
+
+  .cell-modal-content::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  .cell-modal-content::-webkit-scrollbar-thumb {
+    background: #9b9da1;
+    border-radius: 6px;
+  }
+
+  .cell-modal-content::-webkit-scrollbar-thumb:hover {
+    background: #505050;
+  }
+
+  /* Scrollbar styling for table */
+  .table-container::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  .table-container::-webkit-scrollbar-thumb {
+    background: #9b9da1;
+    border-radius: 6px;
+  }
+
+  .table-container::-webkit-scrollbar-thumb:hover {
+    background: #505050;
+  }
+  .bold-text {
+    font-weight: 700;
+    color: var(--text-ds-neutral-200);
+  }
+
+  /* scope to the pre with preview-content */
+  :global(pre.preview-content .json-key) {
+    color: #5ec5ed;
+  }
+  :global(pre.preview-content .json-string) {
+    color: #ef9765;
+  }
+  :global(pre.preview-content .json-boolean),
+  :global(pre.preview-content .json-null) {
+    color: #6ce096;
+  }
+
+  /* If something still overrides color, make the string rule more specific/or force it */
+  :global(pre.preview-content .json-string) {
+    color: #ef9765 !important;
+  }
+
+  /* ensure the pre doesn't override children color with higher specificity later */
+  :global(pre.preview-content) {
+    color: inherit; /* allow children to define colors */
+  }
+
+  .file-preview-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    width: 100%;
+    height: 638px;
+    background: transparent;
+    overflow: visible;
+  }
+
+  .file-preview-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    height: 48px;
+    margin-bottom: 16px;
+    background-color: var(--bg-ds-surface-600);
+  }
+
+  .file-header-left {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .file-name {
+    font-weight: 600;
+    font-size: 20px;
+    color: var(--text-ds-neutral-50);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .file-meta {
+    font-size: 12px;
+    color: var(--text-ds-neutral-300);
+    margin-top: 4px;
+  }
+
+  .file-header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .file-preview-csv {
+    width: 780px;
+    max-height: 528px;
+    overflow: auto;
+    background: var(--bg-ds-surface-600);
+    border-radius: 6px;
+    font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Code", "Consolas",
+      monospace;
+    box-sizing: border-box;
+    margin: 0 auto;
+  }
+
+  /* .file-preview {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background: var(--bg-ds-surface-600);
+    border: 1px solid #2e2e2e;
+    border-radius: 6px;
+    padding-right: 8px;
+    padding: 16px;
+    font-family: "SF Mono", "Monaco", "Inconsolata", "Fira Code", "Consolas",
+      monospace;
+    box-sizing: border-box;
+    margin: 0 auto;
+  } */
+
+  .preview-content {
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 400;
+    background: transparent;
+    margin: 0;
+    padding: 0;
+    padding-right: 4px;
+    white-space: pre;
+    line-height: 1.6;
+    letter-spacing: 0.01em;
+  }
+
+  /* Scrollbar styling */
+  .file-preview::-webkit-scrollbar {
+    width: 12px;
+    height: auto;
+  }
+
+  .file-preview::-webkit-scrollbar-track {
+    background: transparent;
+    margin-top: 16px;
+    margin-bottom: 20px;
+  }
+
+  .file-preview::-webkit-scrollbar-thumb {
+    background: #9b9da1;
+    border-radius: 8px;
+    height: 150px;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .file-preview::-webkit-scrollbar-thumb:hover {
+    background: #9b9da1;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+    background-clip: padding-box;
+  }
+
+  .file-preview::-webkit-scrollbar-button {
+    display: none;
+  }
+  .import-loading-container {
+    height: 648px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .loading-text {
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 150%;
+    margin-bottom: 16px;
+  }
+
+  .loading-spinner {
+    margin-bottom: 10px;
+  }
   .downgrade-card {
     bottom: 30px;
     right: 20px;

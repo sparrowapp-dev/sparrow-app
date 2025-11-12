@@ -1,6 +1,9 @@
 import { getAuthHeaders, makeRequest } from "@app/containers/api/api.common";
 import constants from "@app/constants/constants";
-import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
+import type {
+  ScheduleTestFlowRunDto,
+  TestflowDataSetImportDto,
+} from "@sparrow/common/types/workspace/testflow-dto";
 
 export class TestflowService {
   constructor() {}
@@ -112,11 +115,12 @@ export class TestflowService {
     _testflowId: string,
     _scheduleId: string,
     baseUrl: string,
+    payload?: { testflowDataSetId: string },
   ) => {
     const response = await makeRequest(
       "POST",
       `${baseUrl}/api/workspace/${_workspaceId}/testflow/${_testflowId}/schedule/${_scheduleId}/run`,
-      { headers: getAuthHeaders() },
+      { headers: getAuthHeaders(), body: payload },
     );
     return response;
   };
@@ -131,6 +135,21 @@ export class TestflowService {
     const response = await makeRequest(
       "DELETE",
       `${baseUrl}/api/workspace/${_workspaceId}/testflow/${_testflowId}/schedule/${_scheduleId}/run-history/${_runHistoryId}`,
+      { headers: getAuthHeaders() },
+    );
+    return response;
+  };
+
+  public deleteScheduleRunTestDataHistory = async (
+    _workspaceId: string,
+    _testflowId: string,
+    _scheduleId: string,
+    _runHistoryTestDataId: string,
+    baseUrl: string,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${baseUrl}/api/workspace/${_workspaceId}/testflow/${_testflowId}/schedule/${_scheduleId}/run-history-dataset/${_runHistoryTestDataId}`,
       { headers: getAuthHeaders() },
     );
     return response;
@@ -162,7 +181,8 @@ export class TestflowService {
       `${baseUrl}/api/workspace/${workspaceId}/testflow/${_testflowId}/schedule/${_scheduleId}`,
       {
         body: _schedule,
-        headers: getAuthHeaders() },
+        headers: getAuthHeaders(),
+      },
     );
     return response;
   };
@@ -193,6 +213,96 @@ export class TestflowService {
       "GET",
       `${baseUrl}/api/workspace/${workspaceId}/testflow/${testflowId}/validate-run`,
       {
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public fetchTestflowDataSets = async (
+    workspaceId: string,
+    testflowId: string,
+  ) => {
+    const response = await makeRequest(
+      "GET",
+      `${this.apiUrl}/api/workspace/${workspaceId}/testflow/${testflowId}/DataSets`,
+      { headers: getAuthHeaders() },
+    );
+    return response;
+  };
+
+  public importTestflowDataSet = async (
+    testflowId: string,
+    payload: TestflowDataSetImportDto,
+    workspaceId: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/workspace/${workspaceId}/testflow/${testflowId}/import-dataset`,
+      {
+        body: payload,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public deleteTestDataSet = async (
+    _testflowId: string,
+    testflowDataSetId: string,
+    workspaceId: string,
+  ) => {
+    const response = await makeRequest(
+      "DELETE",
+      `${this.apiUrl}/api/workspace/${workspaceId}/testflow/${_testflowId}/dataset/${testflowDataSetId}`,
+      { headers: getAuthHeaders() },
+    );
+    return response;
+  };
+
+  public renameTestDataSet = async (
+    _testflowId: string,
+    testflowDataSetId: string,
+    updatedDataSetName: string,
+    workspaceId: string,
+  ) => {
+    const response = await makeRequest(
+      "PATCH",
+      `${this.apiUrl}/api/workspace/${workspaceId}/testflow/${_testflowId}/dataset/${testflowDataSetId}`,
+      {
+        body: { name: updatedDataSetName },
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public importTestflowDataSetFileChange = async (
+    testflowId: string,
+    payload: TestflowDataSetImportDto,
+    workspaceId: string,
+  ) => {
+    const response = await makeRequest(
+      "POST",
+      `${this.apiUrl}/api/workspace/${workspaceId}/testflow/${testflowId}/import-dataset/file`,
+      {
+        body: payload,
+        headers: getAuthHeaders(),
+      },
+    );
+    return response;
+  };
+
+  public updateDatasetByName = async (
+    testflowId: string,
+    payload: TestflowDataSetImportDto,
+    workspaceId: string,
+  ) => {
+    const response = await makeRequest(
+      "PATCH",
+      `${this.apiUrl}/api/workspace/${workspaceId}/testflow/${testflowId}/dataset`,
+      {
+        body: payload,
         headers: getAuthHeaders(),
       },
     );
