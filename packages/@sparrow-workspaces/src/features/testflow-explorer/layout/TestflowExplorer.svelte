@@ -2688,14 +2688,18 @@
                 on:change={handleImportFileChange}
                 style="display:none"
               />
-              {#if !(userRole === WorkspaceRole.WORKSPACE_VIEWER) && !isGuestUser}
+              {#if !(userRole === WorkspaceRole.WORKSPACE_VIEWER) || isGuestUser}
                 <Tooltip
-                  title={"Import Data"}
-                  subtext={`Accepted formats: JSON, CSV (max 500 kb).
+                  title={!isGuestUser
+                    ? "Import Data"
+                    : "Create an account or sign in to access import feature"}
+                  subtext={!isGuestUser
+                    ? `Accepted formats: JSON, CSV (max 500 kb).
                   Ensure your file contains valid key–value pairs. 
                   The key refers to the variable declared in test flow nodes {{key}}.
-                  Use Export Template for format reference.`}
-                  placement={"bottom-left"}
+                  Use Export Template for format reference.`
+                    : ""}
+                  placement={!isGuestUser ? "bottom-left" : "bottom-center"}
                   distance={12}
                   show={!runButtonMenu}
                   size="medium"
@@ -2707,6 +2711,7 @@
                     startIcon={ArrowUploadFilled}
                     title={"Import Data"}
                     onClick={handleImportClick}
+                    disable={isGuestUser}
                   />
                 </Tooltip>
               {/if}
