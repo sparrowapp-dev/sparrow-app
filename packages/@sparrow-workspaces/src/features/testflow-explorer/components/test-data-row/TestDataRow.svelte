@@ -83,12 +83,14 @@
 
     const diffInMinutes = Math.floor(diffInSeconds / 60);
     if (diffInMinutes < 60) {
-      return diffInMinutes === 1 ? "a minute ago" : `few minutes ago`;
+      return diffInMinutes === 1
+        ? "a minute ago"
+        : `${diffInMinutes} minutes ago`;
     }
 
     const diffInHours = Math.floor(diffInMinutes / 60);
     if (diffInHours < 24) {
-      return diffInHours === 1 ? "an hour ago" : `few hours ago`;
+      return diffInHours === 1 ? "an hour ago" : `${diffInHours} hours ago`;
     }
 
     const diffInDays = Math.floor(diffInHours / 24);
