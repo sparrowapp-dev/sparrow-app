@@ -136,14 +136,6 @@
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + "...";
   }
-
-  // Capitalize column header
-  function formatColumnHeader(column: string): string {
-    return column
-      .split(/(?=[A-Z])|_|-/) // Split on camelCase, underscore, or hyphen
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(" ");
-  }
 </script>
 
 <!-- Header -->
@@ -236,7 +228,7 @@
               </th>
               {#each columns as column}
                 <th class="column-header">
-                  {formatColumnHeader(column)}
+                  {column}
                 </th>
               {/each}
             </tr>
