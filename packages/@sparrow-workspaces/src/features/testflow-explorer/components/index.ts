@@ -21,3 +21,4 @@ export { default as Edge } from "./edge/Edge.svelte";
 export { default as ScheduleRow } from "./schedule-row/ScheduleRow.svelte";
 export { default as TestflowNavigator } from "./testflow-navigator/TestflowNavigator.svelte";
 export { default as RequestAssertionsTestFlow } from "./request-tests/RequestAssertionsTestFlow.svelte";
+export { default as ResponseTestResults } from "./response-test-results/ResponseTestResults.svelte";
