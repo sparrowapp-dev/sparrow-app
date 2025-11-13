@@ -140,10 +140,48 @@
     receiveNotifications,
   };
 
-  $: isModified =
-    initialFormData == null
-      ? true
-      : JSON.stringify(currentForm) !== JSON.stringify(initialFormData);
+  $: isModified = (() => {
+    if (initialFormData == null) return true;
+
+    // Compare each field individually
+    const current = {
+      scheduleName,
+      selectedEnvironment,
+      selectedCycle,
+      formattedDate,
+      selectedTime,
+      intervalHours,
+      days: [...days].sort(), // Sort for consistent comparison
+      notificationEmails: [...notificationEmails].sort(),
+      receiveNotifications,
+      selectedTestData,
+    };
+
+    const initial = {
+      ...initialFormData,
+      days: [...(initialFormData.days || [])].sort(),
+      notificationEmails: [
+        ...(initialFormData.notificationEmails || []),
+      ].sort(),
+    };
+
+    // Compare each property
+    for (const key in current) {
+      if (Array.isArray(current[key])) {
+        // For arrays, compare stringified sorted versions
+        if (JSON.stringify(current[key]) !== JSON.stringify(initial[key])) {
+          return true;
+        }
+      } else {
+        // For other values, direct comparison
+        if (current[key] !== initial[key]) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  })();
 
   // Format environments for Select component
   $: formattedEnvironments = [
@@ -454,11 +492,12 @@
       formattedDate = initialFormData.formattedDate;
       selectedTime = initialFormData.selectedTime;
       intervalHours = initialFormData.intervalHours;
-      days = [...initialFormData.days];
-      notificationEmails = [...initialFormData.notificationEmails];
+      days = initialFormData.days ? [...initialFormData.days] : [];
+      notificationEmails = initialFormData.notificationEmails
+        ? [...initialFormData.notificationEmails]
+        : [];
       receiveNotifications = initialFormData.receiveNotifications;
-      selectedTestData=initialFormData.selectedTestData;
-      updateScheduleRealtime();
+      selectedTestData = initialFormData.selectedTestData;
     }
   };
 
