@@ -58,7 +58,9 @@
   let itemsPerPage = 10;
 
   // Get column headers dynamically from first object
-  $: columns = datasets.length > 0 ? Object.keys(datasets[0]) : [];
+  $: columns = Array.isArray(datasets)
+    ? Array.from(new Set(datasets.flatMap((obj) => Object.keys(obj))))
+    : [];
 
   // Paginated data
   $: paginatedData = datasets.slice(
