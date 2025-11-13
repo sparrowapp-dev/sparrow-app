@@ -2332,7 +2332,7 @@ export class TestflowExplorerPageViewModel {
           progressiveTab?.path?.workspaceId,
         );
       if (response?.isSuccessful) {
-        const dataset = response.data?.data.data;
+        const dataset = response?.data?.data?.data;
         addTestflowDataSet(progressiveTab.id as string, dataset || []);
         notifications.success(`Data set imported successfully.`);
       }
@@ -2360,7 +2360,7 @@ export class TestflowExplorerPageViewModel {
         progressiveTab?.path?.workspaceId,
       );
       if (response?.isSuccessful) {
-        const dataset = response.data?.data.data;
+        const dataset = response?.data?.data?.item.dataSet;
         replaceTestflowDataSet(progressiveTab.id as string, dataset || []);
         notifications.success(`Data set imported successfully.`);
       }
@@ -2388,6 +2388,7 @@ export class TestflowExplorerPageViewModel {
       })
       .updateUpdatedAt(dataSet?.updatedAt || "")
       .getValue();
+    await this.tabRepository.removeTab(initTestflowDataSetTab.id);
     await this.tabRepository.createTab(initTestflowDataSetTab);
   };
 }
