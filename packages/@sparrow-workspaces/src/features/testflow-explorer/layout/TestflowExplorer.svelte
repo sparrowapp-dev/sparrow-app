@@ -3664,8 +3664,9 @@
         {#if importedFileContent}
           {@const parsed = JSON.parse(importedFileContent)}
           {@const data = parsed.dataSet || parsed}
-          {@const columns =
-            Array.isArray(data) && data.length > 0 ? Object.keys(data[0]) : []}
+          {@const columns = Array.isArray(data)
+            ? Array.from(new Set(data.flatMap((obj) => Object.keys(obj))))
+            : []}
           <div class="file-preview-csv">
             <div class="table-container">
               <table class="data-table">
