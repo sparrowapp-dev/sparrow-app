@@ -72,8 +72,37 @@
 
   function formatDate(iso) {
     if (!iso) return "-";
-    const d = new Date(iso);
-    return d.toLocaleString();
+
+    const now = new Date();
+    const past = new Date(iso);
+    const diffInSeconds = Math.floor((now - past) / 1000);
+
+    if (diffInSeconds < 60) {
+      return "a few seconds ago";
+    }
+
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) {
+      return diffInMinutes === 1 ? "a minute ago" : `few minutes ago`;
+    }
+
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) {
+      return diffInHours === 1 ? "an hour ago" : `few hours ago`;
+    }
+
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 30) {
+      return diffInDays === 1 ? "1 day ago" : `${diffInDays} days ago`;
+    }
+
+    const diffInMonths = Math.floor(diffInDays / 30);
+    if (diffInMonths < 12) {
+      return diffInMonths === 1 ? "1 month ago" : `${diffInMonths} months ago`;
+    }
+
+    const diffInYears = Math.floor(diffInMonths / 12);
+    return diffInYears === 1 ? "1 year ago" : `${diffInYears} years ago`;
   }
 
   const handleNameChange = (e: CustomEvent<string>) => {
@@ -116,6 +145,7 @@
   const startRename = () => {
     isEditingName = true;
     showMenu = false;
+    setActiveMenuId(null);
     // Focus the input after the DOM updates
     setTimeout(() => {
       const input = document.getElementById(
@@ -126,6 +156,12 @@
         input.select();
       }
     }, 0);
+  };
+
+  const handleRowClick = () => {
+    if (!isEditingName) {
+      onPreviewDataset(dataset.originalData);
+    }
   };
 </script>
 
@@ -168,16 +204,11 @@
   </div>
 </Modal>
 
-<tr
-  class="data-row"
-  on:click={() => {
-    onPreviewDataset(dataset.originalData);
-  }}
->
+<tr class="data-row" on:click={handleRowClick}>
   <td>
     <div class="d-flex flex-column">
       {#if isEditingName}
-        <div class="input-wrapper">
+        <div class="input-wrapper" on:click|stopPropagation>
           <Input
             id={`dataset-name-${dataset?.id}`}
             variant="inline"

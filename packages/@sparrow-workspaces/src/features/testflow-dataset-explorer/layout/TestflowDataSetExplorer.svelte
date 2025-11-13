@@ -79,10 +79,10 @@
     originalName = $tab?.name;
   }
 
-  $: isSaveDisabled = $tab?.isSaved;
+  $: isSaveDisabled = (testDataName ?? "").trim().length === 0 || $tab?.isSaved;
 
-  function handleTestDataHeadingChange(_name) {
-    onUpdateName(_name);
+  function handleTestDataHeadingChange(_name, event) {
+    onUpdateName(_name, event);
   }
 
   async function handleSave() {
@@ -155,7 +155,8 @@
         variant="inline"
         placeholder="Enter dataset name"
         disabled={isWorkspaceViewer}
-        on:input={() => handleTestDataHeadingChange(testDataName)}
+        on:input={() => handleTestDataHeadingChange(testDataName, "")}
+        on:blur={() => handleTestDataHeadingChange(testDataName, "blur")}
       />
 
       <div class="d-flex gap-2">

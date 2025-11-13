@@ -57,6 +57,7 @@
     ExpandIcon,
     DocumentRegular,
     ArrowExpandRegular,
+    ArrowSortRegular,
   } from "@sparrow/library/icons";
 
   import "@xyflow/svelte/dist/style.css";
@@ -498,29 +499,59 @@
     }
 
     let lastResult = "No results yet";
-    const runHistory =
-      schedule.schedularRunHistory ||
-      schedule.originalData?.schedularRunHistory;
 
-    if (Array.isArray(runHistory) && runHistory.length > 0) {
-      // Sort by createdAt to get the most recent run (if array is not already sorted)
-      const sortedHistory = [...runHistory].sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
-      );
-      const lastRun = sortedHistory[0];
-
-      if (lastRun.status === "pass") {
-        lastResult = "Success";
-      } else if (lastRun.status === "fail") {
-        if (lastRun.successRequests > 0) {
-          lastResult = "Partial Fail";
+    // Check for dataset run history first
+    if (
+      schedule.schedularDataSetHistory &&
+      schedule.schedularDataSetHistory.length > 0
+    ) {
+      // Get the most recent dataset run (assuming sorted by createdAt descending)
+      const datasetHistory =
+        schedule.schedularDataSetHistory[0].schedularDataRunHistory;
+      if (Array.isArray(datasetHistory) && datasetHistory.length > 0) {
+        const sortedDatasetRuns = [...datasetHistory].sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+        );
+        const lastDatasetRun = sortedDatasetRuns[0];
+        if (lastDatasetRun.status === "pass") {
+          lastResult = "Success";
+        } else if (lastDatasetRun.status === "fail") {
+          if (lastDatasetRun.successRequests > 0) {
+            lastResult = "Partial Fail";
+          } else {
+            lastResult = "Fail";
+          }
+        } else if (lastDatasetRun.status === "pending") {
+          lastResult = "Pending";
         } else {
-          lastResult = "Fail";
+          lastResult = lastDatasetRun.status || "Unknown";
         }
-      } else if (lastRun.status === "pending") {
-        lastResult = "Pending";
-      } else {
-        lastResult = lastRun.status || "Unknown";
+      }
+    } else {
+      // Fallback to regular run history
+      const runHistory =
+        schedule.schedularRunHistory ||
+        schedule.originalData?.schedularRunHistory;
+
+      if (Array.isArray(runHistory) && runHistory.length > 0) {
+        const sortedHistory = [...runHistory].sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+        );
+        const lastRun = sortedHistory[0];
+
+        if (lastRun.status === "pass") {
+          lastResult = "Success";
+        } else if (lastRun.status === "fail") {
+          if (lastRun.successRequests > 0) {
+            lastResult = "Partial Fail";
+          } else {
+            lastResult = "Fail";
+          }
+        } else if (lastRun.status === "pending") {
+          lastResult = "Pending";
+        } else {
+          lastResult = lastRun.status || "Unknown";
+        }
       }
     }
 
@@ -1635,7 +1666,6 @@
         return edges;
       });
       dfs(graph, Number(_id));
-      // debugger;
     }
   };
 
@@ -3095,7 +3125,15 @@
                   <th>Test Data Name</th>
                   <th>Type</th>
                   <th>Size</th>
-                  <th>Last Updated</th>
+                  <th>
+                    <div class="d-flex align-items-center gap-2">
+                      Last Updated
+                      <ArrowSortRegular
+                        size="15px"
+                        color="var(--text-ds-neutral-50)"
+                      />
+                    </div>
+                  </th>
                   <th>Actions</th>
                 </tr>
               </thead>

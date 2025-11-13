@@ -584,7 +584,6 @@ export class TestflowViewModel {
   };
 
   public saveTestflowDataset = async (_tab) => {
-    debugger;
     const currentDataset = _tab;
     const response = await this.testflowService.renameTestDataSet(
       currentDataset.path.testflowId,
