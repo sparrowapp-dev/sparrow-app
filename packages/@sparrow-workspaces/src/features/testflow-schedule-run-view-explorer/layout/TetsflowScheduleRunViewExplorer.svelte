@@ -103,7 +103,7 @@
     HttpRequestContentTypeBaseEnum,
   } from "@sparrow/common/types/workspace/http-request-base";
   // import { isDynamicExpressionModalOpen } from "../store/testflow";
-  import { testflowDataSetIndex } from "../store/testflow";
+  import { testflowDataSetItem } from "../store/testflow";
   import { WorkspaceRole } from "@sparrow/common/enums";
   import { PlanUpgradeModal } from "@sparrow/common/components";
   import { planInfoByRole } from "@sparrow/common/utils";
@@ -401,7 +401,6 @@
   $: if (resultsArray.length > 0 && selectedTestDataItem === null) {
     selectedTestDataItem = resultsArray[0];
     selectedDatasetIndex = 0;
-    testflowDataSetIndex.set(0);
   }
 
   // Update test data options based on results array
@@ -425,7 +424,6 @@
 
   // Handle test data item selection
   function handleTestDataSelection(dataItem, index) {
-    testflowDataSetIndex.set(index);
     selectedTestDataItem = dataItem;
     selectedDatasetIndex = index;
     testDataMenuOpen = false;
@@ -1326,6 +1324,7 @@
 
   $: if (selectedTestDataItem) {
     testflowViewRequestItems = allocationNodeWithRequest();
+    testflowDataSetItem.set(testflowViewRequestItems);
   }
 
   $: {
