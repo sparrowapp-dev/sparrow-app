@@ -325,6 +325,7 @@
   } | null = null;
   let datasetContent;
   let activeMenuId: string | null = null;
+  let sortOrder: "asc" | "desc" | null = "desc";
 
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
@@ -2168,11 +2169,41 @@
     currentPage * itemsPerPage,
   );
 
+  $: sortedTestData = (() => {
+    const data = [...filteredTestData];
+    data.sort((a, b) => {
+      const dateA = new Date(a.originalData?.updatedAt || 0).getTime();
+      const dateB = new Date(b.originalData?.updatedAt || 0).getTime();
+
+      if (sortOrder === "desc") {
+        return dateA - dateB;
+      } else {
+        return dateB - dateA;
+      }
+    });
+
+    return data;
+  })();
+
+  $: sortIconColor =
+    sortOrder === "asc"
+      ? "var(--primary-color, #6366f1)"
+      : "var(--text-ds-neutral-50)";
+  $: sortIconRotation = sortOrder === "asc" ? "rotate(180deg)" : "rotate(0deg)";
+
   // Get paginated test data
-  $: paginatedTestData = filteredTestData.slice(
+  $: paginatedTestData = sortedTestData.slice(
     (currentTestDataPage - 1) * testDataItemsPerPage,
     currentTestDataPage * testDataItemsPerPage,
   );
+
+  function toggleSort() {
+    if (sortOrder === "desc") {
+      sortOrder = "asc";
+    } else if (sortOrder === "asc") {
+      sortOrder = "desc";
+    }
+  }
 
   const handlePageChange = (newPage: number) => {
     currentPage = newPage;
@@ -3088,12 +3119,19 @@
                   <th>Type</th>
                   <th>Size</th>
                   <th>
-                    <div class="d-flex align-items-center gap-2">
+                    <div
+                      class="d-flex align-items-center gap-2 sort-header"
+                      on:click={toggleSort}
+                      role="button"
+                      tabindex="1"
+                      on:keydown={(e) => e.key === "Enter" && toggleSort()}
+                    >
                       Last Updated
-                      <ArrowSortRegular
-                        size="15px"
-                        color="var(--text-ds-neutral-50)"
-                      />
+                      <div
+                        style="transform: {sortIconRotation}; transition: transform 0.2s ease;"
+                      >
+                        <ArrowSortRegular size="15px" color={sortIconColor} />
+                      </div>
                     </div>
                   </th>
                   <th>Actions</th>
