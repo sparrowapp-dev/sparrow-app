@@ -53,16 +53,14 @@ export class TestflowDataSetExplorerPageViewModel {
     });
   };
 
-  public updateName = async (_name: string) => {
+  public updateName = async (_name: string, event?: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const trimmedName = _name.trim();
 
-    if (trimmedName === "") {
-      const data = await getDatasetById(progressiveTab.path.testflowId);
-      const matching = data._data?.datasets?.find(
-        (d: any) => d.id === progressiveTab.id,
-      );
-      progressiveTab.name = matching?.name || progressiveTab.name;
+    if (trimmedName === "" && event === "blur") {
+      const data = await getDatasetById(progressiveTab.id);
+      const matching = data?.name;
+      progressiveTab.name = matching || progressiveTab.name;
     } else {
       progressiveTab.name = trimmedName;
     }

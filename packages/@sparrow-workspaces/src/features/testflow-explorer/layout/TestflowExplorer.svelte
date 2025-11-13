@@ -57,6 +57,7 @@
     ExpandIcon,
     DocumentRegular,
     ArrowExpandRegular,
+    ArrowSortRegular,
   } from "@sparrow/library/icons";
 
   import "@xyflow/svelte/dist/style.css";
@@ -3086,7 +3087,15 @@
                   <th>Test Data Name</th>
                   <th>Type</th>
                   <th>Size</th>
-                  <th>Last Updated</th>
+                  <th>
+                    <div class="d-flex align-items-center gap-2">
+                      Last Updated
+                      <ArrowSortRegular
+                        size="15px"
+                        color="var(--text-ds-neutral-50)"
+                      />
+                    </div>
+                  </th>
                   <th>Actions</th>
                 </tr>
               </thead>
