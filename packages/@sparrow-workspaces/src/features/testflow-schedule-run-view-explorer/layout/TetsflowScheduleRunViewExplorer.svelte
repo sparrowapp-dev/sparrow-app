@@ -1357,8 +1357,8 @@
     if (transformedResults.length > 0) {
       return {
         id: index.toString(),
-        request: transformedResults[index - 1].requests,
-        response: transformedResults[index - 1].responses,
+        request: transformedResults[index - 1]?.requests || [],
+        response: transformedResults[index - 1]?.responses || [],
       };
     }
   }
