@@ -76,7 +76,7 @@
 <style lang="scss">
   .input-header {
     font-size: 12px;
-    color: #8a9299;
+    color: var(--text-secondary-200);
     font-weight: 500;
   }
   .input-icon {
