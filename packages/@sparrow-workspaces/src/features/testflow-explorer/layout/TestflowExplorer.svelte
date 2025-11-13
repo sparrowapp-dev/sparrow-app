@@ -2662,7 +2662,16 @@
                       TestflowNavigatorEnum.SCHEDULE
                     ) {
                       // Handle scheduled run logic
-                      await onClickScheduledRun();
+                      notifications.warning(
+                        "Please navigate to Testflow to execute the run",
+                      );
+                    } else if (
+                      $tab?.property?.testflow?.state?.testflowNavigator ===
+                      TestflowNavigatorEnum.TESTDATA
+                    ) {
+                      notifications.warning(
+                        "Please navigate to Testflow to execute the run",
+                      );
                     } else {
                       unselectNodes();
                       await onClickRun();
