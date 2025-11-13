@@ -14,6 +14,7 @@
     RequestNavigatorTestFlow,
     RequestParameterTestFlow,
     RequestAuthorizationTestFlow,
+    RequestAssertionsTestFlow,
     ResponseErrorScreen,
     ResponseHeaders,
     ResponseNavigator,
@@ -75,6 +76,8 @@
       requestNavigation = "Headers";
     } else if (tab === "Authorization") {
       requestNavigation = "Authorization";
+    } else if (tab === "Assertions") {
+      requestNavigation = "Assertions";
     } else {
       requestNavigation = "Parameters";
     }
@@ -366,6 +369,16 @@
               {handleOpenCurrentDynamicExpression}
               {onUpdateEnvironment}
               bind:selectAuthHeader
+            />
+          {:else if requestNavigation === RequestSectionEnum.ASSERTIONS}
+            <RequestAssertionsTestFlow
+              tests={selectedBlock?.data?.requestData?.tests ?? { noCode: [] }}
+              onTestsChange={(updatedTests) =>
+                handleUpdateRequestData("tests", updatedTests)}
+              tabSplitDirection="horizontal"
+              testResults={[]}
+              responseBody={selectedNodeResponse?.response?.body ?? ""}
+              responseHeader={selectedNodeResponse?.response?.headers ?? []}
             />
           {/if}
         </div>

@@ -55,6 +55,11 @@
         id: RequestSectionEnum.AUTHORIZATION,
         count: 0,
       },
+      {
+        name: "Assertions",
+        id: RequestSectionEnum.ASSERTIONS,
+        count: 0,
+      },
     ];
   };
 
