@@ -36,8 +36,8 @@ export const replaceTestflowDataSet = (_id: string | number, _dataset: any) => {
   testflowDataSets.update((current) => {
     const updated = new Map(current);
     const existingDatasets = updated.get(_id) || [];
-    updatedList = existingDatasets.map((ds: any) =>
-      ds.name === _dataset.name ? _dataset : ds,
+    updatedList = existingDatasets.map(
+      (ds: any) => (ds.id === _dataset.id ? _dataset : ds), // Match individual dataset ID
     );
     updated.set(_id, updatedList);
     return updated;
