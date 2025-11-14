@@ -2360,7 +2360,7 @@ export class TestflowExplorerPageViewModel {
         progressiveTab?.path?.workspaceId,
       );
       if (response?.isSuccessful) {
-        const dataset = response?.data?.data?.item.dataSet;
+        const dataset = response?.data?.data;
         replaceTestflowDataSet(progressiveTab.id as string, dataset || []);
         notifications.success(`Data set imported successfully.`);
       }
