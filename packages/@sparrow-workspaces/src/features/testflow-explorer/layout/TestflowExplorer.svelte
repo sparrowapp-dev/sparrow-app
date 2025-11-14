@@ -510,22 +510,35 @@
       const datasetHistory =
         schedule.schedularDataSetHistory[0].schedularDataRunHistory;
       if (Array.isArray(datasetHistory) && datasetHistory.length > 0) {
-        const sortedDatasetRuns = [...datasetHistory].sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
-        );
-        const lastDatasetRun = sortedDatasetRuns[0];
-        if (lastDatasetRun.status === "pass") {
+        const datasetHistoryStatus = schedule.schedularDataSetHistory[0].status;
+        if (datasetHistoryStatus === "pass") {
           lastResult = "Success";
-        } else if (lastDatasetRun.status === "fail") {
-          if (lastDatasetRun.successRequests > 0) {
+        } else if (datasetHistoryStatus === "error") {
+          lastResult = "Error";
+        } else if (datasetHistoryStatus === "fail") {
+          // Check if any object in datasetHistory has status "pass"
+          const hasAnyPass = datasetHistory.some(
+            (item) => item.status === "pass",
+          );
+
+          if (hasAnyPass) {
             lastResult = "Partial Fail";
           } else {
-            lastResult = "Fail";
+            // All have fail status, check if any has successRequests > 0
+            const hasAnySuccessRequests = datasetHistory.some(
+              (item) => item.successRequests && item.successRequests > 0,
+            );
+
+            if (hasAnySuccessRequests) {
+              lastResult = "Partial Fail";
+            } else {
+              lastResult = "Fail";
+            }
           }
-        } else if (lastDatasetRun.status === "pending") {
+        } else if (datasetHistoryStatus === "pending") {
           lastResult = "Pending";
         } else {
-          lastResult = lastDatasetRun.status || "Unknown";
+          lastResult = datasetHistoryStatus || "Unknown";
         }
       }
     } else {
@@ -2693,16 +2706,16 @@
                       TestflowNavigatorEnum.SCHEDULE
                     ) {
                       // Handle scheduled run logic
-                      notifications.warning(
-                        "Please navigate to Testflow to execute the run",
-                      );
+                      onUpdateTestflowState({
+                        testflowNavigator: TestflowNavigatorEnum.TESTFLOW,
+                      });
                     } else if (
                       $tab?.property?.testflow?.state?.testflowNavigator ===
                       TestflowNavigatorEnum.TESTDATA
                     ) {
-                      notifications.warning(
-                        "Please navigate to Testflow to execute the run",
-                      );
+                      onUpdateTestflowState({
+                        testflowNavigator: TestflowNavigatorEnum.TESTFLOW,
+                      });
                     } else {
                       unselectNodes();
                       await onClickRun();

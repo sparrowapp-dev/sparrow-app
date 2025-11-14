@@ -36,7 +36,7 @@
   import { get, type Unsubscriber } from "svelte/store";
   import { Button } from "@sparrow/library/ui";
   import { currentStep, isTestFlowTourGuideOpen } from "../../../../stores";
-  import { testflowDataSetIndex } from "../../store";
+  import { testflowDataSetItem } from "../../store/testflow";
 
   /**
    * The data object containing various handlers and data stores.
@@ -124,27 +124,24 @@
   };
 
   const setCurrentBlockFromDataset = () => {
-    const index = get(testflowDataSetIndex);
-    const current = data?.currentItem;
-    if (!current || !current.request || !current.response) return null;
-    // Fetch request/response per index safely
-    const request = Array.isArray(current.request)
-      ? (current.request[index] ?? current.request[current.request.length - 1])
-      : current.request;
-    const response = Array.isArray(current.response)
-      ? (current.response[index] ??
-        current.response[current.response.length - 1])
-      : current.response;
-
-    return {
-      id: current.id,
-      request,
-      response,
+    const items = get(testflowDataSetItem);
+    let matchedItem = null;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i]?.node.id === id) {
+        matchedItem = items[i];
+        break;
+      }
+    }
+    const updateItem = {
+      id,
+      request: matchedItem?.request,
+      response: matchedItem?.response,
     };
+    return updateItem;
   };
 
   // Reactively update currentBlock based on currentItem + dataset index
-  $: if (data?.currentItem && $testflowDataSetIndex !== undefined) {
+  $: if (data?.currentItem && $testflowDataSetItem) {
     const datasetBlock = setCurrentBlockFromDataset();
     if (datasetBlock) {
       currentBlock = datasetBlock;
