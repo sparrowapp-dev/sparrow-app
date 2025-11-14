@@ -21,7 +21,10 @@ import { TestflowTabAdapter } from "src/adapter";
 import { WorkspaceType } from "@sparrow/common/enums";
 import { tick } from "svelte";
 import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
-import { updateTestflowSchedules } from "@sparrow/common/store";
+import {
+  updateTestflowDataSets,
+  updateTestflowSchedules,
+} from "@sparrow/common/store";
 
 export class TestflowViewModel {
   private workspaceRepository = new WorkspaceRepository();
@@ -234,7 +237,10 @@ export class TestflowViewModel {
         const allChildTabs = childTabs.map((tab) => tab.tabId);
         tabsIdsToDelete.push(...allChildTabs);
       }
-      await this.tabRepository.deleteTabsWithTabIdInAWorkspace(testflow.workspaceId, tabsIdsToDelete);
+      await this.tabRepository.deleteTabsWithTabIdInAWorkspace(
+        testflow.workspaceId,
+        tabsIdsToDelete,
+      );
       notifications.success(
         `${testflow.name} testflow is removed from ${currentWorkspace.name}.`,
       );
@@ -574,6 +580,32 @@ export class TestflowViewModel {
         isSuccessful: false,
         message: error.message || "Error scheduling test flow run",
       };
+    }
+  };
+
+  public saveTestflowDataset = async (_tab) => {
+    const currentDataset = _tab;
+    const response = await this.testflowService.renameTestDataSet(
+      currentDataset.path.testflowId,
+      currentDataset.id,
+      currentDataset.name,
+      currentDataset.path.workspaceId,
+    );
+    if (response) {
+      const datasets = response.data?.data.result;
+      updateTestflowDataSets(
+        currentDataset.path.testflowId as string,
+        datasets || [],
+      );
+      notifications.success(
+        `Changes saved for "${currentDataset.name}" test data.`,
+      );
+      return true;
+    } else {
+      notifications.error(
+        `Failed to save changes for "${currentDataset.name}" test data.`,
+      );
+      return false;
     }
   };
 }

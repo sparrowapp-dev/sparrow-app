@@ -70,6 +70,7 @@
     ArrowRightRegular,
     WorkspaceRegular,
   } from "@sparrow/library/icons";
+  import { FormatCount } from "@sparrow/common/utils";
   export let onOpenWorkspace: (workspaceId: string) => Promise<void>;
   export let appVersion;
 
@@ -876,7 +877,7 @@
       <Tooltip title={"Star Us On GitHub"} placement={"top-center"}>
         <GithubStarRedirect
           onClick={navigateToGithub}
-          count={githubRepo?.stargazers_count || ""}
+          count={FormatCount(githubRepo?.stargazers_count) || ""}
         />
       </Tooltip>
 

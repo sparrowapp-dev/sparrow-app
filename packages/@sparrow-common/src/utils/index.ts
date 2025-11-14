@@ -21,6 +21,7 @@ export { Base64Converter } from "./base64Converter";
 export { InitSavedRequestTab } from "./init-saved-request";
 export { InitMockRequestTab } from "./init-mock-request";
 export { InitTestflowScheduleTab } from "./init-testflow-schedule-tab";
+export { InitTestflowDataSetTab } from "./init-testflow-dataset-tab";
 export { InitHubTab } from "./init-hub-tab";
 export { StatusCode } from "./status-code";
 export {
@@ -42,3 +43,4 @@ export { InitTestflowScheduleRunViewTab } from "./init-testflow-schedule-run-vie
 export { TimeISOExtractor } from "./extractTimefromISO";
 export { FormatDays } from "./formatDays";
 export { FormatCurl } from "./formatCurl";
+export { FormatCount } from "./formatCount";
