@@ -430,12 +430,12 @@
         >
           <!-- Left Sidebar -->
           <div
-            class="h-100"
+            class="h-100 d-flex flex-column"
             style="width: {tabSplitDirection === 'vertical'
               ? '100%'
-              : '25%'}; overflow: auto;"
+              : '40%'}; overflow: hidden;"
           >
-            <div class="pb-2">
+            <div class="pb-2" style="flex: 1; overflow-y: auto;">
               {#each localTest.noCode as test, index}
                 <TestListItem
                   {test}
@@ -447,18 +447,15 @@
                 />
               {/each}
             </div>
-
-            <div class="d-flex gap-2 pb-2" style="flex-wrap:wrap;">
-              <div class="">
-                <Button
-                  startIcon={AddRegular}
-                  title={"Add Test"}
-                  type="primary"
-                  size="small"
-                  onClick={addTest}
-                />
-              </div>
-              <div class="">
+            <div class="d-flex align-items-center pb-2 pt-2">
+              <Button
+                startIcon={AddRegular}
+                title={"Add Test"}
+                type="primary"
+                size="small"
+                onClick={addTest}
+              />
+              {#if localTest.noCode.length > 1}
                 <Button
                   title={"Remove All"}
                   startIcon={DeleteRegular}
@@ -467,27 +464,28 @@
                   onClick={() => {
                     isDeletePopup = true;
                   }}
+                  customStyle="margin-left: 8px;"
                 />
-              </div>
+              {/if}
             </div>
           </div>
 
           <!-- Right Form -->
           <div
-            class="h-100 gap-2 d-flex {tabSplitDirection === 'vertical'
+            class="h-100 d-flex {tabSplitDirection === 'vertical'
               ? 'border-top pt-2'
-              : 'border-start ms-2 ps-2'}"
+              : 'border-start'}"
             style="width: {tabSplitDirection === 'vertical'
               ? '100%'
-              : '75%'}; overflow: auto; flex-flow:wrap; align-content:flex-start;"
+              : '60%'}; overflow: auto; flex-flow:wrap; align-content:flex-start; padding: 0 0 0 16px;"
           >
             {#if localTest.noCode.some((t) => t.isActive)}
               {#each localTest.noCode as test}
                 {#if test.isActive}
                   <div
-                    style="display: flex; flex-wrap: wrap; gap: 1rem; width: 100%;"
+                    style="display: flex; flex-direction: column; gap: 1rem; width: 100%;"
                   >
-                    <div style="flex: 1 1 45%; min-width: 0;">
+                    <div style="width: 100%;">
                       <label class="form-label text-fs-12"
                         >Name <span style="color: var(--text-ds-danger-300)"
                           >*</span
@@ -516,7 +514,7 @@
                         </div>
                       {/if}
                     </div>
-                    <div style="flex: 1 1 45%; min-width: 0;">
+                    <div style="width: 100%;">
                       <label class="form-label text-fs-12"
                         >Test Target <span
                           style="color: var(--text-ds-danger-300)">*</span
@@ -564,7 +562,7 @@
                         </div>
                       {/if}
                     </div>
-                    <div style="flex: 1 1 45%; min-width: 0;">
+                    <div style="width: 100%;">
                       <label class="form-label text-fs-12"
                         >Condition <span
                           style="color: var(--text-ds-danger-300)">*</span
@@ -669,7 +667,7 @@
                       {/if}
                     </div>
                     {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER || test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON || test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
-                      <div style="flex: 1 1 45%; min-width: 0;">
+                      <div style="width: 100%;">
                         <label class="form-label text-fs-12">
                           {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
                             Header
@@ -861,7 +859,7 @@
                       </div>
                     {/if}
                     {#if test?.condition === TestCaseConditionOperatorEnum.EQUALS || test?.condition === TestCaseConditionOperatorEnum.NOT_EQUAL || test?.condition === TestCaseConditionOperatorEnum.EXISTS || test?.condition === TestCaseConditionOperatorEnum.DOES_NOT_EXIST || test?.condition === TestCaseConditionOperatorEnum.LESS_THAN || test?.condition === TestCaseConditionOperatorEnum.GREATER_THAN || test?.condition === TestCaseConditionOperatorEnum.CONTAINS || test?.condition === TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN || test?.condition === TestCaseConditionOperatorEnum.IN_LIST || test?.condition === TestCaseConditionOperatorEnum.NOT_IN_LIST || test?.condition === TestCaseConditionOperatorEnum.GREATER_THAN_OR_EQUAL || test?.condition === TestCaseConditionOperatorEnum.LESS_THAN_OR_EQUAL}
-                      <div style="flex: 1 1 45%; min-width: 0;">
+                      <div style="width: 100%;">
                         <label class="form-label text-fs-12"
                           >Comparison Value <span
                             style="color: var(--text-ds-danger-300)">*</span
@@ -886,7 +884,6 @@
                         {/if}
                       </div>
                     {/if}
-                    <div style="flex: 1 1 45%; min-width: 0;"></div>
                   </div>
                 {/if}
               {/each}
