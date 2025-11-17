@@ -3,6 +3,7 @@
     CopyRegular,
     DeleteRegular,
     MoreHorizontalRegular,
+    WarningFilled,
   } from "@sparrow/library/icons";
   import { Button, Modal, Options, Tooltip } from "@sparrow/library/ui";
 
@@ -138,11 +139,21 @@
     <span
       role="button"
       tabindex="0"
-      class="ellipsis text-fs-12 h-100 w-100 pt-1"
+      class="ellipsis text-fs-12 h-100 w-100 pt-1 d-flex align-items-center gap-1"
       on:click={() => selectTest(test)}
       on:keydown={(e) => e.key === "Enter" && selectTest(test)}
-      >{test.name}</span
     >
+      {test.name}
+      {#if test.hasUnsavedChanges}
+        <Tooltip
+          title={"Changes not saved. Click the Save icon to apply changes."}
+          placement={"top"}
+          zIndex={702}
+        >
+          <WarningFilled size={12} color="var(--text-ds-warning-300)" />
+        </Tooltip>
+      {/if}
+    </span>
     <Tooltip
       title={"More"}
       show={!showMenu}
