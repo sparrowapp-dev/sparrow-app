@@ -29,6 +29,7 @@
   import * as Sentry from "@sentry/svelte";
   import { currentStep, isTestFlowTourGuideOpen } from "../../../../stores";
   import { emptyRequest } from "../../utils";
+  import NoCode from "../request-tests/sub-components/no-code/NoCode.svelte";
 
   export let selectedBlock;
   export let onClose;
@@ -371,15 +372,18 @@
               bind:selectAuthHeader
             />
           {:else if requestNavigation === RequestSectionEnum.ASSERTIONS}
-            <RequestAssertionsTestFlow
-              tests={selectedBlock?.data?.requestData?.tests ?? { noCode: [] }}
-              onTestsChange={(updatedTests) =>
-                handleUpdateRequestData("tests", updatedTests)}
-              tabSplitDirection="horizontal"
-              testResults={[]}
-              responseBody={selectedNodeResponse?.response?.body ?? ""}
-              responseHeader={selectedNodeResponse?.response?.headers ?? []}
-            />
+            {#key selectedBlock?.id}
+              <NoCode
+                tests={selectedBlock?.data?.requestData?.tests ?? []}
+                onTestsChange={(updatedTests) => {
+                  handleUpdateRequestData("tests", updatedTests);
+                }}
+                tabSplitDirection="horizontal"
+                testResults={[]}
+                responseBody={selectedNodeResponse?.response?.body ?? ""}
+                responseHeader={selectedNodeResponse?.response?.headers ?? []}
+              />
+            {/key}
           {/if}
         </div>
       </div>

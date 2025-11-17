@@ -360,6 +360,9 @@ export class RxDB {
           23: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          24: function (oldDoc: TabDocument) {
+            return oldDoc;
+          },
         },
       },
       collection: {
@@ -521,6 +524,9 @@ export class RxDB {
                 oldDoc.nodes = updatedNodes;
               }
             }
+            return oldDoc;
+          },
+          2: function (oldDoc: EnvironmentDocument) {
             return oldDoc;
           },
         },

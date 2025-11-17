@@ -15,13 +15,15 @@
   id="request-tab-test"
 >
   <div style="flex:1; overflow:auto;">
-    <NoCode
-      {tabSplitDirection}
-      {tests}
-      {onTestsChange}
-      {testResults}
-      {responseBody}
-      {responseHeader}
-    />
+    {#if tests}
+      <NoCode
+        {tabSplitDirection}
+        {tests}
+        {onTestsChange}
+        {testResults}
+        {responseBody}
+        {responseHeader}
+      />
+    {/if}
   </div>
 </div>
