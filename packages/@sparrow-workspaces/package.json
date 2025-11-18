@@ -1,6 +1,6 @@
 {
   "name": "@sparrow/workspaces",
-  "version": "2.34.0",
+  "version": "2.35.0",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
@@ -27,6 +27,7 @@
     "./features/graphql-explorer/store": "./src/features/graphql-explorer/store/index.ts",
     "./features/socket-explorer/store": "./src/features/socket-explorer/store/index.ts",
     "./features/socketio-explorer/store": "./src/features/socketio-explorer/store/index.ts",
+    "./features/testflow-dataset-explorer/utils": "./src/features/testflow-dataset-explorer/utils/index.ts",
     "./components": "./src/components/index.ts",
     "./constants": "./src/constants/index.ts",
     "./hoc": "./src/hoc/index.ts",

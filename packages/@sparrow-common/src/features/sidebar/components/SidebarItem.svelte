@@ -5,7 +5,7 @@
   export let item: SidebarItemObj;
   export let slidebarPlace;
   export let isGuestUser;
-  export let type="desktop";
+  export let type = "desktop";
   let isRouteActive = false;
   let isPressed = false;
 
@@ -20,7 +20,11 @@
 
 <Tooltip
   placement="right-center"
-  title={item.heading.toLowerCase()=="community" && type=="desktop"? "Community" :item.disabled ? "Coming Soon" :item.heading}
+  title={item.heading.toLowerCase() === "community" && type === "desktop"
+    ? "Community"
+    : item.disabled
+      ? item.message || "Coming Soon"
+      : item.heading}
   zIndex={600}
 >
   <Router>

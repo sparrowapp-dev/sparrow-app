@@ -3804,7 +3804,6 @@ class RestExplorerViewModel {
    * @param Prompt - Prompt from the user
    */
   public generateAIResponseWS = async (prompt = "") => {
-    debugger;
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();
 
@@ -4078,7 +4077,6 @@ class RestExplorerViewModel {
    * @returns A promise that resolves to the response from the AI assistant service.
    */
   public generateAiResponse = async (prompt = "") => {
-    debugger;
     // Set the request state to indicate that a response is being generated
     await this.updateRequestState({ isChatbotGeneratingResponse: true });
     const componentData = this._tab.getValue();

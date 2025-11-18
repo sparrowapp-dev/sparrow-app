@@ -5,18 +5,43 @@
     MoreVerticalRegular,
     ThreeDotIcon,
   } from "@sparrow/library/icons";
+  import { testflowDataSets, getDatasetById } from "@sparrow/common/store";
 
   export let r;
   export let schedule;
   export let formatDate: (date: string) => string;
   export let getRunType: (flowName: string) => string;
   export let isScheduled: boolean;
-  export let onDeleteTestflowScheduleHistory;
+  export let onDeleteResult;
   export let onScheduleRunview;
-  export let isTestflowScheduleEditable;
+  export let isEditable;
 
   let deleteLoader = false;
   let isDeleteModalOpen: boolean = false;
+
+  // Get selected dataset from store using the getDatasetById function
+  $: selectedTestData = (() => {
+    // First try to get dataset ID from originalDataSet
+    const testflowDataSetId = schedule?.testflowDataSetId;
+    if (testflowDataSetId) {
+      // Use the getDatasetById function to find the dataset
+      return getDatasetById(testflowDataSetId);
+    }
+
+    // Fallback: return null if no dataset ID found
+    return null;
+  })();
+
+  // Create selectedDataset object from store data
+  $: selectedDataset = selectedTestData
+    ? {
+        id: selectedTestData.id || "",
+        name: selectedTestData.name || "Dataset Execution",
+        formatType: selectedTestData.formatType || "JSON",
+        fileSize: selectedTestData.fileSize || "",
+        item: selectedTestData.item || null,
+      }
+    : null;
 
   function handleDeleteCancel() {
     isDeleteModalOpen = false;
@@ -24,7 +49,7 @@
 
   async function handleDeleteConfirm() {
     deleteLoader = true;
-    await onDeleteTestflowScheduleHistory(r?.id);
+    await onDeleteResult(r?.id);
     isDeleteModalOpen = false;
     deleteLoader = false;
   }
@@ -62,7 +87,7 @@
 <tr
   on:click={() => {
     if (r?.status === "pending" || r?.status === "error") return;
-    onScheduleRunview(r, schedule);
+    onScheduleRunview(r, schedule, selectedDataset);
   }}
   style={r?.status === "pending" ? "pointer-events: none;" : ""}
 >
@@ -114,7 +139,7 @@
 
   <td bind:this={activeWrapper}>
     <span class="threedot-icon-container d-flex">
-      {#if isTestflowScheduleEditable}
+      {#if isEditable}
         <Button
           tabindex={-1}
           id={`show-more-schedule-result-${r.id}`}

@@ -16,6 +16,7 @@ export interface TestflowScheduleWrapperTabInterface {
     testflowId: string;
     runConfiguration: RunConfigurationDTO;
     notification: NotificationDTO;
+    testflowDataSetId: string;
     state: TestflowScheduleStateDto;
   };
 }

@@ -7,6 +7,7 @@ import {
   InitTestflowScheduleTab,
   scrollToTab,
   InitEnvironmentTab,
+  InitTestflowDataSetTab,
 } from "@sparrow/common/utils";
 import { RequestTabAdapter, TestflowTabAdapter } from "../../../../adapter";
 import type {
@@ -68,10 +69,22 @@ import { PlanRepository } from "@app/repositories/plan.repository";
 import { TeamService } from "src/services/team.service";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 import { getAuthJwt } from "src/utils/jwt";
-import type { ScheduleTestFlowRunDto } from "@sparrow/common/types/workspace/testflow-dto";
-import { updateTestflowSchedules } from "@sparrow/common/store";
+import type {
+  ScheduleTestFlowRunDto,
+  TestflowDataSetImportDto,
+} from "@sparrow/common/types/workspace/testflow-dto";
+import {
+  testflowDataSets,
+  updateTestflowDataSets,
+  updateTestflowSchedules,
+} from "@sparrow/common/store";
 import { TestflowScheduleNavigatorEnum } from "@sparrow/common/types/workspace/testflow-schedule-tab";
 import { captureEvent } from "src/utils/posthog/posthogConfig";
+import type { TestflowDataSetItem } from "@sparrow/common/types/workspace/testflow-dateset-tab";
+import {
+  addTestflowDataSet,
+  replaceTestflowDataSet,
+} from "@sparrow/common/store";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -107,6 +120,7 @@ export class TestflowExplorerPageViewModel {
         this.tab = t;
 
         this.fetchTestflow();
+        this.fetchTestflowDataSets();
       }, 0);
     }
   }
@@ -1842,6 +1856,7 @@ export class TestflowExplorerPageViewModel {
         emails: _schedule.notification.emails,
         receiveNotifications: _schedule.notification.receiveNotifications,
       })
+      .updateTestflowDataSetId(_schedule.testflowDataSetId)
       .getValue();
     await this.tabRepository.createTab(initTestflowScheduleTab);
   };
@@ -1884,6 +1899,23 @@ export class TestflowExplorerPageViewModel {
     }
   };
 
+  private fetchTestflowDataSets = async () => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const guestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    const isGuestUser = guestUser?.getLatest().toMutableJSON().isGuestUser;
+    if (isGuestUser) return;
+    const response = await this.testflowService.fetchTestflowDataSets(
+      progressiveTab.path.workspaceId as string,
+      progressiveTab.id as string,
+    );
+    if (response?.isSuccessful) {
+      const datasets = response.data?.data.datasets;
+      updateTestflowDataSets(progressiveTab.id as string, datasets || []);
+    }
+  };
+
   public openTestflowScheduleConfigurationsTab = async (_schedule: string) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const initTestflowScheduleTab = new InitTestflowScheduleTab(
@@ -1907,6 +1939,7 @@ export class TestflowExplorerPageViewModel {
       .updateState({
         scheduleNavigator: TestflowScheduleNavigatorEnum.CONFIGURATION,
       })
+      .updateTestflowDataSetId(_schedule.testflowDataSetId)
       .getValue();
     await this.tabRepository.createTab(initTestflowScheduleTab);
   };
@@ -1919,6 +1952,7 @@ export class TestflowExplorerPageViewModel {
     environmentId: string,
     runConfiguration: ScheduleTestFlowRunDto["runConfiguration"],
     notification: ScheduleTestFlowRunDto["notification"],
+    testflowDataSetId?: string,
   ) => {
     captureEvent("set_schedule_run_cta_clicked", {
       event_source: "web_app",
@@ -1943,6 +1977,7 @@ export class TestflowExplorerPageViewModel {
         testflowId,
         runConfiguration,
         notification,
+        testflowDataSetId,
       };
 
       const response = await this.testflowService.scheduleTestFlowRun(
@@ -2054,11 +2089,16 @@ export class TestflowExplorerPageViewModel {
         this.fetchTestflow();
       }, i * 500);
     }
+    const payload = {
+      testflowDataSetId:
+        progressiveTab?.property?.testflowSchedule?.testflowDataSetId || "",
+    };
     const response = await this.testflowService.runTestflowSchedule(
       progressiveTab.path.workspaceId,
       progressiveTab.id,
       _scheduleId,
       baseUrl,
+      payload,
     );
     if (response?.isSuccessful) {
       const schedules = response.data.data.schedules;
@@ -2099,6 +2139,18 @@ export class TestflowExplorerPageViewModel {
       this.editTestflowSchedule(_scheduleId);
     } else if (_type === "delete") {
       this.deleteTestflowSchedule(_scheduleId, _scheduleName);
+    }
+  };
+
+  public performTestDataSetOperations = async (
+    _type: "delete" | "export" | "rename",
+    testflowDataSetId: string,
+    updatedDataSetName?: string,
+  ) => {
+    if (_type === "delete") {
+      return this.deleteTestDataSet(testflowDataSetId);
+    } else if (_type === "rename") {
+      return this.renameTestDataSet(testflowDataSetId, updatedDataSetName);
     }
   };
 
@@ -2176,5 +2228,157 @@ export class TestflowExplorerPageViewModel {
       return teamDoc;
     }
     return null;
+  };
+
+  public importTestflowDataSet = async (
+    dataSet: any,
+    dataSetType: string,
+    name: string,
+  ) => {
+    try {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const payload = {
+        item: dataSet,
+        formatType: dataSetType,
+        name,
+      } as TestflowDataSetImportDto;
+      const response = await this.testflowService.importTestflowDataSet(
+        progressiveTab.id as string,
+        payload,
+        progressiveTab?.path?.workspaceId,
+      );
+      if (response?.isSuccessful) {
+        const dataset = response.data?.data.data;
+        addTestflowDataSet(progressiveTab.id as string, dataset || []);
+        notifications.success(`Data set imported successfully.`);
+      }
+      return response;
+    } catch (err) {
+      notifications.error("Failed to import dataset. Please try again.");
+    }
+  };
+
+  public importTestflowDataSetFileChange = async (
+    dataSet: any,
+    dataSetType: string,
+    name: string,
+  ) => {
+    try {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const payload = {
+        item: dataSet,
+        formatType: dataSetType,
+        name,
+      } as TestflowDataSetImportDto;
+      const response =
+        await this.testflowService.importTestflowDataSetFileChange(
+          progressiveTab.id as string,
+          payload,
+          progressiveTab?.path?.workspaceId,
+        );
+      if (response?.isSuccessful) {
+        const dataset = response?.data?.data?.data;
+        addTestflowDataSet(progressiveTab.id as string, dataset || []);
+        notifications.success(`Data set imported successfully.`);
+      }
+      return response;
+    } catch (err) {
+      notifications.error("Failed to import dataset. Please try again.");
+    }
+  };
+
+  public updateDatasetByName = async (
+    dataSet: any,
+    dataSetType: string,
+    name: string,
+  ) => {
+    try {
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const payload = {
+        item: dataSet,
+        formatType: dataSetType,
+        name,
+      } as TestflowDataSetImportDto;
+      const response = await this.testflowService.updateDatasetByName(
+        progressiveTab.id as string,
+        payload,
+        progressiveTab?.path?.workspaceId,
+      );
+      if (response?.isSuccessful) {
+        const dataset = response?.data?.data;
+        replaceTestflowDataSet(progressiveTab.id as string, dataset || []);
+        notifications.success(`Data set imported successfully.`);
+      }
+      return response;
+    } catch (err) {
+      notifications.error("Failed to import dataset. Please try again.");
+    }
+  };
+
+  private deleteTestDataSet = async (testflowDataSetId: string) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const response = await this.testflowService.deleteTestDataSet(
+      progressiveTab.id as string,
+      testflowDataSetId,
+      progressiveTab?.path?.workspaceId,
+    );
+    if (response?.isSuccessful) {
+      const tabsIdsToDelete = [];
+      const mainTabId = await this.tabRepository.getTabById(testflowDataSetId);
+      if (mainTabId) tabsIdsToDelete.push(mainTabId.tabId);
+      await this.tabRepository.deleteTabsWithTabIdInAWorkspace(
+        progressiveTab.path.workspaceId,
+        tabsIdsToDelete,
+      );
+      const datasets = response.data?.data.result;
+      updateTestflowDataSets(progressiveTab.id as string, datasets || []);
+    }
+    return response;
+  };
+
+  public renameTestDataSet = async (
+    testflowDataSetId: string,
+    updatedDataSetName: string,
+  ) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const response = await this.testflowService.renameTestDataSet(
+      progressiveTab.id as string,
+      testflowDataSetId,
+      updatedDataSetName,
+      progressiveTab?.path?.workspaceId,
+    );
+    if (response?.isSuccessful) {
+      const datasets = response.data?.data.result;
+      updateTestflowDataSets(progressiveTab.id as string, datasets || []);
+      const mainTab = await this.tabRepository.getTabById(testflowDataSetId);
+      if (mainTab) {
+        await this.tabRepository.updateTab(mainTab.tabId, {
+          name: updatedDataSetName,
+        });
+      }
+    }
+    return response;
+  };
+
+  public openTestflowDataSetTab = async (dataSet: TestflowDataSetItem) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const initTestflowDataSetTab = new InitTestflowDataSetTab(
+      dataSet.id,
+      progressiveTab.path.workspaceId,
+      progressiveTab.id,
+    )
+      .updateName(dataSet.name)
+      .updateDataSet(dataSet?.item)
+      .updateFormatType(dataSet.formatType)
+      .updateTimestamps(dataSet.createdAt, dataSet.updatedAt)
+      .updateFileDetails({
+        fileSize: dataSet.fileSize,
+        fileUrl: dataSet.fileUrl,
+        updatedBy: dataSet.updatedBy,
+      })
+      .updateUpdatedAt(dataSet?.updatedAt || "")
+      .getValue();
+    await this.tabRepository.removeTab(initTestflowDataSetTab.id);
+    await this.tabRepository.createTab(initTestflowDataSetTab);
   };
 }
