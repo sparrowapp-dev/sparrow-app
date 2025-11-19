@@ -698,9 +698,6 @@ export class RxDB {
             return oldDoc;
           },
           2: function (oldDoc) {
-            return oldDoc;
-          },
-          3: function (oldDoc) {
             if (oldDoc && Array.isArray(oldDoc.nodes)) {
               const test = {
                 testCaseMode: "no-code",
