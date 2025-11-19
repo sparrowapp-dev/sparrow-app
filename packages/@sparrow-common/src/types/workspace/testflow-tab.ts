@@ -204,6 +204,7 @@ export type TFHistoryAPIResponseStoreType = {
   body: string;
   time: number;
   size: number;
+  testResults?: any[];
   responseContentType?: RequestDataTypeEnum;
 };
 export type TFNodeStoreType = {

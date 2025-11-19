@@ -7,13 +7,13 @@
   import { loadingState } from "@sparrow/common/store";
   import { WorkspaceRole } from "@sparrow/common/enums";
 
-  export let responseTestResults = [];
-  export let responseTestMessage = "";
-  export let tests;
-  export let onFixTestScript;
-  export let tabId;
-  export let isGuestUser;
-  export let userRole;
+  export let responseTestResults: any[] = [];
+  export let responseTestMessage: any[] = [];
+  export let tests: any;
+  export let onFixTestScript: any;
+  export let tabId: string;
+  export let isGuestUser: boolean;
+  export let userRole: string;
 
   let filter: "all" | "passed" | "failed" = "all";
   let allBtn: HTMLSpanElement;
@@ -39,8 +39,14 @@
       <span
         bind:this={allBtn}
         role="button"
+        tabindex="0"
         on:click={() => {
           filter = "all";
+        }}
+        on:keydown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            filter = "all";
+          }
         }}
         class="rounded text-fs-12 border-radius-2 px-2 py-1 btn-formatter"
         style={filter === "all"
@@ -53,8 +59,14 @@
       <span
         bind:this={passedBtn}
         role="button"
+        tabindex="0"
         on:click={() => {
           filter = "passed";
+        }}
+        on:keydown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            filter = "passed";
+          }
         }}
         class="rounded text-fs-12 border-radius-2 px-2 py-1 btn-formatter"
         style={filter === "passed"
@@ -67,8 +79,14 @@
       <span
         bind:this={failedBtn}
         role="button"
+        tabindex="0"
         on:click={() => {
           filter = "failed";
+        }}
+        on:keydown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            filter = "failed";
+          }
         }}
         class="rounded text-fs-12 border-radius-2 px-2 py-1 btn-formatter"
         style={filter === "failed"
