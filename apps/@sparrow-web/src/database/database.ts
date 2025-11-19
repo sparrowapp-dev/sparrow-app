@@ -363,6 +363,24 @@ export class RxDB {
           24: function (oldDoc: TabDocument) {
             return oldDoc;
           },
+          25: function (oldDoc: TabDocument) {
+            const test = {
+              testCaseMode: "no-code",
+              noCode: [],
+              script: "",
+            };
+            if (oldDoc?.property?.testflow?.nodes) {
+              oldDoc.property.testflow.nodes =
+                oldDoc.property.testflow.nodes.map((node) => {
+                  if (node?.data?.requestData) {
+                    node.data.requestData.tests = test;
+                  }
+                  return node;
+                });
+            }
+
+            return oldDoc;
+          },
         },
       },
       collection: {
@@ -527,6 +545,22 @@ export class RxDB {
             return oldDoc;
           },
           2: function (oldDoc) {
+            return oldDoc;
+          },
+          3: function (oldDoc) {
+            if (oldDoc && Array.isArray(oldDoc.nodes)) {
+              const test = {
+                testCaseMode: "no-code",
+                noCode: [],
+                script: "",
+              };
+              oldDoc.nodes = oldDoc.nodes.map((node) => {
+                if (node?.data?.requestData) {
+                  node.data.requestData.tests = test;
+                }
+                return node;
+              });
+            }
             return oldDoc;
           },
         },
