@@ -4,6 +4,7 @@
   import { TestCaseModeEnum } from "@sparrow/common/types/workspace";
   import { ErrorCircleRegular, SparkleRegular } from "@sparrow/library/icons";
   import { Button, Tag } from "@sparrow/library/ui";
+  import { onMount, tick } from "svelte";
   import { loadingState } from "@sparrow/common/store";
   import { WorkspaceRole } from "@sparrow/common/enums";
 
@@ -13,6 +14,7 @@
   export let onFixTestScript;
   export let tabId;
   export let isGuestUser;
+  export let isSharedWorkspace;
   export let userRole;
 
   let filter: "all" | "passed" | "failed" = "all";
@@ -26,6 +28,33 @@
     if (filter === "failed") return tc.testStatus === false;
     return true;
   });
+  onMount(async () => {
+    await tick(); // wait for DOM to render
+    sliderStyle = getSliderStyle(filteredResults); // set initial slider position
+  });
+
+  $: sliderStyle = getSliderStyle(filteredResults);
+
+  function getSliderStyle(filter: any) {
+    if (!allBtn || !passedBtn || !failedBtn) return "";
+    const gap = 4; // or read from CSS
+    const prettyWidth = allBtn.offsetWidth;
+    const rawWidth = passedBtn?.offsetWidth || 0;
+    const previewWidth = failedBtn.offsetWidth;
+    let left = 0;
+    let width = prettyWidth;
+    if (filter === "all") {
+      left = prettyWidth / 2;
+      width = prettyWidth;
+    } else if (filter === "passed") {
+      left = prettyWidth + gap + rawWidth / 2;
+      width = rawWidth;
+    } else if (filter === "failed") {
+      left = prettyWidth + gap + rawWidth + gap + previewWidth / 2;
+      width = previewWidth;
+    }
+    return `left: ${left}px; width: ${width}px; transform: translateX(-50%);`;
+  }
 </script>
 
 {#if responseTestResults?.length > 0 || responseTestMessage?.length > 0}
