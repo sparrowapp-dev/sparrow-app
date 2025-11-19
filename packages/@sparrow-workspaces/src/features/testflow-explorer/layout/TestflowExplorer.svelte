@@ -884,6 +884,11 @@
     } else {
       response.method = tempTab?.method;
     }
+    if (data?.request?.tests) {
+      response.tests = data?.request?.tests;
+    } else {
+      response.tests = tempTab?.tests;
+    }
     // Use the provided requestName parameter first, then fallback to data.name, then "Untitled"
     if (requestName) {
       response.name = requestName;
