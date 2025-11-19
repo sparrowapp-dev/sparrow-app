@@ -25,5 +25,14 @@ export interface ScheduleTestFlowRunDto {
   workspaceId: string;
   testflowId: string;
   runConfiguration: RunConfigurationDTO;
+  testflowDataSetId?: string;
   notification?: NotificationDTO;
+}
+
+export type TestflowDataSetFormatType = "JSON" | "CSV";
+
+export interface TestflowDataSetImportDto {
+  item: any;
+  formatType: TestflowDataSetFormatType;
+  name: string;
 }

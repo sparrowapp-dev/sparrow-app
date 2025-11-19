@@ -56,8 +56,10 @@
     RunIcon,
     StopFilled,
     Clock,
+    ChevronDownRegular,
+    CheckMarkIcon,
   } from "@sparrow/library/icons";
-  import { Button, Modal, notifications } from "@sparrow/library/ui";
+  import { Button, Modal, notifications, Dropdown } from "@sparrow/library/ui";
   import { BroomRegular } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
   import DeleteNode from "../../../components/delete-node/DeleteNode.svelte";
@@ -100,13 +102,8 @@
     HttpRequestAuthTypeBaseEnum,
     HttpRequestContentTypeBaseEnum,
   } from "@sparrow/common/types/workspace/http-request-base";
-  import TestflowDynamicExpression from "../../testflow-dynamic-expressions/layout/TestflowDynamicExpression.svelte";
   // import { isDynamicExpressionModalOpen } from "../store/testflow";
-  import { selectedRequestTypes } from "../store/testflow";
-  import {
-    isDynamicExpressionContent,
-    updateDynamicExpressionValue,
-  } from "../store/testflow";
+  import { testflowDataSetItem } from "../store/testflow";
   import { WorkspaceRole } from "@sparrow/common/enums";
   import { PlanUpgradeModal } from "@sparrow/common/components";
   import { planInfoByRole } from "@sparrow/common/utils";
@@ -116,7 +113,6 @@
     TimeISOExtractor,
     FormatDays,
   } from "@sparrow/common/utils";
-  import type { TestFlowScheduleRunResult } from "../../../../../@sparrow-common/src/types/workspace/testflow-schedule-run-view-tab";
 
   // Declaring props for the component
   export let tab: Observable<Partial<Tab>>;
@@ -229,6 +225,7 @@
   let blockName = `Block ${nodesValue}`;
   // List to store collection documents and filtered collections
   let filteredCollections = writable<CollectionDto[]>([]);
+  let transformedResults = [{}];
 
   // Writable stores for nodes and edges
   const nodes = writable<Node[]>([]);
@@ -386,6 +383,60 @@
 
   function dismissWarning() {
     dismissed = true;
+  }
+
+  // Dataset selection state
+  let selectedDatasetIndex: number = 0;
+  let selectedTestDataItem: any = null;
+  let testDataMenuOpen: boolean = false;
+
+  // Get the selected dataset from tab property
+  $: tabSelectedDataset =
+    $tab.property?.testflowScheduleRunView?.selectedDataset?.id;
+
+  // Get results array from tab property
+  $: resultsArray = $tab.property?.testflowScheduleRunView?.results || [];
+
+  // Set default selected result when tab loads - for both dataset and non-dataset modes
+  $: if (resultsArray.length > 0 && selectedTestDataItem === null) {
+    selectedTestDataItem = resultsArray[0];
+    selectedDatasetIndex = 0;
+  }
+
+  // Update test data options based on results array
+  $: testDataOptions = resultsArray.map((result, index) => ({
+    name: `Dataset ${index + 1}`,
+    color:
+      selectedDatasetIndex === index
+        ? "var(--text-ds-primary-300)"
+        : "var(--text-ds-neutral-50)",
+    onclick: () => handleTestDataSelection(result, index),
+    ...getTestDataIconProps(index, selectedDatasetIndex),
+  }));
+
+  function getTestDataIconProps(dataIndex: number, selectedIndex: number) {
+    return {
+      endIcon: selectedIndex === dataIndex ? CheckMarkIcon : undefined,
+      iconSize: "16px",
+      iconColor: "var(--text-ds-primary-300)",
+    };
+  }
+
+  // Handle test data item selection
+  function handleTestDataSelection(dataItem, index) {
+    selectedTestDataItem = dataItem;
+    selectedDatasetIndex = index;
+    testDataMenuOpen = false;
+  }
+
+  // Set default selected result when tab loads
+  $: if (
+    tabSelectedDataset &&
+    resultsArray.length > 0 &&
+    selectedTestDataItem === null
+  ) {
+    selectedTestDataItem = resultsArray[0];
+    selectedDatasetIndex = 0;
   }
 
   function handleSearchSchedules(event) {
@@ -1215,20 +1266,27 @@
   const allocationNodeWithRequest = () => {
     let nodes = $tab.property?.testflowScheduleRunView?.nodes || [];
     let edges = $tab.property?.testflowScheduleRunView?.edges || [];
-    let runResult = $tab.property?.testflowScheduleRunView?.result;
+    let resultsArray = $tab.property?.testflowScheduleRunView?.results;
+    // Use the selected result instead of the first result
+    let runResult = selectedTestDataItem || resultsArray[0];
+
     // Find max node ID for graph size
     let maxNodeId = 1;
     for (let i = 0; i < nodes.length; i++) {
       maxNodeId = Math.max(maxNodeId, Number(nodes[i].id));
     }
+
     // Initialize adjacency list for graph traversal
     const graph = Array.from({ length: maxNodeId + 1 }, () => []);
+
     // Populate adjacency list with edges
     for (let i = 0; i < edges.length; i++) {
       graph[Number(edges[i].source)].push(Number(edges[i].target));
     }
+
     // Find all connected nodes in sequential order starting from node "1"
     let connectedNodes = [];
+
     // Inner function to find connected nodes
     const findNodes = (start: number, visited = new Set()) => {
       if (visited.has(start)) return;
@@ -1242,16 +1300,19 @@
         findNodes(neighbor, visited);
       }
     };
+
     findNodes(Number("1"));
-    // Create array of objects with request, response, and node
+
+    // Create array of objects with request, response, and node using selected result
     let testflowStoreItems = [];
     for (let i = 1; i < connectedNodes.length; i++) {
       const node = connectedNodes[i];
-      // Get corresponding request and response from runResult
+
+      // Get corresponding request and response from selected runResult
       const request =
         runResult?.requests?.[i - 1] || node?.data?.requestData || null;
       const response =
-        runResult?.response?.[i - 1] || node?.data?.response || null;
+        runResult?.responses?.[i - 1] || node?.data?.response || null;
       testflowStoreItems.push({
         request: request,
         response: response,
@@ -1261,20 +1322,45 @@
     return testflowStoreItems;
   };
 
+  $: if (selectedTestDataItem) {
+    testflowViewRequestItems = allocationNodeWithRequest();
+    testflowDataSetItem.set(testflowViewRequestItems);
+  }
+
+  $: {
+    transformedResults = [];
+    const results = $tab.property?.testflowScheduleRunView?.results || [];
+    if (results.length > 0) {
+      // Find the maximum number of requests/responses
+      const maxLength = Math.max(
+        ...results.map((r) =>
+          Math.max(r.requests?.length || 0, r.responses?.length || 0),
+        ),
+      );
+
+      // Create grouped objects for each index
+      for (let i = 0; i < maxLength; i++) {
+        transformedResults.push({
+          requests: results.map((r) => r.requests?.[i]).filter(Boolean),
+          responses: results.map((r) => r.responses?.[i]).filter(Boolean),
+        });
+      }
+    }
+  }
+
   function getScheduleRunItemByIndex(
-    runResult: TestFlowScheduleRunResult | undefined,
     index: number,
   ): { id: string; request: any; response: any } | undefined {
-    const requests = runResult?.requests ?? [];
-    const responses = runResult?.response ?? [];
     if (index <= 0) {
       return undefined;
     }
-    return {
-      id: index.toString(),
-      request: requests[index - 1],
-      response: responses[index - 1],
-    };
+    if (transformedResults.length > 0) {
+      return {
+        id: index.toString(),
+        request: transformedResults[index - 1]?.requests || [],
+        response: transformedResults[index - 1]?.responses || [],
+      };
+    }
   }
 
   /**
@@ -1357,10 +1443,7 @@
                   requestData: dbNodes[i].data?.requestData,
                   collections: filteredCollections,
                   tabId: $tab.tabId,
-                  currentItem: getScheduleRunItemByIndex(
-                    $tab.property?.testflowScheduleRunView?.result,
-                    i,
-                  ),
+                  currentItem: getScheduleRunItemByIndex(i),
                 },
                 position: {
                   x: dbNodes[i].position.x,
@@ -1684,14 +1767,6 @@
     }
   }
 
-  // const setIsCurrentOpenFalse = () => {
-  //   isDynamicExpressionContent.update((items) =>
-  //     items.map((item) =>
-  //       item.isCurrentOpen ? { ...item, isCurrentOpen: false } : item,
-  //     ),
-  //   );
-  // };
-
   let isDynamicExpressionModalOpen = false;
 
   const deleteEdges = (_source: string, _target: string) => {
@@ -1768,6 +1843,7 @@
     currentPage = 1;
   }
 
+  // Reactive statement to update view when selected result changes
   $: {
     if ($tab.property?.testflowScheduleRunView) {
       testflowViewRequestItems = allocationNodeWithRequest();
@@ -1827,15 +1903,48 @@
           ? "Auto Run"
           : "Manual Run"}
       </span>
-      <span>{$tab.property?.testflowScheduleRunView?.result?.status}</span>
+      <!-- Show status from selected result -->
+      <span>{selectedTestDataItem?.status || "Unknown"}</span>
       <span>
-        {($tab.property?.testflowScheduleRunView?.result?.successRequests ??
-          0) +
-          ($tab.property?.testflowScheduleRunView?.result?.failedRequests ?? 0)}
-        Requests (
-        {$tab.property?.testflowScheduleRunView?.result?.successRequests ?? 0} Passed,
-        {$tab.property?.testflowScheduleRunView?.result?.failedRequests ?? 0} Failed)
+        {(selectedTestDataItem?.successRequests ?? 0) +
+          (selectedTestDataItem?.failedRequests ?? 0)}
+        Requests ({selectedTestDataItem?.successRequests ?? 0} Passed, {selectedTestDataItem?.failedRequests ??
+          0} Failed)
       </span>
+    </div>
+
+    <div style="position:absolute; top:12px; right:16px; z-index:4;">
+      <!-- Dataset Results Selection -->
+      {#if tabSelectedDataset}
+        <Dropdown
+          buttonId="datasetDropdownBtn"
+          bind:isMenuOpen={testDataMenuOpen}
+          options={testDataOptions}
+          horizontalPosition="left"
+          minWidth={150}
+        >
+          <button
+            id="datasetDropdownBtn"
+            class="d-flex align-items-center gap-2 border-0"
+            on:click={() => (testDataMenuOpen = !testDataMenuOpen)}
+            style="padding:6px 12px; border-radius:6px; background:var(--bg-ds-surface-600); color:var(--text-ds-neutral-50); font-size:13px; font-weight:500;"
+          >
+            {selectedTestDataItem
+              ? `Dataset ${selectedDatasetIndex + 1}`
+              : "Select Dataset"}
+            <span
+              style="display:flex; transition: transform 0.2s ease; transform: rotate({testDataMenuOpen
+                ? '180deg'
+                : '0deg'});"
+            >
+              <ChevronDownRegular
+                size="16px"
+                color="var(--text-ds-neutral-300)"
+              />
+            </span>
+          </button>
+        </Dropdown>
+      {/if}
     </div>
   </div>
 
@@ -1983,7 +2092,7 @@
   </div>
 </Modal>
 
-<Modal
+<!-- <Modal
   title={"Insert Dynamic Content"}
   type={"dark"}
   width={"851px"}
@@ -2009,7 +2118,7 @@
     {onPreviewExpression}
     {dynamicExpressionPath}
   />
-</Modal>
+</Modal> -->
 
 <Modal
   title={"Delete Block?"}

@@ -29,4 +29,5 @@ export interface SidebarItemBaseAllIconInterface
   defaultLogo: string;
   hoveredLogo?: string;
   selectedLogo?: string;
+  message?: string;
 }

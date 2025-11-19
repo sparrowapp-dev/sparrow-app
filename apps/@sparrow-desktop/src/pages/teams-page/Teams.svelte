@@ -42,6 +42,7 @@
   } from "@sparrow/common/components";
   import { shouldRunThrottled } from "@sparrow/common/store";
   import { getSelfhostUrls } from "@app/utils/jwt";
+  import { FormatCount } from "@sparrow/common/utils";
 
   const _viewModel = new TeamsViewModel();
   const teamList: Observable<TeamDocument[]> = _viewModel.teams;
@@ -253,7 +254,7 @@
                     onClick={async () => {
                       await open(externalSparrowGithub);
                     }}
-                    count={githubRepoData?.stargazers_count || ""}
+                    count={FormatCount(githubRepoData?.stargazers_count) || ""}
                   />
                 </Tooltip>
 
