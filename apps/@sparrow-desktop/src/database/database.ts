@@ -679,7 +679,7 @@ export class RxDB {
             }
             return oldDoc;
           },
-          2: function (oldDoc: EnvironmentDocument) {
+          2: function (oldDoc) {
             return oldDoc;
           },
         },
