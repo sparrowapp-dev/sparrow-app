@@ -119,10 +119,79 @@
     }));
   }
 
+  // Track unsaved changes by comparing current state with original
+  const hasTestChanged = (test) => {
+    if (!test._originalState) return false;
+    return (
+      test.name !== test._originalState.name ||
+      test.testTarget !== test._originalState.testTarget ||
+      test.condition !== test._originalState.condition ||
+      test.testPath !== test._originalState.testPath ||
+      test.expectedResult !== test._originalState.expectedResult
+    );
+  };
+
+  // Validate required fields
+  const validateFields = (test) => {
+    const errors = {
+      name:
+        !test.name || test.name.trim() === ""
+          ? "This field cannot be empty"
+          : "",
+      testTarget: !test.testTarget ? "This field cannot be empty" : "",
+      condition: !test.condition ? "This field cannot be empty" : "",
+      testPath: "",
+      expectedResult: "",
+    };
+
+    // Test path is required for response JSON, XML, and header
+    if (
+      test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON ||
+      test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML ||
+      test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER
+    ) {
+      if (!test.testPath || test.testPath.trim() === "") {
+        errors.testPath = "This field cannot be empty";
+      }
+    }
+
+    // Expected result is required for all comparison conditions except EXISTS and DOES_NOT_EXIST
+    if (
+      test.condition !== TestCaseConditionOperatorEnum.EXISTS &&
+      test.condition !== TestCaseConditionOperatorEnum.DOES_NOT_EXIST
+    ) {
+      if (
+        !test.expectedResult ||
+        test.expectedResult.toString().trim() === ""
+      ) {
+        errors.expectedResult = "This field cannot be empty";
+      }
+    }
+
+    return errors;
+  };
+
   const selectTest = (test) => {
+    // Track unsaved changes before switching
+    const currentTest = localTest.noCode.find((t) => t.isActive);
+    if (currentTest) {
+      currentTest.hasUnsavedChanges = hasTestChanged(currentTest);
+    }
+
+    // Store original state when selecting a test
     localTest.noCode = localTest.noCode.map((t) => ({
       ...t,
       isActive: t.id === test.id,
+      _originalState:
+        t.id === test.id && !t._originalState
+          ? {
+              name: t.name,
+              testTarget: t.testTarget,
+              condition: t.condition,
+              testPath: t.testPath,
+              expectedResult: t.expectedResult,
+            }
+          : t._originalState,
     }));
   };
 
@@ -183,6 +252,24 @@
 
   $: {
     onTestsChange(localTest);
+  }
+
+  // Track active test validation
+  let activeTestErrors = {
+    name: "",
+    testTarget: "",
+    condition: "",
+    testPath: "",
+    expectedResult: "",
+  };
+
+  $: {
+    const activeTest = localTest.noCode.find((t) => t.isActive);
+    if (activeTest) {
+      activeTestErrors = validateFields(activeTest);
+      // Track unsaved changes
+      activeTest.hasUnsavedChanges = hasTestChanged(activeTest);
+    }
   }
 
   // ✅ Delete test
@@ -344,12 +431,12 @@
         >
           <!-- Left Sidebar -->
           <div
-            class="h-100"
+            class="h-100 d-flex flex-column"
             style="width: {tabSplitDirection === 'vertical'
               ? '100%'
-              : '25%'}; overflow: auto;"
+              : '40%'}; overflow: hidden;"
           >
-            <div class="pb-2">
+            <div class="pb-2" style="flex: 1; overflow-y: auto;">
               {#each localTest.noCode as test, index}
                 <TestListItem
                   {test}
@@ -361,18 +448,15 @@
                 />
               {/each}
             </div>
-
-            <div class="d-flex gap-2 pb-2" style="flex-wrap:wrap;">
-              <div class="">
-                <Button
-                  startIcon={AddRegular}
-                  title={"Add Test"}
-                  type="primary"
-                  size="small"
-                  onClick={addTest}
-                />
-              </div>
-              <div class="">
+            <div class="d-flex align-items-center pb-2 pt-2">
+              <Button
+                startIcon={AddRegular}
+                title={"Add Test"}
+                type="primary"
+                size="small"
+                onClick={addTest}
+              />
+              {#if localTest.noCode.length > 1}
                 <Button
                   title={"Remove All"}
                   startIcon={DeleteRegular}
@@ -381,27 +465,28 @@
                   onClick={() => {
                     isDeletePopup = true;
                   }}
+                  customStyle="margin-left: 8px;"
                 />
-              </div>
+              {/if}
             </div>
           </div>
 
           <!-- Right Form -->
           <div
-            class="h-100 gap-2 d-flex {tabSplitDirection === 'vertical'
+            class="h-100 d-flex {tabSplitDirection === 'vertical'
               ? 'border-top pt-2'
-              : 'border-start ms-2 ps-2'}"
+              : 'border-start'}"
             style="width: {tabSplitDirection === 'vertical'
               ? '100%'
-              : '75%'}; overflow: auto; flex-flow:wrap; align-content:flex-start;"
+              : '60%'}; overflow: auto; flex-flow:wrap; align-content:flex-start; padding: 0 0 0 16px;"
           >
             {#if localTest.noCode.some((t) => t.isActive)}
               {#each localTest.noCode as test}
                 {#if test.isActive}
                   <div
-                    style="display: flex; flex-wrap: wrap; gap: 1rem; width: 100%;"
+                    style="display: flex; flex-direction: column; gap: 1rem; width: 100%;"
                   >
-                    <div style="flex: 1 1 45%; min-width: 0;">
+                    <div style="width: 100%;">
                       <label class="form-label text-fs-12"
                         >Name <span style="color: var(--text-ds-danger-300)"
                           >*</span
@@ -410,6 +495,9 @@
                       <input
                         type="text"
                         class="form-control text-light"
+                        style="border: {activeTestErrors.name
+                          ? '1px solid var(--text-ds-danger-300)'
+                          : ''}"
                         bind:value={test.name}
                         on:blur={() => {
                           if (!test.name) {
@@ -418,8 +506,16 @@
                         }}
                         placeholder="Enter Test Name"
                       />
+                      {#if activeTestErrors.name}
+                        <div
+                          class="text-fs-10 mt-1"
+                          style="color: var(--text-ds-danger-300)"
+                        >
+                          {activeTestErrors.name}
+                        </div>
+                      {/if}
                     </div>
-                    <div style="flex: 1 1 45%; min-width: 0;">
+                    <div style="width: 100%;">
                       <label class="form-label text-fs-12"
                         >Test Target <span
                           style="color: var(--text-ds-danger-300)">*</span
@@ -467,7 +563,7 @@
                         </div>
                       {/if}
                     </div>
-                    <div style="flex: 1 1 45%; min-width: 0;">
+                    <div style="width: 100%;">
                       <label class="form-label text-fs-12"
                         >Condition <span
                           style="color: var(--text-ds-danger-300)">*</span
@@ -572,7 +668,7 @@
                       {/if}
                     </div>
                     {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER || test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON || test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
-                      <div style="flex: 1 1 45%; min-width: 0;">
+                      <div style="width: 100%;">
                         <label class="form-label text-fs-12">
                           {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
                             Header
@@ -599,48 +695,41 @@
                                   TestCaseSelectionTypeEnum.RESPONSE_HEADER
                                 ? "E.g. Content-Type"
                                 : "Enter path"}
-                          style={errors &&
-                          (!test.testPath ||
-                            (test.testPath &&
-                              test?.testTarget ===
-                                TestCaseSelectionTypeEnum.RESPONSE_JSON &&
-                              !isValidJsonPath(test.testPath)) ||
-                            (test.testPath &&
-                              test?.testTarget ===
-                                TestCaseSelectionTypeEnum.RESPONSE_XML &&
-                              !isValidXPath(test.testPath)) ||
-                            (test.testPath &&
-                              test?.testTarget ===
-                                TestCaseSelectionTypeEnum.RESPONSE_HEADER &&
-                              !isValidHeaderKey(test.testPath)))
-                            ? "border: 1px solid var(--text-ds-danger-300)"
-                            : ""}
+                          style="border: {activeTestErrors.testPath ||
+                          (test.testPath &&
+                            test?.testTarget ===
+                              TestCaseSelectionTypeEnum.RESPONSE_JSON &&
+                            !isValidJsonPath(test.testPath)) ||
+                          (test.testPath &&
+                            test?.testTarget ===
+                              TestCaseSelectionTypeEnum.RESPONSE_XML &&
+                            !isValidXPath(test.testPath)) ||
+                          (test.testPath &&
+                            test?.testTarget ===
+                              TestCaseSelectionTypeEnum.RESPONSE_HEADER &&
+                            !isValidHeaderKey(test.testPath))
+                            ? '1px solid var(--text-ds-danger-300)'
+                            : ''}"
                         />
-                        {#if errors && !test.testPath}
+                        {#if activeTestErrors.testPath}
                           <div
-                            class="text-fs-12 mt-1"
+                            class="text-fs-10 mt-1"
                             style="color: var(--text-ds-danger-300)"
                           >
-                            Please enter a {#if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
-                              Header
-                            {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON}
-                              JSON
-                            {:else if test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
-                              XML
-                            {/if} Path
+                            {activeTestErrors.testPath}
                           </div>
                         {:else if test.testPath && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON}
                           {#if !isValidJsonPath(test.testPath)}
                             <div
-                              class="text-fs-12 mt-1"
+                              class="text-fs-10 mt-1"
                               style="color: var(--text-ds-danger-300)"
                             >
-                              Invalid Path syntax. Please check your path
+                              Invalid path syntax. Please check your path
                               format.
                             </div>
                           {:else if !responseBody}
                             <div
-                              class="text-fs-12 mt-1 d-flex"
+                              class="text-fs-10 mt-1 d-flex"
                               style="color: var(--text-ds-neutral-300)"
                             >
                               <span class="me-1">
@@ -679,15 +768,15 @@
                         {:else if test.testPath && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
                           {#if !isValidXPath(test.testPath)}
                             <div
-                              class="text-fs-12 mt-1"
+                              class="text-fs-10 mt-1"
                               style="color: var(--text-ds-danger-300)"
                             >
-                              Invalid Path syntax. Please check your path
+                              Invalid path syntax. Please check your path
                               format.
                             </div>
                           {:else if !responseBody}
                             <div
-                              class="text-fs-12 mt-1 d-flex"
+                              class="text-fs-10 mt-1 d-flex"
                               style="color: var(--text-ds-neutral-300)"
                             >
                               <span class="me-1">
@@ -723,15 +812,15 @@
                         {:else if test.testPath && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
                           {#if !isValidHeaderKey(test.testPath)}
                             <div
-                              class="text-fs-12 mt-1"
+                              class="text-fs-10 mt-1"
                               style="color: var(--text-ds-danger-300)"
                             >
-                              Invalid Path syntax. Please check your path
+                              Invalid path syntax. Please check your path
                               format.
                             </div>
                           {:else if !responseHeader}
                             <div
-                              class="text-fs-12 mt-1 d-flex"
+                              class="text-fs-10 mt-1 d-flex"
                               style="color: var(--text-ds-neutral-300)"
                             >
                               <span class="me-1">
@@ -771,7 +860,7 @@
                       </div>
                     {/if}
                     {#if test?.condition === TestCaseConditionOperatorEnum.EQUALS || test?.condition === TestCaseConditionOperatorEnum.NOT_EQUAL || test?.condition === TestCaseConditionOperatorEnum.EXISTS || test?.condition === TestCaseConditionOperatorEnum.DOES_NOT_EXIST || test?.condition === TestCaseConditionOperatorEnum.LESS_THAN || test?.condition === TestCaseConditionOperatorEnum.GREATER_THAN || test?.condition === TestCaseConditionOperatorEnum.CONTAINS || test?.condition === TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN || test?.condition === TestCaseConditionOperatorEnum.IN_LIST || test?.condition === TestCaseConditionOperatorEnum.NOT_IN_LIST || test?.condition === TestCaseConditionOperatorEnum.GREATER_THAN_OR_EQUAL || test?.condition === TestCaseConditionOperatorEnum.LESS_THAN_OR_EQUAL}
-                      <div style="flex: 1 1 45%; min-width: 0;">
+                      <div style="width: 100%;">
                         <label class="form-label text-fs-12"
                           >Comparison Value <span
                             style="color: var(--text-ds-danger-300)">*</span
@@ -782,21 +871,20 @@
                           class="form-control text-light"
                           bind:value={test.expectedResult}
                           placeholder="Enter Comparison Value"
-                          style={errors && !test.expectedResult
-                            ? "border: 1px solid var(--text-ds-danger-300)"
-                            : ""}
+                          style="border: {activeTestErrors.expectedResult
+                            ? '1px solid var(--text-ds-danger-300)'
+                            : ''}"
                         />
-                        {#if errors && !test.expectedResult}
+                        {#if activeTestErrors.expectedResult}
                           <div
-                            class="text-fs-12 mt-1"
+                            class="text-fs-10 mt-1"
                             style="color: var(--text-ds-danger-300)"
                           >
-                            Please enter comparison value
+                            {activeTestErrors.expectedResult}
                           </div>
                         {/if}
                       </div>
                     {/if}
-                    <div style="flex: 1 1 45%; min-width: 0;"></div>
                   </div>
                 {/if}
               {/each}
