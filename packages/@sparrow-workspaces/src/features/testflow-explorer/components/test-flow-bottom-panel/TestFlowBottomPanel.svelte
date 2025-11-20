@@ -18,6 +18,7 @@
     RequestParameterTestFlow,
     RequestAuthorizationTestFlow,
     RequestAssertionsTestFlow,
+    RequestTestsTestFlow,
     ResponseErrorScreen,
     ResponseHeaders,
     ResponseNavigator,
@@ -81,6 +82,8 @@
       requestNavigation = "Headers";
     } else if (tab === "Authorization") {
       requestNavigation = "Authorization";
+    } else if (tab === "Scripts" || tab === RequestSectionEnum.TESTS) {
+      requestNavigation = RequestSectionEnum.TESTS;
     } else if (tab === "Assertions") {
       requestNavigation = "Assertions";
     } else {
@@ -388,6 +391,24 @@
                 testResults={[]}
                 responseBody={selectedNodeResponse?.response?.body ?? ""}
                 responseHeader={selectedNodeResponse?.response?.headers ?? []}
+              />
+            {/key}
+          {:else if requestNavigation === RequestSectionEnum.TESTS}
+            {#key selectedBlock?.id}
+              <RequestTestsTestFlow
+                tests={selectedBlock?.data?.requestData?.tests ?? {
+                  testCaseMode: "no-code",
+                  preScript: "",
+                  script: "",
+                }}
+                onTestsChange={(updatedTests) => {
+                  handleUpdateRequestData("tests", updatedTests);
+                }}
+                tabSplitDirection="horizontal"
+                onGenerateTestCases={undefined}
+                onGeneratePreScript={undefined}
+                isTestCasesGenerating={false}
+                isPreScriptGenerating={false}
               />
             {/key}
           {/if}
