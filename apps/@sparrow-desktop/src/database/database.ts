@@ -466,9 +466,6 @@ export class RxDB {
             return oldDoc;
           },
           40: function (oldDoc: TabDocument) {
-            return oldDoc;
-          },
-          41: function (oldDoc: TabDocument) {
             const test = {
               testCaseMode: "no-code",
               noCode: [],
