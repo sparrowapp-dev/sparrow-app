@@ -5,9 +5,8 @@ import type {
   HttpRequestBodyModeDtoEnum,
   HttpRequestKeyValueDtoInterface,
   HttpRequestMethodsDtoInterface,
-  HttpRequestNoCodeDtoInterface,
 } from "./http-request-dto";
-import type { RequestDataTypeEnum } from "./http-request-tab";
+import type { RequestDataTypeEnum, Tests } from "./http-request-tab";
 import type { Tab } from "./tab";
 
 export interface HttpRequestUIStateDto {
@@ -52,7 +51,7 @@ export interface HttpRequestMetaDataTestFlowDtoInterface {
   selectedRequestBodyType?: HttpRequestBodyModeDtoEnum;
   state?: HttpRequestUIStateDto;
   url: string;
-  tests?: HttpRequestNoCodeDtoInterface;
+  tests?: Tests;
 }
 
 export enum TestflowNavigatorEnum {
