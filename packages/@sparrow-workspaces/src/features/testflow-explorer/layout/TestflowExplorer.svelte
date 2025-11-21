@@ -760,6 +760,7 @@
       file: [],
     };
     response.auth = tempTab?.auth;
+    response.tests = tempTab?.tests;
     response.state = tempTab?.state;
     return response;
   };
