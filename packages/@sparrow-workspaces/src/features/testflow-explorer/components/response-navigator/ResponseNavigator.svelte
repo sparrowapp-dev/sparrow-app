@@ -6,6 +6,8 @@
   export let requestStateSection: string;
   export let updateResponseNavigation;
   export let responseHeadersLength = 0;
+  export let responsePassedTestResultsLength = 0;
+  export let responseTestResultsLength = 0;
 
   let tabs: {
     name: string;
@@ -24,6 +26,18 @@
         name: "Headers",
         id: ResponseSectionEnum.HEADERS,
         count: _responseHeadersLength,
+        type: "count",
+      },
+      {
+        name: "Test Results",
+        id: ResponseSectionEnum.TESTRESULT,
+        count: responsePassedTestResultsLength,
+        type: "fraction",
+        secondaryCount: responseTestResultsLength,
+        variant:
+          responsePassedTestResultsLength === responseTestResultsLength
+            ? "success"
+            : "danger",
       },
     ];
   };
@@ -32,7 +46,11 @@
    * @description - re-calculates value when dependency changes
    */
   $: {
-    if (responseHeadersLength) {
+    if (
+      responseHeadersLength ||
+      responseTestResultsLength ||
+      responsePassedTestResultsLength
+    ) {
       tabs = refreshTabs(responseHeadersLength);
     }
   }
