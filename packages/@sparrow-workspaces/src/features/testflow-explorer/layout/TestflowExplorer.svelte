@@ -3216,9 +3216,13 @@
                   <DocumentRegular size="32px" color="#6b6b6b" />
                 </div>
                 <div class="empty-message">
-                  No test data imported yet. Use the <span
-                    style="font-weight: 700;">Import</span
-                  > button to upload JSON or CSV files for testing.
+                  {#if searchQuery.trim() === ""}
+                    No test data imported yet. Use the <span
+                      style="font-weight: 700;">Import</span
+                    > button to upload JSON or CSV files for testing.
+                  {:else}
+                    No result found
+                  {/if}
                 </div>
               </div>
             {/if}
@@ -3815,7 +3819,7 @@
     width: 100%;
   }
   .empty-icon {
-    margin-bottom: 18px;
+    margin-bottom: 8px;
     opacity: 0.7;
   }
   .empty-message {
