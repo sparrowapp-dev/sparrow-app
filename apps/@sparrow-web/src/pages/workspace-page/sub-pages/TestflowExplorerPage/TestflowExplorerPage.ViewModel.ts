@@ -23,6 +23,8 @@ import { WorkspaceRepository } from "../../../../repositories/workspace.reposito
 import { TestflowService } from "../../../../services/testflow.service";
 import {
   RequestDataTypeEnum,
+  TestCaseConditionOperatorEnum,
+  TestCaseSelectionTypeEnum,
   type HttpRequestCollectionLevelAuthTabInterface,
 } from "@sparrow/common/types/workspace";
 import {
@@ -85,7 +87,8 @@ import {
   addTestflowDataSet,
   replaceTestflowDataSet,
 } from "@sparrow/common/store";
-
+import { JSONPath } from "jsonpath-plus";
+import * as xpath from "xpath";
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
   private tabRepository = new TabRepository();
@@ -644,6 +647,7 @@ export class TestflowExplorerPageViewModel {
                     this._decodeRequest.setResponseContentType(
                       formattedHeaders,
                     ),
+                  testResults: [],
                 };
 
                 if (
@@ -742,6 +746,7 @@ export class TestflowExplorerPageViewModel {
                   status: ResponseStatusCode.ERROR,
                   time: duration,
                   size: 0,
+                  testResults: [],
                 };
                 failedRequests++;
                 totalTime += duration;
@@ -753,12 +758,18 @@ export class TestflowExplorerPageViewModel {
                 };
                 history.requests.push(req);
               }
-              existingTestFlowData.nodes.push({
+              // existingTestFlowData.nodes.push({
+              //   id: element.id,
+              //   response: resData,
+              //   request: adaptedRequest,
+              // });
+              const nodeWithResponse = {
                 id: element.id,
                 response: resData,
                 request: adaptedRequest,
-              });
-
+              };
+              this.executeNoCodeTestcases(nodeWithResponse);
+              existingTestFlowData.nodes.push(nodeWithResponse);
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
             }
             return testFlowDataMap;
@@ -779,13 +790,21 @@ export class TestflowExplorerPageViewModel {
                 status: ResponseStatusCode.ERROR,
                 time: 0,
                 size: 0,
+                testResults: [],
               };
 
-              existingTestFlowData.nodes.push({
+              // existingTestFlowData.nodes.push({
+              //   id: element.id,
+              //   response: resData,
+              //   request: adaptedRequest,
+              // });
+              const nodeWithResponse = {
                 id: element.id,
                 response: resData,
                 request: adaptedRequest,
-              });
+              };
+              this.executeNoCodeTestcases(nodeWithResponse);
+              existingTestFlowData.nodes.push(nodeWithResponse);
 
               requestChainResponse[
                 "$$" +
@@ -860,6 +879,237 @@ export class TestflowExplorerPageViewModel {
         `Test Completed: ${successRequests} Passed, ${failedRequests} Failed`,
       );
     }
+  };
+
+  private evaluateCondition = (
+    actual: any,
+    expectedRaw: string,
+    condition: TestCaseConditionOperatorEnum,
+  ): { passed: boolean; message?: string } => {
+    let passed = false;
+    let message: string | undefined = "";
+    const expected: any = expectedRaw;
+
+    try {
+      switch (condition) {
+        case TestCaseConditionOperatorEnum.EQUALS:
+          passed = actual == expected;
+          message = passed
+            ? ""
+            : `Expected ${actual} to equal  ${expected || "(empty)"}`;
+          break;
+        case TestCaseConditionOperatorEnum.NOT_EQUAL:
+          passed = actual != expected;
+          message = passed
+            ? ""
+            : `Expected ${actual} not to equal ${expected || "(empty)"}`;
+          break;
+        case TestCaseConditionOperatorEnum.EXISTS:
+          passed = actual !== undefined && actual !== null;
+          message = passed ? "" : `Expected ${actual} to exist`;
+          break;
+        case TestCaseConditionOperatorEnum.DOES_NOT_EXIST:
+          passed = actual === undefined || actual === null;
+          message = passed ? "" : `Expected ${actual} not to exist`;
+          break;
+        case TestCaseConditionOperatorEnum.LESS_THAN:
+          passed =
+            typeof actual === "number"
+              ? actual < Number(expected)
+              : actual.length < Number(expected);
+          message = passed
+            ? ""
+            : `Expected ${actual} to be less than ${expected || "(empty)"}`;
+          break;
+        case TestCaseConditionOperatorEnum.LESS_THAN_OR_EQUAL:
+          passed =
+            typeof actual === "number"
+              ? actual <= Number(expected)
+              : actual.length <= Number(expected);
+          message = passed
+            ? ""
+            : `Expected ${actual} to be less than or equal to ${
+                expected || "(empty)"
+              }`;
+          break;
+        case TestCaseConditionOperatorEnum.GREATER_THAN:
+          passed =
+            typeof actual === "number"
+              ? actual > Number(expected)
+              : actual.length > Number(expected);
+          message = passed
+            ? ""
+            : `Expected ${actual} to be greater than ${expected || "(empty)"}`;
+          break;
+        case TestCaseConditionOperatorEnum.GREATER_THAN_OR_EQUAL:
+          passed =
+            typeof actual === "number"
+              ? actual >= Number(expected)
+              : actual.length >= Number(expected);
+          message = passed
+            ? ""
+            : `Expected ${actual} to be greater than or equal to ${
+                expected || "(empty)"
+              }`;
+          break;
+        case TestCaseConditionOperatorEnum.CONTAINS:
+          passed = typeof actual === "string" && actual.includes(expected);
+          message = passed
+            ? ""
+            : `Expected ${actual} to contain ${expected || "(empty)"}`;
+          break;
+        case TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN:
+          passed = typeof actual === "string" && !actual.includes(expected);
+          message = passed
+            ? ""
+            : `Expected ${actual} not to contain ${expected || "(empty)"}`;
+          break;
+        case TestCaseConditionOperatorEnum.IS_EMPTY:
+          passed = actual === "" || actual === 0;
+          message = passed ? "" : `Expected ${actual} to be empty`;
+          break;
+        case TestCaseConditionOperatorEnum.IS_NOT_EMPTY:
+          passed = actual !== "" && actual !== 0;
+          message = passed ? "" : `Expected ${actual} not to be empty`;
+          break;
+        case TestCaseConditionOperatorEnum.IN_LIST:
+          try {
+            passed = Array.isArray(actual) && actual.includes(expected);
+            message = passed
+              ? ""
+              : `Expected ${actual} to be in list ${expected || "(empty)"}`;
+          } catch {
+            message = "Result for IN LIST must be a JSON array";
+          }
+          break;
+        case TestCaseConditionOperatorEnum.NOT_IN_LIST:
+          try {
+            passed = Array.isArray(actual) && !actual.includes(expected);
+            message = passed
+              ? ""
+              : `Expected ${actual} not to be in list ${expected || "(empty)"}`;
+          } catch {
+            message = "Result for NOT IN LIST must be a JSON array";
+          }
+          break;
+        default:
+          message = `Condition ${condition} not supported`;
+      }
+    } catch (e) {
+      message = (e as Error).message;
+    }
+
+    return { passed, message };
+  };
+
+  private executeNoCodeTestcases = (node) => {
+    // const progressiveTab = createDeepCopy(this._tab.getValue());
+    // testFlowDataStore.update((testFlowDataMap) => {
+    //   const response = testFlowDataMap.get(progressiveTab?.tabId);
+
+    // response.response.testResults = [];
+    const testCases = node?.request?.property?.request?.tests?.noCode || [];
+    testCases.map((test) => {
+      let actual: any;
+      let error: string | undefined;
+      let testCasePassed = false;
+      let testCaseStatusMessage = "";
+
+      if (test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_TEXT) {
+        actual = node.response.body;
+      } else if (test.testTarget === TestCaseSelectionTypeEnum.TIME_CONSUMING) {
+        actual = node.response.time;
+      } else if (
+        test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER
+      ) {
+        if (!test.condition) {
+          error = `Condition not found`;
+          actual = undefined;
+        } else if (!test.testPath) {
+          error = `Test path not found`;
+          actual = undefined;
+        } else {
+          actual = node.response.headers.find(
+            (h) => h.key.toLowerCase() === test.testPath?.toLowerCase(),
+          )?.value;
+        }
+      } else if (test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON) {
+        try {
+          if (!test.condition) {
+            error = `Condition not found`;
+            actual = undefined;
+          } else if (!test.testPath) {
+            error = `Test path not found`;
+            actual = undefined;
+          } else {
+            const json = JSON.parse(node.response.body);
+            // Use JSONPath to extract value, supports $[3].userId, $[0].address.city, etc.
+            const result = JSONPath({ path: test.testPath, json });
+            // If result is an array, take the first value
+            actual = Array.isArray(result) ? result[0] : result;
+          }
+        } catch (e) {
+          error = "Invalid JSON or path";
+          actual = undefined;
+        }
+      } else if (test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML) {
+        try {
+          if (!test.condition) {
+            error = `Condition not found`;
+            actual = undefined;
+          } else if (!test.testPath) {
+            error = `Test path not found`;
+            actual = undefined;
+          } else {
+            const xml = node.response.body;
+            const doc = new DOMParser().parseFromString(xml, "text/xml");
+            // test.testPath should be a valid XPath, e.g. "/root/country/city"
+            const nodes = xpath.select(test.testPath, doc);
+
+            if (Array.isArray(nodes) && nodes.length > 0) {
+              // If it's an attribute node
+              if (nodes[0].nodeType === 2) {
+                actual = nodes[0].nodeValue;
+              } else if (nodes[0].firstChild) {
+                actual = nodes[0].firstChild.nodeValue;
+              } else if ((nodes[0] as any).data) {
+                actual = (nodes[0] as any).data;
+              } else {
+                actual = nodes[0].toString();
+              }
+            } else {
+              actual = undefined;
+            }
+          }
+        } catch (e) {
+          error = "Invalid XML or XPath";
+          actual = undefined;
+        }
+      } else {
+        error = `Test target not found`;
+      }
+
+      if (actual) {
+        const { passed, message: testMessage } = this.evaluateCondition(
+          actual,
+          test.expectedResult,
+          test.condition,
+        );
+        testCasePassed = passed;
+        testCaseStatusMessage = testMessage;
+      }
+      const testResponse = {
+        testId: test.id,
+        testName: test.name,
+        testStatus: testCasePassed,
+        initiator: "Assertions",
+        testMessage: error || testCaseStatusMessage,
+      };
+
+      node.response.testResults.push(testResponse);
+
+      // testFlowDataMap.set(progressiveTab.tabId, resData);
+    });
   };
 
   private setEnvironmentVariables = (
@@ -1039,6 +1289,7 @@ export class TestflowExplorerPageViewModel {
           size: responseSizeKB,
           responseContentType:
             this._decodeRequest.setResponseContentType(formattedHeaders),
+          testResults: [],
         };
       } else {
         resData = {
@@ -1047,6 +1298,7 @@ export class TestflowExplorerPageViewModel {
           status: ResponseStatusCode.ERROR,
           time: duration,
           size: 0,
+          testResults: [],
         };
       }
     } catch (error) {
@@ -1056,6 +1308,7 @@ export class TestflowExplorerPageViewModel {
         status: ResponseStatusCode.ERROR,
         time: 0,
         size: 0,
+        testResults: [],
       };
     }
 
@@ -1070,6 +1323,7 @@ export class TestflowExplorerPageViewModel {
           request: adaptedRequest,
         };
 
+        this.executeNoCodeTestcases(newNode);
         if (nodeIndex !== -1) {
           // Update existing node
           wsData.nodes[nodeIndex] = newNode;
@@ -2305,7 +2559,7 @@ export class TestflowExplorerPageViewModel {
         progressiveTab?.path?.workspaceId,
       );
       if (response?.isSuccessful) {
-        const dataset = response?.data?.data?.item.dataSet;
+        const dataset = response?.data?.data;
         replaceTestflowDataSet(progressiveTab.id as string, dataset || []);
         notifications.success(`Data set imported successfully.`);
       }

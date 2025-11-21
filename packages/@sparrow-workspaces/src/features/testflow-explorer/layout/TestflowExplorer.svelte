@@ -884,6 +884,11 @@
     } else {
       response.method = tempTab?.method;
     }
+    if (data?.request?.tests) {
+      response.tests = data?.request?.tests;
+    } else {
+      response.tests = tempTab?.tests;
+    }
     // Use the provided requestName parameter first, then fallback to data.name, then "Untitled"
     if (requestName) {
       response.name = requestName;
@@ -3217,9 +3222,13 @@
                   <DocumentRegular size="32px" color="#6b6b6b" />
                 </div>
                 <div class="empty-message">
-                  No test data imported yet. Use the <span
-                    style="font-weight: 700;">Import</span
-                  > button to upload JSON or CSV files for testing.
+                  {#if searchQuery.trim() === ""}
+                    No test data imported yet. Use the <span
+                      style="font-weight: 700;">Import</span
+                    > button to upload JSON or CSV files for testing.
+                  {:else}
+                    No result found
+                  {/if}
                 </div>
               </div>
             {/if}
@@ -3816,7 +3825,7 @@
     width: 100%;
   }
   .empty-icon {
-    margin-bottom: 18px;
+    margin-bottom: 8px;
     opacity: 0.7;
   }
   .empty-message {
