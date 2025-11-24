@@ -2090,7 +2090,7 @@ export class TestflowExplorerPageViewModel {
     }
   };
 
-  public openTestflowScheduleTab = async (_schedule: string) => {
+  public openTestflowScheduleTab = async (_schedule: any) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const initTestflowScheduleTab = new InitTestflowScheduleTab(
       _schedule.id,
@@ -2244,15 +2244,16 @@ export class TestflowExplorerPageViewModel {
       if (response?.isSuccessful) {
         notifications.success(`New schedule created successfully.`);
         const schedules = response.data.data.testflow.schedules;
-        const lastestSchedule = response.data.data.schedule;
+        const latestSchedule = response.data.data.schedule;
         updateTestflowSchedules(progressiveTab.id as string, schedules);
         captureEvent("schedule_created", {
           event_source: "web_app",
-          schedule_id: lastestSchedule.data.id,
+          schedule_id: latestSchedule.data.id,
           testflowId: response.data.data.testflow._id,
           schedule_run_frequency: runConfiguration.runCycle,
-          status: lastestSchedule.data.isActive,
+          status: latestSchedule.data.isActive,
         });
+        this.openTestflowScheduleTab(latestSchedule.data);
         return {
           isSuccessful: true,
           data: response.data,
