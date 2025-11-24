@@ -319,7 +319,7 @@
     horizontal={false}
   >
     <!-- Request Pane -->
-    <Pane minSize={30} size={"30%"} class="position-relative bg-transparent">
+    <Pane minSize={50} size={"50%"} class="position-relative bg-transparent">
       <div class="h-100 d-flex flex-column position-relative pe-2">
         <RequestNavigatorTestFlow
           paramsLength={selectedBlock?.data?.requestData?.queryParams?.length ||
@@ -385,7 +385,7 @@
                   handleUpdateRequestData("tests", updatedTests);
                 }}
                 tabSplitDirection="horizontal"
-                testResults={[]}
+                testResults={selectedNodeResponse?.response?.testResults ?? []}
                 responseBody={selectedNodeResponse?.response?.body ?? ""}
                 responseHeader={selectedNodeResponse?.response?.headers ?? []}
               />
