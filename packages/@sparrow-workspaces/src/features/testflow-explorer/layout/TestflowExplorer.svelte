@@ -2729,16 +2729,15 @@
                       onUpdateTestflowState({
                         testflowNavigator: TestflowNavigatorEnum.TESTFLOW,
                       });
-                    } else {
-                      unselectNodes();
-                      await onClickRun();
-                      const startingNode = handleSelectFirstNode();
-                      if (startingNode) {
-                        selectNode(startingNode);
-                      }
-                      MixpanelEvent(Events.Run_TestFlows);
-                      handleEventOnRunBlocks();
                     }
+                    unselectNodes();
+                    await onClickRun();
+                    const startingNode = handleSelectFirstNode();
+                    if (startingNode) {
+                      selectNode(startingNode);
+                    }
+                    MixpanelEvent(Events.Run_TestFlows);
+                    handleEventOnRunBlocks();
                   }}
                 />
               </div>
