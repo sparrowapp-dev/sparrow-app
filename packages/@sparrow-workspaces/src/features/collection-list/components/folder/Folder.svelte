@@ -25,6 +25,7 @@
     Button,
     Options,
     Tooltip,
+    notifications,
   } from "@sparrow/library/ui";
 
   // ---- Enum, Constants and Interface
@@ -387,8 +388,27 @@
     newFolderName = target.value.trim();
   };
 
+  const isValidFolderName = (name: string) => {
+    const trimmedName = name.trim();
+    // Check if empty
+    if (!trimmedName) return false;
+    // Check if contains at least one alphanumeric character
+    const hasAlphanumeric = /[a-zA-Z0-9]/.test(trimmedName);
+    // Check if contains only allowed characters (letters, digits, spaces, ., -, _)
+    const onlyAllowedChars = /^[a-zA-Z0-9._\- ]+$/.test(trimmedName);
+    return hasAlphanumeric && onlyAllowedChars;
+  };
+
   const onRenameBlur = async () => {
     if (newFolderName) {
+      if (!isValidFolderName(newFolderName)) {
+        notifications.error(
+          "Folder names can contain combination of letters, digits and these special characters (.,-,_). Please provide the folder names accordingly.",
+        );
+        isRenaming = false;
+        newFolderName = "";
+        return;
+      }
       await onItemRenamed("folder", {
         workspaceId: collection.workspaceId,
         collection,
