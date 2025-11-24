@@ -760,6 +760,7 @@
       file: [],
     };
     response.auth = tempTab?.auth;
+    response.tests = tempTab?.tests;
     response.state = tempTab?.state;
     return response;
   };
@@ -2695,7 +2696,7 @@
       {/if}
       <div class="run-btn" style="margin-right: 5px; position:relative;">
         <div class="d-flex" style="gap: 8px;">
-          {#if isRunButtonEnabled}
+          {#if isRunButtonEnabled || isGuestUser}
             {#if testflowStore?.isTestFlowRunning}
               <Button
                 type="secondary"
@@ -2711,6 +2712,7 @@
                   size="medium"
                   startIcon={PlayFilled}
                   title={"Run Now"}
+                  disable={isGuestUser && !isRunButtonEnabled}
                   onClick={async () => {
                     if (
                       $tab?.property?.testflow?.state?.testflowNavigator ===
@@ -2775,6 +2777,7 @@
                 onClick={() => {
                   runButtonMenu = !runButtonMenu;
                 }}
+                disable={isGuestUser && !isRunButtonEnabled}
               />
             </Dropdown>
             <div class="d-flex" style="gap:8px; align-items:center;">
