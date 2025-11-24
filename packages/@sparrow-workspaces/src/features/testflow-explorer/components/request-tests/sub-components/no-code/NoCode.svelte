@@ -434,7 +434,7 @@
             class="h-100 d-flex flex-column"
             style="width: {tabSplitDirection === 'vertical'
               ? '100%'
-              : '40%'}; overflow: hidden;"
+              : '45%'}; overflow: hidden;"
           >
             <div class="pb-2" style="flex: 1; overflow-y: auto;">
               {#each localTest.noCode as test, index}
@@ -448,10 +448,13 @@
                 />
               {/each}
             </div>
-            <div class="d-flex align-items-center pb-2 pt-2">
+            <div
+              class="d-flex align-items-center pb-2 pt-2 gap-2"
+              style="flex-wrap:wrap;"
+            >
               <Button
                 startIcon={AddRegular}
-                title={"Add Test"}
+                title={"Add Tests"}
                 type="primary"
                 size="small"
                 onClick={addTest}
@@ -465,7 +468,6 @@
                   onClick={() => {
                     isDeletePopup = true;
                   }}
-                  customStyle="margin-left: 8px;"
                 />
               {/if}
             </div>
@@ -478,7 +480,7 @@
               : 'border-start'}"
             style="width: {tabSplitDirection === 'vertical'
               ? '100%'
-              : '60%'}; overflow: auto; flex-flow:wrap; align-content:flex-start; padding: 0 0 0 16px;"
+              : '55%'}; overflow: auto; flex-flow:wrap; align-content:flex-start; padding: 0 0 0 16px;"
           >
             {#if localTest.noCode.some((t) => t.isActive)}
               {#each localTest.noCode as test}
