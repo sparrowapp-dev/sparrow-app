@@ -2461,7 +2461,13 @@
 
       const formatType = fileType.toUpperCase();
       const wrappedData = { dataSet: jsonData };
-
+      if (!Array.isArray(jsonData)) {
+        notifications.error(
+          "Import failed. Please ensure the file contains data in a valid format.",
+        );
+        resetImportState();
+        return;
+      }
       // Send wrapped data to backend
       const response = await importTestflowDataSet(
         wrappedData,
