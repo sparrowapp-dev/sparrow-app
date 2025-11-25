@@ -15,6 +15,7 @@
   import { JSONPath } from "jsonpath-plus";
   import * as xpath from "xpath";
   import { DOMParser } from "xmldom";
+  import { onMount } from "svelte";
 
   export let tests;
   export let onTestsChange;

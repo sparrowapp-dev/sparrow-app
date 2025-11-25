@@ -147,7 +147,7 @@
       {#if test.hasUnsavedChanges}
         <Tooltip
           title={"Changes not saved. Click the Save icon to apply changes."}
-          placement={"top"}
+          placement={"top-center"}
           zIndex={702}
         >
           <WarningFilled size={12} color="var(--text-ds-warning-300)" />

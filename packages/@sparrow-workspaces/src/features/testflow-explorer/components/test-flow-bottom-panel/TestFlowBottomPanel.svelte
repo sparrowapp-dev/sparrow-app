@@ -7,7 +7,10 @@
     ErrorCircleRegular,
     ArrowSwapRegular,
   } from "@sparrow/library/icons";
-  import { RequestSectionEnum } from "@sparrow/common/types/workspace";
+  import {
+    RequestSectionEnum,
+    ResponseSectionEnum,
+  } from "@sparrow/common/types/workspace";
   import {
     RequestBodyTestFlow,
     RequestHeaderTestFlow,
@@ -21,6 +24,7 @@
     ResponseBody,
     ResponseBodyNavigator,
     ResponseStatus,
+    ResponseTestResults,
   } from "..";
   import SparrowLogo from "../../assets/images/sparrow-logo.svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
@@ -29,6 +33,7 @@
   import * as Sentry from "@sentry/svelte";
   import { currentStep, isTestFlowTourGuideOpen } from "../../../../stores";
   import { emptyRequest } from "../../utils";
+  import NoCode from "../request-tests/sub-components/no-code/NoCode.svelte";
 
   export let selectedBlock;
   export let onClose;
@@ -135,6 +140,8 @@
       responseNavigation = "Response";
     } else if (tab === "Headers") {
       responseNavigation = "Headers";
+    } else if (tab === ResponseSectionEnum.TESTRESULT) {
+      responseNavigation = ResponseSectionEnum.TESTRESULT;
     }
   };
 
@@ -312,7 +319,7 @@
     horizontal={false}
   >
     <!-- Request Pane -->
-    <Pane minSize={30} size={"30%"} class="position-relative bg-transparent">
+    <Pane minSize={50} size={"50%"} class="position-relative bg-transparent">
       <div class="h-100 d-flex flex-column position-relative pe-2">
         <RequestNavigatorTestFlow
           paramsLength={selectedBlock?.data?.requestData?.queryParams?.length ||
@@ -371,15 +378,18 @@
               bind:selectAuthHeader
             />
           {:else if requestNavigation === RequestSectionEnum.ASSERTIONS}
-            <RequestAssertionsTestFlow
-              tests={selectedBlock?.data?.requestData?.tests ?? { noCode: [] }}
-              onTestsChange={(updatedTests) =>
-                handleUpdateRequestData("tests", updatedTests)}
-              tabSplitDirection="horizontal"
-              testResults={[]}
-              responseBody={selectedNodeResponse?.response?.body ?? ""}
-              responseHeader={selectedNodeResponse?.response?.headers ?? []}
-            />
+            {#key selectedBlock?.id}
+              <NoCode
+                tests={selectedBlock?.data?.requestData?.tests ?? []}
+                onTestsChange={(updatedTests) => {
+                  handleUpdateRequestData("tests", updatedTests);
+                }}
+                tabSplitDirection="horizontal"
+                testResults={selectedNodeResponse?.response?.testResults ?? []}
+                responseBody={selectedNodeResponse?.response?.body ?? ""}
+                responseHeader={selectedNodeResponse?.response?.headers ?? []}
+              />
+            {/key}
           {/if}
         </div>
       </div>
@@ -419,6 +429,11 @@
                     {updateResponseNavigation}
                     responseHeadersLength={selectedNodeResponse?.response
                       ?.headers?.length || 0}
+                    responsePassedTestResultsLength={selectedNodeResponse?.response?.testResults?.filter(
+                      (test) => test.testStatus === true,
+                    )?.length || 0}
+                    responseTestResultsLength={selectedNodeResponse?.response
+                      ?.testResults?.length || 0}
                   />
                   <ResponseStatus
                     response={selectedNodeResponse?.response}
@@ -448,6 +463,19 @@
                       responseHeader={selectedNodeResponse?.response.headers}
                     />
                   </div>
+                {:else if responseNavigation === ResponseSectionEnum.TESTRESULT}
+                  <ResponseTestResults
+                    responseTestResults={selectedNodeResponse.response
+                      ?.testResults || []}
+                    responseTestMessage={selectedNodeResponse.response
+                      ?.testMessage || []}
+                    tests={selectedBlock?.data?.requestData?.tests}
+                    onFixTestScript={undefined}
+                    tabId={selectedBlock?.id}
+                    isGuestUser={false}
+                    isSharedWorkspace={false}
+                    {userRole}
+                  />
                 {/if}
               </div>
             {/if}
