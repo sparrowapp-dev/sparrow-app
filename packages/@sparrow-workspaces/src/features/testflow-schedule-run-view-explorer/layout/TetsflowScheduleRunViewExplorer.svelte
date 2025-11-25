@@ -392,7 +392,7 @@
 
   // Get the selected dataset from tab property
   $: tabSelectedDataset =
-    $tab.property?.testflowScheduleRunView?.selectedDataset?.id;
+    $tab.property?.testflowScheduleRunView?.selectedDataset?.id || "0";
 
   // Get results array from tab property
   $: resultsArray = $tab.property?.testflowScheduleRunView?.results || [];
@@ -1915,7 +1915,7 @@
 
     <div style="position:absolute; top:12px; right:16px; z-index:4;">
       <!-- Dataset Results Selection -->
-      {#if tabSelectedDataset}
+      {#if tabSelectedDataset && testDataOptions.length > 1}
         <Dropdown
           buttonId="datasetDropdownBtn"
           bind:isMenuOpen={testDataMenuOpen}
