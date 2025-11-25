@@ -136,10 +136,14 @@
     const errors = {
       name:
         !test.name || test.name.trim() === ""
-          ? "This field cannot be empty"
+          ? "This field cannot be empty. Please enter test name"
           : "",
-      testTarget: !test.testTarget ? "This field cannot be empty" : "",
-      condition: !test.condition ? "This field cannot be empty" : "",
+      testTarget: !test.testTarget
+        ? "This field cannot be empty. Please select test target"
+        : "",
+      condition: !test.condition
+        ? "This field cannot be empty. Please select condition"
+        : "",
       testPath: "",
       expectedResult: "",
     };
@@ -151,7 +155,17 @@
       test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER
     ) {
       if (!test.testPath || test.testPath.trim() === "") {
-        errors.testPath = "This field cannot be empty";
+        let pathType = "path";
+        if (test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON) {
+          pathType = "JSON path";
+        } else if (test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML) {
+          pathType = "XML path";
+        } else if (
+          test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER
+        ) {
+          pathType = "header key";
+        }
+        errors.testPath = `This field cannot be empty. Please enter ${pathType}`;
       }
     }
 
@@ -164,7 +178,8 @@
         !test.expectedResult ||
         test.expectedResult.toString().trim() === ""
       ) {
-        errors.expectedResult = "This field cannot be empty";
+        errors.expectedResult =
+          "This field cannot be empty. Please enter comparison value";
       }
     }
 
@@ -245,6 +260,8 @@
       id: `${test.id}-copy-${Date.now()}`,
       name: `${baseName} ${nextNumber}`,
       isActive: false,
+      hasUnsavedChanges: false,
+      _originalState: undefined,
     };
     localTest.noCode = [...localTest.noCode, newTest];
     selectTest(newTest);
@@ -434,7 +451,7 @@
             class="h-100 d-flex flex-column"
             style="width: {tabSplitDirection === 'vertical'
               ? '100%'
-              : '45%'}; overflow: hidden;"
+              : '40%'}; overflow: hidden;"
           >
             <div class="pb-2" style="flex: 1; overflow-y: auto;">
               {#each localTest.noCode as test, index}
@@ -448,13 +465,10 @@
                 />
               {/each}
             </div>
-            <div
-              class="d-flex align-items-center pb-2 pt-2 gap-2"
-              style="flex-wrap:wrap;"
-            >
+            <div class="d-flex align-items-center pb-2 pt-2">
               <Button
                 startIcon={AddRegular}
-                title={"Add Tests"}
+                title={"Add Test"}
                 type="primary"
                 size="small"
                 onClick={addTest}
@@ -468,6 +482,7 @@
                   onClick={() => {
                     isDeletePopup = true;
                   }}
+                  customStyle="margin-left: 8px;"
                 />
               {/if}
             </div>
@@ -480,7 +495,7 @@
               : 'border-start'}"
             style="width: {tabSplitDirection === 'vertical'
               ? '100%'
-              : '55%'}; overflow: auto; flex-flow:wrap; align-content:flex-start; padding: 0 0 0 16px;"
+              : '60%'}; overflow: auto; flex-flow:wrap; align-content:flex-start; padding: 0 0 0 16px;"
           >
             {#if localTest.noCode.some((t) => t.isActive)}
               {#each localTest.noCode as test}
@@ -766,6 +781,14 @@
                                 )}
                               </span>
                             </div>
+                          {:else}
+                            <div
+                              class="text-fs-10 mt-1"
+                              style="color: var(--text-ds-danger-300)"
+                            >
+                              Invalid path syntax. Please check your path
+                              format.
+                            </div>
                           {/if}
                         {:else if test.testPath && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
                           {#if !isValidXPath(test.testPath)}
@@ -809,6 +832,14 @@
                                 Path valid. Sample value: {test.testPath}
                                 = {getXPathValue(test.testPath, responseBody)}
                               </span>
+                            </div>
+                          {:else}
+                            <div
+                              class="text-fs-10 mt-1"
+                              style="color: var(--text-ds-danger-300)"
+                            >
+                              Invalid path syntax. Please check your path
+                              format.
                             </div>
                           {/if}
                         {:else if test.testPath && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
@@ -856,6 +887,14 @@
                                   responseHeader,
                                 )}
                               </span>
+                            </div>
+                          {:else}
+                            <div
+                              class="text-fs-10 mt-1"
+                              style="color: var(--text-ds-danger-300)"
+                            >
+                              Invalid path syntax. Please check your path
+                              format.
                             </div>
                           {/if}
                         {/if}
