@@ -674,11 +674,10 @@
 
   $: {
     const mappedSchedules = testflowScheduleStore.map(mapScheduleData);
-
-    if (searchQuery.trim() === "") {
+    const query = searchQuery.trim().toLowerCase();
+    if (query === "") {
       filteredSchedules = [...mappedSchedules];
     } else {
-      const query = searchQuery.toLowerCase();
       filteredSchedules = mappedSchedules.filter(
         (schedule) =>
           schedule.name.toLowerCase().includes(query) ||
@@ -686,6 +685,12 @@
           schedule.description.toLowerCase().includes(query),
       );
     }
+    // Sort by updatedAt (newest first)
+    filteredSchedules.sort((a, b) => {
+      const timeA = new Date(a.originalData.updatedAt).getTime();
+      const timeB = new Date(b.originalData.updatedAt).getTime();
+      return timeB - timeA; // Descending → latest at top
+    });
   }
 
   $: {
