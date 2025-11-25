@@ -649,6 +649,7 @@
         <!-- Email Recipients -->
         <div class="form-group mb-3">
           <label class="form-label"> Email Recipients </label>
+          <p class="helper-text mb-2">Use comma to separate emails</p>
 
           <div class="email-picker-container">
             <EmailReceipentsPicker
@@ -756,7 +757,8 @@
 
     /* Styling for the scrollbar */
     &::-webkit-scrollbar {
-      width: 8px;
+      width: 4px;
+      height: 4px;
     }
 
     &::-webkit-scrollbar-track {

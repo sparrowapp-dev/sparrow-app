@@ -2466,7 +2466,13 @@
 
       const formatType = fileType.toUpperCase();
       const wrappedData = { dataSet: jsonData };
-
+      if (!Array.isArray(jsonData)) {
+        notifications.error(
+          "Import failed. Please ensure the file contains data in a valid format.",
+        );
+        resetImportState();
+        return;
+      }
       // Send wrapped data to backend
       const response = await importTestflowDataSet(
         wrappedData,
@@ -2695,7 +2701,7 @@
       {/if}
       <div class="run-btn" style="margin-right: 5px; position:relative;">
         <div class="d-flex" style="gap: 8px;">
-          {#if isRunButtonEnabled}
+          {#if isRunButtonEnabled || isGuestUser}
             {#if testflowStore?.isTestFlowRunning}
               <Button
                 type="secondary"
@@ -2711,6 +2717,7 @@
                   size="medium"
                   startIcon={PlayFilled}
                   title={"Run Now"}
+                  disable={isGuestUser && !isRunButtonEnabled}
                   onClick={async () => {
                     if (
                       $tab?.property?.testflow?.state?.testflowNavigator ===
@@ -2727,16 +2734,15 @@
                       onUpdateTestflowState({
                         testflowNavigator: TestflowNavigatorEnum.TESTFLOW,
                       });
-                    } else {
-                      unselectNodes();
-                      await onClickRun();
-                      const startingNode = handleSelectFirstNode();
-                      if (startingNode) {
-                        selectNode(startingNode);
-                      }
-                      MixpanelEvent(Events.Run_TestFlows);
-                      handleEventOnRunBlocks();
                     }
+                    unselectNodes();
+                    await onClickRun();
+                    const startingNode = handleSelectFirstNode();
+                    if (startingNode) {
+                      selectNode(startingNode);
+                    }
+                    MixpanelEvent(Events.Run_TestFlows);
+                    handleEventOnRunBlocks();
                   }}
                 />
               </div>
@@ -2775,6 +2781,7 @@
                 onClick={() => {
                   runButtonMenu = !runButtonMenu;
                 }}
+                disable={isGuestUser && !isRunButtonEnabled}
               />
             </Dropdown>
             <div class="d-flex" style="gap:8px; align-items:center;">
