@@ -24,11 +24,15 @@
    */
   const inputId: string = "team-name-input";
 
-  const isOnlySpecialCharacters = (teamName: string) => {
-    // This regex checks if the string contains ONLY non-alphanumeric characters
-    return !/^(?!.*[^A-Za-z0-9]{3,})(?=.*[A-Za-z0-9])[\x20-\x7E]+$/.test(
-      teamName,
-    );
+  const isValidHubName = (name: string) => {
+    const trimmedName = name.trim();
+    // Check if empty
+    if (!trimmedName) return false;
+    // Check if contains at least one alphanumeric character
+    const hasAlphanumeric = /[a-zA-Z0-9]/.test(trimmedName);
+    // Check if contains only allowed characters (letters, digits, spaces, ., -, _)
+    const onlyAllowedChars = /^[a-zA-Z0-9._\- ]+$/.test(trimmedName);
+    return hasAlphanumeric && onlyAllowedChars;
   };
 </script>
 
@@ -53,11 +57,8 @@
       bind:value={teamForm.name.value}
       on:blur={() => {
         teamForm.name.isTouched = true;
-        teamForm.name.value = teamForm.name.value.trim(); // Trim the value on blur
-        if (
-          teamForm.name.value &&
-          isOnlySpecialCharacters(teamForm.name.value)
-        ) {
+        teamForm.name.value = teamForm.name.value.trim();
+        if (teamForm.name.value && !isValidHubName(teamForm.name.value)) {
           teamForm.name.invalid = true;
         } else {
           teamForm.name.invalid = false;
