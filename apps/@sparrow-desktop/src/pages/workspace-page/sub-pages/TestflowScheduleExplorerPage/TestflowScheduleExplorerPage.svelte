@@ -8,10 +8,11 @@
   // Component
   import { TestflowScheduleExplorer } from "@sparrow/workspaces/features";
   import { user } from "@app/store/auth.store";
-  import { testflowSchedules } from "@sparrow/common/store";
+  import { testflowSchedules, testflowDataSets } from "@sparrow/common/store";
   import { environmentType } from "@sparrow/common/enums";
   import { WorkspaceRole } from "@sparrow/common/enums";
   import { onDestroy } from "svelte";
+  import { TestDataPreviewModal } from "@sparrow/common/features";
 
   /**
    * folder tab document
@@ -30,6 +31,31 @@
   let currentWorkspace;
   let isTestflowScheduleEditable;
   let userRole = "";
+  let testflowDataSetStore = [];
+
+  let isTestDataPreviewModalOpen = false;
+  let selectedTestDataForPreview = null;
+  let wasConfigurationTabOpen = false;
+
+  // Function to open test data preview
+  const openTestDataPreview = (testDataId) => {
+    if (testDataId && testDataId !== "none") {
+      // Find the test data from the store
+      const testData = testflowDataSetStore?.find(
+        (dataset) => dataset.id === testDataId,
+      );
+      if (testData) {
+        selectedTestDataForPreview = testData;
+        isTestDataPreviewModalOpen = true;
+      }
+    }
+  };
+
+  // Function to close test data preview
+  const closeTestDataPreview = () => {
+    isTestDataPreviewModalOpen = false;
+    selectedTestDataForPreview = null;
+  };
 
   /**
    * Find the role of user in active workspace
@@ -59,12 +85,19 @@
   let testflow;
 
   let testflowScheduleStoreMap;
+  let testflowDataSetStoreMap;
 
   let testflowScheduleStore;
 
   testflowSchedules.subscribe((_testflowScheduleStoreMap) => {
     if (_testflowScheduleStoreMap) {
       testflowScheduleStoreMap = _testflowScheduleStoreMap;
+    }
+  });
+
+  testflowDataSets.subscribe((_testflowDataSetStoreMap) => {
+    if (_testflowDataSetStoreMap) {
+      testflowDataSetStoreMap = _testflowDataSetStoreMap;
     }
   });
 
@@ -75,6 +108,7 @@
     testflowScheduleStore = testflowScheduleStoreMap?.get(
       tab?.path?.testflowId,
     );
+    testflowDataSetStore = testflowDataSetStoreMap?.get(tab?.path?.testflowId);
 
     let storeSchedule = testflowScheduleStore?.find((s) => s.id === tab?.id);
 
@@ -104,6 +138,7 @@
            */
           _viewModel = new TestFlowScheduleExplorerPage(tab);
           testflowScheduleStore = testflowScheduleStoreMap?.get(tab?.id);
+          testflowDataSetStore = testflowDataSetStoreMap?.get(tab?.id);
           testflowObserver = _viewModel.getTestflowObserver(
             tab?.path?.testflowId as string,
           );
@@ -167,4 +202,16 @@
   onOpenTestflow={_viewModel.handleOpenTestflow}
   onOpenEnvironment={_viewModel.handleOpenEnvironment}
   onValidateTestflowRun={_viewModel.validateTestflowRun}
+  testflowDataSetStore={testflowDataSetStore || []}
+  onOpenTestDataPreview={openTestDataPreview}
+  openTestflowDataSetTab={_viewModel.openTestflowDataSetTab}
+  onDeleteTestflowScheduleTestDataHistory={_viewModel.deleteTestflowScheduleTestDataHistory}
+/>
+
+<!-- Test Data Preview Modal -->
+<TestDataPreviewModal
+  isOpen={isTestDataPreviewModalOpen}
+  testDataSet={selectedTestDataForPreview}
+  onClose={closeTestDataPreview}
+  onOpenTestflowDataSetTab={_viewModel.openTestflowDataSetTab}
 />

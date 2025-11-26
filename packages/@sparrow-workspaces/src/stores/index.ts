@@ -47,5 +47,5 @@ export {
 
 export {
   isTeamDowngradePopupDismissed,
-  setTeamDowngradePopupDismissed
+  setTeamDowngradePopupDismissed,
 } from "./downgrade-popup";

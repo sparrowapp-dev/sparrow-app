@@ -65,6 +65,7 @@
   import type { GithubRepoDocType } from "src/models/github-repo.model";
   import { DownloadApp } from "@sparrow/common/features";
   import { shouldRunThrottled } from "@sparrow/common/store";
+  import { FormatCount } from "@sparrow/common/utils";
 
   let githubRepoData: GithubRepoDocType;
   let isGuestUser = false;
@@ -290,7 +291,7 @@
                     onClick={async () => {
                       await open(externalSparrowGithub);
                     }}
-                    count={githubRepoData?.stargazers_count || ""}
+                    count={FormatCount(githubRepoData?.stargazers_count) || ""}
                   />
                 </Tooltip>
 

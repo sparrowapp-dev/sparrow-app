@@ -15,12 +15,17 @@
   export let environments = [];
   export let onScheduleTestFlowRun;
   export let creatorEmail;
+  export let testDataFiles = [];
+  export let onPreviewTestData;
+  export let onTestDataSelection = null;
+  export let selectedTestDataId = "none";
 
   // Form data
   let scheduleName = "";
   let selectedEnvironment = "none";
   let isError = false;
   let isScheduling = false;
+  let selectedTestData = selectedTestDataId;
 
   // Run Configuration
   let selectedCycle = "Once"; // Once, Daily, Hourly, Weekly
@@ -46,6 +51,8 @@
     { label: "Sat", value: "saturday", dayNumber: 6 },
     { label: "Sun", value: "sunday", dayNumber: 0 },
   ];
+
+  $: selectedTestData = selectedTestDataId;
 
   // Set default schedule name when component loads or testflow name changes
   $: if (testFlowName) {
@@ -302,12 +309,27 @@
         emails: notificationEmails,
         receiveNotifications: notificationPreference,
       },
+      selectedTestData === "none" ? "" : selectedTestData,
     );
 
     if (result?.isSuccessful || result.message === "Plan limit reached") {
       isScheduleRunPopupOpen = false;
     }
     isScheduling = false;
+  }
+
+  function handleTestDataSelect(data) {
+    selectedTestData = data;
+    // Notify parent about the selection
+    if (onTestDataSelection) {
+      onTestDataSelection(data);
+    }
+  }
+
+  function handlePreviewTestData() {
+    if (selectedTestData && selectedTestData !== "none" && onPreviewTestData) {
+      onPreviewTestData(selectedTestData);
+    }
   }
 </script>
 
@@ -573,6 +595,46 @@
           {/if}
         {/if}
       </div>
+      <div class="form-group mb-4">
+        <label
+          class="form-label text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-medium mb-2"
+          style="color: var(--text-ds-neutral-200);"
+        >
+          Select Test Data
+        </label>
+        <p
+          class="helper-text text-ds-font-size-12 mb-2"
+          style="color: var(--text-ds-neutral-400);"
+        >
+          Select a test data file to execute tests with dynamic inputs.
+        </p>
+        <Select
+          id="testdata-select"
+          data={[{ id: "none", name: "None" }, ...testDataFiles]}
+          titleId={selectedTestData === "none" ? "" : selectedTestData}
+          onclick={handleTestDataSelect}
+          size="medium"
+          minHeaderWidth="100%"
+          placeholderText="Select"
+          menuItem="v2"
+          showDescription={false}
+          bodyTheme={"violet"}
+          headerTheme={"violet2"}
+          variant={"tertiary"}
+          zIndex={10}
+        />
+        {#if selectedTestData && selectedTestData !== "none"}
+          <div class="preview-button">
+            <Button
+              title="Preview File"
+              type="link-primary"
+              size="small"
+              onClick={handlePreviewTestData}
+              buttonClassProp="mt-2"
+            />
+          </div>
+        {/if}
+      </div>
       <div
         style="height: 1px; background-color: var(--bg-ds-surface-100); margin: 20px 0;"
       ></div>
@@ -587,6 +649,7 @@
         <!-- Email Recipients -->
         <div class="form-group mb-3">
           <label class="form-label"> Email Recipients </label>
+          <p class="helper-text mb-2">Use comma to separate emails</p>
 
           <div class="email-picker-container">
             <EmailReceipentsPicker
@@ -683,6 +746,9 @@
     max-height: 80vh;
     overflow: hidden;
   }
+  .preview-button {
+    margin-left: -16px;
+  }
 
   .schedule-run-form-container {
     flex: 1;
@@ -691,7 +757,8 @@
 
     /* Styling for the scrollbar */
     &::-webkit-scrollbar {
-      width: 8px;
+      width: 4px;
+      height: 4px;
     }
 
     &::-webkit-scrollbar-track {

@@ -123,6 +123,7 @@
 
   import TestflowScheduleRVExplorerPage from "./sub-pages/TestflowScheduleRVExplorerPage.svelte/TestflowScheduleRVExplorerPage.svelte";
   import TestflowScheduleExplorerPage from "./sub-pages/TestflowScheduleExplorerPage/TestflowScheduleExplorerPage.svelte";
+  import TestflowDataSetExplorerPage from "./sub-pages/TestflowDataSetExplorerPage/TestflowDataSetExplorerPage.svelte";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -280,6 +281,7 @@
         tab?.type === TabTypeEnum.WEB_SOCKET ||
         tab?.type === TabTypeEnum.ENVIRONMENT ||
         tab?.type === TabTypeEnum.TESTFLOW ||
+        tab?.type === TabTypeEnum.TESTFLOW_DATASET ||
         tab?.type === TabTypeEnum.SOCKET_IO ||
         tab?.type === TabTypeEnum.SAVED_REQUEST ||
         tab?.type === TabTypeEnum.MOCK_REQUEST ||
@@ -411,6 +413,7 @@
     if (
       removeTab.type === TabTypeEnum.ENVIRONMENT ||
       removeTab.type === TabTypeEnum.TESTFLOW ||
+      removeTab.type === TabTypeEnum.TESTFLOW_DATASET ||
       removeTab.type === TabTypeEnum.COLLECTION ||
       removeTab.type === TabTypeEnum.WORKSPACE
     ) {
@@ -426,6 +429,13 @@
           }
         } else if (removeTab.type === TabTypeEnum.TESTFLOW) {
           const res = await _viewModel3.saveTestflow(removeTab);
+          if (res) {
+            loader = false;
+            _viewModel.handleRemoveTab(id);
+            isPopupClosed = false;
+          }
+        } else if (removeTab.type === TabTypeEnum.TESTFLOW_DATASET) {
+          const res = await _viewModel3.saveTestflowDataset(removeTab);
           if (res) {
             loader = false;
             _viewModel.handleRemoveTab(id);
@@ -1118,6 +1128,12 @@
                     <Motion {...scaleMotionProps} let:motion>
                       <div class="h-100">
                         <TestflowScheduleExplorerPage tab={$activeTab} />
+                      </div>
+                    </Motion>
+                  {:else if $activeTab?.type === TabTypeEnum.TESTFLOW_DATASET}
+                    <Motion {...scaleMotionProps} let:motion>
+                      <div class="h-100">
+                        <TestflowDataSetExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if !$tabList?.length}

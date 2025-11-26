@@ -20,6 +20,8 @@
   export let onSaveSchedule;
   export let isSaved;
   export let userRole;
+  export let testDataFiles = [];
+  export let onPreviewTestData = null;
 
   const extractTimeFromISOString = new TimeISOExtractor()
     .extractTimeFromISOString;
@@ -78,6 +80,7 @@
           emails: notificationEmails,
           receiveNotifications,
         },
+        testflowDataSetId: selectedTestData === "none" ? "" : selectedTestData,
       };
 
       // Call the update function from parent
@@ -90,6 +93,7 @@
   let selectedEnvironment = "";
   let isError = false;
   let isUpdating = false;
+  let selectedTestData = "none";
 
   // Run Configuration
   let selectedCycle = "once"; // once, daily, hourly, weekly
@@ -123,6 +127,61 @@
 
   // Store initial values to track changes
   let initialFormData = null;
+
+  $: currentForm = {
+    scheduleName,
+    selectedEnvironment,
+    selectedCycle,
+    formattedDate,
+    selectedTime,
+    intervalHours,
+    days: [...days],
+    notificationEmails: [...notificationEmails],
+    receiveNotifications,
+  };
+
+  $: isModified = (() => {
+    if (initialFormData == null) return true;
+
+    // Compare each field individually
+    const current = {
+      scheduleName,
+      selectedEnvironment,
+      selectedCycle,
+      formattedDate,
+      selectedTime,
+      intervalHours,
+      days: [...days].sort(), // Sort for consistent comparison
+      notificationEmails: [...notificationEmails].sort(),
+      receiveNotifications,
+      selectedTestData,
+    };
+
+    const initial = {
+      ...initialFormData,
+      days: [...(initialFormData.days || [])].sort(),
+      notificationEmails: [
+        ...(initialFormData.notificationEmails || []),
+      ].sort(),
+    };
+
+    // Compare each property
+    for (const key in current) {
+      if (Array.isArray(current[key])) {
+        // For arrays, compare stringified sorted versions
+        if (JSON.stringify(current[key]) !== JSON.stringify(initial[key])) {
+          return true;
+        }
+      } else {
+        // For other values, direct comparison
+        if (current[key] !== initial[key]) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  })();
 
   // Format environments for Select component
   $: formattedEnvironments = [
@@ -177,6 +236,7 @@
       scheduleName = schedule.name || "";
       selectedEnvironment = schedule.environmentId || "none";
       selectedCycle = schedule.runConfiguration?.runCycle || "once";
+      selectedTestData = schedule.testflowDataSetId || "none";
 
       if (selectedCycle === "once" && schedule.runConfiguration?.executeAt) {
         const executeAtDate = new Date(schedule.runConfiguration.executeAt);
@@ -218,6 +278,7 @@
         days: [...days],
         notificationEmails: [...notificationEmails],
         receiveNotifications,
+        selectedTestData,
       };
     }
   });
@@ -287,6 +348,11 @@
   // Handle time change
   const handleTimeChange = (event) => {
     selectedTime = event.detail;
+    updateScheduleRealtime();
+  };
+
+  const handleTestDataSelect = (testDataId: string) => {
+    selectedTestData = testDataId;
     updateScheduleRealtime();
   };
 
@@ -403,6 +469,7 @@
           days: [...days],
           notificationEmails: [...notificationEmails],
           receiveNotifications,
+          selectedTestData,
         };
       } else {
         console.error("Failed to save schedule:", result?.error);
@@ -425,10 +492,18 @@
       formattedDate = initialFormData.formattedDate;
       selectedTime = initialFormData.selectedTime;
       intervalHours = initialFormData.intervalHours;
-      days = [...initialFormData.days];
-      notificationEmails = [...initialFormData.notificationEmails];
+      days = initialFormData.days ? [...initialFormData.days] : [];
+      notificationEmails = initialFormData.notificationEmails
+        ? [...initialFormData.notificationEmails]
+        : [];
       receiveNotifications = initialFormData.receiveNotifications;
-      updateScheduleRealtime();
+      selectedTestData = initialFormData.selectedTestData;
+    }
+  };
+
+  const handlePreviewTestData = () => {
+    if (selectedTestData && selectedTestData !== "none" && onPreviewTestData) {
+      onPreviewTestData(selectedTestData);
     }
   };
 
@@ -708,6 +783,46 @@
           {/if}
         {/if}
       </div>
+      <div class="form-group mb-4">
+        <label
+          class="form-label text-ds-font-size-14 text-ds-line-height-130 text-ds-font-weight-medium mb-2"
+          style="color: var(--text-ds-neutral-200);"
+        >
+          Select Test Data
+        </label>
+        <p
+          class="helper-text text-ds-font-size-12 mb-2"
+          style="color: var(--text-ds-neutral-400);"
+        >
+          Select a test data file to execute tests with dynamic inputs.
+        </p>
+        <Select
+          id="testdata-select"
+          data={[{ id: "none", name: "None" }, ...testDataFiles]}
+          titleId={selectedTestData === "none" ? "" : selectedTestData}
+          onclick={handleTestDataSelect}
+          size="medium"
+          minHeaderWidth="100%"
+          placeholderText="Select"
+          menuItem="v2"
+          showDescription={false}
+          bodyTheme={"violet"}
+          headerTheme={"violet2"}
+          variant={"tertiary"}
+          zIndex={10}
+        />
+        <div class="preview-button">
+          {#if selectedTestData && selectedTestData !== "none"}
+            <Button
+              title="Preview File"
+              type="link-primary"
+              size="small"
+              onClick={handlePreviewTestData}
+              buttonClassProp="mt-2"
+            />
+          {/if}
+        </div>
+      </div>
       <div
         style="height: 1px; background-color: var(--bg-ds-surface-100); margin: 20px 0;"
       ></div>
@@ -774,7 +889,8 @@
         <Button
           title="Save Changes"
           onClick={handleSaveChanges}
-          disable={isSaved ||
+          disable={!isModified ||
+            isSaved ||
             !scheduleName.trim() ||
             (selectedCycle === "once" && (!formattedDate || !selectedTime)) ||
             (selectedCycle === "daily" && !selectedTime) ||
@@ -784,7 +900,7 @@
           type="primary"
           loader={isUpdating}
         />
-        {#if !isSaved}
+        {#if !isSaved && isModified}
           <Button title="Cancel" onClick={handleCancel} type="secondary" />
         {/if}
       {/if}
@@ -793,6 +909,9 @@
 </div>
 
 <style lang="scss">
+  .preview-button {
+    margin-left: -16px;
+  }
   .configurations-container {
     display: flex;
     flex-direction: column;

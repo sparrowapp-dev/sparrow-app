@@ -59,6 +59,7 @@
       defaultLogo: "",
       hoveredLogo: "",
       selectedLogo: "",
+      message: "",
     };
 
     switch (item.id) {
@@ -78,6 +79,8 @@
         sidebarItemWithIcons.defaultLogo = Marketplace;
         sidebarItemWithIcons.hoveredLogo = hoveredMarketplace;
         sidebarItemWithIcons.selectedLogo = selectedMarketplace;
+        sidebarItemWithIcons.message =
+          "Create an account or sign in to access the Marketplace.";
         break;
 
       case SidebarItemImgEnum.COMMUNITY:

@@ -33,9 +33,10 @@
     TFDataStoreType,
     TFNodeStoreType,
   } from "@sparrow/common/types/workspace/testflow";
-  import type { Unsubscriber } from "svelte/store";
+  import { get, type Unsubscriber } from "svelte/store";
   import { Button } from "@sparrow/library/ui";
   import { currentStep, isTestFlowTourGuideOpen } from "../../../../stores";
+  import { testflowDataSetItem } from "../../store/testflow";
 
   /**
    * The data object containing various handlers and data stores.
@@ -122,6 +123,31 @@
     );
   };
 
+  const setCurrentBlockFromDataset = () => {
+    const items = get(testflowDataSetItem);
+    let matchedItem = null;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i]?.node.id === id) {
+        matchedItem = items[i];
+        break;
+      }
+    }
+    const updateItem = {
+      id,
+      request: matchedItem?.request,
+      response: matchedItem?.response,
+    };
+    return updateItem;
+  };
+
+  // Reactively update currentBlock based on currentItem + dataset index
+  $: if (data?.currentItem && $testflowDataSetItem) {
+    const datasetBlock = setCurrentBlockFromDataset();
+    if (datasetBlock) {
+      currentBlock = datasetBlock;
+    }
+  }
+
   /**
    * Testflow store subscriber to get current node status
    */
@@ -138,10 +164,10 @@
           }
         });
       } else {
-        currentBlock = data.currentItem;
+        currentBlock = setCurrentBlockFromDataset();
       }
     } else {
-      currentBlock = data.currentItem;
+      currentBlock = setCurrentBlockFromDataset();
     }
   });
 
@@ -273,7 +299,7 @@
 
 <div
   class="request-block position-relative"
-  style={selected && !currentBlock?.response.status
+  style={selected && !currentBlock?.response?.status
     ? "outline: 1px solid var(--border-ds-primary-300);"
     : (selected && currentBlock && checkIfRequestSucceed(currentBlock)) ||
         ($currentStep > 6 && $isTestFlowTourGuideOpen)

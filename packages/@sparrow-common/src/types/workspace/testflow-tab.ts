@@ -6,7 +6,7 @@ import type {
   HttpRequestKeyValueDtoInterface,
   HttpRequestMethodsDtoInterface,
 } from "./http-request-dto";
-import type { RequestDataTypeEnum } from "./http-request-tab";
+import type { RequestDataTypeEnum, Tests } from "./http-request-tab";
 import type { Tab } from "./tab";
 
 export interface HttpRequestUIStateDto {
@@ -51,11 +51,13 @@ export interface HttpRequestMetaDataTestFlowDtoInterface {
   selectedRequestBodyType?: HttpRequestBodyModeDtoEnum;
   state?: HttpRequestUIStateDto;
   url: string;
+  tests?: Tests;
 }
 
 export enum TestflowNavigatorEnum {
   TESTFLOW = "Testflow",
   SCHEDULE = "Schedule",
+  TESTDATA = "TestData",
 }
 /**
  * TF (Test FLow) Default Type
@@ -201,6 +203,7 @@ export type TFHistoryAPIResponseStoreType = {
   body: string;
   time: number;
   size: number;
+  testResults?: any[];
   responseContentType?: RequestDataTypeEnum;
 };
 export type TFNodeStoreType = {

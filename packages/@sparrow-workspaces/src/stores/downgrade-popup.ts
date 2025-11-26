@@ -1,8 +1,13 @@
 import { writable } from "svelte/store";
 
-export const isTeamDowngradePopupDismissed = writable<Map<string, boolean>>(new Map());
+export const isTeamDowngradePopupDismissed = writable<Map<string, boolean>>(
+  new Map(),
+);
 
-export const setTeamDowngradePopupDismissed = (hubId: string, dismissed: boolean) => {
+export const setTeamDowngradePopupDismissed = (
+  hubId: string,
+  dismissed: boolean,
+) => {
   isTeamDowngradePopupDismissed.update((currentMap) => {
     const updated = new Map(currentMap);
     updated.set(hubId, dismissed);

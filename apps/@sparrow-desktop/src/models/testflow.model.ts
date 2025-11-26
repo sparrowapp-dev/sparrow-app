@@ -108,6 +108,44 @@ const httpRequestAuth = {
   },
 };
 
+const tests = {
+  testCaseMode: {
+    type: "string",
+  },
+  noCode: {
+    type: "array",
+    items: {
+      type: "object",
+      properties: {
+        id: {
+          type: "string",
+        },
+        name: {
+          type: "string",
+        },
+        condition: {
+          type: "string",
+        },
+        expectedResult: {
+          type: "string",
+        },
+        testPath: {
+          type: "string",
+        },
+        testTarget: {
+          type: "string",
+        },
+      },
+    },
+  },
+  script: {
+    type: "string",
+  },
+  preScript: {
+    type: "string",
+  },
+};
+
 const requestItems = {
   name: {
     type: "string",
@@ -143,13 +181,17 @@ const requestItems = {
     type: "array",
     properties: params,
   },
+  tests: {
+    type: "array",
+    properties: tests,
+  },
 };
 
 const TestflowSchemaLiteral = {
   title: "Testflow",
   primaryKey: "_id",
   type: "object",
-  version: 1,
+  version: 2,
   properties: {
     _id: {
       type: "string",

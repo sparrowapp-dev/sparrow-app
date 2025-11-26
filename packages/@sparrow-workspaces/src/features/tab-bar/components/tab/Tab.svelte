@@ -33,6 +33,7 @@
     DatabaseStackRegular,
     ClockRegular,
     ClockAlarmRegular,
+    DocumentRegular,
   } from "@sparrow/library/icons";
   import {
     TabPersistenceTypeEnum,
@@ -325,6 +326,10 @@
             color={"var(--icon-ds-neutral-100)"}
           />
         </span>
+      {:else if tab.type === TabTypeEnum.TESTFLOW_DATASET}
+        <span class="d-inline-block" style="transform: translateY(2px);">
+          <DocumentRegular size={"14px"} color={"var(--icon-ds-neutral-100)"} />
+        </span>
       {:else if tab.type === TabTypeEnum.AI_REQUEST}
         <span>
           <BotRegular height={"17px"} width={"15px"} />
@@ -367,7 +372,7 @@
       <Tag type={"green"} text={tab.label} />
     {/if}
     <div style="align-items:center; justify-content:center;">
-      {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.MOCK_REQUEST || tab?.type === TabTypeEnum.AI_REQUEST || tab?.type === TabTypeEnum.WORKSPACE || tab?.type === TabTypeEnum.FOLDER || tab?.type === TabTypeEnum.COLLECTION || tab?.type === TabTypeEnum.SAVED_REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW) && !tab?.isSaved}
+      {#if (tab?.type === TabTypeEnum.REQUEST || tab?.type === TabTypeEnum.MOCK_REQUEST || tab?.type === TabTypeEnum.AI_REQUEST || tab?.type === TabTypeEnum.WORKSPACE || tab?.type === TabTypeEnum.FOLDER || tab?.type === TabTypeEnum.COLLECTION || tab?.type === TabTypeEnum.SAVED_REQUEST || tab?.type === TabTypeEnum.WEB_SOCKET || tab?.type === TabTypeEnum.SOCKET_IO || tab?.type === TabTypeEnum.GRAPHQL || tab?.type === TabTypeEnum.ENVIRONMENT || tab?.type === TabTypeEnum.TESTFLOW || tab?.type === TabTypeEnum.TESTFLOW_DATASET) && !tab?.isSaved}
         <div
           class="badge-container badge"
           style="width:18px ; height:18px ; align-items:center; justify-content:center;"
