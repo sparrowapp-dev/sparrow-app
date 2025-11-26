@@ -49,6 +49,7 @@
   export let handleOpenCurrentDynamicExpression;
   export let selectedAuthHeader;
   export let selectAuthHeader: string;
+  export let isSaved = false; // Track save state for assertions
 
   let responseLoader = false;
   let height = 300;
@@ -388,6 +389,7 @@
                 testResults={selectedNodeResponse?.response?.testResults ?? []}
                 responseBody={selectedNodeResponse?.response?.body ?? ""}
                 responseHeader={selectedNodeResponse?.response?.headers ?? []}
+                {isSaved}
               />
             {/key}
           {/if}
