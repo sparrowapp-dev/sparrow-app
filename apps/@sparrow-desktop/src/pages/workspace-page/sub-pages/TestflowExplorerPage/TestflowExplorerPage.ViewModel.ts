@@ -192,7 +192,7 @@ export class TestflowExplorerPageViewModel {
    */
   public updateNodes = new Debounce().debounce(
     this.updateNodesDebounce as any,
-    300,
+    150,
   );
 
   /**
