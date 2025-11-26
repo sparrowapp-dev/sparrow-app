@@ -233,11 +233,36 @@
   ) => Promise<any>;
 
   export let onOpenEnvironment;
-
+  export let onGeneratePreScript;
+  export let onGenerateTestCases;
+  export let onFixTestScript;
+  const isTestCasesGenerating = writable<boolean>(false);
+  const isPreScriptGenerating = writable<boolean>(false);
+  const loading = writable<boolean>(false);
   let planContent: any;
   let planContentNonActive: any;
   let selectedAuthHeader: any;
   let datasetId: string;
+
+  $: {
+    loadingState.subscribe((tab) => {
+      loading.set(tab.get($tab.tabId));
+    });
+  }
+  $: {
+    loadingState.subscribe((tab) => {
+      isTestCasesGenerating.set(
+        tab.get($tab.tabId + "generatingTestCasesforTestflow"),
+      );
+    });
+  }
+  $: {
+    loadingState.subscribe((tab) => {
+      isPreScriptGenerating.set(
+        tab.get($tab.tabId + "generatingPreScriptforTestflow"),
+      );
+    });
+  }
 
   const checkRequestExistInNode = (_id: string) => {
     let result = false;
@@ -3260,6 +3285,11 @@
           {selectedAuthHeader}
           bind:selectAuthHeader
           {handleOpenCurrentDynamicExpression}
+          {onGeneratePreScript}
+          {onGenerateTestCases}
+          isPreScriptGenerating={$isPreScriptGenerating}
+          isTestCasesGenerating={$isTestCasesGenerating}
+          {onFixTestScript}
         />
       </div>
     {:else if $isTestFlowTourGuideOpen && $currentStep === 7}

@@ -50,10 +50,15 @@
   export let handleOpenCurrentDynamicExpression;
   export let selectedAuthHeader;
   export let selectAuthHeader: string;
+  export let onGeneratePreScript;
+  export let onGenerateTestCases;
+  export let isPreScriptGenerating;
+  export let isTestCasesGenerating;
+  export let onFixTestScript;
 
   let responseLoader = false;
   let height = 300;
-  let minHeight = 100;
+  let minHeight = 200;
   let isResizing = false;
   let isResizingActive = false;
   let inputRef;
@@ -401,14 +406,15 @@
                   preScript: "",
                   script: "",
                 }}
+                node_id={selectedBlock?.id}
                 onTestsChange={(updatedTests) => {
                   handleUpdateRequestData("tests", updatedTests);
                 }}
                 tabSplitDirection="horizontal"
-                onGenerateTestCases={undefined}
-                onGeneratePreScript={undefined}
-                isTestCasesGenerating={false}
-                isPreScriptGenerating={false}
+                {onGenerateTestCases}
+                {onGeneratePreScript}
+                {isPreScriptGenerating}
+                {isTestCasesGenerating}
               />
             {/key}
           {/if}
@@ -488,14 +494,26 @@
                   <ResponseTestResults
                     responseTestResults={selectedNodeResponse.response
                       ?.testResults || []}
-                    responseTestMessage={selectedNodeResponse.response
-                      ?.testMessage || []}
+                    responseTestMessage={selectedNodeResponse?.response?.testResults
+                      ?.filter(
+                        (t) =>
+                          t.testStatus === false &&
+                          t.testMessage.includes("SyntaxError"),
+                      )
+                      ?.map((t) => ({
+                        initiator: t.initiator,
+                        error: t.testMessage,
+                      })) || []}
                     tests={selectedBlock?.data?.requestData?.tests}
-                    onFixTestScript={undefined}
-                    tabId={selectedBlock?.id}
+                    {onFixTestScript}
+                    tabId={selectedBlock?.data?.tabId}
+                    nodeId={selectedBlock?.id}
                     isGuestUser={false}
                     isSharedWorkspace={false}
                     {userRole}
+                    onTestsChange={(updatedTests) => {
+                      handleUpdateRequestData("tests", updatedTests);
+                    }}
                   />
                 {/if}
               </div>

@@ -6,10 +6,11 @@
   export let tests;
   export let onTestsChange;
   export let tabSplitDirection = "horizontal";
-  export let onGenerateTestCases = undefined;
-  export let onGeneratePreScript = undefined;
-  export let isTestCasesGenerating = false;
-  export let isPreScriptGenerating = false;
+  export let onGenerateTestCases;
+  export let onGeneratePreScript;
+  export let isTestCasesGenerating;
+  export let isPreScriptGenerating;
+  export let node_id;
 </script>
 
 <div
@@ -70,23 +71,12 @@
 
   <div class="border rounded-top">
     {#if tests?.testCaseMode === TestCaseModeEnum.SCRIPT}
-      <div class="px-3 py-2">
+      <div class="d-flex align-items-center justify-content-between px-3 py-2">
         <p class="text-fs-12 mb-0 text-muted">JavaScript Code</p>
       </div>
     {:else if tests?.testCaseMode === TestCaseModeEnum.NO_CODE}
       <div class="d-flex align-items-center justify-content-between px-3 py-2">
         <p class="text-fs-12 mb-0 text-muted">JavaScript Code</p>
-        <Button
-          title="Read Documentation"
-          size={"extra-small"}
-          type="link-secondary"
-          onClick={() => {
-            window.open(
-              "https://docs.sparrowapp.dev/api-testing/rest/pre-request-script",
-              "_blank",
-            );
-          }}
-        />
       </div>
     {/if}
   </div>
@@ -99,6 +89,7 @@
         {onTestsChange}
         {onGenerateTestCases}
         {isTestCasesGenerating}
+        {node_id}
       />
     {:else}
       <PreScript
@@ -107,6 +98,7 @@
         {onTestsChange}
         {onGeneratePreScript}
         {isPreScriptGenerating}
+        {node_id}
       />
     {/if}
   </div>
