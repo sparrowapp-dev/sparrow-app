@@ -172,7 +172,6 @@
     id={"input-select2"}
     currentWorkspaceUsers={currentWorkspaceDetails.users}
     onChange={(items) => {
-      console.log("--------------this is", items);
       emailstoBeSentArr = items;
       clearErrors();
       filterWorkspaceInviteEmails(emailstoBeSentArr);
