@@ -49,6 +49,7 @@
   export let handleOpenCurrentDynamicExpression;
   export let selectedAuthHeader;
   export let selectAuthHeader: string;
+  export let isSaved = false; // Track save state for assertions
 
   let responseLoader = false;
   let height = 300;
@@ -379,23 +380,17 @@
             />
           {:else if requestNavigation === RequestSectionEnum.ASSERTIONS}
             {#key selectedBlock?.id}
-              <div
-                style={isAnyEnvVariableMissing
-                  ? `height: calc(100% - 72px);`
-                  : `height: 100%;`}
-              >
-                <NoCode
-                  tests={selectedBlock?.data?.requestData?.tests ?? []}
-                  onTestsChange={(updatedTests) => {
-                    handleUpdateRequestData("tests", updatedTests);
-                  }}
-                  tabSplitDirection="horizontal"
-                  testResults={selectedNodeResponse?.response?.testResults ??
-                    []}
-                  responseBody={selectedNodeResponse?.response?.body ?? ""}
-                  responseHeader={selectedNodeResponse?.response?.headers ?? []}
-                />
-              </div>
+              <NoCode
+                tests={selectedBlock?.data?.requestData?.tests ?? []}
+                onTestsChange={(updatedTests) => {
+                  handleUpdateRequestData("tests", updatedTests);
+                }}
+                tabSplitDirection="horizontal"
+                testResults={selectedNodeResponse?.response?.testResults ?? []}
+                responseBody={selectedNodeResponse?.response?.body ?? ""}
+                responseHeader={selectedNodeResponse?.response?.headers ?? []}
+                {isSaved}
+              />
             {/key}
           {/if}
         </div>
