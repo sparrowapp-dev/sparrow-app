@@ -92,6 +92,9 @@
   let scheduleName = "";
   let selectedEnvironment = "";
   let isError = false;
+  let isErrors = {
+    scheduleNameError: false,
+  };
   let isUpdating = false;
   let selectedTestData = "none";
 
@@ -511,6 +514,24 @@
   $: if (formattedDate) {
     selectedDate = parseDateString(formattedDate);
   }
+
+  const isValidScheduleName = (name: string) => {
+    // Regex: 1–30 characters, allows letters, numbers, spaces, hyphens, and underscores
+    const regex = /^[A-Za-z0-9 _-]{1,30}$/;
+    return regex.test(name);
+  };
+
+  $: {
+    if (scheduleName && scheduleName.trim()) {
+      if (!isValidScheduleName(scheduleName.trim())) {
+        isErrors.scheduleNameError = true;
+      } else {
+        isErrors.scheduleNameError = false;
+      }
+    } else {
+      isErrors.scheduleNameError = false;
+    }
+  }
 </script>
 
 <div class="configurations-container">
@@ -541,6 +562,14 @@
             style="color: var(--text-ds-danger-300);"
           >
             Schedule name is required
+          </p>
+        {:else if isErrors.scheduleNameError}
+          <p
+            class="error-text text-ds-font-size-12 mt-1"
+            style="color: var(--text-ds-danger-300);"
+          >
+            Schedule name must be 1-30 characters and can only contain letters,
+            numbers, spaces, hyphens (-), and underscores (_).
           </p>
         {/if}
       </div>
@@ -892,6 +921,7 @@
           disable={!isModified ||
             isSaved ||
             !scheduleName.trim() ||
+            isErrors.scheduleNameError ||
             (selectedCycle === "once" && (!formattedDate || !selectedTime)) ||
             (selectedCycle === "daily" && !selectedTime) ||
             (selectedCycle === "hourly" && !intervalHours) ||
