@@ -264,6 +264,7 @@
             }
           : t._originalState,
     }));
+    onTestsChange(localTest);
   };
 
   const addTest = () => {
@@ -281,6 +282,7 @@
       ...localTest.noCode.map((t) => ({ ...t, isActive: false })),
       newTest,
     ];
+    onTestsChange(localTest);
   };
 
   // ✅ Duplicate test with incremental naming
@@ -321,11 +323,8 @@
     };
     localTest.noCode = [...localTest.noCode, newTest];
     selectTest(newTest);
-  };
-
-  $: {
     onTestsChange(localTest);
-  }
+  };
 
   // Track active test validation
   let activeTestErrors = {
@@ -361,11 +360,13 @@
     notifications.success(
       `"${test.name}" is removed from your assertion list.`,
     );
+    onTestsChange(localTest);
   };
 
   const clearTests = () => {
     localTest.noCode = [];
     notifications.success("All tests are removed from your list.");
+    onTestsChange(localTest);
   };
 
   const handleConditionDropdown = (
@@ -376,17 +377,42 @@
       ...t,
       condition: t.id === test.id ? conditionItem : t.condition,
     }));
+    onTestsChange(localTest);
   };
 
   const handleTestTargetDropdown = (
     testTargetItem: TestCaseSelectionTypeEnum,
     test,
   ) => {
-    localTest.noCode = localTest.noCode.map((t) => ({
-      ...t,
-      testTarget: t.id === test.id ? testTargetItem : t.testTarget,
-      testPath: t.id === test.id ? "" : t.testPath,
-    }));
+    // Define conditions that are not allowed for Time Consuming
+    const timeConsumingInvalidConditions = [
+      TestCaseConditionOperatorEnum.EXISTS,
+      TestCaseConditionOperatorEnum.DOES_NOT_EXIST,
+      TestCaseConditionOperatorEnum.CONTAINS,
+      TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN,
+      TestCaseConditionOperatorEnum.IS_EMPTY,
+      TestCaseConditionOperatorEnum.IS_NOT_EMPTY,
+      TestCaseConditionOperatorEnum.IN_LIST,
+      TestCaseConditionOperatorEnum.NOT_IN_LIST,
+    ];
+
+    localTest.noCode = localTest.noCode.map((t) => {
+      if (t.id === test.id) {
+        // Check if switching to Time Consuming and current condition is invalid
+        const shouldResetCondition =
+          testTargetItem === TestCaseSelectionTypeEnum.TIME_CONSUMING &&
+          timeConsumingInvalidConditions.includes(t.condition);
+
+        return {
+          ...t,
+          testTarget: testTargetItem,
+          testPath: "",
+          condition: shouldResetCondition ? "" : t.condition,
+        };
+      }
+      return t;
+    });
+    onTestsChange(localTest);
   };
 
   const setByDefaultTestName = (test) => {
@@ -394,7 +420,14 @@
       ...t,
       name: t.id === test.id ? `New Test` : t.name,
     }));
+    onTestsChange(localTest);
   };
+
+  // Handler for input field blur events
+  const handleInputBlur = () => {
+    onTestsChange(localTest);
+  };
+
   let isDeletePopup = false;
 
   const isValidJsonPath = (path: string): boolean => {
@@ -575,6 +608,8 @@
                         on:blur={() => {
                           if (!test.name) {
                             setByDefaultTestName(test);
+                          } else {
+                            handleInputBlur();
                           }
                         }}
                         placeholder="Enter Test Name"
@@ -758,6 +793,7 @@
                           type="text"
                           class="form-control text-light"
                           bind:value={test.testPath}
+                          on:blur={handleInputBlur}
                           placeholder={test?.testTarget ===
                           TestCaseSelectionTypeEnum.RESPONSE_JSON
                             ? "E.g. $.user.name"
@@ -988,6 +1024,7 @@
                           type="text"
                           class="form-control text-light"
                           bind:value={test.expectedResult}
+                          on:blur={handleInputBlur}
                           placeholder="Enter Comparison Value"
                           style="border: {activeTestErrors.expectedResult
                             ? '1px solid var(--text-ds-danger-300)'
