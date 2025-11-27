@@ -15,7 +15,7 @@
   import { JSONPath } from "jsonpath-plus";
   import * as xpath from "xpath";
   import { DOMParser } from "xmldom";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
 
   export let tests;
   export let onTestsChange;
@@ -25,6 +25,20 @@
   export let responseHeader;
   const localTest = tests;
   let errors = false;
+  let isZoomedIn = false;
+
+  const detectZoom = () => {
+    isZoomedIn = window.devicePixelRatio > 1.25;
+  };
+
+  onMount(() => {
+    detectZoom();
+    window.addEventListener("resize", detectZoom);
+  });
+
+  onDestroy(() => {
+    window.removeEventListener("resize", detectZoom);
+  });
 
   const getJsonPathValue = (_path, _response) => {
     try {
@@ -465,11 +479,17 @@
                 />
               {/each}
             </div>
-            <div class="d-flex align-items-center pb-2 pt-2">
+            <div
+              class="d-flex pb-2 pt-2 gap-2"
+              class:flex-column={isZoomedIn}
+              class:align-items-start={isZoomedIn}
+              class:align-items-center={!isZoomedIn}
+            >
               <Button
                 startIcon={AddRegular}
                 title={"Add Test"}
                 type="primary"
+                customWidth="100px"
                 size="small"
                 onClick={addTest}
               />
@@ -478,11 +498,11 @@
                   title={"Remove All"}
                   startIcon={DeleteRegular}
                   type="secondary"
+                  customWidth="100px"
                   size="small"
                   onClick={() => {
                     isDeletePopup = true;
                   }}
-                  customStyle="margin-left: 8px;"
                 />
               {/if}
             </div>
