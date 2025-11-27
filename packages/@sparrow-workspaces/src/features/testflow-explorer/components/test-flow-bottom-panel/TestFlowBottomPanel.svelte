@@ -49,6 +49,7 @@
   export let handleOpenCurrentDynamicExpression;
   export let selectedAuthHeader;
   export let selectAuthHeader: string;
+  export let isSaved = false; // Track save state for assertions
 
   let responseLoader = false;
   let height = 300;
@@ -319,7 +320,7 @@
     horizontal={false}
   >
     <!-- Request Pane -->
-    <Pane minSize={50} size={"50%"} class="position-relative bg-transparent">
+    <Pane minSize={50} size="52" class="position-relative bg-transparent">
       <div class="h-100 d-flex flex-column position-relative pe-2">
         <RequestNavigatorTestFlow
           paramsLength={selectedBlock?.data?.requestData?.queryParams?.length ||
@@ -403,7 +404,7 @@
     </Pane>
 
     <!-- Response Pane -->
-    <Pane minSize={30} size={"30%"} class="position-relative bg-transparent">
+    <Pane minSize={42} size="34" class="position-relative bg-transparent">
       <div class="response-pane-container">
         {#if (!responseLoader && selectedNodeResponse === undefined) || selectedNodeResponse?.response?.status === ""}
           <div class="dumy-response-container">

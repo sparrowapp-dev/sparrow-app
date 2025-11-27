@@ -23,8 +23,29 @@
   export let testResults;
   export let responseBody;
   export let responseHeader;
+  export let isSaved = false; // New prop to track save state
   const localTest = tests;
   let errors = false;
+
+  // Function to reset unsaved changes after save
+  export const resetUnsavedChanges = () => {
+    localTest.noCode = localTest.noCode.map((t) => ({
+      ...t,
+      hasUnsavedChanges: false,
+      _originalState: {
+        name: t.name,
+        testTarget: t.testTarget,
+        condition: t.condition,
+        testPath: t.testPath,
+        expectedResult: t.expectedResult,
+      },
+    }));
+  };
+
+  // Watch for isSaved prop changes to reset unsaved state
+  $: if (isSaved) {
+    resetUnsavedChanges();
+  }
 
   const getJsonPathValue = (_path, _response) => {
     try {
@@ -94,6 +115,8 @@
   $: {
     const x = localTest.noCode.find((t) => t.isActive);
     errors = false;
+
+    // Check test execution results
     if (testResults) {
       for (let testResult of testResults) {
         if (
@@ -105,6 +128,18 @@
           break;
         }
       }
+    }
+
+    // Also check for field validation errors
+    if (x && !errors) {
+      const fieldErrors = validateFields(x);
+      errors = !!(
+        fieldErrors.name ||
+        fieldErrors.testTarget ||
+        fieldErrors.condition ||
+        fieldErrors.testPath ||
+        fieldErrors.expectedResult
+      );
     }
   }
 
@@ -166,6 +201,27 @@
           pathType = "header key";
         }
         errors.testPath = `This field cannot be empty. Please enter ${pathType}`;
+      } else {
+        // Check syntax validation if path is provided
+        if (
+          test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON &&
+          !isValidJsonPath(test.testPath)
+        ) {
+          errors.testPath =
+            "Invalid path syntax. Please check your path format.";
+        } else if (
+          test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML &&
+          !isValidXPath(test.testPath)
+        ) {
+          errors.testPath =
+            "Invalid path syntax. Please check your path format.";
+        } else if (
+          test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER &&
+          !isValidHeaderKey(test.testPath)
+        ) {
+          errors.testPath =
+            "Invalid path syntax. Please check your path format.";
+        }
       }
     }
 
@@ -465,11 +521,12 @@
                 />
               {/each}
             </div>
-            <div class="d-flex align-items-center pb-2 pt-2">
+            <div class="d-flex align-items-center pb-2 pt-2 gap-2">
               <Button
                 startIcon={AddRegular}
                 title={"Add Test"}
                 type="primary"
+                customWidth="100px"
                 size="small"
                 onClick={addTest}
               />
@@ -478,11 +535,11 @@
                   title={"Remove All"}
                   startIcon={DeleteRegular}
                   type="secondary"
+                  customWidth="100px"
                   size="small"
                   onClick={() => {
                     isDeletePopup = true;
                   }}
-                  customStyle="margin-left: 8px;"
                 />
               {/if}
             </div>
@@ -783,11 +840,18 @@
                             </div>
                           {:else}
                             <div
-                              class="text-fs-10 mt-1"
-                              style="color: var(--text-ds-danger-300)"
+                              class="text-fs-10 mt-1 d-flex"
+                              style="color: var(--text-ds-neutral-300)"
                             >
-                              Invalid path syntax. Please check your path
-                              format.
+                              <span class="me-1">
+                                <InfoRegular
+                                  size={"16px"}
+                                  color={"var(--icon-ds-neutral-300)"}
+                                />
+                              </span>
+                              <span>
+                                Path is valid but value not found in response.
+                              </span>
                             </div>
                           {/if}
                         {:else if test.testPath && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
@@ -835,11 +899,18 @@
                             </div>
                           {:else}
                             <div
-                              class="text-fs-10 mt-1"
-                              style="color: var(--text-ds-danger-300)"
+                              class="text-fs-10 mt-1 d-flex"
+                              style="color: var(--text-ds-neutral-300)"
                             >
-                              Invalid path syntax. Please check your path
-                              format.
+                              <span class="me-1">
+                                <InfoRegular
+                                  size={"16px"}
+                                  color={"var(--icon-ds-neutral-300)"}
+                                />
+                              </span>
+                              <span>
+                                Path is valid but value not found in response.
+                              </span>
                             </div>
                           {/if}
                         {:else if test.testPath && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
@@ -890,11 +961,18 @@
                             </div>
                           {:else}
                             <div
-                              class="text-fs-10 mt-1"
-                              style="color: var(--text-ds-danger-300)"
+                              class="text-fs-10 mt-1 d-flex"
+                              style="color: var(--text-ds-neutral-300)"
                             >
-                              Invalid path syntax. Please check your path
-                              format.
+                              <span class="me-1">
+                                <InfoRegular
+                                  size={"16px"}
+                                  color={"var(--icon-ds-neutral-300)"}
+                                />
+                              </span>
+                              <span>
+                                Path is valid but header not found in response.
+                              </span>
                             </div>
                           {/if}
                         {/if}
