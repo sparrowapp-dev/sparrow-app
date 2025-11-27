@@ -600,6 +600,9 @@
     {#if !isGuestUser && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
       <div class="bottom-bar-wrapper">
         <!-- Generated Test Actions Bar -->
+        {#if errorMessage}
+          <div class="input-error">{errorMessage}</div>
+        {/if}
         {#if showGeneratedTestActions}
           <div
             class="d-flex align-items-center generated-test-actions"
@@ -757,9 +760,6 @@
 
           <!-- AI Input (Right) -->
           <div class="ai-input-container" style="flex: 1;">
-            {#if errorMessage}
-              <div class="input-error">{errorMessage}</div>
-            {/if}
             <div style="position: relative;">
               <Tooltip
                 title="You've reached your monthly AI request limit. Upgrade your plan to continue using AI feature."
