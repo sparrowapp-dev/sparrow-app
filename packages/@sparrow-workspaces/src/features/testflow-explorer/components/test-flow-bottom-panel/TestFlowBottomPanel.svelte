@@ -380,17 +380,23 @@
             />
           {:else if requestNavigation === RequestSectionEnum.ASSERTIONS}
             {#key selectedBlock?.id}
-              <NoCode
-                tests={selectedBlock?.data?.requestData?.tests ?? []}
-                onTestsChange={(updatedTests) => {
-                  handleUpdateRequestData("tests", updatedTests);
-                }}
-                tabSplitDirection="horizontal"
-                testResults={selectedNodeResponse?.response?.testResults ?? []}
-                responseBody={selectedNodeResponse?.response?.body ?? ""}
-                responseHeader={selectedNodeResponse?.response?.headers ?? []}
-                {isSaved}
-              />
+              <div
+                style={isAnyEnvVariableMissing
+                  ? `height: calc(100% - 72px);`
+                  : `height: 100%;`}
+              >
+                <NoCode
+                  tests={selectedBlock?.data?.requestData?.tests ?? []}
+                  onTestsChange={(updatedTests) => {
+                    handleUpdateRequestData("tests", updatedTests);
+                  }}
+                  tabSplitDirection="horizontal"
+                  testResults={selectedNodeResponse?.response?.testResults ??
+                    []}
+                  responseBody={selectedNodeResponse?.response?.body ?? ""}
+                  responseHeader={selectedNodeResponse?.response?.headers ?? []}
+                />
+              </div>
             {/key}
           {/if}
         </div>
