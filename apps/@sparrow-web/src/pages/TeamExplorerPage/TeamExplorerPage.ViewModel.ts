@@ -1047,6 +1047,10 @@ export class TeamExplorerPageViewModel {
         `You are now a member ${response?.data?.data.name} Hub.`,
       );
       return response;
+    } else if (response.message === "User is already a member of the hub") {
+      notifications.warning("You are already a member of this hub");
+    } else if (response.message === "Plan limit reached.") {
+      notifications.error("The user limit for the Hub Plan has been reached.");
     } else {
       notifications.error(`Failed to join the Hub. Please try again.`);
     }

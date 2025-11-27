@@ -364,7 +364,7 @@ export class AppViewModel {
     this.enqueue(url, (link) => this.processDeepLink(link));
   };
 
-  private async processDeepLink(url: string): Promise<void> {
+  async processDeepLink(url: string): Promise<void> {
     try {
       await getCurrentWindow().setFocus();
       const params = new URLSearchParams(url.split("?")[1]);
