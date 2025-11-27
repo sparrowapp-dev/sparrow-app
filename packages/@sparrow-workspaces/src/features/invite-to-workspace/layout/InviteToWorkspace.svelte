@@ -59,6 +59,8 @@
     roleInvalid: false,
     userConflict: "",
   };
+  let inviteSelectContent: boolean = false;
+  let isProceed: boolean = false;
 
   const clearErrors = () => {
     errors = {
@@ -73,6 +75,7 @@
    */
   const handleInvite = async () => {
     loader = true;
+    isProceed = true;
     clearErrors();
     if (emailstoBeSentArr.length === 0) {
       errors.emailsEmpty = true;
@@ -138,6 +141,12 @@
     selectedRole = role as WorkspaceRole;
     if (role !== defaultRole) errors.roleInvalid = false;
   };
+
+  $: {
+    if (!inviteSelectContent) {
+      isProceed = false;
+    }
+  }
 </script>
 
 <div class="d-flex flex-column pt-3">
@@ -163,13 +172,19 @@
     id={"input-select2"}
     currentWorkspaceUsers={currentWorkspaceDetails.users}
     onChange={(items) => {
+      console.log("--------------this is", items);
       emailstoBeSentArr = items;
       clearErrors();
       filterWorkspaceInviteEmails(emailstoBeSentArr);
     }}
     isError={errors.emailsEmpty || !!errors.userConflict}
+    bind:inviteSelectContent
   />
-  {#if errors.emailsEmpty}
+  {#if inviteSelectContent && isProceed}
+    <p class="error-text mb-0 sparrow-fs-12">
+      Please Select Item From Dropdown.
+    </p>
+  {:else if errors.emailsEmpty}
     <p class="error-text mb-0 sparrow-fs-12">Email ID cannot be empty.</p>
   {:else if errors.userConflict}
     <p class="error-text mb-0 sparrow-fs-12">{errors.userConflict}</p>
