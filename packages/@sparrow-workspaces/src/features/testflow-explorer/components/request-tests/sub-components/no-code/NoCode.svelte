@@ -521,11 +521,12 @@
                 />
               {/each}
             </div>
-            <div class="d-flex align-items-center pb-2 pt-2">
+            <div class="d-flex align-items-center pb-2 pt-2 gap-2">
               <Button
                 startIcon={AddRegular}
                 title={"Add Test"}
                 type="primary"
+                customWidth="100px"
                 size="small"
                 onClick={addTest}
               />
@@ -534,11 +535,11 @@
                   title={"Remove All"}
                   startIcon={DeleteRegular}
                   type="secondary"
+                  customWidth="100px"
                   size="small"
                   onClick={() => {
                     isDeletePopup = true;
                   }}
-                  customStyle="margin-left: 8px;"
                 />
               {/if}
             </div>
