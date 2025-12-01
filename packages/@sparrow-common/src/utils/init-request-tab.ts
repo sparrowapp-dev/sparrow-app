@@ -15,6 +15,8 @@ import {
   TestCaseConditionOperatorEnum,
   TestCaseSelectionTypeEnum,
   type Tests,
+  GrantTypeOAuth2,
+  AddOAuth2To,
 } from "@sparrow/common/types/workspace";
 import {
   TabTypeEnum,
@@ -153,6 +155,22 @@ class InitRequestTab {
               authKey: "",
               authValue: "",
               addTo: CollectionRequestAddToBaseEnum.HEADER,
+            },
+            oAuth2: {
+              configuration: {
+                tokenName: "", // new field added
+                clientId: "",
+                clientSecret: "",
+                AuthUrl: "", // authorization URL
+                AccessTokenUrl: "", // access token URL
+                callbackUrl: "",
+                state: "",
+                scopes: [],
+                grantType: GrantTypeOAuth2.AUTHORIZATION_CODE, // default
+                addTo: AddOAuth2To.Header,
+              },
+              tokens: [], // will hold OAuth2Token objects
+              selectToken: "",
             },
           },
           ai: {

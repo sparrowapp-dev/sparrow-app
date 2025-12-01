@@ -18,7 +18,8 @@ export enum HttpRequestAuthTypeBaseEnum {
   BEARER_TOKEN = "Bearer Token",
   BASIC_AUTH = "Basic Auth",
   INHERIT_AUTH = "Inherit Auth",
-  AUTH_PROFILES = "Authentication Profiles"
+  AUTH_PROFILES = "Authentication Profiles",
+  OAUTH_2 = "OAuth 2.0",
 }
 
 export interface HttpRequestBodyBaseInterface {

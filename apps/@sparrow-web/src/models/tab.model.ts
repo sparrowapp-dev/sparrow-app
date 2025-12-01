@@ -607,27 +607,69 @@ export const tabSchemaLiteral = {
                 basicAuth: {
                   type: "object",
                   properties: {
-                    username: {
-                      type: "string",
-                    },
-                    password: {
-                      type: "string",
-                    },
+                    username: { type: "string" },
+                    password: { type: "string" },
                   },
                 },
                 apiKey: {
                   type: "object",
                   properties: {
-                    authKey: {
-                      type: "string",
-                    },
-                    authValue: {
-                      type: "string",
-                    },
-                    addTo: {
-                      type: "string",
-                    },
+                    authKey: { type: "string" },
+                    authValue: { type: "string" },
+                    addTo: { type: "string" },
                   },
+                },
+                oAuth2: {
+                  type: "object",
+                  properties: {
+                    configuration: {
+                      type: "object",
+                      properties: {
+                        tokenName: { type: "string" },
+                        clientId: { type: "string" },
+                        clientSecret: { type: "string" },
+                        AuthUrl: { type: "string" },
+                        AccessTokenUrl: { type: "string" },
+                        callbackUrl: { type: "string" },
+                        state: { type: "string" },
+                        scopes: {
+                          type: "array",
+                          items: { type: "string" },
+                        },
+                        grantType: { type: "string" },
+                        addTo: { type: "string" }, // e.g., header, query
+                      },
+                      required: [
+                        "tokenName",
+                        "clientId",
+                        "clientSecret",
+                        "callbackUrl",
+                        "addTo",
+                      ],
+                    },
+                    tokens: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          id: { type: "string" }, // unique token id
+                          name: { type: "string" }, // friendly name
+                          accessToken: { type: "string" },
+                          refreshToken: { type: "string" },
+                          scopes: {
+                            type: "array",
+                            items: { type: "string" },
+                          },
+                          createdAt: { type: "string", format: "date-time" },
+                          expiresAt: { type: "string", format: "date-time" },
+                          add: { type: "string" }, // where to add (header, query)
+                        },
+                        required: ["id", "name", "add"],
+                      },
+                    },
+                    selectToken: { type: "string" },
+                  },
+                  required: ["configuration", "tokens"],
                 },
               },
             },

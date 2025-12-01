@@ -96,6 +96,19 @@ export enum UntrackedItemsEnum {
   UNTRACKED = "UNTRACKED-",
 }
 
+export enum AddOAuth2To {
+  Header = "Header",
+  QueryParameter = "Query Parameter",
+}
+
+export enum GrantTypeOAuth2 {
+  AUTHORIZATION_CODE = "authorization_code",
+  CLIENT_CREDENTIALS = "client_credentials",
+  PASSWORD = "password",
+  REFRESH_TOKEN = "refresh_token",
+  IMPLICIT = "implicit",
+}
+
 export interface KeyWrapper {
   key: string;
 }
@@ -423,10 +436,49 @@ export interface ApiKey
 export interface ApiKeyWrapper {
   apiKey: ApiKey;
 }
+
+export interface OAuth2Token {
+  id: string;
+  name: string;
+  accessToken?: string;
+  refreshToken?: string;
+  scopes?: string[];
+  createdAt?: Date;
+  expiresAt?: Date;
+  add: AddOAuth2To;
+}
+
+export interface OAuth2Configuration {
+  tokenName: string;
+  clientId: string;
+  clientSecret: string;
+  AuthUrl?: string;
+  AccessTokenUrl?: string;
+  callbackUrl: string;
+  state?: string;
+  scopes?: string[];
+  grantType?: GrantTypeOAuth2;
+  addTo: AddOAuth2To;
+}
+
+// OAuth2 interface
+export interface OAuth2 {
+  tokens: OAuth2Token[];
+  configuration: OAuth2Configuration;
+  selectToken?: string;
+}
+
+export interface OAuthWrapper {
+  oAuth2?: OAuth2;
+}
+
+// Combined Auth interface
 export interface Auth
   extends BearerTokenWrapper,
     BasicAuthWrapper,
-    ApiKeyWrapper {}
+    ApiKeyWrapper,
+    OAuthWrapper {}
+
 export interface AuthWrapper {
   auth: Auth;
 }

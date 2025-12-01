@@ -10,6 +10,7 @@ import type {
   HttpResponseMockBodyModeBaseEnum,
 } from "./http-request-mock-base";
 import type { HttpRequestSavedBaseInterface } from "./http-request-saved-base";
+import type { OAuth2Configuration, OAuth2Token } from "./http-request-tab";
 import type { HttpResponseMockBaseInterface } from "./http-response-mock-base";
 import type { SocketIORequestBaseInterface } from "./socket-io-request-base";
 import type { WebsocketRequestBaseInterface } from "./websocket-request-base";
@@ -95,6 +96,11 @@ export interface CollectionAuthBaseInterface {
     authKey: string;
     authValue: string;
     addTo: CollectionRequestAddToBaseEnum;
+  };
+  oAuth2: {
+    tokens: OAuth2Token[];
+    configuration: OAuth2Configuration;
+    selectToken?: string;
   };
 }
 

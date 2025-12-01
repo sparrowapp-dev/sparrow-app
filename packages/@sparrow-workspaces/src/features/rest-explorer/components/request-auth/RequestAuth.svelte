@@ -16,6 +16,7 @@
   import { Button, notifications } from "@sparrow/library/ui";
   import { OpenRegular } from "@sparrow/library/icons";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
+  import OAuth2 from "./sub-auth/oauth-2/OAuth2.svelte";
 
   export let auth;
   export let environmentVariables;
@@ -93,6 +94,10 @@
               {
                 name: "Basic Auth",
                 id: HttpRequestAuthTypeBaseEnum.BASIC_AUTH,
+              },
+              {
+                name: "OAuth 2.0",
+                id: HttpRequestAuthTypeBaseEnum.OAUTH_2,
               },
               {
                 name: "Auth Profiles",
@@ -244,6 +249,12 @@
           />
         </p>
       {/if}
+    {:else if requestStateAuth === HttpRequestAuthTypeBaseEnum.OAUTH_2}
+      <OAuth2
+        oAuthData={auth.oAuth2}
+        callback={onUpdateRequestAuth}
+        {environmentVariables}
+      />
     {/if}
   </section>
 </div>
