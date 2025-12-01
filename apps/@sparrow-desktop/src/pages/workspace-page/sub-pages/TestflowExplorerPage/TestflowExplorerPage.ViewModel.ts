@@ -1125,7 +1125,7 @@ export class TestflowExplorerPageViewModel {
       });
       if (response.isSuccessful) {
         const generatedContent = response?.data?.data.result;
-        notifications.success("Test is generated successfully.");
+        notifications.success("Post-request script is generated successfully.");
         return {
           generatedContent: generatedContent,
           originalContent: originalScript,
