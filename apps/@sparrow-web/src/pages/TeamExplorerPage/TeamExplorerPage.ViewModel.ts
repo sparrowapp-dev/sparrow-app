@@ -322,18 +322,20 @@ export class TeamExplorerPageViewModel {
    * Create workspace in the team
    * @param teamId ID of team where workspace need to be created
    */
-  public handleCreateWorkspace = async (teamId: string) => {
+  public handleCreateWorkspace = async (
+    teamId: string,
+    name: string,
+    description: string,
+  ) => {
     const workspaces = await this.workspaces;
     let workspaceList: WorkspaceDocument[] = [];
     await workspaces
       .subscribe((workspace) => (workspaceList = workspace))
       .unsubscribe();
-    const updatgedWorkspaceList = workspaceList.filter(
-      (workspace) => workspace.team?.teamId === teamId,
-    );
     const newWorkspace = {
       id: UntrackedItems.UNTRACKED + uuidv4(),
-      name: this.getNextWorkspace(updatgedWorkspaceList, "My Workspace"),
+      name: name || "My Workspace",
+      description: description || "",
       items: [],
       createdAt: new Date().toISOString(),
     };
@@ -341,6 +343,7 @@ export class TeamExplorerPageViewModel {
     const response = await this.workspaceService.createWorkspace(
       {
         name: newWorkspace.name,
+        description: newWorkspace.description,
         id: teamId,
       },
       baseUrl,
@@ -351,7 +354,6 @@ export class TeamExplorerPageViewModel {
         ...res,
         id: res._id,
       });
-
       await new Sleep().setTime(2000).exec();
       const clientUserId = getClientUser().id;
       if (clientUserId) {
@@ -364,7 +366,7 @@ export class TeamExplorerPageViewModel {
       await this.workspaceRepository.setActiveWorkspace(res._id);
       // this will be removed when we unlock collection in web app.
       navigate("collections");
-      notifications.success("New Workspace Created");
+      notifications.success("New Workspace created successfully.");
       MixpanelEvent(Events.Create_New_Workspace_TeamPage);
     }
     // else if (response?.data?.statusCode) {
