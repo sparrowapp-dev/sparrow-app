@@ -60,9 +60,9 @@
         typeof value === "boolean"
       ) {
         return value;
-      } else return "";
+      } else return undefined;
     } catch (e) {
-      return "";
+      return undefined;
     }
   };
 
@@ -853,7 +853,7 @@
                                 yet.
                               </span>
                             </div>
-                          {:else if getJsonPathValue(test.testPath, responseBody)}
+                          {:else if getJsonPathValue(test.testPath, responseBody) || getJsonPathValue(test.testPath, responseBody) === 0 || getJsonPathValue(test.testPath, responseBody) === -0 || getJsonPathValue(test.testPath, responseBody) === ""}
                             <div
                               class="text-fs-12 d-flex mt-1 ellipsis text-muted"
                             >
