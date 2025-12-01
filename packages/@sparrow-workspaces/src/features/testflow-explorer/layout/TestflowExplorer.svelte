@@ -233,7 +233,10 @@
   ) => Promise<any>;
 
   export let onOpenEnvironment;
-
+  export let onGeneratePreScript;
+  export let onGenerateTestCases;
+  export let onFixTestScript;
+  const loading = writable<boolean>(false);
   let planContent: any;
   let planContentNonActive: any;
   let selectedAuthHeader: any;
@@ -1076,18 +1079,29 @@
   };
 
   let isSaveModalOpen = false;
+  let isTestsSaved = false; // Track if tests were just saved
 
-  const handleOpenSaveModal = () => {
+  const handleOpenSaveModal = async () => {
     if (testflowScheduleStore.some((schedule) => schedule.isActive)) {
       isSaveModalOpen = true;
     } else {
-      onSaveTestflow();
+      await onSaveTestflow();
+      // Trigger saved state to reset unsaved changes in assertions
+      isTestsSaved = true;
+      setTimeout(() => {
+        isTestsSaved = false;
+      }, 100);
     }
   };
-  const handleSaveConfirm = () => {
+  const handleSaveConfirm = async () => {
     handleEventClickTestflowSaveSchedule();
-    onSaveTestflow(); // Your original save function
+    await onSaveTestflow(); // Your original save function
     isSaveModalOpen = false;
+    // Trigger saved state to reset unsaved changes in assertions
+    isTestsSaved = true;
+    setTimeout(() => {
+      isTestsSaved = false;
+    }, 100);
   };
   const handleUpdateRequestData = async (field: string, value: any) => {
     if (!selectedBlock) {
@@ -3277,6 +3291,11 @@
           {selectedAuthHeader}
           bind:selectAuthHeader
           {handleOpenCurrentDynamicExpression}
+          {onGeneratePreScript}
+          {onGenerateTestCases}
+          {onFixTestScript}
+          {tab}
+          isSaved={isTestsSaved}
         />
       </div>
     {:else if $isTestFlowTourGuideOpen && $currentStep === 7}
@@ -3285,6 +3304,7 @@
         id="testflow-bottom-panel"
       >
         <TestFlowBottomPanel
+          isSaved={isTestsSaved}
           selectedBlock={{
             data: {
               name: "Sample API",

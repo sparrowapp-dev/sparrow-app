@@ -22,4 +22,5 @@ export { default as ScheduleRow } from "./schedule-row/ScheduleRow.svelte";
 export { default as TestflowNavigator } from "./testflow-navigator/TestflowNavigator.svelte";
 export { default as TestDataRow } from "./test-data-row/TestDataRow.svelte";
 export { default as RequestAssertionsTestFlow } from "./request-tests/RequestAssertionsTestFlow.svelte";
+export { default as RequestTestsTestFlow } from "./request-tests/RequestTestsTestFlow.svelte";
 export { default as ResponseTestResults } from "./test-results-panel/ResponseTestResults.svelte";

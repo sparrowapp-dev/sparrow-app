@@ -7,6 +7,15 @@
   export let testResults;
   export let responseBody;
   export let responseHeader;
+
+  let noCodeComponent: any;
+
+  // Expose method to reset unsaved changes
+  export const resetUnsavedChanges = () => {
+    if (noCodeComponent?.resetUnsavedChanges) {
+      noCodeComponent.resetUnsavedChanges();
+    }
+  };
 </script>
 
 <div
@@ -17,6 +26,7 @@
   <div style="flex:1; overflow:auto;">
     {#if tests}
       <NoCode
+        bind:this={noCodeComponent}
         {tabSplitDirection}
         {tests}
         {onTestsChange}

@@ -4,6 +4,7 @@ import type { WorkspaceRole } from "../enums/enums";
 export interface WorkspacePostBody {
   name: string;
   id: string;
+  description?: string;
 }
 
 export interface WorkspacePutBody {
