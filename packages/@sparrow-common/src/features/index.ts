@@ -10,3 +10,4 @@ export * from "./shared-workspace";
 export * from "./failed-published-workspace";
 export * from "./schedule-run-pop-up";
 export * from "./test-data-preview-modal";
+export * from "./create-workspace";

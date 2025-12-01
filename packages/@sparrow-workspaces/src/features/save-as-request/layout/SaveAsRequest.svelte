@@ -184,6 +184,21 @@
   };
 
   const handleCreateFolder = async (folderName: string): Promise<void> => {
+    const trimmedName = folderName.trim();
+    // Validate folder name
+    if (!trimmedName) {
+      notifications.error("Folder name cannot be empty.");
+      return;
+    }
+    const hasAlphanumeric = /[a-zA-Z0-9]/.test(trimmedName);
+    const onlyAllowedChars = /^[a-zA-Z0-9._\- ]+$/.test(trimmedName);
+    if (!hasAlphanumeric || !onlyAllowedChars) {
+      notifications.error(
+        "Folder names can contain combination of letters, digits and these special characters (.,-,_). Please provide the folder names accordingly.",
+      );
+      return;
+    }
+
     createDirectoryLoader = true;
     const res = await onCreateFolder(workspaceMeta, path[0].id, folderName);
     if (res.status === "success") {
@@ -201,6 +216,21 @@
   };
 
   const handleCreateCollection = async (collectionName: string) => {
+    const trimmedName = collectionName.trim();
+    // Validate collection name
+    if (!trimmedName) {
+      notifications.error("Collection name cannot be empty.");
+      return;
+    }
+    const hasAlphanumeric = /[a-zA-Z0-9]/.test(trimmedName);
+    const onlyAllowedChars = /^[a-zA-Z0-9._\- ]+$/.test(trimmedName);
+    if (!hasAlphanumeric || !onlyAllowedChars) {
+      notifications.error(
+        "Collection names can contain combination of letters, digits and these special characters (.,-,_). Please provide the collection names accordingly.",
+      );
+      return;
+    }
+
     createDirectoryLoader = true;
     const res = await onCreateCollection(workspaceMeta, collectionName);
     if (res.status === "success") {

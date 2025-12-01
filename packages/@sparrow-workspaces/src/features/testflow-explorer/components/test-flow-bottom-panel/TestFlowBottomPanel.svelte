@@ -50,6 +50,7 @@
   export let handleOpenCurrentDynamicExpression;
   export let selectedAuthHeader;
   export let selectAuthHeader: string;
+  export let isSaved = false; // Track save state for assertions
   export let onGeneratePreScript;
   export let onGenerateTestCases;
   export let onFixTestScript;
@@ -326,7 +327,7 @@
     horizontal={false}
   >
     <!-- Request Pane -->
-    <Pane minSize={30} size={"30%"} class="position-relative bg-transparent">
+    <Pane minSize={50} size="52" class="position-relative bg-transparent">
       <div class="h-100 d-flex flex-column position-relative pe-2">
         <RequestNavigatorTestFlow
           paramsLength={selectedBlock?.data?.requestData?.queryParams?.length ||
@@ -386,15 +387,41 @@
             />
           {:else if requestNavigation === RequestSectionEnum.ASSERTIONS}
             {#key selectedBlock?.id}
-              <NoCode
-                tests={selectedBlock?.data?.requestData?.tests ?? []}
+              <div
+                style={isAnyEnvVariableMissing
+                  ? `height: calc(100% - 72px);`
+                  : `height: 100%;`}
+              >
+                <NoCode
+                  tests={selectedBlock?.data?.requestData?.tests ?? []}
+                  onTestsChange={(updatedTests) => {
+                    handleUpdateRequestData("tests", updatedTests);
+                  }}
+                  tabSplitDirection="horizontal"
+                  testResults={selectedNodeResponse?.response?.testResults ??
+                    []}
+                  responseBody={selectedNodeResponse?.response?.body ?? ""}
+                  responseHeader={selectedNodeResponse?.response?.headers ?? []}
+                  {isSaved}
+                />
+              </div>
+            {/key}
+          {:else if requestNavigation === RequestSectionEnum.TESTS}
+            {#key selectedBlock?.id}
+              <RequestTestsTestFlow
+                tests={selectedBlock?.data?.requestData?.tests ?? {
+                  testCaseMode: "no-code",
+                  preScript: "",
+                  script: "",
+                }}
+                node_id={selectedBlock?.id}
                 onTestsChange={(updatedTests) => {
                   handleUpdateRequestData("tests", updatedTests);
                 }}
                 tabSplitDirection="horizontal"
-                testResults={[]}
-                responseBody={selectedNodeResponse?.response?.body ?? ""}
-                responseHeader={selectedNodeResponse?.response?.headers ?? []}
+                {onGenerateTestCases}
+                {onGeneratePreScript}
+                {tab}
               />
             {/key}
           {:else if requestNavigation === RequestSectionEnum.TESTS}
@@ -421,7 +448,7 @@
     </Pane>
 
     <!-- Response Pane -->
-    <Pane minSize={30} size={"30%"} class="position-relative bg-transparent">
+    <Pane minSize={42} size="34" class="position-relative bg-transparent">
       <div class="response-pane-container">
         {#if (!responseLoader && selectedNodeResponse === undefined) || selectedNodeResponse?.response?.status === ""}
           <div class="dumy-response-container">
