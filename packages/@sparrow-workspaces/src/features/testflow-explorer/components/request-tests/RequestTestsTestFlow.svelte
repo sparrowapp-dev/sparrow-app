@@ -8,9 +8,8 @@
   export let tabSplitDirection = "horizontal";
   export let onGenerateTestCases;
   export let onGeneratePreScript;
-  export let isTestCasesGenerating;
-  export let isPreScriptGenerating;
   export let node_id;
+  export let tab;
 </script>
 
 <div
@@ -88,8 +87,8 @@
         {tests}
         {onTestsChange}
         {onGenerateTestCases}
-        {isTestCasesGenerating}
         {node_id}
+        {tab}
       />
     {:else}
       <PreScript
@@ -97,8 +96,8 @@
         {tests}
         {onTestsChange}
         {onGeneratePreScript}
-        {isPreScriptGenerating}
         {node_id}
+        {tab}
       />
     {/if}
   </div>

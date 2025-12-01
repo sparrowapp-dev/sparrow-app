@@ -1394,7 +1394,6 @@ export class TestflowExplorerPageViewModel {
     }
     const componentData = this._tab.getValue();
     const tabId = componentData?.tabId;
-    startLoading(tabId + "generatingTestCasesforTestflow");
 
     const workspaceId = componentData.path.workspaceId;
     const workspaceVal =
@@ -1413,7 +1412,6 @@ export class TestflowExplorerPageViewModel {
         teamId: teamId,
       });
       if (response.isSuccessful) {
-        stopLoading(tabId + "generatingTestCasesforTestflow");
         const generatedContent = response?.data?.data.result;
         notifications.success("Test is generated successfully.");
         return {
@@ -1421,11 +1419,9 @@ export class TestflowExplorerPageViewModel {
           originalContent: originalScript,
         };
       } else {
-        stopLoading(tabId + "generatingTestCasesforTestflow");
         return response?.data;
       }
     } catch (error) {
-      stopLoading(tabId + "generatingTestCasesforTestflow");
       notifications.error("Failed to generate test. Please try again.");
     }
   };
@@ -1439,7 +1435,6 @@ export class TestflowExplorerPageViewModel {
     }
     const componentData = this._tab.getValue();
     const tabId = componentData?.tabId;
-    startLoading(tabId + "generatingPreScriptforTestflow");
 
     let workspaceId = componentData.path.workspaceId;
     let workspaceVal =
@@ -1457,7 +1452,6 @@ export class TestflowExplorerPageViewModel {
         teamId: teamId,
       });
       if (response.isSuccessful) {
-        stopLoading(tabId + "generatingPreScriptforTestflow");
         const generatedContent = response?.data?.data.result;
         notifications.success("Pre-request script is generated successfully.");
         return {
@@ -1465,11 +1459,9 @@ export class TestflowExplorerPageViewModel {
           originalContent: originalPreScript,
         };
       } else {
-        stopLoading(tabId + "generatingPreScriptforTestflow");
         return response?.data;
       }
     } catch (error) {
-      stopLoading(tabId + "generatingPreScriptforTestflow");
       notifications.error(
         "Failed to generate pre-request script. Please try again.",
       );

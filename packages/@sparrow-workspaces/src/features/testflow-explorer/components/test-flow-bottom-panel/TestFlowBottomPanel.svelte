@@ -52,9 +52,8 @@
   export let selectAuthHeader: string;
   export let onGeneratePreScript;
   export let onGenerateTestCases;
-  export let isPreScriptGenerating;
-  export let isTestCasesGenerating;
   export let onFixTestScript;
+  export let tab;
 
   let responseLoader = false;
   let height = 300;
@@ -413,8 +412,7 @@
                 tabSplitDirection="horizontal"
                 {onGenerateTestCases}
                 {onGeneratePreScript}
-                {isPreScriptGenerating}
-                {isTestCasesGenerating}
+                {tab}
               />
             {/key}
           {/if}

@@ -16,14 +16,19 @@
   import { fade, fly } from "svelte/transition";
   import { WorkspaceRole } from "@sparrow/common/enums";
   import { tick, onDestroy } from "svelte";
+  import {
+    loadingState,
+    startLoading,
+    stopLoading,
+  } from "@sparrow/common/store";
 
   export let onTestsChange;
   export let tests;
   export let onGeneratePreScript;
-  export let isPreScriptGenerating;
   export let isGuestUser;
   export let userRole;
   export let node_id;
+  export let tab;
 
   type EditorLanguage = "PreTestJavaScript";
 
@@ -59,6 +64,9 @@
   let generatedContentStartLine = 0;
   let generatedContentEndLine = 0;
   let isSnippetTypingState = false;
+  $: isPreScriptGenerating = $loadingState.get(
+    tab.tabId + "generatingPreScriptforTestflow" + node_id,
+  );
 
   // Preprocess search string
   $: trimmedSearch = searchData.trim().toLowerCase();
@@ -279,7 +287,6 @@
   };
 
   const handleGenerateTestCases = async () => {
-    // Store the original content and current prompt (from first file)
     originalTestContent = tests?.preScript || "";
     contentAddedDuringGeneration = "";
     originalLineCount = originalTestContent.trim()
@@ -287,31 +294,36 @@
       : 0;
     currentPrompt = testCasePrompt;
 
+    // Use loadingState for AI generation
+    const loadingKey = tab.tabId + "generatingPreScriptforTestflow" + node_id;
+    startLoading(loadingKey);
     if (onGeneratePreScript) {
-      const result = await onGeneratePreScript(testCasePrompt, node_id);
-      if (result?.error) {
-        if (result?.message === "Limit reached. Please try again later.") {
-          isUserLimitReached = true;
+      try {
+        const result = await onGeneratePreScript(testCasePrompt, node_id);
+        if (result?.error) {
+          if (result?.message === "Limit reached. Please try again later.") {
+            isUserLimitReached = true;
+          }
+          isError = true;
+          errorMessage =
+            "This request is a bit tricky to turn into a test. Please try rephrasing it in a simpler way.";
+        } else if (result?.generatedContent) {
+          isError = false;
+          errorMessage = "";
+          testCasePrompt = "";
+          generatedTestContent = result.generatedContent;
+          await showGeneratedContentTemporarily();
+          showGeneratedTestActions = true;
+        } else {
+          isError = false;
+          errorMessage = "";
+          testCasePrompt = "";
         }
-        isError = true;
-        errorMessage =
-          "This request is a bit tricky to turn into a test. Please try rephrasing it in a simpler way.";
-      } else if (result?.generatedContent) {
-        isError = false;
-        errorMessage = "";
-        testCasePrompt = "";
-        generatedTestContent = result.generatedContent;
-
-        // Show generated content temporarily (don't save to tests object)
-        await showGeneratedContentTemporarily();
-
-        // Show the action buttons
-        showGeneratedTestActions = true;
-      } else {
-        isError = false;
-        errorMessage = "";
-        testCasePrompt = "";
+      } finally {
+        stopLoading(loadingKey);
       }
+    } else {
+      stopLoading(loadingKey);
     }
   };
 
@@ -545,13 +557,15 @@
     showGeneratedTestActions = false;
 
     temporaryDisplayContent = originalTestContent;
-
+    startLoading(tab.tabId + "generatingPreScriptforTestflow" + node_id);
     const result = await onGeneratePreScript(currentPrompt, node_id);
     if (result?.error) {
+      stopLoading(tab.tabId + "generatingPreScriptforTestflow" + node_id);
       isError = true;
       errorMessage =
         "This request is a bit tricky to turn into a test. Please try rephrasing it in a simpler way.";
     } else if (result?.generatedContent) {
+      stopLoading(tab.tabId + "generatingPreScriptforTestflow" + node_id);
       isError = false;
       errorMessage = "";
       generatedTestContent = result.generatedContent;
