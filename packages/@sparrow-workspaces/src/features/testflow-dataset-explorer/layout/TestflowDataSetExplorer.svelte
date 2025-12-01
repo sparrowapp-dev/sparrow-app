@@ -25,7 +25,7 @@
     await handleTestDataDownloadWeb(
       $tab?.property?.testflowDataSet?.item?.dataSet,
       $tab?.property?.testflowDataSet?.formatType,
-      $tab?.property?.testflowDataSet?.name,
+      testDataName,
     );
   };
 
@@ -33,7 +33,7 @@
     await handleTestDataDownloadDesktop(
       $tab?.property?.testflowDataSet?.item?.dataSet,
       $tab?.property?.testflowDataSet?.formatType,
-      $tab?.property?.testflowDataSet?.name,
+      testDataName,
     );
   };
 
