@@ -277,6 +277,13 @@
       testPath: "",
       testTarget: "",
       isActive: true,
+      _originalState: {
+        name: `New Test ${localTest.noCode.length + 1}`,
+        testTarget: "",
+        condition: "",
+        testPath: "",
+        expectedResult: "",
+      },
     };
     localTest.noCode = [
       ...localTest.noCode.map((t) => ({ ...t, isActive: false })),
@@ -339,8 +346,14 @@
     const activeTest = localTest.noCode.find((t) => t.isActive);
     if (activeTest) {
       activeTestErrors = validateFields(activeTest);
-      // Track unsaved changes
-      activeTest.hasUnsavedChanges = hasTestChanged(activeTest);
+      // Track unsaved changes - update immutably to trigger reactivity
+      const hasChanges = hasTestChanged(activeTest);
+      if (activeTest.hasUnsavedChanges !== hasChanges) {
+        localTest.noCode = localTest.noCode.map((t) =>
+          t.id === activeTest.id ? { ...t, hasUnsavedChanges: hasChanges } : t,
+        );
+        onTestsChange(localTest);
+      }
     }
   }
 
