@@ -18,6 +18,7 @@
     RequestParameterTestFlow,
     RequestAuthorizationTestFlow,
     RequestAssertionsTestFlow,
+    RequestTestsTestFlow,
     ResponseErrorScreen,
     ResponseHeaders,
     ResponseNavigator,
@@ -50,10 +51,14 @@
   export let selectedAuthHeader;
   export let selectAuthHeader: string;
   export let isSaved = false; // Track save state for assertions
+  export let onGeneratePreScript;
+  export let onGenerateTestCases;
+  export let onFixTestScript;
+  export let tab;
 
   let responseLoader = false;
   let height = 300;
-  let minHeight = 100;
+  let minHeight = 200;
   let isResizing = false;
   let isResizingActive = false;
   let inputRef;
@@ -82,6 +87,8 @@
       requestNavigation = "Headers";
     } else if (tab === "Authorization") {
       requestNavigation = "Authorization";
+    } else if (tab === "Scripts" || tab === RequestSectionEnum.TESTS) {
+      requestNavigation = RequestSectionEnum.TESTS;
     } else if (tab === "Assertions") {
       requestNavigation = "Assertions";
     } else {
@@ -399,6 +406,42 @@
                 />
               </div>
             {/key}
+          {:else if requestNavigation === RequestSectionEnum.TESTS}
+            {#key selectedBlock?.id}
+              <RequestTestsTestFlow
+                tests={selectedBlock?.data?.requestData?.tests ?? {
+                  testCaseMode: "no-code",
+                  preScript: "",
+                  script: "",
+                }}
+                node_id={selectedBlock?.id}
+                onTestsChange={(updatedTests) => {
+                  handleUpdateRequestData("tests", updatedTests);
+                }}
+                tabSplitDirection="horizontal"
+                {onGenerateTestCases}
+                {onGeneratePreScript}
+                {tab}
+              />
+            {/key}
+          {:else if requestNavigation === RequestSectionEnum.TESTS}
+            {#key selectedBlock?.id}
+              <RequestTestsTestFlow
+                tests={selectedBlock?.data?.requestData?.tests ?? {
+                  testCaseMode: "no-code",
+                  preScript: "",
+                  script: "",
+                }}
+                node_id={selectedBlock?.id}
+                onTestsChange={(updatedTests) => {
+                  handleUpdateRequestData("tests", updatedTests);
+                }}
+                tabSplitDirection="horizontal"
+                {onGenerateTestCases}
+                {onGeneratePreScript}
+                {tab}
+              />
+            {/key}
           {/if}
         </div>
       </div>
@@ -476,14 +519,26 @@
                   <ResponseTestResults
                     responseTestResults={selectedNodeResponse.response
                       ?.testResults || []}
-                    responseTestMessage={selectedNodeResponse.response
-                      ?.testMessage || []}
+                    responseTestMessage={selectedNodeResponse?.response?.testResults
+                      ?.filter(
+                        (t) =>
+                          t.testStatus === false &&
+                          t.testMessage.includes("SyntaxError"),
+                      )
+                      ?.map((t) => ({
+                        initiator: t.initiator,
+                        error: t.testMessage,
+                      })) || []}
                     tests={selectedBlock?.data?.requestData?.tests}
-                    onFixTestScript={undefined}
-                    tabId={selectedBlock?.id}
+                    {onFixTestScript}
+                    tabId={selectedBlock?.data?.tabId}
+                    nodeId={selectedBlock?.id}
                     isGuestUser={false}
                     isSharedWorkspace={false}
                     {userRole}
+                    onTestsChange={(updatedTests) => {
+                      handleUpdateRequestData("tests", updatedTests);
+                    }}
                   />
                 {/if}
               </div>
