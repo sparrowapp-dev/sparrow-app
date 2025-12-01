@@ -395,6 +395,7 @@
                     []}
                   responseBody={selectedNodeResponse?.response?.body ?? ""}
                   responseHeader={selectedNodeResponse?.response?.headers ?? []}
+                  {isSaved}
                 />
               </div>
             {/key}
