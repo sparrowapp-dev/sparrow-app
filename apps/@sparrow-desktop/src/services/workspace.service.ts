@@ -14,11 +14,10 @@ let apiUrl: string = constants.API_URL;
 
 export class WorkspaceService {
   constructor() {
-     const [selfhostBackendUrl] = getSelfhostUrls();
+    const [selfhostBackendUrl] = getSelfhostUrls();
     if (selfhostBackendUrl) {
       apiUrl = selfhostBackendUrl;
-    }
-    else{
+    } else {
       apiUrl = constants.API_URL;
     }
   }
