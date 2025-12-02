@@ -737,6 +737,7 @@
         title="Cancel"
         type="secondary"
         onClick={() => {
+          onTestDataSelection("none");
           isScheduleRunPopupOpen = false;
         }}
       />
