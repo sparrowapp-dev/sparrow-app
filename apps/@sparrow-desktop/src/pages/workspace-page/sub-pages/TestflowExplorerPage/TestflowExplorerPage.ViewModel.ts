@@ -1134,7 +1134,9 @@ export class TestflowExplorerPageViewModel {
         return response?.data;
       }
     } catch (error) {
-      notifications.error("Failed to generate test. Please try again.");
+      notifications.error(
+        "Failed to generate post-request script. Please try again.",
+      );
     }
   };
 
