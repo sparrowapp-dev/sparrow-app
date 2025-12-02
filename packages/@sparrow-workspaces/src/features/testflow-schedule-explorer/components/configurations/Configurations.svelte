@@ -841,7 +841,7 @@
           zIndex={10}
         />
         <div class="preview-button">
-          {#if selectedTestData && selectedTestData !== "none"}
+          {#if selectedTestData && selectedTestData !== "none" && testDataFiles.some((file) => file.id === selectedTestData)}
             <Button
               title="Preview File"
               type="link-primary"
