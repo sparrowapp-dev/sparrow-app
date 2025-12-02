@@ -235,7 +235,6 @@
 
   // Initialize form with schedule data
   onMount(() => {
-    debugger;
     if (schedule) {
       scheduleName = schedule.name || "";
       selectedEnvironment = schedule.environmentId || "none";
