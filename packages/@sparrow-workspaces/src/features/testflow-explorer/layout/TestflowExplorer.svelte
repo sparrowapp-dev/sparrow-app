@@ -233,7 +233,10 @@
   ) => Promise<any>;
 
   export let onOpenEnvironment;
-
+  export let onGeneratePreScript;
+  export let onGenerateTestCases;
+  export let onFixTestScript;
+  const loading = writable<boolean>(false);
   let planContent: any;
   let planContentNonActive: any;
   let selectedAuthHeader: any;
@@ -3301,6 +3304,10 @@
           {selectedAuthHeader}
           bind:selectAuthHeader
           {handleOpenCurrentDynamicExpression}
+          {onGeneratePreScript}
+          {onGenerateTestCases}
+          {onFixTestScript}
+          {tab}
           isSaved={isTestsSaved}
         />
       </div>

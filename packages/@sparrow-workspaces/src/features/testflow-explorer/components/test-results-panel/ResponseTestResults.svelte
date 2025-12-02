@@ -15,6 +15,8 @@
   export let tabId: string;
   export let isGuestUser: boolean;
   export let userRole: string;
+  export let nodeId;
+  export let onTestsChange;
 
   let filter: "all" | "passed" | "failed" = "all";
   let allBtn: HTMLSpanElement;
@@ -159,7 +161,19 @@
                   startLoading(
                     tabId + "-" + errorMessage.initiator + "-fix-test-script",
                   );
-                  await onFixTestScript(errorMessage.initiator);
+                  const res = await onFixTestScript(
+                    errorMessage.initiator,
+                    nodeId,
+                  );
+                  const key =
+                    errorMessage.initiator === "Post Script"
+                      ? "script"
+                      : "preScript";
+                  onTestsChange({
+                    ...tests,
+                    [key]: res?.data?.data?.result,
+                  });
+
                   stopLoading(
                     tabId + "-" + errorMessage.initiator + "-fix-test-script",
                   );
