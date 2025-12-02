@@ -3102,6 +3102,7 @@
                 onClick={async () => {
                   startLoading("schedule-refresh-" + $tab?.id);
                   await onFetchTestflow();
+                  notifications.success("Schedules fetched successfully.");
                   stopLoading("schedule-refresh-" + $tab?.id);
                 }}
               />
@@ -3198,6 +3199,7 @@
                 isGuestUser}
               onClick={async () => {
                 startLoading("testdata-refresh-" + $tab?.id);
+                notifications.success("TestData fetched successfully.");
                 await onFetchTestflowDataSets();
                 stopLoading("testdata-refresh-" + $tab?.id);
               }}
