@@ -792,7 +792,7 @@
                 <div class="input-with-button">
                   <Input
                     id="sparkle-input-post"
-                    placeholder="Ask AI to generate a Post-Request test"
+                    placeholder="Ask AI to generate a Post-Request"
                     startIcon={showGeneratedTestActions || isUserLimitReached
                       ? SparkleFilledIcon
                       : SparkleColoredIcon}
@@ -957,6 +957,10 @@
 
   .input-with-button :global(input) {
     padding-right: 120px !important;
+  }
+
+  .input-with-button :global(input::placeholder) {
+    font-size: 12px !important;
   }
 
   .input-error {
