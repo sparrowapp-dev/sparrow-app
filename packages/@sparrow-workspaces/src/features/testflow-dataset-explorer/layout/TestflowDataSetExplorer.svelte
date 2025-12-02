@@ -147,19 +147,21 @@
 >
   <div class="d-flex flex-column h-100 w-100">
     <div class="d-flex justify-content-between align-items-center h-100 w-100">
-      <Input
-        type="text"
-        size="large"
-        maxlength={100}
-        width="398px"
-        id="renameInputFieldTestdata"
-        bind:value={testDataName}
-        variant="inline"
-        placeholder="Enter dataset name"
-        disabled={isWorkspaceViewer}
-        on:input={() => handleTestDataHeadingChange(testDataName, "")}
-        on:blur={() => handleTestDataHeadingChange(testDataName, "blur")}
-      />
+      <div class="input-small-placeholder">
+        <Input
+          type="text"
+          size="large"
+          maxlength={100}
+          width="300px"
+          id="renameInputFieldTestdata"
+          bind:value={testDataName}
+          variant="inline"
+          placeholder="Enter dataset name"
+          disabled={isWorkspaceViewer}
+          on:input={() => handleTestDataHeadingChange(testDataName, "")}
+          on:blur={() => handleTestDataHeadingChange(testDataName, "blur")}
+        />
+      </div>
 
       <div class="d-flex gap-2">
         {#if !isWebApp}
@@ -284,6 +286,10 @@
 </div>
 
 <style>
+  :global(.input-small-placeholder input::placeholder) {
+    font-size: 16px !important;
+  }
+
   .header-subtext {
     font-family: "Inter", sans-serif;
     font-weight: 700;
