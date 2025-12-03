@@ -141,6 +141,7 @@
   export let handleContactSales;
   export let invitedCount;
   export let appEdition = "MANAGED";
+  export let isCreateWorkspaceModalOpen: boolean = false;
 
   let selectedView: string = "Grid";
   let userRole: string;
@@ -473,8 +474,8 @@
                 title={`New Workspace`}
                 type={`primary`}
                 startIcon={AddRegular}
-                onClick={async () => {
-                  await handleCreateNewWorkspace();
+                onClick={() => {
+                  isCreateWorkspaceModalOpen = true;
                 }}
                 loader={isWorkspaceCreationInProgress}
                 disable={isGuestUser ||

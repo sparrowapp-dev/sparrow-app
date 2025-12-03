@@ -453,6 +453,9 @@
     importTestflowDataSetFileChange={_viewModel.importTestflowDataSetFileChange}
     updateDatasetByName={_viewModel.updateDatasetByName}
     openTestflowDataSetTab={_viewModel.openTestflowDataSetTab}
+    onGeneratePreScript={_viewModel.generatePreScript}
+    onGenerateTestCases={_viewModel.generateTestCases}
+    onFixTestScript={_viewModel.fixTestScript}
   />
 {/if}
 

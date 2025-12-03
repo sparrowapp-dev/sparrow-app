@@ -1991,7 +1991,7 @@ class RestExplorerViewModel {
             error = `Test target not found`;
           }
 
-          if (actual) {
+          if (actual !== undefined) {
             const { passed, message: testMessage } = this.evaluateCondition(
               actual,
               test.expectedResult,

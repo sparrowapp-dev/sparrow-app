@@ -5,9 +5,13 @@ class CompareArray {
    * @param delay :number - the time period limit for debouncing
    */
 
-  private deepCompareObjects = (obj1, obj2) => {
-    const keys1 = Object.keys(obj1);
-    const keys2 = Object.keys(obj2);
+  private deepCompareObjects = (
+    obj1,
+    obj2,
+    ignoreKeys = ["position", "_originalState", "hasUnsavedChanges"],
+  ) => {
+    const keys1 = Object.keys(obj1).filter((key) => !ignoreKeys.includes(key));
+    const keys2 = Object.keys(obj2).filter((key) => !ignoreKeys.includes(key));
 
     if (keys1.length !== keys2.length) return false;
 
@@ -17,7 +21,7 @@ class CompareArray {
 
       const areObjects = this.isObject(val1) && this.isObject(val2);
       if (
-        (areObjects && !this.deepCompareObjects(val1, val2)) ||
+        (areObjects && !this.deepCompareObjects(val1, val2, ignoreKeys)) ||
         (!areObjects && val1 !== val2)
       ) {
         return false;
@@ -29,11 +33,15 @@ class CompareArray {
   private isObject = (object) => {
     return object != null && typeof object === "object";
   };
-  public init = (arr1, arr2) => {
+  public init = (
+    arr1,
+    arr2,
+    ignoreKeys = ["position", "_originalState", "hasUnsavedChanges"],
+  ) => {
     if (arr1.length !== arr2.length) return false;
 
     for (let i = 0; i < arr1.length; i++) {
-      if (!this.deepCompareObjects(arr1[i], arr2[i])) {
+      if (!this.deepCompareObjects(arr1[i], arr2[i], ignoreKeys)) {
         return false;
       }
     }
