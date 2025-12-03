@@ -605,168 +605,168 @@
     </div>
 
     <!-- Bottom Bar with Snippets Dropdown and AI Input -->
-    {#if !isGuestUser && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
-      <div class="bottom-bar-wrapper">
-        <!-- Dynamic Content Above Both Inputs -->
-        {#if errorMessage}
-          <div class="input-error">{errorMessage}</div>
-        {/if}
 
-        {#if showGeneratedTestActions}
-          <div
-            class="d-flex align-items-center generated-test-actions"
-            style="gap: 12px;"
-            in:fly={{ y: 20, duration: 300 }}
-          >
-            <div
-              class="text-ds-font-size-12"
-              style="color: var(--text-ds-neutral-500);"
-            >
-              Do you want to use this generated test in your script?
-            </div>
-            <div class="actionable-button">
-              <Tooltip title="Yes" placement="top-center" size="small">
-                <Button
-                  size="small"
-                  type="outline-primary"
-                  startIcon={ThumbLikeRegular}
-                  onClick={acceptGeneratedTest}
-                />
-              </Tooltip>
-              <Tooltip title="No" placement="top-center" size="small">
-                <Button
-                  size="small"
-                  type="outline-primary"
-                  startIcon={ThumbDislikeRegular}
-                  onClick={rejectGeneratedTest}
-                />
-              </Tooltip>
-              <Tooltip title="Regenerate" placement="top-center" size="small">
-                <Button
-                  size="small"
-                  type="outline-primary"
-                  startIcon={ArrowSyncRegular}
-                  onClick={regenerateTest}
-                />
-              </Tooltip>
-            </div>
-          </div>
-        {/if}
+    <div class="bottom-bar-wrapper">
+      <!-- Dynamic Content Above Both Inputs -->
+      {#if errorMessage}
+        <div class="input-error">{errorMessage}</div>
+      {/if}
 
-        {#if isPreScriptGenerating}
-          <p
-            class="text-primary-300 generating-img d-flex justify-content-center align-items-center"
-            in:fade={{ duration: 200 }}
-          >
-            <img src={generatingImage} style="width: 118px;" alt="" />
-          </p>
-        {/if}
-
-        <!-- Bottom Bar with Both Inputs -->
+      {#if showGeneratedTestActions}
         <div
-          class="bottom-bar d-flex align-items-center"
-          style="flex:0 0 auto; margin-top:8px; gap:8px;"
+          class="d-flex align-items-center generated-test-actions"
+          style="gap: 12px;"
+          in:fly={{ y: 20, duration: 300 }}
         >
-          <!-- Snippets Dropdown (Left) -->
           <div
-            class="snippet-dropdown-container"
-            bind:this={snippetDropdownElement}
-            on:click|stopPropagation
-            on:mousedown|stopPropagation
+            class="text-ds-font-size-12"
+            style="color: var(--text-ds-neutral-500);"
           >
-            {#if !isSnippetTypingState}
-              <!-- Normal Snippets Button -->
-              <div class="snippets-button">
-                <Button
-                  size="medium"
-                  customWidth="151px"
-                  type={isSnippetDropdownOpen ? "primary" : "outline-secondary"}
-                  title="Snippets"
-                  endIcon={isSnippetDropdownOpen
-                    ? ChevronDownRegular
-                    : ChevronUpRegular}
-                  onClick={() => {
-                    isSnippetDropdownOpen = true;
-                    isSnippetTypingState = true;
-                    searchData = "";
-                  }}
-                />
-              </div>
-            {:else}
-              <!-- Typing State: Replace button with search input -->
-              <div class="snippet-search-wrapper">
-                <Input
-                  placeholder="Search snippets..."
-                  variant="secondary"
-                  size="medium"
-                  bind:value={searchData}
-                  autofocus={true}
-                  on:click={(e) => e.stopPropagation()}
-                />
-                <div
-                  class="snippet-close-icon"
-                  on:click={() => {
-                    isSnippetDropdownOpen = false;
-                    isSnippetTypingState = false;
-                    searchData = "";
-                  }}
-                >
-                  <ChevronDownRegular width="16px" height="16px" />
-                </div>
-              </div>
-            {/if}
+            Do you want to use this generated test in your script?
+          </div>
+          <div class="actionable-button">
+            <Tooltip title="Yes" placement="top-center" size="small">
+              <Button
+                size="small"
+                type="outline-primary"
+                startIcon={ThumbLikeRegular}
+                onClick={acceptGeneratedTest}
+              />
+            </Tooltip>
+            <Tooltip title="No" placement="top-center" size="small">
+              <Button
+                size="small"
+                type="outline-primary"
+                startIcon={ThumbDislikeRegular}
+                onClick={rejectGeneratedTest}
+              />
+            </Tooltip>
+            <Tooltip title="Regenerate" placement="top-center" size="small">
+              <Button
+                size="small"
+                type="outline-primary"
+                startIcon={ArrowSyncRegular}
+                onClick={regenerateTest}
+              />
+            </Tooltip>
+          </div>
+        </div>
+      {/if}
 
-            {#if isSnippetDropdownOpen}
-              <div class="snippet-dropdown-menu">
-                <!-- Snippets List -->
-                <div class="dropdown-snippets-list">
-                  {#if filteredSnippets.length > 0}
-                    {#each filteredSnippets as snippet}
-                      <div
-                        class="snippet-item"
-                        tabindex="0"
-                        role="button"
-                        on:click={() => {
+      {#if isPreScriptGenerating}
+        <p
+          class="text-primary-300 generating-img d-flex justify-content-center align-items-center"
+          in:fade={{ duration: 200 }}
+        >
+          <img src={generatingImage} style="width: 118px;" alt="" />
+        </p>
+      {/if}
+
+      <!-- Bottom Bar with Both Inputs -->
+      <div
+        class="bottom-bar d-flex align-items-center"
+        style="flex:0 0 auto; margin-top:8px; gap:8px;"
+      >
+        <!-- Snippets Dropdown (Left) -->
+        <div
+          class="snippet-dropdown-container"
+          bind:this={snippetDropdownElement}
+          on:click|stopPropagation
+          on:mousedown|stopPropagation
+        >
+          {#if !isSnippetTypingState}
+            <!-- Normal Snippets Button -->
+            <div class="snippets-button">
+              <Button
+                size="medium"
+                customWidth="151px"
+                type={isSnippetDropdownOpen ? "primary" : "outline-secondary"}
+                title="Snippets"
+                endIcon={isSnippetDropdownOpen
+                  ? ChevronDownRegular
+                  : ChevronUpRegular}
+                onClick={() => {
+                  isSnippetDropdownOpen = true;
+                  isSnippetTypingState = true;
+                  searchData = "";
+                }}
+              />
+            </div>
+          {:else}
+            <!-- Typing State: Replace button with search input -->
+            <div class="snippet-search-wrapper">
+              <Input
+                placeholder="Search snippets..."
+                variant="secondary"
+                size="medium"
+                bind:value={searchData}
+                autofocus={true}
+                on:click={(e) => e.stopPropagation()}
+              />
+              <div
+                class="snippet-close-icon"
+                on:click={() => {
+                  isSnippetDropdownOpen = false;
+                  isSnippetTypingState = false;
+                  searchData = "";
+                }}
+              >
+                <ChevronDownRegular width="16px" height="16px" />
+              </div>
+            </div>
+          {/if}
+
+          {#if isSnippetDropdownOpen}
+            <div class="snippet-dropdown-menu">
+              <!-- Snippets List -->
+              <div class="dropdown-snippets-list">
+                {#if filteredSnippets.length > 0}
+                  {#each filteredSnippets as snippet}
+                    <div
+                      class="snippet-item"
+                      tabindex="0"
+                      role="button"
+                      on:click={() => {
+                        selectSnippet(snippet.function);
+                        isSnippetDropdownOpen = false;
+                        isSnippetTypingState = false;
+                      }}
+                      on:keydown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
                           selectSnippet(snippet.function);
                           isSnippetDropdownOpen = false;
                           isSnippetTypingState = false;
-                        }}
-                        on:keydown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault();
-                            selectSnippet(snippet.function);
-                            isSnippetDropdownOpen = false;
-                            isSnippetTypingState = false;
-                          }
-                        }}
-                      >
-                        <p class="snippet-item-text">
-                          {@html highlightMatch(snippet.title, searchData)}
-                        </p>
-                      </div>
-                    {/each}
-                  {:else if trimmedSearch}
-                    <div class="no-results">
-                      <div
-                        class="d-flex justify-content-center align-items-center"
-                        style="margin-bottom: 8px;"
-                      >
-                        <SearchIcon2
-                          width={"20px"}
-                          height={"20px"}
-                          color={"var(--bg-ds-neutral-300)"}
-                        />
-                      </div>
-                      <p class="no-results-text">
-                        No result found for "{searchData}"
+                        }
+                      }}
+                    >
+                      <p class="snippet-item-text">
+                        {@html highlightMatch(snippet.title, searchData)}
                       </p>
                     </div>
-                  {/if}
-                </div>
+                  {/each}
+                {:else if trimmedSearch}
+                  <div class="no-results">
+                    <div
+                      class="d-flex justify-content-center align-items-center"
+                      style="margin-bottom: 8px;"
+                    >
+                      <SearchIcon2
+                        width={"20px"}
+                        height={"20px"}
+                        color={"var(--bg-ds-neutral-300)"}
+                      />
+                    </div>
+                    <p class="no-results-text">
+                      No result found for "{searchData}"
+                    </p>
+                  </div>
+                {/if}
               </div>
-            {/if}
-          </div>
-
+            </div>
+          {/if}
+        </div>
+        {#if !isGuestUser && userRole !== WorkspaceRole.WORKSPACE_VIEWER}
           <!-- AI Input (Right) -->
           <div class="ai-input-container" style="flex: 1;">
             <div style="position: relative;">
@@ -830,9 +830,9 @@
               </div>
             </div>
           </div>
-        </div>
+        {/if}
       </div>
-    {/if}
+    </div>
   </div>
 </div>
 
