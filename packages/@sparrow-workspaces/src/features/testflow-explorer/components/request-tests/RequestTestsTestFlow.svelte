@@ -10,6 +10,8 @@
   export let onGeneratePreScript;
   export let node_id;
   export let tab;
+  export let isGuestUser = false;
+  export let userRole;
 </script>
 
 <div
@@ -89,6 +91,8 @@
         {onGenerateTestCases}
         {node_id}
         {tab}
+        {isGuestUser}
+        {userRole}
       />
     {:else}
       <PreScript
@@ -98,6 +102,8 @@
         {onGeneratePreScript}
         {node_id}
         {tab}
+        {userRole}
+        {isGuestUser}
       />
     {/if}
   </div>
