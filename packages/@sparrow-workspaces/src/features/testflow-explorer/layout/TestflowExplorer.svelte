@@ -3309,6 +3309,7 @@
           {onFixTestScript}
           {tab}
           isSaved={isTestsSaved}
+          {isGuestUser}
         />
       </div>
     {:else if $isTestFlowTourGuideOpen && $currentStep === 7}

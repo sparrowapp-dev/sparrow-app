@@ -55,6 +55,7 @@
   export let onGenerateTestCases;
   export let onFixTestScript;
   export let tab;
+  export let isGuestUser = false;
 
   let responseLoader = false;
   let height = 300;
@@ -422,6 +423,8 @@
                 {onGenerateTestCases}
                 {onGeneratePreScript}
                 {tab}
+                {userRole}
+                {isGuestUser}
               />
             {/key}
           {:else if requestNavigation === RequestSectionEnum.TESTS}
