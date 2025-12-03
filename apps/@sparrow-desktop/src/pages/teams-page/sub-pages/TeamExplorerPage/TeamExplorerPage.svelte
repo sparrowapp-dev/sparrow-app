@@ -6,7 +6,7 @@
   import { user } from "@app/store/auth.store";
   import { Modal } from "@sparrow/library/ui";
   import { LeaveTeam } from "@sparrow/teams/features";
-  import { DeleteWorkspace } from "@sparrow/common/features";
+  import { CreateWorkspace, DeleteWorkspace } from "@sparrow/common/features";
   import { onDestroy, onMount } from "svelte";
   import { InviteToWorkspace } from "@sparrow/workspaces/features";
   import { copyToClipBoard } from "@sparrow/common/utils";
@@ -62,6 +62,7 @@
   let isLeaveTeamModelOpen = false;
   let invitedCount = 0;
   let isGuestUser;
+  let isCreateWorkspaceModalOpen: boolean = false;
 
   const handleDeleteWorkspace = (workspace: WorkspaceDocument) => {
     selectedWorkspace = workspace;
@@ -133,11 +134,21 @@
     }
   };
 
-  const handleCreateWorkspace = async (teamId: string) => {
-    const response = await _viewModel.handleCreateWorkspace(teamId);
+  const handleCreateWorkspace = async (name: string, description: string) => {
+    const teamId = $activeTeam?.teamId;
+    const response = await _viewModel.handleCreateWorkspace(
+      teamId,
+      name,
+      description,
+    );
     if (response?.data?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
       upgradePlanModal = true;
+      isCreateWorkspaceModalOpen = false;
     }
+    if (response?.isSuccessful) {
+      isCreateWorkspaceModalOpen = false;
+    }
+    return response;
   };
 
   const handleAddWorkspace = async (
@@ -174,6 +185,7 @@
   bind:upgradePlanModalInvite
   bind:upgradePlanModal
   bind:invitedCount
+  bind:isCreateWorkspaceModalOpen
   onAddMember={handleWorkspaceDetails}
   openTeam={$activeTeam}
   workspaces={$workspaces}
@@ -296,5 +308,21 @@
     plan={currentTeam?.plan}
     onInviteUserToWorkspace={handleAddWorkspace}
     isSelfHost={isSelfhost ? true : false}
+  />
+</Modal>
+
+<Modal
+  title={"Add Workspace"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isCreateWorkspaceModalOpen}
+  handleModalState={(flag) => {
+    isCreateWorkspaceModalOpen = flag;
+  }}
+>
+  <CreateWorkspace
+    bind:isCreateWorkspaceModalOpen
+    onCreateWorkspace={handleCreateWorkspace}
   />
 </Modal>

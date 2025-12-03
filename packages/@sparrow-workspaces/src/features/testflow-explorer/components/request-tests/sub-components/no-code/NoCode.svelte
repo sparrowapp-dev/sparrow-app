@@ -23,8 +23,29 @@
   export let testResults;
   export let responseBody;
   export let responseHeader;
+  export let isSaved = false; // New prop to track save state
   const localTest = tests;
   let errors = false;
+
+  // Function to reset unsaved changes after save
+  export const resetUnsavedChanges = () => {
+    localTest.noCode = localTest.noCode.map((t) => ({
+      ...t,
+      hasUnsavedChanges: false,
+      _originalState: {
+        name: t.name,
+        testTarget: t.testTarget,
+        condition: t.condition,
+        testPath: t.testPath,
+        expectedResult: t.expectedResult,
+      },
+    }));
+  };
+
+  // Watch for isSaved prop changes to reset unsaved state
+  $: if (isSaved) {
+    resetUnsavedChanges();
+  }
 
   const getJsonPathValue = (_path, _response) => {
     try {
@@ -39,9 +60,9 @@
         typeof value === "boolean"
       ) {
         return value;
-      } else return "";
+      } else return undefined;
     } catch (e) {
-      return "";
+      return undefined;
     }
   };
 
@@ -94,6 +115,8 @@
   $: {
     const x = localTest.noCode.find((t) => t.isActive);
     errors = false;
+
+    // Check test execution results
     if (testResults) {
       for (let testResult of testResults) {
         if (
@@ -105,6 +128,18 @@
           break;
         }
       }
+    }
+
+    // Also check for field validation errors
+    if (x && !errors) {
+      const fieldErrors = validateFields(x);
+      errors = !!(
+        fieldErrors.name ||
+        fieldErrors.testTarget ||
+        fieldErrors.condition ||
+        fieldErrors.testPath ||
+        fieldErrors.expectedResult
+      );
     }
   }
 
@@ -166,6 +201,27 @@
           pathType = "header key";
         }
         errors.testPath = `This field cannot be empty. Please enter ${pathType}`;
+      } else {
+        // Check syntax validation if path is provided
+        if (
+          test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON &&
+          !isValidJsonPath(test.testPath)
+        ) {
+          errors.testPath =
+            "Invalid path syntax. Please check your path format.";
+        } else if (
+          test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML &&
+          !isValidXPath(test.testPath)
+        ) {
+          errors.testPath =
+            "Invalid path syntax. Please check your path format.";
+        } else if (
+          test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER &&
+          !isValidHeaderKey(test.testPath)
+        ) {
+          errors.testPath =
+            "Invalid path syntax. Please check your path format.";
+        }
       }
     }
 
@@ -208,6 +264,7 @@
             }
           : t._originalState,
     }));
+    onTestsChange(localTest);
   };
 
   const addTest = () => {
@@ -220,11 +277,19 @@
       testPath: "",
       testTarget: "",
       isActive: true,
+      _originalState: {
+        name: `New Test ${localTest.noCode.length + 1}`,
+        testTarget: "",
+        condition: "",
+        testPath: "",
+        expectedResult: "",
+      },
     };
     localTest.noCode = [
       ...localTest.noCode.map((t) => ({ ...t, isActive: false })),
       newTest,
     ];
+    onTestsChange(localTest);
   };
 
   // ✅ Duplicate test with incremental naming
@@ -265,11 +330,8 @@
     };
     localTest.noCode = [...localTest.noCode, newTest];
     selectTest(newTest);
-  };
-
-  $: {
     onTestsChange(localTest);
-  }
+  };
 
   // Track active test validation
   let activeTestErrors = {
@@ -284,8 +346,14 @@
     const activeTest = localTest.noCode.find((t) => t.isActive);
     if (activeTest) {
       activeTestErrors = validateFields(activeTest);
-      // Track unsaved changes
-      activeTest.hasUnsavedChanges = hasTestChanged(activeTest);
+      // Track unsaved changes - update immutably to trigger reactivity
+      const hasChanges = hasTestChanged(activeTest);
+      if (activeTest.hasUnsavedChanges !== hasChanges) {
+        localTest.noCode = localTest.noCode.map((t) =>
+          t.id === activeTest.id ? { ...t, hasUnsavedChanges: hasChanges } : t,
+        );
+        onTestsChange(localTest);
+      }
     }
   }
 
@@ -305,11 +373,13 @@
     notifications.success(
       `"${test.name}" is removed from your assertion list.`,
     );
+    onTestsChange(localTest);
   };
 
   const clearTests = () => {
     localTest.noCode = [];
     notifications.success("All tests are removed from your list.");
+    onTestsChange(localTest);
   };
 
   const handleConditionDropdown = (
@@ -320,17 +390,42 @@
       ...t,
       condition: t.id === test.id ? conditionItem : t.condition,
     }));
+    onTestsChange(localTest);
   };
 
   const handleTestTargetDropdown = (
     testTargetItem: TestCaseSelectionTypeEnum,
     test,
   ) => {
-    localTest.noCode = localTest.noCode.map((t) => ({
-      ...t,
-      testTarget: t.id === test.id ? testTargetItem : t.testTarget,
-      testPath: t.id === test.id ? "" : t.testPath,
-    }));
+    // Define conditions that are not allowed for Time Consuming
+    const timeConsumingInvalidConditions = [
+      TestCaseConditionOperatorEnum.EXISTS,
+      TestCaseConditionOperatorEnum.DOES_NOT_EXIST,
+      TestCaseConditionOperatorEnum.CONTAINS,
+      TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN,
+      TestCaseConditionOperatorEnum.IS_EMPTY,
+      TestCaseConditionOperatorEnum.IS_NOT_EMPTY,
+      TestCaseConditionOperatorEnum.IN_LIST,
+      TestCaseConditionOperatorEnum.NOT_IN_LIST,
+    ];
+
+    localTest.noCode = localTest.noCode.map((t) => {
+      if (t.id === test.id) {
+        // Check if switching to Time Consuming and current condition is invalid
+        const shouldResetCondition =
+          testTargetItem === TestCaseSelectionTypeEnum.TIME_CONSUMING &&
+          timeConsumingInvalidConditions.includes(t.condition);
+
+        return {
+          ...t,
+          testTarget: testTargetItem,
+          testPath: "",
+          condition: shouldResetCondition ? "" : t.condition,
+        };
+      }
+      return t;
+    });
+    onTestsChange(localTest);
   };
 
   const setByDefaultTestName = (test) => {
@@ -338,7 +433,14 @@
       ...t,
       name: t.id === test.id ? `New Test` : t.name,
     }));
+    onTestsChange(localTest);
   };
+
+  // Handler for input field blur events
+  const handleInputBlur = () => {
+    onTestsChange(localTest);
+  };
+
   let isDeletePopup = false;
 
   const isValidJsonPath = (path: string): boolean => {
@@ -465,11 +567,12 @@
                 />
               {/each}
             </div>
-            <div class="d-flex align-items-center pb-2 pt-2">
+            <div class="d-flex align-items-center pb-2 pt-2 gap-2">
               <Button
                 startIcon={AddRegular}
                 title={"Add Test"}
                 type="primary"
+                customWidth="100px"
                 size="small"
                 onClick={addTest}
               />
@@ -478,11 +581,11 @@
                   title={"Remove All"}
                   startIcon={DeleteRegular}
                   type="secondary"
+                  customWidth="100px"
                   size="small"
                   onClick={() => {
                     isDeletePopup = true;
                   }}
-                  customStyle="margin-left: 8px;"
                 />
               {/if}
             </div>
@@ -519,6 +622,8 @@
                         on:blur={() => {
                           if (!test.name) {
                             setByDefaultTestName(test);
+                          } else {
+                            handleInputBlur();
                           }
                         }}
                         placeholder="Enter Test Name"
@@ -702,6 +807,7 @@
                           type="text"
                           class="form-control text-light"
                           bind:value={test.testPath}
+                          on:blur={handleInputBlur}
                           placeholder={test?.testTarget ===
                           TestCaseSelectionTypeEnum.RESPONSE_JSON
                             ? "E.g. $.user.name"
@@ -760,7 +866,7 @@
                                 yet.
                               </span>
                             </div>
-                          {:else if getJsonPathValue(test.testPath, responseBody)}
+                          {:else if getJsonPathValue(test.testPath, responseBody) || getJsonPathValue(test.testPath, responseBody) === 0 || getJsonPathValue(test.testPath, responseBody) === -0 || getJsonPathValue(test.testPath, responseBody) === ""}
                             <div
                               class="text-fs-12 d-flex mt-1 ellipsis text-muted"
                             >
@@ -783,11 +889,18 @@
                             </div>
                           {:else}
                             <div
-                              class="text-fs-10 mt-1"
-                              style="color: var(--text-ds-danger-300)"
+                              class="text-fs-10 mt-1 d-flex"
+                              style="color: var(--text-ds-neutral-300)"
                             >
-                              Invalid path syntax. Please check your path
-                              format.
+                              <span class="me-1">
+                                <InfoRegular
+                                  size={"16px"}
+                                  color={"var(--icon-ds-neutral-300)"}
+                                />
+                              </span>
+                              <span>
+                                Path is valid but value not found in response.
+                              </span>
                             </div>
                           {/if}
                         {:else if test.testPath && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML}
@@ -835,11 +948,18 @@
                             </div>
                           {:else}
                             <div
-                              class="text-fs-10 mt-1"
-                              style="color: var(--text-ds-danger-300)"
+                              class="text-fs-10 mt-1 d-flex"
+                              style="color: var(--text-ds-neutral-300)"
                             >
-                              Invalid path syntax. Please check your path
-                              format.
+                              <span class="me-1">
+                                <InfoRegular
+                                  size={"16px"}
+                                  color={"var(--icon-ds-neutral-300)"}
+                                />
+                              </span>
+                              <span>
+                                Path is valid but value not found in response.
+                              </span>
                             </div>
                           {/if}
                         {:else if test.testPath && test?.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER}
@@ -890,11 +1010,18 @@
                             </div>
                           {:else}
                             <div
-                              class="text-fs-10 mt-1"
-                              style="color: var(--text-ds-danger-300)"
+                              class="text-fs-10 mt-1 d-flex"
+                              style="color: var(--text-ds-neutral-300)"
                             >
-                              Invalid path syntax. Please check your path
-                              format.
+                              <span class="me-1">
+                                <InfoRegular
+                                  size={"16px"}
+                                  color={"var(--icon-ds-neutral-300)"}
+                                />
+                              </span>
+                              <span>
+                                Path is valid but header not found in response.
+                              </span>
                             </div>
                           {/if}
                         {/if}
@@ -911,6 +1038,7 @@
                           type="text"
                           class="form-control text-light"
                           bind:value={test.expectedResult}
+                          on:blur={handleInputBlur}
                           placeholder="Enter Comparison Value"
                           style="border: {activeTestErrors.expectedResult
                             ? '1px solid var(--text-ds-danger-300)'

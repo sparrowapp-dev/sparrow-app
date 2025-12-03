@@ -10,7 +10,7 @@
   import { user } from "@app/store/auth.store";
   import { Modal } from "@sparrow/library/ui";
   import { LeaveTeam } from "@sparrow/teams/features";
-  import { DeleteWorkspace } from "@sparrow/common/features";
+  import { CreateWorkspace, DeleteWorkspace } from "@sparrow/common/features";
   import { onDestroy, onMount } from "svelte";
   import { InviteToWorkspace } from "@sparrow/workspaces/features";
   import { BackIcon } from "@sparrow/library/icons";
@@ -29,10 +29,11 @@
   const _viewModel = new TeamExplorerPageViewModel();
   let upgradePlanModalInvite = false;
   let upgradePlanModal = false;
-  let usersInvitePlanCount: number = 5; 
+  let usersInvitePlanCount: number = 5;
 
   let isWorkspaceInviteModalOpen = false;
   let isWebEnvironment = true;
+  let isCreateWorkspaceModalOpen: boolean = false;
 
   const activeTeam: Observable<TeamDocument> = _viewModel.openTeam;
   const workspaces: Observable<WorkspaceDocument[]> = _viewModel.workspaces;
@@ -211,11 +212,21 @@
     }
   };
 
-  const handleCreateWorkspace = async (teamId: string) => {
-    const response = await _viewModel.handleCreateWorkspace(teamId);
+  const handleCreateWorkspace = async (name: string, description: string) => {
+    const teamId = $activeTeam?.teamId;
+    const response = await _viewModel.handleCreateWorkspace(
+      teamId,
+      name,
+      description,
+    );
     if (response?.data?.message === ResponseMessage.PLAN_LIMIT_MESSAGE) {
       upgradePlanModal = true;
+      isCreateWorkspaceModalOpen = false;
     }
+    if (response?.isSuccessful) {
+      isCreateWorkspaceModalOpen = false;
+    }
+    return response;
   };
 
   const handleAddWorkspace = async (
@@ -293,6 +304,7 @@
     bind:upgradePlanModalInvite
     bind:upgradePlanModal
     bind:invitedCount
+    bind:isCreateWorkspaceModalOpen
     onAddMember={handleWorkspaceDetails}
     openTeam={$activeTeam}
     workspaces={$workspaces}
@@ -422,5 +434,21 @@
     plan={currentTeam?.plan}
     onInviteUserToWorkspace={handleAddWorkspace}
     isSelfHost={constants.APP_EDITION === "SELFHOSTED" ? true : false}
+  />
+</Modal>
+
+<Modal
+  title={"Add Workspace"}
+  type={"dark"}
+  width={"35%"}
+  zIndex={1000}
+  isOpen={isCreateWorkspaceModalOpen}
+  handleModalState={(flag) => {
+    isCreateWorkspaceModalOpen = flag;
+  }}
+>
+  <CreateWorkspace
+    bind:isCreateWorkspaceModalOpen
+    onCreateWorkspace={handleCreateWorkspace}
   />
 </Modal>

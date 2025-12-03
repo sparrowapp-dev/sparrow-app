@@ -32,6 +32,8 @@
    */
   export let currentWorkspaceUsers: { email: string }[] = [];
 
+  export let inviteSelectContent: boolean = false;
+
   // State variables
   let isOpen = false;
   let data = list;
@@ -218,6 +220,14 @@
       }
     }
   };
+
+  $: {
+    if (currentEmailEntered) {
+      inviteSelectContent = true;
+    } else {
+      inviteSelectContent = false;
+    }
+  }
 </script>
 
 <div on:click={handleDropdownClick}>

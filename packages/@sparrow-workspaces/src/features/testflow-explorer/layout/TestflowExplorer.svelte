@@ -233,7 +233,10 @@
   ) => Promise<any>;
 
   export let onOpenEnvironment;
-
+  export let onGeneratePreScript;
+  export let onGenerateTestCases;
+  export let onFixTestScript;
+  const loading = writable<boolean>(false);
   let planContent: any;
   let planContentNonActive: any;
   let selectedAuthHeader: any;
@@ -466,6 +469,19 @@
               break;
             }
           }
+        }
+
+        if (!found && scheduledDays.length > 0) {
+          // Find the earliest scheduled day in the week
+          const sortedDays = [...scheduledDays].sort((a, b) => a - b);
+          const currentDay = now.getDay();
+
+          // Calculate days until the first scheduled day of next week
+          daysToAdd = 7 - currentDay + sortedDays[0];
+          if (daysToAdd > 7) daysToAdd -= 7;
+          if (daysToAdd === 0) daysToAdd = 7; // Same day next week
+
+          found = true;
         }
 
         if (found) {
@@ -1076,18 +1092,29 @@
   };
 
   let isSaveModalOpen = false;
+  let isTestsSaved = false; // Track if tests were just saved
 
-  const handleOpenSaveModal = () => {
+  const handleOpenSaveModal = async () => {
     if (testflowScheduleStore.some((schedule) => schedule.isActive)) {
       isSaveModalOpen = true;
     } else {
-      onSaveTestflow();
+      await onSaveTestflow();
+      // Trigger saved state to reset unsaved changes in assertions
+      isTestsSaved = true;
+      setTimeout(() => {
+        isTestsSaved = false;
+      }, 100);
     }
   };
-  const handleSaveConfirm = () => {
+  const handleSaveConfirm = async () => {
     handleEventClickTestflowSaveSchedule();
-    onSaveTestflow(); // Your original save function
+    await onSaveTestflow(); // Your original save function
     isSaveModalOpen = false;
+    // Trigger saved state to reset unsaved changes in assertions
+    isTestsSaved = true;
+    setTimeout(() => {
+      isTestsSaved = false;
+    }, 100);
   };
   const handleUpdateRequestData = async (field: string, value: any) => {
     if (!selectedBlock) {
@@ -3075,6 +3102,7 @@
                 onClick={async () => {
                   startLoading("schedule-refresh-" + $tab?.id);
                   await onFetchTestflow();
+                  notifications.success("Schedules fetched successfully.");
                   stopLoading("schedule-refresh-" + $tab?.id);
                 }}
               />
@@ -3171,6 +3199,7 @@
                 isGuestUser}
               onClick={async () => {
                 startLoading("testdata-refresh-" + $tab?.id);
+                notifications.success("TestData fetched successfully.");
                 await onFetchTestflowDataSets();
                 stopLoading("testdata-refresh-" + $tab?.id);
               }}
@@ -3277,6 +3306,11 @@
           {selectedAuthHeader}
           bind:selectAuthHeader
           {handleOpenCurrentDynamicExpression}
+          {onGeneratePreScript}
+          {onGenerateTestCases}
+          {onFixTestScript}
+          {tab}
+          isSaved={isTestsSaved}
         />
       </div>
     {:else if $isTestFlowTourGuideOpen && $currentStep === 7}
@@ -3285,6 +3319,7 @@
         id="testflow-bottom-panel"
       >
         <TestFlowBottomPanel
+          isSaved={isTestsSaved}
           selectedBlock={{
             data: {
               name: "Sample API",

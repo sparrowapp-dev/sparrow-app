@@ -2006,7 +2006,7 @@ class RestExplorerViewModel {
             error = `Test target not found`;
           }
 
-          if (actual) {
+          if (actual !== undefined) {
             const { passed, message: testMessage } = this.evaluateCondition(
               actual,
               test.expectedResult,
@@ -4309,7 +4309,7 @@ class RestExplorerViewModel {
     }
   };
 
-   /**
+  /**
    * Generates pre-request script for the particular API Request Tab.
    *
    * @param prompt - The prompt to be used for generating the pre-request script.
@@ -4951,11 +4951,11 @@ class RestExplorerViewModel {
     const teamId = workspaceData.toMutableJSON().team?.teamId || "";
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const testCases = progressiveTab.property.request.tests;
-    if(type === "Post-Request"){
+    if (type === "Post-Request") {
       const response = await this.aiAssistentService.fixTestScript({
         teamId: teamId,
         testScript: testCases.script,
-        type: "post-script"
+        type: "post-script",
       });
       if (response.isSuccessful) {
         this.updateRequestTests({
@@ -4965,13 +4965,46 @@ class RestExplorerViewModel {
         restExplorerDataStore.update((restApiDataMap) => {
           const r = restApiDataMap.get(progressiveTab?.tabId);
           if (r) {
-              r.response.testMessage = r?.response?.testMessage?.filter((error)=>{
-                if(error.initiator === "Post-Request"){
+            r.response.testMessage =
+              r?.response?.testMessage?.filter((error) => {
+                if (error.initiator === "Post-Request") {
                   return false;
-                }
-                else{
+                } else {
                   return true;
-                } 
+                }
+              }) || [];
+          }
+          return restApiDataMap;
+        });
+        notifications.success("Test script fixed successfully.");
+      } else if (
+        response?.data?.message === "Limit reached. Please try again later."
+      ) {
+        notifications.error("AI Limit has Reached.please upgrade plan.");
+      } else {
+        notifications.error("Failed to fix test script.");
+      }
+    } else if (type === "Pre-Request") {
+      const response = await this.aiAssistentService.fixTestScript({
+        teamId: teamId,
+        testScript: testCases.preScript,
+        type: "pre-script",
+      });
+      if (response.isSuccessful) {
+        this.updateRequestTests({
+          ...testCases,
+          preScript: response?.data?.data.result,
+        });
+        restExplorerDataStore.update((restApiDataMap) => {
+          const r = restApiDataMap.get(progressiveTab?.tabId);
+          if (r) {
+            r.response.testMessage =
+              r?.response?.testMessage?.filter((error) => {
+                if (error.initiator === "Pre-Request") {
+                  return false;
+                } else {
+                  return true;
+                }
               }) || [];
           }
           return restApiDataMap;
@@ -4985,42 +5018,6 @@ class RestExplorerViewModel {
         notifications.error("Failed to fix test script.");
       }
     }
-    else if(type === "Pre-Request"){
-      const response = await this.aiAssistentService.fixTestScript({
-        teamId: teamId,
-        testScript: testCases.preScript,
-        type: "pre-script"
-      });
-      if (response.isSuccessful) {
-        this.updateRequestTests({
-          ...testCases,
-          preScript: response?.data?.data.result,
-        });
-        restExplorerDataStore.update((restApiDataMap) => {
-          const r = restApiDataMap.get(progressiveTab?.tabId);
-          if (r) {
-            r.response.testMessage = r?.response?.testMessage?.filter((error)=>{
-              if(error.initiator === "Pre-Request"){
-                return false;
-              }
-              else{
-                return true;
-              } 
-            }) || [];
-          }
-          return restApiDataMap;
-        });
-        notifications.success("Test script fixed successfully.");
-      } else if (
-        response?.data?.message === "Limit reached. Please try again later."
-      ) {
-        notifications.error("AI Limit has Reached.please upgrade plan.");
-      } else {
-        notifications.error("Failed to fix test script.");
-      }
-    }
-
-    
   };
 
   public handleRequestTestScriptDemoCompleted = async () => {
