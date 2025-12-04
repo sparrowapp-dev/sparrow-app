@@ -578,10 +578,17 @@
     startLoading(tab.tabId + "generatingTestCasesforTestflow" + node_id);
     const result = await onGenerateTestCases(currentPrompt, node_id);
     if (result?.error) {
-      stopLoading(tab.tabId + "generatingTestCasesforTestflow" + node_id);
-      isError = true;
-      errorMessage =
-        "This request is a bit tricky to turn into a test. Please try rephrasing it in a simpler way.";
+      stopLoading(tab.tabId + "generatingPreScriptforTestflow" + node_id);
+      if (result?.message === "Limit reached. Please try again later.") {
+        isUserLimitReached = true;
+        isError = true;
+        testCasePrompt = "";
+        await tick();
+      } else {
+        isError = true;
+        errorMessage =
+          "This request is a bit tricky to turn into a test. Please try rephrasing it in a simpler way.";
+      }
     } else if (result?.generatedContent) {
       stopLoading(tab.tabId + "generatingTestCasesforTestflow" + node_id);
       isError = false;

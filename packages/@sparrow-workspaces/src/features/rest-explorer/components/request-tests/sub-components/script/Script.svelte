@@ -289,10 +289,14 @@
     if (result?.error) {
       if (result?.message === "Limit reached. Please try again later.") {
         isUserLimitReached = true;
+        isError = true;
+        testCasePrompt = "";
+        await tick();
+      } else {
+        isError = true;
+        errorMessage =
+          "This request is a bit tricky to turn into a test. Please try rephrasing it in a simpler way.";
       }
-      isError = true;
-      errorMessage =
-        "This request is a bit tricky to turn into a test. Please try rephrasing it in a simpler way.";
     } else if (result?.generatedContent) {
       isError = false;
       errorMessage = "";
@@ -573,9 +577,16 @@
     // Use the same prompt to regenerate
     const result = await onGenerateTestCases(currentPrompt);
     if (result?.error) {
-      isError = true;
-      errorMessage =
-        "This request is a bit tricky to turn into a test. Please try rephrasing it in a simpler way.";
+      if (result?.message === "Limit reached. Please try again later.") {
+        isUserLimitReached = true;
+        isError = true;
+        testCasePrompt = "";
+        await tick();
+      } else {
+        isError = true;
+        errorMessage =
+          "This request is a bit tricky to turn into a test. Please try rephrasing it in a simpler way.";
+      }
     } else if (result?.generatedContent) {
       isError = false;
       errorMessage = "";
