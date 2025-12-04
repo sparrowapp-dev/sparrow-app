@@ -42,7 +42,16 @@
     return testDataSet.item.dataSet;
   })();
 
-  $: columns = parsedData.length > 0 ? Object.keys(parsedData[0]) : [];
+  $: columns = (() => {
+    if (parsedData.length === 0) return [];
+
+    const allKeys = new Set();
+    parsedData.forEach((row) => {
+      Object.keys(row).forEach((key) => allKeys.add(key));
+    });
+
+    return Array.from(allKeys);
+  })();
 
   // Format file size
   function formatFileSize(size) {
