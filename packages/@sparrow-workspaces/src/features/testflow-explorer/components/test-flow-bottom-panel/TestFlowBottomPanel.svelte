@@ -409,23 +409,27 @@
             {/key}
           {:else if requestNavigation === RequestSectionEnum.TESTS}
             {#key selectedBlock?.id}
-              <RequestTestsTestFlow
-                tests={selectedBlock?.data?.requestData?.tests ?? {
-                  testCaseMode: "no-code",
-                  preScript: "",
-                  script: "",
-                }}
-                node_id={selectedBlock?.id}
-                onTestsChange={(updatedTests) => {
-                  handleUpdateRequestData("tests", updatedTests);
-                }}
-                tabSplitDirection="horizontal"
-                {onGenerateTestCases}
-                {onGeneratePreScript}
-                {tab}
-                {userRole}
-                {isGuestUser}
-              />
+              <div
+                style={isAnyEnvVariableMissing
+                  ? `height: calc(100% - 72px);`
+                  : `height: 100%;`}
+              >
+                <RequestTestsTestFlow
+                  tests={selectedBlock?.data?.requestData?.tests ?? {
+                    testCaseMode: "no-code",
+                    preScript: "",
+                    script: "",
+                  }}
+                  node_id={selectedBlock?.id}
+                  onTestsChange={(updatedTests) => {
+                    handleUpdateRequestData("tests", updatedTests);
+                  }}
+                  tabSplitDirection="horizontal"
+                  {onGenerateTestCases}
+                  {onGeneratePreScript}
+                  {tab}
+                />
+              </div>
             {/key}
           {:else if requestNavigation === RequestSectionEnum.TESTS}
             {#key selectedBlock?.id}
