@@ -4,6 +4,7 @@
   import { HttpRequestDefaultNameBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
   import { slide } from "svelte/transition";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
+  import { notifications } from "@sparrow/library/ui";
   export let onItemCreated: (entityType: string, args: any) => void;
   export let onItemDeleted: (entityType: string, args: any) => void;
   export let onItemRenamed: (entityType: string, args: any) => void;
@@ -484,8 +485,27 @@
     newCollectionName = target.value.trim();
   };
 
+  const isValidCollectionName = (name: string) => {
+    const trimmedName = name.trim();
+    // Check if empty
+    if (!trimmedName) return false;
+    // Check if contains at least one alphanumeric character
+    const hasAlphanumeric = /[a-zA-Z0-9]/.test(trimmedName);
+    // Check if contains only allowed characters (letters, digits, spaces, ., -, _)
+    const onlyAllowedChars = /^[a-zA-Z0-9._\- ]+$/.test(trimmedName);
+    return hasAlphanumeric && onlyAllowedChars;
+  };
+
   const onRenameBlur = async () => {
     if (newCollectionName) {
+      if (!isValidCollectionName(newCollectionName)) {
+        notifications.error(
+          "Collection names can contain combination of letters, digits and these special characters (.,-,_). Please provide the collection names accordingly.",
+        );
+        isRenaming = false;
+        newCollectionName = "";
+        return;
+      }
       await onItemRenamed("collection", {
         workspaceId: collection.workspaceId,
         collection,

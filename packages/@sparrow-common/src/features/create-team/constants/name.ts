@@ -3,5 +3,5 @@ export const NAME_CONFIG = {
   MAX_TEXT_SIZE: 100,
   REQUIRED_ERROR_MESSAGE: `Please enter your hub name.`,
   PLACEHOLDER: `Enter your hub name`,
-  INVALID_ERROR_MESSAGE: `Invalid team name. Please remove unsupported characters like emojis or more than two special symbols.`,
+  INVALID_ERROR_MESSAGE: `Hub names can contain combination of letters, digits and these special characters (.,-,_). Please provide the hub names accordingly.`,
 };

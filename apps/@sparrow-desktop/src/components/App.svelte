@@ -110,6 +110,10 @@
       initPostHog();
     }
     setupMaximizeToggleListenerForMac();
+    const initialUrl = await invoke<string | null>("get_initial_deep_link");
+    if (initialUrl) {
+      await _viewModel.processDeepLink(initialUrl?.toString());
+    }
     await _viewModel.registerDeepLinkHandler();
     await singleInstanceHandler();
     await setScaleFactorToDb(await getScaleFactor());

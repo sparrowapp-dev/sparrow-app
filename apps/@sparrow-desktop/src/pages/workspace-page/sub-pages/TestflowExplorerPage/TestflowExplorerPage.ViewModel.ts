@@ -23,7 +23,10 @@ import { WorkspaceRepository } from "../../../../repositories/workspace.reposito
 import { TestflowService } from "../../../../services/testflow.service";
 import {
   RequestDataTypeEnum,
+  TestCaseConditionOperatorEnum,
+  TestCaseSelectionTypeEnum,
   type HttpRequestCollectionLevelAuthTabInterface,
+  type Tests,
 } from "@sparrow/common/types/workspace";
 import {
   TabPersistenceTypeEnum,
@@ -74,6 +77,8 @@ import type {
   TestflowDataSetImportDto,
 } from "@sparrow/common/types/workspace/testflow-dto";
 import {
+  startLoading,
+  stopLoading,
   testflowDataSets,
   updateTestflowDataSets,
   updateTestflowSchedules,
@@ -85,6 +90,9 @@ import {
   addTestflowDataSet,
   replaceTestflowDataSet,
 } from "@sparrow/common/store";
+import { JSONPath } from "jsonpath-plus";
+import * as xpath from "xpath";
+import { AiAssistantService } from "@app/services/ai-assistant.service";
 
 export class TestflowExplorerPageViewModel {
   private _tab = new BehaviorSubject<Partial<Tab>>({});
@@ -102,6 +110,7 @@ export class TestflowExplorerPageViewModel {
   private teamRepository = new TeamRepository();
   private planRepository = new PlanRepository();
   private teamService = new TeamService();
+  private aiAssistentService = new AiAssistantService();
 
   /**
    * Utils
@@ -268,7 +277,7 @@ export class TestflowExplorerPageViewModel {
    */
   public updateNodes = new Debounce().debounce(
     this.updateNodesDebounce as any,
-    300,
+    150,
   );
 
   /**
@@ -669,16 +678,71 @@ export class TestflowExplorerPageViewModel {
         const request = transformRequestData(requestData);
 
         const requestTabAdapter = new RequestTabAdapter();
+
+        // --- auth to be used for pre-script + request ---
+        const baseAuth =
+          request.request.state.requestAuthNavigation ===
+          HttpRequestAuthTypeBaseEnum.AUTH_PROFILES
+            ? ({
+                auth: request.request.auth,
+                collectionAuthNavigation: request.request.auth,
+              } as HttpRequestCollectionLevelAuthTabInterface)
+            : await this.fetchCollectionAuth(element?.data?.collectionId);
+
+        const preRequestResult = await this.executePreScriptTestcases(
+          request.request,
+          environments.filtered || [],
+          baseAuth,
+          element.id,
+        );
+
+        const {
+          success: preScriptSuccess,
+          tests: preScriptTests = [],
+          error: preScriptError,
+          request: preRequest = request.request,
+          env: preEnv = environments.filtered || [],
+          auth: preAuth = baseAuth,
+        } = preRequestResult || {};
+
+        // Build pre-script testResults array
+        const preScriptTestResults =
+          preScriptSuccess && preScriptTests?.length
+            ? preScriptTests.map((t) => ({
+                testId: "",
+                testName: t.name,
+                testStatus: t.passed,
+                testMessage: t.error || "",
+                initiator: "Pre Script",
+              }))
+            : preScriptError
+            ? [
+                {
+                  testId: "",
+                  testName: "Pre Script Error",
+                  testStatus: false,
+                  testMessage: preScriptError,
+                  initiator: "Pre Script",
+                },
+              ]
+            : [];
+
+        // Use possibly mutated request/env/auth coming from pre-script
+        const updatedRequestWrapper = {
+          ...request,
+          request: preRequest,
+        };
+
         const adaptedRequest: Tab = requestTabAdapter.adapt(
           progressiveTab.path.workspaceId ?? "",
           element?.data?.collectionId ?? "",
           element?.data?.folderId ?? "",
-          request,
+          updatedRequestWrapper,
         );
 
         const decodeData = this._decodeRequest.init(
           adaptedRequest.property.request,
-          environments?.filtered || [],
+          preEnv || [],
           requestChainResponse,
         );
         const start = Date.now();
@@ -695,151 +759,149 @@ export class TestflowExplorerPageViewModel {
           const end = Date.now();
           const duration = end - start;
 
+          let resData: TFHistoryAPIResponseStoreType;
+          if (response.isSuccessful) {
+            const byteLength = new TextEncoder().encode(
+              JSON.stringify(response),
+            ).length;
+            const responseSizeKB = byteLength / 1024;
+            const responseData: TFAPIResponseType = response.data;
+            const responseBody = responseData.body;
+            const formattedHeaders = Object.entries(
+              response?.data?.headers || {},
+            ).map(([key, value]) => ({
+              key,
+              value,
+            })) as TFKeyValueStoreType[];
+            const responseStatus = response?.data?.status;
+            resData = {
+              body: responseBody,
+              headers: formattedHeaders,
+              status: responseStatus,
+              time: duration,
+              size: responseSizeKB,
+              responseContentType:
+                this._decodeRequest.setResponseContentType(formattedHeaders),
+              testResults: preScriptTestResults,
+            };
+
+            if (
+              Number(resData.status.split(" ")[0]) >= 200 &&
+              Number(resData.status.split(" ")[0]) < 300
+            ) {
+              successRequests++;
+            } else {
+              failedRequests++;
+            }
+            totalTime += duration;
+            const req = {
+              method: request?.request?.method as string,
+              name: request?.name as string,
+              status: resData.status,
+              time: new ParseTime().convertMilliseconds(duration),
+            };
+            history.requests.push(req);
+
+            const responseHeader =
+              this._decodeRequest.setResponseContentType(formattedHeaders);
+
+            const reqParam = {};
+            const params = new URL(decodeData[0]).searchParams;
+
+            for (const [key, value] of params.entries()) {
+              reqParam[key] = value;
+            }
+
+            const headersObject = Object.fromEntries(
+              JSON.parse(decodeData[2]).map(({ key, value }) => [key, value]),
+            );
+
+            let reqBody;
+            if (decodeData[4] === "application/json") {
+              try {
+                reqBody = JSON.parse(decodeData[3]);
+              } catch (e) {
+                reqBody = {};
+              }
+            } else if (
+              decodeData[4] === "multipart/form-data" ||
+              decodeData[4] === "application/x-www-form-urlencoded"
+            ) {
+              const formDataObject = Object.fromEntries(
+                JSON.parse(decodeData[3]).map(({ key, value }) => [key, value]),
+              );
+              reqBody = formDataObject || {};
+            } else {
+              reqBody = decodeData[3];
+            }
+            requestChainResponse[
+              "$$" +
+                element.data.requestData.name.replace(/[^a-zA-Z0-9_]/g, "_")
+            ] = {
+              response: {
+                body:
+                  responseHeader === "JSON"
+                    ? JSON.parse(resData.body)
+                    : resData.body,
+                headers: response?.data?.headers,
+              },
+              request: {
+                headers: headersObject || {},
+                body: reqBody,
+                parameters: reqParam || {},
+              },
+            };
+            requestChainResponse[
+              "$$" + element.data.blockName.replace(/[^a-zA-Z0-9_]/g, "_")
+            ] = {
+              response: {
+                body:
+                  responseHeader === "JSON"
+                    ? JSON.parse(resData.body)
+                    : resData.body,
+                headers: response?.data?.headers,
+              },
+              request: {
+                headers: headersObject || {},
+                body: reqBody,
+                parameters: reqParam || {},
+              },
+            };
+          } else {
+            resData = {
+              body: response.message,
+              headers: [],
+              status: ResponseStatusCode.ERROR,
+              time: duration,
+              size: 0,
+              testResults: preScriptTestResults,
+            };
+            failedRequests++;
+            totalTime += duration;
+            const req = {
+              method: request?.request?.method as string,
+              name: request?.name as string,
+              status: ResponseStatusCode.ERROR,
+              time: new ParseTime().convertMilliseconds(duration),
+            };
+            history.requests.push(req);
+          }
+          const nodeWithResponse = {
+            id: element.id,
+            response: resData,
+            request: adaptedRequest,
+          };
+
+          this.executeNoCodeTestcases(nodeWithResponse);
+          await this.executeScriptTestcases(nodeWithResponse);
+
+          // Update store with all test results
           testFlowDataStore.update((testFlowDataMap) => {
             const existingTestFlowData = testFlowDataMap.get(
               progressiveTab.tabId,
             );
             if (existingTestFlowData) {
-              let resData: TFHistoryAPIResponseStoreType;
-              if (response.isSuccessful) {
-                const byteLength = new TextEncoder().encode(
-                  JSON.stringify(response),
-                ).length;
-                const responseSizeKB = byteLength / 1024;
-                const responseData: TFAPIResponseType = response.data;
-                const responseBody = responseData.body;
-                const formattedHeaders = Object.entries(
-                  response?.data?.headers || {},
-                ).map(([key, value]) => ({
-                  key,
-                  value,
-                })) as TFKeyValueStoreType[];
-                const responseStatus = response?.data?.status;
-                resData = {
-                  body: responseBody,
-                  headers: formattedHeaders,
-                  status: responseStatus,
-                  time: duration,
-                  size: responseSizeKB,
-                  responseContentType:
-                    this._decodeRequest.setResponseContentType(
-                      formattedHeaders,
-                    ),
-                };
-
-                if (
-                  Number(resData.status.split(" ")[0]) >= 200 &&
-                  Number(resData.status.split(" ")[0]) < 300
-                ) {
-                  successRequests++;
-                } else {
-                  failedRequests++;
-                }
-                totalTime += duration;
-                const req = {
-                  method: request?.request?.method as string,
-                  name: request?.name as string,
-                  status: resData.status,
-                  time: new ParseTime().convertMilliseconds(duration),
-                };
-                history.requests.push(req);
-
-                const responseHeader =
-                  this._decodeRequest.setResponseContentType(formattedHeaders);
-
-                const reqParam = {};
-                const params = new URL(decodeData[0]).searchParams;
-
-                for (const [key, value] of params.entries()) {
-                  reqParam[key] = value;
-                }
-
-                const headersObject = Object.fromEntries(
-                  JSON.parse(decodeData[2]).map(({ key, value }) => [
-                    key,
-                    value,
-                  ]),
-                );
-
-                let reqBody;
-                if (decodeData[4] === "application/json") {
-                  // tried to handle js but that is treated as text/plain, skipping that for now
-                  try {
-                    reqBody = JSON.parse(decodeData[3]);
-                  } catch (e) {
-                    reqBody = {};
-                  }
-                } else if (
-                  decodeData[4] === "multipart/form-data" ||
-                  decodeData[4] === "application/x-www-form-urlencoded"
-                ) {
-                  const formDataObject = Object.fromEntries(
-                    JSON.parse(decodeData[3]).map(({ key, value }) => [
-                      key,
-                      value,
-                    ]),
-                  );
-                  reqBody = formDataObject || {};
-                } else {
-                  reqBody = decodeData[3];
-                }
-                requestChainResponse[
-                  "$$" +
-                    element.data.requestData.name.replace(/[^a-zA-Z0-9_]/g, "_")
-                ] = {
-                  response: {
-                    body:
-                      responseHeader === "JSON"
-                        ? JSON.parse(resData.body)
-                        : resData.body,
-                    headers: response?.data?.headers,
-                  },
-                  request: {
-                    headers: headersObject || {},
-                    body: reqBody,
-                    parameters: reqParam || {},
-                  },
-                };
-                requestChainResponse[
-                  "$$" + element.data.blockName.replace(/[^a-zA-Z0-9_]/g, "_")
-                ] = {
-                  response: {
-                    body:
-                      responseHeader === "JSON"
-                        ? JSON.parse(resData.body)
-                        : resData.body,
-                    headers: response?.data?.headers,
-                  },
-                  request: {
-                    headers: headersObject || {},
-                    body: reqBody,
-                    parameters: reqParam || {},
-                  },
-                };
-              } else {
-                resData = {
-                  body: response.message,
-                  headers: [],
-                  status: ResponseStatusCode.ERROR,
-                  time: duration,
-                  size: 0,
-                };
-                failedRequests++;
-                totalTime += duration;
-                const req = {
-                  method: request?.request?.method as string,
-                  name: request?.name as string,
-                  status: ResponseStatusCode.ERROR,
-                  time: new ParseTime().convertMilliseconds(duration),
-                };
-                history.requests.push(req);
-              }
-              existingTestFlowData.nodes.push({
-                id: element.id,
-                response: resData,
-                request: adaptedRequest,
-              });
-
+              existingTestFlowData.nodes.push(nodeWithResponse);
               testFlowDataMap.set(progressiveTab.tabId, existingTestFlowData);
             }
             return testFlowDataMap;
@@ -850,24 +912,31 @@ export class TestflowExplorerPageViewModel {
           if (error?.name === "AbortError") {
             break;
           }
+
+          const resData = {
+            body: "",
+            headers: [],
+            status: ResponseStatusCode.ERROR,
+            time: 0,
+            size: 0,
+            testResults: preScriptTestResults,
+          };
+
+          const nodeWithResponse = {
+            id: element.id,
+            response: resData,
+            request: adaptedRequest,
+          };
+
+          this.executeNoCodeTestcases(nodeWithResponse);
+          await this.executeScriptTestcases(nodeWithResponse);
+
           testFlowDataStore.update((testFlowDataMap) => {
             const existingTestFlowData = testFlowDataMap.get(
               progressiveTab.tabId,
             );
             if (existingTestFlowData) {
-              const resData = {
-                body: "",
-                headers: [],
-                status: ResponseStatusCode.ERROR,
-                time: 0,
-                size: 0,
-              };
-
-              existingTestFlowData.nodes.push({
-                id: element.id,
-                response: resData,
-                request: adaptedRequest,
-              });
+              existingTestFlowData.nodes.push(nodeWithResponse);
 
               requestChainResponse[
                 "$$" +
@@ -1028,6 +1097,422 @@ export class TestflowExplorerPageViewModel {
     );
   };
 
+  public generateTestCases = async (prompt = "", node_id) => {
+    const isGuestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    if (isGuestUser) {
+      return;
+    }
+    const componentData = this._tab.getValue();
+    const tabId = componentData?.tabId;
+
+    const workspaceId = componentData.path.workspaceId;
+    const workspaceVal =
+      await this.workspaceRepository.readWorkspace(workspaceId);
+    let teamId = workspaceVal.team?.teamId;
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const node = progressiveTab?.property?.testflow?.nodes.find(
+      (item) => item.id === node_id,
+    );
+    const testCases = node.data.requestData.tests;
+    const originalScript = testCases.script || "";
+
+    try {
+      const response = await this.aiAssistentService.generateTestCases({
+        text: prompt,
+        teamId: teamId,
+      });
+      if (response.isSuccessful) {
+        const generatedContent = response?.data?.data.result;
+        notifications.success("Post-request script is generated successfully.");
+        return {
+          generatedContent: generatedContent,
+          originalContent: originalScript,
+        };
+      } else {
+        return response?.data;
+      }
+    } catch (error) {
+      notifications.error(
+        "Failed to generate post-request script. Please try again.",
+      );
+    }
+  };
+
+  public generatePreScript = async (prompt = "", node_id) => {
+    const isGuestUser = await this.guestUserRepository.findOne({
+      name: "guestUser",
+    });
+    if (isGuestUser) {
+      return;
+    }
+    const componentData = this._tab.getValue();
+    const tabId = componentData?.tabId;
+
+    let workspaceId = componentData.path.workspaceId;
+    let workspaceVal =
+      await this.workspaceRepository.readWorkspace(workspaceId);
+    let teamId = workspaceVal.team?.teamId;
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const node = progressiveTab?.property?.testflow?.nodes.find(
+      (item) => item.id === node_id,
+    );
+    const testCases = node.data.requestData.tests;
+    const originalPreScript = testCases.preScript || "";
+    try {
+      const response = await this.aiAssistentService.generatePreScript({
+        text: prompt,
+        teamId: teamId,
+      });
+      if (response.isSuccessful) {
+        const generatedContent = response?.data?.data.result;
+        notifications.success("Pre-request script is generated successfully.");
+        return {
+          generatedContent: generatedContent,
+          originalContent: originalPreScript,
+        };
+      } else {
+        return response?.data;
+      }
+    } catch (error) {
+      notifications.error(
+        "Failed to generate pre-request script. Please try again.",
+      );
+    }
+  };
+
+  private evaluateCondition = (
+    actual: any,
+    expectedRaw: string,
+    condition: TestCaseConditionOperatorEnum,
+  ): { passed: boolean; message?: string } => {
+    let passed = false;
+    let message: string | undefined = "";
+    const expected: any = expectedRaw;
+
+    try {
+      switch (condition) {
+        case TestCaseConditionOperatorEnum.EQUALS:
+          passed = actual == expected;
+          message = passed
+            ? ""
+            : `Expected ${actual} to equal  ${expected || "(empty)"}`;
+          break;
+        case TestCaseConditionOperatorEnum.NOT_EQUAL:
+          passed = actual != expected;
+          message = passed
+            ? ""
+            : `Expected ${actual} not to equal ${expected || "(empty)"}`;
+          break;
+        case TestCaseConditionOperatorEnum.EXISTS:
+          passed = actual !== undefined && actual !== null;
+          message = passed ? "" : `Expected ${actual} to exist`;
+          break;
+        case TestCaseConditionOperatorEnum.DOES_NOT_EXIST:
+          passed = actual === undefined || actual === null;
+          message = passed ? "" : `Expected ${actual} not to exist`;
+          break;
+        case TestCaseConditionOperatorEnum.LESS_THAN:
+          passed =
+            typeof actual === "number"
+              ? actual < Number(expected)
+              : actual.length < Number(expected);
+          message = passed
+            ? ""
+            : `Expected ${actual} to be less than ${expected || "(empty)"}`;
+          break;
+        case TestCaseConditionOperatorEnum.LESS_THAN_OR_EQUAL:
+          passed =
+            typeof actual === "number"
+              ? actual <= Number(expected)
+              : actual.length <= Number(expected);
+          message = passed
+            ? ""
+            : `Expected ${actual} to be less than or equal to ${
+                expected || "(empty)"
+              }`;
+          break;
+        case TestCaseConditionOperatorEnum.GREATER_THAN:
+          passed =
+            typeof actual === "number"
+              ? actual > Number(expected)
+              : actual.length > Number(expected);
+          message = passed
+            ? ""
+            : `Expected ${actual} to be greater than ${expected || "(empty)"}`;
+          break;
+        case TestCaseConditionOperatorEnum.GREATER_THAN_OR_EQUAL:
+          passed =
+            typeof actual === "number"
+              ? actual >= Number(expected)
+              : actual.length >= Number(expected);
+          message = passed
+            ? ""
+            : `Expected ${actual} to be greater than or equal to ${
+                expected || "(empty)"
+              }`;
+          break;
+        case TestCaseConditionOperatorEnum.CONTAINS:
+          passed = typeof actual === "string" && actual.includes(expected);
+          message = passed
+            ? ""
+            : `Expected ${actual} to contain ${expected || "(empty)"}`;
+          break;
+        case TestCaseConditionOperatorEnum.DOES_NOT_CONTAIN:
+          passed = typeof actual === "string" && !actual.includes(expected);
+          message = passed
+            ? ""
+            : `Expected ${actual} not to contain ${expected || "(empty)"}`;
+          break;
+        case TestCaseConditionOperatorEnum.IS_EMPTY:
+          passed = actual === "" || actual === 0;
+          message = passed ? "" : `Expected ${actual} to be empty`;
+          break;
+        case TestCaseConditionOperatorEnum.IS_NOT_EMPTY:
+          passed = actual !== "" && actual !== 0;
+          message = passed ? "" : `Expected ${actual} not to be empty`;
+          break;
+        case TestCaseConditionOperatorEnum.IN_LIST:
+          try {
+            passed = Array.isArray(actual) && actual.includes(expected);
+            message = passed
+              ? ""
+              : `Expected ${actual} to be in list ${expected || "(empty)"}`;
+          } catch {
+            message = "Result for IN LIST must be a JSON array";
+          }
+          break;
+        case TestCaseConditionOperatorEnum.NOT_IN_LIST:
+          try {
+            passed = Array.isArray(actual) && !actual.includes(expected);
+            message = passed
+              ? ""
+              : `Expected ${actual} not to be in list ${expected || "(empty)"}`;
+          } catch {
+            message = "Result for NOT IN LIST must be a JSON array";
+          }
+          break;
+        default:
+          message = `Condition ${condition} not supported`;
+      }
+    } catch (e) {
+      message = (e as Error).message;
+    }
+
+    return { passed, message };
+  };
+
+  private async executePreScriptTestcases(request, env, auth, nodeId) {
+    return new Promise((resolve) => {
+      const worker = new Worker(
+        new URL(
+          "../../../../workers/test-pre-script-worker.ts",
+          import.meta.url,
+        ),
+        {
+          type: "module",
+        },
+      );
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const node = progressiveTab?.property?.testflow?.nodes.find(
+        (item) => item.id === nodeId,
+      );
+
+      const javaScriptTestCases =
+        node?.data?.requestData?.tests?.preScript || "";
+
+      // Just send data to worker – no store updates here
+      worker.postMessage({
+        javaScriptTestCases,
+        request,
+        env,
+        auth,
+      });
+
+      worker.onmessage = (e) => {
+        const { success, tests, error, request, env, auth } = e.data;
+
+        worker.terminate(); // cleanup
+
+        // Return everything to the caller
+        resolve({
+          success,
+          tests,
+          error,
+          request,
+          env,
+          auth,
+        });
+      };
+    });
+  }
+
+  private executeNoCodeTestcases = (node) => {
+    // const progressiveTab = createDeepCopy(this._tab.getValue());
+    // testFlowDataStore.update((testFlowDataMap) => {
+    //   const response = testFlowDataMap.get(progressiveTab?.tabId);
+
+    // response.response.testResults = [];
+    const testCases = node?.request?.property?.request?.tests?.noCode || [];
+    testCases.map((test) => {
+      let actual: any;
+      let error: string | undefined;
+      let testCasePassed = false;
+      let testCaseStatusMessage = "";
+
+      if (test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_TEXT) {
+        actual = node.response.body;
+      } else if (test.testTarget === TestCaseSelectionTypeEnum.TIME_CONSUMING) {
+        actual = node.response.time;
+      } else if (
+        test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_HEADER
+      ) {
+        if (!test.condition) {
+          error = `Condition not found`;
+          actual = undefined;
+        } else if (!test.testPath) {
+          error = `Test path not found`;
+          actual = undefined;
+        } else {
+          actual = node.response.headers.find(
+            (h) => h.key.toLowerCase() === test.testPath?.toLowerCase(),
+          )?.value;
+        }
+      } else if (test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_JSON) {
+        try {
+          if (!test.condition) {
+            error = `Condition not found`;
+            actual = undefined;
+          } else if (!test.testPath) {
+            error = `Test path not found`;
+            actual = undefined;
+          } else {
+            const json = JSON.parse(node.response.body);
+            // Use JSONPath to extract value, supports $[3].userId, $[0].address.city, etc.
+            const result = JSONPath({ path: test.testPath, json });
+            // If result is an array, take the first value
+            actual = Array.isArray(result) ? result[0] : result;
+          }
+        } catch (e) {
+          error = "Invalid JSON or path";
+          actual = undefined;
+        }
+      } else if (test.testTarget === TestCaseSelectionTypeEnum.RESPONSE_XML) {
+        try {
+          if (!test.condition) {
+            error = `Condition not found`;
+            actual = undefined;
+          } else if (!test.testPath) {
+            error = `Test path not found`;
+            actual = undefined;
+          } else {
+            const xml = node.response.body;
+            const doc = new DOMParser().parseFromString(xml, "text/xml");
+            // test.testPath should be a valid XPath, e.g. "/root/country/city"
+            const nodes = xpath.select(test.testPath, doc);
+
+            if (Array.isArray(nodes) && nodes.length > 0) {
+              // If it's an attribute node
+              if (nodes[0].nodeType === 2) {
+                actual = nodes[0].nodeValue;
+              } else if (nodes[0].firstChild) {
+                actual = nodes[0].firstChild.nodeValue;
+              } else if ((nodes[0] as any).data) {
+                actual = (nodes[0] as any).data;
+              } else {
+                actual = nodes[0].toString();
+              }
+            } else {
+              actual = undefined;
+            }
+          }
+        } catch (e) {
+          error = "Invalid XML or XPath";
+          actual = undefined;
+        }
+      } else {
+        error = `Test target not found`;
+      }
+
+      if (actual !== undefined) {
+        const { passed, message: testMessage } = this.evaluateCondition(
+          actual,
+          test.expectedResult,
+          test.condition,
+        );
+        testCasePassed = passed;
+        testCaseStatusMessage = testMessage;
+      }
+      const testResponse = {
+        testId: test.id,
+        testName: test.name,
+        testStatus: testCasePassed,
+        initiator: "Assertions",
+        testMessage: error || testCaseStatusMessage,
+      };
+
+      node.response.testResults.push(testResponse);
+
+      // testFlowDataMap.set(progressiveTab.tabId, resData);
+    });
+  };
+
+  private executeScriptTestcases = async (node) => {
+    return new Promise((resolve) => {
+      const worker = new Worker(
+        new URL("../../../../workers/test-script-worker.ts", import.meta.url),
+        {
+          type: "module",
+        },
+      );
+
+      const progressiveTab = createDeepCopy(this._tab.getValue());
+      const currentNode = progressiveTab?.property?.testflow?.nodes.find(
+        (item) => item.id === node.id,
+      );
+
+      const javaScriptTestCases =
+        currentNode?.data?.requestData?.tests?.script || "";
+
+      // Send data to worker
+      worker.postMessage({
+        javaScriptTestCases,
+        response: node.response,
+      });
+
+      worker.onmessage = (e) => {
+        const { success, tests, error } = e.data;
+
+        // Add script test results directly to node.response.testResults (same as no-code)
+        if (success && tests?.length) {
+          tests.forEach((t) => {
+            const testResponse = {
+              testId: "",
+              testName: t.name,
+              testStatus: t.passed,
+              testMessage: t.error || "",
+              initiator: "Post Script",
+            };
+            node.response.testResults.push(testResponse);
+          });
+        } else if (error) {
+          const testResponse = {
+            testId: "",
+            testName: "Post Script Error",
+            testStatus: false,
+            testMessage: error,
+            initiator: "Post Script",
+          };
+          node.response.testResults.push(testResponse);
+        }
+
+        worker.terminate(); // cleanup
+        resolve("resolved");
+      };
+    });
+  };
+
   /**
    * Runs a single test flow node and updates the testFlowDataStore
    * @param nodeId - The id of the node to be executed
@@ -1068,16 +1553,71 @@ export class TestflowExplorerPageViewModel {
     const request = transformRequestData(requestData);
     const requestTabAdapter = new RequestTabAdapter();
 
+    // --- auth to be used for pre-script + request ---
+    const baseAuth =
+      request.request.state.requestAuthNavigation ===
+      HttpRequestAuthTypeBaseEnum.AUTH_PROFILES
+        ? ({
+            auth: request.request.auth,
+            collectionAuthNavigation: request.request.auth,
+          } as HttpRequestCollectionLevelAuthTabInterface)
+        : await this.fetchCollectionAuth(node?.data?.collectionId);
+
+    // ---------- PRE SCRIPT EXECUTION (before API call) ----------
+    const preRequestResult = await this.executePreScriptTestcases(
+      request.request,
+      environments.filtered || [],
+      baseAuth,
+      nodeId,
+    );
+
+    const {
+      success: preScriptSuccess,
+      tests: preScriptTests = [],
+      error: preScriptError,
+      request: preRequest = request.request,
+      env: preEnv = environments.filtered || [],
+      auth: preAuth = baseAuth,
+    } = preRequestResult || {};
+
+    // Build pre-script testResults array (same structure as no-code)
+    const preScriptTestResults =
+      preScriptSuccess && preScriptTests?.length
+        ? preScriptTests.map((t) => ({
+            testId: "",
+            testName: t.name,
+            testStatus: t.passed,
+            testMessage: t.error || "",
+            initiator: "Pre Script",
+          }))
+        : preScriptError
+        ? [
+            {
+              testId: "",
+              testName: "Pre Script Error",
+              testStatus: false,
+              testMessage: preScriptError,
+              initiator: "Pre Script",
+            },
+          ]
+        : [];
+
+    // Use possibly mutated request/env/auth coming from pre-script
+    const updatedRequestWrapper = {
+      ...request,
+      request: preRequest,
+    };
+
     const adaptedRequest: Tab = requestTabAdapter.adapt(
       tab.path.workspaceId ?? "",
       node?.data?.collectionId ?? "",
       node?.data?.folderId ?? "",
-      request,
+      updatedRequestWrapper,
     );
 
     const decodeData = this._decodeRequest.init(
       adaptedRequest.property.request,
-      environments?.filtered || [],
+      preEnv || [],
     );
 
     const start = Date.now();
@@ -1113,6 +1653,8 @@ export class TestflowExplorerPageViewModel {
           size: responseSizeKB,
           responseContentType:
             this._decodeRequest.setResponseContentType(formattedHeaders),
+          // IMPORTANT: seed with pre-script results
+          testResults: preScriptTestResults,
         };
       } else {
         resData = {
@@ -1121,6 +1663,8 @@ export class TestflowExplorerPageViewModel {
           status: ResponseStatusCode.ERROR,
           time: duration,
           size: 0,
+          // even on error, keep pre-script results
+          testResults: preScriptTestResults,
         };
       }
     } catch (error) {
@@ -1131,25 +1675,26 @@ export class TestflowExplorerPageViewModel {
         status: ResponseStatusCode.ERROR,
         time: 0,
         size: 0,
+        testResults: preScriptTestResults,
       };
     }
 
+    const newNode = {
+      id: node.id,
+      response: resData,
+      request: adaptedRequest,
+    };
+    this.executeNoCodeTestcases(newNode);
+
+    await this.executeScriptTestcases(newNode);
     testFlowDataStore.update((testFlowDataMap) => {
       const wsData = testFlowDataMap.get(tab.tabId);
       if (wsData) {
         const nodeIndex = wsData.nodes.findIndex((n) => n.id === node.id);
 
-        const newNode = {
-          id: node.id,
-          response: resData,
-          request: adaptedRequest,
-        };
-
         if (nodeIndex !== -1) {
-          // Update existing node
           wsData.nodes[nodeIndex] = newNode;
         } else {
-          // Add new node
           wsData.nodes.push(newNode);
         }
 
@@ -1157,6 +1702,133 @@ export class TestflowExplorerPageViewModel {
       }
       return testFlowDataMap;
     });
+  };
+
+  public fixTestScript = async (type: string, nodeId): Promise<void> => {
+    const componentData = this._tab.getValue();
+    const tabId = componentData?.tabId;
+    let workspaceId = componentData.path.workspaceId;
+    let workspaceVal =
+      await this.workspaceRepository.readWorkspace(workspaceId);
+    let teamId = workspaceVal.team?.teamId;
+
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const requestNode = progressiveTab?.property?.testflow?.nodes.find(
+      (item) => item.id === nodeId,
+    );
+
+    if (!requestNode) {
+      notifications.error("No test request node found.");
+      return;
+    }
+
+    // pick correct script field
+    const testCases = requestNode.data.requestData.tests;
+
+    if (type === "Post Script") {
+      const response = await this.aiAssistentService.fixTestScript({
+        teamId: teamId,
+        testScript: testCases.script,
+        type: "post-script",
+      });
+
+      if (response.isSuccessful) {
+        await this.updateRequestTests(
+          {
+            ...testCases,
+            script: response?.data?.data.result,
+          },
+          nodeId,
+        );
+
+        // Then update the store to remove error messages
+        testFlowDataStore.update((testFlowDataMap) => {
+          const testFlowData = testFlowDataMap.get(tabId);
+          if (testFlowData?.nodes) {
+            const nodeData = testFlowData.nodes.find(
+              (node) => node.id === nodeId,
+            );
+
+            if (nodeData?.response?.testResults) {
+              nodeData.response.testResults =
+                nodeData.response.testResults.filter((testResult) => {
+                  return !(
+                    testResult.initiator === "Post Script" &&
+                    testResult.testName.includes("Script Error")
+                  );
+                });
+            }
+          }
+
+          return testFlowDataMap;
+        });
+        notifications.success("Test script fixed successfully.");
+        return response;
+      } else if (
+        response?.data?.message === "Limit reached. Please try again later."
+      ) {
+        notifications.error("AI Limit has Reached.please upgrade plan.");
+      } else {
+        notifications.error("Failed to fix test script.");
+      }
+    } else if (type === "Pre Script") {
+      const response = await this.aiAssistentService.fixTestScript({
+        teamId: teamId,
+        testScript: testCases.preScript,
+        type: "pre-script",
+      });
+
+      if (response.isSuccessful) {
+        await this.updateRequestTests(
+          {
+            ...testCases,
+            preScript: response?.data?.data.result,
+          },
+          nodeId,
+        );
+        testFlowDataStore.update((testFlowDataMap) => {
+          const testFlowData = testFlowDataMap.get(tabId);
+
+          if (testFlowData?.nodes) {
+            const nodeData = testFlowData.nodes.find(
+              (node) => node.id === nodeId,
+            );
+
+            if (nodeData?.response?.testResults) {
+              nodeData.response.testResults =
+                nodeData.response.testResults.filter((testResult) => {
+                  return !(
+                    testResult.initiator === "Pre Script" &&
+                    testResult.testName.includes("Script Error")
+                  );
+                });
+            }
+          }
+
+          return testFlowDataMap;
+        });
+        notifications.success("Test script fixed successfully.");
+
+        return response;
+      } else if (
+        response?.data?.message === "Limit reached. Please try again later."
+      ) {
+        notifications.error("AI Limit has Reached.please upgrade plan.");
+      } else {
+        notifications.error("Failed to fix test script.");
+      }
+    }
+  };
+
+  public updateRequestTests = async (_tests: Tests, nodeId) => {
+    const progressiveTab = createDeepCopy(this._tab.getValue());
+    const node = progressiveTab?.property?.testflow?.nodes.find(
+      (item) => item.id === nodeId,
+    );
+    node.data.requestData.tests = _tests;
+    this.tab = progressiveTab;
+    await this.tabRepository.updateTab(progressiveTab.tabId, progressiveTab);
+    this.compareTestflowWithServer();
   };
 
   /**
@@ -1913,7 +2585,7 @@ export class TestflowExplorerPageViewModel {
     }
   };
 
-  public openTestflowScheduleTab = async (_schedule: string) => {
+  public openTestflowScheduleTab = async (_schedule: any) => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
     const initTestflowScheduleTab = new InitTestflowScheduleTab(
       _schedule.id,
@@ -2029,15 +2701,16 @@ export class TestflowExplorerPageViewModel {
       if (response?.isSuccessful) {
         notifications.success(`New schedule created successfully.`);
         const schedules = response.data.data.testflow.schedules;
-        const lastestSchedule = response.data.data.schedule;
+        const latestSchedule = response.data.data.schedule;
         updateTestflowSchedules(progressiveTab.id as string, schedules);
         captureEvent("schedule_created", {
           event_source: "desktop_app",
-          schedule_id: lastestSchedule.data.id,
+          schedule_id: latestSchedule.data.id,
           testflowId: response.data.data.testflow._id,
           schedule_run_frequency: runConfiguration.runCycle,
-          status: lastestSchedule.data.isActive,
+          status: latestSchedule.data.isActive,
         });
+        this.openTestflowScheduleTab(latestSchedule.data);
         return {
           isSuccessful: true,
           data: response.data,

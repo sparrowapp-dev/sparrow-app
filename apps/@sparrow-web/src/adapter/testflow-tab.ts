@@ -216,6 +216,7 @@ export class TestflowTabAdapter {
             ..._nd?.data,
             requestData: {
               ..._nd?.data?.requestData,
+              tests: _nd?.data?.requestData?.tests || "",
               state: {
                 requestBodyLanguage: requestBodyLanguage
                   ? requestBodyLanguage

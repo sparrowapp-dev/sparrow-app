@@ -24,12 +24,15 @@
   let scheduleName = "";
   let selectedEnvironment = "none";
   let isError = false;
+  let isErrors = {
+    scheduleNameError: false,
+  };
   let isScheduling = false;
   let selectedTestData = selectedTestDataId;
 
   // Run Configuration
   let selectedCycle = "Once"; // Once, Daily, Hourly, Weekly
-  let selectedDate = new Date();
+  let selectedDate: Date | null = new Date();
   let selectedTime = "";
 
   // Hourly specific variables
@@ -190,6 +193,9 @@
   // Keep selectedDate in sync with formattedDate
   $: if (formattedDate) {
     selectedDate = parseDateString(formattedDate);
+  } else {
+    // If formattedDate is empty, set selectedDate to null or empty
+    selectedDate = null;
   }
 
   // Weekly helper functions
@@ -263,6 +269,24 @@
     return dateObj.toISOString();
   }
 
+  const isValidScheduleName = (name: string) => {
+    // Regex: 1–30 characters, allows letters, numbers, spaces, hyphens, and underscores
+    const regex = /^[A-Za-z0-9 _-]{1,30}$/;
+    return regex.test(name);
+  };
+
+  $: {
+    if (scheduleName && scheduleName.trim()) {
+      if (!isValidScheduleName(scheduleName.trim())) {
+        isErrors.scheduleNameError = true;
+      } else {
+        isErrors.scheduleNameError = false;
+      }
+    } else {
+      isErrors.scheduleNameError = false;
+    }
+  }
+
   // Add schedule run handler
   async function handleScheduleRun() {
     isScheduling = true;
@@ -270,7 +294,10 @@
     let runConfiguration = {
       runCycle: selectedCycle.toLowerCase(),
     };
-
+    const isScheduleName = isValidScheduleName(scheduleName);
+    if (!isScheduleName) {
+      return;
+    }
     switch (selectedCycle.toLowerCase()) {
       case "once":
         // For once, we only need executeAt
@@ -359,6 +386,14 @@
             style="color: var(--text-ds-danger-300);"
           >
             Schedule name is required
+          </p>
+        {:else if isErrors.scheduleNameError}
+          <p
+            class="error-text text-ds-font-size-12 mt-1"
+            style="color: var(--text-ds-danger-300);"
+          >
+            Schedule name must be 1-30 characters and can only contain letters,
+            numbers, spaces, hyphens (-), and underscores (_).
           </p>
         {/if}
       </div>
@@ -649,6 +684,7 @@
         <!-- Email Recipients -->
         <div class="form-group mb-3">
           <label class="form-label"> Email Recipients </label>
+          <p class="helper-text mb-2">Use comma to separate emails</p>
 
           <div class="email-picker-container">
             <EmailReceipentsPicker
@@ -701,6 +737,7 @@
         title="Cancel"
         type="secondary"
         onClick={() => {
+          onTestDataSelection("none");
           isScheduleRunPopupOpen = false;
         }}
       />
@@ -709,7 +746,8 @@
         type="primary"
         onClick={handleScheduleRun}
         disable={!scheduleName.trim() ||
-          (selectedCycle === "Once" && (!selectedDate || !selectedTime)) ||
+          isErrors.scheduleNameError ||
+          (selectedCycle === "Once" && (!formattedDate || !selectedTime)) ||
           (selectedCycle === "Daily" && !selectedTime) ||
           (selectedCycle === "Hourly" && !selectedHours) ||
           (selectedCycle === "Weekly" &&
@@ -756,7 +794,8 @@
 
     /* Styling for the scrollbar */
     &::-webkit-scrollbar {
-      width: 8px;
+      width: 4px;
+      height: 4px;
     }
 
     &::-webkit-scrollbar-track {

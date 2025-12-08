@@ -265,7 +265,7 @@
                 }}
                 onReleaseNoteRedirect={async (title) => {
                   const version = title.match(/v\d+\.\d+\.\d+/)[0];
-                  const releaseNoteUrl = `${constants.SPARROW_GITHUB}/sparrow-app/releases/tag/${version}`;
+                  const releaseNoteUrl = `${constants.SPARROW_GITHUB}/releases/tag/${version}`;
                   await open(releaseNoteUrl);
                   MixpanelEvent(Events.Github_Updates);
                 }}

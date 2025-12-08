@@ -1,6 +1,8 @@
 # Stage 1: Build
 FROM node:20.8.1 AS builder
 
+RUN apt-get update && apt-get install -y python3 make g++ && npm install -g node-gyp
+
 # Set the working directory
 WORKDIR /app
 

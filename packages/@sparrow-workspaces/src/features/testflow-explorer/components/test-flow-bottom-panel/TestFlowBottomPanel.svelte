@@ -7,19 +7,25 @@
     ErrorCircleRegular,
     ArrowSwapRegular,
   } from "@sparrow/library/icons";
-  import { RequestSectionEnum } from "@sparrow/common/types/workspace";
+  import {
+    RequestSectionEnum,
+    ResponseSectionEnum,
+  } from "@sparrow/common/types/workspace";
   import {
     RequestBodyTestFlow,
     RequestHeaderTestFlow,
     RequestNavigatorTestFlow,
     RequestParameterTestFlow,
     RequestAuthorizationTestFlow,
+    RequestAssertionsTestFlow,
+    RequestTestsTestFlow,
     ResponseErrorScreen,
     ResponseHeaders,
     ResponseNavigator,
     ResponseBody,
     ResponseBodyNavigator,
     ResponseStatus,
+    ResponseTestResults,
   } from "..";
   import SparrowLogo from "../../assets/images/sparrow-logo.svelte";
   import { ResponseStatusCode } from "@sparrow/common/enums";
@@ -28,6 +34,7 @@
   import * as Sentry from "@sentry/svelte";
   import { currentStep, isTestFlowTourGuideOpen } from "../../../../stores";
   import { emptyRequest } from "../../utils";
+  import NoCode from "../request-tests/sub-components/no-code/NoCode.svelte";
 
   export let selectedBlock;
   export let onClose;
@@ -43,10 +50,16 @@
   export let handleOpenCurrentDynamicExpression;
   export let selectedAuthHeader;
   export let selectAuthHeader: string;
+  export let isSaved = false; // Track save state for assertions
+  export let onGeneratePreScript;
+  export let onGenerateTestCases;
+  export let onFixTestScript;
+  export let tab;
+  export let isGuestUser = false;
 
   let responseLoader = false;
   let height = 300;
-  let minHeight = 100;
+  let minHeight = 200;
   let isResizing = false;
   let isResizingActive = false;
   let inputRef;
@@ -75,6 +88,10 @@
       requestNavigation = "Headers";
     } else if (tab === "Authorization") {
       requestNavigation = "Authorization";
+    } else if (tab === "Scripts" || tab === RequestSectionEnum.TESTS) {
+      requestNavigation = RequestSectionEnum.TESTS;
+    } else if (tab === "Assertions") {
+      requestNavigation = "Assertions";
     } else {
       requestNavigation = "Parameters";
     }
@@ -132,6 +149,8 @@
       responseNavigation = "Response";
     } else if (tab === "Headers") {
       responseNavigation = "Headers";
+    } else if (tab === ResponseSectionEnum.TESTRESULT) {
+      responseNavigation = ResponseSectionEnum.TESTRESULT;
     }
   };
 
@@ -309,7 +328,7 @@
     horizontal={false}
   >
     <!-- Request Pane -->
-    <Pane minSize={30} size={"30%"} class="position-relative bg-transparent">
+    <Pane minSize={50} size="52" class="position-relative bg-transparent">
       <div class="h-100 d-flex flex-column position-relative pe-2">
         <RequestNavigatorTestFlow
           paramsLength={selectedBlock?.data?.requestData?.queryParams?.length ||
@@ -367,13 +386,76 @@
               {onUpdateEnvironment}
               bind:selectAuthHeader
             />
+          {:else if requestNavigation === RequestSectionEnum.ASSERTIONS}
+            {#key selectedBlock?.id}
+              <div
+                style={isAnyEnvVariableMissing
+                  ? `height: calc(100% - 72px);`
+                  : `height: 100%;`}
+              >
+                <NoCode
+                  tests={selectedBlock?.data?.requestData?.tests ?? []}
+                  onTestsChange={(updatedTests) => {
+                    handleUpdateRequestData("tests", updatedTests);
+                  }}
+                  tabSplitDirection="horizontal"
+                  testResults={selectedNodeResponse?.response?.testResults ??
+                    []}
+                  responseBody={selectedNodeResponse?.response?.body ?? ""}
+                  responseHeader={selectedNodeResponse?.response?.headers ?? []}
+                  {isSaved}
+                />
+              </div>
+            {/key}
+          {:else if requestNavigation === RequestSectionEnum.TESTS}
+            {#key selectedBlock?.id}
+              <div
+                style={isAnyEnvVariableMissing
+                  ? `height: calc(100% - 72px);`
+                  : `height: 100%;`}
+              >
+                <RequestTestsTestFlow
+                  tests={selectedBlock?.data?.requestData?.tests ?? {
+                    testCaseMode: "no-code",
+                    preScript: "",
+                    script: "",
+                  }}
+                  node_id={selectedBlock?.id}
+                  onTestsChange={(updatedTests) => {
+                    handleUpdateRequestData("tests", updatedTests);
+                  }}
+                  tabSplitDirection="horizontal"
+                  {onGenerateTestCases}
+                  {onGeneratePreScript}
+                  {tab}
+                />
+              </div>
+            {/key}
+          {:else if requestNavigation === RequestSectionEnum.TESTS}
+            {#key selectedBlock?.id}
+              <RequestTestsTestFlow
+                tests={selectedBlock?.data?.requestData?.tests ?? {
+                  testCaseMode: "no-code",
+                  preScript: "",
+                  script: "",
+                }}
+                node_id={selectedBlock?.id}
+                onTestsChange={(updatedTests) => {
+                  handleUpdateRequestData("tests", updatedTests);
+                }}
+                tabSplitDirection="horizontal"
+                {onGenerateTestCases}
+                {onGeneratePreScript}
+                {tab}
+              />
+            {/key}
           {/if}
         </div>
       </div>
     </Pane>
 
     <!-- Response Pane -->
-    <Pane minSize={30} size={"30%"} class="position-relative bg-transparent">
+    <Pane minSize={42} size="34" class="position-relative bg-transparent">
       <div class="response-pane-container">
         {#if (!responseLoader && selectedNodeResponse === undefined) || selectedNodeResponse?.response?.status === ""}
           <div class="dumy-response-container">
@@ -406,6 +488,11 @@
                     {updateResponseNavigation}
                     responseHeadersLength={selectedNodeResponse?.response
                       ?.headers?.length || 0}
+                    responsePassedTestResultsLength={selectedNodeResponse?.response?.testResults?.filter(
+                      (test) => test.testStatus === true,
+                    )?.length || 0}
+                    responseTestResultsLength={selectedNodeResponse?.response
+                      ?.testResults?.length || 0}
                   />
                   <ResponseStatus
                     response={selectedNodeResponse?.response}
@@ -435,6 +522,31 @@
                       responseHeader={selectedNodeResponse?.response.headers}
                     />
                   </div>
+                {:else if responseNavigation === ResponseSectionEnum.TESTRESULT}
+                  <ResponseTestResults
+                    responseTestResults={selectedNodeResponse.response
+                      ?.testResults || []}
+                    responseTestMessage={selectedNodeResponse?.response?.testResults
+                      ?.filter(
+                        (t) =>
+                          t.testStatus === false &&
+                          t.testMessage.includes("SyntaxError"),
+                      )
+                      ?.map((t) => ({
+                        initiator: t.initiator,
+                        error: t.testMessage,
+                      })) || []}
+                    tests={selectedBlock?.data?.requestData?.tests}
+                    {onFixTestScript}
+                    tabId={selectedBlock?.data?.tabId}
+                    nodeId={selectedBlock?.id}
+                    isGuestUser={false}
+                    isSharedWorkspace={false}
+                    {userRole}
+                    onTestsChange={(updatedTests) => {
+                      handleUpdateRequestData("tests", updatedTests);
+                    }}
+                  />
                 {/if}
               </div>
             {/if}

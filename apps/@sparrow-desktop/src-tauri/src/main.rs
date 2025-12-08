@@ -1292,6 +1292,18 @@ async fn send_graphql_request(
 }
 
 // Driver Function
+struct InitialDeepLink {
+    url: Option<String>,
+}
+
+#[tauri::command]
+async fn get_initial_deep_link(
+    state: tauri::State<'_, Arc<Mutex<InitialDeepLink>>>,
+) -> Result<Option<String>, String> {
+    let deep_link = state.lock().await;
+    Ok(deep_link.url.clone())
+}
+
 fn main() {
     // Initiate Tauri Runtime
     tauri::Builder::default()
@@ -1321,11 +1333,11 @@ fn main() {
             // Emit general single-instance payload
             let _ = app
                 .emit(
-                    "single-instance",
-                    SingleInstancePayload {
-                        args: argv.clone(),
+                "single-instance",
+                SingleInstancePayload {
+                    args: argv.clone(),
                         cwd: _cwd,
-                    },
+                },
                 )
                 .unwrap();
 
@@ -1354,7 +1366,16 @@ fn main() {
                 connections: Mutex::new(std::collections::HashMap::new()),
             }));
 
-            // Hide Titlebar for MacOS and close the additional window
+            // Store initial deep link URL
+            let args: Vec<String> = std::env::args().collect();
+            let initial_url = if args.len() > 1 && args[1].starts_with("sparrow://") {
+                Some(args[1].clone())
+            } else {
+                None
+            };
+            
+            app.manage(Arc::new(Mutex::new(InitialDeepLink { url: initial_url })));
+
             let platform_name = platform();
             if platform_name == "macos" || platform_name == "linux" {
                 // Fetch tauri windows
@@ -1393,6 +1414,7 @@ fn main() {
             send_graphql_request,
             show_toolbar,
             hide_toolbar,
+            get_initial_deep_link, // Add this new command
         ])
         .on_page_load(|wry_window, _payload| {
             if let Ok(url) = wry_window.url() {

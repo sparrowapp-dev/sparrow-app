@@ -233,7 +233,10 @@
   ) => Promise<any>;
 
   export let onOpenEnvironment;
-
+  export let onGeneratePreScript;
+  export let onGenerateTestCases;
+  export let onFixTestScript;
+  const loading = writable<boolean>(false);
   let planContent: any;
   let planContentNonActive: any;
   let selectedAuthHeader: any;
@@ -468,6 +471,19 @@
           }
         }
 
+        if (!found && scheduledDays.length > 0) {
+          // Find the earliest scheduled day in the week
+          const sortedDays = [...scheduledDays].sort((a, b) => a - b);
+          const currentDay = now.getDay();
+
+          // Calculate days until the first scheduled day of next week
+          daysToAdd = 7 - currentDay + sortedDays[0];
+          if (daysToAdd > 7) daysToAdd -= 7;
+          if (daysToAdd === 0) daysToAdd = 7; // Same day next week
+
+          found = true;
+        }
+
         if (found) {
           nextRunDate.setDate(nextRunDate.getDate() + daysToAdd);
         }
@@ -674,11 +690,10 @@
 
   $: {
     const mappedSchedules = testflowScheduleStore.map(mapScheduleData);
-
-    if (searchQuery.trim() === "") {
+    const query = searchQuery.trim().toLowerCase();
+    if (query === "") {
       filteredSchedules = [...mappedSchedules];
     } else {
-      const query = searchQuery.toLowerCase();
       filteredSchedules = mappedSchedules.filter(
         (schedule) =>
           schedule.name.toLowerCase().includes(query) ||
@@ -686,6 +701,12 @@
           schedule.description.toLowerCase().includes(query),
       );
     }
+    // Sort by updatedAt (newest first)
+    filteredSchedules.sort((a, b) => {
+      const timeA = new Date(a.originalData.updatedAt).getTime();
+      const timeB = new Date(b.originalData.updatedAt).getTime();
+      return timeB - timeA; // Descending → latest at top
+    });
   }
 
   $: {
@@ -760,6 +781,7 @@
       file: [],
     };
     response.auth = tempTab?.auth;
+    response.tests = tempTab?.tests;
     response.state = tempTab?.state;
     return response;
   };
@@ -883,6 +905,11 @@
       response.method = data?.request?.method;
     } else {
       response.method = tempTab?.method;
+    }
+    if (data?.request?.tests) {
+      response.tests = data?.request?.tests;
+    } else {
+      response.tests = tempTab?.tests;
     }
     // Use the provided requestName parameter first, then fallback to data.name, then "Untitled"
     if (requestName) {
@@ -1065,18 +1092,29 @@
   };
 
   let isSaveModalOpen = false;
+  let isTestsSaved = false; // Track if tests were just saved
 
-  const handleOpenSaveModal = () => {
+  const handleOpenSaveModal = async () => {
     if (testflowScheduleStore.some((schedule) => schedule.isActive)) {
       isSaveModalOpen = true;
     } else {
-      onSaveTestflow();
+      await onSaveTestflow();
+      // Trigger saved state to reset unsaved changes in assertions
+      isTestsSaved = true;
+      setTimeout(() => {
+        isTestsSaved = false;
+      }, 100);
     }
   };
-  const handleSaveConfirm = () => {
+  const handleSaveConfirm = async () => {
     handleEventClickTestflowSaveSchedule();
-    onSaveTestflow(); // Your original save function
+    await onSaveTestflow(); // Your original save function
     isSaveModalOpen = false;
+    // Trigger saved state to reset unsaved changes in assertions
+    isTestsSaved = true;
+    setTimeout(() => {
+      isTestsSaved = false;
+    }, 100);
   };
   const handleUpdateRequestData = async (field: string, value: any) => {
     if (!selectedBlock) {
@@ -2455,7 +2493,13 @@
 
       const formatType = fileType.toUpperCase();
       const wrappedData = { dataSet: jsonData };
-
+      if (!Array.isArray(jsonData)) {
+        notifications.error(
+          "Import failed. Please ensure the file contains data in a valid format.",
+        );
+        resetImportState();
+        return;
+      }
       // Send wrapped data to backend
       const response = await importTestflowDataSet(
         wrappedData,
@@ -2684,7 +2728,7 @@
       {/if}
       <div class="run-btn" style="margin-right: 5px; position:relative;">
         <div class="d-flex" style="gap: 8px;">
-          {#if isRunButtonEnabled}
+          {#if isRunButtonEnabled || isGuestUser}
             {#if testflowStore?.isTestFlowRunning}
               <Button
                 type="secondary"
@@ -2700,6 +2744,7 @@
                   size="medium"
                   startIcon={PlayFilled}
                   title={"Run Now"}
+                  disable={isGuestUser && !isRunButtonEnabled}
                   onClick={async () => {
                     if (
                       $tab?.property?.testflow?.state?.testflowNavigator ===
@@ -2716,16 +2761,15 @@
                       onUpdateTestflowState({
                         testflowNavigator: TestflowNavigatorEnum.TESTFLOW,
                       });
-                    } else {
-                      unselectNodes();
-                      await onClickRun();
-                      const startingNode = handleSelectFirstNode();
-                      if (startingNode) {
-                        selectNode(startingNode);
-                      }
-                      MixpanelEvent(Events.Run_TestFlows);
-                      handleEventOnRunBlocks();
                     }
+                    unselectNodes();
+                    await onClickRun();
+                    const startingNode = handleSelectFirstNode();
+                    if (startingNode) {
+                      selectNode(startingNode);
+                    }
+                    MixpanelEvent(Events.Run_TestFlows);
+                    handleEventOnRunBlocks();
                   }}
                 />
               </div>
@@ -2764,6 +2808,7 @@
                 onClick={() => {
                   runButtonMenu = !runButtonMenu;
                 }}
+                disable={isGuestUser && !isRunButtonEnabled}
               />
             </Dropdown>
             <div class="d-flex" style="gap:8px; align-items:center;">
@@ -3057,6 +3102,7 @@
                 onClick={async () => {
                   startLoading("schedule-refresh-" + $tab?.id);
                   await onFetchTestflow();
+                  notifications.success("Schedules fetched successfully.");
                   stopLoading("schedule-refresh-" + $tab?.id);
                 }}
               />
@@ -3153,6 +3199,7 @@
                 isGuestUser}
               onClick={async () => {
                 startLoading("testdata-refresh-" + $tab?.id);
+                notifications.success("TestData fetched successfully.");
                 await onFetchTestflowDataSets();
                 stopLoading("testdata-refresh-" + $tab?.id);
               }}
@@ -3211,9 +3258,13 @@
                   <DocumentRegular size="32px" color="#6b6b6b" />
                 </div>
                 <div class="empty-message">
-                  No test data imported yet. Use the <span
-                    style="font-weight: 700;">Import</span
-                  > button to upload JSON or CSV files for testing.
+                  {#if searchQuery.trim() === ""}
+                    No test data imported yet. Use the <span
+                      style="font-weight: 700;">Import</span
+                    > button to upload JSON or CSV files for testing.
+                  {:else}
+                    No result found
+                  {/if}
                 </div>
               </div>
             {/if}
@@ -3255,6 +3306,12 @@
           {selectedAuthHeader}
           bind:selectAuthHeader
           {handleOpenCurrentDynamicExpression}
+          {onGeneratePreScript}
+          {onGenerateTestCases}
+          {onFixTestScript}
+          {tab}
+          isSaved={isTestsSaved}
+          {isGuestUser}
         />
       </div>
     {:else if $isTestFlowTourGuideOpen && $currentStep === 7}
@@ -3263,6 +3320,7 @@
         id="testflow-bottom-panel"
       >
         <TestFlowBottomPanel
+          isSaved={isTestsSaved}
           selectedBlock={{
             data: {
               name: "Sample API",
@@ -3810,7 +3868,7 @@
     width: 100%;
   }
   .empty-icon {
-    margin-bottom: 18px;
+    margin-bottom: 8px;
     opacity: 0.7;
   }
   .empty-message {

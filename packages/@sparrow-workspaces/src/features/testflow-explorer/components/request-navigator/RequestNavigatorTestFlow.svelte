@@ -55,6 +55,16 @@
         id: RequestSectionEnum.AUTHORIZATION,
         count: 0,
       },
+      {
+        name: "Scripts",
+        id: RequestSectionEnum.TESTS,
+        count: 0,
+      },
+      {
+        name: "Assertions",
+        id: RequestSectionEnum.ASSERTIONS,
+        count: 0,
+      },
     ];
   };
 

@@ -19,14 +19,42 @@
 
   let showCalendar = false;
   let currentMonth = new Date();
-  let selectedDay: number = currentMonth.getDate();
-  let selectedMonth: number = currentMonth.getMonth();
-  let selectedYear: number = currentMonth.getFullYear();
+  let selectedDay: number | null = null;
+  let selectedMonth: number | null = null;
+  let selectedYear: number | null = null;
   let calendarRef: HTMLDivElement;
   let inputRef: HTMLInputElement;
   let showAbove = false;
   let isInvalid = false;
   let internalValue = value; // Track internal value for validation
+  let isClearing = false; // Add flag to track clearing state
+
+  // Track the original/previous date for clear functionality
+  let originalValue = value;
+  let hasChanged = false;
+
+  // Initialize selected date state when component mounts or value changes
+  function initializeSelectedDate(dateValue: string) {
+    const date = parseDate(dateValue);
+    if (date) {
+      selectedDay = date.getDate();
+      selectedMonth = date.getMonth();
+      selectedYear = date.getFullYear();
+      currentMonth = new Date(selectedYear, selectedMonth, 1);
+    } else {
+      selectedDay = null;
+      selectedMonth = null;
+      selectedYear = null;
+    }
+  }
+
+  // Initialize on mount if value exists
+  onMount(() => {
+    if (value) {
+      initializeSelectedDate(value);
+      originalValue = value;
+    }
+  });
 
   // Process min/max dates
   let minDateObj: Date | null = null;
@@ -137,11 +165,19 @@
     const target = event.target as HTMLInputElement;
     internalValue = target.value;
 
-    // If empty, clear the date
+    // If empty, clear the date and selected state
     if (!internalValue.trim()) {
       isInvalid = false;
       value = "";
+      selectedDay = null;
+      selectedMonth = null;
+      selectedYear = null;
       return;
+    }
+
+    // Store original value if this is the first change
+    if (!hasChanged && value) {
+      originalValue = value;
     }
 
     // Try to parse the date
@@ -160,6 +196,7 @@
       selectedMonth = date.getMonth();
       selectedYear = date.getFullYear();
       currentMonth = new Date(selectedYear, selectedMonth, 1);
+      hasChanged = true;
 
       // Dispatch change event
       dispatch("change", value);
@@ -231,18 +268,26 @@
     }
   }
 
-  // Watch for external value changes
+  // Watch for external value changes and track original value
   $: if (value !== internalValue && !isInvalid) {
     internalValue = value;
 
-    // Parse value to update selected date in calendar
-    const date = parseDate(value);
-    if (date) {
-      selectedDay = date.getDate();
-      selectedMonth = date.getMonth();
-      selectedYear = date.getFullYear();
-      currentMonth = new Date(selectedYear, selectedMonth, 1);
+    // If this is the first time setting a value (from props), store as original
+    if (!hasChanged && value && !originalValue) {
+      originalValue = value;
     }
+
+    // Initialize selected date state for calendar
+    initializeSelectedDate(value);
+  }
+
+  // Also watch for direct value prop changes (when parent updates the value)
+  $: if (
+    value &&
+    value === internalValue &&
+    (selectedDay === null || selectedMonth === null || selectedYear === null)
+  ) {
+    initializeSelectedDate(value);
   }
 
   function getDaysInMonth(date: Date) {
@@ -300,6 +345,11 @@
       return; // Don't select disabled or non-current month days
     }
 
+    // Store original value if this is the first change
+    if (!hasChanged && value) {
+      originalValue = value;
+    }
+
     selectedDay = dayObj.day;
     selectedMonth = currentMonth.getMonth();
     selectedYear = currentMonth.getFullYear();
@@ -307,6 +357,7 @@
     internalValue = value;
     isInvalid = false;
     showCalendar = false;
+    hasChanged = true;
 
     // Dispatch change event when date is selected
     dispatch("change", value);
@@ -327,6 +378,11 @@
       return;
     }
 
+    // Store original value if this is the first change
+    if (!hasChanged && value) {
+      originalValue = value;
+    }
+
     currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     selectedDay = today.getDate();
     selectedMonth = today.getMonth();
@@ -335,17 +391,51 @@
     internalValue = value;
     isInvalid = false;
     showCalendar = false;
+    hasChanged = true;
     // Dispatch change event when Today is clicked
     dispatch("change", value);
   }
 
   function handleClear() {
-    value = "";
-    internalValue = "";
-    isInvalid = false;
-    showCalendar = false;
-    // Dispatch change event when Clear is clicked
-    dispatch("change", "");
+    // If user has made changes, revert to the original value
+    if (hasChanged && originalValue) {
+      const originalDate = parseDate(originalValue);
+      if (originalDate) {
+        selectedDay = originalDate.getDate();
+        selectedMonth = originalDate.getMonth();
+        selectedYear = originalDate.getFullYear();
+        value = originalValue;
+        internalValue = originalValue;
+        currentMonth = new Date(selectedYear, selectedMonth, 1);
+        hasChanged = false; // Reset the change flag
+
+        isInvalid = false;
+        showCalendar = false;
+
+        // Dispatch change event with the reverted value
+        dispatch("change", originalValue);
+      }
+    } else if (value && !hasChanged) {
+      // If there's a date selected but no changes made, keep the current date (do nothing)
+      showCalendar = false;
+      // Don't dispatch change event as we're not changing the value
+      return;
+    } else {
+      // No original value and no current value, clear completely
+      value = "";
+      internalValue = "";
+      selectedDay = null;
+      selectedMonth = null;
+      selectedYear = null;
+      originalValue = "";
+      hasChanged = false;
+
+      isInvalid = false;
+      showCalendar = false;
+
+      // Dispatch change event with empty value
+      dispatch("change", "");
+    }
   }
 
   const toggleCalendar = () => {
