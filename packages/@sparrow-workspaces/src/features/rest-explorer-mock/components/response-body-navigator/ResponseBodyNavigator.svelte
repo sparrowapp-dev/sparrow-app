@@ -41,7 +41,6 @@
   export let responseId;
 
   let fileExtension: string;
-  let formatedBody: string;
   let fileNameWithExtension: string;
   // travers array of object and get content-type value
   const contentType: string | undefined = response.find(
@@ -94,8 +93,6 @@
     }
     // build complete file name with extension will be used for export in desttop-app and web-app;
     fileNameWithExtension = `api_response_${response?.status || ""}_${response?.time || "0"}ms_${response?.size || "0"}kb.${fileExtension}`;
-
-    formatedBody = formatCode(response?.body); //pre formate body for exporting
   }
   /**
    * @description - remove indentation from the string
@@ -124,7 +121,7 @@
     });
     // Check if a path was selected
     if (path) {
-      const contents = formatedBody;
+      const contents = formatCode(response?.body);
       await writeTextFile(path, contents, {
         baseDir: BaseDirectory.AppConfig,
       });
@@ -291,7 +288,7 @@
               icon={ArrowDownloadRegular}
               onClick={() =>
                 handleDownloadResponse(
-                  formatedBody,
+                  formatCode(response?.body),
                   contentType,
                   fileNameWithExtension,
                 )}
