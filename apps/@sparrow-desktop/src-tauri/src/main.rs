@@ -60,6 +60,7 @@ use request_handler::http_requests::make_without_body_request;
 use request_handler::json_handler_v2::make_json_request_v2;
 use request_handler::urlencoded_handler_v2::make_www_form_urlencoded_request_v2;
 use reqwest::Client;
+use tokio::sync::oneshot;
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -213,6 +214,10 @@ static CLIENT: Lazy<Client> = Lazy::new(|| {
             std::process::exit(1);
         })
 });
+
+// Global abort channels keyed by request id
+static ABORTS: Lazy<tokio::sync::Mutex<HashMap<String, oneshot::Sender<()>>>> =
+    Lazy::new(|| tokio::sync::Mutex::new(HashMap::new()));
 
 // Commands
 #[tauri::command]
@@ -378,24 +383,55 @@ async fn make_http_request_v2(
     headers: &str,
     body: &str,
     request: &str,
+    request_id: Option<String>,
 ) -> Result<String, String> {
-    let result = make_request_v2(url, method, headers, body, request).await;
+    // BFF log: request entry
+    println!(
+        "[BFF] make_http_request_v2 -> method={:?} url={} request={:?} reqId={}",
+        method,
+        url,
+        request,
+        request_id.clone().unwrap_or_else(|| "<none>".to_string())
+    );
 
-    // Convert the result to a string for response formatting
-    let result_value = match result {
-        Ok(value) => value.to_string(), // Convert successful result to string
-        Err(err) => err.to_string(),    // Convert error to string
+    // Prepare abort channel if request_id provided
+    let (abort_tx, abort_rx) = oneshot::channel::<()>();
+    if let Some(ref rid) = request_id {
+        let mut map = ABORTS.lock().await;
+        // Insert only if not already present
+        map.entry(rid.clone()).or_insert(abort_tx);
+    }
+
+    // Measure server-side timing around full request processing
+    let start = std::time::Instant::now();
+
+    let fut = make_request_v2(url, method, headers, body, request);
+    let result = tokio::select! {
+        res = fut => res,
+        _ = abort_rx => {
+            Err(std::io::Error::new(std::io::ErrorKind::Interrupted, "Aborted"))
+        }
     };
 
-    // Create a JSON response with the result and tab ID
-    let response = json!({
-        "body": result_value,
-    });
+    let elapsed_ms = start.elapsed().as_millis() as u64;
 
-    return match serde_json::to_string(&response) {
-        Ok(value) => Ok(value.to_string()),
+    // Cleanup abort entry
+    if let Some(rid) = request_id.clone() {
+        let mut map = ABORTS.lock().await;
+        map.remove(&rid);
+    }
+
+    match result {
+        Ok(structured) => {
+            // structured already includes headers/status/body; enrich with timeMs
+            let mut value: serde_json::Value = serde_json::from_str(&structured)
+                .map_err(|e| e.to_string())?;
+            value["timeMs"] = serde_json::Value::from(elapsed_ms);
+            let serialized = serde_json::to_string(&value).map_err(|e| e.to_string())?;
+            Ok(serialized)
+        }
         Err(err) => Err(err.to_string()),
-    };
+    }
 }
 
 /// Makes an asynchronous HTTP request with various options.
@@ -529,14 +565,39 @@ async fn make_request_v2(
         .map(|(name, value)| (name.to_string(), value.to_str().unwrap_or("")))
         .collect();
 
-    // Combining all the parameters
+    // Combining all the parameters (structured JSON; timing added by caller)
     let combined_json = json!({
         "headers": response_headers_json,
         "status": response_status.to_string(),
         "body": response_body,
     });
 
+    // BFF log: response summary
+    println!(
+        "[BFF] HTTP response -> status={} content_type='{}' body_len={}",
+        response_status.as_u16(),
+        content_type,
+        combined_json
+            .get("body")
+            .and_then(|v| v.as_str())
+            .map(|s| s.len())
+            .unwrap_or(0)
+    );
+
     Ok(combined_json.to_string())
+}
+
+#[tauri::command]
+async fn abort_http_request(request_id: String) -> Result<(), String> {
+    let mut map = ABORTS.lock().await;
+    if let Some(tx) = map.remove(&request_id) {
+        let _ = tx.send(()); // signal abort; ignore if receiver gone
+        println!("[BFF] Abort signaled for reqId={}", request_id);
+        Ok(())
+    } else {
+        // no active request found
+        Err(format!("No active request for reqId={}", request_id))
+    }
 }
 
 async fn make_request(

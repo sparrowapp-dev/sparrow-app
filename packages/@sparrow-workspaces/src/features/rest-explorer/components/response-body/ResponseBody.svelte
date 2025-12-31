@@ -54,6 +54,23 @@
       );
     }
   }
+
+  // UI log: when response and formatter/language change
+  $: if (response && apiState) {
+    const ct =
+      response?.headers?.["content-type"] ||
+      response?.headers?.["Content-Type"] ||
+      "";
+    const bodyLen =
+      typeof response?.body === "string" ? response.body.length : 0;
+    console.log("[UI] Render response", {
+      formatter: apiState.bodyFormatter,
+      language: apiState.bodyLanguage,
+      status: response?.status,
+      contentType: ct,
+      bodyLen,
+    });
+  }
 </script>
 
 <div

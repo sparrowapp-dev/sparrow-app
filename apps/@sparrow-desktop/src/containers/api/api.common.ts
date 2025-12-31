@@ -19,6 +19,11 @@ import { notifications } from "@sparrow/library/ui";
 import { appInsights } from "@app/logger";
 import { socketIoDataStore } from "@sparrow/workspaces/features/socketio-explorer/store";
 import { SocketIORequestDefaultAliasBaseEnum } from "@sparrow/common/types/workspace/socket-io-request-base";
+import {
+  SocketIORequestMessageTransmitterTabEnum,
+  SocketIORequestStatusTabEnum,
+} from "@sparrow/common/types/workspace/socket-io-request-tab";
+import { WorkspaceUserAgentBaseEnum } from "@sparrow/common/types/workspace/workspace-base";
 import { TabRepository } from "@app/repositories/tab.repository";
 import { version } from "../../../src-tauri/tauri.conf.json";
 
@@ -127,9 +132,9 @@ const makeRequest = async (
         },
       });
       if (includeAxiosData) {
-        return success(response, "");
+        return success(response);
       } else {
-        return success(response.data, "");
+        return success(response.data);
       }
     } else {
       appInsights?.trackDependencyData({
@@ -147,7 +152,7 @@ const makeRequest = async (
       });
       return error(response.data.message);
     }
-  } catch (e) {
+  } catch (e: any) {
     const endTime = performance.now(); // End timing
     const duration = endTime - startTime; // Calculate duration in milliseconds
     appInsights?.trackDependencyData({
@@ -164,31 +169,31 @@ const makeRequest = async (
       },
     });
     if (
-      e.response?.data?.statusCode === 401 &&
-      e.response?.data?.message === ErrorMessages.ExpiredToken
+      e?.response?.data?.statusCode === 401 &&
+      e?.response?.data?.message === ErrorMessages.ExpiredToken
     ) {
       return await regenerateAuthToken(method, url, requestData);
     } else if (
-      e.response?.data?.statusCode === 401 &&
-      e.response.data.message === ErrorMessages.JWTFailed
+      e?.response?.data?.statusCode === 401 &&
+      e?.response?.data?.message === ErrorMessages.JWTFailed
     ) {
       const _viewModel = new DashboardViewModel();
       await _viewModel.clientLogout();
       return error("Unauthorized");
-    } else if (e.response?.data?.statusCode === 401) {
+    } else if (e?.response?.data?.statusCode === 401) {
       return error("Unauthorized");
     }
-    if (e.code === "ERR_NETWORK") {
-      return error(e.message);
-    } else if (e.response?.data) {
-      return error(e.response?.data?.message, e.response?.data);
+    if (e?.code === "ERR_NETWORK") {
+      return error(String(e?.message));
+    } else if (e?.response?.data) {
+      return error(e?.response?.data?.message, e?.response?.data);
     }
-    return error(e);
+    return error(String(e));
   } finally {
   }
 };
 
-function formatTime(date) {
+function formatTime(date: Date) {
   let hours = date.getHours();
   const minutes = date.getMinutes();
   const seconds = date.getSeconds();
@@ -210,7 +215,7 @@ function formatTime(date) {
  */
 const sendMessage = async (tab_id: string, message: string) => {
   await invoke("send_websocket_message", { tabid: tab_id, message: message })
-    .then(async (data: string) => {
+    .then(async (data) => {
       try {
         webSocketDataStore.update((webSocketDataMap) => {
           const wsData = webSocketDataMap.get(tab_id);
@@ -230,7 +235,7 @@ const sendMessage = async (tab_id: string, message: string) => {
         return error("error");
       }
     })
-    .catch((e) => {
+    .catch((e: any) => {
       console.error(e);
       return error("error");
     });
@@ -262,7 +267,7 @@ const sendSocketIoMessage = async (
     event: _eventName,
     message: message,
   })
-    .then(async (data: string) => {
+    .then(async (data) => {
       try {
         // Logic to handle response
         socketIoDataStore.update((webSocketDataMap) => {
@@ -274,7 +279,7 @@ const sendSocketIoMessage = async (
           if (wsData) {
             wsData.messages.unshift({
               data: r,
-              transmitter: "sender",
+              transmitter: SocketIORequestMessageTransmitterTabEnum.SENDER,
               timestamp: formatTime(new Date()),
               uuid: uuidv4(),
             });
@@ -282,7 +287,7 @@ const sendSocketIoMessage = async (
           }
           return webSocketDataMap;
         });
-      } catch (e) {
+      } catch (e: any) {
         console.error(e);
         notifications.error(
           `Failed to send message over ${SocketIORequestDefaultAliasBaseEnum.NAME} connection. Please try again.`,
@@ -290,7 +295,7 @@ const sendSocketIoMessage = async (
         return removeSocketDataFromMap(tab_id, url);
       }
     })
-    .catch((e) => {
+    .catch((e: any) => {
       console.error(e);
       notifications.error(
         `Failed to send message over ${SocketIORequestDefaultAliasBaseEnum.NAME} connection. Please try again.`,
@@ -307,14 +312,14 @@ const sendSocketIoMessage = async (
  */
 const disconnectWebSocket = async (tab_id: string) => {
   let url = "";
-  let abortController;
+  let abortController: AbortController | undefined;
   let isRequestCancelled = false;
   webSocketDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(tab_id);
     if (wsData) {
       url = wsData.url;
-      if (wsData?.status === "connecting") {
-        wsData.status = "disconnected";
+      if (wsData?.status === SocketIORequestStatusTabEnum.CONNECTING) {
+        wsData.status = SocketIORequestStatusTabEnum.DISCONNECTED;
         abortController = wsData?.abortController;
         isRequestCancelled = true;
         wsData.messages.unshift({
@@ -339,7 +344,7 @@ const disconnectWebSocket = async (tab_id: string) => {
     return;
   }
   await invoke("disconnect_websocket", { tabid: tab_id })
-    .then(async (data: string) => {
+    .then(async (data) => {
       try {
         // Logic to handle response
         let listener;
@@ -363,7 +368,7 @@ const disconnectWebSocket = async (tab_id: string) => {
         });
 
         notifications.success("WebSocket disconnected successfully.");
-      } catch (e) {
+      } catch (e: any) {
         console.error(e);
         notifications.error(
           "Failed to disconnect WebSocket. Please try again.",
@@ -371,20 +376,20 @@ const disconnectWebSocket = async (tab_id: string) => {
         return error("error");
       }
     })
-    .catch((e) => {
+    .catch((e: any) => {
       console.error(e);
       notifications.error("Failed to disconnect WebSocket. Please try again.");
       return error("error");
     });
 };
 
-const addSocketDataToMap = (tabId, url) => {
+const addSocketDataToMap = (tabId: string, url: string) => {
   try {
     updateSocketDataStore(
       tabId,
       `Connected to ${url}`,
-      "connecter",
-      "connected",
+      SocketIORequestMessageTransmitterTabEnum.CONNECTER,
+      SocketIORequestStatusTabEnum.CONNECTED,
     );
     notifications.success(
       `${SocketIORequestDefaultAliasBaseEnum.NAME} connected successfully.`,
@@ -394,7 +399,11 @@ const addSocketDataToMap = (tabId, url) => {
   }
 };
 
-const removeSocketDataFromMap = (tab_id, url, err = "") => {
+const removeSocketDataFromMap = (
+  tab_id: string,
+  url: string,
+  err: string = "",
+) => {
   socketIoDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(tab_id);
 
@@ -412,8 +421,8 @@ const removeSocketDataFromMap = (tab_id, url, err = "") => {
       updateSocketDataStore(
         tab_id,
         errorMesssage,
-        "disconnector",
-        "disconnected",
+        SocketIORequestMessageTransmitterTabEnum.DISCONNECTOR,
+        SocketIORequestStatusTabEnum.DISCONNECTED,
       );
 
       // notifications.error(
@@ -423,8 +432,8 @@ const removeSocketDataFromMap = (tab_id, url, err = "") => {
       updateSocketDataStore(
         tab_id,
         `Disconnected from ${url}`,
-        "disconnector",
-        "disconnected",
+        SocketIORequestMessageTransmitterTabEnum.DISCONNECTOR,
+        SocketIORequestStatusTabEnum.DISCONNECTED,
       );
 
       connectListener?.();
@@ -437,7 +446,7 @@ const removeSocketDataFromMap = (tab_id, url, err = "") => {
 };
 
 // Function to update process socket io messages
-async function processMessageEvent(tabId, event) {
+async function processMessageEvent(tabId: string, event: any) {
   // Simulate delay
   await new Promise((resolve) => setTimeout(resolve, 10));
 
@@ -449,9 +458,14 @@ async function processMessageEvent(tabId, event) {
   const message = socketIOresponse.message;
 
   // Check if event should be included
-  const isIncludeInResponse = tabDataJSON?.property.socketio?.events.some(
-    (tabEvent) => tabEvent.listen && tabEvent.event === eventName,
-  );
+  const eventsList = tabDataJSON?.property?.socketio?.events as
+    | any[]
+    | undefined;
+  const isIncludeInResponse = Array.isArray(eventsList)
+    ? eventsList.some(
+        (tabEvent: any) => tabEvent.listen && tabEvent.event === eventName,
+      )
+    : false;
 
   // Update WebSocket data store if conditions are met
   if (socketIOresponse && isIncludeInResponse && message) {
@@ -463,13 +477,19 @@ async function processMessageEvent(tabId, event) {
           ? message[0]
           : JSON.stringify(message[0]),
       ]),
-      "receiver",
+      SocketIORequestMessageTransmitterTabEnum.RECEIVER,
+      "",
     );
   }
 }
 
-// Function to update WebSocket data store
-function updateSocketDataStore(tabId, data, transmitter, status = "") {
+// Function to update Socket.IO data store
+function updateSocketDataStore(
+  tabId: string,
+  data: string,
+  transmitter: SocketIORequestMessageTransmitterTabEnum,
+  status: SocketIORequestStatusTabEnum | "" = "",
+) {
   socketIoDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(tabId);
     if (wsData) {
@@ -479,7 +499,11 @@ function updateSocketDataStore(tabId, data, transmitter, status = "") {
         timestamp: formatTime(new Date()),
         uuid: uuidv4(),
       });
-      if (status && status.length) wsData.status = status;
+      if (status && typeof status === "string" && status.length) {
+        wsData.status = status as SocketIORequestStatusTabEnum;
+      } else if (status && typeof status !== "string") {
+        wsData.status = status as SocketIORequestStatusTabEnum;
+      }
       webSocketDataMap.set(tabId, wsData);
     }
     return webSocketDataMap;
@@ -487,10 +511,10 @@ function updateSocketDataStore(tabId, data, transmitter, status = "") {
 }
 
 const storeListenerstoMap = (
-  connectListener,
-  disconnectListener,
-  messageListener,
-  tabId,
+  connectListener: any,
+  disconnectListener: any,
+  messageListener: any,
+  tabId: string,
 ) => {
   socketIoDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(tabId);
@@ -511,25 +535,25 @@ const storeListenerstoMap = (
  */
 const disconnectSocketIo = async (tab_id: string) => {
   let url = "";
-  let abortController;
+  let abortController: AbortController | undefined;
   let isRequestCancelled = false;
   socketIoDataStore.update((webSocketDataMap) => {
     const wsData = webSocketDataMap.get(tab_id);
 
     if (wsData) {
       url = wsData.url;
-      if (wsData?.status === "connecting") {
-        wsData.status = "disconnected";
+      if (wsData?.status === SocketIORequestStatusTabEnum.CONNECTING) {
+        wsData.status = SocketIORequestStatusTabEnum.DISCONNECTED;
         abortController = wsData?.abortController;
         isRequestCancelled = true;
         updateSocketDataStore(
           tab_id,
           `Connection aborted`,
-          "disconnector",
-          "disconnected",
+          SocketIORequestMessageTransmitterTabEnum.DISCONNECTOR,
+          SocketIORequestStatusTabEnum.DISCONNECTED,
         );
       } else {
-        wsData.status = "disconnecting";
+        wsData.status = SocketIORequestStatusTabEnum.DISCONNECTING;
         isRequestCancelled = false;
       }
       wsData.url = "";
@@ -544,10 +568,12 @@ const disconnectSocketIo = async (tab_id: string) => {
     return;
   }
   await invoke("disconnect_socket_io", { tabid: tab_id })
-    .then(async (data: string) => {
+    .then(async (data) => {
       try {
         // Logic to handle response
-        const response = JSON.parse(data);
+        const response = JSON.parse(
+          typeof data === "string" ? data : String(data),
+        );
 
         if (response.is_successful) {
           notifications.success(
@@ -558,14 +584,14 @@ const disconnectSocketIo = async (tab_id: string) => {
             `Failed to disconnect ${SocketIORequestDefaultAliasBaseEnum.NAME}. ${response.message}`,
           );
         }
-      } catch (e) {
+      } catch (e: any) {
         console.error(e);
         notifications.error(
           `Failed to disconnect ${SocketIORequestDefaultAliasBaseEnum.NAME}. Please try again.`,
         );
       }
     })
-    .catch((e) => {
+    .catch((e: any) => {
       console.error(e);
       notifications.error(
         `Failed to disconnect ${SocketIORequestDefaultAliasBaseEnum.NAME}. Please try again.`,
@@ -629,6 +655,7 @@ const connectWebSocket = async (
       filter: "All Messages",
       url,
       listener: null,
+      agent: WorkspaceUserAgentBaseEnum.BROWSER_AGENT,
     });
     return webSocketDataMap;
   });
@@ -697,7 +724,7 @@ const connectWebSocket = async (
       notifications.success("WebSocket connected successfully.");
 
       // Setup message listener
-      const listener = await listen(`ws_message_${tabId}`, (event) => {
+      const listener = await listen(`ws_message_${tabId}`, (event: any) => {
         if (event?.payload?.type === "disconnect") {
           handleDisconnect();
         } else {
@@ -709,7 +736,7 @@ const connectWebSocket = async (
       updateStore((wsData) => {
         wsData.listener = listener;
       });
-    } catch (e) {
+    } catch (e: any) {
       const errorMessage = typeof e === "string" ? e : String(e);
       // Retry with wss:// if we got a 307 temp redirect or 301 perm redirect
       if (
@@ -736,7 +763,7 @@ const connectWebSocket = async (
   // Execute connection
   try {
     await attemptConnection();
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to establish WebSocket connection:", error);
     // Error already logged in store, just propagate
     throw error;
@@ -764,7 +791,7 @@ const connectSocketIo = async (
     webSocketDataMap.set(tabId, {
       abortController: abortController,
       messages: [],
-      status: "connecting",
+      status: SocketIORequestStatusTabEnum.CONNECTING,
       search: "",
       contentType: RequestDataTypeEnum.TEXT,
       body: "",
@@ -773,6 +800,7 @@ const connectSocketIo = async (
       connectListener: null,
       disconnectListener: null,
       messageListener: null,
+      agent: WorkspaceUserAgentBaseEnum.BROWSER_AGENT,
     });
 
     return webSocketDataMap;
@@ -815,7 +843,7 @@ const connectSocketIo = async (
         // Disconnect listener
         const disconnectListener = await listen(
           `socket-disconnect-${tabId}`,
-          async (data) => {
+          async (data: any) => {
             if (signal?.aborted) {
               return;
             }
@@ -827,7 +855,7 @@ const connectSocketIo = async (
         // Handle message listener
         const messageListener = await listen(
           `socket-message-${tabId}`,
-          (event) => {
+          (event: any) => {
             if (signal?.aborted) {
               return;
             }
@@ -842,7 +870,7 @@ const connectSocketIo = async (
           messageListener,
           tabId,
         );
-      } catch (e) {
+      } catch (e: any) {
         console.error(e);
         notifications.error(
           `Failed to fetch ${SocketIORequestDefaultAliasBaseEnum.NAME} response. Please try again.`,
@@ -850,7 +878,7 @@ const connectSocketIo = async (
         return error("error");
       }
     })
-    .catch((e) => {
+    .catch((e: any) => {
       console.error("Invalid host name", e);
       removeSocketDataFromMap(tabId, url, "Invalid host name");
       return error("error");
@@ -897,20 +925,35 @@ const makeHttpRequestV2 = async (
   signal?: AbortSignal,
 ) => {
   console.table({ url, method, headers, body, request });
+  const requestId = uuidv4();
   const startTime = performance.now();
   try {
-    const data = await Promise.race([
-      invoke("make_http_request_v2", {
-        url,
-        method,
-        headers,
-        body,
-        request,
-      }),
-      waitForAbort(signal),
-    ]);
+    const data = signal
+      ? await Promise.race([
+          invoke("make_http_request_v2", {
+            url,
+            method,
+            headers,
+            body,
+            request,
+            requestId,
+          }),
+          waitForAbort(signal),
+        ])
+      : await invoke("make_http_request_v2", {
+          url,
+          method,
+          headers,
+          body,
+          request,
+          requestId,
+        });
     // Handle the response and update UI accordingly
     if (signal?.aborted) {
+      // Propagate abort to BFF
+      try {
+        await invoke("abort_http_request", { requestId });
+      } catch (e) {}
       throw new Error(); // Ignore response if request was cancelled
     }
 
@@ -918,28 +961,76 @@ const makeHttpRequestV2 = async (
     const duration = endTime - startTime;
 
     try {
-      const responseBody = JSON.parse(data);
-      const apiResponse: Response = JSON.parse(responseBody.body) as Response;
+      const dataStr = typeof data === "string" ? data : String(data);
+      const parsed = JSON.parse(dataStr);
+      let apiResponse: any;
+      // Prefer structured JSON from BFF
+      if (
+        parsed &&
+        parsed.headers &&
+        parsed.status !== undefined &&
+        parsed.body !== undefined
+      ) {
+        apiResponse = {
+          body: parsed.body,
+          headers: parsed.headers,
+          status: parsed.status,
+          time: typeof parsed.timeMs === "number" ? parsed.timeMs : 0,
+          size: 0,
+        };
+      } else {
+        // Backward compatibility with { body: "<json>" }
+        const responseBody = parsed;
+        apiResponse = JSON.parse(responseBody.body);
+      }
+
+      // Frontend log: response summary from BFF
+      console.log("[JS] BFF->JS response", {
+        status: apiResponse.status,
+        contentType:
+          apiResponse?.headers?.["content-type"] ||
+          apiResponse?.headers?.["Content-Type"],
+        bodyLen:
+          typeof apiResponse.body === "string" ? apiResponse.body.length : 0,
+      });
 
       const appInsightData = {
         id: uuidv4(),
         name: "RPC Duration Metric",
-        duration,
+        // Prefer BFF time when available
+        duration:
+          typeof (apiResponse as any)?.time === "number" &&
+          (apiResponse as any).time > 0
+            ? (apiResponse as any).time
+            : duration,
         success: true,
-        responseCode: parseInt(apiResponse.status),
+        responseCode: Number(apiResponse?.status) || 200,
         properties: {
           source: "frontend",
           type: "RPC_HTTP",
         },
       };
       appInsights?.trackDependencyData(appInsightData);
+      // Ensure UI receives unified timing
+      if (!apiResponse.time || (apiResponse.time as number) <= 0) {
+        apiResponse.time = appInsightData.duration;
+      }
       return success(apiResponse);
-    } catch (e) {
-      const responseBody = JSON.parse(data);
-      return error(responseBody.body);
+    } catch (e: any) {
+      const dataStr = typeof data === "string" ? data : String(data);
+      const responseBody = JSON.parse(dataStr);
+      console.error("[JS] BFF->JS parse error", e);
+      return error(
+        typeof responseBody?.body === "string"
+          ? responseBody.body
+          : "Unexpected response format",
+      );
     }
-  } catch (e) {
+  } catch (e: any) {
     if (signal?.aborted) {
+      try {
+        await invoke("abort_http_request", { requestId });
+      } catch (err) {}
       throw new DOMException("Request was aborted", "AbortError");
     }
     console.error(e);
@@ -961,9 +1052,9 @@ const makeHttpRequestV2 = async (
 /**
  * Function to convert schema into required type. (Will shift to util in future, DO NOT REMOVE IT.)
  */
-const formatGraphQLSchema = (introspectionData) => {
-  const schema = {};
-  introspectionData.__schema?.types?.forEach((type) => {
+const formatGraphQLSchema = (introspectionData: any): string => {
+  const schema: Record<string, string> = {};
+  introspectionData.__schema?.types?.forEach((type: any) => {
     // Ignore built-in types like __Schema, __Type, etc.
     if (type?.name?.startsWith("__")) return;
 
@@ -976,9 +1067,9 @@ const formatGraphQLSchema = (introspectionData) => {
         // Special handling for Query, Mutation, and Subscription
         if (["Query", "Mutation", "Subscription"].includes(type?.name)) {
           typeDef.push(`type ${type?.name} {`);
-          type?.fields?.forEach((field) => {
+          type?.fields?.forEach((field: any) => {
             const args = field?.args
-              .map((arg) => `${arg?.name}: ${formatFieldType(arg?.type)}`)
+              .map((arg: any) => `${arg?.name}: ${formatFieldType(arg?.type)}`)
               .join(", ");
             const fieldComment = field?.description
               ? `"""${field?.description}"""`
@@ -993,7 +1084,7 @@ const formatGraphQLSchema = (introspectionData) => {
           typeDef.push("}");
         } else {
           typeDef.push(`type ${type?.name} {`);
-          type?.fields?.forEach((field) => {
+          type?.fields?.forEach((field: any) => {
             const fieldComment = field?.description
               ? `"""${field?.description}"""`
               : "";
@@ -1010,7 +1101,7 @@ const formatGraphQLSchema = (introspectionData) => {
 
       case "INPUT_OBJECT":
         typeDef.push(`input ${type.name} {`);
-        type.inputFields.forEach((field) => {
+        type.inputFields.forEach((field: any) => {
           const fieldComment = field.description
             ? `"""${field.description}"""`
             : "";
@@ -1033,7 +1124,7 @@ const formatGraphQLSchema = (introspectionData) => {
     }
 
     // Store the formatted type definition in the schema object
-    schema[type?.name] = headerComment
+    schema[type?.name as string] = headerComment
       ? `${headerComment}\n${typeDef.join("\n")}`
       : typeDef.join("\n");
   });
@@ -1043,7 +1134,7 @@ const formatGraphQLSchema = (introspectionData) => {
 };
 
 // Helper function to format field types, handling nested types and non-null markers
-const formatFieldType = (type) => {
+const formatFieldType = (type: any): string => {
   if (type?.kind === "NON_NULL") return `${formatFieldType(type?.ofType)}!`;
   if (type?.kind === "LIST") return `[${formatFieldType(type?.ofType)}]`;
   return type?.name || type?.ofType?.name || "";
@@ -1092,7 +1183,7 @@ const makeGraphQLRequest = async (
       },
     };
     appInsights?.trackDependencyData(appInsightData);
-  } catch (err) {
+  } catch (err: any) {
     const endTime = performance.now();
     const duration = endTime - startTime;
     appInsights?.trackDependencyData({
@@ -1119,7 +1210,7 @@ const makeGraphQLRequest = async (
   try {
     const parsedResponse = JSON.parse(httpResponse);
     return success(parsedResponse);
-  } catch (err) {
+  } catch (err: any) {
     throw err;
   }
 };
