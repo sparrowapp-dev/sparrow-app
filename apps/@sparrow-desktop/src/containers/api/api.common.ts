@@ -7,6 +7,7 @@ import constants from "@app/constants/constants";
 import { setAuthJwt } from "@app/utils/jwt";
 import { ErrorMessages } from "@sparrow/common/enums/enums";
 import { invoke } from "@tauri-apps/api/core";
+import { readTextFile, remove } from "@tauri-apps/plugin-fs";
 import { DashboardViewModel } from "@app/pages/dashboard-page/Dashboard.ViewModel";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
@@ -924,7 +925,6 @@ const makeHttpRequestV2 = async (
   request: string,
   signal?: AbortSignal,
 ) => {
-  console.table({ url, method, headers, body, request });
   const requestId = uuidv4();
   const startTime = performance.now();
   try {
@@ -963,9 +963,27 @@ const makeHttpRequestV2 = async (
     try {
       const dataStr = typeof data === "string" ? data : String(data);
       const parsed = JSON.parse(dataStr);
+
       let apiResponse: any;
-      // Prefer structured JSON from BFF
-      if (
+
+      // Check if this is a file-based response (for large payloads)
+      if (parsed && parsed._isFileResponse && parsed._filePath) {
+        const fileContent = await readTextFile(parsed._filePath);
+        const fileData = JSON.parse(fileContent);
+
+        apiResponse = {
+          body: fileData.body,
+          headers: fileData.headers,
+          status: fileData.status,
+          time: typeof parsed.timeMs === "number" ? parsed.timeMs : 0,
+          size: 0,
+        };
+
+        // Clean up temp file in background
+        remove(parsed._filePath).catch(() => {});
+      }
+      // Prefer structured JSON from BFF (small responses)
+      else if (
         parsed &&
         parsed.headers &&
         parsed.status !== undefined &&
@@ -983,16 +1001,6 @@ const makeHttpRequestV2 = async (
         const responseBody = parsed;
         apiResponse = JSON.parse(responseBody.body);
       }
-
-      // Frontend log: response summary from BFF
-      console.log("[JS] BFF->JS response", {
-        status: apiResponse.status,
-        contentType:
-          apiResponse?.headers?.["content-type"] ||
-          apiResponse?.headers?.["Content-Type"],
-        bodyLen:
-          typeof apiResponse.body === "string" ? apiResponse.body.length : 0,
-      });
 
       const appInsightData = {
         id: uuidv4(),

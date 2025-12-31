@@ -63,13 +63,6 @@
       "";
     const bodyLen =
       typeof response?.body === "string" ? response.body.length : 0;
-    console.log("[UI] Render response", {
-      formatter: apiState.bodyFormatter,
-      language: apiState.bodyLanguage,
-      status: response?.status,
-      contentType: ct,
-      bodyLen,
-    });
   }
 </script>
 

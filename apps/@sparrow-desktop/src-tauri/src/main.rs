@@ -1,5 +1,6 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![windows_subsystem = "windows"]
+#![allow(unexpected_cfgs)]
 //! # Module: HTTP Request Handlers & Sparrow RPC Logic
 //!
 //! This module provides handlers for various types of HTTP requests, related operations and RPC Logic of Sparrow App.
@@ -43,45 +44,48 @@ mod group_policy_config;
 mod json_handler;
 mod raw_handler;
 mod request_handler;
+mod response_serializer;
 mod url_fetch_handler;
 mod urlencoded_handler;
 mod utils;
 
 // External Imports
-use once_cell::sync::Lazy;
 use base64;
+use base64::Engine;
 use formdata_handler::make_formdata_request;
 use group_policy_config::get_policy_config;
 use json_handler::make_json_request;
 use nfd::Response;
+use once_cell::sync::Lazy;
 use raw_handler::make_text_request;
 use request_handler::formdata_handler_v2::make_formdata_request_v2;
 use request_handler::http_requests::make_without_body_request;
 use request_handler::json_handler_v2::make_json_request_v2;
 use request_handler::urlencoded_handler_v2::make_www_form_urlencoded_request_v2;
-use reqwest::Client;
-use tokio::sync::oneshot;
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
+use reqwest::Client;
+use response_serializer::{HttpResponseLegacy, HttpResponseV2};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use serde_json::Value;
 use std::collections::HashMap;
+use std::io::Write;
 use std::process::Command;
 use std::time::Duration;
 use tauri::Emitter;
 use tauri::Manager;
+use tokio::sync::oneshot;
 use url_fetch_handler::import_swagger_url;
 use urlencoded_handler::make_www_form_urlencoded_request;
 use utils::response_decoder::decode_response_body;
-use base64::Engine;
 
 // Web socket imports
 use futures_util::{SinkExt, StreamExt};
 use std::sync::Arc;
 use tokio::sync::mpsc::{self, UnboundedSender};
 use tokio::sync::Mutex;
-use tokio_tungstenite::tungstenite::protocol::Message;
 use tokio::time::interval;
+use tokio_tungstenite::tungstenite::protocol::Message;
 
 // --- Connect WebSocket with invalid certs allowed ---
 use tokio_tungstenite::tungstenite::client::IntoClientRequest;
@@ -102,7 +106,7 @@ use tokio::sync::Mutex as SocketMutex;
 extern crate objc;
 
 #[cfg(target_os = "macos")]
-use objc::runtime::{Object, YES, NO};
+use objc::runtime::{Object, NO, YES};
 use tauri::{Runtime, WebviewWindow};
 
 pub trait WindowExt {
@@ -119,19 +123,19 @@ impl<R: Runtime> WindowExt for WebviewWindow<R> {
 
             // Set titlebar transparency
             let _: () = msg_send![id, setTitlebarAppearsTransparent: YES];
-            
+
             // Get current style mask
             let mut style_mask: u64 = msg_send![id, styleMask];
-            
+
             // NSFullSizeContentViewWindowMask = 1 << 15 = 32768
             const NS_FULL_SIZE_CONTENT_VIEW_WINDOW_MASK: u64 = 1 << 15;
-            
+
             if title_transparent {
                 style_mask |= NS_FULL_SIZE_CONTENT_VIEW_WINDOW_MASK;
             } else {
                 style_mask &= !NS_FULL_SIZE_CONTENT_VIEW_WINDOW_MASK;
             }
-            
+
             let _: () = msg_send![id, setStyleMask: style_mask];
 
             // Adjust toolbar visibility
@@ -153,10 +157,10 @@ impl<R: Runtime> WindowExt for WebviewWindow<R> {
             let id = self.ns_window().unwrap() as *mut Object;
 
             let visibility = if visible { NO } else { YES };
-            
+
             // NSWindowCloseButton = 0, NSWindowMiniaturizeButton = 1, NSWindowZoomButton = 2
             let button_types = [0u32, 1u32, 2u32];
-            
+
             for button_type in button_types {
                 let button: *mut Object = msg_send![id, standardWindowButton: button_type];
                 if !button.is_null() {
@@ -200,13 +204,13 @@ impl<R: Runtime> WindowExt for WebviewWindow<R> {
 static CLIENT: Lazy<Client> = Lazy::new(|| {
     Client::builder()
         .danger_accept_invalid_certs(true)
-        .pool_max_idle_per_host(5)         
-        .pool_idle_timeout(Some(Duration::from_secs(30))) 
-        .connect_timeout(Duration::from_secs(30))       
+        .pool_max_idle_per_host(5)
+        .pool_idle_timeout(Some(Duration::from_secs(30)))
+        .connect_timeout(Duration::from_secs(30))
         .gzip(true)
         .deflate(true)
         .brotli(true)
-        .tcp_nodelay(true)                
+        .tcp_nodelay(true)
         .cookie_store(true)
         .build()
         .unwrap_or_else(|e| {
@@ -385,15 +389,6 @@ async fn make_http_request_v2(
     request: &str,
     request_id: Option<String>,
 ) -> Result<String, String> {
-    // BFF log: request entry
-    println!(
-        "[BFF] make_http_request_v2 -> method={:?} url={} request={:?} reqId={}",
-        method,
-        url,
-        request,
-        request_id.clone().unwrap_or_else(|| "<none>".to_string())
-    );
-
     // Prepare abort channel if request_id provided
     let (abort_tx, abort_rx) = oneshot::channel::<()>();
     if let Some(ref rid) = request_id {
@@ -423,12 +418,35 @@ async fn make_http_request_v2(
 
     match result {
         Ok(structured) => {
-            // structured already includes headers/status/body; enrich with timeMs
-            let mut value: serde_json::Value = serde_json::from_str(&structured)
-                .map_err(|e| e.to_string())?;
-            value["timeMs"] = serde_json::Value::from(elapsed_ms);
-            let serialized = serde_json::to_string(&value).map_err(|e| e.to_string())?;
-            Ok(serialized)
+            // For large responses (>1MB), write to temp file to bypass slow IPC
+            const LARGE_RESPONSE_THRESHOLD: usize = 1_000_000;
+
+            if structured.len() > LARGE_RESPONSE_THRESHOLD {
+                let temp_dir = std::env::temp_dir();
+                let file_name = format!(
+                    "sparrow_response_{}.json",
+                    request_id.clone().unwrap_or_else(|| "temp".to_string())
+                );
+                let file_path = temp_dir.join(&file_name);
+
+                let mut file = std::fs::File::create(&file_path)
+                    .map_err(|e| format!("Failed to create temp file: {}", e))?;
+                file.write_all(structured.as_bytes())
+                    .map_err(|e| format!("Failed to write to temp file: {}", e))?;
+
+                let response_meta = json!({
+                    "_isFileResponse": true,
+                    "_filePath": file_path.to_string_lossy(),
+                    "timeMs": elapsed_ms
+                });
+                Ok(serde_json::to_string(&response_meta).map_err(|e| e.to_string())?)
+            } else {
+                let mut value: serde_json::Value =
+                    serde_json::from_str(&structured).map_err(|e| e.to_string())?;
+                value["timeMs"] = serde_json::Value::from(elapsed_ms);
+                let serialized = serde_json::to_string(&value).map_err(|e| e.to_string())?;
+                Ok(serialized)
+            }
         }
         Err(err) => Err(err.to_string()),
     }
@@ -544,7 +562,8 @@ async fn make_request_v2(
                 .await
                 .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
 
-            base64_string = base64::engine::general_purpose::STANDARD.encode(bytes); // convert bytes to base64 string for efficient transmission such that no data will get corrupted.
+            base64_string = base64::engine::general_purpose::STANDARD.encode(bytes);
+            // convert bytes to base64 string for efficient transmission such that no data will get corrupted.
         }
 
         //create src from content type and base64 string
@@ -559,45 +578,14 @@ async fn make_request_v2(
         };
     }
 
-    // Serialize headers directly without cloning
-    let response_headers_json: serde_json::Value = response_headers
-        .iter()
-        .map(|(name, value)| (name.to_string(), value.to_str().unwrap_or("")))
-        .collect();
+    // Use optimized response serializer for fast JSON construction
+    let response = HttpResponseV2 {
+        headers: &response_headers,
+        status: response_status,
+        body: &response_body,
+    };
 
-    // Combining all the parameters (structured JSON; timing added by caller)
-    let combined_json = json!({
-        "headers": response_headers_json,
-        "status": response_status.to_string(),
-        "body": response_body,
-    });
-
-    // BFF log: response summary
-    println!(
-        "[BFF] HTTP response -> status={} content_type='{}' body_len={}",
-        response_status.as_u16(),
-        content_type,
-        combined_json
-            .get("body")
-            .and_then(|v| v.as_str())
-            .map(|s| s.len())
-            .unwrap_or(0)
-    );
-
-    Ok(combined_json.to_string())
-}
-
-#[tauri::command]
-async fn abort_http_request(request_id: String) -> Result<(), String> {
-    let mut map = ABORTS.lock().await;
-    if let Some(tx) = map.remove(&request_id) {
-        let _ = tx.send(()); // signal abort; ignore if receiver gone
-        println!("[BFF] Abort signaled for reqId={}", request_id);
-        Ok(())
-    } else {
-        // no active request found
-        Err(format!("No active request for reqId={}", request_id))
-    }
+    Ok(response.to_json_string())
 }
 
 async fn make_request(
@@ -658,23 +646,20 @@ async fn make_request(
     let headers = response_value.headers().clone();
     let status = response_value.status().clone();
     let response_text_result = response_value.text().await;
-    let headers_json: serde_json::Value = headers
-        .iter()
-        .map(|(name, value)| (name.to_string(), value.to_str().unwrap()))
-        .collect();
 
     let response_text = match response_text_result {
         Ok(value) => value,
         Err(err) => format!("Error: {}", err),
     };
 
-    // Combining all parameters
-    let combined_json = json!({
-        "headers": headers_json,
-        "status": status.to_string(),
-        "response": response_text,
-    });
-    return Ok(combined_json.to_string());
+    // Use optimized response serializer for fast JSON construction
+    let response = HttpResponseLegacy {
+        headers: &headers,
+        status,
+        response: &response_text,
+    };
+
+    Ok(response.to_json_string())
 }
 
 // Struct Types
@@ -683,11 +668,6 @@ struct Payload {
     url: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-struct MyResponse {
-    tab_id: String,
-    response: Result<String, String>,
-}
 #[derive(Clone, serde::Serialize)]
 struct SingleInstancePayload {
     args: Vec<String>,
@@ -727,7 +707,6 @@ async fn connect_websocket(
     state: tauri::State<'_, Arc<AppState>>,
     app_handle: tauri::AppHandle,
 ) -> Result<String, String> {
-
     // Deserialize the JSON string into a Vec<KeyValue>
     let headers_key_values: Vec<KeyValue> =
         serde_json::from_str(&headers).map_err(|e| format!("Failed to parse headers: {}", e))?;
@@ -847,7 +826,6 @@ async fn connect_websocket(
         }
     });
 
-    
     // WRITE & PING TASK (graceful close aware)
     let tabid_for_log = tabid.clone();
     tokio::spawn(async move {
@@ -1394,11 +1372,11 @@ fn main() {
             // Emit general single-instance payload
             let _ = app
                 .emit(
-                "single-instance",
-                SingleInstancePayload {
-                    args: argv.clone(),
+                    "single-instance",
+                    SingleInstancePayload {
+                        args: argv.clone(),
                         cwd: _cwd,
-                },
+                    },
                 )
                 .unwrap();
 
@@ -1434,7 +1412,7 @@ fn main() {
             } else {
                 None
             };
-            
+
             app.manage(Arc::new(Mutex::new(InitialDeepLink { url: initial_url })));
 
             let platform_name = platform();
