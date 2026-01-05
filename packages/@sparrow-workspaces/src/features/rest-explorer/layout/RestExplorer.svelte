@@ -197,6 +197,8 @@
    */
   export let userRole;
   export let storeData: restExplorerData | undefined;
+  export let restExplorerDataMap: Map<string, restExplorerData> | undefined;
+  export let activeTabId: string | undefined;
   export let isTourGuideOpen = false;
   export let isWebApp = false;
   export let azureBlobCDN;
@@ -231,6 +233,20 @@
   export let onGeneratePreScript;
 
   export let selectedModel;
+
+  let responseEditorEntries: Array<[string, restExplorerData]> = [];
+  let hasActivePersistedEditor = false;
+  let shouldShowFallbackEditor = true;
+  $: responseEditorEntries = restExplorerDataMap
+    ? Array.from(restExplorerDataMap.entries())
+    : [];
+  $: {
+    const activeKey = activeTabId ?? "";
+    hasActivePersistedEditor = Boolean(
+      activeKey && restExplorerDataMap?.has(activeKey),
+    );
+    shouldShowFallbackEditor = !hasActivePersistedEditor;
+  }
 
   // Reference to the splitpane container element
   let splitpaneContainer;
@@ -1211,12 +1227,36 @@
                                   />
                                 {/if}
                                 <div
-                                  style="flex:1; overflow:auto; border:1px solid var(--border-ds-surface-100); border-radius: 4px;"
+                                  class="response-body-stack"
+                                  style="flex:1; border:1px solid var(--border-ds-surface-100); border-radius: 4px;"
                                 >
-                                  <ResponseBody
-                                    response={storeData?.response}
-                                    apiState={storeData?.response}
-                                  />
+                                  {#each responseEditorEntries as [entryTabId, entryData] (entryTabId)}
+                                    <div
+                                      class="response-body-pane"
+                                      data-tab-id={entryTabId}
+                                      aria-hidden={entryTabId === activeTabId
+                                        ? "false"
+                                        : "true"}
+                                    >
+                                      <ResponseBody
+                                        response={entryData?.response}
+                                        apiState={entryData?.response}
+                                      />
+                                    </div>
+                                  {/each}
+
+                                  {#if shouldShowFallbackEditor}
+                                    <div
+                                      class="response-body-pane"
+                                      data-tab-id={activeTabId ?? "__fallback"}
+                                      aria-hidden="false"
+                                    >
+                                      <ResponseBody
+                                        response={storeData?.response}
+                                        apiState={storeData?.response}
+                                      />
+                                    </div>
+                                  {/if}
                                 </div>
                               {:else if storeData?.response.navigation === ResponseSectionEnum.HEADERS}
                                 <div style="overflow:auto;">
@@ -1781,5 +1821,22 @@
   }
   .hide-vertical-scroller::-webkit-scrollbar {
     display: none; /* Chrome, Safari */
+  }
+
+  .response-body-stack {
+    position: relative;
+    height: 100%;
+  }
+
+  .response-body-pane {
+    position: absolute;
+    inset: 0;
+    overflow: auto;
+  }
+
+  .response-body-pane[aria-hidden="true"] {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
   }
 </style>

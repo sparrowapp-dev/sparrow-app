@@ -51,7 +51,6 @@
   export let status;
   export let isResponseGenerating;
   // export let chatResponse: AiRequestExplorerData;
-  export let modelVariant: string;
   export let aiResponseMetrices: AiRequestExplorerData;
 
   export let onClickCodeBlockPreview;

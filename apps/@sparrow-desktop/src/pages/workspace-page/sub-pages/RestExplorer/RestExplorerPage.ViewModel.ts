@@ -91,7 +91,10 @@ import { AiAssistantService } from "../../../../services/ai-assistant.service";
 import type { GuideQuery } from "../../../../types/user-guide";
 import { AiAssistantWebSocketService } from "../../../../services/ai-assistant.ws.service";
 import type { Socket } from "socket.io-client";
-import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explorer/store";
+import {
+  restExplorerDataStore,
+  createRestExplorerDataState,
+} from "@sparrow/workspaces/features/rest-explorer/store";
 import { InitTab } from "@sparrow/common/factory";
 import { CollectionTabAdapter, RequestSavedTabAdapter } from "@app/adapter";
 import type { Tab } from "@sparrow/common/types/workspace/tab";
@@ -1762,20 +1765,7 @@ class RestExplorerViewModel {
       if (data) {
         data.abortController = abortController;
       } else {
-        data = {
-          abortController: abortController,
-          response: {
-            body: "",
-            headers: [],
-            status: "",
-            time: 0,
-            size: 0,
-            navigation: ResponseSectionEnum.RESPONSE,
-            bodyLanguage: RequestDataTypeEnum.TEXT,
-            bodyFormatter: ResponseFormatterEnum.PRETTY,
-          },
-          isSendRequestInProgress: false,
-        };
+        data = createRestExplorerDataState({ abortController });
       }
       restApiDataMap.set(progressiveTab.tabId, data);
       return restApiDataMap;

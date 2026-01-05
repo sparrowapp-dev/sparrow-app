@@ -11,7 +11,10 @@
   import { Debounce } from "@sparrow/common/utils";
   import { isGuestUserActive, user } from "@app/store/auth.store";
   import { onDestroy, onMount } from "svelte";
-  import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explorer/store";
+  import {
+    restExplorerDataStore,
+    createRestExplorerDataState,
+  } from "@sparrow/workspaces/features/rest-explorer/store";
   import type { restExplorerData } from "@sparrow/workspaces/features/rest-explorer/store";
   import constants from "../../../../constants/constants";
   import type { RxDocument } from "rxdb";
@@ -101,6 +104,17 @@
 
   $: {
     restExplorerData = webSocketMap?.get(tab?.tabId);
+  }
+
+  $: {
+    if (tab?.tabId && webSocketMap && !webSocketMap.has(tab.tabId)) {
+      restExplorerDataStore.update((restApiDataMap) => {
+        if (!restApiDataMap.has(tab.tabId)) {
+          restApiDataMap.set(tab.tabId, createRestExplorerDataState());
+        }
+        return restApiDataMap;
+      });
+    }
   }
 
   /**
@@ -293,6 +307,8 @@
   bind:isTourGuideOpen
   {collection}
   storeData={restExplorerData}
+  restExplorerDataMap={webSocketMap}
+  activeTabId={tab?.tabId}
   {environmentVariables}
   {isGuestUser}
   {isLoginBannerActive}
