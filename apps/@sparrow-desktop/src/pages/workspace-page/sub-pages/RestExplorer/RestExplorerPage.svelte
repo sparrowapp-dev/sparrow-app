@@ -26,6 +26,20 @@
   export let tab;
   export let isTourGuideOpen = false;
 
+  // Cache ViewModels per tab to avoid re-initialization on tab switch
+  const viewModelCache = new Map<string, RestExplorerViewModel>();
+  // Preserve per-tab UI flags to avoid visual reloads/flicker
+  const tabUiState = new Map<
+    string,
+    {
+      isMergeViewEnableForRequestBody: boolean;
+      isMergeViewEnableForParams: boolean;
+      isMergeViewEnableForHeaders: boolean;
+      isMergeViewLoading: boolean;
+      mergeViewRequestDatasetType: RequestDatasetEnum;
+    }
+  >();
+
   let _viewModel;
   let isLoginBannerActive = false;
   let collection: CollectionDocType;
@@ -116,56 +130,85 @@
   $: {
     if (tab) {
       if (prevTabId !== tab?.tabId) {
+        // Persist UI state for previous tab
+        if (prevTabId) {
+          tabUiState.set(prevTabId, {
+            isMergeViewEnableForRequestBody,
+            isMergeViewEnableForParams,
+            isMergeViewEnableForHeaders,
+            isMergeViewLoading,
+            mergeViewRequestDatasetType:
+              mergeViewRequestDatasetType ?? RequestDatasetEnum.RAW,
+          });
+        }
         if (scriptComponent?.handleTabChange) {
           scriptComponent.handleTabChange();
         }
         if (preScriptComponent?.handleTabChange) {
           preScriptComponent.handleTabChange();
         }
-        isMergeViewEnableForRequestBody = false;
-        isMergeViewEnableForParams = false;
-        isMergeViewEnableForHeaders = false;
-        isMergeViewLoading = false;
-        mergeViewRequestDatasetType = undefined;
+        // Restore UI state for new tab (or default if first time)
+        const cachedUi = tabUiState.get(tab.tabId);
+        if (cachedUi) {
+          isMergeViewEnableForRequestBody =
+            cachedUi.isMergeViewEnableForRequestBody;
+          isMergeViewEnableForParams = cachedUi.isMergeViewEnableForParams;
+          isMergeViewEnableForHeaders = cachedUi.isMergeViewEnableForHeaders;
+          isMergeViewLoading = cachedUi.isMergeViewLoading;
+          mergeViewRequestDatasetType = cachedUi.mergeViewRequestDatasetType;
+        } else {
+          isMergeViewEnableForRequestBody = false;
+          isMergeViewEnableForParams = false;
+          isMergeViewEnableForHeaders = false;
+          isMergeViewLoading = false;
+          mergeViewRequestDatasetType = RequestDatasetEnum.RAW;
+        }
         (async () => {
           /**
-           * @description - Initialize the view model for the new http request tab
+           * @description - Initialize or reuse the view model for the http request tab
            */
-          _viewModel = new RestExplorerViewModel(tab);
-          collectionObserver = _viewModel.collectionSubscriber(
-            tab.path.collectionId,
-          );
-          environmentsObserver = _viewModel.environments;
-          activeWorkspaceObserver = _viewModel.activeWorkspace;
-          renameWithCollectionList = new Debounce().debounce(
-            _viewModel?.updateNameWithCollectionList as any,
-            1000,
-          );
-          debouncedAPIUpdater = new Debounce().debounce(
-            _viewModel?.refreshTabData as any,
-            1000,
-          );
-          guestUser = await _viewModel.getGuestUser(); // <-- now valid inside async IIFE
-          if (guestUser?.isBannerActive) {
-            isLoginBannerActive = guestUser?.isBannerActive;
-          }
-          collectionSubscriber = collectionObserver?.subscribe(
-            (data: RxDocument<CollectionDocument>) => {
-              collection = data?.toMutableJSON();
-            },
-          );
+          const cachedVM = viewModelCache.get(tab.tabId);
+          if (cachedVM) {
+            _viewModel = cachedVM;
+          } else {
+            _viewModel = new RestExplorerViewModel(tab);
+            viewModelCache.set(tab.tabId, _viewModel);
 
-          activeWorkspaceSubscriber = activeWorkspaceObserver?.subscribe(
-            async (value: WorkspaceDocument) => {
-              const activeWorkspaceRxDoc = value;
-              if (activeWorkspaceRxDoc) {
-                currentWorkspace = activeWorkspaceRxDoc;
-                currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
-                environmentId = activeWorkspaceRxDoc.get("environmentId");
-                isSharedWorkspace = activeWorkspaceRxDoc.get("isShared");
-              }
-            },
-          );
+            collectionObserver = _viewModel.collectionSubscriber(
+              tab.path.collectionId,
+            );
+            environmentsObserver = _viewModel.environments;
+            activeWorkspaceObserver = _viewModel.activeWorkspace;
+            renameWithCollectionList = new Debounce().debounce(
+              _viewModel?.updateNameWithCollectionList as any,
+              1000,
+            );
+            debouncedAPIUpdater = new Debounce().debounce(
+              _viewModel?.refreshTabData as any,
+              1000,
+            );
+            guestUser = await _viewModel.getGuestUser();
+            if (guestUser?.isBannerActive) {
+              isLoginBannerActive = guestUser?.isBannerActive;
+            }
+            collectionSubscriber = collectionObserver?.subscribe(
+              (data: RxDocument<CollectionDocument>) => {
+                collection = data?.toMutableJSON();
+              },
+            );
+
+            activeWorkspaceSubscriber = activeWorkspaceObserver?.subscribe(
+              async (value: WorkspaceDocument) => {
+                const activeWorkspaceRxDoc = value;
+                if (activeWorkspaceRxDoc) {
+                  currentWorkspace = activeWorkspaceRxDoc;
+                  currentWorkspaceId = activeWorkspaceRxDoc.get("_id");
+                  environmentId = activeWorkspaceRxDoc.get("environmentId");
+                  isSharedWorkspace = activeWorkspaceRxDoc.get("isShared");
+                }
+              },
+            );
+          }
         })();
       } else {
         if (tab?.name && prevTabName !== tab.name) {
