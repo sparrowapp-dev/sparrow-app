@@ -7,8 +7,12 @@
     type State,
   } from "@sparrow/common/types/workspace";
   import { SparrowLogo } from "../../assets/images";
+  import ResponseBodyViewer from "./ResponseBodyViewer.svelte";
+
   export let response: Response;
   export let apiState;
+  /** Tab ID for file-backed response support */
+  export let tabId: string = "";
 
   let language = apiState.bodyLanguage;
   $: {
@@ -23,6 +27,11 @@
   let imageHasError = false;
 
   let iframeRef: HTMLIFrameElement;
+
+  /**
+   * Check if response is file-backed (large response stored in temp file)
+   */
+  $: isFileBacked = response?.isFileBacked === true;
 
   function handleIframeLoad(): void {
     try {
@@ -53,16 +62,6 @@
         "Cannot access iframe content due to cross-origin restrictions",
       );
     }
-  }
-
-  // UI log: when response and formatter/language change
-  $: if (response && apiState) {
-    const ct =
-      response?.headers?.["content-type"] ||
-      response?.headers?.["Content-Type"] ||
-      "";
-    const bodyLen =
-      typeof response?.body === "string" ? response.body.length : 0;
   }
 </script>
 
@@ -106,9 +105,18 @@
         style="width: 100%; height: calc(100%);"
         on:load={handleIframeLoad}
       ></iframe>
+    {:else if isFileBacked && tabId}
+      <!-- 
+        --
+        -- Large file-backed response - use optimized viewer
+        -- This prevents UI freezes for 20-30MB responses
+        -- 
+      -->
+      <ResponseBodyViewer {tabId} {response} {apiState} />
     {:else}
       <!-- 
         --
+        -- Small response - use standard Editor (in-memory)
         -- Reponse content-type set to HTML, JSON, XML, Javascript, Text,
         -- 
       -->

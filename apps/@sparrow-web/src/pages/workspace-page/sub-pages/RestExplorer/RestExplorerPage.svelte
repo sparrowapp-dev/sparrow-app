@@ -253,6 +253,7 @@
   bind:scriptComponent
   bind:preScriptComponent
   {collection}
+  tabId={tab?.tabId ?? ""}
   storeData={restExplorerData}
   {environmentVariables}
   {isGuestUser}

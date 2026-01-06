@@ -1216,6 +1216,7 @@
                                   <ResponseBody
                                     response={storeData?.response}
                                     apiState={storeData?.response}
+                                    tabId={$tab?.tabId}
                                   />
                                 </div>
                               {:else if storeData?.response.navigation === ResponseSectionEnum.HEADERS}

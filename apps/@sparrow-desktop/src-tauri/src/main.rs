@@ -45,6 +45,7 @@ mod json_handler;
 mod raw_handler;
 mod request_handler;
 mod response_serializer;
+mod response_temp_file;
 mod url_fetch_handler;
 mod urlencoded_handler;
 mod utils;
@@ -1453,7 +1454,17 @@ fn main() {
             send_graphql_request,
             show_toolbar,
             hide_toolbar,
-            get_initial_deep_link, // Add this new command
+            get_initial_deep_link,
+            // Response temp file commands
+            response_temp_file::write_response_to_temp,
+            response_temp_file::write_formatted_response,
+            response_temp_file::read_response_file,
+            response_temp_file::get_response_artifact,
+            response_temp_file::has_formatted_file,
+            response_temp_file::get_formatted_file_path,
+            response_temp_file::cleanup_response_files,
+            response_temp_file::cleanup_all_response_files,
+            response_temp_file::get_response_size_threshold,
         ])
         .on_page_load(|wry_window, _payload| {
             if let Ok(url) = wry_window.url() {
