@@ -100,9 +100,6 @@ export function isLargeResponse(bodySize: number): boolean {
  */
 export function getArtifact(tabId: string): ResponseArtifact | undefined {
   const artifact = responseArtifacts.get(tabId);
-  console.log(
-    `[ResponseArtifact] getArtifact - tabId: ${tabId}, found: ${!!artifact}`,
-  );
   return artifact;
 }
 
@@ -334,9 +331,6 @@ export function getCachedContent(
 ): string | undefined {
   const cacheKey = `${tabId}:${format}`;
   const cached = formattedContentCache.get(cacheKey);
-  console.log(
-    `[ResponseArtifact] getCachedContent - tabId: ${tabId}, format: ${format}, found: ${!!cached}, length: ${cached?.length || 0}`,
-  );
   return cached;
 }
 

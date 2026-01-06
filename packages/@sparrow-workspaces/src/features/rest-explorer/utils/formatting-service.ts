@@ -37,20 +37,15 @@ function yieldToMain(): Promise<void> {
  * Uses native JSON.stringify which is much faster than js_beautify.
  */
 async function formatJson(value: string): Promise<string> {
-  console.log(`[FormattingService] formatJson - length: ${value.length}`);
   try {
     // Parse JSON
     const parsed = JSON.parse(value);
-    console.log(`[FormattingService] JSON parsed successfully`);
 
     // Yield before stringify (parsing can be slow)
     await yieldToMain();
 
     // Use native JSON.stringify for formatting
     const formatted = JSON.stringify(parsed, null, 2);
-    console.log(
-      `[FormattingService] JSON formatted - output length: ${formatted.length}`,
-    );
 
     return formatted;
   } catch (parseError) {
@@ -161,9 +156,6 @@ export async function getFormattedResponse(
   options: FormatOptions,
 ): Promise<string> {
   const { tabId, format, onProgress } = options;
-  console.log(
-    `[FormattingService] getFormattedResponse - tabId: ${tabId}, format: ${format}`,
-  );
 
   // Check if we have an artifact
   const artifact = getArtifact(tabId);
@@ -174,29 +166,44 @@ export async function getFormattedResponse(
 
   // For raw format, no formatting needed - just return as-is
   if (format === "raw") {
-    console.log(
-      `[FormattingService] Raw format requested, no formatting needed`,
-    );
     onProgress?.("done");
     return getOrCreateFormattedContent(tabId, format, async (raw) => raw);
   }
 
   // Get or create formatted content using inline formatting
   const contentType = formatToContentType(format);
-  console.log(`[FormattingService] Content type: ${contentType}`);
 
   return getOrCreateFormattedContent(tabId, format, async (raw) => {
-    console.log(
-      `[FormattingService] Formatting content - length: ${raw.length}`,
-    );
     onProgress?.("formatting");
     const formatted = await formatContent(contentType, raw);
     onProgress?.("writing");
-    console.log(
-      `[FormattingService] Formatting complete - output length: ${formatted.length}`,
-    );
     return formatted;
   });
+}
+
+/**
+ * Pre-warm formatted outputs so that UI interactions are instant when users
+ * switch tabs or view the response for the first time.
+ *
+ * Formats are processed serially to avoid overwhelming the main thread.
+ */
+export async function prewarmFormattedResponses(
+  tabId: string,
+  formats: ResponseFormat[],
+): Promise<void> {
+  const uniqueFormats = Array.from(new Set(formats));
+  if (!uniqueFormats.length) return;
+
+  for (const format of uniqueFormats) {
+    try {
+      await getFormattedResponse({ tabId, format });
+    } catch (error) {
+      console.warn(
+        `[FormattingService] Failed to prewarm format ${format} for tab ${tabId}:`,
+        error,
+      );
+    }
+  }
 }
 
 /**

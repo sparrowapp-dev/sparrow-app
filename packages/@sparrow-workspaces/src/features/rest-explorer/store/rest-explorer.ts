@@ -25,6 +25,10 @@ export type restExplorerData = {
      * When true, use response artifact system to read content
      */
     isFileBacked?: boolean;
+    /**
+     * Monotonically increasing counter used to detect when a fresh response arrives
+     */
+    responseVersion?: number;
   };
   isSendRequestInProgress: boolean;
 };

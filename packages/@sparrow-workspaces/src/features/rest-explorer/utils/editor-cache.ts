@@ -63,34 +63,22 @@ export function getOrCreateEditor(
   extensions: Extension[],
   parentElement: HTMLElement,
 ): CachedEditor {
-  console.log(
-    `[EditorCache] getOrCreateEditor - tabId: ${tabId}, format: ${format}`,
-  );
   let tabEditors = editorCache.get(tabId);
   if (!tabEditors) {
-    console.log(`[EditorCache] Creating new editor map for tab: ${tabId}`);
     tabEditors = new Map();
     editorCache.set(tabId, tabEditors);
   }
 
   let cached = tabEditors.get(format);
   if (cached) {
-    console.log(
-      `[EditorCache] Found existing editor - initialized: ${cached.initialized}, visible: ${cached.container.style.display !== "none"}`,
-    );
     // Ensure the container is in the correct parent
     if (cached.container.parentElement !== parentElement) {
-      console.log(`[EditorCache] Re-parenting editor container`);
       parentElement.appendChild(cached.container);
     }
     // Show the container
     cached.container.style.display = "block";
     return cached;
   }
-
-  console.log(
-    `[EditorCache] Creating new editor for tab: ${tabId}, format: ${format}`,
-  );
   // Create new editor container
   const container = document.createElement("div");
   container.className = "cm-cached-editor";
@@ -139,9 +127,6 @@ export function initializeEditorContent(
   format: ResponseFormat,
   content: string,
 ): void {
-  console.log(
-    `[EditorCache] initializeEditorContent - tabId: ${tabId}, format: ${format}, contentLength: ${content?.length || 0}`,
-  );
   const tabEditors = editorCache.get(tabId);
   if (!tabEditors) {
     console.warn(`[EditorCache] No editor map found for tab: ${tabId}`);
@@ -160,15 +145,9 @@ export function initializeEditorContent(
 
   // If already initialized with same content, skip
   if (cached.initialized && cached.contentHash === newHash) {
-    console.log(
-      `[EditorCache] Editor already initialized with same content hash: ${newHash}`,
-    );
     return;
   }
 
-  console.log(
-    `[EditorCache] Updating editor content - oldHash: ${cached.contentHash}, newHash: ${newHash}`,
-  );
   // Set the document content (only time we modify the doc)
   cached.view.dispatch({
     changes: {
@@ -180,7 +159,6 @@ export function initializeEditorContent(
 
   cached.initialized = true;
   cached.contentHash = newHash;
-  console.log(`[EditorCache] Editor initialized successfully`);
 }
 
 /**
@@ -190,28 +168,7 @@ export function initializeEditorContent(
  * @param tabId - Unique tab identifier
  */
 export function resetEditorForNewResponse(tabId: string): void {
-  console.log(`[EditorCache] resetEditorForNewResponse - tabId: ${tabId}`);
-  const tabEditors = editorCache.get(tabId);
-  if (!tabEditors) {
-    console.log(`[EditorCache] No editors to reset for tab: ${tabId}`);
-    return;
-  }
-
-  let resetCount = 0;
-  for (const cached of tabEditors.values()) {
-    cached.initialized = false;
-    cached.contentHash = "";
-    // Clear content
-    cached.view.dispatch({
-      changes: {
-        from: 0,
-        to: cached.view.state.doc.length,
-        insert: "",
-      },
-    });
-    resetCount++;
-  }
-  console.log(`[EditorCache] Reset ${resetCount} editors for tab: ${tabId}`);
+  destroyTabEditors(tabId);
 }
 
 /**
@@ -220,10 +177,8 @@ export function resetEditorForNewResponse(tabId: string): void {
  * @param tabId - Unique tab identifier
  */
 export function hideTabEditors(tabId: string): void {
-  console.log(`[EditorCache] hideTabEditors - tabId: ${tabId}`);
   const tabEditors = editorCache.get(tabId);
   if (!tabEditors) {
-    console.log(`[EditorCache] No editors to hide for tab: ${tabId}`);
     return;
   }
 
@@ -232,7 +187,6 @@ export function hideTabEditors(tabId: string): void {
     cached.container.style.display = "none";
     hiddenCount++;
   }
-  console.log(`[EditorCache] Hidden ${hiddenCount} editors for tab: ${tabId}`);
 }
 
 /**
@@ -242,9 +196,6 @@ export function hideTabEditors(tabId: string): void {
  * @param format - Format to show
  */
 export function showTabEditor(tabId: string, format: ResponseFormat): void {
-  console.log(
-    `[EditorCache] showTabEditor - tabId: ${tabId}, format: ${format}`,
-  );
   const tabEditors = editorCache.get(tabId);
   if (!tabEditors) {
     console.warn(`[EditorCache] No editor map found for tab: ${tabId}`);
@@ -257,18 +208,10 @@ export function showTabEditor(tabId: string, format: ResponseFormat): void {
     cached.container.style.display = "none";
     hiddenCount++;
   }
-  console.log(`[EditorCache] Hidden ${hiddenCount} other editors`);
-
   // Show the requested format
   const cached = tabEditors.get(format);
   if (cached) {
-    console.log(
-      `[EditorCache] Showing editor for format: ${format}, currently: ${cached.container.style.display}`,
-    );
     cached.container.style.display = "block";
-    console.log(
-      `[EditorCache] Editor display is now: ${cached.container.style.display}`,
-    );
   } else {
     console.warn(`[EditorCache] Editor not found for format: ${format}`);
   }
