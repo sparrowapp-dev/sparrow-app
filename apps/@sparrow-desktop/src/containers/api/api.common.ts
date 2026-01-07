@@ -925,40 +925,33 @@ const makeHttpRequestV2 = async (
   request: string,
   signal?: AbortSignal,
 ) => {
-  const requestId = uuidv4();
-  const startTime = performance.now();
   try {
-    const data = signal
-      ? await Promise.race([
-          invoke("make_http_request_v2", {
-            url,
-            method,
-            headers,
-            body,
-            request,
-            requestId,
-          }),
-          waitForAbort(signal),
-        ])
-      : await invoke("make_http_request_v2", {
+    let data;
+    if (signal) {
+      data = await Promise.race([
+        invoke("make_http_request_v2", {
           url,
           method,
           headers,
           body,
           request,
-          requestId,
-        });
-    // Handle the response and update UI accordingly
-    if (signal?.aborted) {
-      // Propagate abort to BFF
-      try {
-        await invoke("abort_http_request", { requestId });
-      } catch (e) {}
-      throw new Error(); // Ignore response if request was cancelled
+        }),
+        waitForAbort(signal),
+      ]);
+    } else {
+      data = await invoke("make_http_request_v2", {
+        url,
+        method,
+        headers,
+        body,
+        request,
+      });
     }
 
-    const endTime = performance.now();
-    const duration = endTime - startTime;
+    // Handle the response and update UI accordingly
+    if (signal?.aborted) {
+      throw new Error(); // Ignore response if request was cancelled
+    }
 
     try {
       const dataStr = typeof data === "string" ? data : String(data);
@@ -1001,44 +994,25 @@ const makeHttpRequestV2 = async (
         const responseBody = parsed;
         apiResponse = JSON.parse(responseBody.body);
       }
-
       const appInsightData = {
         id: uuidv4(),
         name: "RPC Duration Metric",
-        // Prefer BFF time when available
-        duration:
-          typeof (apiResponse as any)?.time === "number" &&
-          (apiResponse as any).time > 0
-            ? (apiResponse as any).time
-            : duration,
+        duration: parsed.timeMs,
         success: true,
-        responseCode: Number(apiResponse?.status) || 200,
+        responseCode: parseInt(apiResponse.status),
         properties: {
           source: "frontend",
           type: "RPC_HTTP",
         },
       };
       appInsights?.trackDependencyData(appInsightData);
-      // Ensure UI receives unified timing
-      if (!apiResponse.time || (apiResponse.time as number) <= 0) {
-        apiResponse.time = appInsightData.duration;
-      }
       return success(apiResponse);
     } catch (e: any) {
-      const dataStr = typeof data === "string" ? data : String(data);
-      const responseBody = JSON.parse(dataStr);
-      console.error("[JS] BFF->JS parse error", e);
-      return error(
-        typeof responseBody?.body === "string"
-          ? responseBody.body
-          : "Unexpected response format",
-      );
+      const responseBody = JSON.parse(data);
+      return error(responseBody.body);
     }
   } catch (e: any) {
     if (signal?.aborted) {
-      try {
-        await invoke("abort_http_request", { requestId });
-      } catch (err) {}
       throw new DOMException("Request was aborted", "AbortError");
     }
     console.error(e);

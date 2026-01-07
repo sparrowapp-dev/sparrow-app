@@ -129,15 +129,11 @@ export function initializeEditorContent(
 ): void {
   const tabEditors = editorCache.get(tabId);
   if (!tabEditors) {
-    console.warn(`[EditorCache] No editor map found for tab: ${tabId}`);
     return;
   }
 
   const cached = tabEditors.get(format);
   if (!cached) {
-    console.warn(
-      `[EditorCache] No editor found for tab: ${tabId}, format: ${format}`,
-    );
     return;
   }
 
@@ -198,22 +194,20 @@ export function hideTabEditors(tabId: string): void {
 export function showTabEditor(tabId: string, format: ResponseFormat): void {
   const tabEditors = editorCache.get(tabId);
   if (!tabEditors) {
-    console.warn(`[EditorCache] No editor map found for tab: ${tabId}`);
     return;
   }
 
   // Hide all editors for this tab first
-  let hiddenCount = 0;
-  for (const cached of tabEditors.values()) {
-    cached.container.style.display = "none";
-    hiddenCount++;
+  for (const [fmt, cached] of tabEditors.entries()) {
+    if (fmt !== format) {
+      cached.container.style.display = "none";
+    }
   }
+
   // Show the requested format
   const cached = tabEditors.get(format);
   if (cached) {
     cached.container.style.display = "block";
-  } else {
-    console.warn(`[EditorCache] Editor not found for format: ${format}`);
   }
 }
 

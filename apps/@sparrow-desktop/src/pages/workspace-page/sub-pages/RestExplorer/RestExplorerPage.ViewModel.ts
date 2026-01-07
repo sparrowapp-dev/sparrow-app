@@ -95,9 +95,7 @@ import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explore
 import {
   writeResponseArtifact,
   isLargeResponse,
-  cleanupArtifact,
   resetEditorForNewResponse,
-  LARGE_RESPONSE_THRESHOLD,
   prewarmFormattedResponses,
 } from "@sparrow/workspaces/features/rest-explorer/utils";
 import type { ResponseFormat } from "@sparrow/workspaces/features/rest-explorer/utils";

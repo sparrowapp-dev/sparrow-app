@@ -15,7 +15,6 @@
   "exports": {
     "./containers": "./src/containers/index.ts",
     "./forms": "./src/forms/index.ts",
-    "./forms/editor/theme": "./src/forms/editor/theme.ts",
     "./icons": "./src/icons/index.ts",
     "./assets": "./src/assets/index.ts",
     "./typography": "./src/typography/index.ts",

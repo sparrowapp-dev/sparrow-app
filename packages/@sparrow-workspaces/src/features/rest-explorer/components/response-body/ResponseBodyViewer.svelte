@@ -23,6 +23,7 @@
   import { ResponseFormatterEnum } from "@sparrow/common/types/workspace";
   import {
     getCachedContent,
+    clearInMemoryCache,
     type ResponseFormat,
   } from "../../utils/response-artifact";
   import { getFormattedResponse } from "../../utils/formatting-service";
@@ -91,6 +92,31 @@
   }
 
   /**
+   * Create CodeMirror extensions for a given format
+   */
+  function createExtensions(format: ResponseFormat) {
+    return [
+      getBasicSetup({
+        showLineNumbers: true,
+        highlightActiveLine: false,
+        highlightActiveLineGutter: false,
+      }),
+      getTheme({
+        showLineNumbers: true,
+        highlightActiveLine: false,
+        highlightActiveLineGutter: false,
+      }),
+      getLanguageExtension(format),
+      EditorView.lineWrapping,
+      EditorState.readOnly.of(true),
+      EditorView.scrollMargins.of(() => ({
+        top: 200,
+        bottom: 200,
+      })),
+    ];
+  }
+
+  /**
    * Check if response is file-backed (large response)
    */
   function isFileBacked(): boolean {
@@ -133,17 +159,28 @@
    * Load content from file-backed storage
    */
   async function loadFileBackedContent(format: ResponseFormat) {
-    if (hasInitializedEditor(tabId, format)) {
-      const cachedContent = getCachedContent(tabId, format);
-      if (cachedContent) {
-        await setupEditor(format, cachedContent);
-      } else {
-        showTabEditor(tabId, format);
+    // Always check for cached content first
+    const cachedContent = getCachedContent(tabId, format);
+
+    // If editor is already initialized and we have content, just show it
+    if (hasInitializedEditor(tabId, format) && cachedContent) {
+      hasDisplayedContent = true;
+
+      // Ensure editor is attached to DOM before showing
+      if (editorContainer) {
+        getOrCreateEditor(
+          tabId,
+          format,
+          createExtensions(format),
+          editorContainer,
+        );
       }
+
+      showTabEditor(tabId, format);
       return;
     }
 
-    const cachedContent = getCachedContent(tabId, format);
+    // If we have cached content but editor not initialized, set it up
     if (cachedContent) {
       await setupEditor(format, cachedContent);
       return;
@@ -194,8 +231,66 @@
    * Load in-memory content (small responses)
    */
   async function loadInMemoryContent(format: ResponseFormat) {
-    const content = response?.body || "";
-    await setupEditor(format, content);
+    // Always check for cached content first
+    const cachedContent = getCachedContent(tabId, format);
+    const editorInitialized = hasInitializedEditor(tabId, format);
+
+    // If editor is already initialized and we have content, just show it
+    if (editorInitialized && cachedContent) {
+      hasDisplayedContent = true;
+
+      // Ensure editor is attached to DOM before showing
+      if (editorContainer) {
+        getOrCreateEditor(
+          tabId,
+          format,
+          createExtensions(format),
+          editorContainer,
+        );
+      }
+
+      showTabEditor(tabId, format);
+      return;
+    }
+
+    // If we have cached content but editor not initialized, set it up
+    if (cachedContent) {
+      await setupEditor(format, cachedContent);
+      return;
+    }
+
+    // Not cached - format and cache it
+    const rawContent = response?.body || "";
+
+    // Show loading state for formatting
+    if (format !== "raw") {
+      isLoading = true;
+      loadingMessage = `Formatting as ${format}...`;
+    }
+
+    try {
+      const formattedContent = await getFormattedResponse({
+        tabId,
+        format,
+        rawContent,
+        onProgress: (stage) => {
+          if (stage === "formatting") {
+            loadingMessage = `Formatting as ${format}...`;
+          } else if (stage === "done") {
+            loadingMessage = "";
+          }
+        },
+      });
+
+      await setupEditor(format, formattedContent);
+    } catch (e: any) {
+      console.error("Failed to format in-memory content:", e);
+      hasError = true;
+      errorMessage = e?.message || "Failed to format response";
+    } finally {
+      isLoading = false;
+      loadingMessage = "";
+    }
   }
 
   /**
@@ -204,30 +299,10 @@
   async function setupEditor(format: ResponseFormat, content: string) {
     if (!editorContainer) return;
 
-    const extensions = [
-      getBasicSetup({
-        showLineNumbers: true,
-        highlightActiveLine: false,
-        highlightActiveLineGutter: false,
-      }),
-      getTheme({
-        showLineNumbers: true,
-        highlightActiveLine: false,
-        highlightActiveLineGutter: false,
-      }),
-      getLanguageExtension(format),
-      EditorView.lineWrapping,
-      EditorState.readOnly.of(true),
-      EditorView.scrollMargins.of(() => ({
-        top: 200,
-        bottom: 200,
-      })),
-    ];
-
     const cached = getOrCreateEditor(
       tabId,
       format,
-      extensions,
+      createExtensions(format),
       editorContainer,
     );
 
@@ -289,6 +364,12 @@
     ) {
       lastResponseVersion = responseVersion;
       hasDisplayedContent = false;
+
+      // Clear in-memory cache when response changes
+      if (!isFileBacked()) {
+        clearInMemoryCache(tabId);
+      }
+
       loadContent();
     }
   }

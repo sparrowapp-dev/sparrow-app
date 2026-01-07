@@ -105,18 +105,18 @@
         style="width: 100%; height: calc(100%);"
         on:load={handleIframeLoad}
       ></iframe>
-    {:else if isFileBacked && tabId}
+    {:else if tabId}
       <!-- 
         --
-        -- Large file-backed response - use optimized viewer
-        -- This prevents UI freezes for 20-30MB responses
+        -- Use ResponseBodyViewer for both small and large responses
+        -- This provides consistent caching behavior and prevents re-formatting
         -- 
       -->
       <ResponseBodyViewer {tabId} {response} {apiState} />
     {:else}
       <!-- 
         --
-        -- Small response - use standard Editor (in-memory)
+        -- Fallback to standard Editor if no tabId
         -- Reponse content-type set to HTML, JSON, XML, Javascript, Text,
         -- 
       -->

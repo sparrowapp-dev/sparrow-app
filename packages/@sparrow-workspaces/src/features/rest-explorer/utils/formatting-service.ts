@@ -3,7 +3,7 @@
  *
  * Manages the formatting pipeline for large responses:
  * 1. Read raw content from file
- * 2. Format content (yields to main thread periodically)
+ * 2. Format content using Web Worker (non-blocking)
  * 3. Write formatted content to temp file
  * 4. Cache for instant retrieval
  *
@@ -16,98 +16,84 @@ import {
   getOrCreateFormattedContent,
   hasFormattedFile,
   getCachedContent,
+  cacheInMemoryContent,
 } from "./response-artifact";
 
+// Import the beautify worker
+// @ts-ignore - Worker import
+import BeautifyWorker from "../../../../../@sparrow-library/src/forms/editor/beautify.worker?worker";
+
 /**
- * Yield to the main thread to keep UI responsive.
- * Uses requestIdleCallback if available, otherwise setTimeout.
+ * Web Worker instance for background beautification
  */
-function yieldToMain(): Promise<void> {
-  return new Promise((resolve) => {
-    if (typeof requestIdleCallback !== "undefined") {
-      requestIdleCallback(() => resolve(), { timeout: 50 });
-    } else {
-      setTimeout(resolve, 0);
-    }
+let beautifyWorker: Worker | null = null;
+let workerRequestId = 0;
+const pendingWorkerRequests = new Map<
+  number,
+  { resolve: (result: string) => void; reject: (error: Error) => void }
+>();
+
+/**
+ * Initialize the beautify worker and set up message handlers (only once)
+ */
+function getBeautifyWorker(): Worker {
+  if (!beautifyWorker) {
+    const worker = new BeautifyWorker();
+    beautifyWorker = worker;
+
+    // Set up message handlers only once when worker is created
+    worker.onmessage = (event: MessageEvent) => {
+      const { id, result, error } = event.data;
+      const pending = pendingWorkerRequests.get(id);
+      if (pending) {
+        pendingWorkerRequests.delete(id);
+        if (error) {
+          pending.reject(new Error(error));
+        } else {
+          pending.resolve(result);
+        }
+      }
+    };
+
+    worker.onerror = (error: ErrorEvent) => {
+      console.error("[FormattingService] Worker error:", error);
+    };
+
+    return worker;
+  }
+
+  return beautifyWorker;
+}
+
+/**
+ * Run beautification in a Web Worker (non-blocking)
+ */
+function beautifyInWorker(
+  type: "json" | "javascript" | "html" | "xml",
+  value: string,
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const worker = getBeautifyWorker();
+    const id = ++workerRequestId;
+    pendingWorkerRequests.set(id, { resolve, reject });
+    worker.postMessage({ id, type, value });
   });
 }
 
 /**
- * Format JSON content with periodic yielding for large files.
- * Uses native JSON.stringify which is much faster than js_beautify.
- */
-async function formatJson(value: string): Promise<string> {
-  try {
-    // Parse JSON
-    const parsed = JSON.parse(value);
-
-    // Yield before stringify (parsing can be slow)
-    await yieldToMain();
-
-    // Use native JSON.stringify for formatting
-    const formatted = JSON.stringify(parsed, null, 2);
-
-    return formatted;
-  } catch (parseError) {
-    // If JSON parsing fails, return original
-    console.warn(
-      "[FormattingService] JSON parse error during formatting:",
-      parseError,
-    );
-    return value;
-  }
-}
-
-/**
- * Format HTML/XML content.
- * For simplicity, we do basic indentation without heavy libraries.
- */
-async function formatHtml(value: string): Promise<string> {
-  // For large HTML, just return as-is to avoid blocking
-  // Users can still read it, just not perfectly formatted
-  if (value.length > 5_000_000) {
-    return value;
-  }
-
-  await yieldToMain();
-
-  // Basic HTML formatting - add newlines after tags
-  let formatted = value;
-  try {
-    // Add newlines after closing tags for readability
-    formatted = value.replace(/></g, ">\n<").replace(/>\s+</g, ">\n<");
-  } catch (e) {
-    // If any error, return original
-    return value;
-  }
-
-  return formatted;
-}
-
-/**
- * Format XML content (same as HTML for now).
- */
-async function formatXml(value: string): Promise<string> {
-  return formatHtml(value);
-}
-
-/**
- * Format content based on type.
+ * Format content based on type using Web Worker (non-blocking).
  */
 async function formatContent(
   type: "json" | "javascript" | "html" | "xml",
   value: string,
 ): Promise<string> {
-  switch (type) {
-    case "json":
-    case "javascript":
-      return formatJson(value);
-    case "html":
-      return formatHtml(value);
-    case "xml":
-      return formatXml(value);
-    default:
-      return value;
+  // Use Web Worker for all formatting - keeps UI responsive
+  try {
+    return await beautifyInWorker(type, value);
+  } catch (error) {
+    console.error("[FormattingService] Formatting error:", error);
+    // Return original content if formatting fails
+    return value;
   }
 }
 
@@ -141,6 +127,8 @@ export interface FormatOptions {
   format: ResponseFormat;
   /** Callback for progress updates */
   onProgress?: (stage: "reading" | "formatting" | "writing" | "done") => void;
+  /** Raw content for small in-memory responses (optional) */
+  rawContent?: string;
 }
 
 /**
@@ -148,6 +136,7 @@ export interface FormatOptions {
  * This is the main entry point for the formatting pipeline.
  *
  * Returns instantly if content is cached, otherwise triggers formatting.
+ * Supports both file-backed (large) and in-memory (small) responses.
  *
  * @param options - Format options
  * @returns Formatted content string
@@ -155,30 +144,54 @@ export interface FormatOptions {
 export async function getFormattedResponse(
   options: FormatOptions,
 ): Promise<string> {
-  const { tabId, format, onProgress } = options;
+  const { tabId, format, onProgress, rawContent } = options;
 
-  // Check if we have an artifact
-  const artifact = getArtifact(tabId);
-  if (!artifact) {
-    console.error(`[FormattingService] No response artifact for tab ${tabId}`);
-    throw new Error(`No response artifact for tab ${tabId}`);
+  // Check cache first (works for both file-backed and in-memory)
+  const cachedContent = getCachedContent(tabId, format);
+  if (cachedContent) {
+    onProgress?.("done");
+    return cachedContent;
   }
 
   // For raw format, no formatting needed - just return as-is
   if (format === "raw") {
     onProgress?.("done");
+    if (rawContent !== undefined) {
+      cacheInMemoryContent(tabId, format, rawContent);
+      return rawContent;
+    }
     return getOrCreateFormattedContent(tabId, format, async (raw) => raw);
   }
 
-  // Get or create formatted content using inline formatting
-  const contentType = formatToContentType(format);
+  // Check if this is a file-backed response
+  const artifact = getArtifact(tabId);
 
-  return getOrCreateFormattedContent(tabId, format, async (raw) => {
+  if (artifact) {
+    // File-backed response - use artifact system
+    const contentType = formatToContentType(format);
+    return getOrCreateFormattedContent(tabId, format, async (raw) => {
+      onProgress?.("formatting");
+      const formatted = await formatContent(contentType, raw);
+      onProgress?.("writing");
+      return formatted;
+    });
+  } else if (rawContent !== undefined) {
+    // In-memory response - format and cache
     onProgress?.("formatting");
-    const formatted = await formatContent(contentType, raw);
-    onProgress?.("writing");
+    const contentType = formatToContentType(format);
+    const formatted = await formatContent(contentType, rawContent);
+
+    // Cache the formatted result
+    cacheInMemoryContent(tabId, format, formatted);
+
+    onProgress?.("done");
     return formatted;
-  });
+  } else {
+    console.error(
+      `[FormattingService] No response data available for tab ${tabId}`,
+    );
+    throw new Error(`No response data available for tab ${tabId}`);
+  }
 }
 
 /**

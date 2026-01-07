@@ -75,7 +75,6 @@ use std::process::Command;
 use std::time::Duration;
 use tauri::Emitter;
 use tauri::Manager;
-use tokio::sync::oneshot;
 use url_fetch_handler::import_swagger_url;
 use urlencoded_handler::make_www_form_urlencoded_request;
 use utils::response_decoder::decode_response_body;
@@ -219,10 +218,6 @@ static CLIENT: Lazy<Client> = Lazy::new(|| {
             std::process::exit(1);
         })
 });
-
-// Global abort channels keyed by request id
-static ABORTS: Lazy<tokio::sync::Mutex<HashMap<String, oneshot::Sender<()>>>> =
-    Lazy::new(|| tokio::sync::Mutex::new(HashMap::new()));
 
 // Commands
 #[tauri::command]
@@ -388,34 +383,13 @@ async fn make_http_request_v2(
     headers: &str,
     body: &str,
     request: &str,
-    request_id: Option<String>,
 ) -> Result<String, String> {
-    // Prepare abort channel if request_id provided
-    let (abort_tx, abort_rx) = oneshot::channel::<()>();
-    if let Some(ref rid) = request_id {
-        let mut map = ABORTS.lock().await;
-        // Insert only if not already present
-        map.entry(rid.clone()).or_insert(abort_tx);
-    }
-
     // Measure server-side timing around full request processing
     let start = std::time::Instant::now();
 
-    let fut = make_request_v2(url, method, headers, body, request);
-    let result = tokio::select! {
-        res = fut => res,
-        _ = abort_rx => {
-            Err(std::io::Error::new(std::io::ErrorKind::Interrupted, "Aborted"))
-        }
-    };
+    let result = make_request_v2(url, method, headers, body, request).await;
 
     let elapsed_ms = start.elapsed().as_millis() as u64;
-
-    // Cleanup abort entry
-    if let Some(rid) = request_id.clone() {
-        let mut map = ABORTS.lock().await;
-        map.remove(&rid);
-    }
 
     match result {
         Ok(structured) => {
@@ -424,16 +398,13 @@ async fn make_http_request_v2(
 
             if structured.len() > LARGE_RESPONSE_THRESHOLD {
                 let temp_dir = std::env::temp_dir();
-                let file_name = format!(
-                    "sparrow_response_{}.json",
-                    request_id.clone().unwrap_or_else(|| "temp".to_string())
-                );
+                let file_name = format!("sparrow_response_temp.json");
                 let file_path = temp_dir.join(&file_name);
 
                 let mut file = std::fs::File::create(&file_path)
                     .map_err(|e| format!("Failed to create temp file: {}", e))?;
                 file.write_all(structured.as_bytes())
-                    .map_err(|e| format!("Failed to write to temp file: {}", e))?;
+                    .map_err(|e: std::io::Error| format!("Failed to write to temp file: {}", e))?;
 
                 let response_meta = json!({
                     "_isFileResponse": true,
@@ -1459,12 +1430,8 @@ fn main() {
             response_temp_file::write_response_to_temp,
             response_temp_file::write_formatted_response,
             response_temp_file::read_response_file,
-            response_temp_file::get_response_artifact,
-            response_temp_file::has_formatted_file,
-            response_temp_file::get_formatted_file_path,
             response_temp_file::cleanup_response_files,
             response_temp_file::cleanup_all_response_files,
-            response_temp_file::get_response_size_threshold,
         ])
         .on_page_load(|wry_window, _payload| {
             if let Ok(url) = wry_window.url() {

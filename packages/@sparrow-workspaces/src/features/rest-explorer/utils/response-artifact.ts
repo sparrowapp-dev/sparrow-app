@@ -52,6 +52,16 @@ const responseArtifacts = new Map<string, ResponseArtifact>();
 const formattedContentCache = new Map<string, string>();
 
 /**
+ * In-memory cache for small responses (no file backing).
+ * Key: `${tabId}:${format}`
+ * Value: formatted content string
+ *
+ * Used for responses below LARGE_RESPONSE_THRESHOLD to avoid
+ * re-formatting on every tab switch.
+ */
+const inMemoryFormattedCache = new Map<string, string>();
+
+/**
  * Write raw response body to a temp file and create an artifact.
  * Called immediately after receiving HTTP response.
  *
@@ -279,9 +289,10 @@ export async function cleanupArtifact(tabId: string): Promise<void> {
   const artifact = responseArtifacts.get(tabId);
   if (!artifact) return;
 
-  // Clean up all cached content for this tab
+  // Clean up all cached content for this tab (both file-backed and in-memory)
   for (const format of ["json", "html", "xml", "raw"] as ResponseFormat[]) {
     formattedContentCache.delete(`${tabId}:${format}`);
+    inMemoryFormattedCache.delete(`${tabId}:${format}`);
   }
 
   // Remove from local map
@@ -301,6 +312,7 @@ export async function cleanupArtifact(tabId: string): Promise<void> {
 export async function cleanupAllArtifacts(): Promise<void> {
   responseArtifacts.clear();
   formattedContentCache.clear();
+  inMemoryFormattedCache.clear();
 
   try {
     await invoke("cleanup_all_response_files");
@@ -321,6 +333,7 @@ export function hasArtifact(tabId: string): boolean {
 /**
  * Get cached formatted content directly without file read.
  * Returns undefined if not cached.
+ * Works for both file-backed and in-memory responses.
  *
  * @param tabId - Unique tab identifier
  * @param format - Format type
@@ -330,8 +343,49 @@ export function getCachedContent(
   format: ResponseFormat,
 ): string | undefined {
   const cacheKey = `${tabId}:${format}`;
+  // Check file-backed cache first
   const cached = formattedContentCache.get(cacheKey);
-  return cached;
+  if (cached !== undefined) {
+    return cached;
+  }
+
+  // Check in-memory cache for small responses
+  const inMemoryCached = inMemoryFormattedCache.get(cacheKey);
+  if (inMemoryCached !== undefined) {
+    return inMemoryCached;
+  }
+
+  return undefined;
+}
+
+/**
+ * Cache formatted content for small in-memory responses.
+ * This avoids re-formatting on every tab switch.
+ *
+ * @param tabId - Unique tab identifier
+ * @param format - Format type
+ * @param content - Formatted content to cache
+ */
+export function cacheInMemoryContent(
+  tabId: string,
+  format: ResponseFormat,
+  content: string,
+): void {
+  const cacheKey = `${tabId}:${format}`;
+  inMemoryFormattedCache.set(cacheKey, content);
+}
+
+/**
+ * Clear in-memory cache for a specific tab.
+ * Called when tab is closed or response changes.
+ *
+ * @param tabId - Unique tab identifier
+ */
+export function clearInMemoryCache(tabId: string): void {
+  for (const format of ["json", "html", "xml", "raw"] as ResponseFormat[]) {
+    const cacheKey = `${tabId}:${format}`;
+    inMemoryFormattedCache.delete(cacheKey);
+  }
 }
 
 /**
