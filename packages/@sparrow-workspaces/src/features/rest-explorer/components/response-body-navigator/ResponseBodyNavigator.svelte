@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { downloadIcon, SaveIcon } from "@sparrow/library/assets";
-  import { copyIcon } from "@sparrow/library/assets";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
   import {
     copyToClipBoard,
@@ -14,10 +12,8 @@
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import { ResponseFormatterEnum } from "@sparrow/common/types/workspace";
-  import { beautifyIcon as BeautifyIcon } from "@sparrow/library/assets";
   import js_beautify, { html_beautify } from "js-beautify";
   import { WithButtonV6, WithSelectV3 } from "@sparrow/workspaces/hoc";
-  import { invoke } from "@tauri-apps/api/core";
   import { save } from "@tauri-apps/plugin-dialog";
   import { writeTextFile, BaseDirectory } from "@tauri-apps/plugin-fs";
   import {
@@ -25,7 +21,6 @@
     CopyRegular,
     SaveRegular,
   } from "@sparrow/library/icons";
-  import { Select } from "@sparrow/library/forms";
   import { WorkspaceRole } from "@sparrow/common/enums";
   import { onMount, tick } from "svelte";
 

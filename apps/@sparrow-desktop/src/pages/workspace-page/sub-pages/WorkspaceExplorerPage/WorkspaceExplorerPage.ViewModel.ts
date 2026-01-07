@@ -26,10 +26,7 @@ import { UpdatesService } from "../../../../services/updates.service";
 import { WorkspaceService } from "../../../../services/workspace.service";
 import { notifications } from "@sparrow/library/ui";
 import { BehaviorSubject, type Observable } from "rxjs";
-import {
-  TabPersistenceTypeEnum,
-  type Tab,
-} from "@sparrow/common/types/workspace/tab";
+import { type Tab } from "@sparrow/common/types/workspace/tab";
 import { WorkspaceTabAdapter } from "@app/adapter";
 import constants from "@app/constants/constants";
 import { TeamService } from "@app/services/team.service";
@@ -190,9 +187,9 @@ export default class WorkspaceExplorerViewModel {
 
     const [selfhostBackendUrl] = getSelfhostUrls();
     if (selfhostBackendUrl) {
-        return selfhostBackendUrl;
+      return selfhostBackendUrl;
     }
-    
+
     if (hubUrl && constants.APP_ENVIRONMENT_PATH !== "local") {
       const envSuffix = constants.APP_ENVIRONMENT_PATH;
       return `${hubUrl}/${envSuffix}`;
@@ -599,9 +596,11 @@ export default class WorkspaceExplorerViewModel {
 
   public handleShareWorkspace = async () => {
     const progressiveTab = createDeepCopy(this._tab.getValue());
-    const [,selfhostWebUrl] = getSelfhostUrls();
+    const [, selfhostWebUrl] = getSelfhostUrls();
     await copyToClipBoard(
-      `${selfhostWebUrl ? selfhostWebUrl : constants.SPARROW_WEB_APP_URL}/app/collections?workspaceId=${progressiveTab.id}`,
+      `${
+        selfhostWebUrl ? selfhostWebUrl : constants.SPARROW_WEB_APP_URL
+      }/app/collections?workspaceId=${progressiveTab.id}`,
     );
     notifications.success("Link copied to clipboard.");
   };
@@ -652,11 +651,11 @@ export default class WorkspaceExplorerViewModel {
    */
   public handleRedirectToAdminPanel = async (teamId: string) => {
     const [authToken] = getAuthJwt();
-    const [,,selfhostAdminUrl] = getSelfhostUrls();
+    const [, , selfhostAdminUrl] = getSelfhostUrls();
 
-    if(selfhostAdminUrl){
-       await open(selfhostAdminUrl);
-    }else{
+    if (selfhostAdminUrl) {
+      await open(selfhostAdminUrl);
+    } else {
       await open(
         `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
       );
