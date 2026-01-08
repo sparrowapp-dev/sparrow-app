@@ -1208,6 +1208,7 @@
                                     {isWebApp}
                                     {isGuestUser}
                                     {userRole}
+                                    tabId={$tab?.tabId}
                                   />
                                 {/if}
                                 <div

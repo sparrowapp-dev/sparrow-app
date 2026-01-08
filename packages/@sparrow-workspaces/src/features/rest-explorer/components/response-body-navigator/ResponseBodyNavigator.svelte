@@ -23,6 +23,8 @@
   } from "@sparrow/library/icons";
   import { WorkspaceRole } from "@sparrow/common/enums";
   import { onMount, tick } from "svelte";
+  import { getFormattedResponse } from "../../utils/formatting-service";
+  import type { ResponseFormat } from "../../utils/response-artifact";
 
   export let response;
   export let apiState;
@@ -33,6 +35,7 @@
   export let onSaveResponse;
   export let path;
   export let userRole;
+  export let tabId: string = "";
   onMount(async () => {
     await tick(); // wait for DOM to render
     sliderStyle = getSliderStyle(apiState.bodyFormatter); // set initial slider position
@@ -58,14 +61,44 @@
         ? html_beautify(_data)
         : removeIndentation(_data);
   };
+
+  /**
+   * @description Get formatted response text for copy/download
+   */
+  const getResponseText = async (): Promise<string> => {
+    // Check if response is file-backed (large response)
+    if (response?.isFileBacked && tabId) {
+      const format: ResponseFormat =
+        fileExtension === "json"
+          ? "json"
+          : fileExtension === "xml"
+            ? "xml"
+            : fileExtension === "html"
+              ? "html"
+              : "raw";
+      return await getFormattedResponse({
+        tabId,
+        format,
+        onProgress: () => {},
+      });
+    } else {
+      return formatCode(response?.body);
+    }
+  };
+
   /**
    * @description Copy API response to users clipboard.
    */
-
   const handleCopy = async () => {
-    await copyToClipBoard(formatCode(response?.body));
-    notifications.success("Copied to Clipboard.");
-    MixpanelEvent(Events.COPY_API_RESPONSE);
+    try {
+      const textToCopy = await getResponseText();
+      await copyToClipBoard(textToCopy);
+      notifications.success("Copied to Clipboard.");
+      MixpanelEvent(Events.COPY_API_RESPONSE);
+    } catch (error) {
+      console.error("Failed to copy:", error);
+      notifications.error("Failed to copy response.");
+    }
   };
 
   const handleTypeDropdown: (tab: string) => void = (tab) => {
@@ -116,11 +149,16 @@
     });
     // Check if a path was selected
     if (path) {
-      const contents = formatCode(response?.body);
-      await writeTextFile(path, contents, {
-        baseDir: BaseDirectory.AppConfig,
-      });
-      notifications.success("Exported successfully.");
+      try {
+        const contents = await getResponseText();
+        await writeTextFile(path, contents, {
+          baseDir: BaseDirectory.AppConfig,
+        });
+        notifications.success("Exported successfully.");
+      } catch (error) {
+        console.error("Failed to export:", error);
+        notifications.error("Failed to export response.");
+      }
     } else {
       console.error("Save dialog was canceled or no path was selected.");
     }
