@@ -79,7 +79,7 @@ impl FastJsonWriter {
             self.buffer.push('"');
             escape_json_to_buffer(name.as_str(), &mut self.buffer);
             self.buffer.push_str("\":\"");
-            escape_json_to_buffer(value.to_str().unwrap_or(""), &mut self.buffer);
+            escape_json_to_buffer(value.to_str().unwrap_or("[invalid UTF-8]"), &mut self.buffer);
             self.buffer.push('"');
         }
         self.buffer.push('}');

@@ -68,14 +68,22 @@
   const getResponseText = async (): Promise<string> => {
     // Check if response is file-backed (large response)
     if (response?.isFileBacked && tabId) {
-      const format: ResponseFormat =
-        fileExtension === "json"
-          ? "json"
-          : fileExtension === "xml"
-            ? "xml"
-            : fileExtension === "html"
-              ? "html"
-              : "raw";
+      // Map file extension to ResponseFormat
+      let format: ResponseFormat;
+      switch (fileExtension) {
+        case "json":
+          format = "json";
+          break;
+        case "xml":
+          format = "xml";
+          break;
+        case "html":
+          format = "html";
+          break;
+        default:
+          format = "raw";
+      }
+
       return await getFormattedResponse({
         tabId,
         format,

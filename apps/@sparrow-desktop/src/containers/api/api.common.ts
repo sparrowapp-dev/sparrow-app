@@ -961,8 +961,22 @@ const makeHttpRequestV2 = async (
 
       // Check if this is a file-based response (for large payloads)
       if (parsed && parsed._isFileResponse && parsed._filePath) {
-        const fileContent = await readTextFile(parsed._filePath);
-        const fileData = JSON.parse(fileContent);
+        let fileContent: string;
+        let fileData: any;
+
+        try {
+          fileContent = await readTextFile(parsed._filePath);
+        } catch (readError) {
+          // Handle cases where the temporary file cannot be read (deleted, moved, or permission issues)
+          return error("Failed to read temporary response file.");
+        }
+
+        try {
+          fileData = JSON.parse(fileContent);
+        } catch (parseError) {
+          // Handle cases where the temporary file content is not valid JSON
+          return error("Failed to parse temporary response file.");
+        }
 
         apiResponse = {
           body: fileData.body,

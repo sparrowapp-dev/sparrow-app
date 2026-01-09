@@ -100,12 +100,13 @@ self.onmessage = (event: MessageEvent<BeautifyRequest>) => {
           const parsed = JSON.parse(value);
           const formatted = JSON.stringify(parsed, null, 2);
 
-          // Skip fixJsonBraces for large files (> 1MB) - it's too slow with regex
-          // Native JSON.stringify already produces nicely formatted JSON
-          if (formatted.length > 1_000_000) {
+          // Skip fixJsonBraces for large inputs (> 10KB based on original content length)
+          // to avoid slow regex processing. Native JSON.stringify already produces
+          // nicely formatted JSON in these cases.
+          if (value.length > 10_000) {
             result = formatted;
           } else {
-            // Apply fixJsonBraces for smaller files to clean up array formatting
+            // Apply fixJsonBraces for smaller inputs to clean up array formatting
             result = fixJsonBraces(formatted);
           }
         } catch (parseError) {
