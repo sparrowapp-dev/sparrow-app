@@ -34,19 +34,19 @@ fn get_response_temp_dir() -> PathBuf {
 
 /// Sanitize a tab ID for safe use in filesystem paths.
 /// Allows only ASCII alphanumeric characters, '-' and '_'.
-/// Returns None if the sanitized ID would be empty or contains problematic sequences.
+/// Returns None if the input is empty, contains path traversal sequences, or results in an empty string after sanitization.
 fn sanitize_tab_id(tab_id: &str) -> Option<String> {
+    // Check for problematic sequences in the original input before sanitization
+    if tab_id.is_empty() || tab_id.starts_with('.') || tab_id.contains("..") || tab_id.contains('/') || tab_id.contains('\\') {
+        return None;
+    }
+
     let sanitized: String = tab_id
         .chars()
         .filter(|c| c.is_ascii_alphanumeric() || *c == '-' || *c == '_')
         .collect();
 
     if sanitized.is_empty() {
-        return None;
-    }
-
-    // Reject if starts with '.' or contains '..' to prevent path traversal
-    if sanitized.starts_with('.') || sanitized.contains("..") {
         return None;
     }
 
