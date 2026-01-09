@@ -70,10 +70,7 @@
 >
   <div
     class="w-100 position-relative {apiState.bodyFormatter ===
-      ResponseFormatterEnum.PREVIEW ||
-    (isFileBacked &&
-      tabId &&
-      apiState.bodyLanguage !== RequestDataTypeEnum.IMAGE)
+    ResponseFormatterEnum.PREVIEW
       ? 'h-100 overflow-hidden'
       : ''}"
   >

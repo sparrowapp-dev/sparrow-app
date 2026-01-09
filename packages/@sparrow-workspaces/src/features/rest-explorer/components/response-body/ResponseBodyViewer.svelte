@@ -342,17 +342,6 @@
     isMounted = true;
     loadContent();
     lastResponseVersion = response?.responseVersion;
-
-    if (editorContainer) {
-      editorContainer.addEventListener("keydown", (event) => {
-        if (
-          (event.ctrlKey || event.metaKey) &&
-          event.key.toLowerCase() === "f"
-        ) {
-          event.stopPropagation();
-        }
-      });
-    }
   });
 
   onDestroy(() => {
