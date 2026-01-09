@@ -75,7 +75,7 @@
   let codeMirrorEditorDiv: HTMLDivElement;
   let codeMirrorView: EditorView;
 
-  // Custom JS validator (from first code)
+  // ✅ Custom JS validator (from first code)
   function jsLinter() {
     return (view: EditorView) => {
       const diagnostics: Diagnostic[] = [];
