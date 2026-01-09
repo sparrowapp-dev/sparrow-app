@@ -220,6 +220,12 @@ export async function getOrCreateFormattedContent(
   if (artifact.formattingInProgress.has(format)) {
     // Wait for formatting to complete by polling
     return new Promise((resolve, reject) => {
+      // Timeout after 60 seconds
+      const timeoutId = setTimeout(() => {
+        clearInterval(checkInterval);
+        reject(new Error("Formatting timeout"));
+      }, 60000);
+
       const checkInterval = setInterval(async () => {
         if (!artifact.formattingInProgress.has(format)) {
           clearInterval(checkInterval);
@@ -232,12 +238,6 @@ export async function getOrCreateFormattedContent(
           }
         }
       }, 100);
-
-      // Timeout after 60 seconds
-      const timeoutId = setTimeout(() => {
-        clearInterval(checkInterval);
-        reject(new Error("Formatting timeout"));
-      }, 60000);
     });
   }
 

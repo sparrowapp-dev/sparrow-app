@@ -34,7 +34,7 @@ fn get_response_temp_dir() -> PathBuf {
 
 /// Sanitize a tab ID for safe use in filesystem paths.
 /// Allows only ASCII alphanumeric characters, '-' and '_'.
-/// Returns None if the sanitized ID would be empty.
+/// Returns None if the sanitized ID would be empty or contains problematic sequences.
 fn sanitize_tab_id(tab_id: &str) -> Option<String> {
     let sanitized: String = tab_id
         .chars()
@@ -42,10 +42,15 @@ fn sanitize_tab_id(tab_id: &str) -> Option<String> {
         .collect();
 
     if sanitized.is_empty() {
-        None
-    } else {
-        Some(sanitized)
+        return None;
     }
+
+    // Reject if starts with '.' or contains '..' to prevent path traversal
+    if sanitized.starts_with('.') || sanitized.contains("..") {
+        return None;
+    }
+
+    Some(sanitized)
 }
 
 /// Write response body to a temp file
