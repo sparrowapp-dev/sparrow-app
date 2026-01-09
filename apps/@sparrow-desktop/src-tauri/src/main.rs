@@ -398,7 +398,12 @@ async fn make_http_request_v2(
 
             if structured.len() > LARGE_RESPONSE_THRESHOLD {
                 let temp_dir = std::env::temp_dir();
-                let file_name = format!("sparrow_response_temp.json");
+                let timestamp = std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap_or_default()
+                    .as_millis();
+                let pid = std::process::id();
+                let file_name = format!("sparrow_response_temp_{}_{}.json", pid, timestamp);
                 let file_path = temp_dir.join(&file_name);
 
                 let mut file = std::fs::File::create(&file_path)

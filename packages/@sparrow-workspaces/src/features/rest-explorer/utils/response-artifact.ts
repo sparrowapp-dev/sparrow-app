@@ -223,6 +223,7 @@ export async function getOrCreateFormattedContent(
       const checkInterval = setInterval(async () => {
         if (!artifact.formattingInProgress.has(format)) {
           clearInterval(checkInterval);
+          clearTimeout(timeoutId);
           const cachedContent = formattedContentCache.get(cacheKey);
           if (cachedContent) {
             resolve(cachedContent);
@@ -233,7 +234,7 @@ export async function getOrCreateFormattedContent(
       }, 100);
 
       // Timeout after 60 seconds
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         clearInterval(checkInterval);
         reject(new Error("Formatting timeout"));
       }, 60000);

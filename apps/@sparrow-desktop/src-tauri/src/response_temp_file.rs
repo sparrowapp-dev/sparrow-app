@@ -32,12 +32,30 @@ fn get_response_temp_dir() -> PathBuf {
     temp_dir
 }
 
+/// Sanitize a tab ID for safe use in filesystem paths.
+/// Allows only ASCII alphanumeric characters, '-' and '_'.
+/// Returns None if the sanitized ID would be empty.
+fn sanitize_tab_id(tab_id: &str) -> Option<String> {
+    let sanitized: String = tab_id
+        .chars()
+        .filter(|c| c.is_ascii_alphanumeric() || *c == '-' || *c == '_')
+        .collect();
+
+    if sanitized.is_empty() {
+        None
+    } else {
+        Some(sanitized)
+    }
+}
+
 /// Write response body to a temp file
 /// Returns the file path on success
 #[tauri::command]
 pub fn write_response_to_temp(tab_id: String, body: String) -> Result<String, String> {
+    let safe_tab_id =
+        sanitize_tab_id(&tab_id).ok_or_else(|| "Invalid tab_id".to_string())?;
     let temp_dir = get_response_temp_dir();
-    let file_name = format!("{}.raw", tab_id);
+    let file_name = format!("{}.raw", safe_tab_id);
     let file_path = temp_dir.join(&file_name);
 
     let mut file =
@@ -72,8 +90,10 @@ pub fn write_formatted_response(
     format: String,
     content: String,
 ) -> Result<String, String> {
+    let safe_tab_id =
+        sanitize_tab_id(&tab_id).ok_or_else(|| "Invalid tab_id".to_string())?;
     let temp_dir = get_response_temp_dir();
-    let file_name = format!("{}.pretty.{}", tab_id, format);
+    let file_name = format!("{}.pretty.{}", safe_tab_id, format);
     let file_path = temp_dir.join(&file_name);
 
     let mut file = File::create(&file_path)

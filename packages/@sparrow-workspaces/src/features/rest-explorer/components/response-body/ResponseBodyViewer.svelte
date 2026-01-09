@@ -33,6 +33,7 @@
     showTabEditor,
     hideTabEditors,
     hasInitializedEditor,
+    resetEditorForNewResponse,
   } from "../../utils/editor-cache";
   import { Loader } from "@sparrow/library/ui";
 
@@ -375,6 +376,11 @@
     ) {
       lastResponseVersion = responseVersion;
       hasDisplayedContent = false;
+
+      // Clear file-backed cache when response changes
+      if (isFileBacked()) {
+        resetEditorForNewResponse(tabId);
+      }
 
       // Clear in-memory cache when response changes
       if (!isFileBacked()) {
