@@ -239,11 +239,21 @@
       setGlobalSearch(false);
       return;
     }
+
+    // Check if the user is inside the response body viewer's CodeMirror editor
+    const isInResponseEditor =
+      event.target?.closest('[data-response-body-editor="true"] .cm-editor') !==
+      null;
+
     if (
       decidingKey(event) &&
       event.key.toLowerCase() === "f" &&
       !event.shiftKey
     ) {
+      // Don't open global search if user is in the response body editor
+      if (isInResponseEditor) {
+        return;
+      }
       event.preventDefault();
       setGlobalSearch(true);
     } else if (decidingKey(event) && event.shiftKey) {

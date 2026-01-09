@@ -411,13 +411,14 @@
     bind:this={editorContainer}
     class="editor-container"
     class:hidden={blockingOverlayVisible || hasError}
+    data-response-body-editor="true"
   />
 </div>
 
 <style>
   .response-body-viewer {
     position: relative;
-    overflow: hidden;
+    overflow: visible;
   }
 
   .editor-container {
@@ -492,5 +493,12 @@
     /* GPU acceleration */
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
+  }
+
+  /* Keep search panel sticky inside the response editor */
+  :global(.cm-cached-editor .cm-panels.cm-panels-top) {
+    position: sticky;
+    top: 0;
+    z-index: 10;
   }
 </style>
