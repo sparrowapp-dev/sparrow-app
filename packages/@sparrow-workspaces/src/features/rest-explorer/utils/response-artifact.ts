@@ -209,9 +209,7 @@ export async function getOrCreateFormattedContent(
   // Check if formatted file already exists
   if (artifact.prettyPaths.has(format)) {
     const path = artifact.prettyPaths.get(format)!;
-    const content = await invoke<string>("read_response_file", {
-      filePath: path,
-    });
+    const content = await readLargeFileInChunks(path);
     formattedContentCache.set(cacheKey, content);
     return content;
   }
@@ -248,10 +246,8 @@ export async function getOrCreateFormattedContent(
   artifact.formattingInProgress.add(format);
 
   try {
-    // Read raw content
-    const raw = await invoke<string>("read_response_file", {
-      filePath: artifact.rawPath,
-    });
+    // Read raw content in chunks
+    const raw = await readLargeFileInChunks(artifact.rawPath);
 
     // Format using provided function (Worker-based)
     const formatted = await formatFn(raw);
@@ -278,9 +274,32 @@ export async function readRawContent(tabId: string): Promise<string> {
     throw new Error(`No artifact exists for tab ${tabId}`);
   }
 
-  return await invoke<string>("read_response_file", {
-    filePath: artifact.rawPath,
-  });
+  return await readLargeFileInChunks(artifact.rawPath);
+}
+
+/**
+ * Read a large file in chunks using the Tauri chunked read command
+ * @param filePath - Path to the file
+ * @param chunkSize - Size of each chunk (default 1MB)
+ */
+export async function readLargeFileInChunks(
+  filePath: string,
+  chunkSize = 1024 * 1024,
+): Promise<string> {
+  let offset = 0;
+  let result = "";
+  while (true) {
+    const chunk = await invoke<string>("read_response_file_chunk", {
+      filePath,
+      offset,
+      length: chunkSize,
+    });
+    if (!chunk) break;
+    result += chunk;
+    if (chunk.length < chunkSize) break;
+    offset += chunk.length;
+  }
+  return result;
 }
 
 /**

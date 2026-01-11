@@ -166,8 +166,6 @@
     // If editor is already initialized and we have content, just show it
     if (hasInitializedEditor(tabId, format) && cachedContent) {
       hasDisplayedContent = true;
-
-      // Ensure editor is attached to DOM before showing
       if (editorContainer) {
         getOrCreateEditor(
           tabId,
@@ -176,7 +174,6 @@
           editorContainer,
         );
       }
-
       showTabEditor(tabId, format);
       return;
     }
@@ -239,8 +236,6 @@
     // If editor is already initialized and we have content, just show it
     if (editorInitialized && cachedContent) {
       hasDisplayedContent = true;
-
-      // Ensure editor is attached to DOM before showing
       if (editorContainer) {
         getOrCreateEditor(
           tabId,
@@ -249,7 +244,6 @@
           editorContainer,
         );
       }
-
       showTabEditor(tabId, format);
       return;
     }

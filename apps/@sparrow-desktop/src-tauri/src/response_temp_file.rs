@@ -7,7 +7,8 @@ use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs::{self, File};
-use std::io::{BufReader, Read, Write};
+use std::io::{Read, Write};
+use std::io::{Seek, SeekFrom};
 use std::path::PathBuf;
 use std::sync::Mutex;
 
@@ -37,12 +38,13 @@ fn get_response_temp_dir() -> PathBuf {
 /// Returns None if the input is empty, contains path traversal sequences, or results in an empty string after sanitization.
 fn sanitize_tab_id(tab_id: &str) -> Option<String> {
     // Check for problematic sequences in the original input before sanitization
-    if tab_id.is_empty() 
-        || tab_id.starts_with('.') 
-        || tab_id.contains("..") 
-        || tab_id.contains('/') 
+    if tab_id.is_empty()
+        || tab_id.starts_with('.')
+        || tab_id.contains("..")
+        || tab_id.contains('/')
         || tab_id.contains('\\')
-        || tab_id.contains('\0') {
+        || tab_id.contains('\0')
+    {
         return None;
     }
 
@@ -62,8 +64,7 @@ fn sanitize_tab_id(tab_id: &str) -> Option<String> {
 /// Returns the file path on success
 #[tauri::command]
 pub fn write_response_to_temp(tab_id: String, body: String) -> Result<String, String> {
-    let safe_tab_id =
-        sanitize_tab_id(&tab_id).ok_or_else(|| "Invalid tab_id".to_string())?;
+    let safe_tab_id = sanitize_tab_id(&tab_id).ok_or_else(|| "Invalid tab_id".to_string())?;
     let temp_dir = get_response_temp_dir();
     let file_name = format!("{}.raw", safe_tab_id);
     let file_path = temp_dir.join(&file_name);
@@ -100,8 +101,7 @@ pub fn write_formatted_response(
     format: String,
     content: String,
 ) -> Result<String, String> {
-    let safe_tab_id =
-        sanitize_tab_id(&tab_id).ok_or_else(|| "Invalid tab_id".to_string())?;
+    let safe_tab_id = sanitize_tab_id(&tab_id).ok_or_else(|| "Invalid tab_id".to_string())?;
     let temp_dir = get_response_temp_dir();
     let file_name = format!("{}.pretty.{}", safe_tab_id, format);
     let file_path = temp_dir.join(&file_name);
@@ -125,41 +125,24 @@ pub fn write_formatted_response(
     Ok(path_str)
 }
 
-/// Read response content from temp file
-/// For large files, returns content in streaming manner
+/// Read response content from temp file in chunks
+/// Returns a string chunk from offset with given length
 #[tauri::command]
-pub fn read_response_file(file_path: String) -> Result<String, String> {
-    let file = File::open(&file_path).map_err(|e| format!("Failed to open file: {}", e))?;
-
-    let metadata = file
-        .metadata()
-        .map_err(|e| format!("Failed to get file metadata: {}", e))?;
-
-    let file_size = metadata.len() as usize;
-    let mut reader = BufReader::new(file);
-    let mut content = String::with_capacity(file_size);
-
-    reader
-        .read_to_string(&mut content)
+pub fn read_response_file_chunk(
+    file_path: String,
+    offset: usize,
+    length: usize,
+) -> Result<String, String> {
+    let mut file =
+        std::fs::File::open(&file_path).map_err(|e| format!("Failed to open file: {}", e))?;
+    file.seek(SeekFrom::Start(offset as u64))
+        .map_err(|e| format!("Failed to seek: {}", e))?;
+    let mut buffer = vec![0; length];
+    let bytes_read = file
+        .read(&mut buffer)
         .map_err(|e| format!("Failed to read file: {}", e))?;
-
-    Ok(content)
-}
-
-/// Get the path to a formatted file if it exists
-#[tauri::command]
-pub fn get_formatted_file_path(tab_id: String, format: String) -> Result<Option<String>, String> {
-    let cache = FILE_CACHE
-        .lock()
-        .map_err(|e| format!("Lock error: {}", e))?;
-    if let Some(artifact) = cache.get(&tab_id) {
-        if let Some(path) = artifact.pretty_paths.get(&format) {
-            if std::path::Path::new(path).exists() {
-                return Ok(Some(path.clone()));
-            }
-        }
-    }
-    Ok(None)
+    buffer.truncate(bytes_read);
+    Ok(String::from_utf8_lossy(&buffer).to_string())
 }
 
 /// Clean up temp files for a specific tab
