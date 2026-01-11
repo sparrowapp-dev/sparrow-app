@@ -287,19 +287,34 @@ export async function readLargeFileInChunks(
   chunkSize = 1024 * 1024,
 ): Promise<string> {
   let offset = 0;
-  let result = "";
+  const chunks: Uint8Array[] = [];
   while (true) {
-    const chunk = await invoke<string>("read_response_file_chunk", {
+    const base64Chunk = await invoke<string>("read_response_file_chunk", {
       filePath,
       offset,
       length: chunkSize,
     });
-    if (!chunk) break;
-    result += chunk;
-    if (chunk.length < chunkSize) break;
-    offset += chunk.length;
+    if (!base64Chunk) break;
+    // Decode base64 to Uint8Array
+    const byteChunk = Uint8Array.from(atob(base64Chunk), (c) =>
+      c.charCodeAt(0),
+    );
+    if (byteChunk.length === 0) break;
+    chunks.push(byteChunk);
+    if (byteChunk.length < chunkSize) break;
+    offset += byteChunk.length;
   }
-  return result;
+  // Concatenate all chunks
+  const totalLength = chunks.reduce((sum, arr) => sum + arr.length, 0);
+  const fullArray = new Uint8Array(totalLength);
+  let pos = 0;
+  for (const arr of chunks) {
+    fullArray.set(arr, pos);
+    pos += arr.length;
+  }
+  // Decode as UTF-8 string
+  const decoder = new TextDecoder("utf-8");
+  return decoder.decode(fullArray);
 }
 
 /**

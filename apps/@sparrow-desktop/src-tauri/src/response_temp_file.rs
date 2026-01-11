@@ -3,6 +3,7 @@
 //! This module handles writing large HTTP response bodies to temporary files
 //! to avoid keeping them in JS memory and causing UI freezes.
 
+use base64::{engine::general_purpose, Engine as _};
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -126,7 +127,7 @@ pub fn write_formatted_response(
 }
 
 /// Read response content from temp file in chunks
-/// Returns a string chunk from offset with given length
+/// Returns a base64-encoded chunk from offset with given length
 #[tauri::command]
 pub fn read_response_file_chunk(
     file_path: String,
@@ -142,7 +143,8 @@ pub fn read_response_file_chunk(
         .read(&mut buffer)
         .map_err(|e| format!("Failed to read file: {}", e))?;
     buffer.truncate(bytes_read);
-    Ok(String::from_utf8_lossy(&buffer).to_string())
+    // Encode as base64
+    Ok(general_purpose::STANDARD.encode(&buffer))
 }
 
 /// Clean up temp files for a specific tab
