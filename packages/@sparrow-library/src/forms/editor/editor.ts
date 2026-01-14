@@ -11,7 +11,7 @@ import { xml } from "@codemirror/lang-xml";
 import { html_beautify, js_beautify } from "js-beautify";
 import * as Sentry from "@sentry/svelte";
 import { autocompletion, CompletionContext } from "@codemirror/autocomplete";
-import BeautifyWorker from "./beautify.worker?worker&inline";
+import BeautifyWorker from "@sparrow/library/src/forms/editor/beautify.worker?worker";
 
 /**
  * @description - remove indentation from the string

@@ -21,7 +21,7 @@ import {
 
 // Import the beautify worker
 // @ts-ignore - Worker import
-import BeautifyWorker from "../../../../../@sparrow-library/src/forms/editor/beautify.worker?worker";
+import BeautifyWorker from "@sparrow/library/src/forms/editor/beautify.worker?worker";
 
 /**
  * Web Worker instance for background beautification
