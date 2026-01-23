@@ -1038,8 +1038,16 @@
           tabsSplitterDirection.set("horizontal");
           isChatbotOpenInCurrTab.set(true);
         }
+        const isCurrentlyActive =
+          $tab?.property?.mockRequest?.state?.isChatbotActive;
+
+        if (!isCurrentlyActive) {
+          // User is intentionally OPENING AI
+          sessionStorage.setItem("sparrow_ai_auto_open", "true");
+        }
+
         onUpdateRequestState({
-          isChatbotActive: !$tab?.property?.mockRequest?.state?.isChatbotActive,
+          isChatbotActive: !isCurrentlyActive,
         });
 
         MixpanelEvent(Events.AI_Chat_Initiation);
