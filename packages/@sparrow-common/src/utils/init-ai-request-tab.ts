@@ -12,12 +12,7 @@ import {
 } from "@sparrow/common/types/workspace/tab";
 import { v4 as uuidv4 } from "uuid";
 import { CollectionRequestAddToBaseEnum } from "../types/workspace/collection-base";
-import {
-  AiRequestAuthTypeBaseEnum,
-  AiModelProviderEnum,
-  OpenAIModelEnum,
-  type AIModelVariant,
-} from "../types/workspace/ai-request-base";
+import { AiRequestAuthTypeBaseEnum, AiModelProviderEnum, OpenAIModelEnum, type AIModelVariant } from "../types/workspace/ai-request-base";
 import { AiRequestSectionEnum } from "../types/workspace/ai-request-tab";
 class InitAiRequestTab {
   private _tab: Tab;
@@ -101,8 +96,7 @@ class InitAiRequestTab {
             isAiSendRequestInProgress: false,
             isSaveDescriptionInProgress: false,
             isSaveRequestInProgress: false,
-            isChatbotActive:
-              sessionStorage.getItem("sparrow_ai_auto_open") !== "false",
+            isChatbotActive: sessionStorage.getItem("sparrow_ai_auto_open") !== "false",
             isChatAutoClearActive: false,
             isChatbotSuggestionsActive: true,
             isChatbotGeneratingResponse: false,
