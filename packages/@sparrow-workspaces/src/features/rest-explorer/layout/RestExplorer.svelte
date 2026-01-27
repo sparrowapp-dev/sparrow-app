@@ -191,6 +191,7 @@
   export let onStopGeneratingAIResponse;
   export let generateMockData: () => any;
   export let updateRequestStatAiChatBot: () => any;
+  export let openAiForAllOpenedRequestTabs: () => any;
 
   /**
    * Role of user in active workspace
@@ -1673,13 +1674,12 @@
           $tab?.property?.request?.state?.isChatbotActive;
 
         if (!isCurrentlyActive) {
-          // User is intentionally OPENING AI
-          sessionStorage.setItem("sparrow_ai_auto_open", "true");
+          openAiForAllOpenedRequestTabs();
+        } else {
+          // Close only current tab
+          onUpdateRequestState({ isChatbotActive: false });
+          isChatbotOpenInCurrTab.set(false);
         }
-
-        onUpdateRequestState({
-          isChatbotActive: !isCurrentlyActive,
-        });
 
         aiChatBotPanelClose.set(true);
         MixpanelEvent(Events.AI_Chat_Initiation);
