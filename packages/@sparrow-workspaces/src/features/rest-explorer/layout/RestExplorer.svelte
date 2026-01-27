@@ -191,6 +191,7 @@
   export let onStopGeneratingAIResponse;
   export let generateMockData: () => any;
   export let updateRequestStatAiChatBot: () => any;
+  export let openAiForAllOpenedRequestTabs: () => any;
 
   /**
    * Role of user in active workspace
@@ -1669,9 +1670,16 @@
           tabsSplitterDirection.set("horizontal");
           isChatbotOpenInCurrTab.set(true);
         }
-        onUpdateRequestState({
-          isChatbotActive: !$tab?.property?.request?.state?.isChatbotActive,
-        });
+        const isCurrentlyActive =
+          $tab?.property?.request?.state?.isChatbotActive;
+
+        if (!isCurrentlyActive) {
+          openAiForAllOpenedRequestTabs();
+        } else {
+          // Close only current tab
+          onUpdateRequestState({ isChatbotActive: false });
+          isChatbotOpenInCurrTab.set(false);
+        }
         aiChatBotPanelClose.set(true);
         MixpanelEvent(Events.AI_Chat_Initiation);
       }}

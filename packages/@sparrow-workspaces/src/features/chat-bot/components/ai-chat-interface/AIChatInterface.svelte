@@ -89,6 +89,7 @@
   };
 
   const handleEventOnCloseAIPanel = () => {
+    sessionStorage.setItem("sparrow_ai_auto_open", "false");
     captureEvent("copilot_dismissed", {
       component: "AIChatInterface",
       Suggestions_shown: suggestionCount,
