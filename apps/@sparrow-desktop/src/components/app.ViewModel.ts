@@ -368,6 +368,10 @@ export class AppViewModel {
     try {
       await getCurrentWindow().setFocus();
       const params = new URLSearchParams(url.split("?")[1]);
+      const isInviteLoginFlow =
+        url.includes("invite-login") &&
+        params.get("accessToken") &&
+        params.get("refreshToken");
       const currentUserAccessToken = params.get("accessToken");
       const workspaceId = params.get("workspaceID");
       const isSparrowEdge = params.get("isSparrowEdge");
@@ -381,6 +385,39 @@ export class AppViewModel {
       policyConfig.subscribe((value) => {
         policySettings = value;
       })();
+      if (isInviteLoginFlow) {
+        const accessToken = params.get("accessToken")!;
+        const refreshToken = params.get("refreshToken")!;
+        const teamId = params.get("teamId");
+
+        setAuthJwt(constants.AUTH_TOKEN, accessToken);
+        setAuthJwt(constants.REF_TOKEN, refreshToken);
+
+        const userDetails = jwtDecode(accessToken);
+        setUser(userDetails);
+
+        notifications.success("Logged in successfully");
+
+        await Promise.all([
+          this.refreshTeams(userDetails._id),
+          this.refreshWorkspaces(userDetails._id),
+        ]);
+
+        if (teamId) {
+          await this.teamRepository.setOpenTeam(teamId);
+        }
+
+        if (teamId) {
+          const invitedWorkspace =
+            await this.workspaceRepository.findWorkspaceByTeamId(teamId);
+
+          if (invitedWorkspace) {
+            await this.workspaceSwitcher(invitedWorkspace._id);
+          }
+        }
+
+        return;
+      }
 
       const isGuestUser = guestUser?.getLatest()?.toMutableJSON()?.isGuestUser;
       if (isGuestUser) {
@@ -463,8 +500,10 @@ export class AppViewModel {
     }
   };
 
-  private deepLinkHandlerMacOs = async (deepLinkUrl: string): Promise<void> => {
-    if (deepLinkUrl) {
+  private deepLinkHandlerMacOs = async (
+    deepLinkUrl: string[],
+  ): Promise<void> => {
+    if (deepLinkUrl && deepLinkUrl[0]) {
       await this.throttleHandleIncomingDeepLink(deepLinkUrl[0]);
     }
   };
