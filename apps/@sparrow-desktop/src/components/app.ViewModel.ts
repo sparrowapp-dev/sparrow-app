@@ -373,14 +373,13 @@ export class AppViewModel {
         params.get("accessToken") &&
         params.get("refreshToken");
       const currentUserAccessToken = params.get("accessToken");
-      const workspaceId = params.get("workspaceID");
+      const workspaceId = params.get("workspaceId");
       const isSparrowEdge = params.get("isSparrowEdge");
       const tokens = getAuthJwt();
 
       const guestUser = await this.guestUserRepository.findOne({
         name: "guestUser",
       });
-      // Get current policy settings
       let policySettings: any;
       policyConfig.subscribe((value) => {
         policySettings = value;
@@ -389,6 +388,7 @@ export class AppViewModel {
         const accessToken = params.get("accessToken")!;
         const refreshToken = params.get("refreshToken")!;
         const teamId = params.get("teamId");
+        const workspaceId = params.get("workspaceId");
 
         setAuthJwt(constants.AUTH_TOKEN, accessToken);
         setAuthJwt(constants.REF_TOKEN, refreshToken);
@@ -407,13 +407,10 @@ export class AppViewModel {
           await this.teamRepository.setOpenTeam(teamId);
         }
 
-        if (teamId) {
-          const invitedWorkspace =
-            await this.workspaceRepository.findWorkspaceByTeamId(teamId);
-
-          if (invitedWorkspace) {
-            await this.workspaceSwitcher(invitedWorkspace._id);
-          }
+        if (workspaceId) {
+          await this.workspaceSwitcher(workspaceId);
+        } else {
+          navigate("/app/collections");
         }
 
         return;
