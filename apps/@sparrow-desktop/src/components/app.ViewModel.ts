@@ -404,13 +404,14 @@ export class AppViewModel {
         ]);
 
         if (teamId) {
+          await this.teamRepository.setActiveTeam(teamId);
           await this.teamRepository.setOpenTeam(teamId);
         }
 
         if (workspaceId) {
           await this.workspaceSwitcher(workspaceId);
         } else {
-          navigate("/app/collections");
+          navigate("/app/home");
         }
 
         return;
