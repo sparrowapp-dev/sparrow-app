@@ -32,6 +32,7 @@ import { notifications } from "@sparrow/library/ui";
 import { isUserFirstSignUp } from "@app/store/user.store";
 import { isFirstTimeInTestFlow } from "@sparrow/workspaces/stores";
 import mixpanel from "mixpanel-browser";
+import { inviteModalStore } from "../store/inviteModal.store";
 
 interface DeepLinkHandlerWindowsPayload {
   payload: {
@@ -390,13 +391,26 @@ export class AppViewModel {
         const teamId = params.get("teamId");
         const workspaceId = params.get("workspaceId");
 
+        const teamName = params.get("teamName");
+        const role = params.get("role");
+        const workspaceNames = params.get("workspaceNames");
+
         setAuthJwt(constants.AUTH_TOKEN, accessToken);
         setAuthJwt(constants.REF_TOKEN, refreshToken);
 
         const userDetails = jwtDecode(accessToken);
         setUser(userDetails);
 
-        notifications.success("Logged in successfully");
+        if (teamName && role && workspaceNames) {
+          inviteModalStore.set({
+            show: true,
+            data: {
+              teamName,
+              role,
+              workspaceNames: workspaceNames.split(",").map((w) => w.trim()),
+            },
+          });
+        }
 
         await Promise.all([
           this.refreshTeams(userDetails._id),
