@@ -1836,6 +1836,7 @@ class RestExplorerViewModel {
               data.response.status = ResponseStatusCode.ERROR;
               data.response.time = 0;
               data.response.size = 0;
+              data.response.isFileBacked = false;
               data.isSendRequestInProgress = false;
             }
             restApiDataMap.set(progressiveTab.tabId, data);
@@ -1874,6 +1875,7 @@ class RestExplorerViewModel {
               data.response.time = duration;
               data.response.size = responseSizeKB;
               data.response.bodyLanguage = bodyLanguage;
+              data.response.isFileBacked = false;
               data.isSendRequestInProgress = false;
             }
             restApiDataMap.set(progressiveTab.tabId, data);
@@ -1898,6 +1900,7 @@ class RestExplorerViewModel {
             data.response.status = ResponseStatusCode.ERROR;
             data.response.time = 0;
             data.response.size = 0;
+            data.response.isFileBacked = false;
             data.isSendRequestInProgress = false;
           }
           restApiDataMap.set(progressiveTab.tabId, data);

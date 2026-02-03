@@ -92,6 +92,13 @@ import type { GuideQuery } from "../../../../types/user-guide";
 import { AiAssistantWebSocketService } from "../../../../services/ai-assistant.ws.service";
 import type { Socket } from "socket.io-client";
 import { restExplorerDataStore } from "@sparrow/workspaces/features/rest-explorer/store";
+import {
+  writeResponseArtifact,
+  isLargeResponse,
+  resetEditorForNewResponse,
+  prewarmFormattedResponses,
+} from "@sparrow/workspaces/features/rest-explorer/utils";
+import type { ResponseFormat } from "@sparrow/workspaces/features/rest-explorer/utils";
 import { InitTab } from "@sparrow/common/factory";
 import { CollectionTabAdapter, RequestSavedTabAdapter } from "@app/adapter";
 import type { Tab } from "@sparrow/common/types/workspace/tab";
@@ -127,6 +134,34 @@ import { DOMParser } from "xmldom";
 import { JSONPath } from "jsonpath-plus";
 import { captureEvent } from "@app/utils/posthog/posthogConfig";
 import { size } from "@tauri-apps/plugin-fs";
+
+const ALL_RESPONSE_FORMATS: ResponseFormat[] = ["raw", "json", "html", "xml"];
+
+function mapBodyLanguageToResponseFormat(language?: string): ResponseFormat {
+  switch ((language || "").toUpperCase()) {
+    case RequestDataTypeEnum.JSON:
+      return "json";
+    case RequestDataTypeEnum.HTML:
+      return "html";
+    case RequestDataTypeEnum.XML:
+      return "xml";
+    default:
+      return "raw";
+  }
+}
+
+function getInitialFormatsToWarm(
+  formatter: ResponseFormatterEnum | undefined,
+  bodyLanguage?: string,
+): ResponseFormat[] {
+  const formats = new Set<ResponseFormat>();
+  if (formatter === ResponseFormatterEnum.RAW) {
+    formats.add("raw");
+  } else {
+    formats.add(mapBodyLanguageToResponseFormat(bodyLanguage));
+  }
+  return Array.from(formats);
+}
 class RestExplorerViewModel {
   /**
    * Repository
@@ -1773,6 +1808,7 @@ class RestExplorerViewModel {
             navigation: ResponseSectionEnum.RESPONSE,
             bodyLanguage: RequestDataTypeEnum.TEXT,
             bodyFormatter: ResponseFormatterEnum.PRETTY,
+            responseVersion: 0,
           },
           isSendRequestInProgress: false,
         };
@@ -1813,6 +1849,9 @@ class RestExplorerViewModel {
     makeHttpRequestV2(...decodeData, signal)
       .then(async (response) => {
         if (response.isSuccessful === false) {
+          // Reset editor cache for new response
+          resetEditorForNewResponse(progressiveTab.tabId);
+
           restExplorerDataStore.update((restApiDataMap) => {
             const data = restApiDataMap.get(progressiveTab?.tabId);
             if (data) {
@@ -1821,6 +1860,9 @@ class RestExplorerViewModel {
               data.response.status = ResponseStatusCode.ERROR;
               data.response.time = 0;
               data.response.size = 0;
+              data.response.isFileBacked = false;
+              data.response.responseVersion =
+                (data.response.responseVersion ?? 0) + 1;
               data.isSendRequestInProgress = false;
             }
             restApiDataMap.set(progressiveTab.tabId, data);
@@ -1830,12 +1872,12 @@ class RestExplorerViewModel {
           await this.executeNoCodeTestcases();
         } else {
           const end = Date.now();
-          const byteLength = new TextEncoder().encode(
-            JSON.stringify(response),
-          ).length;
-          const responseSizeKB = byteLength / 1024;
-          const duration = end - start;
           const responseBody = response.data.body;
+          const bodySize =
+            typeof responseBody === "string" ? responseBody.length : 0;
+          const responseSizeKB = bodySize / 1024;
+          const duration = end - start;
+
           const formattedHeaders = Object.entries(
             response?.data?.headers || {},
           );
@@ -1849,16 +1891,55 @@ class RestExplorerViewModel {
           let responseStatus = response.data.status;
           const bodyLanguage =
             this._decodeRequest.setResponseContentType(responseHeaders);
+          const responseBodyFormatter =
+            progressiveTab.property.request.response?.bodyFormatter ||
+            ResponseFormatterEnum.PRETTY;
+          const initialFormatsToWarm = getInitialFormatsToWarm(
+            responseBodyFormatter,
+            bodyLanguage,
+          );
+
+          // Reset editor cache for new response
+          resetEditorForNewResponse(progressiveTab.tabId);
+
+          // Check if response is large enough to use file-backed storage
+          const useFileBacked = isLargeResponse(bodySize);
+
+          if (useFileBacked) {
+            // Write large response to temp file
+            try {
+              await writeResponseArtifact(progressiveTab.tabId, responseBody);
+              await prewarmFormattedResponses(
+                progressiveTab.tabId,
+                initialFormatsToWarm,
+              );
+              const backgroundFormats = ALL_RESPONSE_FORMATS.filter(
+                (format) => !initialFormatsToWarm.includes(format),
+              );
+              if (backgroundFormats.length) {
+                void prewarmFormattedResponses(
+                  progressiveTab.tabId,
+                  backgroundFormats,
+                );
+              }
+            } catch (e) {
+              console.warn("Failed to write response artifact:", e);
+            }
+          }
 
           restExplorerDataStore.update((restApiDataMap) => {
             let data = restApiDataMap.get(progressiveTab?.tabId);
             if (data) {
-              data.response.body = responseBody;
+              // For large responses, don't store body in memory - use artifact
+              data.response.body = useFileBacked ? "" : responseBody;
               data.response.headers = responseHeaders;
               data.response.status = responseStatus;
               data.response.time = duration;
               data.response.size = responseSizeKB;
               data.response.bodyLanguage = bodyLanguage;
+              data.response.isFileBacked = useFileBacked;
+              data.response.responseVersion =
+                (data.response.responseVersion ?? 0) + 1;
               data.isSendRequestInProgress = false;
             }
             restApiDataMap.set(progressiveTab.tabId, data);
@@ -1874,6 +1955,9 @@ class RestExplorerViewModel {
           return;
         }
 
+        // Reset editor cache for new response
+        resetEditorForNewResponse(progressiveTab.tabId);
+
         restExplorerDataStore.update((restApiDataMap) => {
           const data = restApiDataMap.get(progressiveTab?.tabId);
 
@@ -1883,6 +1967,9 @@ class RestExplorerViewModel {
             data.response.status = ResponseStatusCode.ERROR;
             data.response.time = 0;
             data.response.size = 0;
+            data.response.isFileBacked = false;
+            data.response.responseVersion =
+              (data.response.responseVersion ?? 0) + 1;
             data.isSendRequestInProgress = false;
           }
           restApiDataMap.set(progressiveTab.tabId, data);

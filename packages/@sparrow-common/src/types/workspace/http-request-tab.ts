@@ -224,6 +224,13 @@ export interface ResponseTimeWrapper {
 export interface ResponseSizeWrapper {
   size: number;
 }
+export interface ResponseFileBackedWrapper {
+  /**
+   * Flag indicating if response body is file-backed (large response).
+   * When true, use response artifact system to read content instead of `body`.
+   */
+  isFileBacked?: boolean;
+}
 export interface isGeneratedVariable {
   isGeneratedVariable: boolean;
 }
@@ -243,7 +250,8 @@ export interface Response
     ResponseHeadersWrapper,
     ResponseBodyWrapper,
     ResponseTimeWrapper,
-    ResponseSizeWrapper {}
+    ResponseSizeWrapper,
+    ResponseFileBackedWrapper {}
 
 export interface ResponseWrapper {
   response: Response;
