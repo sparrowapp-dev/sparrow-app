@@ -26,6 +26,7 @@
   import { open } from "@tauri-apps/plugin-shell";
   import { Platform } from "@sparrow/common/enums";
   import { inviteModalStore } from "@app/store/inviteModal.store";
+  import { navigate } from "svelte-navigator";
 
   let isAccessDeniedModalOpen = false;
   const handleAccessDeniedClose = (flag = false) => {
@@ -193,7 +194,10 @@
       <div style="display:flex; justify-content:flex-end;">
         <button
           class="btn btn-primary"
-          on:click={() => inviteModalStore.set({ show: false, data: null })}
+          on:click={() => {
+            inviteModalStore.set({ show: false, data: null });
+            navigate("/app/home");
+          }}
         >
           Continue
         </button>

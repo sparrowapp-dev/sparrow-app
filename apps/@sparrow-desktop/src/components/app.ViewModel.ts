@@ -369,12 +369,14 @@ export class AppViewModel {
     try {
       await getCurrentWindow().setFocus();
       const params = new URLSearchParams(url.split("?")[1]);
+      const source = params.get("source");
       const isInviteLoginFlow =
-        url.includes("invite-login") &&
+        source === "invite" &&
         params.get("accessToken") &&
         params.get("refreshToken");
       const currentUserAccessToken = params.get("accessToken");
-      const workspaceId = params.get("workspaceId");
+      const workspaceId =
+        params.get("workspaceId") || params.get("workspaceID");
       const isSparrowEdge = params.get("isSparrowEdge");
       const tokens = getAuthJwt();
 
@@ -389,7 +391,8 @@ export class AppViewModel {
         const accessToken = params.get("accessToken")!;
         const refreshToken = params.get("refreshToken")!;
         const teamId = params.get("teamId");
-        const workspaceId = params.get("workspaceId");
+        const workspaceId =
+          params.get("workspaceId") || params.get("workspaceID");
 
         const teamName = params.get("teamName");
         const role = params.get("role");
@@ -420,12 +423,6 @@ export class AppViewModel {
         if (teamId) {
           await this.teamRepository.setActiveTeam(teamId);
           await this.teamRepository.setOpenTeam(teamId);
-        }
-
-        if (workspaceId) {
-          await this.workspaceSwitcher(workspaceId);
-        } else {
-          navigate("/app/home");
         }
 
         return;
