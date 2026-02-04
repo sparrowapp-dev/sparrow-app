@@ -1674,10 +1674,11 @@
           $tab?.property?.request?.state?.isChatbotActive;
 
         if (!isCurrentlyActive) {
+          localStorage.setItem("sparrow_ai_auto_open", "true");
           openAiForAllOpenedRequestTabs();
         } else {
-          // Close only current tab
-          onUpdateRequestState({ isChatbotActive: false });
+          localStorage.setItem("sparrow_ai_auto_open", "false");
+          openAiForAllOpenedRequestTabs();
           isChatbotOpenInCurrTab.set(false);
         }
         aiChatBotPanelClose.set(true);

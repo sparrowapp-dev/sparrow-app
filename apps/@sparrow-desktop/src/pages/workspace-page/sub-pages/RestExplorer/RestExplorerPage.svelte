@@ -231,6 +231,11 @@
     }
   }
 
+  $: if (_viewModel && tab) {
+    // ensure AI preference is reapplied after late tab restoration
+    _viewModel.openAiForAllOpenedRequestTabs();
+  }
+
   onDestroy(() => {
     collectionSubscriber?.unsubscribe();
     activeWorkspaceSubscriber?.unsubscribe();

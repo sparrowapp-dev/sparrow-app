@@ -1673,25 +1673,31 @@ class RestExplorerViewModel {
    * and restores default auto-open behavior for future tabs
    */
   public openAiForAllOpenedRequestTabs = async () => {
-    sessionStorage.setItem("sparrow_ai_auto_open", "true");
+    const shouldAutoOpen =
+      localStorage.getItem("sparrow_ai_auto_open") !== "false";
 
     const currentTab = createDeepCopy(this._tab.getValue());
     const allTabs = await this.tabRepository.getTabLs();
     if (!allTabs || allTabs.length === 0) return;
 
     for (const tab of allTabs) {
-      if (tab.type === TabTypeEnum.REQUEST) {
-        const progressiveTab = createDeepCopy(tab);
+      if (tab.type !== TabTypeEnum.REQUEST) continue;
 
-        if (progressiveTab.property?.request?.state) {
-          progressiveTab.property.request.state.isChatbotActive = true;
+      const progressiveTab = createDeepCopy(tab);
+
+      if (progressiveTab.property?.request?.state) {
+        const prev = progressiveTab.property.request.state.isChatbotActive;
+
+        if (prev !== shouldAutoOpen) {
+          progressiveTab.property.request.state.isChatbotActive =
+            shouldAutoOpen;
 
           await this.tabRepository.updateTab(
             progressiveTab.tabId,
             progressiveTab,
           );
 
-          if (progressiveTab.tabId === currentTab.tabId) {
+          if (progressiveTab.tabId === currentTab?.tabId) {
             this.tab = progressiveTab;
           }
         }
