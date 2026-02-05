@@ -231,6 +231,11 @@
     }
   }
 
+  $: if (_viewModel && tab) {
+    // ensure AI preference is reapplied after late tab restoration
+    _viewModel.openAiForAllOpenedRequestTabs();
+  }
+
   onDestroy(() => {
     collectionSubscriber?.unsubscribe();
     activeWorkspaceSubscriber?.unsubscribe();
@@ -315,5 +320,6 @@
   selectedModel={selectedAIModel}
   onGeneratePreScript={_viewModel.generatePreScript}
   updateRequestStatAiChatBot={_viewModel.updateRequestStateAiChatBot}
+  openAiForAllOpenedRequestTabs={_viewModel.openAiForAllOpenedRequestTabs}
   upgradePlanRedirect={_viewModel.handleRedirectToAdminPanel}
 />

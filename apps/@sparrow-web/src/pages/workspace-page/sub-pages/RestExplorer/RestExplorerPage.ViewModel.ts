@@ -1669,6 +1669,45 @@ class RestExplorerViewModel {
   };
 
   /**
+   * Opens Sparrow AI for all already opened REST API request tabs
+   * and restores default auto-open behavior for future tabs
+   */
+  public openAiForAllOpenedRequestTabs = async () => {
+    const shouldAutoOpen =
+      localStorage.getItem("sparrow_ai_auto_open") !== "false";
+
+    const currentTab = createDeepCopy(this._tab.getValue());
+    const allTabs = await this.tabRepository.getTabLs();
+    if (!allTabs || allTabs.length === 0) return;
+
+    for (const tab of allTabs) {
+      if (tab.type !== TabTypeEnum.REQUEST) continue;
+
+      const progressiveTab = createDeepCopy(tab);
+
+      if (progressiveTab.property?.request?.state) {
+        const prev = progressiveTab.property.request.state.isChatbotActive;
+
+        if (prev !== shouldAutoOpen) {
+          progressiveTab.property.request.state.isChatbotActive =
+            shouldAutoOpen;
+
+          await this.tabRepository.updateTab(
+            progressiveTab.tabId,
+            progressiveTab,
+          );
+
+          if (progressiveTab.tabId === currentTab?.tabId) {
+            this.tab = progressiveTab;
+          }
+        }
+      }
+    }
+
+    this.compareRequestWithServer();
+  };
+
+  /**
    *
    * @param  - response state
    */
