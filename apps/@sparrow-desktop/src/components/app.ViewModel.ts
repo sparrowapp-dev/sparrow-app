@@ -375,8 +375,7 @@ export class AppViewModel {
         params.get("accessToken") &&
         params.get("refreshToken");
       const currentUserAccessToken = params.get("accessToken");
-      const workspaceId =
-        params.get("workspaceId") || params.get("workspaceID");
+      const workspaceId = params.get("workspaceID");
       const isSparrowEdge = params.get("isSparrowEdge");
       const tokens = getAuthJwt();
 
