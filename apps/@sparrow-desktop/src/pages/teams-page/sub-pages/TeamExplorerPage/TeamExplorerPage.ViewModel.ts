@@ -1095,21 +1095,34 @@ export class TeamExplorerPageViewModel {
     options?: { toWorkspace?: boolean },
   ) => {
     const [authToken] = getAuthJwt();
-    const [, , selfhostAdminUrl] = getSelfhostUrls();
-    if (options?.toWorkspace) {
-      await open(
-        `${
-          selfhostAdminUrl ? selfhostAdminUrl : constants.ADMIN_URL
-        }/hubs/workspace/${teamId}?xid=${authToken}`,
+
+    try {
+      const response = await fetch(
+        `${constants.API_URL}/api/auth/admin-sso-token`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({ teamId }),
+        },
       );
-    } else {
-      if (selfhostAdminUrl) {
-        await open(selfhostAdminUrl);
-      } else {
-        await open(
-          `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
-        );
+
+      if (response.status === 403) {
+        await open(`${constants.ADMIN_URL}/login`);
+        return;
       }
+
+      if (!response.ok) {
+        throw new Error("Unexpected error");
+      }
+
+      const data = await response.json();
+
+      await open(`${constants.ADMIN_URL}/sso?ssoToken=${data.ssoToken}`);
+    } catch (error) {
+      await open(`${constants.ADMIN_URL}/login`);
     }
   };
 
