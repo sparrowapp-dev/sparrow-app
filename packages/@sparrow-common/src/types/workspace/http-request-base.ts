@@ -17,6 +17,7 @@ export enum HttpRequestAuthTypeBaseEnum {
   API_KEY = "API Key",
   BEARER_TOKEN = "Bearer Token",
   BASIC_AUTH = "Basic Auth",
+  OAUTH2 = "OAuth 2.0",
   INHERIT_AUTH = "Inherit Auth",
   AUTH_PROFILES = "Authentication Profiles"
 }
@@ -41,10 +42,29 @@ interface HttpRequestApiKeyBaseInterface {
   addTo: CollectionRequestAddToBaseEnum;
 }
 
+export enum HttpRequestOAuth2GrantTypeBaseEnum {
+  AUTHORIZATION_CODE = "Authorization Code",
+  CLIENT_CREDENTIALS = "Client Credentials",
+}
+
+interface HttpRequestOAuth2BaseInterface {
+  grantType?: HttpRequestOAuth2GrantTypeBaseEnum;
+  headerPrefix?: string;
+  callbackUrl?: string;
+  clientId?: string;
+  clientSecret?: string;
+  authUrl?: string;
+  accessTokenUrl?: string;
+  scope?: string;
+  state?: string;
+  accessToken?: string;
+}
+
 interface HttpRequestAuthBaseInterface {
   bearerToken?: string;
   basicAuth?: HttpRequestBasicAuthBaseInterface;
   apiKey?: HttpRequestApiKeyBaseInterface;
+  oauth2?: HttpRequestOAuth2BaseInterface;
 }
 
 export enum HttpRequestMethodBaseEnum {

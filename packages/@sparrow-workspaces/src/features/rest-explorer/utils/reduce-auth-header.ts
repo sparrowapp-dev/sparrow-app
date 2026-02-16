@@ -23,6 +23,13 @@ class ReduceAuthHeader {
         _auth.basicAuth.username + ":" + _auth.basicAuth.password,
       )}`;
     } else if (
+      _state === HttpRequestAuthTypeBaseEnum.OAUTH2 &&
+      _auth.oauth2?.accessToken
+    ) {
+      authValue.key = "Authorization";
+      const prefix = _auth.oauth2.headerPrefix || "Bearer";
+      authValue.value = `${prefix} ${_auth.oauth2.accessToken}`;
+    } else if (
       _state === HttpRequestAuthTypeBaseEnum.API_KEY &&
       _auth.apiKey.addTo === CollectionRequestAddToBaseEnum.HEADER &&
       (_auth.apiKey.authKey || _auth.apiKey.authValue)

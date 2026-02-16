@@ -78,11 +78,17 @@ export enum CollectionAuthTypeBaseEnum {
   API_KEY = "API Key",
   BEARER_TOKEN = "Bearer Token",
   BASIC_AUTH = "Basic Auth",
+  OAUTH2 = "OAuth 2.0",
 }
 
 export enum CollectionTypeBaseEnum {
   MOCK = "MOCK",
   STANDARD = "STANDARD",
+}
+
+export enum CollectionOAuth2GrantTypeBaseEnum {
+  AUTHORIZATION_CODE = "Authorization Code",
+  CLIENT_CREDENTIALS = "Client Credentials",
 }
 
 export interface CollectionAuthBaseInterface {
@@ -95,6 +101,18 @@ export interface CollectionAuthBaseInterface {
     authKey: string;
     authValue: string;
     addTo: CollectionRequestAddToBaseEnum;
+  };
+  oauth2: {
+    grantType: CollectionOAuth2GrantTypeBaseEnum;
+    headerPrefix: string;
+    callbackUrl: string;
+    clientId: string;
+    clientSecret: string;
+    authUrl: string;
+    accessTokenUrl: string;
+    scope: string;
+    state: string;
+    accessToken: string;
   };
 }
 

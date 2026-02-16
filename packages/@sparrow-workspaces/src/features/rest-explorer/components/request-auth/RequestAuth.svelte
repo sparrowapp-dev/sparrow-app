@@ -5,6 +5,7 @@
     BasicAuth,
     BearerToken,
     NoAuth,
+    OAuth2,
   } from "./sub-auth";
   import { WithSelect } from "@sparrow/workspaces/hoc";
   import type { HttpRequestCollectionLevelAuthTabInterface } from "@sparrow/common/types/workspace";
@@ -95,6 +96,10 @@
                 id: HttpRequestAuthTypeBaseEnum.BASIC_AUTH,
               },
               {
+                name: "OAuth 2.0",
+                id: HttpRequestAuthTypeBaseEnum.OAUTH2,
+              },
+              {
                 name: "Auth Profiles",
                 id: HttpRequestAuthTypeBaseEnum.AUTH_PROFILES,
                 disabled: !collection?.authProfiles?.length,
@@ -146,6 +151,13 @@
         {environmentVariables}
         {onUpdateEnvironment}
       />
+    {:else if requestStateAuth === HttpRequestAuthTypeBaseEnum.OAUTH2}
+      <OAuth2
+        oauth2Data={auth.oauth2}
+        callback={onUpdateRequestAuth}
+        {environmentVariables}
+        {onUpdateEnvironment}
+      />
     {:else if requestStateAuth === HttpRequestAuthTypeBaseEnum.INHERIT_AUTH}
       {#if collectionAuth?.collectionAuthNavigation === CollectionAuthTypeBaseEnum.NO_AUTH}
         <p class="text-fs-16">No Auth</p>
@@ -172,6 +184,15 @@
         <p class="text-fs-16">Basic Auth</p>
         <BasicAuth
           basicAuth={collectionAuth.auth.basicAuth}
+          callback={() => {}}
+          {environmentVariables}
+          {onUpdateEnvironment}
+          disabled={true}
+        />
+      {:else if collectionAuth?.collectionAuthNavigation === CollectionAuthTypeBaseEnum.OAUTH2}
+        <p class="text-fs-16">OAuth 2.0</p>
+        <OAuth2
+          oauth2Data={collectionAuth.auth.oauth2}
           callback={() => {}}
           {environmentVariables}
           {onUpdateEnvironment}
