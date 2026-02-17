@@ -42,6 +42,7 @@ mod config;
 mod formdata_handler;
 mod group_policy_config;
 mod json_handler;
+mod oauth_window;
 mod raw_handler;
 mod request_handler;
 mod response_serializer;
@@ -1431,6 +1432,8 @@ fn main() {
             show_toolbar,
             hide_toolbar,
             get_initial_deep_link,
+            // OAuth2 window command
+            oauth_window::open_oauth_window,
             // Response temp file commands
             response_temp_file::write_response_to_temp,
             response_temp_file::write_formatted_response,

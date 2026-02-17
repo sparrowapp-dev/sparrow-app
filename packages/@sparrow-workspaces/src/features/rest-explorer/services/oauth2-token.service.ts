@@ -3,6 +3,8 @@
  * Handles OAuth2 token acquisition for different grant types
  */
 
+const isTauri = "__TAURI_INTERNALS__" in window;
+
 export interface OAuth2ClientCredentialsParams {
   clientId: string;
   clientSecret: string;
@@ -15,7 +17,7 @@ export interface OAuth2AuthorizationCodeParams {
   clientSecret: string;
   authUrl: string;
   accessTokenUrl: string;
-  callbackUrl?: string;
+  callbackUrl: string;
   scope?: string;
   state?: string;
 }
@@ -33,15 +35,16 @@ export class OAuth2TokenService {
    * Get access token using Client Credentials grant type
    */
   async getTokenClientCredentials(
-    params: OAuth2ClientCredentialsParams
+    params: OAuth2ClientCredentialsParams,
   ): Promise<OAuth2TokenResponse> {
     const { clientId, clientSecret, accessTokenUrl, scope } = params;
 
     if (!clientId || !clientSecret || !accessTokenUrl) {
-      throw new Error("Missing required parameters for Client Credentials flow");
+      throw new Error(
+        "Missing required parameters for Client Credentials flow",
+      );
     }
 
-    // Prepare the request body
     const body = new URLSearchParams({
       grant_type: "client_credentials",
       client_id: clientId,
@@ -63,7 +66,9 @@ export class OAuth2TokenService {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Token request failed: ${response.status} - ${errorText}`);
+        throw new Error(
+          `Token request failed: ${response.status} - ${errorText}`,
+        );
       }
 
       const tokenData = await response.json();
@@ -76,46 +81,59 @@ export class OAuth2TokenService {
 
   /**
    * Get access token using Authorization Code grant type
-   * This requires browser interaction for user authorization
    */
   async getTokenAuthorizationCode(
-    params: OAuth2AuthorizationCodeParams
+    params: OAuth2AuthorizationCodeParams,
   ): Promise<OAuth2TokenResponse> {
-    const { clientId, clientSecret, authUrl, accessTokenUrl, callbackUrl, scope, state } = params;
+    const {
+      clientId,
+      clientSecret,
+      authUrl,
+      accessTokenUrl,
+      callbackUrl,
+      scope,
+      state,
+    } = params;
 
-    if (!clientId || !clientSecret || !authUrl || !accessTokenUrl) {
-      throw new Error("Missing required parameters for Authorization Code flow");
+    if (
+      !clientId ||
+      !clientSecret ||
+      !authUrl ||
+      !accessTokenUrl ||
+      !callbackUrl
+    ) {
+      throw new Error(
+        "Missing required parameters for Authorization Code flow",
+      );
     }
 
-    const redirectUri = callbackUrl || this.getDefaultRedirectUri();
+    // Get authorization code
+    const authorizationCode = await this.getAuthorizationCode({
+      authUrl,
+      clientId,
+      redirectUri: callbackUrl,
+      scope,
+      state,
+    });
+
+    if (!authorizationCode) {
+      throw new Error("Failed to obtain authorization code");
+    }
+
+    // Exchange authorization code for access token
+    const body = new URLSearchParams({
+      grant_type: "authorization_code",
+      code: authorizationCode,
+      client_id: clientId,
+      client_secret: clientSecret,
+      redirect_uri: callbackUrl,
+    });
+
+    if (scope) {
+      body.append("scope", scope);
+    }
 
     try {
-      // Step 1: Get authorization code via browser
-      const authorizationCode = await this.getAuthorizationCode({
-        authUrl,
-        clientId,
-        redirectUri,
-        scope,
-        state,
-      });
-
-      if (!authorizationCode) {
-        throw new Error("Failed to obtain authorization code");
-      }
-
-      // Step 2: Exchange authorization code for access token
-      const body = new URLSearchParams({
-        grant_type: "authorization_code",
-        code: authorizationCode,
-        client_id: clientId,
-        client_secret: clientSecret,
-        redirect_uri: redirectUri,
-      });
-
-      if (scope) {
-        body.append("scope", scope);
-      }
-
       const response = await fetch(accessTokenUrl, {
         method: "POST",
         headers: {
@@ -126,19 +144,21 @@ export class OAuth2TokenService {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Token exchange failed: ${response.status} - ${errorText}`);
+        throw new Error(
+          `Token exchange failed: ${response.status} - ${errorText}`,
+        );
       }
 
       const tokenData = await response.json();
       return tokenData as OAuth2TokenResponse;
     } catch (error) {
       const err = error as Error;
-      throw new Error(`Authorization Code flow failed: ${err.message}`);
+      throw new Error(`Failed to exchange code for token: ${err.message}`);
     }
   }
 
   /**
-   * Opens authorization URL in browser and captures the authorization code
+   * Get authorization code using OAuth window
    */
   private async getAuthorizationCode(params: {
     authUrl: string;
@@ -166,39 +186,112 @@ export class OAuth2TokenService {
 
     const fullAuthUrl = `${authUrl}?${authUrlParams.toString()}`;
 
+    // For Tauri, use OAuth window
+    if (isTauri) {
+      return this.getAuthorizationCodeTauri(fullAuthUrl, redirectUri);
+    }
+
+    // For web, use popup window
+    return this.getAuthorizationCodeWeb(fullAuthUrl);
+  }
+
+  /**
+   * Get authorization code using Tauri OAuth window
+   */
+  private async getAuthorizationCodeTauri(
+    authUrl: string,
+    callbackUrl: string,
+  ): Promise<string> {
+    const { invoke } = await import("@tauri-apps/api/core");
+    const { listen } = await import("@tauri-apps/api/event");
+
     return new Promise((resolve, reject) => {
-      // Open popup window for authorization
-      const width = 600;
+      let unlisten: (() => void) | null = null;
+
+      // Listen for OAuth callback event
+      listen<{ code?: string; error?: string; state?: string }>(
+        "oauth-callback-received",
+        (event) => {
+          if (unlisten) {
+            unlisten();
+          }
+
+          if (event.payload.error) {
+            reject(new Error(`Authorization failed: ${event.payload.error}`));
+            return;
+          }
+
+          if (event.payload.code) {
+            resolve(event.payload.code);
+          } else {
+            reject(new Error("No authorization code received"));
+          }
+        },
+      ).then((fn) => {
+        unlisten = fn;
+      });
+
+      // Open OAuth window
+      invoke("open_oauth_window", {
+        authUrl,
+        callbackUrl,
+      }).catch((error) => {
+        console.error(
+          "[OAuth Service] ERROR invoking open_oauth_window:",
+          error,
+        );
+        if (unlisten) {
+          unlisten();
+        }
+        reject(new Error(`Failed to open OAuth window: ${error}`));
+      });
+
+      // Timeout after 5 minutes
+      setTimeout(() => {
+        if (unlisten) {
+          unlisten();
+        }
+        reject(new Error("Authorization timeout"));
+      }, 300000);
+    });
+  }
+
+  /**
+   * Get authorization code using web popup window
+   */
+  private async getAuthorizationCodeWeb(fullAuthUrl: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      // Open popup window
+      const width = 500;
       const height = 700;
       const left = window.screen.width / 2 - width / 2;
       const top = window.screen.height / 2 - height / 2;
 
       const popup = window.open(
         fullAuthUrl,
-        "OAuth2 Authorization",
-        `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no,location=no`
+        "OAuth Authorization",
+        `width=${width},height=${height},left=${left},top=${top}`,
       );
 
       if (!popup) {
-        reject(new Error("Failed to open authorization popup. Please allow popups for this site."));
+        reject(
+          new Error(
+            "Failed to open authorization popup. Please allow popups for this site.",
+          ),
+        );
         return;
       }
 
-      // Listen for the redirect callback
+      // Listen for messages from popup
       const messageHandler = (event: MessageEvent) => {
-        // Verify origin for security
-        if (event.origin !== window.location.origin) {
-          return;
-        }
-
-        if (event.data.type === "oauth2_callback") {
+        if (event.data && event.data.type === "oauth-callback") {
           window.removeEventListener("message", messageHandler);
           popup.close();
 
-          if (event.data.code) {
-            resolve(event.data.code);
-          } else if (event.data.error) {
+          if (event.data.error) {
             reject(new Error(`Authorization failed: ${event.data.error}`));
+          } else if (event.data.code) {
+            resolve(event.data.code);
           } else {
             reject(new Error("No authorization code received"));
           }
@@ -207,22 +300,14 @@ export class OAuth2TokenService {
 
       window.addEventListener("message", messageHandler);
 
-      // Check if popup was closed without completing authorization
-      const checkPopupClosed = setInterval(() => {
+      // Check if popup was closed
+      const checkPopup = setInterval(() => {
         if (popup.closed) {
-          clearInterval(checkPopupClosed);
+          clearInterval(checkPopup);
           window.removeEventListener("message", messageHandler);
           reject(new Error("Authorization cancelled by user"));
         }
       }, 1000);
     });
-  }
-
-  /**
-   * Get the default redirect URI for OAuth2 callback
-   */
-  private getDefaultRedirectUri(): string {
-    // For web app, use a callback page in the same origin
-    return `${window.location.origin}/oauth2-callback.html`;
   }
 }

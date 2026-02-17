@@ -5,7 +5,7 @@
   import { HttpRequestOAuth2GrantTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
   import { OAuth2TokenService } from "../../../../services/oauth2-token.service";
 
-  export let oauth2Data;
+  export let oauth2Data: any;
   export let callback;
   export let environmentVariables;
   export let onUpdateEnvironment;
@@ -13,9 +13,13 @@
 
   const theme = new AuthInputTheme().build();
   const tokenService = new OAuth2TokenService();
-  
+
   let isGettingToken = false;
   let tokenStatus = "";
+
+  const getDefaultCallbackUrl = () => {
+    return "http://localhost/callback";
+  };
 
   // Initialize with default values if not set
   // Ensure grantType always has a value for radio button binding
@@ -24,7 +28,7 @@
       oauth2Data = {
         grantType: HttpRequestOAuth2GrantTypeBaseEnum.CLIENT_CREDENTIALS,
         headerPrefix: "Bearer",
-        callbackUrl: `${window.location.origin}/oauth2-callback.html`,
+        callbackUrl: getDefaultCallbackUrl(),
         clientId: "",
         clientSecret: "",
         authUrl: "",
@@ -36,13 +40,14 @@
     } else {
       // Ensure required fields have defaults
       if (!oauth2Data.grantType) {
-        oauth2Data.grantType = HttpRequestOAuth2GrantTypeBaseEnum.CLIENT_CREDENTIALS;
+        oauth2Data.grantType =
+          HttpRequestOAuth2GrantTypeBaseEnum.CLIENT_CREDENTIALS;
       }
       if (!oauth2Data.headerPrefix) {
         oauth2Data.headerPrefix = "Bearer";
       }
       if (!oauth2Data.callbackUrl) {
-        oauth2Data.callbackUrl = `${window.location.origin}/oauth2-callback.html`;
+        oauth2Data.callbackUrl = getDefaultCallbackUrl();
       }
     }
   }
@@ -62,15 +67,21 @@
 
     try {
       let tokenResponse;
-      
-      if (oauth2Data.grantType === HttpRequestOAuth2GrantTypeBaseEnum.CLIENT_CREDENTIALS) {
+
+      if (
+        oauth2Data.grantType ===
+        HttpRequestOAuth2GrantTypeBaseEnum.CLIENT_CREDENTIALS
+      ) {
         tokenResponse = await tokenService.getTokenClientCredentials({
           clientId: oauth2Data.clientId,
           clientSecret: oauth2Data.clientSecret,
           accessTokenUrl: oauth2Data.accessTokenUrl,
           scope: oauth2Data.scope,
         });
-      } else if (oauth2Data.grantType === HttpRequestOAuth2GrantTypeBaseEnum.AUTHORIZATION_CODE) {
+      } else if (
+        oauth2Data.grantType ===
+        HttpRequestOAuth2GrantTypeBaseEnum.AUTHORIZATION_CODE
+      ) {
         tokenResponse = await tokenService.getTokenAuthorizationCode({
           clientId: oauth2Data.clientId,
           clientSecret: oauth2Data.clientSecret,
@@ -91,6 +102,7 @@
         throw new Error("No access token received");
       }
     } catch (error) {
+      console.error("Error obtaining token:", error);
       tokenStatus = "Failed to obtain token";
       const err = error as Error;
       notifications.error("Failed to obtain access token: " + err.message);
@@ -192,7 +204,7 @@
           <CodeMirrorInput
             bind:value={oauth2Data.callbackUrl}
             onUpdateInput={handleAuthChange}
-            placeholder="https://oauth.pstmn.io/v1/browser-callback"
+            placeholder={"http://localhost/callback"}
             {theme}
             {disabled}
             {environmentVariables}
@@ -200,6 +212,9 @@
           />
         </div>
       </div>
+      <p class="mt-2 text-fs-10 text-secondary-200" style="font-style: italic;">
+        Enter the redirect URI configured in your OAuth provider.
+      </p>
     </div>
 
     <!-- Auth URL (only for Authorization Code) -->
@@ -284,17 +299,30 @@
         type="primary"
         title={isGettingToken ? "Getting Token..." : "Get Access Token"}
         onClick={handleGetToken}
-        disable={isGettingToken || !oauth2Data.clientId || !oauth2Data.clientSecret || !oauth2Data.accessTokenUrl || (oauth2Data.grantType === HttpRequestOAuth2GrantTypeBaseEnum.AUTHORIZATION_CODE && (!oauth2Data.authUrl || !oauth2Data.callbackUrl))}
+        disable={isGettingToken ||
+          !oauth2Data.clientId ||
+          !oauth2Data.clientSecret ||
+          !oauth2Data.accessTokenUrl ||
+          (oauth2Data.grantType ===
+            HttpRequestOAuth2GrantTypeBaseEnum.AUTHORIZATION_CODE &&
+            (!oauth2Data.authUrl || !oauth2Data.callbackUrl))}
         loader={isGettingToken}
         startIcon={undefined}
         endIcon={undefined}
       />
-      {#if tokenStatus}
-        <p class="mt-2 text-fs-12" style="color: {tokenStatus.includes('success') ? 'var(--text-ds-success-500)' : tokenStatus.includes('Failed') ? 'var(--text-ds-error-500)' : 'var(--text-ds-neutral-400)'}">
-          {tokenStatus}
-        </p>
-      {/if}
     </div>
+    {#if tokenStatus}
+      <p
+        class="mt-2 text-fs-12"
+        style="color: {tokenStatus.includes('success')
+          ? 'var(--text-ds-success-500)'
+          : tokenStatus.includes('Failed')
+            ? 'var(--text-ds-error-500)'
+            : 'var(--text-ds-neutral-400)'}"
+      >
+        {tokenStatus}
+      </p>
+    {/if}
   {/if}
 
   <!-- Access Token -->
