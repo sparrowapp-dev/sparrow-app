@@ -27,6 +27,7 @@
   import { Platform } from "@sparrow/common/enums";
   import { inviteModalStore } from "@app/store/inviteModal.store";
   import { navigate } from "svelte-navigator";
+  import { NotificationService } from "../services/notification.service";
 
   let isAccessDeniedModalOpen = false;
   const handleAccessDeniedClose = (flag = false) => {
@@ -107,6 +108,8 @@
     }
   };
 
+  const notificationService = new NotificationService();
+
   onMount(async () => {
     if (typeof window !== "undefined") {
       initPostHog();
@@ -117,6 +120,8 @@
       await _viewModel.processDeepLink(initialUrl?.toString());
     }
     await _viewModel.registerDeepLinkHandler();
+    await notificationService.loadNotificationsToStore();
+
     await singleInstanceHandler();
     await setScaleFactorToDb(await getScaleFactor());
     let isloggedIn;

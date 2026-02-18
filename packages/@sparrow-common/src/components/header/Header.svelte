@@ -30,6 +30,10 @@
   import { SparrowFilledLogo } from "./images/index";
   import { policyConfig } from "@sparrow/common/store";
   import { TeamRole } from "@sparrow/common/enums";
+  import { unreadCount } from "@sparrow/common/store";
+  import { BellRegular } from "@sparrow/library/icons";
+  import NotificationDropdown from "../notifications/NotificationDropdown.svelte";
+
   // import { GlobalSearch } from "../../components/popup/global-search";
   /**
    * environment list
@@ -90,6 +94,7 @@
   export let appEdition = "MANAGED";
 
   let helpOptionsOpen = false;
+  let showNotifications = false;
 
   /**
    * callback for Select component
@@ -300,7 +305,7 @@
   import { profileTabIcon as profile } from "@sparrow/library/assets";
   import { profileHoveredIcon as hoveredProfile } from "@sparrow/library/assets";
   import { profileSelectedIcon as selectedProfile } from "@sparrow/library/assets";
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import { OSDetector } from "../../utils";
   import WindowAction from "./window-action/WindowAction.svelte";
   import SearchBar from "../SearchBar/SearchBar.svelte";
@@ -316,6 +321,7 @@
   };
 
   let showProfileModal = false;
+
   let searchValue = "";
 
   let appWindow;
@@ -347,6 +353,21 @@
     } else {
       isWindows = false;
     }
+  });
+
+  let bellRef: HTMLElement;
+  onMount(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (bellRef && !bellRef.contains(event.target as Node)) {
+        showNotifications = false;
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
   });
 
   const redirectDocumentation = () => {
@@ -743,6 +764,31 @@
       </div>
     {/if}
 
+    <div
+      bind:this={bellRef}
+      class="bell-wrapper"
+      class:active={showNotifications}
+      style="position: relative;"
+    >
+      <Tooltip placement="bottom-right" title="Notifications" zIndex={600}>
+        <Button
+          type="teritiary-regular"
+          startIcon={BellRegular}
+          iconSize={20}
+          size="medium"
+          onClick={() => (showNotifications = !showNotifications)}
+        />
+      </Tooltip>
+
+      {#if showNotifications}
+        <NotificationDropdown />
+      {/if}
+    </div>
+
+    {#if $unreadCount > 0}
+      <span class="notification-dot"></span>
+    {/if}
+
     {#if !isGuestUser}
       <div>
         <UserProfileModal
@@ -910,5 +956,24 @@
     padding: 4px 8px;
     border-radius: 4px;
     transition: background-color 0.2s;
+  }
+
+  .notification-dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 6px;
+    height: 6px;
+    background: var(--text-ds-danger-500);
+    border-radius: 50%;
+  }
+
+  .bell-wrapper.active :global(button) {
+    background-color: var(--bg-ds-surface-500);
+    border: 1px solid var(--border-ds-primary-500);
+  }
+
+  .bell-wrapper.active :global(svg) {
+    color: var(--icon-ds-primary-400);
   }
 </style>
