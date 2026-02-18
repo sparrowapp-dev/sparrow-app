@@ -169,7 +169,7 @@ export class OAuth2TokenService {
   }): Promise<string> {
     const { authUrl, clientId, redirectUri, scope, state } = params;
 
-    // Build authorization URL
+    // Build authorization URL - handle case where authUrl already has query params
     const authUrlParams = new URLSearchParams({
       response_type: "code",
       client_id: clientId,
@@ -184,7 +184,9 @@ export class OAuth2TokenService {
       authUrlParams.append("state", state);
     }
 
-    const fullAuthUrl = `${authUrl}?${authUrlParams.toString()}`;
+    // Use & if authUrl already has query params, otherwise use ?
+    const separator = authUrl.includes("?") ? "&" : "?";
+    const fullAuthUrl = `${authUrl}${separator}${authUrlParams.toString()}`;
 
     // For Tauri, use OAuth window
     if (isTauri) {

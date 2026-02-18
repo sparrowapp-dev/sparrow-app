@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
 use tauri::{AppHandle, Emitter, Manager, WebviewUrl, WebviewWindowBuilder};
+use tokio::sync::Mutex;
 use url::Url;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -25,7 +27,16 @@ pub async fn open_oauth_window(
         err_msg
     })?;
 
-    // Create the OAuth window
+    // Clone values for use in callback
+    let app_for_callback = app.clone();
+    let callback_url_for_check = callback_url.clone();
+    let window_label_for_close = window_label.clone();
+    
+    // Track if callback was already processed to prevent duplicate handling
+    let callback_processed = Arc::new(Mutex::new(false));
+    let callback_processed_clone = callback_processed.clone();
+
+    // Create the OAuth window with navigation handler
     let window_result = WebviewWindowBuilder::new(
         &app,
         &window_label,
@@ -37,92 +48,67 @@ pub async fn open_oauth_window(
     .resizable(true)
     .visible(true)
     .focused(true)
-    .build();
-
-    let window = match window_result {
-        Ok(w) => {
-            w
-        }
-        Err(e) => {
-            let err_msg = format!("Failed to create OAuth window: {}", e);
-            return Err(err_msg);
-        }
-    };
-
-    // Clone references for the async task
-    let app_clone = app.clone();
-    let window_clone = window.clone();
-    let callback_url_clone = callback_url.clone();
-    let window_label_clone = window_label.clone();
-    
-    // Spawn a task to poll the window URL
-    tokio::spawn(async move {
-        let mut interval = tokio::time::interval(tokio::time::Duration::from_millis(250));
-        let mut poll_count = 0;
+    .on_navigation(move |url| {
+        let url_str = url.to_string();
         
-        loop {
-            interval.tick().await;
-            poll_count += 1;
+        // Check if this is the callback URL
+        if url_str.starts_with(&callback_url_for_check) {
+            // Use try_lock to avoid blocking - if already processing, allow navigation
+            let mut processed = match callback_processed_clone.try_lock() {
+                Ok(guard) => guard,
+                Err(_) => return false, // Already being processed, block navigation
+            };
             
-            // Check if window still exists
-            if app_clone.get_webview_window(&window_label_clone).is_none() {
-                break;
+            if *processed {
+                return false; // Already processed, block navigation
             }
+            *processed = true;
+            drop(processed); // Release lock before doing more work
             
-            // Get current URL
-            match window_clone.url() {
-                Ok(current_url) => {
-                    let url_str = current_url.to_string();
-                    
-                    // STRICT matching: Only match if URL starts with exact callback URL
-                    // This prevents false positives with other pages on the same domain
-                    if url_str.starts_with(&callback_url_clone) {
-                        
-                        // Parse query parameters
-                        if let Ok(parsed_url) = Url::parse(&url_str) {
-                            let mut code: Option<String> = None;
-                            let mut error: Option<String> = None;
-                            let mut state: Option<String> = None;
+            // Parse query parameters from the callback URL
+            let mut code: Option<String> = None;
+            let mut error: Option<String> = None;
+            let mut state: Option<String> = None;
 
-                            for (key, value) in parsed_url.query_pairs() {
-                                match key.as_ref() {
-                                    "code" => {
-                                        code = Some(value.to_string());
-                                    }
-                                    "error" => {
-                                        error = Some(value.to_string());
-                                    }
-                                    "state" => {
-                                        state = Some(value.to_string());
-                                    }
-                                    _ => {}
-                                }
-                            }
-
-                            // Send callback data
-                            let callback_data = OAuthCallbackData {
-                                code,
-                                error,
-                                state,
-                            };
-
-                            let _ = app_clone.emit("oauth-callback-received", callback_data);
-
-                            // Close window
-                            if let Some(oauth_window) = app_clone.get_webview_window(&window_label_clone) {
-                                let _ = oauth_window.close();
-                            }
-                            
-                            break;
-                        } 
+            if let Ok(parsed_url) = Url::parse(&url_str) {
+                for (key, value) in parsed_url.query_pairs() {
+                    match key.as_ref() {
+                        "code" => code = Some(value.to_string()),
+                        "error" => error = Some(value.to_string()),
+                        "state" => state = Some(value.to_string()),
+                        _ => {}
                     }
                 }
-                Err(e) => {
-                }
             }
+
+            // Send callback data to frontend
+            let callback_data = OAuthCallbackData {
+                code,
+                error,
+                state,
+            };
+            let _ = app_for_callback.emit("oauth-callback-received", callback_data);
+
+            // Close the OAuth window
+            if let Some(oauth_window) = app_for_callback.get_webview_window(&window_label_for_close) {
+                let _ = oauth_window.close();
+            }
+
+            // Return false to prevent navigation to the callback URL
+            // This avoids loading a potentially non-existent page
+            return false;
         }
         
-    });
+        // Allow all other navigations
+        true
+    })
+    .build();
 
-    Ok(())
+    match window_result {
+        Ok(_) => Ok(()),
+        Err(e) => {
+            let err_msg = format!("Failed to create OAuth window: {}", e);
+            Err(err_msg)
+        }
+    }
 }
