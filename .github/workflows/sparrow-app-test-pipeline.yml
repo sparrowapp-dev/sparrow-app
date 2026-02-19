@@ -267,8 +267,8 @@ jobs:
           echo "artifact_msi=$msiPath\*.msi" >> $env:GITHUB_OUTPUT
 
       - name: Upload MSI artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: windows-msi
           path: ${{ steps.prepare_msi.outputs.artifact_msi }}
-          retention-days: 7
+          retention-days: 1
