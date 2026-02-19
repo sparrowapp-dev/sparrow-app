@@ -101,9 +101,9 @@
               </div>
             {/if}
             {#if description}
-              <h3 class="sparrow-modal-description fw-normal ellipsis">
+              <p class="sparrow-modal-description fw-normal">
                 {description}
-              </h3>
+              </p>
             {/if}
           </div>
         </div>
@@ -192,5 +192,10 @@
     color: var(--text-ds-neutral-100);
     font-weight: 400;
     line-height: 20px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
 </style>

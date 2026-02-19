@@ -111,6 +111,9 @@ export class RequestTabAdapter {
       case HttpRequestAuthTypeBaseEnum.BEARER_TOKEN:
         requestAuthNavigation = HttpRequestAuthTypeBaseEnum.BEARER_TOKEN;
         break;
+      case HttpRequestAuthTypeBaseEnum.OAUTH2:
+        requestAuthNavigation = HttpRequestAuthTypeBaseEnum.OAUTH2;
+        break;
       case HttpRequestAuthTypeBaseEnum.INHERIT_AUTH:
         requestAuthNavigation = HttpRequestAuthTypeBaseEnum.INHERIT_AUTH;
         break;
@@ -137,6 +140,9 @@ export class RequestTabAdapter {
         break;
       case HttpRequestAuthTypeBaseEnum.BEARER_TOKEN:
         authType = HttpRequestAuthTypeBaseEnum.BEARER_TOKEN;
+        break;
+      case HttpRequestAuthTypeBaseEnum.OAUTH2:
+        authType = HttpRequestAuthTypeBaseEnum.OAUTH2;
         break;
       case HttpRequestAuthTypeBaseEnum.INHERIT_AUTH:
         authType = HttpRequestAuthTypeBaseEnum.INHERIT_AUTH;
