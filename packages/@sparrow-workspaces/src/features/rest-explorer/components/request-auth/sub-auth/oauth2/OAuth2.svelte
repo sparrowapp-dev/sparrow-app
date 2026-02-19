@@ -9,6 +9,7 @@
     Dropdown,
   } from "@sparrow/library/ui";
   import { CopyIcon2, BroomRegular, SaveRegular } from "@sparrow/library/icons";
+  import { eyeShowIcon, eyeHideIcon } from "@sparrow/library/assets";
   import { copyToClipBoard } from "@sparrow/common/utils";
   import { HttpRequestOAuth2GrantTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
   import { OAuth2TokenService } from "../../../../services/oauth2-token.service";
@@ -24,6 +25,9 @@
 
   let isGettingToken = false;
   let tokenStatus = "";
+
+  // Client secret visibility
+  let showSecret = false;
 
   // Modal states for copy/clear/save functionality
   let showClearConfirmation = false;
@@ -114,7 +118,10 @@
       }
 
       if (tokenResponse?.access_token) {
-        oauth2Data.accessToken = tokenResponse.access_token;
+        const prefix = oauth2Data.headerPrefix || "Bearer";
+        // Always store the access token with the header prefix so saving to
+        // environment preserves the full Authorization value.
+        oauth2Data.accessToken = `${prefix} ${tokenResponse.access_token}`;
         tokenStatus = "Token obtained successfully";
         notifications.success("Access token obtained successfully");
         handleAuthChange();
@@ -402,15 +409,41 @@
     <p class="mb-2 text-secondary-100">Client Secret</p>
     <div class="position-relative" style="min-height: 40px;">
       <div class="position-absolute top-0 auth-input-container">
-        <CodeMirrorInput
-          bind:value={oauth2Data.clientSecret}
-          onUpdateInput={handleAuthChange}
-          placeholder="Enter client secret"
-          {theme}
-          {disabled}
-          {environmentVariables}
-          {onUpdateEnvironment}
-        />
+        <div class="secret-input-wrapper">
+          {#if showSecret}
+            <input
+              id="oauth-client-secret"
+              type="text"
+              bind:value={oauth2Data.clientSecret}
+              on:input={handleAuthChange}
+              placeholder="Enter client secret"
+              class="form-control text-fs-12"
+              {disabled}
+              style="width:100%; padding-right:36px;"
+            />
+          {:else}
+            <input
+              id="oauth-client-secret"
+              type="password"
+              bind:value={oauth2Data.clientSecret}
+              on:input={handleAuthChange}
+              placeholder="Enter client secret"
+              class="form-control text-fs-12"
+              {disabled}
+              style="width:100%; padding-right:36px;"
+            />
+          {/if}
+          <button
+            type="button"
+            class="secret-toggle"
+            on:click={() => (showSecret = !showSecret)}
+            aria-label="Toggle client secret visibility"
+            title={showSecret ? "Hide secret" : "Show secret"}
+            {disabled}
+          >
+            <img src={showSecret ? eyeHideIcon : eyeShowIcon} alt="toggle" />
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -789,5 +822,30 @@
     width: 100%;
     justify-content: space-between;
     text-align: left;
+  }
+
+  .secret-input-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  .secret-toggle {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .secret-toggle img {
+    width: 18px;
+    height: 18px;
+    display: block;
   }
 </style>

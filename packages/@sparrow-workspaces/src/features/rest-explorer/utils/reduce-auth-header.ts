@@ -1,12 +1,17 @@
+import { type KeyValue } from "@sparrow/common/types/workspace";
 import {
-  type KeyValue,
-} from "@sparrow/common/types/workspace";
-import { CollectionRequestAddToBaseEnum, type CollectionAuthBaseInterface, type CollectionAuthTypeBaseEnum } from "@sparrow/common/types/workspace/collection-base";
+  CollectionRequestAddToBaseEnum,
+  type CollectionAuthBaseInterface,
+  type CollectionAuthTypeBaseEnum,
+} from "@sparrow/common/types/workspace/collection-base";
 import { HttpRequestAuthTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
 
 class ReduceAuthHeader {
   private authHeader: KeyValue;
-  constructor(_state: HttpRequestAuthTypeBaseEnum | CollectionAuthTypeBaseEnum, _auth: CollectionAuthBaseInterface) {
+  constructor(
+    _state: HttpRequestAuthTypeBaseEnum | CollectionAuthTypeBaseEnum,
+    _auth: CollectionAuthBaseInterface,
+  ) {
     const authValue: { key: string; value: string } = {
       key: "",
       value: "",
@@ -27,8 +32,16 @@ class ReduceAuthHeader {
       _auth.oauth2?.accessToken
     ) {
       authValue.key = "Authorization";
-      const prefix = _auth.oauth2.headerPrefix || "Bearer";
-      authValue.value = `${prefix} ${_auth.oauth2.accessToken}`;
+      const prefix = (_auth.oauth2.headerPrefix || "Bearer").trim();
+      const tokenValue = _auth.oauth2.accessToken.trim();
+      // If the stored accessToken already includes the prefix (e.g. "Bearer ..."),
+      // use it as-is. Otherwise, prepend the configured prefix.
+      const normalizedPrefix = prefix.toLowerCase();
+      if (tokenValue.toLowerCase().startsWith(normalizedPrefix + " ")) {
+        authValue.value = tokenValue;
+      } else {
+        authValue.value = `${prefix} ${tokenValue}`;
+      }
     } else if (
       _state === HttpRequestAuthTypeBaseEnum.API_KEY &&
       _auth.apiKey.addTo === CollectionRequestAddToBaseEnum.HEADER &&
@@ -42,7 +55,7 @@ class ReduceAuthHeader {
     }
     this.authHeader = authValue;
   }
-  public getValue() : KeyValue {
+  public getValue(): KeyValue {
     return this.authHeader;
   }
 }
