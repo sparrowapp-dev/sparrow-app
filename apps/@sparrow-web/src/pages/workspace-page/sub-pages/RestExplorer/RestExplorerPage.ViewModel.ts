@@ -150,6 +150,8 @@ class RestExplorerViewModel {
   private aiAssistentService = new AiAssistantService();
   private aiAssistentWebSocketService =
     AiAssistantWebSocketService.getInstance();
+  private _aiPreferenceSyncedOnLoad = false;
+
   /**
    * Utils
    */
@@ -1749,6 +1751,10 @@ class RestExplorerViewModel {
     const currentTab = createDeepCopy(this._tab.getValue());
     const allTabs = await this.tabRepository.getTabLs();
     if (!allTabs || allTabs.length === 0) return;
+
+    if (!this._aiPreferenceSyncedOnLoad) {
+      this._aiPreferenceSyncedOnLoad = true;
+    }
 
     for (const tab of allTabs) {
       if (tab.type !== TabTypeEnum.REQUEST) continue;
