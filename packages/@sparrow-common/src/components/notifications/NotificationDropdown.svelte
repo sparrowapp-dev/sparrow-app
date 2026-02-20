@@ -1,10 +1,61 @@
 <script lang="ts">
   import { notifications, unreadCount } from "@sparrow/common/store";
   import { onMount, onDestroy } from "svelte";
+  import InviteModal from "../invites/InviteModal.svelte";
+  import { NotificationService } from "@app/services/notification.service";
+  import { notifications as toast } from "@sparrow/library/ui";
+  import { navigate } from "svelte-navigator";
+
+  const notificationService = new NotificationService();
 
   let activeTab: "all" | "unread" = "all";
   let showMenu = false;
   let menuRef: HTMLElement;
+  let showInviteModal = false;
+  let selectedNotification: any = null;
+
+  async function handleAccept() {
+    try {
+      await notificationService.respondToInvite(
+        selectedNotification._id,
+        "accept",
+      );
+
+      // refresh notifications
+      await notificationService.loadNotificationsToStore();
+
+      toast.success(
+        `You now have access to ${selectedNotification.data.workspaceNames.join(", ")}`,
+      );
+
+      // navigate to invited hub
+      navigate(`/app/home/}`);
+
+      // close modal
+      showInviteModal = false;
+
+      // reload hub state so UI updates immediately
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to accept invite");
+    }
+  }
+
+  async function handleDecline() {
+    try {
+      await notificationService.respondToInvite(
+        selectedNotification._id,
+        "reject",
+      );
+
+      showInviteModal = false;
+
+      toast.info("Invite declined");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to decline invite");
+    }
+  }
 
   function handleClickOutside(event: MouseEvent) {
     if (!menuRef) return;
@@ -25,6 +76,12 @@
       minute: "2-digit",
       hour12: true,
     });
+  }
+
+  function openInvite(n) {
+    selectedNotification = n;
+    showInviteModal = true;
+    console.log("Opening invite modal for notification:", n);
   }
 
   onMount(() => {
@@ -110,7 +167,12 @@
             {formatTime(n.createdAt)}
           </div>
 
-          <button class="action-btn"> View Invite </button>
+          <button
+            class="action-btn"
+            on:click|stopPropagation={() => openInvite(n)}
+          >
+            View Invite
+          </button>
         </div>
 
         <!-- Unread indicator -->
@@ -121,6 +183,17 @@
     {/each}
   </div>
 </div>
+
+<InviteModal
+  open={showInviteModal}
+  onClose={() => (showInviteModal = false)}
+  inviterName={selectedNotification?.data?.inviterName}
+  hubName={selectedNotification?.data?.teamName}
+  role={selectedNotification?.data?.role}
+  workspaceNames={selectedNotification?.data?.workspaceNames || []}
+  onAccept={handleAccept}
+  onDecline={handleDecline}
+/>
 
 <style>
   .panel {
