@@ -785,9 +785,9 @@
       {/if}
     </div>
 
-    {#if $unreadCount > 0}
+    <!-- {#if $unreadCount > 0}
       <span class="notification-dot"></span>
-    {/if}
+    {/if} -->
 
     {#if !isGuestUser}
       <div>
@@ -966,11 +966,6 @@
     height: 6px;
     background: var(--text-ds-danger-500);
     border-radius: 50%;
-  }
-
-  .bell-wrapper.active :global(button) {
-    background-color: var(--bg-ds-surface-500);
-    border: 1px solid var(--border-ds-primary-500);
   }
 
   .bell-wrapper.active :global(svg) {

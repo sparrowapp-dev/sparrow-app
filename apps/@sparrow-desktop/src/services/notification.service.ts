@@ -86,7 +86,7 @@ export class NotificationService {
 
       const res = await this.fetchNotifications();
 
-      setNotifications(res.data.notifications || []);
+      setNotifications(res.data?.data?.notifications || []);
     } catch (err) {
       console.error("Failed to load notifications", err);
     } finally {
