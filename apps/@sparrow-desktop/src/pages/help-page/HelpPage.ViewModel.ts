@@ -294,11 +294,13 @@ class HelpPageViewModel {
   }
 
   /**
-   * Creates a post on the feedback board retrieved from Canny service with the given title and description.
+   * Creates a post on the feedback board using a single unified API call.
    *
    * @param  title - The title of the post.
    * @param  description - The description of the post.
-   * @returns Promise<Object> The response from the Canny service after creating the post.
+   * @param  categoryName - The category name for the post.
+   * @param  uploadFeedback - Object containing files to upload.
+   * @returns Promise<Object> The response from the upload API.
    */
 
   public createPost = async (
@@ -312,38 +314,53 @@ class HelpPageViewModel {
     },
   ) => {
     const errorMessage = "Failed to add the feedback. Please try again.";
-    const files = Array.from(uploadFeedback?.file?.value);
-    const formData = new FormData();
-    files.forEach((file) => formData.append("files", file));
-    const imageResponse = await this.feedbackService.fetchuploads(formData);
-    if (imageResponse?.isSuccessful) {
-      const images = imageResponse?.data?.data?.map(
-        (file: { fileUrl: string }) => file?.fileUrl,
-      );
-      try {
-        const categoryID = await this.getCategoryIDbyName(categoryName);
-        const userResponse = await this.createUser();
-        const boards = await this.RetrieveBoards();
-        const boardID = boards?.data?.boards[0]?.id;
-        const response = await this.cannyService.createPost({
-          boardID: boardID,
-          title: title,
-          details: description,
-          authorID: userResponse?.data?.id,
-          categoryID: categoryID,
-          imageURLs: images,
-        });
-        if (response.isSuccessful) {
-          notifications.success("Feedback added successfully.");
-        } else {
-          notifications.error(errorMessage);
-        }
-        return response;
-      } catch (e) {
+
+    try {
+      // Get user info for email
+      let userInfo: CannyUserType | null;
+      await user.subscribe((value) => {
+        userInfo = value;
+      });
+
+      // Get board ID and category ID
+      const boards = await this.RetrieveBoards();
+      const boardID = boards?.data?.boards[0]?.id;
+      const categoryID = await this.getCategoryIDbyName(categoryName);
+
+      // Build FormData with files and post data
+      const formData = new FormData();
+
+      // Append files if present
+      const files = Array.from(uploadFeedback?.file?.value || []);
+      files.forEach((file) => formData.append("files", file));
+
+      // Append required fields
+      formData.append("title", title);
+      formData.append("boardID", boardID);
+
+      // Append optional fields
+      if (description) {
+        formData.append("description", description);
+      }
+      if (userInfo?.email) {
+        formData.append("email", userInfo.email);
+      }
+      if (categoryID) {
+        formData.append("categoryID", categoryID);
+      }
+
+      // Single API call to upload files and create post
+      const response = await this.feedbackService.uploadPost(formData);
+
+      if (response.isSuccessful) {
+        notifications.success("Feedback added successfully.");
+      } else {
         notifications.error(errorMessage);
       }
-    } else {
+      return response;
+    } catch (e) {
       notifications.error(errorMessage);
+      Sentry.captureException(e);
     }
   };
 
@@ -453,10 +470,12 @@ class HelpPageViewModel {
   };
 
   /**
-   * Adds a comment to a post. If the user does not exist, creates a new user and then adds the comment.
+   * Adds a comment to a post using a single unified API call.
    * @param postID - The ID of the post to comment on.
    * @param value - The text of the comment.
-   * @returns {Promise<any>} The response from the Canny service.
+   * @param parentID - The ID of the parent comment (for replies).
+   * @param uploadedImageAttachment - Object containing files to upload.
+   * @returns {Promise<any>} The response from the upload API.
    */
   public addComment = async (
     postID: string,
@@ -468,55 +487,47 @@ class HelpPageViewModel {
       };
     },
   ) => {
-    let userInfo: CannyUserType | null;
-    await user.subscribe((value) => {
-      userInfo = value;
-    });
+    const errorMessage = "Failed to add comment. Please try again.";
 
-    // Try to retrieve the user first
-    let userResponse = await this.cannyService.retrieveUser(userInfo?.email);
-
-    // If user does not exist, create a new user
-    if (!userResponse?.isSuccessful) {
-      userResponse = await this.cannyService.createUser({
-        name: userInfo?.name,
-        email: userInfo?.email,
-        userID: userInfo?._id,
+    try {
+      // Get user info for email
+      let userInfo: CannyUserType | null;
+      await user.subscribe((value) => {
+        userInfo = value;
       });
-    }
 
-    const authorID = userResponse?.data?.id; // Use the retrieved or newly created user's ID
+      // Build FormData with files and comment data
+      const formData = new FormData();
 
-    // Handle file upload (similar to createPost)
-    const errorMessage = "Failed to upload files. Please try again.";
-    const files = Array.from(uploadedImageAttachment?.file?.value);
-    const formData = new FormData();
-    files.forEach((file) => formData.append("files", file));
-    const imageResponse = await this.feedbackService.fetchuploads(formData);
+      // Append files if present
+      const files = Array.from(uploadedImageAttachment?.file?.value || []);
+      files.forEach((file) => formData.append("files", file));
 
-    let images: string[] = [];
-    if (imageResponse?.isSuccessful) {
-      images = imageResponse?.data?.data?.map(
-        (file: { fileUrl: string }) => file?.fileUrl,
-      );
-    } else {
+      // Append required fields
+      formData.append("postID", postID);
+      formData.append("value", value);
+
+      // Append optional fields
+      if (parentID) {
+        formData.append("parentID", parentID);
+      }
+      if (userInfo?.email) {
+        formData.append("email", userInfo.email);
+      }
+
+      // Single API call to upload files and create comment
+      const response = await this.feedbackService.uploadComment(formData);
+
+      if (response.isSuccessful) {
+        notifications.success("Comment added successfully.");
+      } else {
+        notifications.error(errorMessage);
+      }
+      return response;
+    } catch (e) {
       notifications.error(errorMessage);
-      return;
+      Sentry.captureException(e);
     }
-
-    // Call the create comment API
-    const response = await this.cannyService.createComment(authorID, postID, {
-      value,
-      parentID,
-      imageURLs: images,
-    });
-
-    if (response.isSuccessful) {
-      notifications.success("Comment added successfully.");
-    } else {
-      notifications.error("Failed to add comment. Please try again.");
-    }
-    return response;
   };
 
   /**
