@@ -144,8 +144,10 @@
           <div class="message">
             <strong>'{n.data?.inviterName}'</strong>
             has invited you as a {n.data?.role} to
-            <strong>'{n.data?.workspaceNames?.[0]}'</strong>
-            workspace.
+            <strong>
+              '{n.data?.workspaceNames?.join(", ")}'
+            </strong>
+            workspace{n.data?.workspaceNames?.length > 1 ? "s" : ""}.
           </div>
 
           <div class="time">

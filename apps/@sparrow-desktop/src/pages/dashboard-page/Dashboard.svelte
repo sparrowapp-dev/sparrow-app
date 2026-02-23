@@ -116,6 +116,7 @@
   let isUpgradePlanModelOpen: boolean = false;
   let currentWorkspacePlan = "";
   let isUpgradeCurrentTeamPlanModalOpen: boolean = false;
+  let notificationPollingInterval: any;
 
   const openDefaultBrowser = async () => {
     await open(externalSparrowLink);
@@ -328,12 +329,25 @@
 
     // Disabling web socket for now due to issues in release_v1 deployment, can be enabled in future if required.
     // await _viewModel.connectWebSocket();
+    // load notifications immediately
+    await notificationService.loadNotificationsToStore();
+
+    // start polling every 5 minutes
+    notificationPollingInterval = setInterval(
+      () => {
+        notificationService.loadNotificationsToStore();
+      },
+      5 * 60 * 1000,
+    ); // 5 minutes
   });
 
   onDestroy(() => {
     userUnsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
     activeTeamSubscriber.unsubscribe();
+    if (notificationPollingInterval) {
+      clearInterval(notificationPollingInterval);
+    }
   });
 
   let updaterVisible = true;
