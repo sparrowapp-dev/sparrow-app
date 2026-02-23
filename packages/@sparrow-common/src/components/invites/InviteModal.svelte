@@ -10,10 +10,16 @@
   export let teamId = "";
   export let workspaceIds: string[] = [];
 
-  export let onAccept = () => {};
-  export let onDecline = () => {};
+  export let onAccept: (payload: InviteActionPayload) => void = () => {};
+  export let onDecline: (payload: InviteActionPayload) => void = () => {};
 
   $: isMultiple = (workspaceNames?.length || 0) > 1;
+
+  type InviteActionPayload = {
+    notificationId: string;
+    teamId: string;
+    workspaceIds: string[];
+  };
 </script>
 
 {#if open}
@@ -61,9 +67,19 @@
     {/if}
 
     <div class="actions">
-      <button class="decline" on:click={onDecline}> Decline </button>
+      <button
+        class="decline"
+        on:click={() => onDecline({ notificationId, teamId, workspaceIds })}
+      >
+        Decline
+      </button>
 
-      <button class="accept" on:click={onAccept}> Accept </button>
+      <button
+        class="accept"
+        on:click={() => onAccept({ notificationId, teamId, workspaceIds })}
+      >
+        Accept
+      </button>
     </div>
   </div>
 {/if}

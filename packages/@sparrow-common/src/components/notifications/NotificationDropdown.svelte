@@ -2,11 +2,9 @@
   import { notifications, unreadCount } from "@sparrow/common/store";
   import { onMount, onDestroy } from "svelte";
   import InviteModal from "../invites/InviteModal.svelte";
-  import { NotificationService } from "@app/services/notification.service";
-  import { notifications as toast } from "@sparrow/library/ui";
-  import { navigate } from "svelte-navigator";
+  import { createEventDispatcher } from "svelte";
 
-  const notificationService = new NotificationService();
+  const dispatch = createEventDispatcher();
 
   let activeTab: "all" | "unread" = "all";
   let showMenu = false;
@@ -14,47 +12,12 @@
   let showInviteModal = false;
   let selectedNotification: any = null;
 
-  async function handleAccept() {
-    try {
-      await notificationService.respondToInvite(
-        selectedNotification._id,
-        "accept",
-      );
-
-      // refresh notifications
-      await notificationService.loadNotificationsToStore();
-
-      toast.success(
-        `You now have access to ${selectedNotification.data.workspaceNames.join(", ")}`,
-      );
-
-      // navigate to invited hub
-      navigate(`/app/home/}`);
-
-      // close modal
-      showInviteModal = false;
-
-      // reload hub state so UI updates immediately
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to accept invite");
-    }
+  function handleAccept(n) {
+    dispatch("acceptInvite", n);
   }
 
-  async function handleDecline() {
-    try {
-      await notificationService.respondToInvite(
-        selectedNotification._id,
-        "reject",
-      );
-
-      showInviteModal = false;
-
-      toast.info("Invite declined");
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to decline invite");
-    }
+  function handleDecline(n) {
+    dispatch("declineInvite", n);
   }
 
   function handleClickOutside(event: MouseEvent) {
@@ -191,6 +154,9 @@
   hubName={selectedNotification?.data?.teamName}
   role={selectedNotification?.data?.role}
   workspaceNames={selectedNotification?.data?.workspaceNames || []}
+  notificationId={selectedNotification?._id}
+  teamId={selectedNotification?.data?.teamId}
+  workspaceIds={selectedNotification?.data?.workspaceIds || []}
   onAccept={handleAccept}
   onDecline={handleDecline}
 />

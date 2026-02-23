@@ -64,8 +64,10 @@
   } from "@sparrow/workspaces/stores";
   import { getSelfhostUrls } from "@app/utils/jwt";
   import { get } from "svelte/store";
+  import { NotificationService } from "@app/services/notification.service";
 
   const _viewModel = new DashboardViewModel();
+  const notificationService = new NotificationService();
   const osDetector = new OSDetector();
   const location = useLocation();
   let userId: string;
@@ -692,6 +694,47 @@
     upgradePlanModalWorkspace = true;
   };
 
+  async function handleAcceptInvite(e) {
+    try {
+      const { notificationId, teamId } = e.detail;
+
+      console.log("ACCEPT PAYLOAD:", e.detail);
+
+      // 1 accept invite
+      await notificationService.respondToInvite(notificationId, "accept");
+
+      // 2 refresh data
+      await _viewModel.refreshTeams(userId);
+      await _viewModel.refreshWorkspaces(userId);
+
+      // 3 switch hub
+      await _viewModel.setOpenTeam(teamId);
+
+      // 4 go to hub home
+      navigate("/app/home");
+    } catch (err) {
+      console.error("❌ ACCEPT ERROR FULL:", err);
+      console.error("❌ RESPONSE:", err?.response);
+      console.error("❌ RESPONSE DATA:", err?.response?.data);
+      notifications.error("Failed to accept invite");
+    }
+  }
+
+  async function handleDeclineInvite(e) {
+    try {
+      const { notificationId } = e.detail;
+
+      await notificationService.respondToInvite(notificationId, "reject");
+
+      // ✅ refresh data so UI updates immediately
+      await _viewModel.refreshTeams(userId);
+      await _viewModel.refreshWorkspaces(userId);
+    } catch (err) {
+      console.error("Invite reject failed", err);
+      notifications.error("Failed to reject invite");
+    }
+  }
+
   $: {
     if (userRole) {
       planContent = planInfoByRole(userRole);
@@ -773,6 +816,8 @@
     handleFeaturesRedirect={_viewModel.redirectFeatureUpdates}
     onAdminRedirect={_viewModel.onAdminRedirect}
     recentVisitedWorkspaces={$recentVisitedWorkspaces}
+    on:acceptInvite={handleAcceptInvite}
+    on:declineInvite={handleDeclineInvite}
   />
 
   <!--

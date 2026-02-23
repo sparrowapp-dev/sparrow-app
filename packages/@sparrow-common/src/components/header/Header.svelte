@@ -93,6 +93,18 @@
   export let recentVisitedWorkspaces;
   export let appEdition = "MANAGED";
 
+  import { createEventDispatcher } from "svelte";
+
+  const dispatch = createEventDispatcher();
+
+  function handleAcceptInvite(event) {
+    dispatch("acceptInvite", event.detail);
+  }
+
+  function handleDeclineInvite(event) {
+    dispatch("declineInvite", event.detail);
+  }
+
   let helpOptionsOpen = false;
   let showNotifications = false;
 
@@ -781,7 +793,10 @@
       </Tooltip>
 
       {#if showNotifications}
-        <NotificationDropdown />
+        <NotificationDropdown
+          on:acceptInvite={handleAcceptInvite}
+          on:declineInvite={handleDeclineInvite}
+        />
       {/if}
     </div>
 
