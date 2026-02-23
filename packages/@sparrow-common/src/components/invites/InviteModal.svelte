@@ -26,11 +26,10 @@
 </script>
 
 {#if open}
-  <div class="backdrop" on:click={onClose} />
-
-  <div class="invite-modal">
+  <div class="backdrop" on:click|stopPropagation={onClose} />
+  <div class="invite-modal" on:click|stopPropagation>
     <!-- close -->
-    <button class="close" on:click={onClose}>✕</button>
+    <button class="close" on:click|stopPropagation={onClose}>✕</button>
 
     <!-- avatar -->
     <div class="avatar">

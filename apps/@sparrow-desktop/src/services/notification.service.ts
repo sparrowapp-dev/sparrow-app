@@ -67,7 +67,7 @@ export class NotificationService {
    */
   public archiveNotification = async (notificationId: string) => {
     const response = await makeRequest(
-      "POST",
+      "PATCH",
       `${this.apiUrl}/api/notifications/${notificationId}/archive`,
       {
         headers: getAuthHeaders(),
@@ -107,5 +107,13 @@ export class NotificationService {
     } finally {
       loadingNotifications.set(false);
     }
+  };
+
+  public clearAllNotifications = async (notifications: any[]) => {
+    await Promise.all(
+      notifications.map((n) => this.archiveNotification(n._id)),
+    );
+
+    await this.loadNotificationsToStore();
   };
 }

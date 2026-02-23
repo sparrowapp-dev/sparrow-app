@@ -394,6 +394,10 @@
   function handleMarkAllRead() {
     dispatch("markAllRead");
   }
+
+  function handleClearAllNotifications(event) {
+    dispatch("clearAllNotifications", event.detail);
+  }
 </script>
 
 <header
@@ -808,6 +812,8 @@
           on:declineInvite={handleDeclineInvite}
           on:closeDropdown={() => (showNotifications = false)}
           on:markAllRead={handleMarkAllRead}
+          on:openInvite={(e) => dispatch("openInvite", e.detail)}
+          on:clearAllNotifications={handleClearAllNotifications}
         />
       {/if}
     </div>

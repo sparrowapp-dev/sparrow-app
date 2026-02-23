@@ -79,6 +79,8 @@
           _viewModel.refreshTeams(userId),
           _viewModel.refreshWorkspaces(userId),
         ]);
+
+        await notificationService.loadNotificationsToStore();
       } else {
         console.error(`Throttled for ${userId}`);
       }
@@ -703,6 +705,8 @@
         "accept",
       );
 
+      await notificationService.loadNotificationsToStore();
+
       await _viewModel.refreshTeams(userId);
       await _viewModel.refreshWorkspaces(userId);
       await _viewModel.setOpenTeam(payload.teamId);
@@ -733,6 +737,8 @@
         "reject",
       );
 
+      await notificationService.loadNotificationsToStore();
+
       await _viewModel.refreshTeams(userId);
       await _viewModel.refreshWorkspaces(userId);
 
@@ -762,6 +768,29 @@
     } catch (err) {
       console.error("Mark all read failed", err);
       notifications.error("Failed to mark all as read");
+    }
+  }
+
+  async function handleOpenInvite(e) {
+    const notification = e.detail;
+
+    if (!notification.isRead) {
+      try {
+        await notificationService.markAsRead(notification._id);
+        await notificationService.loadNotificationsToStore();
+      } catch (err) {
+        console.error("Failed to mark as read", err);
+      }
+    }
+  }
+
+  async function handleClearAllNotifications(e) {
+    try {
+      await notificationService.clearAllNotifications(e.detail);
+      notifications.success("All notifications cleared");
+    } catch (err) {
+      console.error(err);
+      notifications.error("Failed to clear notifications");
     }
   }
 
@@ -849,6 +878,8 @@
     on:acceptInvite={handleAcceptInvite}
     on:declineInvite={handleDeclineInvite}
     on:markAllRead={handleMarkAllRead}
+    on:openInvite={handleOpenInvite}
+    on:clearAllNotifications={handleClearAllNotifications}
   />
 
   <!--

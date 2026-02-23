@@ -12,6 +12,14 @@
   let showInviteModal = false;
   let selectedNotification: any = null;
 
+  async function handleClearAll() {
+    const list = $notifications;
+
+    if (!list.length) return;
+
+    dispatch("clearAllNotifications", list);
+  }
+
   function handleMarkAllRead() {
     dispatch("markAllRead");
     showMenu = false;
@@ -55,6 +63,9 @@
   function openInvite(n) {
     selectedNotification = n;
     showInviteModal = true;
+
+    dispatch("openInvite", n); // ⭐ tell parent
+
     console.log("Opening invite modal for notification:", n);
   }
 
@@ -87,7 +98,7 @@
         <span>Mark all as read</span>
       </button>
 
-      <button class="menu-item">
+      <button class="menu-item" on:click={handleClearAll}>
         <span class="menu-icon">✕</span>
         <span>Clear all</span>
       </button>
@@ -145,7 +156,9 @@
             class="action-btn"
             on:click|stopPropagation={() => openInvite(n)}
           >
-            View Invite
+            {showInviteModal && selectedNotification?._id === n._id
+              ? "Review and Accept"
+              : "View Invite"}
           </button>
         </div>
 
@@ -160,7 +173,10 @@
 
 <InviteModal
   open={showInviteModal}
-  onClose={() => (showInviteModal = false)}
+  onClose={() => {
+    showInviteModal = false;
+    selectedNotification = null;
+  }}
   inviterName={selectedNotification?.data?.inviterName}
   hubName={selectedNotification?.data?.teamName}
   role={selectedNotification?.data?.role}
