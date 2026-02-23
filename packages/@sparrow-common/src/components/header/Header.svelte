@@ -792,6 +792,12 @@
         />
       </Tooltip>
 
+      {#if $unreadCount > 0}
+        <span class="notification-badge">
+          {$unreadCount > 99 ? "99+" : $unreadCount}
+        </span>
+      {/if}
+
       {#if showNotifications}
         <NotificationDropdown
           on:acceptInvite={handleAcceptInvite}
@@ -800,10 +806,6 @@
         />
       {/if}
     </div>
-
-    <!-- {#if $unreadCount > 0}
-      <span class="notification-dot"></span>
-    {/if} -->
 
     {#if !isGuestUser}
       <div>
@@ -974,17 +976,34 @@
     transition: background-color 0.2s;
   }
 
-  .notification-dot {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 6px;
-    height: 6px;
-    background: var(--text-ds-danger-500);
-    border-radius: 50%;
-  }
-
   .bell-wrapper.active :global(svg) {
     color: var(--icon-ds-primary-400);
+  }
+
+  .bell-wrapper {
+    position: relative;
+  }
+
+  .notification-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+
+    background: #ad2b29; /* red */
+    color: #ffffff;
+
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 600;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 2px solid var(--bg-ds-surface-700); /* border like Figma */
   }
 </style>
