@@ -2,18 +2,18 @@ import { user } from "@app/store/auth.store";
 import { Events } from "@sparrow/common/enums";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { ReleaseRepository } from "../../repositories/release.repository";
-import { CannyIoService } from "../../services/canny.service";
+import { OpenfeedbackService } from "../../services/openfeedback.service";
 import { FeedbackService } from "../../services/feedback.service";
 import { ReleaseService } from "../../services/release.service";
 import { notifications } from "@sparrow/library/ui";
 import { DiscordIDs } from "@sparrow/support/constants/discord.constants";
 import { LearnMoreURL } from "@sparrow/support/constants/learnMore.constant";
-// import type { CannyUserType } from "@common/types/canny/canny";
+// import type { OpenfeedbackUserType } from "@common/types/openfeedback/openfeedback";
 import { open } from "@tauri-apps/plugin-shell";
 import * as Sentry from "@sentry/svelte";
 class HelpPageViewModel {
   // Private Services
-  private cannyService = new CannyIoService();
+  private openfeedbackService = new OpenfeedbackService();
   private feedbackService = new FeedbackService();
   private releaseService = new ReleaseService();
   private releaseRepository = new ReleaseRepository();
@@ -132,16 +132,16 @@ class HelpPageViewModel {
   };
 
   /**
-   * Creates a user in canny service .
+   * Creates a user in openfeedback service .
    *
    * @returns Promise<any[]> with the authorID.
    */
   public createUser = async () => {
-    let userInfo: CannyUserType | null;
+    let userInfo: OpenfeedbackUserType | null;
     await user.subscribe((value) => {
       userInfo = value;
     });
-    const response = await this.cannyService.createUser({
+    const response = await this.openfeedbackService.createUser({
       name: userInfo?.name,
       email: userInfo?.email,
       userID: userInfo?._id,
@@ -149,28 +149,28 @@ class HelpPageViewModel {
     return response;
   };
   /**
-   * Retrieves the list of boards from the Canny dashboard.
+   * Retrieves the list of boards from the Openfeedback dashboard.
    *
-   * @returns {Promise<Object>} The response from the Canny service containing boards list.
+   * @returns {Promise<Object>} The response from the Openfeedback service containing boards list.
    */
   public RetrieveBoards = async () => {
-    const response = await this.cannyService.fetchBoards();
+    const response = await this.openfeedbackService.fetchBoards();
     return response;
   };
 
   /**
-   * Retrieves the list of posts from the Canny dashboard.
+   * Retrieves the list of posts from the Openfeedback dashboard.
    *
    * @param  boardID - The ID of the board from which the posts are to be retrieved.
    * @returns A list of posts.
    */
   private getCategoryID = async (boardID: string) => {
-    const response = await this.cannyService.listCategories(boardID);
+    const response = await this.openfeedbackService.listCategories(boardID);
     return response;
   };
 
   /**
-   * Retrieves the category ID from the Canny dashboard.
+   * Retrieves the category ID from the Openfeedback dashboard.
    *
    * @param  categoryName - The name of the category for which the ID is to be retrieved.
    * @returns The category
@@ -208,7 +208,7 @@ class HelpPageViewModel {
     });
 
     // Retrieve the post data (keeping the full response intact)
-    const response = await this.cannyService.retrievePost(postID);
+    const response = await this.openfeedbackService.retrievePost(postID);
 
     // Retrieve the votes for the post
     const voteList = await this.listVoteUsingPostId(postID);
@@ -241,7 +241,7 @@ class HelpPageViewModel {
   ) => {
     const boards = await this.RetrieveBoards();
     const boardID = boards?.data?.boards[0]?.id;
-    const response = await this.cannyService.listPosts(
+    const response = await this.openfeedbackService.listPosts(
       boardID,
       sort,
       search,
@@ -317,7 +317,7 @@ class HelpPageViewModel {
 
     try {
       // Get user info for email
-      let userInfo: CannyUserType | null;
+      let userInfo: OpenfeedbackUserType | null;
       await user.subscribe((value) => {
         userInfo = value;
       });
@@ -373,7 +373,7 @@ class HelpPageViewModel {
    * @param {{ file: { value: File[] } }} uploadFeedback - An object containing the uploaded files for feedback.
    * @param {string[]} imageURLsArray - An array of existing image URLs to be combined with new uploads.
    *
-   * @returns {Promise<Object>} The response from the Canny service after attempting to update the post.
+   * @returns {Promise<Object>} The response from the Openfeedback service after attempting to update the post.
    */
 
   public updatePost = async (
@@ -406,7 +406,7 @@ class HelpPageViewModel {
       }
 
       try {
-        const response = await this.cannyService.updatePost({
+        const response = await this.openfeedbackService.updatePost({
           postID: postID,
           title: title,
           details: description,
@@ -434,7 +434,7 @@ class HelpPageViewModel {
     status?: string,
     limit?: number,
   ) => {
-    const response = await this.cannyService.listUsersPost(
+    const response = await this.openfeedbackService.listUsersPost(
       sort,
       userId,
       search,
@@ -445,7 +445,7 @@ class HelpPageViewModel {
   };
 
   // public retreiveComments = async (body: object, authorID: string) => {
-  //   const response = await this.cannyService.retreiveComments(body, authorID)
+  //   const response = await this.openfeedbackService.retreiveComments(body, authorID)
   //   return response;
   // }
 
@@ -455,7 +455,7 @@ class HelpPageViewModel {
     search?: string,
     status?: string,
   ) => {
-    const response = await this.cannyService.retrieveUserComments(
+    const response = await this.openfeedbackService.retrieveUserComments(
       authorID,
       sort,
       search,
@@ -465,7 +465,7 @@ class HelpPageViewModel {
   };
 
   public retrieveUserVotes = async (userID: string) => {
-    const response = await this.cannyService.retrieveVotes({}, userID);
+    const response = await this.openfeedbackService.retrieveVotes({}, userID);
     return response;
   };
 
@@ -491,7 +491,7 @@ class HelpPageViewModel {
 
     try {
       // Get user info for email
-      let userInfo: CannyUserType | null;
+      let userInfo: OpenfeedbackUserType | null;
       await user.subscribe((value) => {
         userInfo = value;
       });
@@ -534,7 +534,7 @@ class HelpPageViewModel {
    * Lists comments for a specific post. If the user exists, retrieves their comments for the post.
    * @param postID - The ID of the post to fetch comments for.
    * @param boardID - The ID of the board to which the post belongs.
-   * @returns {Promise<any>} The response from the Canny service.
+   * @returns {Promise<any>} The response from the Openfeedback service.
    */
   public listComments = async (postID: string) => {
     let userInfo;
@@ -545,7 +545,10 @@ class HelpPageViewModel {
     const boards = await this.RetrieveBoards();
     const boardID = boards?.data?.boards[0]?.id;
 
-    const response = await this.cannyService.listComments(postID, boardID);
+    const response = await this.openfeedbackService.listComments(
+      postID,
+      boardID,
+    );
 
     if (response.isSuccessful) {
       const comments = response.data.comments;
@@ -566,11 +569,13 @@ class HelpPageViewModel {
     });
 
     // Try to retrieve the user first
-    let userResponse = await this.cannyService.retrieveUser(userInfo.email);
+    let userResponse = await this.openfeedbackService.retrieveUser(
+      userInfo.email,
+    );
 
     // If user does not exist, create a new user
     if (!userResponse?.isSuccessful) {
-      userResponse = await this.cannyService.createUser({
+      userResponse = await this.openfeedbackService.createUser({
         name: userInfo?.name,
         email: userInfo?.email,
         userID: userInfo?._id,
@@ -578,7 +583,7 @@ class HelpPageViewModel {
     }
     const UserId = userResponse?.data?.id; // Use the retrieved or newly created user's ID
     if (UserId) {
-      const result = await this.cannyService.createVote(postID, UserId);
+      const result = await this.openfeedbackService.createVote(postID, UserId);
       return result;
     }
   };
@@ -595,9 +600,11 @@ class HelpPageViewModel {
     await user.subscribe((value) => {
       userInfo = value;
     });
-    let userResponse = await this.cannyService.retrieveUser(userInfo.email);
+    let userResponse = await this.openfeedbackService.retrieveUser(
+      userInfo.email,
+    );
     if (!userResponse?.isSuccessful) {
-      userResponse = await this.cannyService.createUser({
+      userResponse = await this.openfeedbackService.createUser({
         name: userInfo?.name,
         email: userInfo?.email,
         userID: userInfo?._id,
@@ -606,7 +613,7 @@ class HelpPageViewModel {
 
     const UserId = userResponse?.data?.id;
     if (UserId) {
-      const result = await this.cannyService.deleteVote(postID, UserId);
+      const result = await this.openfeedbackService.deleteVote(postID, UserId);
       return result;
     }
   };
@@ -619,16 +626,18 @@ class HelpPageViewModel {
    */
 
   public listVote = async (postID: string) => {
-    let userInfo: CannyUserType | null;
+    let userInfo: OpenfeedbackUserType | null;
     await user.subscribe((value) => {
       userInfo = value;
     });
 
-    let userResponse = await this.cannyService.retrieveUser(userInfo.email);
+    let userResponse = await this.openfeedbackService.retrieveUser(
+      userInfo.email,
+    );
 
     // If user does not exist, create a new user
     if (!userResponse?.isSuccessful) {
-      userResponse = await this.cannyService.createUser({
+      userResponse = await this.openfeedbackService.createUser({
         name: userInfo?.name,
         email: userInfo?.email,
         userID: userInfo?._id,
@@ -637,7 +646,7 @@ class HelpPageViewModel {
     const UserId = userResponse?.data?.id; // Use the retrieved or newly created user's ID
 
     if (UserId) {
-      const result = await this.cannyService.listVotes(UserId);
+      const result = await this.openfeedbackService.listVotes(UserId);
       return result;
     }
   };
@@ -648,7 +657,8 @@ class HelpPageViewModel {
    */
   public listVoteUsingPostId = async (postID: string) => {
     if (postID) {
-      const result = await this.cannyService.listVotesUsingPostId(postID);
+      const result =
+        await this.openfeedbackService.listVotesUsingPostId(postID);
       return result;
     }
   };
@@ -658,7 +668,7 @@ class HelpPageViewModel {
    * @param {string} type - The type of changelog to retrieve (e.g., feature, bugfix).
    */
   public listChangeLog = async (type: string) => {
-    const result = await this.cannyService.listChangeLog(type);
+    const result = await this.openfeedbackService.listChangeLog(type);
     return result;
   };
 }

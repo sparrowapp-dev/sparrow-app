@@ -2,10 +2,10 @@ import { makeHttpRequestV2, makeRequest } from "@app/containers/api/api.common";
 import { ContentTypeEnum } from "@sparrow/common/enums";
 import constants from "@app/constants/constants";
 
-export class CannyIoService {
+export class OpenfeedbackService {
   constructor() {}
-  private apiUrl: string = constants.CANNY_URL;
-  private apiKey: string = constants.CANNY_API;
+  private apiUrl: string = constants.OPENFEEDBACK_URL;
+  private apiKey: string = constants.OPENFEEDBACK_API;
 
   // returns the list of boards available
   public fetchBoards = async () => {
@@ -66,7 +66,7 @@ export class CannyIoService {
     return response;
   };
 
-  // Fetches the list of categories available for a specific board from canny.
+  // Fetches the list of categories available for a specific board from openfeedback.
   public listCategories = async (boardID: string) => {
     const response = await makeRequest(
       "POST",
@@ -156,7 +156,7 @@ export class CannyIoService {
   };
 
   /**
-   * Retrieves an existing user from Canny.
+   * Retrieves an existing user from Openfeedback.
    * @param userIdentifier - The unique identifier of the user in your application.
    * @returns {Promise<any>} The response containing user details if found.
    */
@@ -167,7 +167,7 @@ export class CannyIoService {
       {
         body: {
           apiKey: this.apiKey,
-          email: userIdentifier, // You can also use email or id from Canny if needed
+          email: userIdentifier, // You can also use email or id from Openfeedback if needed
         },
         headers: {
           "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
@@ -184,7 +184,7 @@ export class CannyIoService {
       {
         body: {
           apiKey: this.apiKey,
-          id, // You can also use email or id from Canny if needed
+          id, // You can also use email or id from Openfeedback if needed
         },
         headers: {
           "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
@@ -396,19 +396,15 @@ export class CannyIoService {
   };
 
   public retrieveVotes = async (body: object, userID: string) => {
-    const response = await makeRequest(
-      "POST",
-      `https://canny.io/api/v1/votes/list`,
-      {
-        body: {
-          apiKey: this.apiKey,
-          // userID,
-        },
-        headers: {
-          "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
-        },
+    const response = await makeRequest("POST", `${this.apiUrl}/votes/list`, {
+      body: {
+        apiKey: this.apiKey,
+        // userID,
       },
-    );
+      headers: {
+        "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
+      },
+    });
 
     return response;
   };

@@ -5,7 +5,7 @@ import {
 import constants from "@app/constants/constants";
 import { getSelfhostUrls } from "@app/utils/jwt";
 let apiUrl: string = constants.API_URL;
-let CANNY_URL: string = constants.CANNY_URL;
+let OPENFEEDBACK_URL: string = constants.OPENFEEDBACK_URL;
 export class FeedbackService {
   constructor() {
     const [selfhostBackendUrl] = getSelfhostUrls();
@@ -44,10 +44,14 @@ export class FeedbackService {
    * @returns Promise with the response from the upload API
    */
   public uploadPost = async (formData: FormData) => {
-    const response = await makeRequest("POST", `${CANNY_URL}/posts/upload`, {
-      body: formData,
-      headers: getMultipartAuthHeaders(),
-    });
+    const response = await makeRequest(
+      "POST",
+      `${OPENFEEDBACK_URL}/posts/upload`,
+      {
+        body: formData,
+        headers: getMultipartAuthHeaders(),
+      },
+    );
     return response;
   };
 
@@ -59,10 +63,14 @@ export class FeedbackService {
    * @returns Promise with the response from the upload API
    */
   public uploadComment = async (formData: FormData) => {
-    const response = await makeRequest("POST", `${CANNY_URL}/comments/upload`, {
-      body: formData,
-      headers: getMultipartAuthHeaders(),
-    });
+    const response = await makeRequest(
+      "POST",
+      `${OPENFEEDBACK_URL}/comments/upload`,
+      {
+        body: formData,
+        headers: getMultipartAuthHeaders(),
+      },
+    );
     return response;
   };
 }

@@ -207,7 +207,7 @@ These variables configure the Sparrow Auth service.
 | `VITE_SPARROW_PRIVACY_POLICY`    | URL for the privacy policy.                              | `https://example.com/privacy-policy`             |
 | `VITE_APP_EDITION`               | Edition of the application.                              | `SELFHOSTED`                                     |
 | `VITE_SPARROW_MARKETING_URL`     | Marketing website URL.                                   | `http://localhost:1452`                          |
-| `VITE_CANNY_FEEDBACK_URL`        | Canny.io feedback portal URL.                            | `https://sparrowapp.canny.io/feedback`           |
+| `VITE_OPENFEEDBACK_FEEDBACK_URL` | Openfeedback portal URL.                                 | `https://openfeedback.sparrowapp.dev/feedback`   |
 | `VITE_SPARROW_CONTACT_SALES_URL` | Contact sales URL.                                       |                                                  |
 
 ---
@@ -234,8 +234,8 @@ These variables configure the Sparrow Web service.
 | `VITE_WEB_RELEASE_NOTES_PAT_TOKEN`          | Personal Access Token (PAT) for fetching release notes. | `N/A`                                                              |
 | `VITE_WEB_RELEASE_NOTES_API`                | API endpoint for fetching release notes from GitHub.    | `https://api.github.com/repos/sparrowapp-dev/sparrow-app/releases` |
 | `VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING` | Azure Application Insights connection string.           | `N/A`                                                              |
-| `VITE_WEB_CANNY_API`                        | API key for integrating with Canny feedback system.     | `N/A`                                                              |
-| `VITE_WEB_CANNY_URL`                        | Canny feedback system URL.                              | `N/A`                                                              |
+| `VITE_WEB_OPENFEEDBACK_API`                 | API key for integrating with Openfeedback system.       | `N/A`                                                              |
+| `VITE_WEB_OPENFEEDBACK_URL`                 | Openfeedback system URL.                                | `N/A`                                                              |
 | `VITE_WEB_MARKETING_URL`                    | Marketing website URL.                                  | `http://localhost:1429`                                            |
 | `VITE_WEB_SPARROW_DOCS`                     | URL to Sparrow Web documentation.                       | `https://docs.sparrowapp.dev/docs/intro`                           |
 | `VITE_WEB_PROXY_SERVICE`                    | URL for the Sparrow Proxy service.                      | `http://localhost:3000`                                            |

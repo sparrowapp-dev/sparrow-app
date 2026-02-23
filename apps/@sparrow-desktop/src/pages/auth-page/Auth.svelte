@@ -349,7 +349,7 @@
       <a
         role="button"
         on:click={async () => {
-          await open(constants.CANNY_FEEDBACK_URL);
+          await open(constants.OPENFEEDBACK_FEEDBACK_URL);
         }}
         class="px-2 sparrow-fs-12 link-button">Report Issue</a
       >
@@ -365,7 +365,7 @@
       <a
         role="button"
         on:click={async () => {
-          await open(constants.CANNY_FEEDBACK_URL);
+          await open(constants.OPENFEEDBACK_FEEDBACK_URL);
         }}
         class="px-2 link-button sparrow-fs-12">Report Issue</a
       >
