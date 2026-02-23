@@ -390,6 +390,10 @@
     // window.open(featureUpdatesLink, "_blank");
     handleFeaturesRedirect();
   };
+
+  function handleMarkAllRead() {
+    dispatch("markAllRead");
+  }
 </script>
 
 <header
@@ -803,6 +807,7 @@
           on:acceptInvite={handleAcceptInvite}
           on:declineInvite={handleDeclineInvite}
           on:closeDropdown={() => (showNotifications = false)}
+          on:markAllRead={handleMarkAllRead}
         />
       {/if}
     </div>

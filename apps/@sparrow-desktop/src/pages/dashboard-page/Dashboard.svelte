@@ -751,6 +751,20 @@
     }
   }
 
+  async function handleMarkAllRead() {
+    try {
+      await notificationService.markAllAsRead();
+
+      // ⭐ reload notifications → unread count becomes 0
+      await notificationService.loadNotificationsToStore();
+
+      notifications.success("All notifications marked as read");
+    } catch (err) {
+      console.error("Mark all read failed", err);
+      notifications.error("Failed to mark all as read");
+    }
+  }
+
   $: {
     if (userRole) {
       planContent = planInfoByRole(userRole);
@@ -834,6 +848,7 @@
     recentVisitedWorkspaces={$recentVisitedWorkspaces}
     on:acceptInvite={handleAcceptInvite}
     on:declineInvite={handleDeclineInvite}
+    on:markAllRead={handleMarkAllRead}
   />
 
   <!--

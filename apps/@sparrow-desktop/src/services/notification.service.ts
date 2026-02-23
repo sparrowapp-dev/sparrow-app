@@ -48,6 +48,21 @@ export class NotificationService {
   };
 
   /**
+   * Mark all notifications as read
+   */
+  public markAllAsRead = async () => {
+    const response = await makeRequest(
+      "PATCH",
+      `${this.apiUrl}/api/notifications/read-all`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+
+    return response;
+  };
+
+  /**
    * Archive notification
    */
   public archiveNotification = async (notificationId: string) => {

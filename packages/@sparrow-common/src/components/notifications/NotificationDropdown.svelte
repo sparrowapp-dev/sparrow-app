@@ -12,6 +12,11 @@
   let showInviteModal = false;
   let selectedNotification: any = null;
 
+  function handleMarkAllRead() {
+    dispatch("markAllRead");
+    showMenu = false;
+  }
+
   function handleAccept(n) {
     showInviteModal = false; // ⭐ close modal
 
@@ -77,7 +82,7 @@
 
   {#if showMenu}
     <div class="menu-panel" bind:this={menuRef} on:click|stopPropagation>
-      <button class="menu-item">
+      <button class="menu-item" on:click={handleMarkAllRead}>
         <span class="menu-icon">✓</span>
         <span>Mark all as read</span>
       </button>
