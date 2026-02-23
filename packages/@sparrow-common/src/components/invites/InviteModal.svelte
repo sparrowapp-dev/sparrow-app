@@ -19,6 +19,9 @@
     notificationId: string;
     teamId: string;
     workspaceIds: string[];
+    workspaceNames: string[];
+    teamName: string;
+    role: string;
   };
 </script>
 
@@ -69,14 +72,30 @@
     <div class="actions">
       <button
         class="decline"
-        on:click={() => onDecline({ notificationId, teamId, workspaceIds })}
+        on:click={() =>
+          onDecline({
+            notificationId,
+            teamId,
+            workspaceIds,
+            workspaceNames,
+            teamName: hubName,
+            role,
+          })}
       >
         Decline
       </button>
 
       <button
         class="accept"
-        on:click={() => onAccept({ notificationId, teamId, workspaceIds })}
+        on:click={() =>
+          onAccept({
+            notificationId,
+            teamId,
+            workspaceIds,
+            workspaceNames,
+            teamName: hubName,
+            role,
+          })}
       >
         Accept
       </button>

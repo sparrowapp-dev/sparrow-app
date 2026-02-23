@@ -696,41 +696,57 @@
 
   async function handleAcceptInvite(e) {
     try {
-      const { notificationId, teamId } = e.detail;
+      const payload = e.detail;
 
-      console.log("ACCEPT PAYLOAD:", e.detail);
+      await notificationService.respondToInvite(
+        payload.notificationId,
+        "accept",
+      );
 
-      // 1 accept invite
-      await notificationService.respondToInvite(notificationId, "accept");
-
-      // 2 refresh data
       await _viewModel.refreshTeams(userId);
       await _viewModel.refreshWorkspaces(userId);
+      await _viewModel.setOpenTeam(payload.teamId);
 
-      // 3 switch hub
-      await _viewModel.setOpenTeam(teamId);
+      // ---------- TOAST ----------
+      const workspaceText =
+        payload.workspaceNames.length > 1
+          ? `${payload.workspaceNames.join(", ")} workspaces`
+          : `${payload.workspaceNames[0]} workspace`;
 
-      // 4 go to hub home
+      notifications.success(
+        `You’ve joined the workspace - You now have access to the ${workspaceText} under ${payload.teamName} as an ${payload.role}.`,
+      );
+
       navigate("/app/home");
     } catch (err) {
-      console.error("❌ ACCEPT ERROR FULL:", err);
-      console.error("❌ RESPONSE:", err?.response);
-      console.error("❌ RESPONSE DATA:", err?.response?.data);
+      console.error(err);
       notifications.error("Failed to accept invite");
     }
   }
 
   async function handleDeclineInvite(e) {
     try {
-      const { notificationId } = e.detail;
+      const payload = e.detail;
 
-      await notificationService.respondToInvite(notificationId, "reject");
+      await notificationService.respondToInvite(
+        payload.notificationId,
+        "reject",
+      );
 
-      // ✅ refresh data so UI updates immediately
       await _viewModel.refreshTeams(userId);
       await _viewModel.refreshWorkspaces(userId);
+
+      // ---------- TOAST ----------
+      const workspaceText =
+        payload.workspaceNames.length > 1
+          ? `${payload.workspaceNames.join(", ")} workspaces`
+          : `${payload.workspaceNames[0]} workspace`;
+
+      notifications.error(
+        `Invite declined - You declined the invite to join ${workspaceText} under ${payload.teamName} as an ${payload.role}.`,
+      );
     } catch (err) {
-      console.error("Invite reject failed", err);
+      console.error(err);
       notifications.error("Failed to reject invite");
     }
   }

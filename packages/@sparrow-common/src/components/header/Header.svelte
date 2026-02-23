@@ -796,6 +796,7 @@
         <NotificationDropdown
           on:acceptInvite={handleAcceptInvite}
           on:declineInvite={handleDeclineInvite}
+          on:closeDropdown={() => (showNotifications = false)}
         />
       {/if}
     </div>

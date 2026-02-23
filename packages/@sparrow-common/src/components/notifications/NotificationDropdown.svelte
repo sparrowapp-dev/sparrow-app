@@ -13,11 +13,17 @@
   let selectedNotification: any = null;
 
   function handleAccept(n) {
+    showInviteModal = false; // ⭐ close modal
+
     dispatch("acceptInvite", n);
+    dispatch("closeDropdown"); // ⭐ NEW
   }
 
   function handleDecline(n) {
+    showInviteModal = false; // ⭐ close modal
+
     dispatch("declineInvite", n);
+    dispatch("closeDropdown"); // ⭐ NEW
   }
 
   function handleClickOutside(event: MouseEvent) {
