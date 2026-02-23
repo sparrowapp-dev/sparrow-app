@@ -1,15 +1,17 @@
 import constants from "../constants/constants";
 import * as Sentry from "@sentry/svelte";
 
-const jwtDecode = (jwt: string) : {
+const jwtDecode = (
+  jwt: string,
+): {
   email: string;
   name: string;
   _id: string;
-}=> {
+} => {
   try {
     return JSON.parse(window.atob(jwt.split(".")[1]));
   } catch (err) {
-    Sentry.captureException(err); 
+    Sentry.captureException(err);
     return {
       email: "",
       name: "",
@@ -31,6 +33,23 @@ const getAuthJwt = () => {
   return [authToken, refToken];
 };
 
+const getSelfhostUrls = () => {
+  let backendUrl = localStorage.getItem("SELFHOST_BACKEND_URL");
+  let webAppUrl = localStorage.getItem("SELFHOST_WEB_APP_URL");
+  let adminUrl = localStorage.getItem("SELFHOST_ADMIN_URL");
+
+  if (backendUrl === "null") {
+    backendUrl = null;
+  }
+  if (webAppUrl === "null") {
+    webAppUrl = null;
+  }
+  if (adminUrl === "null") {
+    adminUrl = null;
+  }
+
+  return [backendUrl, webAppUrl, adminUrl];
+};
 /**
  * Retrieves the authenticated client's user information.
  *
@@ -58,4 +77,11 @@ const clearAuthJwt = (): void => {
   localStorage.removeItem(constants.REF_TOKEN);
 };
 
-export { jwtDecode, setAuthJwt, clearAuthJwt, getAuthJwt, getClientUser };
+export {
+  jwtDecode,
+  setAuthJwt,
+  clearAuthJwt,
+  getAuthJwt,
+  getClientUser,
+  getSelfhostUrls,
+};

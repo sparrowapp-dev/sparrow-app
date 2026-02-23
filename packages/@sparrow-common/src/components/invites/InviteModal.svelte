@@ -28,10 +28,8 @@
 {#if open}
   <div class="backdrop" on:click|stopPropagation={onClose} />
   <div class="invite-modal" on:click|stopPropagation>
-    <!-- close -->
     <button class="close" on:click|stopPropagation={onClose}>✕</button>
 
-    <!-- avatar -->
     <div class="avatar">
       {inviterName?.[0]?.toUpperCase()}
     </div>
@@ -107,7 +105,7 @@
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.6);
-    z-index: 999999; /* ⭐ ADD */
+    z-index: 999999;
   }
 
   .invite-modal {
@@ -119,7 +117,7 @@
     background: #1f2430;
     border-radius: 12px;
     padding: 28px;
-    z-index: 1000000; /* ⭐ ADD */
+    z-index: 1000000;
   }
 
   .close {

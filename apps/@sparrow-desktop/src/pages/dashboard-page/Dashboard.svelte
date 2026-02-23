@@ -79,7 +79,6 @@
           _viewModel.refreshTeams(userId),
           _viewModel.refreshWorkspaces(userId),
         ]);
-
         await notificationService.loadNotificationsToStore();
       } else {
         console.error(`Throttled for ${userId}`);
@@ -331,14 +330,12 @@
     // await _viewModel.connectWebSocket();
     // load notifications immediately
     await notificationService.loadNotificationsToStore();
-
-    // start polling every 5 minutes
     notificationPollingInterval = setInterval(
       () => {
         notificationService.loadNotificationsToStore();
       },
       5 * 60 * 1000,
-    ); // 5 minutes
+    );
   });
 
   onDestroy(() => {
@@ -725,7 +722,6 @@
       await _viewModel.refreshWorkspaces(userId);
       await _viewModel.setOpenTeam(payload.teamId);
 
-      // ---------- TOAST ----------
       const workspaceText =
         payload.workspaceNames.length > 1
           ? `${payload.workspaceNames.join(", ")} workspaces`
@@ -756,7 +752,6 @@
       await _viewModel.refreshTeams(userId);
       await _viewModel.refreshWorkspaces(userId);
 
-      // ---------- TOAST ----------
       const workspaceText =
         payload.workspaceNames.length > 1
           ? `${payload.workspaceNames.join(", ")} workspaces`
@@ -775,7 +770,6 @@
     try {
       await notificationService.markAllAsRead();
 
-      // ⭐ reload notifications → unread count becomes 0
       await notificationService.loadNotificationsToStore();
 
       notifications.success("All notifications marked as read");

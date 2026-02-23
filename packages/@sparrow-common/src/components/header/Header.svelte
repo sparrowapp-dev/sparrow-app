@@ -333,7 +333,6 @@
   };
 
   let showProfileModal = false;
-
   let searchValue = "";
 
   let appWindow;
@@ -1015,6 +1014,6 @@
     align-items: center;
     justify-content: center;
 
-    border: 2px solid var(--bg-ds-surface-700); /* border like Figma */
+    border: 2px solid var(--bg-ds-surface-700);
   }
 </style>

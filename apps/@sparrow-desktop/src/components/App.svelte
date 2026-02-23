@@ -121,7 +121,6 @@
     }
     await _viewModel.registerDeepLinkHandler();
     await notificationService.loadNotificationsToStore();
-
     await singleInstanceHandler();
     await setScaleFactorToDb(await getScaleFactor());
     let isloggedIn;

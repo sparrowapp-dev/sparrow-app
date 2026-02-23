@@ -57,8 +57,10 @@
     isExpandTestflow,
   } from "../../../../../packages/@sparrow-workspaces/src/stores/recent-left-panel";
   import { get } from "svelte/store";
+  import { NotificationService } from "@app/services/notification.service";
 
   const _viewModel = new DashboardViewModel();
+  const notificationService = new NotificationService();
   const location = useLocation();
   let userId: string;
   const userUnsubscribe = user.subscribe(async (value) => {
@@ -69,6 +71,7 @@
           _viewModel.refreshTeams(userId),
           _viewModel.refreshWorkspaces(userId),
         ]);
+        await notificationService.loadNotificationsToStore();
       } else {
         console.error(`Throttled for ${userId}`);
       }
@@ -105,6 +108,7 @@
   let teamDetails: {};
   let isUpgradePlanModelOpen: boolean = false;
   let isUpgradeCurrentTeamPlanModalOpen: boolean = false;
+  let notificationPollingInterval: any;
 
   const openDefaultBrowser = async () => {
     // await open(externalSparrowLink);
@@ -321,12 +325,22 @@
     workspaceDocuments = await _viewModel.workspaces();
     teamDocuments = await _viewModel.getTeams();
     collectionDocuments = await _viewModel.getCollectionList();
+    await notificationService.loadNotificationsToStore();
+    notificationPollingInterval = setInterval(
+      () => {
+        notificationService.loadNotificationsToStore();
+      },
+      5 * 60 * 1000,
+    );
   });
 
   onDestroy(() => {
     userUnsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
     activeTeamSubscriber.unsubscribe();
+    if (notificationPollingInterval) {
+      clearInterval(notificationPollingInterval);
+    }
   });
 
   let showProgressBar = false;
@@ -620,6 +634,83 @@
     upgradePlanModalWorkspace = true;
   };
 
+  async function handleAcceptInvite(e) {
+    try {
+      const payload = e.detail;
+      await notificationService.respondToInvite(
+        payload.notificationId,
+        "accept",
+      );
+      await notificationService.loadNotificationsToStore();
+      await _viewModel.refreshTeams(userId);
+      await _viewModel.refreshWorkspaces(userId);
+      await _viewModel.setOpenTeam(payload.teamId);
+      const workspaceText =
+        payload.workspaceNames.length > 1
+          ? `${payload.workspaceNames.join(", ")} workspaces`
+          : `${payload.workspaceNames[0]} workspace`;
+      notifications.success(
+        `You’ve joined the workspace - You now have access to the ${workspaceText} under ${payload.teamName} as an ${payload.role}.`,
+      );
+      navigate("/app/home");
+    } catch (err) {
+      console.error(err);
+      notifications.error("Failed to accept invite");
+    }
+  }
+  async function handleDeclineInvite(e) {
+    try {
+      const payload = e.detail;
+      await notificationService.respondToInvite(
+        payload.notificationId,
+        "reject",
+      );
+      await notificationService.loadNotificationsToStore();
+      await _viewModel.refreshTeams(userId);
+      await _viewModel.refreshWorkspaces(userId);
+      const workspaceText =
+        payload.workspaceNames.length > 1
+          ? `${payload.workspaceNames.join(", ")} workspaces`
+          : `${payload.workspaceNames[0]} workspace`;
+      notifications.error(
+        `Invite declined - You declined the invite to join ${workspaceText} under ${payload.teamName} as an ${payload.role}.`,
+      );
+    } catch (err) {
+      console.error(err);
+      notifications.error("Failed to reject invite");
+    }
+  }
+  async function handleMarkAllRead() {
+    try {
+      await notificationService.markAllAsRead();
+      await notificationService.loadNotificationsToStore();
+      notifications.success("All notifications marked as read");
+    } catch (err) {
+      console.error("Mark all read failed", err);
+      notifications.error("Failed to mark all as read");
+    }
+  }
+  async function handleOpenInvite(e) {
+    const notification = e.detail;
+    if (!notification.isRead) {
+      try {
+        await notificationService.markAsRead(notification._id);
+        await notificationService.loadNotificationsToStore();
+      } catch (err) {
+        console.error("Failed to mark as read", err);
+      }
+    }
+  }
+  async function handleClearAllNotifications(e) {
+    try {
+      await notificationService.clearAllNotifications(e.detail);
+      notifications.success("All notifications cleared");
+    } catch (err) {
+      console.error(err);
+      notifications.error("Failed to clear notifications");
+    }
+  }
+
   $: {
     if (userRole) {
       planContent = planInfoByRole(userRole);
@@ -711,6 +802,11 @@
     recentVisitedWorkspaces={$recentVisitedWorkspaces}
     onUpgradeClick={handleHeaderUpgradeClick}
     appEdition={constants.APP_EDITION}
+    on:acceptInvite={handleAcceptInvite}
+    on:declineInvite={handleDeclineInvite}
+    on:markAllRead={handleMarkAllRead}
+    on:openInvite={handleOpenInvite}
+    on:clearAllNotifications={handleClearAllNotifications}
   />
 
   {#if $location.pathname === "/app/home"}
