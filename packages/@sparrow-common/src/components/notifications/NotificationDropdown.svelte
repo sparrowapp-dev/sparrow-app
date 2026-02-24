@@ -12,6 +12,10 @@
   let showInviteModal = false;
   let selectedNotification: any = null;
 
+  function handleArchive(n) {
+    dispatch("archiveNotification", n);
+  }
+
   async function handleClearAll() {
     const list = $notifications;
 
@@ -166,6 +170,12 @@
         {#if !n.isRead}
           <div class="unread-dot"></div>
         {/if}
+        <button
+          class="archive-btn"
+          on:click|stopPropagation={() => handleArchive(n)}
+        >
+          ✕
+        </button>
       </div>
     {/each}
   </div>
@@ -435,8 +445,8 @@
 
   .unread-dot {
     position: absolute;
-    right: 6px;
-    top: 18px;
+    right: 9px;
+    top: 105px;
     width: 6px;
     height: 6px;
     border-radius: 50%;
@@ -447,7 +457,7 @@
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    padding: 16px 6px;
+    padding: 16px 36px 16px 6px;
     position: relative;
   }
 
@@ -488,5 +498,20 @@
 
   .list::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.4);
+  }
+
+  .archive-btn {
+    position: absolute;
+    right: 6px;
+    top: 16px;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .archive-btn:hover {
+    color: white;
   }
 </style>

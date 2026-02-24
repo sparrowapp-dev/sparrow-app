@@ -754,6 +754,20 @@
     }
   }
 
+  async function handleArchiveNotification(e) {
+    try {
+      const notification = e.detail;
+
+      await notificationService.archiveNotification(notification._id);
+      await notificationService.loadNotificationsToStore();
+
+      notifications.success("Notification archived");
+    } catch (err) {
+      console.error(err);
+      notifications.error("Failed to archive notification");
+    }
+  }
+
   $: {
     if (userRole) {
       planContent = planInfoByRole(userRole);
@@ -850,6 +864,7 @@
     on:markAllRead={handleMarkAllRead}
     on:openInvite={handleOpenInvite}
     on:clearAllNotifications={handleClearAllNotifications}
+    on:archiveNotification={handleArchiveNotification}
   />
 
   {#if $location.pathname === "/app/home"}

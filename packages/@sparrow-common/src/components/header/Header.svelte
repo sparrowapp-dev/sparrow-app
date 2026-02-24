@@ -404,6 +404,9 @@
   function handleClearAllNotifications(event) {
     dispatch("clearAllNotifications", event.detail);
   }
+  function handleArchiveNotification(event) {
+    dispatch("archiveNotification", event.detail);
+  }
 </script>
 
 <header
@@ -820,6 +823,7 @@
           on:markAllRead={handleMarkAllRead}
           on:openInvite={(e) => dispatch("openInvite", e.detail)}
           on:clearAllNotifications={handleClearAllNotifications}
+          on:archiveNotification={handleArchiveNotification}
         />
       {/if}
     </div>
