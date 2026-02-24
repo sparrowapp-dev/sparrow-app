@@ -150,11 +150,15 @@ class HelpPageViewModel {
   };
   /**
    * Retrieves the list of boards from the Openfeedback dashboard.
+   * If VITE_OPENFEEDBACK_BOARD_ID is configured, fetches that specific board.
+   * Otherwise, fetches all boards (existing behavior).
    *
    * @returns {Promise<Object>} The response from the Openfeedback service containing boards list.
    */
   public RetrieveBoards = async () => {
-    const response = await this.openfeedbackService.fetchBoards();
+    const configuredBoardId = this.openfeedbackService.getBoardId();
+    const response =
+      await this.openfeedbackService.fetchBoards(configuredBoardId);
     return response;
   };
 

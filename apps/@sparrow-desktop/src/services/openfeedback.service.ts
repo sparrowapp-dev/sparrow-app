@@ -6,18 +6,28 @@ export class OpenfeedbackService {
   constructor() {}
   private apiUrl: string = constants.OPENFEEDBACK_URL;
   private apiKey: string = constants.OPENFEEDBACK_API;
+  private boardId: string = constants.OPENFEEDBACK_BOARD_ID;
 
-  // returns the list of boards available
-  public fetchBoards = async () => {
+  // returns the list of boards available, or a specific board if boardID is provided
+  public fetchBoards = async (boardID?: string) => {
+    const body: { apiKey: string; boardID?: string } = {
+      apiKey: this.apiKey,
+    };
+    if (boardID) {
+      body.boardID = boardID;
+    }
     const response = await makeRequest("POST", `${this.apiUrl}/boards/list`, {
-      body: {
-        apiKey: this.apiKey,
-      },
+      body,
       headers: {
         "Content-type": ContentTypeEnum["application/x-www-form-urlencoded"],
       },
     });
     return response;
+  };
+
+  // returns the configured board ID from environment
+  public getBoardId = (): string | undefined => {
+    return this.boardId;
   };
 
   // returns the post data for a specific post
