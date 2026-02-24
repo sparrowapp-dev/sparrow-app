@@ -738,6 +738,7 @@
       notifications.success(message);
 
       navigate("/app/home");
+      window.dispatchEvent(new CustomEvent("closeNotifications"));
     } catch (err) {
       console.error(err);
       notifications.error("Failed to accept invite");

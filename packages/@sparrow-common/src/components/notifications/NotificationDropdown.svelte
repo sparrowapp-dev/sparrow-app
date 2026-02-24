@@ -26,10 +26,7 @@
   }
 
   function handleAccept(n) {
-    showInviteModal = false; // ⭐ close modal
-
     dispatch("acceptInvite", n);
-    dispatch("closeDropdown"); // ⭐ NEW
   }
 
   function handleDecline(n) {

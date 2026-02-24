@@ -367,6 +367,7 @@
   });
 
   let bellRef: HTMLElement;
+
   onMount(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (bellRef && !bellRef.contains(event.target as Node)) {
@@ -374,10 +375,16 @@
       }
     };
 
+    const handleProgrammaticClose = () => {
+      showNotifications = false;
+    };
+
     document.addEventListener("click", handleClickOutside);
+    window.addEventListener("closeNotifications", handleProgrammaticClose);
 
     return () => {
       document.removeEventListener("click", handleClickOutside);
+      window.removeEventListener("closeNotifications", handleProgrammaticClose);
     };
   });
 

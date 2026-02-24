@@ -12,17 +12,32 @@
 
   export let onAccept: (payload: InviteActionPayload) => void = () => {};
   export let onDecline: (payload: InviteActionPayload) => void = () => {};
+  let accepting = false;
 
   $: isMultiple = (workspaceNames?.length || 0) > 1;
   $: isAdmin = role === "admin";
+  $: roleLabel = role ? role.charAt(0).toUpperCase() + role.slice(1) : "";
 
   function roleCapability(role: string) {
     if (role === "admin")
-      return "Full access to manage hub and all workspaces.";
+      return "Full access to manage this hub and all workspaces.";
     if (role === "editor")
-      return "Can edit APIs and collaborate within this workspace.";
+      return "Can edit APIs and collaborate within the workspace.";
     if (role === "viewer") return "Can view APIs and workspace content.";
     return "";
+  }
+
+  async function handleAcceptClick() {
+    accepting = true;
+
+    await onAccept({
+      notificationId,
+      teamId,
+      workspaceIds,
+      workspaceNames,
+      teamName: hubName,
+      role,
+    });
   }
 
   type InviteActionPayload = {
@@ -37,6 +52,7 @@
 
 {#if open}
   <div class="backdrop" on:click|stopPropagation={onClose} />
+
   <div class="invite-modal" on:click|stopPropagation>
     <button class="close" on:click|stopPropagation={onClose}>✕</button>
 
@@ -44,55 +60,46 @@
       {inviterName?.[0]?.toUpperCase()}
     </div>
 
-    <h2>Invite from {hubName}</h2>
+    <h2 class="title">Invite from {hubName}</h2>
 
     <!-- ================= ADMIN ================= -->
     {#if isAdmin}
       <p class="desc">
         {inviterName} has invited you to join the
-        <strong>"{hubName}"</strong> hub as an <strong>Admin</strong>.
+        <strong>"{hubName}" Hub</strong> as an <strong>Admin</strong>.
       </p>
 
-      <p class="role">
-        Role: <strong>Admin</strong>
-      </p>
-
-      <p class="capability">
-        {roleCapability(role)}
-      </p>
+      <p class="role">Role: <strong>Admin</strong></p>
+      <p class="capability">{roleCapability(role)}</p>
 
       <p class="accept-info">
-        Once you accept, you will gain full access to all workspaces and
-        administrative controls within this hub.
+        Once you accept, you will gain full access to this hub and all
+        workspaces along with administrative controls.
       </p>
 
       <!-- =============== MULTIPLE WORKSPACES =============== -->
     {:else if isMultiple}
       <p class="desc">
         {inviterName} has invited you to join the following workspaces under
-        <strong>"{hubName}"</strong> hub.
+        <strong>"{hubName}" Hub</strong>.
       </p>
 
-      <p class="role">
-        Role: <strong>{role}</strong>
-      </p>
-
-      <p class="capability">
-        {roleCapability(role)}
-      </p>
+      <p class="role">Role: <strong>{roleLabel}</strong></p>
+      <p class="capability">{roleCapability(role)}</p>
 
       <div class="list">
         <div class="list-title">Workspaces included in this invite:</div>
         <ul>
           {#each workspaceNames as w}
-            <li>{w}</li>
+            <li><strong>{w}</strong></li>
           {/each}
         </ul>
       </div>
 
       <p class="accept-info">
         Once you accept, these workspaces will be added to your account under
-        the {hubName} hub with {role} access.
+        the {hubName} Hub with {roleLabel} access and all the tools you need to work
+        with your team.
       </p>
 
       <!-- =============== SINGLE WORKSPACE =============== -->
@@ -100,20 +107,16 @@
       <p class="desc">
         {inviterName} has invited you to
         <strong>"{workspaceNames[0]}"</strong> workspace under
-        <strong>"{hubName}"</strong> hub.
+        <strong>"{hubName}" Hub</strong>.
       </p>
 
-      <p class="role">
-        Role: <strong>{role}</strong>
-      </p>
-
-      <p class="capability">
-        {roleCapability(role)}
-      </p>
+      <p class="role">Role: <strong>{roleLabel}</strong></p>
+      <p class="capability">{roleCapability(role)}</p>
 
       <p class="accept-info">
-        Once you accept you will gain access to this workspace and all the tools
-        needed to collaborate with the team.
+        Once you accept you will gain access to the "{workspaceNames[0]}"
+        workspace within this hub and all the tools you need to work with your
+        team.
       </p>
     {/if}
 
@@ -133,19 +136,12 @@
         Decline
       </button>
 
-      <button
-        class="accept"
-        on:click={() =>
-          onAccept({
-            notificationId,
-            teamId,
-            workspaceIds,
-            workspaceNames,
-            teamName: hubName,
-            role,
-          })}
-      >
-        Accept
+      <button class="accept" disabled={accepting} on:click={handleAcceptClick}>
+        {#if accepting}
+          <span class="spinner"></span>
+        {:else}
+          Accept
+        {/if}
       </button>
     </div>
 
@@ -159,7 +155,7 @@
   .backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.65);
     z-index: 999999;
   }
 
@@ -168,108 +164,147 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 520px;
-    background: #1f2430;
-    border-radius: 12px;
-    padding: 28px;
+
+    /* ⬅ wider like figma */
+    width: 580px;
+
+    /* ⬅ slightly tighter padding */
+    padding: 30px 34px;
+
+    border-radius: 14px;
+    background: linear-gradient(180deg, #202636 0%, #1a2030 100%);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55);
     z-index: 1000000;
   }
 
   .close {
     position: absolute;
-    right: 16px;
-    top: 16px;
+    right: 18px;
+    top: 18px;
     background: none;
     border: none;
-    color: white;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 18px;
+    cursor: pointer;
   }
 
   .avatar {
-    width: 52px;
-    height: 52px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
-    background: #6a5cff;
+    background: linear-gradient(135deg, #6a5cff, #7b6cff);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 12px;
+    font-size: 20px;
+    font-weight: 600;
+
+    /* ⬅ reduced */
+    margin-bottom: 14px;
   }
 
-  .actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    margin-top: 24px;
-  }
+  .title {
+    font-size: 26px;
+    font-weight: 600;
 
-  .accept {
-    background: #316cf6;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 8px;
-    color: white;
-  }
-
-  .decline {
-    background: #2b3140;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 8px;
-    color: white;
-  }
-
-  .admin-note {
-    margin-top: 6px;
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.7);
+    /* ⬅ reduced */
+    margin-bottom: 10px;
   }
 
   .desc {
-    margin-top: 8px;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.45; /* ⬅ tighter lines */
+    margin-bottom: 12px;
   }
 
   .role {
-    margin-top: 12px;
+    margin-top: 2px;
+    margin-bottom: 4px;
     font-size: 14px;
   }
 
   .capability {
-    margin-top: 4px;
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.75);
+    margin-bottom: 14px;
+    font-size: 13.5px;
   }
 
   .list {
-    margin-top: 14px;
+    margin-top: 10px;
+    margin-bottom: 14px;
   }
 
   .list-title {
-    font-size: 13px;
-    margin-bottom: 6px;
+    font-size: 13.5px;
+    margin-bottom: 4px;
     color: rgba(255, 255, 255, 0.8);
   }
 
   .list ul {
     padding-left: 18px;
-    margin: 6px 0;
+    margin: 4px 0;
   }
 
   .list li {
-    margin-bottom: 4px;
+    margin-bottom: 4px; /* ⬅ tighter */
   }
 
   .accept-info {
-    margin-top: 14px;
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.7);
-    line-height: 1.5;
+    margin-top: 10px;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 14px;
+
+    /* ⬅ reduced */
+    margin-top: 22px;
+  }
+
+  .accept,
+  .decline {
+    padding: 11px 22px;
+    border-radius: 10px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .decline {
+    background: #2b3140;
+    color: white;
+  }
+
+  .accept {
+    background: #3f6df0;
+    color: white;
+    min-width: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .footer-note {
-    margin-top: 16px;
+    margin-top: 14px; /* ⬅ reduced */
     font-size: 12px;
     color: rgba(255, 255, 255, 0.5);
+  }
+
+  .spinner {
+    width: 18px;
+    height: 18px;
+    border: 2.5px solid rgba(255, 255, 255, 0.35);
+    border-top: 2.5px solid #ffffff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 </style>
