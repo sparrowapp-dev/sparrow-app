@@ -65,6 +65,7 @@
   import { getSelfhostUrls } from "@app/utils/jwt";
   import { get } from "svelte/store";
   import { NotificationService } from "@app/services/notification.service";
+  import { highlightTeam, highlightWorkspace } from "@sparrow/common/store";
 
   const _viewModel = new DashboardViewModel();
   const notificationService = new NotificationService();
@@ -721,6 +722,24 @@
       await _viewModel.refreshTeams(userId);
       await _viewModel.refreshWorkspaces(userId);
       await _viewModel.setOpenTeam(payload.teamId);
+
+      if (payload.role === "admin") {
+        highlightTeam(payload.teamId);
+
+        const allWorkspaces = await _viewModel.getWorkspacesByTeamId(
+          payload.teamId,
+        );
+
+        allWorkspaces.forEach((ws) => {
+          highlightWorkspace(ws._id);
+        });
+      } else {
+        highlightTeam(payload.teamId);
+
+        payload.workspaceIds?.forEach((id) => {
+          highlightWorkspace(id);
+        });
+      }
 
       let message = "";
 

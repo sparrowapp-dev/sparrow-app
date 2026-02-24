@@ -15,6 +15,7 @@
   import { WorkspaceType } from "@sparrow/common/enums";
   import { Tooltip } from "@sparrow/library/ui";
   import { Button } from "@sparrow/library/ui";
+  import { highlightedWorkspaces } from "@sparrow/common/store";
 
   export let workspace: any;
   export let isAdminOrOwner: boolean;
@@ -56,6 +57,8 @@
       showMenu = true;
     }, 100);
   };
+
+  $: highlightedWorkspaceIds = $highlightedWorkspaces;
 
   $: {
     if (isAdminOrOwner) {
@@ -196,7 +199,11 @@
       {/if}
     </div>
     <div
-      class="bg-tertiary-750 workspace-card p-4"
+      class="bg-tertiary-750 workspace-card p-4 {highlightedWorkspaceIds.has(
+        workspace._id,
+      )
+        ? 'workspace-new-highlight'
+        : ''}"
       tabindex="0"
       on:click={() => {
         handleOpenWorkspace();
@@ -206,6 +213,9 @@
       }`}
       on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     >
+      {#if highlightedWorkspaceIds.has(workspace._id)}
+        <div class="new-workspace-badge">NEW</div>
+      {/if}
       <div>
         <div class="d-flex flex-column" style="gap: 10px">
           {#if cardType === "teams"}
@@ -475,5 +485,33 @@
     .error-border {
       border: 1px solid var(--error--color) !important;
     }
+  }
+
+  .workspace-new-highlight {
+    border: 1.5px solid #2f6dfd;
+    box-shadow:
+      0 0 0 1px rgba(47, 109, 253, 0.2),
+      0 0 12px rgba(47, 109, 253, 0.35);
+  }
+
+  .new-workspace-badge {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 3px 10px;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 3px;
+
+    background: rgba(45, 212, 191, 0.08);
+    color: #5ec5ed;
+    border: 1px solid #214d5e;
+
+    letter-spacing: 0.4px;
   }
 </style>

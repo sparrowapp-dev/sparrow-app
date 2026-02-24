@@ -58,6 +58,7 @@
   } from "../../../../../packages/@sparrow-workspaces/src/stores/recent-left-panel";
   import { get } from "svelte/store";
   import { NotificationService } from "@app/services/notification.service";
+  import { highlightTeam, highlightWorkspace } from "@sparrow/common/store";
 
   const _viewModel = new DashboardViewModel();
   const notificationService = new NotificationService();
@@ -637,22 +638,53 @@
   async function handleAcceptInvite(e) {
     try {
       const payload = e.detail;
+
       await notificationService.respondToInvite(
         payload.notificationId,
         "accept",
       );
+
       await notificationService.loadNotificationsToStore();
+
       await _viewModel.refreshTeams(userId);
       await _viewModel.refreshWorkspaces(userId);
       await _viewModel.setOpenTeam(payload.teamId);
-      const workspaceText =
-        payload.workspaceNames.length > 1
-          ? `${payload.workspaceNames.join(", ")} workspaces`
-          : `${payload.workspaceNames[0]} workspace`;
-      notifications.success(
-        `You’ve joined the workspace - You now have access to the ${workspaceText} under ${payload.teamName} as an ${payload.role}.`,
-      );
+
+      if (payload.role === "admin") {
+        highlightTeam(payload.teamId);
+
+        const allWorkspaces = await _viewModel.getWorkspacesByTeamId(
+          payload.teamId,
+        );
+
+        allWorkspaces.forEach((ws) => {
+          highlightWorkspace(ws._id);
+        });
+      } else {
+        highlightTeam(payload.teamId);
+
+        payload.workspaceIds?.forEach((id) => {
+          highlightWorkspace(id);
+        });
+      }
+
+      let message = "";
+
+      if (payload.role === "admin") {
+        message = `You are now an admin in ${payload.teamName} hub.`;
+      } else {
+        const workspaceText =
+          payload.workspaceNames.length > 1
+            ? `${payload.workspaceNames.join(", ")} workspaces`
+            : `${payload.workspaceNames[0]} workspace`;
+
+        message = `You are now a ${payload.role} in ${workspaceText}.`;
+      }
+
+      notifications.success(message);
+
       navigate("/app/home");
+      window.dispatchEvent(new CustomEvent("closeNotifications"));
     } catch (err) {
       console.error(err);
       notifications.error("Failed to accept invite");
@@ -661,20 +693,31 @@
   async function handleDeclineInvite(e) {
     try {
       const payload = e.detail;
+
       await notificationService.respondToInvite(
         payload.notificationId,
         "reject",
       );
+
       await notificationService.loadNotificationsToStore();
+
       await _viewModel.refreshTeams(userId);
       await _viewModel.refreshWorkspaces(userId);
-      const workspaceText =
-        payload.workspaceNames.length > 1
-          ? `${payload.workspaceNames.join(", ")} workspaces`
-          : `${payload.workspaceNames[0]} workspace`;
-      notifications.error(
-        `Invite declined - You declined the invite to join ${workspaceText} under ${payload.teamName} as an ${payload.role}.`,
-      );
+
+      let message = "";
+
+      if (payload.role === "admin") {
+        message = `You declined the invite to join ${payload.teamName} hub.`;
+      } else {
+        const workspaceText =
+          payload.workspaceNames.length > 1
+            ? `${payload.workspaceNames.join(", ")} workspaces`
+            : `${payload.workspaceNames[0]} workspace`;
+
+        message = `You declined the invite to join ${workspaceText}.`;
+      }
+
+      notifications.error(message);
     } catch (err) {
       console.error(err);
       notifications.error("Failed to reject invite");
