@@ -722,14 +722,20 @@
       await _viewModel.refreshWorkspaces(userId);
       await _viewModel.setOpenTeam(payload.teamId);
 
-      const workspaceText =
-        payload.workspaceNames.length > 1
-          ? `${payload.workspaceNames.join(", ")} workspaces`
-          : `${payload.workspaceNames[0]} workspace`;
+      let message = "";
 
-      notifications.success(
-        `You’ve joined the workspace - You now have access to the ${workspaceText} under ${payload.teamName} as an ${payload.role}.`,
-      );
+      if (payload.role === "admin") {
+        message = `You are now an admin in ${payload.teamName} hub.`;
+      } else {
+        const workspaceText =
+          payload.workspaceNames.length > 1
+            ? `${payload.workspaceNames.join(", ")} workspaces`
+            : `${payload.workspaceNames[0]} workspace`;
+
+        message = `You are now a ${payload.role} in ${workspaceText}.`;
+      }
+
+      notifications.success(message);
 
       navigate("/app/home");
     } catch (err) {
@@ -752,14 +758,20 @@
       await _viewModel.refreshTeams(userId);
       await _viewModel.refreshWorkspaces(userId);
 
-      const workspaceText =
-        payload.workspaceNames.length > 1
-          ? `${payload.workspaceNames.join(", ")} workspaces`
-          : `${payload.workspaceNames[0]} workspace`;
+      let message = "";
 
-      notifications.error(
-        `Invite declined - You declined the invite to join ${workspaceText} under ${payload.teamName} as an ${payload.role}.`,
-      );
+      if (payload.role === "admin") {
+        message = `You declined the invite to join ${payload.teamName} hub.`;
+      } else {
+        const workspaceText =
+          payload.workspaceNames.length > 1
+            ? `${payload.workspaceNames.join(", ")} workspaces`
+            : `${payload.workspaceNames[0]} workspace`;
+
+        message = `You declined the invite to join ${workspaceText}.`;
+      }
+
+      notifications.error(message);
     } catch (err) {
       console.error(err);
       notifications.error("Failed to reject invite");

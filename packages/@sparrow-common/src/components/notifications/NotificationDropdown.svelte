@@ -143,24 +143,25 @@
         <div class="content">
           <div class="message">
             <strong>'{n.data?.inviterName}'</strong>
-            has invited you as a {n.data?.role} to
-            <strong>
-              '{n.data?.workspaceNames?.join(", ")}'
-            </strong>
-            workspace{n.data?.workspaceNames?.length > 1 ? "s" : ""}.
+
+            {#if n.data?.role === "admin"}
+              has invited you as an admin to
+              <strong>'{n.data?.teamName}'</strong> hub.
+            {:else}
+              has invited you as a {n.data?.role} to
+              <strong>'{n.data?.workspaceNames?.join(", ")}'</strong>
+              workspace{n.data?.workspaceNames?.length > 1 ? "s" : ""}.
+            {/if}
           </div>
 
           <div class="time">
             {formatTime(n.createdAt)}
           </div>
-
           <button
             class="action-btn"
             on:click|stopPropagation={() => openInvite(n)}
           >
-            {showInviteModal && selectedNotification?._id === n._id
-              ? "Review and Accept"
-              : "View Invite"}
+            View Invite
           </button>
         </div>
 

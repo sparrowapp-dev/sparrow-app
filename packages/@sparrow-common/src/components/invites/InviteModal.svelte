@@ -14,6 +14,16 @@
   export let onDecline: (payload: InviteActionPayload) => void = () => {};
 
   $: isMultiple = (workspaceNames?.length || 0) > 1;
+  $: isAdmin = role === "admin";
+
+  function roleCapability(role: string) {
+    if (role === "admin")
+      return "Full access to manage hub and all workspaces.";
+    if (role === "editor")
+      return "Can edit APIs and collaborate within this workspace.";
+    if (role === "viewer") return "Can view APIs and workspace content.";
+    return "";
+  }
 
   type InviteActionPayload = {
     notificationId: string;
@@ -34,28 +44,43 @@
       {inviterName?.[0]?.toUpperCase()}
     </div>
 
-    <h2>
-      Invite from {hubName}
-    </h2>
+    <h2>Invite from {hubName}</h2>
 
-    {#if isMultiple}
-      <p>
+    <!-- ================= ADMIN ================= -->
+    {#if isAdmin}
+      <p class="desc">
+        {inviterName} has invited you to join the
+        <strong>"{hubName}"</strong> hub as an <strong>Admin</strong>.
+      </p>
+
+      <p class="role">
+        Role: <strong>Admin</strong>
+      </p>
+
+      <p class="capability">
+        {roleCapability(role)}
+      </p>
+
+      <p class="accept-info">
+        Once you accept, you will gain full access to all workspaces and
+        administrative controls within this hub.
+      </p>
+
+      <!-- =============== MULTIPLE WORKSPACES =============== -->
+    {:else if isMultiple}
+      <p class="desc">
         {inviterName} has invited you to join the following workspaces under
-        <strong>"{hubName}"</strong> Hub.
+        <strong>"{hubName}"</strong> hub.
       </p>
-    {:else}
-      <p>
-        {inviterName} has invited you to
-        <strong>"{workspaceNames[0]}"</strong> workspace under
-        <strong>"{hubName}"</strong> Hub.
+
+      <p class="role">
+        Role: <strong>{role}</strong>
       </p>
-    {/if}
 
-    <p class="role">
-      Role: <strong>{role}</strong>
-    </p>
+      <p class="capability">
+        {roleCapability(role)}
+      </p>
 
-    {#if isMultiple}
       <div class="list">
         <div class="list-title">Workspaces included in this invite:</div>
         <ul>
@@ -64,6 +89,32 @@
           {/each}
         </ul>
       </div>
+
+      <p class="accept-info">
+        Once you accept, these workspaces will be added to your account under
+        the {hubName} hub with {role} access.
+      </p>
+
+      <!-- =============== SINGLE WORKSPACE =============== -->
+    {:else}
+      <p class="desc">
+        {inviterName} has invited you to
+        <strong>"{workspaceNames[0]}"</strong> workspace under
+        <strong>"{hubName}"</strong> hub.
+      </p>
+
+      <p class="role">
+        Role: <strong>{role}</strong>
+      </p>
+
+      <p class="capability">
+        {roleCapability(role)}
+      </p>
+
+      <p class="accept-info">
+        Once you accept you will gain access to this workspace and all the tools
+        needed to collaborate with the team.
+      </p>
     {/if}
 
     <div class="actions">
@@ -97,6 +148,10 @@
         Accept
       </button>
     </div>
+
+    <p class="footer-note">
+      You can manage pending invites later from Notifications.
+    </p>
   </div>
 {/if}
 
@@ -161,5 +216,60 @@
     padding: 10px 18px;
     border-radius: 8px;
     color: white;
+  }
+
+  .admin-note {
+    margin-top: 6px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .desc {
+    margin-top: 8px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .role {
+    margin-top: 12px;
+    font-size: 14px;
+  }
+
+  .capability {
+    margin-top: 4px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .list {
+    margin-top: 14px;
+  }
+
+  .list-title {
+    font-size: 13px;
+    margin-bottom: 6px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .list ul {
+    padding-left: 18px;
+    margin: 6px 0;
+  }
+
+  .list li {
+    margin-bottom: 4px;
+  }
+
+  .accept-info {
+    margin-top: 14px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.5;
+  }
+
+  .footer-note {
+    margin-top: 16px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
   }
 </style>
