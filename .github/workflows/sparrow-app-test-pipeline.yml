@@ -100,7 +100,7 @@ jobs:
         id: extract-cert-ids
         run: |
           # Extract Apple Distribution (codesigning) ID
-          CODESIGN_ID=$(security find-identity -v -p codesigning build.keychain | grep "Apple Distribution" | awk -F'"' '{print $2}')
+          CODESIGN_ID=$(security find-identity -v -p codesigning build.keychain | grep "3rd Party Mac Developer Application" | awk -F'"' '{print $2}')
           if [ -z "$CODESIGN_ID" ]; then
             echo "::error::Apple Distribution certificate not found in keychain"
             exit 1
