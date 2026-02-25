@@ -11,6 +11,7 @@
     Daimond,
   } from "@sparrow/library/icons";
   import { Avatar, Button, PlanTag, Tooltip } from "@sparrow/library/ui";
+  import { highlightedTeams } from "@sparrow/common/store";
 
   export let team;
   export let isGuestUser;
@@ -34,6 +35,8 @@
         return SideBarGlobe;
     }
   }
+
+  $: highlightedTeamIds = $highlightedTeams;
 </script>
 
 <button
@@ -112,8 +115,8 @@
       />
     </span>
   {/if} -->
-  {#if team.isNewInvite}
-    <p class="mb-0 new-invite text-labelColor w-50 ellipsis">NEW INVITE</p>
+  {#if highlightedTeamIds.has(team.teamId)}
+    <span class="new-badge">New</span>
   {:else if team?._data?.users?.length > 1}
     <Button
       size="extra-small"
@@ -252,5 +255,15 @@
     justify-content: center;
     z-index: 1 !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .new-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    border: 1px solid #214d5e;
+    color: #5ec5ed;
+    background: rgba(45, 212, 191, 0.08);
+    font-weight: 500;
   }
 </style>
