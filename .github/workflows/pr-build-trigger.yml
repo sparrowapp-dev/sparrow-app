@@ -93,7 +93,7 @@ jobs:
       - name: Trigger Development Release Workflow
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: development-release.yml
+          workflow: sparrow-app-development.yml
           ref: ${{ steps.pr.outputs.branch }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
