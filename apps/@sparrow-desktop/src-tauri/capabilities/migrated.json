@@ -41,7 +41,16 @@
     "fs:allow-write-file",
     "fs:allow-write-text-file",
     "core:window:allow-set-max-size",
-    "core:window:allow-set-position"
+    "core:window:allow-set-position",
+    "fs:allow-app-read",
+    "fs:allow-read-text-file",
+    "fs:allow-remove",
+    {
+      "identifier": "fs:scope",
+      "allow": [
+        "$TEMP/**"
+      ]
+    }
   ],
   "platforms": ["linux", "macOS", "windows", "android", "iOS"]
 }

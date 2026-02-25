@@ -191,6 +191,7 @@
   export let onStopGeneratingAIResponse;
   export let generateMockData: () => any;
   export let updateRequestStatAiChatBot: () => any;
+  export let openAiForAllOpenedRequestTabs: () => any;
 
   /**
    * Role of user in active workspace
@@ -231,6 +232,7 @@
   export let onGeneratePreScript;
 
   export let selectedModel;
+  export let aiPreferenceReady = true;
 
   // Reference to the splitpane container element
   let splitpaneContainer;
@@ -345,7 +347,11 @@
   //     });
   //   }
   // }
-  $: if (!isGuestUser && $tab?.property?.request?.state?.isChatbotActive) {
+  $: if (
+    aiPreferenceReady &&
+    !isGuestUser &&
+    $tab?.property?.request?.state?.isChatbotActive
+  ) {
     isChatbotOpenInCurrTab.set(true);
   }
   onDestroy(() => {
@@ -774,10 +780,12 @@
       style="flex:1; overflow:auto; margin-top: 12px;"
     >
       <Motion
-        animate={$tab?.property?.request?.state?.isChatbotActive
+        animate={aiPreferenceReady &&
+        $tab?.property?.request?.state?.isChatbotActive
           ? chatbotOpenAnimation
           : chatbotClosedAnimation}
-        transition={$tab?.property?.request?.state?.isChatbotActive
+        transition={aiPreferenceReady &&
+        $tab?.property?.request?.state?.isChatbotActive
           ? chatbotOpenTransition
           : chatbotCloseTransition}
         let:motion
@@ -1208,6 +1216,7 @@
                                     {isWebApp}
                                     {isGuestUser}
                                     {userRole}
+                                    tabId={$tab?.tabId}
                                   />
                                 {/if}
                                 <div
@@ -1216,6 +1225,7 @@
                                   <ResponseBody
                                     response={storeData?.response}
                                     apiState={storeData?.response}
+                                    tabId={$tab?.tabId}
                                   />
                                 </div>
                               {:else if storeData?.response.navigation === ResponseSectionEnum.HEADERS}
@@ -1243,7 +1253,7 @@
                             </div>
                           </div>
                         {/if}
-                        {#if $tab?.property?.request?.isGeneratedVariable && !$requestTabTestDemo && !$requestTabTestScriptDemo}
+                        {#if aiPreferenceReady && $tab?.property?.request?.isGeneratedVariable && !$requestTabTestDemo && !$requestTabTestScriptDemo}
                           <div
                             style="position:absolute; bottom:12px; right:{!$tab
                               ?.property?.request?.state?.isChatbotActive
@@ -1267,7 +1277,7 @@
                             />
                           </div>
                         {/if}
-                        {#if $tab.property?.request?.tests?.testCaseMode === "no-code" && $tab?.property?.request?.isRequestTestsNoCodeDemoCompleted && $tab.property?.request?.state?.requestNavigation === "Tests"}
+                        {#if aiPreferenceReady && $tab.property?.request?.tests?.testCaseMode === "no-code" && $tab?.property?.request?.isRequestTestsNoCodeDemoCompleted && $tab.property?.request?.state?.requestNavigation === "Tests"}
                           <div
                             style="position:absolute; bottom:0px; right:{!$tab
                               ?.property?.request?.state?.isChatbotActive
@@ -1295,7 +1305,7 @@
                             />
                           </div>
                         {/if}
-                        {#if $tab.property?.request?.tests?.testCaseMode === "script" && $tab?.property?.request?.isRequestTestsScriptDemoCompleted && $tab.property?.request?.state?.requestNavigation === "Tests"}
+                        {#if aiPreferenceReady && $tab.property?.request?.tests?.testCaseMode === "script" && $tab?.property?.request?.isRequestTestsScriptDemoCompleted && $tab.property?.request?.state?.requestNavigation === "Tests"}
                           <div
                             style="position:absolute; bottom:0px; right:{!$tab
                               ?.property?.request?.state?.isChatbotActive
@@ -1323,7 +1333,7 @@
                             />
                           </div>
                         {/if}
-                        {#if $tab?.property?.request?.isRequestAssertionsDemoCompleted && $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.ASSERTIONS && !$requestTabAssertionsDemo}
+                        {#if aiPreferenceReady && $tab?.property?.request?.isRequestAssertionsDemoCompleted && $tab.property?.request?.state?.requestNavigation === RequestSectionEnum.ASSERTIONS && !$requestTabAssertionsDemo}
                           <div
                             style="position:absolute; bottom:0px; right:{!$tab
                               ?.property?.request?.state?.isChatbotActive
@@ -1485,7 +1495,7 @@
             {/if}
           </Pane>
           <!-- AI Chatbot Interface -->
-          {#if !isGuestUser && $tab?.property?.request?.state?.isChatbotActive && $policyConfig.enableAIAssistance && !isSharedWorkspace}
+          {#if aiPreferenceReady && !isGuestUser && $tab?.property?.request?.state?.isChatbotActive && $policyConfig.enableAIAssistance && !isSharedWorkspace}
             <Pane
               class="position-relative bg-transparent"
               minSize={minSizePct}
@@ -1669,9 +1679,17 @@
           tabsSplitterDirection.set("horizontal");
           isChatbotOpenInCurrTab.set(true);
         }
-        onUpdateRequestState({
-          isChatbotActive: !$tab?.property?.request?.state?.isChatbotActive,
-        });
+        const isCurrentlyActive =
+          $tab?.property?.request?.state?.isChatbotActive;
+
+        if (!isCurrentlyActive) {
+          localStorage.setItem("sparrow_ai_auto_open", "true");
+          openAiForAllOpenedRequestTabs();
+        } else {
+          localStorage.setItem("sparrow_ai_auto_open", "false");
+          openAiForAllOpenedRequestTabs();
+          isChatbotOpenInCurrTab.set(false);
+        }
         aiChatBotPanelClose.set(true);
         MixpanelEvent(Events.AI_Chat_Initiation);
       }}

@@ -1108,23 +1108,35 @@ export class TeamExplorerPageViewModel {
     options?: { toWorkspace?: boolean },
   ) => {
     const [authToken] = getAuthJwt();
-    if (constants.APP_EDITION !== "SELFHOSTED") {
-      if (options?.toWorkspace) {
-        window.open(
-          `${constants.ADMIN_URL}/hubs/workspace/${teamId}?xid=${authToken}`,
-          "_blank",
-        );
-      } else {
-        window.open(
-          `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
-          "_blank",
-        );
-      }
-    } else {
-      window.open(constants.ADMIN_URL, "_blank");
-    }
 
-    return;
+    try {
+      const response = await fetch(
+        `${constants.API_URL}/api/auth/admin-sso-token`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({ teamId }),
+        },
+      );
+
+      if (response.status === 403) {
+        await open(`${constants.ADMIN_URL}/login`);
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error("Unexpected error");
+      }
+
+      const data = await response.json();
+
+      await open(`${constants.ADMIN_URL}/sso?ssoToken=${data.ssoToken}`);
+    } catch (error) {
+      await open(`${constants.ADMIN_URL}/login`);
+    }
   };
 
   public handleContactSales = async () => {

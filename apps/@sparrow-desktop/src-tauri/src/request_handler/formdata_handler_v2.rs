@@ -8,7 +8,6 @@
 //! - `reqwest::Body`: Represents the body of an HTTP request or response in Reqwest.
 //! - `reqwest::RequestBuilder`: Builder for constructing HTTP requests in Reqwest.
 //! - `reqwest::Response`: Represents an HTTP response in Reqwest.
-//! - `serde::{Deserialize, Serialize}`: Serialization and deserialization support with Serde.
 //! - `serde_json::Value`: Represents a JSON value in Serde JSON.
 //! - `std::path::Path`: Represents file paths and provides path-related operations.
 //! - `tokio::fs::File`: Asynchronous file operations using Tokio.
@@ -16,7 +15,6 @@
 
 use reqwest::multipart;
 use reqwest::{Body, RequestBuilder, Response};
-use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::path::Path;
 use tokio::fs::File;
@@ -40,13 +38,6 @@ fn extract_filename(path_str: &str) -> Option<String> {
         .map(|name| name.to_owned()); // Converts the &str to a String
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-struct KeyValue {
-    key: String,
-    value: String,
-    checked: bool,
-    base: Option<String>,
-}
 ///
 /// Makes an asynchronous multipart/form-data HTTP request.
 ///

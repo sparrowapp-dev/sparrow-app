@@ -32,6 +32,7 @@ import { notifications } from "@sparrow/library/ui";
 import { isUserFirstSignUp } from "@app/store/user.store";
 import { isFirstTimeInTestFlow } from "@sparrow/workspaces/stores";
 import mixpanel from "mixpanel-browser";
+import { inviteModalStore } from "../store/inviteModal.store";
 
 interface DeepLinkHandlerWindowsPayload {
   payload: {
@@ -368,6 +369,11 @@ export class AppViewModel {
     try {
       await getCurrentWindow().setFocus();
       const params = new URLSearchParams(url.split("?")[1]);
+      const source = params.get("source");
+      const isInviteLoginFlow =
+        source === "invite" &&
+        params.get("accessToken") &&
+        params.get("refreshToken");
       const currentUserAccessToken = params.get("accessToken");
       const workspaceId = params.get("workspaceID");
       const isSparrowEdge = params.get("isSparrowEdge");
@@ -376,11 +382,50 @@ export class AppViewModel {
       const guestUser = await this.guestUserRepository.findOne({
         name: "guestUser",
       });
-      // Get current policy settings
       let policySettings: any;
       policyConfig.subscribe((value) => {
         policySettings = value;
       })();
+      if (isInviteLoginFlow) {
+        const accessToken = params.get("accessToken")!;
+        const refreshToken = params.get("refreshToken")!;
+        const teamId = params.get("teamId");
+        const workspaceId =
+          params.get("workspaceId") || params.get("workspaceID");
+
+        const teamName = params.get("teamName");
+        const role = params.get("role");
+        const workspaceNames = params.get("workspaceNames");
+
+        setAuthJwt(constants.AUTH_TOKEN, accessToken);
+        setAuthJwt(constants.REF_TOKEN, refreshToken);
+
+        const userDetails = jwtDecode(accessToken);
+        setUser(userDetails);
+
+        if (teamName && role && workspaceNames) {
+          inviteModalStore.set({
+            show: true,
+            data: {
+              teamName,
+              role,
+              workspaceNames: workspaceNames.split(",").map((w) => w.trim()),
+            },
+          });
+        }
+
+        await Promise.all([
+          this.refreshTeams(userDetails._id),
+          this.refreshWorkspaces(userDetails._id),
+        ]);
+
+        if (teamId) {
+          await this.teamRepository.setActiveTeam(teamId);
+          await this.teamRepository.setOpenTeam(teamId);
+        }
+
+        return;
+      }
 
       const isGuestUser = guestUser?.getLatest()?.toMutableJSON()?.isGuestUser;
       if (isGuestUser) {
@@ -463,8 +508,10 @@ export class AppViewModel {
     }
   };
 
-  private deepLinkHandlerMacOs = async (deepLinkUrl: string): Promise<void> => {
-    if (deepLinkUrl) {
+  private deepLinkHandlerMacOs = async (
+    deepLinkUrl: string[],
+  ): Promise<void> => {
+    if (deepLinkUrl && deepLinkUrl[0]) {
       await this.throttleHandleIncomingDeepLink(deepLinkUrl[0]);
     }
   };

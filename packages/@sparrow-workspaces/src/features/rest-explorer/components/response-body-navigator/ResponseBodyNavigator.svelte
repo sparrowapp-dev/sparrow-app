@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { downloadIcon, SaveIcon } from "@sparrow/library/assets";
-  import { copyIcon } from "@sparrow/library/assets";
   import { captureEvent } from "@app/utils/posthog/posthogConfig";
   import {
     copyToClipBoard,
@@ -14,10 +12,8 @@
   import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import { ResponseFormatterEnum } from "@sparrow/common/types/workspace";
-  import { beautifyIcon as BeautifyIcon } from "@sparrow/library/assets";
   import js_beautify, { html_beautify } from "js-beautify";
   import { WithButtonV6, WithSelectV3 } from "@sparrow/workspaces/hoc";
-  import { invoke } from "@tauri-apps/api/core";
   import { save } from "@tauri-apps/plugin-dialog";
   import { writeTextFile, BaseDirectory } from "@tauri-apps/plugin-fs";
   import {
@@ -25,9 +21,10 @@
     CopyRegular,
     SaveRegular,
   } from "@sparrow/library/icons";
-  import { Select } from "@sparrow/library/forms";
   import { WorkspaceRole } from "@sparrow/common/enums";
   import { onMount, tick } from "svelte";
+  import { getFormattedResponse } from "../../utils/formatting-service";
+  import type { ResponseFormat } from "../../utils/response-artifact";
 
   export let response;
   export let apiState;
@@ -38,12 +35,12 @@
   export let onSaveResponse;
   export let path;
   export let userRole;
+  export let tabId: string = "";
   onMount(async () => {
     await tick(); // wait for DOM to render
     sliderStyle = getSliderStyle(apiState.bodyFormatter); // set initial slider position
   });
   let fileExtension: string;
-  let formatedBody: string;
   let fileNameWithExtension: string;
   let textBtn: HTMLSpanElement;
   let rawBtn: HTMLSpanElement;
@@ -64,14 +61,52 @@
         ? html_beautify(_data)
         : removeIndentation(_data);
   };
+
+  /**
+   * @description Get formatted response text for copy/download
+   */
+  const getResponseText = async (): Promise<string> => {
+    // Check if response is file-backed (large response)
+    if (response?.isFileBacked && tabId) {
+      // Map file extension to ResponseFormat
+      let format: ResponseFormat;
+      switch (fileExtension) {
+        case "json":
+          format = "json";
+          break;
+        case "xml":
+          format = "xml";
+          break;
+        case "html":
+          format = "html";
+          break;
+        default:
+          format = "raw";
+      }
+
+      return await getFormattedResponse({
+        tabId,
+        format,
+        onProgress: () => {},
+      });
+    } else {
+      return formatCode(response?.body);
+    }
+  };
+
   /**
    * @description Copy API response to users clipboard.
    */
-
   const handleCopy = async () => {
-    await copyToClipBoard(formatCode(response?.body));
-    notifications.success("Copied to Clipboard.");
-    MixpanelEvent(Events.COPY_API_RESPONSE);
+    try {
+      const textToCopy = await getResponseText();
+      await copyToClipBoard(textToCopy);
+      notifications.success("Copied to Clipboard.");
+      MixpanelEvent(Events.COPY_API_RESPONSE);
+    } catch (error) {
+      console.error("Failed to copy:", error);
+      notifications.error("Failed to copy response.");
+    }
   };
 
   const handleTypeDropdown: (tab: string) => void = (tab) => {
@@ -94,8 +129,6 @@
     }
     // build complete file name with extension will be used for export in desttop-app and web-app;
     fileNameWithExtension = `api_response_${response?.status || ""}_${response?.time || "0"}ms_${response?.size || "0"}kb.${fileExtension}`;
-
-    formatedBody = formatCode(response?.body); //pre formate body for exporting
   }
   /**
    * @description - remove indentation from the string
@@ -124,11 +157,16 @@
     });
     // Check if a path was selected
     if (path) {
-      const contents = formatedBody;
-      await writeTextFile(path, contents, {
-        baseDir: BaseDirectory.AppConfig,
-      });
-      notifications.success("Exported successfully.");
+      try {
+        const contents = await getResponseText();
+        await writeTextFile(path, contents, {
+          baseDir: BaseDirectory.AppConfig,
+        });
+        notifications.success("Exported successfully.");
+      } catch (error) {
+        console.error("Failed to export:", error);
+        notifications.error("Failed to export response.");
+      }
     } else {
       console.error("Save dialog was canceled or no path was selected.");
     }
@@ -323,7 +361,7 @@
               icon={ArrowDownloadRegular}
               onClick={() =>
                 handleDownloadResponse(
-                  formatedBody,
+                  formatCode(response?.body),
                   contentType,
                   fileNameWithExtension,
                 )}
