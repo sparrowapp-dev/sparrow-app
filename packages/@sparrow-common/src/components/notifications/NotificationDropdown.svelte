@@ -65,9 +65,7 @@
     selectedNotification = n;
     showInviteModal = true;
 
-    dispatch("openInvite", n); // ⭐ tell parent
-
-    console.log("Opening invite modal for notification:", n);
+    dispatch("openInvite", n);
   }
 
   onMount(() => {
@@ -77,6 +75,11 @@
   onDestroy(() => {
     document.removeEventListener("click", handleClickOutside);
   });
+
+  $: visibleNotifications =
+    activeTab === "unread"
+      ? $notifications.filter((n) => !n.isRead && !n.isArchived)
+      : $notifications.filter((n) => !n.isArchived);
 </script>
 
 <div class="panel">
@@ -85,7 +88,12 @@
     <span class="title">Notifications</span>
 
     <button
+      type="button"
       class="menu-btn"
+      aria-label="Notification menu"
+      title="Notification menu"
+      aria-haspopup="menu"
+      aria-expanded={showMenu}
       on:click|stopPropagation={() => (showMenu = !showMenu)}
     >
       ⋮
@@ -129,11 +137,11 @@
 
   <!-- List -->
   <div class="list">
-    {#if $notifications.length === 0}
+    {#if visibleNotifications.length === 0}
       <div class="empty">No notifications</div>
     {/if}
 
-    {#each $notifications as n}
+    {#each visibleNotifications as n}
       <div class="notification-item">
         <!-- Avatar -->
         <div class="avatar">
@@ -377,14 +385,6 @@
     border-radius: 999px;
     background: rgba(79, 124, 255, 0.2);
     color: #4f7cff;
-  }
-
-  .notification-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 14px 6px;
-    position: relative;
   }
 
   .avatar {

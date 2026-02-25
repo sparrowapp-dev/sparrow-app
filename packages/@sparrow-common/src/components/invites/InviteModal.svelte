@@ -54,7 +54,14 @@
   <div class="backdrop" on:click|stopPropagation={onClose} />
 
   <div class="invite-modal" on:click|stopPropagation>
-    <button class="close" on:click|stopPropagation={onClose}>✕</button>
+    <button
+      class="close"
+      type="button"
+      aria-label="Close"
+      on:click|stopPropagation={onClose}
+    >
+      ✕
+    </button>
 
     <div class="avatar">
       {inviterName?.[0]?.toUpperCase()}
