@@ -2,18 +2,18 @@ import { user } from "@app/store/auth.store";
 import { Events } from "@sparrow/common/enums";
 import MixpanelEvent from "@app/utils/mixpanel/MixpanelEvent";
 import { ReleaseRepository } from "../../repositories/release.repository";
-import { CannyIoService } from "../../services/canny.service";
+import { OpenfeedbackService } from "../../services/openfeedback.service";
 import { FeedbackService } from "../../services/feedback.service";
 import { ReleaseService } from "../../services/release.service";
 import { notifications } from "@sparrow/library/ui";
 import { DiscordIDs } from "@sparrow/support/constants/discord.constants";
 import { LearnMoreURL } from "@sparrow/support/constants/learnMore.constant";
-// import type { CannyUserType } from "@common/types/canny/canny";
+// import type { OpenfeedbackUserType } from "@common/types/openfeedback/openfeedback";
 import { open } from "@tauri-apps/plugin-shell";
 import * as Sentry from "@sentry/svelte";
 class HelpPageViewModel {
   // Private Services
-  private cannyService = new CannyIoService();
+  private openfeedbackService = new OpenfeedbackService();
   private feedbackService = new FeedbackService();
   private releaseService = new ReleaseService();
   private releaseRepository = new ReleaseRepository();
@@ -132,16 +132,16 @@ class HelpPageViewModel {
   };
 
   /**
-   * Creates a user in canny service .
+   * Creates a user in openfeedback service .
    *
    * @returns Promise<any[]> with the authorID.
    */
   public createUser = async () => {
-    let userInfo: CannyUserType | null;
+    let userInfo: OpenfeedbackUserType | null;
     await user.subscribe((value) => {
       userInfo = value;
     });
-    const response = await this.cannyService.createUser({
+    const response = await this.openfeedbackService.createUser({
       name: userInfo?.name,
       email: userInfo?.email,
       userID: userInfo?._id,
@@ -149,28 +149,32 @@ class HelpPageViewModel {
     return response;
   };
   /**
-   * Retrieves the list of boards from the Canny dashboard.
+   * Retrieves the list of boards from the Openfeedback dashboard.
+   * If VITE_OPENFEEDBACK_BOARD_ID is configured, fetches that specific board.
+   * Otherwise, fetches all boards (existing behavior).
    *
-   * @returns {Promise<Object>} The response from the Canny service containing boards list.
+   * @returns {Promise<Object>} The response from the Openfeedback service containing boards list.
    */
   public RetrieveBoards = async () => {
-    const response = await this.cannyService.fetchBoards();
+    const configuredBoardId = this.openfeedbackService.getBoardId();
+    const response =
+      await this.openfeedbackService.fetchBoards(configuredBoardId);
     return response;
   };
 
   /**
-   * Retrieves the list of posts from the Canny dashboard.
+   * Retrieves the list of posts from the Openfeedback dashboard.
    *
    * @param  boardID - The ID of the board from which the posts are to be retrieved.
    * @returns A list of posts.
    */
   private getCategoryID = async (boardID: string) => {
-    const response = await this.cannyService.listCategories(boardID);
+    const response = await this.openfeedbackService.listCategories(boardID);
     return response;
   };
 
   /**
-   * Retrieves the category ID from the Canny dashboard.
+   * Retrieves the category ID from the Openfeedback dashboard.
    *
    * @param  categoryName - The name of the category for which the ID is to be retrieved.
    * @returns The category
@@ -208,7 +212,7 @@ class HelpPageViewModel {
     });
 
     // Retrieve the post data (keeping the full response intact)
-    const response = await this.cannyService.retrievePost(postID);
+    const response = await this.openfeedbackService.retrievePost(postID);
 
     // Retrieve the votes for the post
     const voteList = await this.listVoteUsingPostId(postID);
@@ -241,7 +245,7 @@ class HelpPageViewModel {
   ) => {
     const boards = await this.RetrieveBoards();
     const boardID = boards?.data?.boards[0]?.id;
-    const response = await this.cannyService.listPosts(
+    const response = await this.openfeedbackService.listPosts(
       boardID,
       sort,
       search,
@@ -294,11 +298,13 @@ class HelpPageViewModel {
   }
 
   /**
-   * Creates a post on the feedback board retrieved from Canny service with the given title and description.
+   * Creates a post on the feedback board using a single unified API call.
    *
    * @param  title - The title of the post.
    * @param  description - The description of the post.
-   * @returns Promise<Object> The response from the Canny service after creating the post.
+   * @param  categoryName - The category name for the post.
+   * @param  uploadFeedback - Object containing files to upload.
+   * @returns Promise<Object> The response from the upload API.
    */
 
   public createPost = async (
@@ -312,38 +318,53 @@ class HelpPageViewModel {
     },
   ) => {
     const errorMessage = "Failed to add the feedback. Please try again.";
-    const files = Array.from(uploadFeedback?.file?.value);
-    const formData = new FormData();
-    files.forEach((file) => formData.append("files", file));
-    const imageResponse = await this.feedbackService.fetchuploads(formData);
-    if (imageResponse?.isSuccessful) {
-      const images = imageResponse?.data?.data?.map(
-        (file: { fileUrl: string }) => file?.fileUrl,
-      );
-      try {
-        const categoryID = await this.getCategoryIDbyName(categoryName);
-        const userResponse = await this.createUser();
-        const boards = await this.RetrieveBoards();
-        const boardID = boards?.data?.boards[0]?.id;
-        const response = await this.cannyService.createPost({
-          boardID: boardID,
-          title: title,
-          details: description,
-          authorID: userResponse?.data?.id,
-          categoryID: categoryID,
-          imageURLs: images,
-        });
-        if (response.isSuccessful) {
-          notifications.success("Feedback added successfully.");
-        } else {
-          notifications.error(errorMessage);
-        }
-        return response;
-      } catch (e) {
+
+    try {
+      // Get user info for email
+      let userInfo: OpenfeedbackUserType | null;
+      await user.subscribe((value) => {
+        userInfo = value;
+      });
+
+      // Get board ID and category ID
+      const boards = await this.RetrieveBoards();
+      const boardID = boards?.data?.boards[0]?.id;
+      const categoryID = await this.getCategoryIDbyName(categoryName);
+
+      // Build FormData with files and post data
+      const formData = new FormData();
+
+      // Append files if present
+      const files = Array.from(uploadFeedback?.file?.value || []);
+      files.forEach((file) => formData.append("files", file));
+
+      // Append required fields
+      formData.append("title", title);
+      formData.append("boardID", boardID);
+
+      // Append optional fields
+      if (description) {
+        formData.append("description", description);
+      }
+      if (userInfo?.email) {
+        formData.append("email", userInfo.email);
+      }
+      if (categoryID) {
+        formData.append("categoryID", categoryID);
+      }
+
+      // Single API call to upload files and create post
+      const response = await this.feedbackService.uploadPost(formData);
+
+      if (response.isSuccessful) {
+        notifications.success("Feedback added successfully.");
+      } else {
         notifications.error(errorMessage);
       }
-    } else {
+      return response;
+    } catch (e) {
       notifications.error(errorMessage);
+      Sentry.captureException(e);
     }
   };
 
@@ -356,7 +377,7 @@ class HelpPageViewModel {
    * @param {{ file: { value: File[] } }} uploadFeedback - An object containing the uploaded files for feedback.
    * @param {string[]} imageURLsArray - An array of existing image URLs to be combined with new uploads.
    *
-   * @returns {Promise<Object>} The response from the Canny service after attempting to update the post.
+   * @returns {Promise<Object>} The response from the Openfeedback service after attempting to update the post.
    */
 
   public updatePost = async (
@@ -389,7 +410,7 @@ class HelpPageViewModel {
       }
 
       try {
-        const response = await this.cannyService.updatePost({
+        const response = await this.openfeedbackService.updatePost({
           postID: postID,
           title: title,
           details: description,
@@ -417,7 +438,7 @@ class HelpPageViewModel {
     status?: string,
     limit?: number,
   ) => {
-    const response = await this.cannyService.listUsersPost(
+    const response = await this.openfeedbackService.listUsersPost(
       sort,
       userId,
       search,
@@ -428,7 +449,7 @@ class HelpPageViewModel {
   };
 
   // public retreiveComments = async (body: object, authorID: string) => {
-  //   const response = await this.cannyService.retreiveComments(body, authorID)
+  //   const response = await this.openfeedbackService.retreiveComments(body, authorID)
   //   return response;
   // }
 
@@ -438,7 +459,7 @@ class HelpPageViewModel {
     search?: string,
     status?: string,
   ) => {
-    const response = await this.cannyService.retrieveUserComments(
+    const response = await this.openfeedbackService.retrieveUserComments(
       authorID,
       sort,
       search,
@@ -448,15 +469,17 @@ class HelpPageViewModel {
   };
 
   public retrieveUserVotes = async (userID: string) => {
-    const response = await this.cannyService.retrieveVotes({}, userID);
+    const response = await this.openfeedbackService.retrieveVotes({}, userID);
     return response;
   };
 
   /**
-   * Adds a comment to a post. If the user does not exist, creates a new user and then adds the comment.
+   * Adds a comment to a post using a single unified API call.
    * @param postID - The ID of the post to comment on.
    * @param value - The text of the comment.
-   * @returns {Promise<any>} The response from the Canny service.
+   * @param parentID - The ID of the parent comment (for replies).
+   * @param uploadedImageAttachment - Object containing files to upload.
+   * @returns {Promise<any>} The response from the upload API.
    */
   public addComment = async (
     postID: string,
@@ -468,62 +491,54 @@ class HelpPageViewModel {
       };
     },
   ) => {
-    let userInfo: CannyUserType | null;
-    await user.subscribe((value) => {
-      userInfo = value;
-    });
+    const errorMessage = "Failed to add comment. Please try again.";
 
-    // Try to retrieve the user first
-    let userResponse = await this.cannyService.retrieveUser(userInfo?.email);
-
-    // If user does not exist, create a new user
-    if (!userResponse?.isSuccessful) {
-      userResponse = await this.cannyService.createUser({
-        name: userInfo?.name,
-        email: userInfo?.email,
-        userID: userInfo?._id,
+    try {
+      // Get user info for email
+      let userInfo: OpenfeedbackUserType | null;
+      await user.subscribe((value) => {
+        userInfo = value;
       });
-    }
 
-    const authorID = userResponse?.data?.id; // Use the retrieved or newly created user's ID
+      // Build FormData with files and comment data
+      const formData = new FormData();
 
-    // Handle file upload (similar to createPost)
-    const errorMessage = "Failed to upload files. Please try again.";
-    const files = Array.from(uploadedImageAttachment?.file?.value);
-    const formData = new FormData();
-    files.forEach((file) => formData.append("files", file));
-    const imageResponse = await this.feedbackService.fetchuploads(formData);
+      // Append files if present
+      const files = Array.from(uploadedImageAttachment?.file?.value || []);
+      files.forEach((file) => formData.append("files", file));
 
-    let images: string[] = [];
-    if (imageResponse?.isSuccessful) {
-      images = imageResponse?.data?.data?.map(
-        (file: { fileUrl: string }) => file?.fileUrl,
-      );
-    } else {
+      // Append required fields
+      formData.append("postID", postID);
+      formData.append("value", value);
+
+      // Append optional fields
+      if (parentID) {
+        formData.append("parentID", parentID);
+      }
+      if (userInfo?.email) {
+        formData.append("email", userInfo.email);
+      }
+
+      // Single API call to upload files and create comment
+      const response = await this.feedbackService.uploadComment(formData);
+
+      if (response.isSuccessful) {
+        notifications.success("Comment added successfully.");
+      } else {
+        notifications.error(errorMessage);
+      }
+      return response;
+    } catch (e) {
       notifications.error(errorMessage);
-      return;
+      Sentry.captureException(e);
     }
-
-    // Call the create comment API
-    const response = await this.cannyService.createComment(authorID, postID, {
-      value,
-      parentID,
-      imageURLs: images,
-    });
-
-    if (response.isSuccessful) {
-      notifications.success("Comment added successfully.");
-    } else {
-      notifications.error("Failed to add comment. Please try again.");
-    }
-    return response;
   };
 
   /**
    * Lists comments for a specific post. If the user exists, retrieves their comments for the post.
    * @param postID - The ID of the post to fetch comments for.
    * @param boardID - The ID of the board to which the post belongs.
-   * @returns {Promise<any>} The response from the Canny service.
+   * @returns {Promise<any>} The response from the Openfeedback service.
    */
   public listComments = async (postID: string) => {
     let userInfo;
@@ -534,7 +549,10 @@ class HelpPageViewModel {
     const boards = await this.RetrieveBoards();
     const boardID = boards?.data?.boards[0]?.id;
 
-    const response = await this.cannyService.listComments(postID, boardID);
+    const response = await this.openfeedbackService.listComments(
+      postID,
+      boardID,
+    );
 
     if (response.isSuccessful) {
       const comments = response.data.comments;
@@ -555,11 +573,13 @@ class HelpPageViewModel {
     });
 
     // Try to retrieve the user first
-    let userResponse = await this.cannyService.retrieveUser(userInfo.email);
+    let userResponse = await this.openfeedbackService.retrieveUser(
+      userInfo.email,
+    );
 
     // If user does not exist, create a new user
     if (!userResponse?.isSuccessful) {
-      userResponse = await this.cannyService.createUser({
+      userResponse = await this.openfeedbackService.createUser({
         name: userInfo?.name,
         email: userInfo?.email,
         userID: userInfo?._id,
@@ -567,7 +587,7 @@ class HelpPageViewModel {
     }
     const UserId = userResponse?.data?.id; // Use the retrieved or newly created user's ID
     if (UserId) {
-      const result = await this.cannyService.createVote(postID, UserId);
+      const result = await this.openfeedbackService.createVote(postID, UserId);
       return result;
     }
   };
@@ -584,9 +604,11 @@ class HelpPageViewModel {
     await user.subscribe((value) => {
       userInfo = value;
     });
-    let userResponse = await this.cannyService.retrieveUser(userInfo.email);
+    let userResponse = await this.openfeedbackService.retrieveUser(
+      userInfo.email,
+    );
     if (!userResponse?.isSuccessful) {
-      userResponse = await this.cannyService.createUser({
+      userResponse = await this.openfeedbackService.createUser({
         name: userInfo?.name,
         email: userInfo?.email,
         userID: userInfo?._id,
@@ -595,7 +617,7 @@ class HelpPageViewModel {
 
     const UserId = userResponse?.data?.id;
     if (UserId) {
-      const result = await this.cannyService.deleteVote(postID, UserId);
+      const result = await this.openfeedbackService.deleteVote(postID, UserId);
       return result;
     }
   };
@@ -608,16 +630,18 @@ class HelpPageViewModel {
    */
 
   public listVote = async (postID: string) => {
-    let userInfo: CannyUserType | null;
+    let userInfo: OpenfeedbackUserType | null;
     await user.subscribe((value) => {
       userInfo = value;
     });
 
-    let userResponse = await this.cannyService.retrieveUser(userInfo.email);
+    let userResponse = await this.openfeedbackService.retrieveUser(
+      userInfo.email,
+    );
 
     // If user does not exist, create a new user
     if (!userResponse?.isSuccessful) {
-      userResponse = await this.cannyService.createUser({
+      userResponse = await this.openfeedbackService.createUser({
         name: userInfo?.name,
         email: userInfo?.email,
         userID: userInfo?._id,
@@ -626,7 +650,7 @@ class HelpPageViewModel {
     const UserId = userResponse?.data?.id; // Use the retrieved or newly created user's ID
 
     if (UserId) {
-      const result = await this.cannyService.listVotes(UserId);
+      const result = await this.openfeedbackService.listVotes(UserId);
       return result;
     }
   };
@@ -637,7 +661,8 @@ class HelpPageViewModel {
    */
   public listVoteUsingPostId = async (postID: string) => {
     if (postID) {
-      const result = await this.cannyService.listVotesUsingPostId(postID);
+      const result =
+        await this.openfeedbackService.listVotesUsingPostId(postID);
       return result;
     }
   };
@@ -647,7 +672,7 @@ class HelpPageViewModel {
    * @param {string} type - The type of changelog to retrieve (e.g., feature, bugfix).
    */
   public listChangeLog = async (type: string) => {
-    const result = await this.cannyService.listChangeLog(type);
+    const result = await this.openfeedbackService.listChangeLog(type);
     return result;
   };
 }
