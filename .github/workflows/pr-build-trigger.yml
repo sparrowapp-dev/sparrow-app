@@ -1,0 +1,111 @@
+name: PR Build Trigger
+
+on:
+  issue_comment:
+    types: [created]
+  workflow_dispatch:  
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+concurrency:
+  group: pr-build-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate-and-build:
+    if: >
+      github.event.issue.pull_request &&
+      github.event.comment.body == '/build'
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Get PR details
+      - name: Get PR info
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+
+            core.setOutput("branch", pr.data.head.ref);
+            core.setOutput("repo", pr.data.head.repo.full_name);
+
+      # Block fork PRs
+      - name: Block fork PR
+        if: steps.pr.outputs.repo != github.repository
+        run: |
+          echo "PR is from fork. Build not allowed."
+          exit 1
+
+      # Install yq to read YAML
+      - name: Install yq
+        run: sudo apt-get install -y yq
+
+      # Check whitelist
+      - name: Validate whitelist
+        id: validate
+        run: |
+          USER="${{ github.event.comment.user.login }}"
+          echo "Comment by: $USER"
+
+          if yq '.users[]' .github/whitelist.yml | grep -w "$USER"; then
+            echo "authorized=true" >> $GITHUB_OUTPUT
+          else
+            echo "authorized=false" >> $GITHUB_OUTPUT
+          fi
+
+      # Permission denied message
+      - name: Comment permission denied
+        if: steps.validate.outputs.authorized == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: "❌ Sorry @${{ github.event.comment.user.login }}, you are not authorized to trigger builds."
+            })
+
+      # Stop workflow if unauthorized
+      - name: Stop if unauthorized
+        if: steps.validate.outputs.authorized == 'false'
+        run: exit 1
+
+      # Checkout PR branch
+      - name: Checkout PR branch
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ steps.pr.outputs.branch }}
+
+      # 🔥 Trigger your existing development workflow
+      - name: Trigger Development Release Workflow
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: sparrow-app-development.yml
+          ref: ${{ steps.pr.outputs.branch }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Comment build started
+      - name: Comment build started
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: "🚀 Build triggered successfully for branch `${{ steps.pr.outputs.branch }}`."
+            })
