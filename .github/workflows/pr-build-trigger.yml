@@ -16,12 +16,29 @@ concurrency:
 
 jobs:
   validate-and-build:
-    if: >
-      github.event.issue.pull_request &&
-      github.event.comment.body == '/build'
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1 — Ensure this is a PR comment with /build
+      - name: Validate trigger
+        run: |
+          echo "Event Name: ${{ github.event_name }}"
+          echo "Comment Body: ${{ github.event.comment.body }}"
+
+          if [ "${{ github.event_name }}" != "issue_comment" ]; then
+            echo "Not an issue_comment event"
+            exit 1
+          fi
+
+          if [ -z "${{ github.event.issue.pull_request }}" ]; then
+            echo "This is not a PR comment"
+            exit 1
+          fi
+
+          if [ "${{ github.event.comment.body }}" != "/build" ]; then
+            echo "Comment is not /build"
+            exit 1
+          fi
 
       # Checkout repository
       - name: Checkout repository
