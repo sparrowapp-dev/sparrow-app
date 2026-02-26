@@ -101,8 +101,7 @@ class InitAiRequestTab {
             isAiSendRequestInProgress: false,
             isSaveDescriptionInProgress: false,
             isSaveRequestInProgress: false,
-            isChatbotActive:
-              localStorage.getItem("sparrow_ai_auto_open") !== "false",
+            isChatbotActive: true,
             isChatAutoClearActive: false,
             isChatbotSuggestionsActive: true,
             isChatbotGeneratingResponse: false,
