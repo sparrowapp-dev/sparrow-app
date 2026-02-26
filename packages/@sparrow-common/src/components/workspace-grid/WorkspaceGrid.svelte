@@ -496,8 +496,8 @@
 
   .new-workspace-badge {
     position: absolute;
-    top: 14px;
-    right: 14px;
+    top: 22px;
+    right: 40px;
 
     display: inline-flex;
     align-items: center;
