@@ -245,7 +245,7 @@
                 onInputFeedback={_viewModel.createPost}
                 onAddFeedback={_viewModel.addFeedback}
                 onUpdateFeedback={_viewModel.updatePost}
-                fetchPosts={_viewModel.getListOfPOsts}
+                fetchPosts={_viewModel.getListOfPosts}
                 onRetrievePost={_viewModel.retrievePostData}
                 onAddComment={_viewModel.addComment}
                 fetchComments={_viewModel.listComments}
@@ -273,7 +273,7 @@
             {:else if activeTab === "roadmap"}
               <Roadmap
                 {setPostId}
-                fetchPosts={_viewModel.getListOfPOsts}
+                fetchPosts={_viewModel.getListOfPosts}
                 {getColor}
               />
             {:else if activeTab === "community"}

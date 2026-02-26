@@ -234,7 +234,7 @@ class HelpPageViewModel {
    * @param   status - The status of the posts to filter (e.g., open, closed).
    * @returns {Promise<Object>} The response from the server containing the list of posts.
    */
-  public getListOfPOsts = async (
+  public getListOfPosts = async (
     sort: string,
     search: string,
     status: string,
