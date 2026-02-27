@@ -761,7 +761,7 @@
       await notificationService.archiveNotification(notification._id);
       await notificationService.loadNotificationsToStore();
 
-      notifications.success("Notification archived");
+      // notifications.success("Notification archived");
     } catch (err) {
       console.error(err);
       notifications.error("Failed to archive notification");
