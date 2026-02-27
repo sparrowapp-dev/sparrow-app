@@ -60,6 +60,8 @@
   let teamId: string = "";
   let selectedAIModel: string = "deepseek";
   let preScriptComponent = null;
+  let aiPreferenceSynced = false;
+  let aiPreferenceReady = false;
 
   const restExplorerDataStoreSubscriber = restExplorerDataStore.subscribe(
     (_webSocketMap) => {
@@ -128,6 +130,15 @@
            * @description - Initialize the view model for the new http request tab
            */
           _viewModel = new RestExplorerViewModel(tab);
+
+          if (!aiPreferenceSynced) {
+            aiPreferenceSynced = true;
+
+            setTimeout(async () => {
+              await _viewModel.openAiForAllOpenedRequestTabs();
+              aiPreferenceReady = true;
+            }, 150);
+          }
           collectionObserver = _viewModel.collectionSubscriber(
             tab.path.collectionId,
           );
@@ -253,6 +264,7 @@
   bind:scriptComponent
   bind:preScriptComponent
   {collection}
+  tabId={tab?.tabId ?? ""}
   storeData={restExplorerData}
   {environmentVariables}
   {isGuestUser}
@@ -312,5 +324,7 @@
   selectedModel={selectedAIModel}
   onGeneratePreScript={_viewModel.generatePreScript}
   updateRequestStatAiChatBot={_viewModel.updateRequestStateAiChatBot}
+  openAiForAllOpenedRequestTabs={_viewModel.openAiForAllOpenedRequestTabs}
   upgradePlanRedirect={_viewModel.handleRedirectToAdminPanel}
+  {aiPreferenceReady}
 />

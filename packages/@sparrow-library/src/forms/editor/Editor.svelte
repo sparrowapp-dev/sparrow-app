@@ -324,6 +324,14 @@
       highlightActiveLineGutter,
     };
 
+    // Scroll margin extension to pre-render content beyond viewport
+    // This reduces blank screens during fast scrolling by rendering
+    // extra lines above and below the visible area
+    const scrollMarginExtension = EditorView.scrollMargins.of(() => ({
+      top: 200, // Pixels of extra content to render above viewport
+      bottom: 200, // Pixels of extra content to render below viewport
+    }));
+
     let extensions: Extension[];
     extensions = [
       ...(isEnterKeyNotAllowed ? [keyBindings] : []),
@@ -336,6 +344,7 @@
       mergeConf.of([]), // Initialize empty merge compartment
       updateExtensionView,
       EditorView.lineWrapping, // Enable line wrapping
+      scrollMarginExtension, // Pre-render content beyond viewport for smoother scrolling
       EditorState.readOnly.of(!isEditable ? true : false),
       CreatePlaceHolder(placeholder),
       lintGutter(), // Add lint gutter support
@@ -487,6 +496,22 @@
     width: 100%;
     height: 100%;
     margin-right: 1%;
+    /* GPU acceleration for smoother scrolling */
+    will-change: transform;
+    transform: translateZ(0);
+  }
+
+  /* Global scroll performance optimizations for CodeMirror */
+  :global(.cm-scroller) {
+    /* Ensure GPU acceleration is applied */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+
+  :global(.cm-content) {
+    /* Reduce paint operations during scroll */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
 
   :global(.cm-expression-block) {

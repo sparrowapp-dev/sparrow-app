@@ -10,3 +10,6 @@ export { default as Search } from "./search/Search.svelte";
 export { default as LabelField } from "./label-field/LabelField.svelte";
 export { default as TimePicker } from "./time-picker/TimePicker.svelte";
 export { default as DatePicker } from "./date-picker/DatePicker.svelte";
+
+// Editor utilities
+export { getTheme, getBasicSetup } from "./editor/theme";

@@ -30,6 +30,10 @@
   import { SparrowFilledLogo } from "./images/index";
   import { policyConfig } from "@sparrow/common/store";
   import { TeamRole } from "@sparrow/common/enums";
+  import { unreadCount } from "@sparrow/common/store";
+  import { BellRegular } from "@sparrow/library/icons";
+  import NotificationDropdown from "../notifications/NotificationDropdown.svelte";
+
   // import { GlobalSearch } from "../../components/popup/global-search";
   /**
    * environment list
@@ -89,7 +93,20 @@
   export let recentVisitedWorkspaces;
   export let appEdition = "MANAGED";
 
+  import { createEventDispatcher } from "svelte";
+
+  const dispatch = createEventDispatcher();
+
+  function handleAcceptInvite(event) {
+    dispatch("acceptInvite", event.detail);
+  }
+
+  function handleDeclineInvite(event) {
+    dispatch("declineInvite", event.detail);
+  }
+
   let helpOptionsOpen = false;
+  let showNotifications = false;
 
   /**
    * callback for Select component
@@ -349,6 +366,28 @@
     }
   });
 
+  let bellRef: HTMLElement;
+
+  onMount(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (bellRef && !bellRef.contains(event.target as Node)) {
+        showNotifications = false;
+      }
+    };
+
+    const handleProgrammaticClose = () => {
+      showNotifications = false;
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    window.addEventListener("closeNotifications", handleProgrammaticClose);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+      window.removeEventListener("closeNotifications", handleProgrammaticClose);
+    };
+  });
+
   const redirectDocumentation = () => {
     // window.open(docsLink, "_blank");
     handleDocsRedirect();
@@ -357,6 +396,17 @@
     // window.open(featureUpdatesLink, "_blank");
     handleFeaturesRedirect();
   };
+
+  function handleMarkAllRead() {
+    dispatch("markAllRead");
+  }
+
+  function handleClearAllNotifications(event) {
+    dispatch("clearAllNotifications", event.detail);
+  }
+  function handleArchiveNotification(event) {
+    dispatch("archiveNotification", event.detail);
+  }
 </script>
 
 <header
@@ -743,6 +793,41 @@
       </div>
     {/if}
 
+    <div
+      bind:this={bellRef}
+      class="bell-wrapper"
+      class:active={showNotifications}
+      style="position: relative;"
+    >
+      <Tooltip placement="bottom-right" title="Notifications" zIndex={600}>
+        <Button
+          type="teritiary-regular"
+          startIcon={BellRegular}
+          iconSize={20}
+          size="medium"
+          onClick={() => (showNotifications = !showNotifications)}
+        />
+      </Tooltip>
+
+      {#if $unreadCount > 0}
+        <span class="notification-badge">
+          {$unreadCount > 99 ? "99+" : $unreadCount}
+        </span>
+      {/if}
+
+      {#if showNotifications}
+        <NotificationDropdown
+          on:acceptInvite={handleAcceptInvite}
+          on:declineInvite={handleDeclineInvite}
+          on:closeDropdown={() => (showNotifications = false)}
+          on:markAllRead={handleMarkAllRead}
+          on:openInvite={(e) => dispatch("openInvite", e.detail)}
+          on:clearAllNotifications={handleClearAllNotifications}
+          on:archiveNotification={handleArchiveNotification}
+        />
+      {/if}
+    </div>
+
     {#if !isGuestUser}
       <div>
         <UserProfileModal
@@ -910,5 +995,36 @@
     padding: 4px 8px;
     border-radius: 4px;
     transition: background-color 0.2s;
+  }
+
+  .bell-wrapper.active :global(svg) {
+    color: var(--icon-ds-primary-400);
+  }
+
+  .bell-wrapper {
+    position: relative;
+  }
+
+  .notification-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+
+    background: #ad2b29; /* red */
+    color: #ffffff;
+
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 600;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 2px solid var(--bg-ds-surface-700);
   }
 </style>

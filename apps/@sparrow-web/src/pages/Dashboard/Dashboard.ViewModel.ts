@@ -1323,4 +1323,17 @@ export class DashboardViewModel {
   public handleContactSales = async () => {
     window.open(`${constants.MARKETING_URL}/pricing/`);
   };
+
+  public async getWorkspacesByTeamId(teamId: string): Promise<any[]> {
+    const observable = await this.workspaces();
+
+    return new Promise((resolve) => {
+      const sub = observable.subscribe((list: any[]) => {
+        const filtered = list.filter((ws) => ws.team?.teamId === teamId);
+
+        resolve(filtered);
+        sub.unsubscribe();
+      });
+    });
+  }
 }

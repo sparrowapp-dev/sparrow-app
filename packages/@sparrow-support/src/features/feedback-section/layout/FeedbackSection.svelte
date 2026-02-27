@@ -329,7 +329,28 @@
   class="h-100"
   bind:this={scrollableContainer}
 >
-  <FeedbackDefault {onAddFeedback} {userInfo} {onInputFeedback} />
+  <FeedbackDefault
+    {onAddFeedback}
+    {userInfo}
+    onInputFeedback={async (title, description, category, files) => {
+      const res = await onInputFeedback(title, description, category, files);
+      if (res?.isSuccessful) {
+        posts = [];
+        skip = 0;
+        showLoading = true;
+        await getPosts(
+          currentSort,
+          searchTerm,
+          status,
+          currentCategory,
+          limit,
+          skip,
+        );
+        skip = skip + 10;
+      }
+      return res;
+    }}
+  />
   {#if !isPostopen}
     <div
       class="d-flex"

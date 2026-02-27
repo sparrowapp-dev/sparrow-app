@@ -11,7 +11,7 @@ const constants = {
   WORKSPACE_LIMIT: 5,
   API_LIMIT: 5,
   SPARROW_SUPPORT_EMAIL: import.meta.env.VITE_SPARROW_SUPPORT_EMAIL,
-  CANNY_FEEDBACK_URL: import.meta.env.VITE_CANNY_FEEDBACK_URL,
+  OPENFEEDBACK_FEEDBACK_URL: import.meta.env.VITE_OPENFEEDBACK_FEEDBACK_URL,
   SPARROW_AUTH_URL: import.meta.env.VITE_AUTH_URL,
   SPARROW_GITHUB: import.meta.env.VITE_SPARROW_GITHUB,
   SPARROW_LINKEDIN: import.meta.env.VITE_SPARROW_LINKEDIN,
@@ -20,21 +20,27 @@ const constants = {
   RELEASE_NOTES_PAT_TOKEN: import.meta.env.VITE_RELEASE_NOTES_PAT_TOKEN,
   RELEASE_NOTES_API: import.meta.env.VITE_RELEASE_NOTES_API,
   AZURE_CDN_URL: import.meta.env.VITE_AZURE_CDN_URL,
-  CANNY_API: import.meta.env.VITE_CANNY_API,
-  CANNY_URL: import.meta.env.VITE_CANNY_URL,
+  OPENFEEDBACK_API: import.meta.env.VITE_OPENFEEDBACK_API,
+  OPENFEEDBACK_URL: import.meta.env.VITE_OPENFEEDBACK_URL,
+  OPENFEEDBACK_BOARD_ID: import.meta.env.VITE_OPENFEEDBACK_BOARD_ID,
   AZURE_INSIGHTS_CONNECTION_STRING: import.meta.env
     .VITE_AZURE_INSIGHTS_CONNECTION_STRING,
   BASE_URL: import.meta.env.VITE_BASE_URL,
-  INTRO_DOCS_URL: import.meta.env.VITE_SPARROW_DOCS + "/docs/user-manual/application/introduction/introduction-to-sparrow",
+  INTRO_DOCS_URL:
+    import.meta.env.VITE_SPARROW_DOCS +
+    "/docs/user-manual/application/introduction/introduction-to-sparrow",
   TESTFLOW_DOCS_URL:
-    import.meta.env.VITE_SPARROW_DOCS + "/docs/user-manual/application/workspace-features/testflows",
+    import.meta.env.VITE_SPARROW_DOCS +
+    "/docs/user-manual/application/workspace-features/testflows",
   APP_ENVIRONMENT_PATH: import.meta.env.VITE_APP_ENVIRONMENT_PATH,
   SPARROW_AI_WEBSOCKET_URL: import.meta.env.VITE_SPARROW_AI_WEBSOCKET,
   SENTRY_DSN: import.meta.env.VITE_SENTRY_DSN,
   APP_ENVIRONMENT: import.meta.env.VITE_APP_ENVIRONMENT,
   SPARROW_WEB_APP_URL: import.meta.env.VITE_SPARROW_WEB_APP_URL,
   MARKETING_URL: import.meta.env.VITE_MARKETING_URL,
-  LINUX_INSTALL_DOCS: import.meta.env.VITE_SPARROW_DOCS + "/docs/user-manual/application/sparrow-on-linux/install-sparrow-linux",
+  LINUX_INSTALL_DOCS:
+    import.meta.env.VITE_SPARROW_DOCS +
+    "/docs/user-manual/application/sparrow-on-linux/install-sparrow-linux",
   ADMIN_URL: import.meta.env.VITE_SPARROW_ADMIN_URL,
 };
 

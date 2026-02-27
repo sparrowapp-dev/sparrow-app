@@ -25,6 +25,9 @@
   import constants from "@app/constants/constants";
   import { open } from "@tauri-apps/plugin-shell";
   import { Platform } from "@sparrow/common/enums";
+  import { inviteModalStore } from "@app/store/inviteModal.store";
+  import { navigate } from "svelte-navigator";
+  import { NotificationService } from "../services/notification.service";
 
   let isAccessDeniedModalOpen = false;
   const handleAccessDeniedClose = (flag = false) => {
@@ -105,6 +108,8 @@
     }
   };
 
+  const notificationService = new NotificationService();
+
   onMount(async () => {
     if (typeof window !== "undefined") {
       initPostHog();
@@ -115,6 +120,7 @@
       await _viewModel.processDeepLink(initialUrl?.toString());
     }
     await _viewModel.registerDeepLinkHandler();
+    await notificationService.loadNotificationsToStore();
     await singleInstanceHandler();
     await setScaleFactorToDb(await getScaleFactor());
     let isloggedIn;
@@ -164,6 +170,108 @@
     </p>
   </div>
 </Modal>
+
+{#if $inviteModalStore.show && $inviteModalStore.data}
+  <Modal
+    title=""
+    type="dark"
+    width="560px"
+    zIndex={2000}
+    isOpen={true}
+    handleModalState={() => {
+      inviteModalStore.set({ show: false, data: null });
+    }}
+  >
+    <div
+      style="display:flex; flex-direction:column; gap:20px; padding:8px 4px;"
+    >
+      <div style="display:flex; justify-content:center;">
+        <div
+          style="
+            height:56px;
+            width:56px;
+            border-radius:50%;
+            background:rgba(25,160,80,0.15);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+          "
+        >
+          <span style="font-size:28px;">🎉</span>
+        </div>
+      </div>
+
+      <div style="text-align:center;">
+        <h3 style="margin:0; font-weight:600;">Access Granted</h3>
+        <p style="margin-top:6px; color:#9B9DA1; font-size:14px;">
+          You’ve been added successfully
+        </p>
+      </div>
+
+      <div
+        style="
+          background:#1F2430;
+          border-radius:10px;
+          padding:14px;
+        "
+      >
+        <p class="text-fs-14" style="margin:0;">
+          You’re now a
+          <b>{$inviteModalStore.data.role}</b>
+          in the following workspace(s) under the
+          <b>{$inviteModalStore.data.teamName}</b> hub:
+        </p>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        {#each $inviteModalStore.data.workspaceNames as workspace, index}
+          <div
+            style="
+              display:flex;
+              align-items:center;
+              gap:10px;
+              padding:10px 12px;
+              border-radius:8px;
+              background:#181C26;
+              border:1px solid #2A2F3A;
+            "
+          >
+            <div
+              style="
+                height:26px;
+                width:26px;
+                border-radius:6px;
+                background:#2A2F3A;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                font-size:13px;
+              "
+            >
+              {index + 1}
+            </div>
+            <span style="font-size:14px;">
+              {workspace}
+            </span>
+          </div>
+        {/each}
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; margin-top:8px;">
+        <button
+          class="btn btn-primary"
+          style="padding:8px 18px;"
+          on:click={() => {
+            inviteModalStore.set({ show: false, data: null });
+            navigate("/app/home");
+          }}
+        >
+          Continue to App →
+        </button>
+      </div>
+    </div>
+  </Modal>
+{/if}
 
 <Router {url}>
   <Authguard>

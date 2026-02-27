@@ -1,4 +1,4 @@
-import { getAuthHeaders, makeRequest } from "@app/containers/api/api.common";
+import { makeRequest } from "@app/containers/api/api.common";
 import constants from "@app/constants/constants";
 
 export class ReleaseService {

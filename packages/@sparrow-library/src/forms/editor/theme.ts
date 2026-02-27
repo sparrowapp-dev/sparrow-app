@@ -63,9 +63,21 @@ export const basicTheme = EditorView.theme({
     flex: "1",
     fontSize: "80%",
   },
+  ".cm-scroller": {
+    // GPU acceleration for smoother scrolling
+    willChange: "transform",
+    // Enable hardware acceleration
+    transform: "translateZ(0)",
+    backfaceVisibility: "hidden",
+    // Optimize for touch scrolling
+    WebkitOverflowScrolling: "touch",
+  },
   ".cm-content": {
     caretColor: "var(--white-color)",
     height: "100%",
+    // GPU acceleration for content rendering
+    willChange: "transform",
+    transform: "translateZ(0)",
   },
   ".cm-panels": {
     backgroundColor: "var(--bg-ds-surface-900)",

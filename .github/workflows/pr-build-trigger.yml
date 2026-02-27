@@ -1,0 +1,267 @@
+name: PR Build Trigger
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+  statuses: write
+
+concurrency:
+  group: pr-build-${{ github.event.issue.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  # ============================================================
+  # JOB 1: Validate the comment trigger and user authorization
+  # ============================================================
+  validate:
+    name: Validate Trigger & Authorization
+    runs-on: ubuntu-latest
+
+    outputs:
+      authorized: ${{ steps.validate_whitelist.outputs.authorized }}
+      branch:     ${{ steps.pr_info.outputs.branch }}
+      sha:        ${{ steps.pr_info.outputs.sha }}
+      pr_number:  ${{ steps.pr_info.outputs.pr_number }}
+
+    steps:
+      # Step 1 — Ensure this is a /build comment on a PR (not a plain issue)
+      - name: Validate trigger
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          EVENT_NAME:   ${{ github.event_name }}
+          PR_URL:       ${{ github.event.issue.pull_request.url }}
+        run: |
+          echo "Event     : $EVENT_NAME"
+          echo "Comment   : $COMMENT_BODY"
+          echo "PR URL    : $PR_URL"
+
+          if [ "$EVENT_NAME" != "issue_comment" ]; then
+            echo "❌ Not an issue_comment event — skipping."
+            exit 1
+          fi
+
+          if [ -z "$PR_URL" ]; then
+            echo "❌ Comment is on an Issue, not a Pull Request — skipping."
+            exit 1
+          fi
+
+          if [[ "$COMMENT_BODY" != *"/build"* ]]; then
+            echo "❌ Comment does not contain /build — skipping."
+            exit 1
+          fi
+
+          echo "✅ Trigger validation passed."
+
+      # Step 2 — Checkout development branch to access .github/pr-build-whitelist.yml
+      - name: Checkout development branch
+        uses: actions/checkout@v3
+        with:
+          ref: development
+
+      # Step 3 — Fetch PR metadata (branch, SHA, number) via GitHub API
+      - name: Get PR info
+        id: pr_info
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner:       context.repo.owner,
+              repo:        context.repo.repo,
+              pull_number: context.issue.number
+            });
+
+            const branch    = pr.data.head.ref;
+            const sha       = pr.data.head.sha;
+            const repo      = pr.data.head.repo.full_name;
+            const pr_number = pr.data.number;
+
+            console.log(`Branch    : ${branch}`);
+            console.log(`SHA       : ${sha}`);
+            console.log(`Repo      : ${repo}`);
+            console.log(`PR Number : ${pr_number}`);
+
+            core.setOutput("branch",    branch);
+            core.setOutput("sha",       sha);
+            core.setOutput("repo",      repo);
+            core.setOutput("pr_number", pr_number);
+
+            // Block builds from forked repositories
+            if (repo !== `${context.repo.owner}/${context.repo.repo}`) {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner:        context.repo.owner,
+                repo:         context.repo.repo,
+                body:         "❌ Builds are not allowed from forked repositories."
+              });
+              core.setFailed("PR is from a fork. Build not allowed.");
+            }
+
+      # Step 4 — Install yq to parse the YAML whitelist
+      - name: Install yq
+        run: sudo apt-get install -y yq
+
+      # Step 5 — Check whether the commenter is in .github/pr-build-whitelist.yml
+      - name: Validate whitelist
+        id: validate_whitelist
+        env:
+          GH_USER: ${{ github.event.comment.user.login }}
+        run: |
+          echo "Checking authorization for: $GH_USER"
+
+          if [ ! -f ".github/pr-build-whitelist.yml" ]; then
+            echo "❌ .github/pr-build-whitelist.yml not found on development branch."
+            exit 1
+          fi
+
+          if yq '.users[]' .github/pr-build-whitelist.yml | grep -qw "$GH_USER"; then
+            echo "✅ $GH_USER is authorized."
+            echo "authorized=true" >> $GITHUB_OUTPUT
+          else
+            echo "⛔ $GH_USER is not in the whitelist."
+            echo "authorized=false" >> $GITHUB_OUTPUT
+          fi
+
+      # Step 6 — Post a permission-denied comment if user is not whitelisted
+      #          (Scenario 2 — Acceptance Criteria)
+      - name: Comment — permission denied
+        if: steps.validate_whitelist.outputs.authorized == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner:        context.repo.owner,
+              repo:         context.repo.repo,
+              body: [
+                "❌ Sorry @${{ github.event.comment.user.login }}, you are not authorized to trigger builds.",
+                "",
+                "Please contact a repository maintainer to be added to the whitelist."
+              ].join("\n")
+            });
+
+      # Step 7 — Fail the job cleanly if unauthorized (stops downstream job)
+      - name: Stop if unauthorized
+        if: steps.validate_whitelist.outputs.authorized == 'false'
+        run: |
+          echo "Stopping — unauthorized user."
+          exit 1
+
+  # ============================================================
+  # JOB 2: Trigger the build and report status back to the PR
+  # ============================================================
+  build:
+    name: Trigger & Monitor Build
+    runs-on: ubuntu-latest
+    needs: validate
+
+    steps:
+      # Step 1 — Set a pending commit status on the PR so it shows in checks
+      #          (Scenario 1 + Scenario 4 — build status in PR checks)
+      - name: Set commit status — pending
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner:       context.repo.owner,
+              repo:        context.repo.repo,
+              sha:         "${{ needs.validate.outputs.sha }}",
+              state:       "pending",
+              context:     "PR Build Trigger",
+              description: "Build has been triggered and is in progress...",
+            });
+
+      # Step 2 — Post a "build started" comment on the PR
+      - name: Comment — build started
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner:        context.repo.owner,
+              repo:         context.repo.repo,
+              body: [
+                "🚀 **Build triggered** for branch `${{ needs.validate.outputs.branch }}`.",
+                "",
+                "⏳ Build is currently in progress. You will receive a status update here once it completes."
+              ].join("\n")
+            });
+
+      # Step 3 — Dispatch the actual development release workflow
+      #          Uses a PAT (not GITHUB_TOKEN) as GITHUB_TOKEN cannot trigger workflows
+      - name: Trigger Development Release Workflow
+        id: dispatch
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: sparrow-app-development.yml
+          ref:      ${{ needs.validate.outputs.branch }}
+          token:    ${{ secrets.PAT_TOKEN }}
+
+      # Step 4 — Set commit status to success after dispatch
+      #          (Scenario 4 — build feedback posted to PR)
+      - name: Set commit status — success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner:       context.repo.owner,
+              repo:        context.repo.repo,
+              sha:         "${{ needs.validate.outputs.sha }}",
+              state:       "success",
+              context:     "PR Build Trigger",
+              description: "Build dispatched successfully.",
+            });
+
+      # Step 5 — Post a success comment on the PR
+      - name: Comment — build success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              issue_number: ${{ needs.validate.outputs.pr_number }},
+              owner:        context.repo.owner,
+              repo:         context.repo.repo,
+              body: [
+                "✅ **Build dispatched successfully** for branch `${{ needs.validate.outputs.branch }}`.",
+                "",
+                "You can monitor the build progress in the [Actions tab](https://github.com/${{ github.repository }}/actions)."
+              ].join("\n")
+            });
+
+      # Step 6 — Set commit status to failure if anything went wrong
+      - name: Set commit status — failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.repos.createCommitStatus({
+              owner:       context.repo.owner,
+              repo:        context.repo.repo,
+              sha:         "${{ needs.validate.outputs.sha }}",
+              state:       "failure",
+              context:     "PR Build Trigger",
+              description: "Build dispatch failed.",
+            });
+
+      # Step 7 — Post a failure comment on the PR
+      - name: Comment — build failed
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              issue_number: ${{ needs.validate.outputs.pr_number }},
+              owner:        context.repo.owner,
+              repo:         context.repo.repo,
+              body: [
+                "❌ **Build dispatch failed** for branch `${{ needs.validate.outputs.branch }}`.",
+                "",
+                "Please check the [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for more details."
+              ].join("\n")
+            });

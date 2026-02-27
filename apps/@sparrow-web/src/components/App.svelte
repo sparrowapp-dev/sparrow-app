@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Router, Route } from "svelte-navigator";
   import "font-awesome/css/font-awesome.css";
-  import { Toast } from "@sparrow/library/ui";
+  import { Modal, Toast } from "@sparrow/library/ui";
   import Authguard from "../routing/Authguard.svelte";
   import Navigate from "../routing/Navigate.svelte";
   import Dashboard from "../pages/Dashboard/Dashboard.svelte";
@@ -9,8 +9,11 @@
   import { handleLogin } from "./App";
   import { initPostHog } from "@app/utils/posthog/posthogConfig";
   export let url = "/";
+  import { inviteModalStore } from "@app/store/inviteModal.store";
+  import { NotificationService } from "../services/notification.service";
 
   let channel: BroadcastChannel;
+  const notificationService = new NotificationService();
 
   onMount(async () => {
     if (typeof window !== "undefined") {
@@ -24,6 +27,7 @@
         }
       };
     }
+    await notificationService.loadNotificationsToStore();
     handleLogin(window.location.search);
   });
 
@@ -31,6 +35,42 @@
     if (channel) channel.close();
   });
 </script>
+
+{#if $inviteModalStore.show && $inviteModalStore.data}
+  <Modal
+    title="Access Granted!"
+    type="dark"
+    width="520px"
+    zIndex={2000}
+    isOpen={true}
+    handleModalState={() => {
+      inviteModalStore.set({ show: false, data: null });
+    }}
+  >
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <p class="text-fs-14">
+        You’re now a <b>{$inviteModalStore.data.role}</b>
+        in the following workspace(s) under the
+        <b>{$inviteModalStore.data.teamName}</b> hub:
+      </p>
+
+      <ol style="padding-left:18px;">
+        {#each $inviteModalStore.data.workspaceNames as workspace}
+          <li>{workspace}</li>
+        {/each}
+      </ol>
+
+      <div style="display:flex; justify-content:flex-end;">
+        <button
+          class="btn btn-primary"
+          on:click={() => inviteModalStore.set({ show: false, data: null })}
+        >
+          Continue
+        </button>
+      </div>
+    </div>
+  </Modal>
+{/if}
 
 <Router {url}>
   <Authguard>
