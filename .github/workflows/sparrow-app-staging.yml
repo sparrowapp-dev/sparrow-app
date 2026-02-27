@@ -3,7 +3,7 @@ name: Staging release
 on:
   push:
     branches:
-      - release/2.36.0
+      - release/2.37.0
   workflow_dispatch:
 
 env:
@@ -346,7 +346,7 @@ jobs:
                     }
                     @{
                       "type" = "TextBlock"
-                      "text" = "Branch: release/2.36.0"
+                      "text" = "Branch: release/2.37.0"
                       "wrap" = $true
                     }
                     @{
@@ -474,7 +474,7 @@ jobs:
                     },
                     {
                       \"type\": \"TextBlock\",
-                      \"text\": \"Branch: release/2.36.0\",
+                      \"text\": \"Branch: release/2.37.0\",
                       \"wrap\": true
                     },
                     {
