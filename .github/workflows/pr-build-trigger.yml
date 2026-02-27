@@ -57,7 +57,7 @@ jobs:
 
           echo "✅ Trigger validation passed."
 
-      # Step 2 — Checkout development branch to access .github/whitelist.yml
+      # Step 2 — Checkout development branch to access .github/pr-build-whitelist.yml
       - name: Checkout development branch
         uses: actions/checkout@v3
         with:
@@ -105,7 +105,7 @@ jobs:
       - name: Install yq
         run: sudo apt-get install -y yq
 
-      # Step 5 — Check whether the commenter is in .github/whitelist.yml
+      # Step 5 — Check whether the commenter is in .github/pr-build-whitelist.yml
       - name: Validate whitelist
         id: validate_whitelist
         env:
@@ -113,12 +113,12 @@ jobs:
         run: |
           echo "Checking authorization for: $GH_USER"
 
-          if [ ! -f ".github/whitelist.yml" ]; then
-            echo "❌ .github/whitelist.yml not found on development branch."
+          if [ ! -f ".github/pr-build-whitelist.yml" ]; then
+            echo "❌ .github/pr-build-whitelist.yml not found on development branch."
             exit 1
           fi
 
-          if yq '.users[]' .github/whitelist.yml | grep -qw "$GH_USER"; then
+          if yq '.users[]' .github/pr-build-whitelist.yml | grep -qw "$GH_USER"; then
             echo "✅ $GH_USER is authorized."
             echo "authorized=true" >> $GITHUB_OUTPUT
           else
