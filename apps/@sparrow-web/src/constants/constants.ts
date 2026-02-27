@@ -45,10 +45,15 @@ const constants = {
   AZURE_CDN_URL:
     runtimeConfig.VITE_WEB_AZURE_CDN_URL ??
     import.meta.env.VITE_WEB_AZURE_CDN_URL,
-  CANNY_API:
-    runtimeConfig.VITE_WEB_CANNY_API ?? import.meta.env.VITE_WEB_CANNY_API,
-  CANNY_URL:
-    runtimeConfig.VITE_WEB_CANNY_URL ?? import.meta.env.VITE_WEB_CANNY_URL,
+  OPENFEEDBACK_API:
+    runtimeConfig.VITE_WEB_OPENFEEDBACK_API ??
+    import.meta.env.VITE_WEB_OPENFEEDBACK_API,
+  OPENFEEDBACK_URL:
+    runtimeConfig.VITE_WEB_OPENFEEDBACK_URL ??
+    import.meta.env.VITE_WEB_OPENFEEDBACK_URL,
+  OPENFEEDBACK_BOARD_ID:
+    runtimeConfig.VITE_WEB_OPENFEEDBACK_BOARD_ID ??
+    import.meta.env.VITE_WEB_OPENFEEDBACK_BOARD_ID,
   AZURE_INSIGHTS_CONNECTION_STRING:
     runtimeConfig.VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING ??
     import.meta.env.VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING,

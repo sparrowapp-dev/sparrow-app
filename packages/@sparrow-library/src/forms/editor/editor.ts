@@ -11,6 +11,7 @@ import { xml } from "@codemirror/lang-xml";
 import { html_beautify, js_beautify } from "js-beautify";
 import * as Sentry from "@sentry/svelte";
 import { autocompletion, CompletionContext } from "@codemirror/autocomplete";
+import BeautifyWorker from "@sparrow/library/src/forms/editor/beautify.worker?worker";
 
 /**
  * @description - remove indentation from the string
@@ -25,6 +26,68 @@ const removeIndentation = (str: string = "") => {
   // Join the lines back together
   return unindentedLines.join("\n");
 };
+
+/**
+ * @description - Size threshold (in characters) above which formatting runs in a Web Worker
+ * Below this threshold, synchronous formatting is fast enough
+ */
+const WORKER_SIZE_THRESHOLD = 10000;
+
+/**
+ * Web Worker instance for background beautification
+ */
+let beautifyWorker: Worker | null = null;
+let workerRequestId = 0;
+const pendingWorkerRequests = new Map<
+  number,
+  { resolve: (result: string) => void; reject: (error: Error) => void }
+>();
+
+/**
+ * Initialize the beautify worker and set up message handlers (only once)
+ */
+function getBeautifyWorker(): Worker {
+  if (!beautifyWorker) {
+    beautifyWorker = new BeautifyWorker();
+
+    // Set up message handlers only once when worker is created
+    beautifyWorker.onmessage = (event) => {
+      const { id, result, error } = event.data;
+      const pending = pendingWorkerRequests.get(id);
+      if (pending) {
+        pendingWorkerRequests.delete(id);
+        if (error) {
+          pending.reject(new Error(error));
+        } else {
+          pending.resolve(result);
+        }
+      } else {
+        console.warn("No pending request found for worker response id:", id);
+      }
+    };
+
+    beautifyWorker.onerror = (error) => {
+      console.error("Beautify worker error:", error);
+    };
+  }
+
+  return beautifyWorker;
+}
+
+/**
+ * Run beautification in a Web Worker (non-blocking)
+ */
+function beautifyInWorker(
+  type: "json" | "javascript" | "html" | "xml",
+  value: string,
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const worker = getBeautifyWorker();
+    const id = ++workerRequestId;
+    pendingWorkerRequests.set(id, { resolve, reject });
+    worker.postMessage({ id, type, value });
+  });
+}
 
 /**
  * @description Formats JSON string by fixing brace and bracket indentation patterns to improve readability.
@@ -123,18 +186,32 @@ const testJsCompletions = (context: CompletionContext) => {
   const spResponseDotMatch = /sp\.response\.$/.test(beforeCursor);
   const spResponseBodyDotMatch = /sp\.response\.body\.$/.test(beforeCursor);
   const expectDotMatch = /expect\([^)]*\)\.$/.test(beforeCursor);
-  const expectToDotMatch = /expect\([^)]*\)\.to\.$/.test(beforeCursor);  // expect().to.
-  const expectToBeDotMatch = /expect\([^)]*\)\.to\.be\.$/.test(beforeCursor);  // expect().to.be.
-  const expectToHaveDotMatch = /expect\([^)]*\)\.to\.have\.$/.test(beforeCursor);  // expect().to.have.
-  const expectToHaveAllDotMatch = /expect\([^)]*\)\.to\.have\.all\.$/.test(beforeCursor);  // expect().to.have.all.
+  const expectToDotMatch = /expect\([^)]*\)\.to\.$/.test(beforeCursor); // expect().to.
+  const expectToBeDotMatch = /expect\([^)]*\)\.to\.be\.$/.test(beforeCursor); // expect().to.be.
+  const expectToHaveDotMatch = /expect\([^)]*\)\.to\.have\.$/.test(
+    beforeCursor,
+  ); // expect().to.have.
+  const expectToHaveAllDotMatch = /expect\([^)]*\)\.to\.have\.all\.$/.test(
+    beforeCursor,
+  ); // expect().to.have.all.
   const word = context.matchBefore(/\w*/);
 
   if (spResponseBodyDotMatch) {
     return {
       from: context.pos,
       options: [
-        { label: "text", type: "function", info: "Get response body as text", apply: "text();" },
-        { label: "json", type: "function", info: "Get response body as JSON", apply: "json();" },
+        {
+          label: "text",
+          type: "function",
+          info: "Get response body as text",
+          apply: "text();",
+        },
+        {
+          label: "json",
+          type: "function",
+          info: "Get response body as JSON",
+          apply: "json();",
+        },
       ],
       validFor: /^\w*$/,
     };
@@ -145,7 +222,11 @@ const testJsCompletions = (context: CompletionContext) => {
       from: context.pos,
       options: [
         { label: "statusCode", type: "variable", info: "Response status code" },
-        { label: "body", type: "variable", info: "Response body object (text, json)" },
+        {
+          label: "body",
+          type: "variable",
+          info: "Response body object (text, json)",
+        },
         { label: "headers", type: "variable", info: "Response headers object" },
         { label: "size", type: "variable", info: "Response size in KB" },
         { label: "time", type: "variable", info: "Response time in ms" },
@@ -159,18 +240,23 @@ const testJsCompletions = (context: CompletionContext) => {
     return {
       from: context.pos,
       options: [
-        { label: "expect", type: "function", info: "Expect testcase function", apply: "expect()" },
+        {
+          label: "expect",
+          type: "function",
+          info: "Expect testcase function",
+          apply: "expect()",
+        },
         {
           label: "xmlToJSON",
           type: "function",
           info: "Convert XML to JSON",
-          apply: "xmlToJSON();"
+          apply: "xmlToJSON();",
         },
         {
           label: "response",
           type: "variable",
           info: "Get response object",
-          apply: "response"
+          apply: "response",
         },
 
         {
@@ -179,7 +265,7 @@ const testJsCompletions = (context: CompletionContext) => {
           info: "Test definition function",
           apply: `test("", function () {
 
-});`
+});`,
         },
       ],
       validFor: /^\w*$/,
@@ -190,7 +276,11 @@ const testJsCompletions = (context: CompletionContext) => {
     return {
       from: context.pos,
       options: [
-        { label: "to", type: "variable", info: "Matcher object for assertions" },
+        {
+          label: "to",
+          type: "variable",
+          info: "Matcher object for assertions",
+        },
       ],
       validFor: /^\w*$/,
     };
@@ -200,15 +290,55 @@ const testJsCompletions = (context: CompletionContext) => {
     return {
       from: context.pos,
       options: [
-        { label: "equal", type: "function", info: "Assert actual equals expected", apply: "equal();" },
-        { label: "notEqual", type: "function", info: "Assert actual not equals expected", apply: "notEqual();" },
-        { label: "exist", type: "function", info: "Assert actual exists", apply: "exist();" },
-        { label: "notExist", type: "function", info: "Assert actual does not exist", apply: "notExist();" },
+        {
+          label: "equal",
+          type: "function",
+          info: "Assert actual equals expected",
+          apply: "equal();",
+        },
+        {
+          label: "notEqual",
+          type: "function",
+          info: "Assert actual not equals expected",
+          apply: "notEqual();",
+        },
+        {
+          label: "exist",
+          type: "function",
+          info: "Assert actual exists",
+          apply: "exist();",
+        },
+        {
+          label: "notExist",
+          type: "function",
+          info: "Assert actual does not exist",
+          apply: "notExist();",
+        },
         { label: "be", type: "variable", info: "Type and value matchers" },
-        { label: "contain", type: "function", info: "Assert actual contains expected", apply: "contain();" },
-        { label: "notContain", type: "function", info: "Assert actual does not contain expected", apply: "notContain();" },
-        { label: "beInList", type: "function", info: "Assert actual is in list", apply: "beInList();" },
-        { label: "notBeInList", type: "function", info: "Assert actual is not in list", apply: "notBeInList();" },
+        {
+          label: "contain",
+          type: "function",
+          info: "Assert actual contains expected",
+          apply: "contain();",
+        },
+        {
+          label: "notContain",
+          type: "function",
+          info: "Assert actual does not contain expected",
+          apply: "notContain();",
+        },
+        {
+          label: "beInList",
+          type: "function",
+          info: "Assert actual is in list",
+          apply: "beInList();",
+        },
+        {
+          label: "notBeInList",
+          type: "function",
+          info: "Assert actual is not in list",
+          apply: "notBeInList();",
+        },
         { label: "have", type: "variable", info: "Object key matchers" },
       ],
       validFor: /^\w*$/,
@@ -219,33 +349,82 @@ const testJsCompletions = (context: CompletionContext) => {
     return {
       from: context.pos,
       options: [
-        { label: "a", type: "function", info: "Assert actual is of type", apply: "a();" },
-        { label: "true", type: "function", info: "Assert actual is true", apply: "true();" },
-        { label: "false", type: "function", info: "Assert actual is false", apply: "false();" },
-        { label: "within", type: "function", info: "Assert actual is within range", apply: "within( , )" },
-        { label: "lessThan", type: "function", info: "Assert actual is less than expected", apply: "lessThan();"},
-        { label: "greaterThan", type: "function", info: "Assert actual is greater than expected", apply: "greaterThan();" },
-        { label: "empty", type: "function", info: "Assert actual is empty", apply: "empty();" },
-        { label: "notEmpty", type: "function", info: "Assert actual is not empty", apply: "notEmpty();" },
+        {
+          label: "a",
+          type: "function",
+          info: "Assert actual is of type",
+          apply: "a();",
+        },
+        {
+          label: "true",
+          type: "function",
+          info: "Assert actual is true",
+          apply: "true();",
+        },
+        {
+          label: "false",
+          type: "function",
+          info: "Assert actual is false",
+          apply: "false();",
+        },
+        {
+          label: "within",
+          type: "function",
+          info: "Assert actual is within range",
+          apply: "within( , )",
+        },
+        {
+          label: "lessThan",
+          type: "function",
+          info: "Assert actual is less than expected",
+          apply: "lessThan();",
+        },
+        {
+          label: "greaterThan",
+          type: "function",
+          info: "Assert actual is greater than expected",
+          apply: "greaterThan();",
+        },
+        {
+          label: "empty",
+          type: "function",
+          info: "Assert actual is empty",
+          apply: "empty();",
+        },
+        {
+          label: "notEmpty",
+          type: "function",
+          info: "Assert actual is not empty",
+          apply: "notEmpty();",
+        },
       ],
       validFor: /^\w*$/,
     };
   }
-   if (expectToHaveDotMatch) {
+  if (expectToHaveDotMatch) {
     return {
       from: context.pos,
       options: [
-        { label: "all", type: "variable", info: "Assert actual has all expected properties", },
+        {
+          label: "all",
+          type: "variable",
+          info: "Assert actual has all expected properties",
+        },
       ],
       validFor: /^\w*$/,
     };
   }
 
-   if (expectToHaveAllDotMatch) {
+  if (expectToHaveAllDotMatch) {
     return {
       from: context.pos,
       options: [
-        { label: "keys", type: "function", info: "Assert actual has all expected keys", apply: "keys();" },
+        {
+          label: "keys",
+          type: "function",
+          info: "Assert actual has all expected keys",
+          apply: "keys();",
+        },
       ],
       validFor: /^\w*$/,
     };
@@ -259,33 +438,135 @@ const testJsCompletions = (context: CompletionContext) => {
       { label: "Object", type: "class", info: "JavaScript Object constructor" },
       { label: "String", type: "class", info: "JavaScript String constructor" },
       { label: "Number", type: "class", info: "JavaScript Number constructor" },
-      { label: "Boolean", type: "class", info: "JavaScript Boolean constructor" },
-      { label: "Math", type: "namespace", info: "Math functions and constants" },
+      {
+        label: "Boolean",
+        type: "class",
+        info: "JavaScript Boolean constructor",
+      },
+      {
+        label: "Math",
+        type: "namespace",
+        info: "Math functions and constants",
+      },
       { label: "JSON", type: "namespace", info: "JSON utilities" },
-      { label: "parseInt", type: "function", info: "Parse string to integer", apply: "parseInt()" },
-      { label: "parseFloat", type: "function", info: "Parse string to float", apply: "parseFloat()" },
+      {
+        label: "parseInt",
+        type: "function",
+        info: "Parse string to integer",
+        apply: "parseInt()",
+      },
+      {
+        label: "parseFloat",
+        type: "function",
+        info: "Parse string to float",
+        apply: "parseFloat()",
+      },
       { label: "Date", type: "class", info: "JavaScript Date constructor" },
-      { label: "Promise", type: "class", info: "JavaScript Promise constructor" },
-      { label: "for", type: "keyword", info: "For loop", apply: "for (let i = 0; i < ; i++) {\n  \n}" },
-      { label: "foreach", type: "keyword", info: "Array forEach loop", apply: ".forEach((item) => {\n  \n});" },
-      { label: "let", type: "keyword", info: "Declare block-scoped variable", apply: "let " },
-      { label: "const", type: "keyword", info: "Declare constant variable", apply: "const " },
-      { label: "var", type: "keyword", info: "Declare function-scoped variable", apply: "var " },
-      { label: "if", type: "keyword", info: "If statement", apply: "if () {\n  \n}" },
-      { label: "else", type: "keyword", info: "Else statement", apply: "else {\n  \n}" },
-      { label: "while", type: "keyword", info: "While loop", apply: "while () {\n  \n}" },
-      { label: "do", type: "keyword", info: "Do-while loop", apply: "do {\n  \n} while ();" },
-      { label: "switch", type: "keyword", info: "Switch statement", apply: "switch () {\n  case :\n    break;\n  default:\n    break;\n}" },
-      { label: "case", type: "keyword", info: "Case in switch", apply: "case :\n  break;" },
-      { label: "break", type: "keyword", info: "Break statement", apply: "break;" },
-      { label: "continue", type: "keyword", info: "Continue statement", apply: "continue;" },
-      { label: "return", type: "keyword", info: "Return statement", apply: "return;" },
-      { label: "function", type: "keyword", info: "Function declaration", apply: "function name() {\n  \n}" },
-      { label: "try", type: "keyword", info: "Try block", apply: "try {\n  \n} catch (e) {\n  \n} finally {\n  \n}" },
+      {
+        label: "Promise",
+        type: "class",
+        info: "JavaScript Promise constructor",
+      },
+      {
+        label: "for",
+        type: "keyword",
+        info: "For loop",
+        apply: "for (let i = 0; i < ; i++) {\n  \n}",
+      },
+      {
+        label: "foreach",
+        type: "keyword",
+        info: "Array forEach loop",
+        apply: ".forEach((item) => {\n  \n});",
+      },
+      {
+        label: "let",
+        type: "keyword",
+        info: "Declare block-scoped variable",
+        apply: "let ",
+      },
+      {
+        label: "const",
+        type: "keyword",
+        info: "Declare constant variable",
+        apply: "const ",
+      },
+      {
+        label: "var",
+        type: "keyword",
+        info: "Declare function-scoped variable",
+        apply: "var ",
+      },
+      {
+        label: "if",
+        type: "keyword",
+        info: "If statement",
+        apply: "if () {\n  \n}",
+      },
+      {
+        label: "else",
+        type: "keyword",
+        info: "Else statement",
+        apply: "else {\n  \n}",
+      },
+      {
+        label: "while",
+        type: "keyword",
+        info: "While loop",
+        apply: "while () {\n  \n}",
+      },
+      {
+        label: "do",
+        type: "keyword",
+        info: "Do-while loop",
+        apply: "do {\n  \n} while ();",
+      },
+      {
+        label: "switch",
+        type: "keyword",
+        info: "Switch statement",
+        apply: "switch () {\n  case :\n    break;\n  default:\n    break;\n}",
+      },
+      {
+        label: "case",
+        type: "keyword",
+        info: "Case in switch",
+        apply: "case :\n  break;",
+      },
+      {
+        label: "break",
+        type: "keyword",
+        info: "Break statement",
+        apply: "break;",
+      },
+      {
+        label: "continue",
+        type: "keyword",
+        info: "Continue statement",
+        apply: "continue;",
+      },
+      {
+        label: "return",
+        type: "keyword",
+        info: "Return statement",
+        apply: "return;",
+      },
+      {
+        label: "function",
+        type: "keyword",
+        info: "Function declaration",
+        apply: "function name() {\n  \n}",
+      },
+      {
+        label: "try",
+        type: "keyword",
+        info: "Try block",
+        apply: "try {\n  \n} catch (e) {\n  \n} finally {\n  \n}",
+      },
     ],
     validFor: /^\w*$/,
   };
-}
+};
 
 /**
  * Custom JavaScript autocompletion source for CodeMirror
@@ -296,37 +577,72 @@ const preTestJsCompletions = (context: CompletionContext) => {
   // Check for sp.request, sp.environment, sp.global, etc.
   const spRequestDotMatch = /sp\.request\.$/.test(beforeCursor);
   const spRequestHeadersDotMatch = /sp\.request\.headers\.$/.test(beforeCursor);
-  const spRequestParametersDotMatch = /sp\.request\.parameters\.$/.test(beforeCursor);
+  const spRequestParametersDotMatch = /sp\.request\.parameters\.$/.test(
+    beforeCursor,
+  );
   const spRequestBodyDotMatch = /sp\.request\.body\.$/.test(beforeCursor);
-  const spRequestBodyFormDataDotMatch = /sp\.request\.body\.formdata\.$/.test(beforeCursor);
-  const spRequestBodyUrlEncodedDotMatch = /sp\.request\.body\.urlencoded\.$/.test(beforeCursor);
-  const spRequestBodyRawDotMatch = /sp\.request\.body\.raw\.$/.test(beforeCursor);
+  const spRequestBodyFormDataDotMatch = /sp\.request\.body\.formdata\.$/.test(
+    beforeCursor,
+  );
+  const spRequestBodyUrlEncodedDotMatch =
+    /sp\.request\.body\.urlencoded\.$/.test(beforeCursor);
+  const spRequestBodyRawDotMatch = /sp\.request\.body\.raw\.$/.test(
+    beforeCursor,
+  );
   const spRequestUrlDotMatch = /sp\.request\.url\.$/.test(beforeCursor);
   const spRequestMethodDotMatch = /sp\.request\.method\.$/.test(beforeCursor);
   const spRequestAuthDotMatch = /sp\.request\.auth\.$/.test(beforeCursor);
-  const spRequestAuthBearerTokenDotMatch = /sp\.request\.auth\.bearerToken\.$/.test(beforeCursor);
-  const spRequestAuthBasicAuthDotMatch = /sp\.request\.auth\.basicAuth\.$/.test(beforeCursor);
-  const spRequestAuthBasicAuthUsernameDotMatch = /sp\.request\.auth\.basicAuth\.username\.$/.test(beforeCursor);
-  const spRequestAuthBasicAuthPasswordDotMatch = /sp\.request\.auth\.basicAuth\.password\.$/.test(beforeCursor);
-  const spRequestAuthApiKeyDotMatch = /sp\.request\.auth\.apiKey\.$/.test(beforeCursor);
-  const spRequestAuthApiKeyKeyDotMatch = /sp\.request\.auth\.apiKey\.key\.$/.test(beforeCursor);
-  const spRequestAuthApiKeyValueDotMatch = /sp\.request\.auth\.apiKey\.value\.$/.test(beforeCursor);
+  const spRequestAuthBearerTokenDotMatch =
+    /sp\.request\.auth\.bearerToken\.$/.test(beforeCursor);
+  const spRequestAuthBasicAuthDotMatch = /sp\.request\.auth\.basicAuth\.$/.test(
+    beforeCursor,
+  );
+  const spRequestAuthBasicAuthUsernameDotMatch =
+    /sp\.request\.auth\.basicAuth\.username\.$/.test(beforeCursor);
+  const spRequestAuthBasicAuthPasswordDotMatch =
+    /sp\.request\.auth\.basicAuth\.password\.$/.test(beforeCursor);
+  const spRequestAuthApiKeyDotMatch = /sp\.request\.auth\.apiKey\.$/.test(
+    beforeCursor,
+  );
+  const spRequestAuthApiKeyKeyDotMatch =
+    /sp\.request\.auth\.apiKey\.key\.$/.test(beforeCursor);
+  const spRequestAuthApiKeyValueDotMatch =
+    /sp\.request\.auth\.apiKey\.value\.$/.test(beforeCursor);
   const spEnvironmentDotMatch = /sp\.environment\.$/.test(beforeCursor);
   const spGlobalDotMatch = /sp\.global\.$/.test(beforeCursor);
   const expectDotMatch = /expect\([^)]*\)\.$/.test(beforeCursor);
-  const expectToDotMatch = /expect\([^)]*\)\.to\.$/.test(beforeCursor);  // expect().to.
-  const expectToBeDotMatch = /expect\([^)]*\)\.to\.be\.$/.test(beforeCursor);  // expect().to.be.
-  const expectToHaveDotMatch = /expect\([^)]*\)\.to\.have\.$/.test(beforeCursor);  // expect().to.have.
-  const expectToHaveAllDotMatch = /expect\([^)]*\)\.to\.have\.all\.$/.test(beforeCursor);  // expect().to.have.all.
+  const expectToDotMatch = /expect\([^)]*\)\.to\.$/.test(beforeCursor); // expect().to.
+  const expectToBeDotMatch = /expect\([^)]*\)\.to\.be\.$/.test(beforeCursor); // expect().to.be.
+  const expectToHaveDotMatch = /expect\([^)]*\)\.to\.have\.$/.test(
+    beforeCursor,
+  ); // expect().to.have.
+  const expectToHaveAllDotMatch = /expect\([^)]*\)\.to\.have\.all\.$/.test(
+    beforeCursor,
+  ); // expect().to.have.all.
   const word = context.matchBefore(/\w*/);
 
   if (spRequestBodyRawDotMatch) {
     return {
       from: context.pos,
       options: [
-        { label: "text", type: "function", info: "Get raw body as text", apply: "text();" },
-        { label: "json", type: "function", info: "Get raw body as JSON", apply: "json();" },
-        { label: "set", type: "function", info: "Set raw body content", apply: "set('');" },
+        {
+          label: "text",
+          type: "function",
+          info: "Get raw body as text",
+          apply: "text();",
+        },
+        {
+          label: "json",
+          type: "function",
+          info: "Get raw body as JSON",
+          apply: "json();",
+        },
+        {
+          label: "set",
+          type: "function",
+          info: "Set raw body content",
+          apply: "set('');",
+        },
       ],
       validFor: /^\w*$/,
     };
@@ -336,16 +652,66 @@ const preTestJsCompletions = (context: CompletionContext) => {
     return {
       from: context.pos,
       options: [
-        { label: "text", type: "function", info: "Get as JSON string", apply: "text();" },
-        { label: "json", type: "function", info: "Get as object", apply: "json();" },
-        { label: "set", type: "function", info: "Set key-value pair", apply: "set('key', 'value');" },
-        { label: "get", type: "function", info: "Get value by key", apply: "get('key');" },
-        { label: "remove", type: "function", info: "Remove key", apply: "remove('key');" },
-        { label: "clear", type: "function", info: "Clear all data", apply: "clear();" },
-        { label: "has", type: "function", info: "Check if key exists", apply: "has('key');" },
-        { label: "enable", type: "function", info: "Enable key", apply: "enable('key');" },
-        { label: "disable", type: "function", info: "Disable key", apply: "disable('key');" },
-        { label: "isChecked", type: "function", info: "Check if key is enabled", apply: "isChecked('key');" },
+        {
+          label: "text",
+          type: "function",
+          info: "Get as JSON string",
+          apply: "text();",
+        },
+        {
+          label: "json",
+          type: "function",
+          info: "Get as object",
+          apply: "json();",
+        },
+        {
+          label: "set",
+          type: "function",
+          info: "Set key-value pair",
+          apply: "set('key', 'value');",
+        },
+        {
+          label: "get",
+          type: "function",
+          info: "Get value by key",
+          apply: "get('key');",
+        },
+        {
+          label: "remove",
+          type: "function",
+          info: "Remove key",
+          apply: "remove('key');",
+        },
+        {
+          label: "clear",
+          type: "function",
+          info: "Clear all data",
+          apply: "clear();",
+        },
+        {
+          label: "has",
+          type: "function",
+          info: "Check if key exists",
+          apply: "has('key');",
+        },
+        {
+          label: "enable",
+          type: "function",
+          info: "Enable key",
+          apply: "enable('key');",
+        },
+        {
+          label: "disable",
+          type: "function",
+          info: "Disable key",
+          apply: "disable('key');",
+        },
+        {
+          label: "isChecked",
+          type: "function",
+          info: "Check if key is enabled",
+          apply: "isChecked('key');",
+        },
       ],
       validFor: /^\w*$/,
     };
@@ -357,7 +723,11 @@ const preTestJsCompletions = (context: CompletionContext) => {
       options: [
         { label: "raw", type: "variable", info: "Raw body manipulation" },
         { label: "formdata", type: "variable", info: "Form data manipulation" },
-        { label: "urlencoded", type: "variable", info: "URL encoded data manipulation" },
+        {
+          label: "urlencoded",
+          type: "variable",
+          info: "URL encoded data manipulation",
+        },
       ],
       validFor: /^\w*$/,
     };
@@ -367,16 +737,66 @@ const preTestJsCompletions = (context: CompletionContext) => {
     return {
       from: context.pos,
       options: [
-        { label: "text", type: "function", info: "Get as JSON string", apply: "text();" },
-        { label: "json", type: "function", info: "Get as array", apply: "json();" },
-        { label: "set", type: "function", info: "Set key-value pair", apply: "set('key', 'value');" },
-        { label: "get", type: "function", info: "Get value by key", apply: "get('key');" },
-        { label: "remove", type: "function", info: "Remove key", apply: "remove('key');" },
-        { label: "clear", type: "function", info: "Clear all data", apply: "clear();" },
-        { label: "has", type: "function", info: "Check if key exists", apply: "has('key');" },
-        { label: "enable", type: "function", info: "Enable key", apply: "enable('key');" },
-        { label: "disable", type: "function", info: "Disable key", apply: "disable('key');" },
-        { label: "isChecked", type: "function", info: "Check if key is enabled", apply: "isChecked('key');" },
+        {
+          label: "text",
+          type: "function",
+          info: "Get as JSON string",
+          apply: "text();",
+        },
+        {
+          label: "json",
+          type: "function",
+          info: "Get as array",
+          apply: "json();",
+        },
+        {
+          label: "set",
+          type: "function",
+          info: "Set key-value pair",
+          apply: "set('key', 'value');",
+        },
+        {
+          label: "get",
+          type: "function",
+          info: "Get value by key",
+          apply: "get('key');",
+        },
+        {
+          label: "remove",
+          type: "function",
+          info: "Remove key",
+          apply: "remove('key');",
+        },
+        {
+          label: "clear",
+          type: "function",
+          info: "Clear all data",
+          apply: "clear();",
+        },
+        {
+          label: "has",
+          type: "function",
+          info: "Check if key exists",
+          apply: "has('key');",
+        },
+        {
+          label: "enable",
+          type: "function",
+          info: "Enable key",
+          apply: "enable('key');",
+        },
+        {
+          label: "disable",
+          type: "function",
+          info: "Disable key",
+          apply: "disable('key');",
+        },
+        {
+          label: "isChecked",
+          type: "function",
+          info: "Check if key is enabled",
+          apply: "isChecked('key');",
+        },
       ],
       validFor: /^\w*$/,
     };
@@ -386,10 +806,30 @@ const preTestJsCompletions = (context: CompletionContext) => {
     return {
       from: context.pos,
       options: [
-        { label: "text", type: "function", info: "Get current URL", apply: "text();" },
-        { label: "set", type: "function", info: "Set new URL", apply: "set('');" },
-        { label: "getBaseUrl", type: "function", info: "Get base URL", apply: "getBaseUrl();" },
-        { label: "getPath", type: "function", info: "Get URL path", apply: "getPath();" },
+        {
+          label: "text",
+          type: "function",
+          info: "Get current URL",
+          apply: "text();",
+        },
+        {
+          label: "set",
+          type: "function",
+          info: "Set new URL",
+          apply: "set('');",
+        },
+        {
+          label: "getBaseUrl",
+          type: "function",
+          info: "Get base URL",
+          apply: "getBaseUrl();",
+        },
+        {
+          label: "getPath",
+          type: "function",
+          info: "Get URL path",
+          apply: "getPath();",
+        },
       ],
       validFor: /^\w*$/,
     };
@@ -399,8 +839,18 @@ const preTestJsCompletions = (context: CompletionContext) => {
     return {
       from: context.pos,
       options: [
-        { label: "text", type: "function", info: "Get current method", apply: "text();" },
-        { label: "set", type: "function", info: "Set HTTP method", apply: "set('GET');" },
+        {
+          label: "text",
+          type: "function",
+          info: "Get current method",
+          apply: "text();",
+        },
+        {
+          label: "set",
+          type: "function",
+          info: "Set HTTP method",
+          apply: "set('GET');",
+        },
       ],
       validFor: /^\w*$/,
     };
@@ -410,20 +860,48 @@ const preTestJsCompletions = (context: CompletionContext) => {
     return {
       from: context.pos,
       options: [
-        { label: "text", type: "function", info: "Get bearer token", apply: "text();" },
-        { label: "set", type: "function", info: "Set bearer token", apply: "set('');" },
-        { label: "clear", type: "function", info: "Clear bearer token", apply: "clear();" },
+        {
+          label: "text",
+          type: "function",
+          info: "Get bearer token",
+          apply: "text();",
+        },
+        {
+          label: "set",
+          type: "function",
+          info: "Set bearer token",
+          apply: "set('');",
+        },
+        {
+          label: "clear",
+          type: "function",
+          info: "Clear bearer token",
+          apply: "clear();",
+        },
       ],
       validFor: /^\w*$/,
     };
   }
 
-  if (spRequestAuthBasicAuthUsernameDotMatch || spRequestAuthBasicAuthPasswordDotMatch) {
+  if (
+    spRequestAuthBasicAuthUsernameDotMatch ||
+    spRequestAuthBasicAuthPasswordDotMatch
+  ) {
     return {
       from: context.pos,
       options: [
-        { label: "text", type: "function", info: "Get current value", apply: "text();" },
-        { label: "set", type: "function", info: "Set new value", apply: "set('');" },
+        {
+          label: "text",
+          type: "function",
+          info: "Get current value",
+          apply: "text();",
+        },
+        {
+          label: "set",
+          type: "function",
+          info: "Set new value",
+          apply: "set('');",
+        },
       ],
       validFor: /^\w*$/,
     };
@@ -435,8 +913,18 @@ const preTestJsCompletions = (context: CompletionContext) => {
       options: [
         { label: "username", type: "variable", info: "Basic auth username" },
         { label: "password", type: "variable", info: "Basic auth password" },
-        { label: "set", type: "function", info: "Set username and password", apply: "set('username', 'password');" },
-        { label: "clear", type: "function", info: "Clear basic auth", apply: "clear();" },
+        {
+          label: "set",
+          type: "function",
+          info: "Set username and password",
+          apply: "set('username', 'password');",
+        },
+        {
+          label: "clear",
+          type: "function",
+          info: "Clear basic auth",
+          apply: "clear();",
+        },
       ],
       validFor: /^\w*$/,
     };
@@ -446,8 +934,18 @@ const preTestJsCompletions = (context: CompletionContext) => {
     return {
       from: context.pos,
       options: [
-        { label: "text", type: "function", info: "Get current value", apply: "text();" },
-        { label: "set", type: "function", info: "Set new value", apply: "set('');" },
+        {
+          label: "text",
+          type: "function",
+          info: "Get current value",
+          apply: "text();",
+        },
+        {
+          label: "set",
+          type: "function",
+          info: "Set new value",
+          apply: "set('');",
+        },
       ],
       validFor: /^\w*$/,
     };
@@ -459,8 +957,18 @@ const preTestJsCompletions = (context: CompletionContext) => {
       options: [
         { label: "key", type: "variable", info: "API key name" },
         { label: "value", type: "variable", info: "API key value" },
-        { label: "set", type: "function", info: "Set API key and value", apply: "set('key', 'value');" },
-        { label: "clear", type: "function", info: "Clear API key", apply: "clear();" },
+        {
+          label: "set",
+          type: "function",
+          info: "Set API key and value",
+          apply: "set('key', 'value');",
+        },
+        {
+          label: "clear",
+          type: "function",
+          info: "Clear API key",
+          apply: "clear();",
+        },
       ],
       validFor: /^\w*$/,
     };
@@ -470,10 +978,19 @@ const preTestJsCompletions = (context: CompletionContext) => {
     return {
       from: context.pos,
       options: [
-        { label: "bearerToken", type: "variable", info: "Bearer token authentication" },
+        {
+          label: "bearerToken",
+          type: "variable",
+          info: "Bearer token authentication",
+        },
         { label: "basicAuth", type: "variable", info: "Basic authentication" },
         { label: "apiKey", type: "variable", info: "API key authentication" },
-        { label: "clear", type: "function", info: "Clear all auth data", apply: "clear();" },
+        {
+          label: "clear",
+          type: "function",
+          info: "Clear all auth data",
+          apply: "clear();",
+        },
       ],
       validFor: /^\w*$/,
     };
@@ -484,11 +1001,23 @@ const preTestJsCompletions = (context: CompletionContext) => {
       from: context.pos,
       options: [
         { label: "body", type: "variable", info: "Request body manipulation" },
-        { label: "headers", type: "variable", info: "Request headers manipulation" },
-        { label: "parameters", type: "variable", info: "Query parameters manipulation" },
+        {
+          label: "headers",
+          type: "variable",
+          info: "Request headers manipulation",
+        },
+        {
+          label: "parameters",
+          type: "variable",
+          info: "Query parameters manipulation",
+        },
         { label: "url", type: "variable", info: "URL manipulation" },
         { label: "method", type: "variable", info: "HTTP method manipulation" },
-        { label: "auth", type: "variable", info: "Authentication manipulation" },
+        {
+          label: "auth",
+          type: "variable",
+          info: "Authentication manipulation",
+        },
       ],
       validFor: /^\w*$/,
     };
@@ -498,8 +1027,18 @@ const preTestJsCompletions = (context: CompletionContext) => {
     return {
       from: context.pos,
       options: [
-        { label: "set", type: "function", info: "Set variable", apply: "set('key', 'value');" },
-        { label: "get", type: "function", info: "Get variable", apply: "get('key');" },
+        {
+          label: "set",
+          type: "function",
+          info: "Set variable",
+          apply: "set('key', 'value');",
+        },
+        {
+          label: "get",
+          type: "function",
+          info: "Get variable",
+          apply: "get('key');",
+        },
       ],
       validFor: /^\w*$/,
     };
@@ -510,13 +1049,41 @@ const preTestJsCompletions = (context: CompletionContext) => {
     return {
       from: context.pos,
       options: [
-        { label: "request", type: "variable", info: "Request data manipulation" },
-        { label: "environment", type: "variable", info: "Environment variables" },
+        {
+          label: "request",
+          type: "variable",
+          info: "Request data manipulation",
+        },
+        {
+          label: "environment",
+          type: "variable",
+          info: "Environment variables",
+        },
         { label: "global", type: "variable", info: "Global variables" },
-        { label: "test", type: "function", info: "Test definition function", apply: `test("", function () {\n\n});` },
-        { label: "expect", type: "function", info: "Expect testcase function", apply: "expect();" },
-        { label: "xmlToJSON", type: "function", info: "Convert XML to JSON", apply: "xmlToJSON();" },
-        { label: "uuid", type: "function", info: "Generate UUID", apply: "uuid();" },
+        {
+          label: "test",
+          type: "function",
+          info: "Test definition function",
+          apply: `test("", function () {\n\n});`,
+        },
+        {
+          label: "expect",
+          type: "function",
+          info: "Expect testcase function",
+          apply: "expect();",
+        },
+        {
+          label: "xmlToJSON",
+          type: "function",
+          info: "Convert XML to JSON",
+          apply: "xmlToJSON();",
+        },
+        {
+          label: "uuid",
+          type: "function",
+          info: "Generate UUID",
+          apply: "uuid();",
+        },
       ],
       validFor: /^\w*$/,
     };
@@ -526,7 +1093,11 @@ const preTestJsCompletions = (context: CompletionContext) => {
     return {
       from: context.pos,
       options: [
-        { label: "to", type: "variable", info: "Matcher object for assertions" },
+        {
+          label: "to",
+          type: "variable",
+          info: "Matcher object for assertions",
+        },
       ],
       validFor: /^\w*$/,
     };
@@ -536,15 +1107,55 @@ const preTestJsCompletions = (context: CompletionContext) => {
     return {
       from: context.pos,
       options: [
-        { label: "equal", type: "function", info: "Assert actual equals expected", apply: "equal();" },
-        { label: "notEqual", type: "function", info: "Assert actual not equals expected", apply: "notEqual();" },
-        { label: "exist", type: "function", info: "Assert actual exists", apply: "exist();" },
-        { label: "notExist", type: "function", info: "Assert actual does not exist", apply: "notExist();" },
+        {
+          label: "equal",
+          type: "function",
+          info: "Assert actual equals expected",
+          apply: "equal();",
+        },
+        {
+          label: "notEqual",
+          type: "function",
+          info: "Assert actual not equals expected",
+          apply: "notEqual();",
+        },
+        {
+          label: "exist",
+          type: "function",
+          info: "Assert actual exists",
+          apply: "exist();",
+        },
+        {
+          label: "notExist",
+          type: "function",
+          info: "Assert actual does not exist",
+          apply: "notExist();",
+        },
         { label: "be", type: "variable", info: "Type and value matchers" },
-        { label: "contain", type: "function", info: "Assert actual contains expected", apply: "contain();" },
-        { label: "notContain", type: "function", info: "Assert actual does not contain expected", apply: "notContain();" },
-        { label: "beInList", type: "function", info: "Assert actual is in list", apply: "beInList();" },
-        { label: "notBeInList", type: "function", info: "Assert actual is not in list", apply: "notBeInList();" },
+        {
+          label: "contain",
+          type: "function",
+          info: "Assert actual contains expected",
+          apply: "contain();",
+        },
+        {
+          label: "notContain",
+          type: "function",
+          info: "Assert actual does not contain expected",
+          apply: "notContain();",
+        },
+        {
+          label: "beInList",
+          type: "function",
+          info: "Assert actual is in list",
+          apply: "beInList();",
+        },
+        {
+          label: "notBeInList",
+          type: "function",
+          info: "Assert actual is not in list",
+          apply: "notBeInList();",
+        },
         { label: "have", type: "variable", info: "Object key matchers" },
       ],
       validFor: /^\w*$/,
@@ -555,33 +1166,82 @@ const preTestJsCompletions = (context: CompletionContext) => {
     return {
       from: context.pos,
       options: [
-        { label: "a", type: "function", info: "Assert actual is of type", apply: "a();" },
-        { label: "true", type: "function", info: "Assert actual is true", apply: "true();" },
-        { label: "false", type: "function", info: "Assert actual is false", apply: "false();" },
-        { label: "within", type: "function", info: "Assert actual is within range", apply: "within( , )" },
-        { label: "lessThan", type: "function", info: "Assert actual is less than expected", apply: "lessThan();"},
-        { label: "greaterThan", type: "function", info: "Assert actual is greater than expected", apply: "greaterThan();" },
-        { label: "empty", type: "function", info: "Assert actual is empty", apply: "empty();" },
-        { label: "notEmpty", type: "function", info: "Assert actual is not empty", apply: "notEmpty();" },
+        {
+          label: "a",
+          type: "function",
+          info: "Assert actual is of type",
+          apply: "a();",
+        },
+        {
+          label: "true",
+          type: "function",
+          info: "Assert actual is true",
+          apply: "true();",
+        },
+        {
+          label: "false",
+          type: "function",
+          info: "Assert actual is false",
+          apply: "false();",
+        },
+        {
+          label: "within",
+          type: "function",
+          info: "Assert actual is within range",
+          apply: "within( , )",
+        },
+        {
+          label: "lessThan",
+          type: "function",
+          info: "Assert actual is less than expected",
+          apply: "lessThan();",
+        },
+        {
+          label: "greaterThan",
+          type: "function",
+          info: "Assert actual is greater than expected",
+          apply: "greaterThan();",
+        },
+        {
+          label: "empty",
+          type: "function",
+          info: "Assert actual is empty",
+          apply: "empty();",
+        },
+        {
+          label: "notEmpty",
+          type: "function",
+          info: "Assert actual is not empty",
+          apply: "notEmpty();",
+        },
       ],
       validFor: /^\w*$/,
     };
   }
-   if (expectToHaveDotMatch) {
+  if (expectToHaveDotMatch) {
     return {
       from: context.pos,
       options: [
-        { label: "all", type: "variable", info: "Assert actual has all expected properties", },
+        {
+          label: "all",
+          type: "variable",
+          info: "Assert actual has all expected properties",
+        },
       ],
       validFor: /^\w*$/,
     };
   }
 
-   if (expectToHaveAllDotMatch) {
+  if (expectToHaveAllDotMatch) {
     return {
       from: context.pos,
       options: [
-        { label: "keys", type: "function", info: "Assert actual has all expected keys", apply: "keys();" },
+        {
+          label: "keys",
+          type: "function",
+          info: "Assert actual has all expected keys",
+          apply: "keys();",
+        },
       ],
       validFor: /^\w*$/,
     };
@@ -595,33 +1255,135 @@ const preTestJsCompletions = (context: CompletionContext) => {
       { label: "Object", type: "class", info: "JavaScript Object constructor" },
       { label: "String", type: "class", info: "JavaScript String constructor" },
       { label: "Number", type: "class", info: "JavaScript Number constructor" },
-      { label: "Boolean", type: "class", info: "JavaScript Boolean constructor" },
-      { label: "Math", type: "namespace", info: "Math functions and constants" },
+      {
+        label: "Boolean",
+        type: "class",
+        info: "JavaScript Boolean constructor",
+      },
+      {
+        label: "Math",
+        type: "namespace",
+        info: "Math functions and constants",
+      },
       { label: "JSON", type: "namespace", info: "JSON utilities" },
-      { label: "parseInt", type: "function", info: "Parse string to integer", apply: "parseInt()" },
-      { label: "parseFloat", type: "function", info: "Parse string to float", apply: "parseFloat()" },
+      {
+        label: "parseInt",
+        type: "function",
+        info: "Parse string to integer",
+        apply: "parseInt()",
+      },
+      {
+        label: "parseFloat",
+        type: "function",
+        info: "Parse string to float",
+        apply: "parseFloat()",
+      },
       { label: "Date", type: "class", info: "JavaScript Date constructor" },
-      { label: "Promise", type: "class", info: "JavaScript Promise constructor" },
-      { label: "for", type: "keyword", info: "For loop", apply: "for (let i = 0; i < ; i++) {\n  \n}" },
-      { label: "foreach", type: "keyword", info: "Array forEach loop", apply: ".forEach((item) => {\n  \n});" },
-      { label: "let", type: "keyword", info: "Declare block-scoped variable", apply: "let " },
-      { label: "const", type: "keyword", info: "Declare constant variable", apply: "const " },
-      { label: "var", type: "keyword", info: "Declare function-scoped variable", apply: "var " },
-      { label: "if", type: "keyword", info: "If statement", apply: "if () {\n  \n}" },
-      { label: "else", type: "keyword", info: "Else statement", apply: "else {\n  \n}" },
-      { label: "while", type: "keyword", info: "While loop", apply: "while () {\n  \n}" },
-      { label: "do", type: "keyword", info: "Do-while loop", apply: "do {\n  \n} while ();" },
-      { label: "switch", type: "keyword", info: "Switch statement", apply: "switch () {\n  case :\n    break;\n  default:\n    break;\n}" },
-      { label: "case", type: "keyword", info: "Case in switch", apply: "case :\n  break;" },
-      { label: "break", type: "keyword", info: "Break statement", apply: "break;" },
-      { label: "continue", type: "keyword", info: "Continue statement", apply: "continue;" },
-      { label: "return", type: "keyword", info: "Return statement", apply: "return;" },
-      { label: "function", type: "keyword", info: "Function declaration", apply: "function name() {\n  \n}" },
-      { label: "try", type: "keyword", info: "Try block", apply: "try {\n  \n} catch (e) {\n  \n} finally {\n  \n}" },
+      {
+        label: "Promise",
+        type: "class",
+        info: "JavaScript Promise constructor",
+      },
+      {
+        label: "for",
+        type: "keyword",
+        info: "For loop",
+        apply: "for (let i = 0; i < ; i++) {\n  \n}",
+      },
+      {
+        label: "foreach",
+        type: "keyword",
+        info: "Array forEach loop",
+        apply: ".forEach((item) => {\n  \n});",
+      },
+      {
+        label: "let",
+        type: "keyword",
+        info: "Declare block-scoped variable",
+        apply: "let ",
+      },
+      {
+        label: "const",
+        type: "keyword",
+        info: "Declare constant variable",
+        apply: "const ",
+      },
+      {
+        label: "var",
+        type: "keyword",
+        info: "Declare function-scoped variable",
+        apply: "var ",
+      },
+      {
+        label: "if",
+        type: "keyword",
+        info: "If statement",
+        apply: "if () {\n  \n}",
+      },
+      {
+        label: "else",
+        type: "keyword",
+        info: "Else statement",
+        apply: "else {\n  \n}",
+      },
+      {
+        label: "while",
+        type: "keyword",
+        info: "While loop",
+        apply: "while () {\n  \n}",
+      },
+      {
+        label: "do",
+        type: "keyword",
+        info: "Do-while loop",
+        apply: "do {\n  \n} while ();",
+      },
+      {
+        label: "switch",
+        type: "keyword",
+        info: "Switch statement",
+        apply: "switch () {\n  case :\n    break;\n  default:\n    break;\n}",
+      },
+      {
+        label: "case",
+        type: "keyword",
+        info: "Case in switch",
+        apply: "case :\n  break;",
+      },
+      {
+        label: "break",
+        type: "keyword",
+        info: "Break statement",
+        apply: "break;",
+      },
+      {
+        label: "continue",
+        type: "keyword",
+        info: "Continue statement",
+        apply: "continue;",
+      },
+      {
+        label: "return",
+        type: "keyword",
+        info: "Return statement",
+        apply: "return;",
+      },
+      {
+        label: "function",
+        type: "keyword",
+        info: "Function declaration",
+        apply: "function name() {\n  \n}",
+      },
+      {
+        label: "try",
+        type: "keyword",
+        info: "Try block",
+        apply: "try {\n  \n} catch (e) {\n  \n} finally {\n  \n}",
+      },
     ],
     validFor: /^\w*$/,
   };
-}
+};
 
 /**
  * @description - adds syntax highlighting and formatting to code mirror view
@@ -644,16 +1406,7 @@ const handleCodeMirrorSyntaxFormat = (
   switch (lang) {
     case RequestDataType.HTML:
       if (codeMirrorView) {
-        let payload = {};
-        if (isFormatted) {
-          payload = {
-            changes: {
-              from: 0,
-              to: codeMirrorView.state.doc.length,
-              insert: html_beautify(value),
-            },
-          };
-        }
+        // Apply language configuration immediately for instant feedback
         codeMirrorView.dispatch({
           effects: languageConf.reconfigure(
             html({
@@ -662,74 +1415,167 @@ const handleCodeMirrorSyntaxFormat = (
               autoCloseTags: true,
             }),
           ),
-          ...payload,
         });
+
+        // Apply formatting - use worker for large content to keep UI responsive
+        if (isFormatted) {
+          if (value.length > WORKER_SIZE_THRESHOLD) {
+            beautifyInWorker("html", value)
+              .then((beautified) => {
+                if (codeMirrorView) {
+                  codeMirrorView.dispatch({
+                    changes: {
+                      from: 0,
+                      to: codeMirrorView.state.doc.length,
+                      insert: beautified,
+                    },
+                  });
+                }
+              })
+              .catch((err) => console.error("Beautify worker error:", err));
+          } else {
+            setTimeout(() => {
+              if (codeMirrorView) {
+                codeMirrorView.dispatch({
+                  changes: {
+                    from: 0,
+                    to: codeMirrorView.state.doc.length,
+                    insert: html_beautify(value),
+                  },
+                });
+              }
+            }, 0);
+          }
+        }
         beautifySyntaxCallback(false);
         return;
       }
       break;
     case RequestDataType.JAVASCRIPT:
       if (codeMirrorView) {
-        let payload = {};
-        if (isFormatted) {
-          payload = {
-            changes: {
-              from: 0,
-              to: codeMirrorView.state.doc.length,
-              insert: js_beautify(value),
-            },
-          };
-        }
+        // Apply language configuration immediately
         codeMirrorView.dispatch({
           effects: languageConf.reconfigure([
             javascript({ jsx: true, typescript: true }),
           ]),
-          ...payload,
         });
+
+        // Apply formatting - use worker for large content to keep UI responsive
+        if (isFormatted) {
+          if (value.length > WORKER_SIZE_THRESHOLD) {
+            beautifyInWorker("javascript", value)
+              .then((beautified) => {
+                if (codeMirrorView) {
+                  codeMirrorView.dispatch({
+                    changes: {
+                      from: 0,
+                      to: codeMirrorView.state.doc.length,
+                      insert: beautified,
+                    },
+                  });
+                }
+              })
+              .catch((err) => console.error("Beautify worker error:", err));
+          } else {
+            setTimeout(() => {
+              if (codeMirrorView) {
+                codeMirrorView.dispatch({
+                  changes: {
+                    from: 0,
+                    to: codeMirrorView.state.doc.length,
+                    insert: js_beautify(value),
+                  },
+                });
+              }
+            }, 0);
+          }
+        }
         beautifySyntaxCallback(false);
       }
       break;
     case RequestDataType.TESTJAVASCRIPT:
       if (codeMirrorView) {
-        let payload = {};
-        if (isFormatted) {
-          payload = {
-            changes: {
-              from: 0,
-              to: codeMirrorView.state.doc.length,
-              insert: js_beautify(value),
-            },
-          };
-        }
+        // Apply language configuration immediately
         codeMirrorView.dispatch({
           effects: languageConf.reconfigure([
             javascript({ jsx: true, typescript: true }),
             autocompletion({ override: [testJsCompletions] }),
           ]),
-          ...payload,
         });
+
+        // Apply formatting - use worker for large content to keep UI responsive
+        if (isFormatted) {
+          if (value.length > WORKER_SIZE_THRESHOLD) {
+            beautifyInWorker("javascript", value)
+              .then((beautified) => {
+                if (codeMirrorView) {
+                  codeMirrorView.dispatch({
+                    changes: {
+                      from: 0,
+                      to: codeMirrorView.state.doc.length,
+                      insert: beautified,
+                    },
+                  });
+                }
+              })
+              .catch((err) => console.error("Beautify worker error:", err));
+          } else {
+            setTimeout(() => {
+              if (codeMirrorView) {
+                codeMirrorView.dispatch({
+                  changes: {
+                    from: 0,
+                    to: codeMirrorView.state.doc.length,
+                    insert: js_beautify(value),
+                  },
+                });
+              }
+            }, 0);
+          }
+        }
         beautifySyntaxCallback(false);
       }
       break;
-      case RequestDataType.PRETESTJAVASCRIPT:
+    case RequestDataType.PRETESTJAVASCRIPT:
       if (codeMirrorView) {
-        let payload = {};
-        if (isFormatted) {
-          payload = {
-            changes: {
-              from: 0,
-              to: codeMirrorView.state.doc.length,
-              insert: js_beautify(value),
-            },
-          };
-        }
+        // Apply language configuration immediately
         codeMirrorView.dispatch({
           effects: languageConf.reconfigure([
             javascript({ jsx: true, typescript: true }),
             autocompletion({ override: [preTestJsCompletions] }),
           ]),
-          ...payload,
         });
+
+        // Apply formatting - use worker for large content to keep UI responsive
+        if (isFormatted) {
+          if (value.length > WORKER_SIZE_THRESHOLD) {
+            beautifyInWorker("javascript", value)
+              .then((beautified) => {
+                if (codeMirrorView) {
+                  codeMirrorView.dispatch({
+                    changes: {
+                      from: 0,
+                      to: codeMirrorView.state.doc.length,
+                      insert: beautified,
+                    },
+                  });
+                }
+              })
+              .catch((err) => console.error("Beautify worker error:", err));
+          } else {
+            setTimeout(() => {
+              if (codeMirrorView) {
+                codeMirrorView.dispatch({
+                  changes: {
+                    from: 0,
+                    to: codeMirrorView.state.doc.length,
+                    insert: js_beautify(value),
+                  },
+                });
+              }
+            }, 0);
+          }
+        }
         beautifySyntaxCallback(false);
       }
       break;
@@ -774,81 +1620,167 @@ const handleCodeMirrorSyntaxFormat = (
       break;
     case RequestDataType.GRAPHQL:
       if (codeMirrorView) {
-        let payload = {};
-        if (isFormatted) {
-          payload = {
-            changes: {
-              from: 0,
-              to: codeMirrorView.state.doc.length,
-              insert: js_beautify(value),
-            },
-          };
-        }
+        // Apply language configuration immediately
         codeMirrorView.dispatch({
           effects: languageConf.reconfigure(
             javascript({ jsx: false, typescript: false }),
           ),
-          ...payload,
         });
+
+        // Apply formatting - use worker for large content to keep UI responsive
+        if (isFormatted) {
+          if (value.length > WORKER_SIZE_THRESHOLD) {
+            beautifyInWorker("javascript", value)
+              .then((beautified) => {
+                if (codeMirrorView) {
+                  codeMirrorView.dispatch({
+                    changes: {
+                      from: 0,
+                      to: codeMirrorView.state.doc.length,
+                      insert: beautified,
+                    },
+                  });
+                }
+              })
+              .catch((err) => console.error("Beautify worker error:", err));
+          } else {
+            setTimeout(() => {
+              if (codeMirrorView) {
+                codeMirrorView.dispatch({
+                  changes: {
+                    from: 0,
+                    to: codeMirrorView.state.doc.length,
+                    insert: js_beautify(value),
+                  },
+                });
+              }
+            }, 0);
+          }
+        }
         beautifySyntaxCallback(false);
       }
       break;
     case RequestDataType.JSON:
       if (codeMirrorView) {
-        let payload = {};
-        if (isFormatted) {
-          let beautified = fixJsonBraces(js_beautify(value));
-          beautified = fixJsonBraces(js_beautify(beautified));
-          payload = {
-            changes: {
-              from: 0,
-              to: codeMirrorView.state.doc.length,
-              insert: beautified,
-            },
-          };
-        }
+        // Apply language configuration immediately
         codeMirrorView.dispatch({
           effects: languageConf.reconfigure(jsonSetup),
-          ...payload,
         });
+
+        // Apply formatting - use worker for large content to keep UI responsive
+        if (isFormatted) {
+          if (value.length > WORKER_SIZE_THRESHOLD) {
+            // Large content: use Web Worker for non-blocking beautification
+            beautifyInWorker("json", value)
+              .then((beautified) => {
+                if (codeMirrorView) {
+                  codeMirrorView.dispatch({
+                    changes: {
+                      from: 0,
+                      to: codeMirrorView.state.doc.length,
+                      insert: beautified,
+                    },
+                  });
+                }
+              })
+              .catch((err) => {
+                console.error("Beautify worker error:", err);
+              });
+          } else {
+            // Small content: synchronous formatting is fast enough
+            setTimeout(() => {
+              if (codeMirrorView) {
+                let beautified: string;
+                try {
+                  // Use native JSON.stringify which is much faster than js_beautify
+                  const parsed = JSON.parse(value);
+                  const formatted = JSON.stringify(parsed, null, 2);
+
+                  // Skip fixJsonBraces for large files - it's too slow with regex
+                  if (formatted.length > 1_000_000) {
+                    beautified = formatted;
+                  } else {
+                    beautified = fixJsonBraces(formatted);
+                  }
+                } catch (parseError) {
+                  // Fallback to js_beautify for invalid JSON
+                  beautified = js_beautify(value);
+                }
+                codeMirrorView.dispatch({
+                  changes: {
+                    from: 0,
+                    to: codeMirrorView.state.doc.length,
+                    insert: beautified,
+                  },
+                });
+              }
+            }, 0);
+          }
+        }
         beautifySyntaxCallback(false);
       }
       break;
     case RequestDataType.XML:
       if (codeMirrorView) {
-        let payload = {};
-        if (isFormatted) {
-          payload = {
-            changes: {
-              from: 0,
-              to: codeMirrorView.state.doc.length,
-              insert: html_beautify(value),
-            },
-          };
-        }
+        // Apply language configuration immediately
         codeMirrorView.dispatch({
           effects: languageConf.reconfigure(xml()),
-          ...payload,
         });
+
+        // Apply formatting - use worker for large content to keep UI responsive
+        if (isFormatted) {
+          if (value.length > WORKER_SIZE_THRESHOLD) {
+            beautifyInWorker("xml", value)
+              .then((beautified) => {
+                if (codeMirrorView) {
+                  codeMirrorView.dispatch({
+                    changes: {
+                      from: 0,
+                      to: codeMirrorView.state.doc.length,
+                      insert: beautified,
+                    },
+                  });
+                }
+              })
+              .catch((err) => console.error("Beautify worker error:", err));
+          } else {
+            setTimeout(() => {
+              if (codeMirrorView) {
+                codeMirrorView.dispatch({
+                  changes: {
+                    from: 0,
+                    to: codeMirrorView.state.doc.length,
+                    insert: html_beautify(value),
+                  },
+                });
+              }
+            }, 0);
+          }
+        }
         beautifySyntaxCallback(false);
       }
       break;
     default:
       if (codeMirrorView) {
-        let payload = {};
-        if (isFormatted) {
-          payload = {
-            changes: {
-              from: 0,
-              to: codeMirrorView.state.doc.length,
-              insert: removeIndentation(value),
-            },
-          };
-        }
+        // Apply language configuration immediately
         codeMirrorView.dispatch({
           effects: languageConf.reconfigure([]),
-          ...payload,
         });
+
+        // Apply formatting asynchronously (text formatting is lightweight, no worker needed)
+        if (isFormatted) {
+          setTimeout(() => {
+            if (codeMirrorView) {
+              codeMirrorView.dispatch({
+                changes: {
+                  from: 0,
+                  to: codeMirrorView.state.doc.length,
+                  insert: removeIndentation(value),
+                },
+              });
+            }
+          }, 0);
+        }
         beautifySyntaxCallback(false);
       }
       break;

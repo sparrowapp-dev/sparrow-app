@@ -23,7 +23,6 @@ import type {
   HttpClientResponseInterface,
 } from "@app/types/http-client";
 import {
-  CollectionItemTypeDtoEnum,
   type CollectionDtoInterface,
   type CollectionItemDtoInterface,
 } from "@sparrow/common/types/workspace/collection-dto";
@@ -50,7 +49,6 @@ import {
 } from "@sparrow/common/types/workspace/collection-base";
 import type { GraphqlRequestAuthModeBaseEnum } from "@sparrow/common/types/workspace/graphql-request-base";
 import type {
-  HttpRequestSavedCreateUpdateInFolderPayloadDtoInterface,
   HttpRequestSavedCreateUpdatePayloadDtoInterface,
   HttpRequestSavedDeletePayloadDtoInterface,
   HttpRequestSavedUpdatePayloadDtoInterface,

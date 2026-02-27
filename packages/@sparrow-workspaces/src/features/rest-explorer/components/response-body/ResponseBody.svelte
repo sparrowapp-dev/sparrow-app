@@ -7,8 +7,12 @@
     type State,
   } from "@sparrow/common/types/workspace";
   import { SparrowLogo } from "../../assets/images";
+  import ResponseBodyViewer from "./ResponseBodyViewer.svelte";
+
   export let response: Response;
   export let apiState;
+  /** Tab ID for file-backed response support */
+  export let tabId: string = "";
 
   let language = apiState.bodyLanguage;
   $: {
@@ -23,6 +27,11 @@
   let imageHasError = false;
 
   let iframeRef: HTMLIFrameElement;
+
+  /**
+   * Check if response is file-backed (large response stored in temp file)
+   */
+  $: isFileBacked = response?.isFileBacked === true;
 
   function handleIframeLoad(): void {
     try {
@@ -96,9 +105,18 @@
         style="width: 100%; height: calc(100%);"
         on:load={handleIframeLoad}
       ></iframe>
+    {:else if tabId}
+      <!-- 
+        --
+        -- Use ResponseBodyViewer for both small and large responses
+        -- This provides consistent caching behavior and prevents re-formatting
+        -- 
+      -->
+      <ResponseBodyViewer {tabId} {response} {apiState} />
     {:else}
       <!-- 
         --
+        -- Fallback to standard Editor if no tabId
         -- Reponse content-type set to HTML, JSON, XML, Javascript, Text,
         -- 
       -->

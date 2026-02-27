@@ -9,7 +9,7 @@ interface Window {
     VITE_WEB_SPARROW_WEB_URL?: string;
     VITE_WEB_SPARROW_ADMIN_URL?: string;
     VITE_WEB_SPARROW_PRIVACY_POLICY?: string;
-    VITE_WEB_CANNY_URL?: string;
+    VITE_WEB_OPENFEEDBACK_URL?: string;
     VITE_WEB_APP_EDITION?: string;
     VITE_WEB_SPARROW_CONTACT_SALES_URL?: string;
     VITE_WEB_POSTHOG_CONNECTION_API_KEY?: string;
@@ -20,7 +20,7 @@ interface Window {
     VITE_WEB_RELEASE_NOTES_PAT_TOKEN?: string;
     VITE_WEB_RELEASE_NOTES_API?: string;
     VITE_WEB_AZURE_CDN_URL?: string;
-    VITE_WEB_CANNY_API?: string;
+    VITE_WEB_OPENFEEDBACK_API?: string;
     VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING?: string;
     VITE_WEB_BASE_URL?: string;
     VITE_WEB_MARKETING_URL?: string;

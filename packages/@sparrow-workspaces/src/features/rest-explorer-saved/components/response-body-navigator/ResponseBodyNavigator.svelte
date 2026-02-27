@@ -80,8 +80,6 @@
     }
     // build complete file name with extension will be used for export in desttop-app and web-app;
     fileNameWithExtension = `api_response_saved.${fileExtension}`;
-
-    formatedBody = formatCode(body); //pre formate body for exporting
   }
   /**
    * @description - remove indentation from the string
@@ -110,7 +108,7 @@
     });
     // Check if a path was selected
     if (path) {
-      const contents = formatedBody;
+      const contents = formatCode(body);
       await writeTextFile(path, contents, {
         baseDir: BaseDirectory.AppConfig,
       });
@@ -248,7 +246,7 @@
               icon={ArrowDownloadRegular}
               onClick={() =>
                 handleDownloadResponse(
-                  formatedBody,
+                  formatCode(body),
                   contentType,
                   fileNameWithExtension,
                 )}
