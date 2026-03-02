@@ -1,10 +1,12 @@
-name: Development release
+name: PR Build
 
 on:
-  push:
-    branches:
-      - development
   workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to build'
+        required: true
+        type: string
 
 env:
   VITE_API_URL: ${{ vars.VITE_API_URL_DEV }}
@@ -46,6 +48,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          ref: ${{ inputs.branch }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v2
@@ -82,7 +86,7 @@ jobs:
           $tauriPackages = @(
             "@tauri-apps/api",
             "@tauri-apps/cli",
-            "@tauri-apps/plugin-deep-link",
+            "@tauri-apps/plugin-clipboard-manager",
             "@tauri-apps/plugin-dialog",
             "@tauri-apps/plugin-fs",
             "@tauri-apps/plugin-os",
@@ -91,8 +95,8 @@ jobs:
             "@tauri-apps/plugin-updater"
           )
           foreach ($pkg in $tauriPackages) {
-            if ($rootPkg.dependencies.PSObject.Properties.Name -contains $pkg) {
-              $desktopPkg.dependencies.$pkg = $rootPkg.dependencies.$pkg
+            if ($rootPkg.devDependencies.$pkg) {
+              $desktopPkg.devDependencies.$pkg = $rootPkg.devDependencies.$pkg
             }
           }
           $desktopPkg | ConvertTo-Json -Depth 20 | Set-Content $desktopPkgPath
@@ -104,16 +108,13 @@ jobs:
           $json = Get-Content $confPath -Raw | ConvertFrom-Json
 
           if ($null -ne $json.bundle) {
-            if (-not ($json.bundle.PSObject.Properties.Name -contains "createUpdaterArtifacts")) {
-              $json.bundle | Add-Member -NotePropertyName "createUpdaterArtifacts" -NotePropertyValue $true
+            if ($null -eq $json.bundle.windows) {
+              $json.bundle | Add-Member -MemberType NoteProperty -Name "windows" -Value @{}
             }
-            elseif ($json.bundle.createUpdaterArtifacts -ne $true) {
-              # enforce correct value in case it exists but is false
-              $json.bundle.createUpdaterArtifacts = $true
-            }
-
-            $json | ConvertTo-Json -Depth 20 | Set-Content $confPath -Encoding UTF8
+            $json.bundle.windows | Add-Member -MemberType NoteProperty -Name "createUpdaterArtifacts" -Value "v1Compatible" -Force
           }
+
+          $json | ConvertTo-Json -Depth 20 | Set-Content $confPath
         shell: pwsh
 
       - name: Build Tauri App
@@ -156,6 +157,7 @@ jobs:
           # Find the actual bundle path dynamically (check both D: and C: drives)
           $possiblePaths = @(
               "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
+              "C:\Users\runneradmin\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
               "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
           )
           
@@ -163,13 +165,13 @@ jobs:
           foreach ($path in $possiblePaths) {
               if (Test-Path $path) {
                   $bundlePath = $path
-                  Write-Host "Found bundle path: $bundlePath"
+                  Write-Host "Found bundle path at: $bundlePath"
                   break
               }
           }
           
           if (-not $bundlePath) {
-              throw "Could not find bundle directory in any of the expected locations"
+              throw "❌ Bundle path not found in any of the expected locations"
           }
           
           # Export certificate with password parameter (THIS WAS MISSING)
@@ -177,7 +179,7 @@ jobs:
           
           # Verify the certificate file was created
           if (-not (Test-Path "$bundlePath\Certificate.pfx")) {
-              throw "Certificate file was not created successfully"
+              throw "❌ Certificate file was not created successfully"
           }
           
           Write-Host "Certificate exported successfully to: $bundlePath\Certificate.pfx"
@@ -185,43 +187,37 @@ jobs:
           # Find and sign MSI files individually
           $msiFiles = Get-ChildItem "$bundlePath\msi\*.msi" -ErrorAction SilentlyContinue
           if ($msiFiles) {
-              Write-Host "Found $($msiFiles.Count) MSI file(s) to sign"
-              $signtoolPath = $env:SIGNTOOL_PATH.Trim()
-              foreach ($file in $msiFiles) {
-                  Write-Host "Signing MSI: $($file.Name)"
-                  $result = & "$signtoolPath" sign /f "$bundlePath\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "$($file.FullName)" 2>&1
-                  if ($LASTEXITCODE -eq 0) {
-                      Write-Host "Successfully signed: $($file.Name)" -ForegroundColor Green
-                  } else {
-                      Write-Error "Failed to sign $($file.Name): $result"
+              foreach ($msiFile in $msiFiles) {
+                  Write-Host "Signing MSI: $($msiFile.FullName)"
+                  & $env:SIGNTOOL_PATH sign /f "$bundlePath\Certificate.pfx" /p "sparrow123" /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "$($msiFile.FullName)"
+                  if ($LASTEXITCODE -ne 0) {
+                      throw "❌ Failed to sign MSI: $($msiFile.Name)"
                   }
+                  Write-Host "✅ Successfully signed MSI: $($msiFile.Name)"
               }
           } else {
-              Write-Warning "No MSI files found in $bundlePath\msi\"
+              Write-Host "⚠️ No MSI files found in $bundlePath\msi\"
           }
           
           # Find and sign EXE files individually
           $exeFiles = Get-ChildItem "$bundlePath\nsis\*.exe" -ErrorAction SilentlyContinue
           if ($exeFiles) {
-              Write-Host "Found $($exeFiles.Count) EXE file(s) to sign"
-              $signtoolPath = $env:SIGNTOOL_PATH.Trim()
-              foreach ($file in $exeFiles) {
-                  Write-Host "Signing EXE: $($file.Name)"
-                  $result = & "$signtoolPath" sign /f "$bundlePath\Certificate.pfx" /p sparrow123 /tr http://timestamp.digicert.com /td sha256 /fd sha256 /v "$($file.FullName)" 2>&1
-                  if ($LASTEXITCODE -eq 0) {
-                      Write-Host "Successfully signed: $($file.Name)" -ForegroundColor Green
-                  } else {
-                      Write-Error "Failed to sign $($file.Name): $result"
+              foreach ($exeFile in $exeFiles) {
+                  Write-Host "Signing EXE: $($exeFile.FullName)"
+                  & $env:SIGNTOOL_PATH sign /f "$bundlePath\Certificate.pfx" /p "sparrow123" /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "$($exeFile.FullName)"
+                  if ($LASTEXITCODE -ne 0) {
+                      throw "❌ Failed to sign EXE: $($exeFile.Name)"
                   }
+                  Write-Host "✅ Successfully signed EXE: $($exeFile.Name)"
               }
           } else {
-              Write-Warning "No EXE files found in $bundlePath\nsis\"
+              Write-Host "⚠️ No EXE files found in $bundlePath\nsis\"
           }
           
           # Debug: List all files in the bundle directory
           Write-Host "`nBundle directory contents:"
           Get-ChildItem $bundlePath -Recurse | ForEach-Object {
-              Write-Host "  $($_.FullName)"
+              Write-Host $_.FullName
           }
         shell: pwsh
 
@@ -252,6 +248,7 @@ jobs:
           # Find the actual bundle path dynamically
           $possiblePaths = @(
               "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
+              "C:\Users\runneradmin\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
               "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
           )
           
@@ -259,19 +256,19 @@ jobs:
           foreach ($path in $possiblePaths) {
               if (Test-Path $path) {
                   $bundlePath = $path
-                  Write-Host "Found bundle path: $bundlePath"
+                  Write-Host "Found bundle path at: $bundlePath"
                   break
               }
           }
           
           if (-not $bundlePath) {
-              throw "Could not find bundle directory for S3 upload"
+              throw "❌ Bundle path not found"
           }
           
           # Check if msi directory exists
           $msiPath = "$bundlePath\msi"
           if (-not (Test-Path $msiPath)) {
-              throw "MSI directory not found at: $msiPath"
+              throw "❌ MSI directory not found at $msiPath"
           }
           
           # Get current date-time in format YYYYMMDD_HHMMSS
@@ -279,16 +276,15 @@ jobs:
           
           # Rename MSI files with timestamp before uploading
           Get-ChildItem "$msiPath\*.msi" | ForEach-Object {
-              $newName = $_.BaseName + "_" + $dateTimeStamp + $_.Extension
-              $newPath = Join-Path -Path $msiPath -ChildPath $newName
-              Rename-Item -Path $_.FullName -NewName $newName
-              Write-Host "Renamed $($_.Name) to $newName"
+              $newName = $_.BaseName + "_$dateTimeStamp" + $_.Extension
+              $newPath = Join-Path $_.DirectoryName $newName
+              Copy-Item $_.FullName $newPath
           }
           
           # List files before upload for debugging
           Write-Host "Files in MSI directory:"
           Get-ChildItem $msiPath | ForEach-Object {
-              Write-Host "  $($_.Name) - $($_.Length) bytes"
+              Write-Host $_.Name
           }
           
           # Test AWS connectivity
@@ -302,7 +298,7 @@ jobs:
           if ($LASTEXITCODE -eq 0) {
               Write-Host "S3 upload completed successfully" -ForegroundColor Green
           } else {
-              throw "S3 upload failed with exit code: $LASTEXITCODE"
+              throw "S3 upload failed with exit code $LASTEXITCODE"
           }
         shell: pwsh
 
@@ -310,62 +306,58 @@ jobs:
         run: |
           $possiblePaths = @(
               "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
+              "C:\Users\runneradmin\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
               "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
           )
           $bundlePath = $null
           foreach ($path in $possiblePaths) {
-              if (Test-Path $path) {
-                  $bundlePath = $path
-                  break
-              }
+              if (Test-Path $path) { $bundlePath = $path; break }
           }
           if (-not $bundlePath) {
-              throw "Could not find bundle directory for Teams notification"
+              throw "❌ Bundle path not found"
           }
           $msiFile = Get-ChildItem -Path "$bundlePath\msi\*.msi" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
           if (-not $msiFile) {
-              throw "No MSI file found in $bundlePath\msi\"
+              throw "❌ No MSI file found"
           }
           $msiFileName = $msiFile.Name
           $msiUrl = "https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/windows/$msiFileName"
           $buildDate = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
           $body = @{
-            "type" = "message"
-            "attachments" = @(
-              @{
-                "contentType" = "application/vnd.microsoft.card.adaptive"
-                "content" = @{
-                  "type" = "AdaptiveCard"
-                  "body" = @(
-                    @{
-                      "type" = "TextBlock"
-                      "text" = "🚀 New Windows Build Available"
-                      "weight" = "bolder"
-                      "size" = "large"
-                    }
-                    @{
-                      "type" = "TextBlock"
-                      "text" = "Branch: development"
-                      "wrap" = $true
-                    }
-                    @{
-                      "type" = "TextBlock"
-                      "text" = "Build Date: $buildDate"
-                      "wrap" = $true
-                    }
-                  )
-                  "actions" = @(
-                    @{
-                      "type" = "Action.OpenUrl"
-                      "title" = "📥 Download Windows Installer (.msi)"
-                      "url" = $msiUrl
-                    }
-                  )
-                  "$schema" = "http://adaptivecards.io/schemas/adaptive-card.json"
-                  "version" = "1.2"
-                }
-              }
-            )
+              type = "message"
+              attachments = @(
+                  @{
+                      contentType = "application/vnd.microsoft.card.adaptive"
+                      content = @{
+                          type = "AdaptiveCard"
+                          version = "1.4"
+                          body = @(
+                              @{
+                                  type = "TextBlock"
+                                  size = "Large"
+                                  weight = "Bolder"
+                                  text = "🪟 Windows Build - PR Branch: ${{ inputs.branch }}"
+                                  wrap = $true
+                              }
+                              @{
+                                  type = "TextBlock"
+                                  text = "Build Date: $buildDate"
+                                  wrap = $true
+                              }
+                              @{
+                                  type = "ActionSet"
+                                  actions = @(
+                                      @{
+                                          type = "Action.OpenUrl"
+                                          title = "Download MSI"
+                                          url = $msiUrl
+                                      }
+                                  )
+                              }
+                          )
+                      }
+                  }
+              )
           }
           $jsonBody = $body | ConvertTo-Json -Depth 10
           Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
@@ -379,6 +371,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
 
       - name: Use latest stable Xcode
         uses: maxim-lobanov/setup-xcode@v1
@@ -415,8 +409,8 @@ jobs:
         run: |
           sed -i '' 's/dev.sparrowapp.desktop/com.sparrow.app/g' apps/@sparrow-desktop/src-tauri/Info.plist
           sed -i '' '/"macOS": {/,/},/ {
-              /"entitlements":.*/d
-              /"minimumSystemVersion":.*/d
+              /"providerShortName":/d
+              /"signingIdentity":/d
               /"files": {/,/      }/d
           }' apps/@sparrow-desktop/src-tauri/tauri.conf.json
         shell: bash
@@ -548,171 +542,41 @@ jobs:
 
           curl -H "Content-Type: application/json" -d "{
             \"type\": \"message\",
-            \"attachments\": [
-              {
-                \"contentType\": \"application/vnd.microsoft.card.adaptive\",
-                \"content\": {
-                  \"type\": \"AdaptiveCard\",
-                  \"body\": [
-                    {
-                      \"type\": \"TextBlock\",
-                      \"text\": \"🍎 New macOS Builds Available\",
-                      \"weight\": \"bolder\",
-                      \"size\": \"large\"
-                    },
-                    {
-                      \"type\": \"TextBlock\",
-                      \"text\": \"Branch: development\",
-                      \"wrap\": true
-                    },
-                    {
-                      \"type\": \"TextBlock\",
-                      \"text\": \"Build Date: $(date +'%Y-%m-%d %H:%M:%S')\",
-                      \"wrap\": true
-                    }
-                  ],
-                  \"actions\": [
-                    {
-                      \"type\": \"Action.OpenUrl\",
-                      \"title\": \"📥 Download Apple Silicon (arm64)\",
-                      \"url\": \"$ARM64_URL\"
-                    },
-                    {
-                      \"type\": \"Action.OpenUrl\",
-                      \"title\": \"📥 Download Intel (x86_64)\",
-                      \"url\": \"$INTEL_URL\"
-                    }
-                  ],
-                  \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
-                  \"version\": \"1.2\"
-                }
+            \"attachments\": [{
+              \"contentType\": \"application/vnd.microsoft.card.adaptive\",
+              \"content\": {
+                \"type\": \"AdaptiveCard\",
+                \"version\": \"1.4\",
+                \"body\": [
+                  {
+                    \"type\": \"TextBlock\",
+                    \"size\": \"Large\",
+                    \"weight\": \"Bolder\",
+                    \"text\": \"🍎 macOS Build - PR Branch: ${{ inputs.branch }}\",
+                    \"wrap\": true
+                  },
+                  {
+                    \"type\": \"TextBlock\",
+                    \"text\": \"Build Date: $(date +'%Y-%m-%d %H:%M:%S')\",
+                    \"wrap\": true
+                  },
+                  {
+                    \"type\": \"ActionSet\",
+                    \"actions\": [
+                      {
+                        \"type\": \"Action.OpenUrl\",
+                        \"title\": \"Download ARM64 (Apple Silicon)\",
+                        \"url\": \"$ARM64_URL\"
+                      },
+                      {
+                        \"type\": \"Action.OpenUrl\",
+                        \"title\": \"Download Intel (x86_64)\",
+                        \"url\": \"$INTEL_URL\"
+                      }
+                    ]
+                  }
+                ]
               }
-            ]
+            }]
           }" "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL}}"
-        shell: bash
-
-  release_linux:
-    runs-on: ubuntu-latest
-    environment: development
-    needs: release_win
-
-    env:
-      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-      CI: false
-
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
-      - name: Setup Rust 1.82.0
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: 1.82.0
-          override: true
-
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y \
-            pkg-config libssl-dev libcairo2-dev \
-            libwebkit2gtk-4.1-dev build-essential \
-            curl wget file libxdo-dev \
-            libayatana-appindicator3-dev librsvg2-dev \
-            gnupg software-properties-common tree
-
-      - name: Setup Node.js 22
-        run: |
-          curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-          sudo apt-get install -y nodejs
-
-      - name: Install Yarn (Ubuntu 24.04 compatible)
-        run: |
-          sudo yarn cache clean
-          sudo mkdir -p /etc/apt/keyrings
-          curl -fsSL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/yarn.gpg
-          echo "deb [signed-by=/etc/apt/keyrings/yarn.gpg] https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-          sudo apt update
-          sudo apt install -y yarn
-
-
-      - name: Install project dependencies
-        run: yarn
-
-      - name: Update updater endpoint in tauri.conf.json file
-        run: |
-          content=$(<apps/@sparrow-desktop/src-tauri/tauri.conf.json)
-          newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_DEV }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
-          echo "$newContent" > apps/@sparrow-desktop/src-tauri/tauri.conf.json
-        shell: bash
-
-      - name: Build Tauri app
-        run: |
-          yarn cache clean
-          npm install -g pnpm
-          yarn install
-          yarn workspace @sparrow/desktop tauri build --bundles deb 
-          # yarn workspace @sparrow/desktop tauri build --debug --bundles deb
-
-      - name: Upload to S3 bucket
-        uses: jakejarvis/s3-sync-action@master
-        with:
-          args: --delete
-        env:
-          AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ vars.AWS_REGION }}
-          SOURCE_DIR: apps/@sparrow-desktop/src-tauri/target/release/bundle/deb
-          DEST_DIR: linux 
-
-      - name: Post Linux Build Link to Teams
-        env:
-          AWS_S3_BUCKET: ${{ vars.AWS_S3_BUCKET }}
-          AWS_REGION: ${{ vars.AWS_REGION }}
-          TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
-        run: |
-          DEB_SRC_DIR="apps/@sparrow-desktop/src-tauri/target/release/bundle/deb"
-          DEB_FILE=$(ls "$DEB_SRC_DIR"/*.deb | sort -V | tail -n 1)
-          DEB_BASENAME=$(basename "$DEB_FILE")
-          DEB_URL="https://sparrow-assest.s3.us-east-1.amazonaws.com/linux/$DEB_BASENAME"
-          BUILD_DATE=$(date +'%Y-%m-%d %H:%M:%S')
-          curl -H "Content-Type: application/json" -d "{
-            \"type\": \"message\",
-            \"attachments\": [
-              {
-                \"contentType\": \"application/vnd.microsoft.card.adaptive\",
-                \"content\": {
-                  \"type\": \"AdaptiveCard\",
-                  \"body\": [
-                    {
-                      \"type\": \"TextBlock\",
-                      \"text\": \"🐧 New Debian Build Available\",
-                      \"weight\": \"bolder\",
-                      \"size\": \"large\"
-                    },
-                    {
-                      \"type\": \"TextBlock\",
-                      \"text\": \"Branch: development\",
-                      \"wrap\": true
-                    },
-                    {
-                      \"type\": \"TextBlock\",
-                      \"text\": \"Build Date: $BUILD_DATE\",
-                      \"wrap\": true
-                    }
-                  ],
-                  \"actions\": [
-                    {
-                      \"type\": \"Action.OpenUrl\",
-                      \"title\": \"📥 Download linux deb package\",
-                      \"url\": \"$DEB_URL\"
-                    }
-                  ],
-                  \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
-                  \"version\": \"1.2\"
-                }
-              }
-            ]
-          }" "$TEAMS_WEBHOOK_URL"
         shell: bash
