@@ -1893,6 +1893,16 @@ class RestExplorerViewModel {
     makeHttpRequestV2(...decodeData, signal)
       .then(async (response) => {
         if (response.isSuccessful === false) {
+          // Calculate new response version before using it
+          let newResponseVersion = 0;
+          restExplorerDataStore.update((restApiDataMap) => {
+            const data = restApiDataMap.get(progressiveTab?.tabId);
+            if (data) {
+              newResponseVersion = (data.response.responseVersion ?? 0) + 1;
+            }
+            return restApiDataMap;
+          });
+
           // Reset editor cache for new response
           resetEditorForNewResponse(progressiveTab.tabId);
 
@@ -1905,8 +1915,7 @@ class RestExplorerViewModel {
               data.response.time = 0;
               data.response.size = 0;
               data.response.isFileBacked = false;
-              data.response.responseVersion =
-                (data.response.responseVersion ?? 0) + 1;
+              data.response.responseVersion = newResponseVersion;
               data.isSendRequestInProgress = false;
             }
             restApiDataMap.set(progressiveTab.tabId, data);
@@ -1943,6 +1952,16 @@ class RestExplorerViewModel {
             bodyLanguage,
           );
 
+          // Calculate new response version before using it
+          let newResponseVersion = 0;
+          restExplorerDataStore.update((restApiDataMap) => {
+            const data = restApiDataMap.get(progressiveTab?.tabId);
+            if (data) {
+              newResponseVersion = (data.response.responseVersion ?? 0) + 1;
+            }
+            return restApiDataMap;
+          });
+
           // Reset editor cache for new response
           resetEditorForNewResponse(progressiveTab.tabId);
 
@@ -1952,9 +1971,14 @@ class RestExplorerViewModel {
           if (useFileBacked) {
             // Write large response to temp file
             try {
-              await writeResponseArtifact(progressiveTab.tabId, responseBody);
+              await writeResponseArtifact(
+                progressiveTab.tabId,
+                String(newResponseVersion),
+                responseBody,
+              );
               await prewarmFormattedResponses(
                 progressiveTab.tabId,
+                String(newResponseVersion),
                 initialFormatsToWarm,
               );
               const backgroundFormats = ALL_RESPONSE_FORMATS.filter(
@@ -1963,6 +1987,7 @@ class RestExplorerViewModel {
               if (backgroundFormats.length) {
                 void prewarmFormattedResponses(
                   progressiveTab.tabId,
+                  String(newResponseVersion),
                   backgroundFormats,
                 );
               }
@@ -1982,8 +2007,7 @@ class RestExplorerViewModel {
               data.response.size = responseSizeKB;
               data.response.bodyLanguage = bodyLanguage;
               data.response.isFileBacked = useFileBacked;
-              data.response.responseVersion =
-                (data.response.responseVersion ?? 0) + 1;
+              data.response.responseVersion = newResponseVersion;
               data.isSendRequestInProgress = false;
             }
             restApiDataMap.set(progressiveTab.tabId, data);
@@ -1999,6 +2023,16 @@ class RestExplorerViewModel {
           return;
         }
 
+        // Calculate new response version before using it
+        let newResponseVersion = 0;
+        restExplorerDataStore.update((restApiDataMap) => {
+          const data = restApiDataMap.get(progressiveTab?.tabId);
+          if (data) {
+            newResponseVersion = (data.response.responseVersion ?? 0) + 1;
+          }
+          return restApiDataMap;
+        });
+
         // Reset editor cache for new response
         resetEditorForNewResponse(progressiveTab.tabId);
 
@@ -2012,8 +2046,7 @@ class RestExplorerViewModel {
             data.response.time = 0;
             data.response.size = 0;
             data.response.isFileBacked = false;
-            data.response.responseVersion =
-              (data.response.responseVersion ?? 0) + 1;
+            data.response.responseVersion = newResponseVersion;
             data.isSendRequestInProgress = false;
           }
           restApiDataMap.set(progressiveTab.tabId, data);
