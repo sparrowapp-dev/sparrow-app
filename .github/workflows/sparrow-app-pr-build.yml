@@ -1,0 +1,502 @@
+name: PR Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to build'
+        required: true
+        type: string
+
+env:
+  VITE_API_URL: ${{ vars.VITE_API_URL_DEV }}
+  VITE_MIX_PANEL_TOKEN: ${{ vars.VITE_MIX_PANEL_TOKEN }}
+  VITE_ENABLE_MIX_PANEL: ${{ vars.VITE_ENABLE_MIX_PANEL_DEV }}
+  VITE_API_TIMEOUT: ${{ vars.VITE_API_TIMEOUT }}
+  VITE_SPARROW_SUPPORT_EMAIL: ${{ vars.VITE_SPARROW_SUPPORT_EMAIL }}
+  VITE_AUTH_URL: ${{ vars.VITE_AUTH_URL_DEV }}
+  VITE_SPARROW_GITHUB: ${{ vars.VITE_SPARROW_GITHUB }}
+  VITE_SPARROW_DOWNLOAD_LINK: ${{ vars.VITE_SPARROW_DOWNLOAD_LINK }}
+  VITE_RELEASE_NOTES_PAT_TOKEN: ${{ secrets.VITE_RELEASE_NOTES_PAT_TOKEN }}
+  VITE_RELEASE_NOTES_API: ${{ vars.VITE_RELEASE_NOTES_API }}
+  VITE_AZURE_CDN_URL: ${{ vars.VITE_AZURE_CDN_URL }}
+  VITE_AZURE_INSIGHTS_CONNECTION_STRING: ${{ vars.VITE_AZURE_INSIGHTS_CONNECTION_STRING }}
+  VITE_OPENFEEDBACK_API: ${{ vars.VITE_OPENFEEDBACK_API }}
+  VITE_OPENFEEDBACK_URL: ${{ vars.VITE_OPENFEEDBACK_URL }}
+  VITE_OPENFEEDBACK_BOARD_ID: ${{ vars.VITE_OPENFEEDBACK_BOARD_ID }}
+  VITE_BASE_URL: ${{ vars.VITE_BASE_URL }}
+  VITE_SPARROW_LINKEDIN: ${{ vars.VITE_SPARROW_LINKEDIN }}
+  VITE_WEB_SOCKET_IO_API_URL: ${{ vars.VITE_WEB_SOCKET_IO_API_URL }}
+  VITE_SPARROW_DOCS: ${{ vars.VITE_SPARROW_DOCS }}
+  VITE_SPARROW_AI_WEBSOCKET: ${{ vars.VITE_SPARROW_AI_WEBSOCKET }}
+  VITE_APP_ENVIRONMENT_PATH: ${{ vars.VITE_APP_ENVIRONMENT_PATH }}
+  VITE_SPARROW_WEB_APP_URL: ${{ vars.VITE_SPARROW_WEB_APP_URL }}
+  VITE_MARKETING_URL: ${{ vars.VITE_MARKETING_URL }}
+  VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
+  VITE_APP_ENVIRONMENT: ${{ vars.VITE_APP_ENVIRONMENT }}
+  VITE_POSTHOG_CONNECTION_API_KEY: ${{ vars.VITE_POSTHOG_CONNECTION_API_KEY }}
+  VITE_POSTHOG_API_URL: ${{ vars.VITE_POSTHOG_API_URL }}
+  VITE_SPARROW_ADMIN_URL: ${{ vars.VITE_SPARROW_ADMIN_URL }}
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+  CI: false
+
+jobs:
+  release_win:
+    runs-on: windows-latest
+    environment: development
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "20.x"
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1
+
+      - name: Install Rust 1.82.0
+        run: |
+          Invoke-WebRequest -Uri https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe -OutFile rustup-init.exe
+          .\rustup-init.exe -y
+          rustup install 1.82.0
+          rustup default 1.82.0
+
+      - name: Update updater endpoint in tauri.conf.json file
+        run: |
+          $content = Get-Content apps/@sparrow-desktop/src-tauri/tauri.conf.json -Raw
+          $newContent = $content -replace '"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"', '"https://${{ secrets.UPDATER_ENDPOINT_DEV }}/updater/{{target}}/{{arch}}/{{current_version}}"'
+          Set-Content -Path apps/@sparrow-desktop/src-tauri/tauri.conf.json -Value $newContent
+        shell: pwsh
+
+      - name: Increase Yarn network timeout
+        run: yarn config set network-timeout 600000
+
+      - name: Update @tauri-apps/* versions in desktop package.json from root
+        run: |
+          $rootPkg = Get-Content package.json | ConvertFrom-Json
+          $desktopPkgPath = "apps/@sparrow-desktop/package.json"
+          $desktopPkg = Get-Content $desktopPkgPath | ConvertFrom-Json
+          $tauriPackages = @(
+            "@tauri-apps/api",
+            "@tauri-apps/cli",
+            "@tauri-apps/plugin-clipboard-manager",
+            "@tauri-apps/plugin-dialog",
+            "@tauri-apps/plugin-fs",
+            "@tauri-apps/plugin-os",
+            "@tauri-apps/plugin-process",
+            "@tauri-apps/plugin-shell",
+            "@tauri-apps/plugin-updater"
+          )
+          foreach ($pkg in $tauriPackages) {
+            if ($rootPkg.devDependencies.$pkg) {
+              $desktopPkg.devDependencies.$pkg = $rootPkg.devDependencies.$pkg
+            }
+          }
+          $desktopPkg | ConvertTo-Json -Depth 20 | Set-Content $desktopPkgPath
+        shell: pwsh
+
+      - name: Add createUpdaterArtifacts to bundle in tauri.conf.json
+        run: |
+          $confPath = "apps/@sparrow-desktop/src-tauri/tauri.conf.json"
+          $json = Get-Content $confPath -Raw | ConvertFrom-Json
+
+          if ($null -ne $json.bundle) {
+            if ($null -eq $json.bundle.windows) {
+              $json.bundle | Add-Member -MemberType NoteProperty -Name "windows" -Value @{}
+            }
+            $json.bundle.windows | Add-Member -MemberType NoteProperty -Name "createUpdaterArtifacts" -Value "v1Compatible" -Force
+          }
+
+          $json | ConvertTo-Json -Depth 20 | Set-Content $confPath
+        shell: pwsh
+
+      - name: Build Tauri App
+        run: |
+          yarn cache clean
+          npm install -g pnpm
+          yarn install
+          yarn desktop-build
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+      
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'    
+
+      - name: Verify preinstalled Windows SDK tools
+        shell: pwsh
+        run: |
+          Write-Host "🔎 Looking for signtool.exe"
+          $signtool = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter signtool.exe | Where-Object FullName -Match '\\x64\\signtool\.exe$' | Select-Object -First 1
+          
+          if (-not $signtool) { throw "❌ signtool.exe not found!" }
+          
+          Write-Host "✅ signtool.exe found at $($signtool.FullName)"
+
+          # Export paths for later steps
+          echo "SIGNTOOL_PATH=$($signtool.FullName)" >> $env:GITHUB_ENV
+
+      - name: sign msi
+        run: |
+          # Create self-signed certificate
+          $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
+          
+          # Convert password to secure string
+          $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
+          
+          # Find the actual bundle path dynamically (check both D: and C: drives)
+          $possiblePaths = @(
+              "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
+              "C:\Users\runneradmin\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
+              "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
+          )
+          
+          $bundlePath = $null
+          foreach ($path in $possiblePaths) {
+              if (Test-Path $path) {
+                  $bundlePath = $path
+                  Write-Host "Found bundle path at: $bundlePath"
+                  break
+              }
+          }
+          
+          if (-not $bundlePath) {
+              throw "❌ Bundle path not found in any of the expected locations"
+          }
+          
+          # Export certificate with password parameter (THIS WAS MISSING)
+          Export-PfxCertificate -Cert "Cert:\LocalMachine\My\$($cert.Thumbprint)" -FilePath "$bundlePath\Certificate.pfx" -Password $password
+          
+          # Verify the certificate file was created
+          if (-not (Test-Path "$bundlePath\Certificate.pfx")) {
+              throw "❌ Certificate file was not created successfully"
+          }
+          
+          Write-Host "Certificate exported successfully to: $bundlePath\Certificate.pfx"
+          
+          # Find and sign MSI files individually
+          $msiFiles = Get-ChildItem "$bundlePath\msi\*.msi" -ErrorAction SilentlyContinue
+          if ($msiFiles) {
+              foreach ($msiFile in $msiFiles) {
+                  Write-Host "Signing MSI: $($msiFile.FullName)"
+                  & $env:SIGNTOOL_PATH sign /f "$bundlePath\Certificate.pfx" /p "sparrow123" /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "$($msiFile.FullName)"
+                  if ($LASTEXITCODE -ne 0) {
+                      throw "❌ Failed to sign MSI: $($msiFile.Name)"
+                  }
+                  Write-Host "✅ Successfully signed MSI: $($msiFile.Name)"
+              }
+          } else {
+              Write-Host "⚠️ No MSI files found in $bundlePath\msi\"
+          }
+          
+          # Find and sign EXE files individually
+          $exeFiles = Get-ChildItem "$bundlePath\nsis\*.exe" -ErrorAction SilentlyContinue
+          if ($exeFiles) {
+              foreach ($exeFile in $exeFiles) {
+                  Write-Host "Signing EXE: $($exeFile.FullName)"
+                  & $env:SIGNTOOL_PATH sign /f "$bundlePath\Certificate.pfx" /p "sparrow123" /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "$($exeFile.FullName)"
+                  if ($LASTEXITCODE -ne 0) {
+                      throw "❌ Failed to sign EXE: $($exeFile.Name)"
+                  }
+                  Write-Host "✅ Successfully signed EXE: $($exeFile.Name)"
+              }
+          } else {
+              Write-Host "⚠️ No EXE files found in $bundlePath\nsis\"
+          }
+          
+          # Debug: List all files in the bundle directory
+          Write-Host "`nBundle directory contents:"
+          Get-ChildItem $bundlePath -Recurse | ForEach-Object {
+              Write-Host $_.FullName
+          }
+        shell: pwsh
+
+      - name: Regenerate MSI updater signature after signing MSI
+        run: |
+          $msiPath = "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi"
+          $msiFile = Get-ChildItem "$msiPath\*.msi" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if (-not $msiFile) { throw "No MSI file found to sign" }
+          # Regenerate signature using Tauri updater CLI with key and password
+          yarn tauri signer sign -k "$env:TAURI_SIGNING_PRIVATE_KEY" -p "$env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD" "$($msiFile.FullName)"
+        shell: pwsh
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+
+      - name: Print MSI Updater Signature
+        run: Get-Content D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle\msi\*.msi.sig
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Upload files to S3
+        run: |
+          # Find the actual bundle path dynamically
+          $possiblePaths = @(
+              "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
+              "C:\Users\runneradmin\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
+              "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
+          )
+          
+          $bundlePath = $null
+          foreach ($path in $possiblePaths) {
+              if (Test-Path $path) {
+                  $bundlePath = $path
+                  Write-Host "Found bundle path at: $bundlePath"
+                  break
+              }
+          }
+          
+          if (-not $bundlePath) {
+              throw "❌ Bundle path not found"
+          }
+          
+          # Check if msi directory exists
+          $msiPath = "$bundlePath\msi"
+          if (-not (Test-Path $msiPath)) {
+              throw "❌ MSI directory not found at $msiPath"
+          }
+          
+          # Get current date-time in format YYYYMMDD_HHMMSS
+          $dateTimeStamp = Get-Date -Format "yyyyMMdd_HHmmss"
+          
+          # Rename MSI files with timestamp before uploading
+          Get-ChildItem "$msiPath\*.msi" | ForEach-Object {
+              $newName = $_.BaseName + "_$dateTimeStamp" + $_.Extension
+              $newPath = Join-Path $_.DirectoryName $newName
+              Copy-Item $_.FullName $newPath
+          }
+          
+          # List files before upload for debugging
+          Write-Host "Files in MSI directory:"
+          Get-ChildItem $msiPath | ForEach-Object {
+              Write-Host $_.Name
+          }
+          
+          # Test AWS connectivity
+          Write-Host "Testing AWS connectivity..."
+          aws sts get-caller-identity
+          
+          # Upload to S3
+          Write-Host "Starting S3 upload..."
+          aws s3 sync "$msiPath" s3://sparrow-release-assests-dev/windows --exclude "*" --include "*.zip" --include "*.msi" --include "*.msi.sig"
+
+          if ($LASTEXITCODE -eq 0) {
+              Write-Host "S3 upload completed successfully" -ForegroundColor Green
+          } else {
+              throw "S3 upload failed with exit code $LASTEXITCODE"
+          }
+        shell: pwsh
+
+      - name: Post Windows Build Links to Teams
+        run: |
+          $possiblePaths = @(
+              "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
+              "C:\Users\runneradmin\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
+              "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
+          )
+          $bundlePath = $null
+          foreach ($path in $possiblePaths) {
+              if (Test-Path $path) { $bundlePath = $path; break }
+          }
+          if (-not $bundlePath) {
+              throw "❌ Bundle path not found"
+          }
+          $msiFile = Get-ChildItem -Path "$bundlePath\msi\*.msi" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if (-not $msiFile) {
+              throw "❌ No MSI file found"
+          }
+          $msiFileName = $msiFile.Name
+          $msiUrl = "https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/windows/$msiFileName"
+          $buildDate = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+          $body = @{
+              type = "message"
+              attachments = @(
+                  @{
+                      contentType = "application/vnd.microsoft.card.adaptive"
+                      content = @{
+                          type = "AdaptiveCard"
+                          version = "1.4"
+                          body = @(
+                              @{
+                                  type = "TextBlock"
+                                  size = "Large"
+                                  weight = "Bolder"
+                                  text = "🪟 Windows Build - PR Branch: ${{ inputs.branch }}"
+                                  wrap = $true
+                              }
+                              @{
+                                  type = "TextBlock"
+                                  text = "Build Date: $buildDate"
+                                  wrap = $true
+                              }
+                              @{
+                                  type = "ActionSet"
+                                  actions = @(
+                                      @{
+                                          type = "Action.OpenUrl"
+                                          title = "Download MSI"
+                                          url = $msiUrl
+                                      }
+                                  )
+                              }
+                          )
+                      }
+                  }
+              )
+          }
+          $jsonBody = $body | ConvertTo-Json -Depth 10
+          Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
+        shell: pwsh
+
+  release_macos:
+    runs-on: macos-latest
+    environment: development
+    needs: release_win
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: Use latest stable Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Install Rust 1.82.0 and add macOS targets
+        shell: bash
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          rustup install 1.82.0
+          rustup default 1.82.0
+          rustup target add x86_64-apple-darwin
+          rustup target add aarch64-apple-darwin
+
+      - name: Sync node version and setup cache
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20.8"
+
+      - name: Install project dependencies
+        run: |
+          yarn cache clean
+          yarn install
+
+      - name: Update updater endpoint in tauri.conf.json file
+        run: |
+          content=$(<apps/@sparrow-desktop/src-tauri/tauri.conf.json)
+          newContent=$(echo "$content" | sed 's|"https://{{UPDATER_URL}}/updater/{{target}}/{{arch}}/{{current_version}}"|"https://${{ secrets.UPDATER_ENDPOINT_DEV }}/updater/{{target}}/{{arch}}/{{current_version}}"|g')
+          echo "$newContent" > apps/@sparrow-desktop/src-tauri/tauri.conf.json
+        shell: bash
+
+      - name: Remove App Store specific properties
+        run: |
+          sed -i '' 's/dev.sparrowapp.desktop/com.sparrow.app/g' apps/@sparrow-desktop/src-tauri/Info.plist
+          sed -i '' '/"macOS": {/,/},/ {
+              /"providerShortName":/d
+              /"signingIdentity":/d
+              /"files": {/,/      }/d
+          }' apps/@sparrow-desktop/src-tauri/tauri.conf.json
+        shell: bash
+
+      - name: Increase Yarn network timeout
+        run: yarn config set network-timeout 600000
+
+      # ------- ARM64 (Apple Silicon) build -------
+      - name: Build & Sign Tauri App (Apple Silicon / arm64)
+        env:
+          APPLE_SIGNING_IDENTITY: "${{ secrets.APPLE_SIGNING_IDENTITY }}"
+          APPLE_CERTIFICATE: "${{ secrets.APPLE_CERTIFICATE }}"
+          APPLE_CERTIFICATE_PASSWORD: "${{ secrets.APPLE_CERTIFICATE_PASSWORD }}"
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          CI: "false"
+        run: |
+          yarn desktop-build
+
+      - name: Install AWS CLI
+        run: |
+          curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+          sudo installer -pkg AWSCLIV2.pkg -target /
+          aws --version
+
+      - name: Set build datetime
+        run: echo "BUILD_DATETIME=$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_ENV
+
+      - name: Upload macOS (ARM64) DMG to S3
+        run: |
+          # Upload macOS (ARM64) DMG
+          MX_DMG_SRC_DIR="/Users/runner/work/sparrow-app/sparrow-app/apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg"
+          DMG_FILE=$(ls "$MX_DMG_SRC_DIR"/*.dmg | head -n 1)
+          DMG_BASENAME=$(basename "$DMG_FILE" .dmg)
+          DMG_SUFFIXED_FILE="$MX_DMG_SRC_DIR/${DMG_BASENAME}_${{ env.BUILD_DATETIME }}.dmg"
+          cp "$DMG_FILE" "$DMG_SUFFIXED_FILE"
+          aws s3 cp "$DMG_SUFFIXED_FILE" s3://sparrow-release-assests-dev/macos/
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Post macOS Build Links to Teams
+        run: |
+          ARM64_DMG=$(ls apps/@sparrow-desktop/src-tauri/target/debug/bundle/dmg/*.dmg | head -n 1)
+
+          # Get filenames with datetime suffix
+          ARM64_FILENAME="$(basename "${ARM64_DMG%.dmg}").dmg"
+
+          ARM64_URL="https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/macos/$ARM64_FILENAME"
+
+          curl -H "Content-Type: application/json" -d "{
+            \"type\": \"message\",
+            \"attachments\": [{
+              \"contentType\": \"application/vnd.microsoft.card.adaptive\",
+              \"content\": {
+                \"type\": \"AdaptiveCard\",
+                \"version\": \"1.4\",
+                \"body\": [
+                  {
+                    \"type\": \"TextBlock\",
+                    \"size\": \"Large\",
+                    \"weight\": \"Bolder\",
+                    \"text\": \"🍎 macOS Build - PR Branch: ${{ inputs.branch }}\",
+                    \"wrap\": true
+                  },
+                  {
+                    \"type\": \"TextBlock\",
+                    \"text\": \"Build Date: $(date +'%Y-%m-%d %H:%M:%S')\",
+                    \"wrap\": true
+                  },
+                  {
+                    \"type\": \"ActionSet\",
+                    \"actions\": [
+                      {
+                        \"type\": \"Action.OpenUrl\",
+                        \"title\": \"Download ARM64 (Apple Silicon)\",
+                        \"url\": \"$ARM64_URL\"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }]
+          }" "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL}}"
+        shell: bash
