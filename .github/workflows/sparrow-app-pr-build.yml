@@ -7,6 +7,11 @@ on:
         description: 'Branch to build'
         required: true
         type: string
+      repository:
+        description: 'Repository to build from (e.g., owner/repo)'
+        required: true
+        type: string
+        default: 'sparrowapp-dev/sparrow-app'
 
 env:
   VITE_API_URL: ${{ vars.VITE_API_URL_DEV }}
@@ -49,6 +54,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
+          repository: ${{ inputs.repository }}
           ref: ${{ inputs.branch }}
 
       - name: Setup Node.js
@@ -372,6 +378,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
+          repository: ${{ inputs.repository }}
           ref: ${{ inputs.branch }}
 
       - name: Use latest stable Xcode
