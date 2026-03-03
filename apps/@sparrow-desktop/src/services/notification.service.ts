@@ -2,6 +2,8 @@ import { makeRequest, getAuthHeaders } from "@app/containers/api/api.common";
 import constants from "@app/constants/constants";
 import { getSelfhostUrls } from "@app/utils/jwt";
 import { setNotifications, loadingNotifications } from "@sparrow/common/store";
+import { get } from "svelte/store";
+import { user } from "@app/store/auth.store";
 
 export class NotificationService {
   private apiUrl: string = constants.API_URL;
@@ -96,6 +98,12 @@ export class NotificationService {
     return response;
   };
   public loadNotificationsToStore = async () => {
+    const currentUser = get(user);
+
+    // DO NOT call API if user not logged in
+    if (!currentUser?._id) {
+      return;
+    }
     try {
       loadingNotifications.set(true);
 
