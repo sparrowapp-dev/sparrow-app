@@ -28,6 +28,7 @@ jobs:
       branch:     ${{ steps.pr_info.outputs.branch }}
       sha:        ${{ steps.pr_info.outputs.sha }}
       pr_number:  ${{ steps.pr_info.outputs.pr_number }}
+      repo:       ${{ steps.pr_info.outputs.repo }}
 
     steps:
       # Step 1 — Ensure this is a /build comment on a PR (not a plain issue)
@@ -175,20 +176,20 @@ jobs:
               owner:        context.repo.owner,
               repo:         context.repo.repo,
               body: [
-                "🚀 **Build triggered** for branch `${{ needs.validate.outputs.branch }}`.",
+                "🚀 **Build triggered** for branch `${{ needs.validate.outputs.branch }}` from `${{ needs.validate.outputs.repo }}`.",
                 "",
                 "⏳ Build is currently in progress. You will receive a status update here once it completes."
               ].join("\n")
             });
 
-      # Step 3 — Dispatch the PR build workflow with the source branch
+      # Step 3 — Dispatch the PR build workflow with the source branch and repository
       - name: Trigger PR Build Workflow
         id: dispatch
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: sparrow-app-pr-build.yml
           ref:      development
-          inputs: '{"branch": "${{ needs.validate.outputs.branch }}"}'
+          inputs: '{"branch": "${{ needs.validate.outputs.branch }}", "repository": "${{ needs.validate.outputs.repo }}"}'
           token:    ${{ secrets.PAT_TOKEN }}
 
       # Step 4 — Set commit status to success after dispatch
@@ -218,7 +219,7 @@ jobs:
               owner:        context.repo.owner,
               repo:         context.repo.repo,
               body: [
-                "✅ **Build dispatched successfully** for branch `${{ needs.validate.outputs.branch }}`.",
+                "✅ **Build dispatched successfully** for branch `${{ needs.validate.outputs.branch }}` from `${{ needs.validate.outputs.repo }}`.",
                 "",
                 "You can monitor the build progress in the [Actions tab](https://github.com/${{ github.repository }}/actions)."
               ].join("\n")
@@ -250,7 +251,7 @@ jobs:
               owner:        context.repo.owner,
               repo:         context.repo.repo,
               body: [
-                "❌ **Build dispatch failed** for branch `${{ needs.validate.outputs.branch }}`.",
+                "❌ **Build dispatch failed** for branch `${{ needs.validate.outputs.branch }}` from `${{ needs.validate.outputs.repo }}`.",
                 "",
                 "Please check the [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for more details."
               ].join("\n")
