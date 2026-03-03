@@ -9,6 +9,7 @@ permissions:
   pull-requests: write
   checks: write
   statuses: write
+  actions: write
 
 concurrency:
   group: pr-build-${{ github.event.issue.number || github.run_id }}
@@ -192,7 +193,7 @@ jobs:
             });
 
       # Step 3 — Dispatch the PR build workflow with the source branch
-      #          Uses a PAT (not GITHUB_TOKEN) as GITHUB_TOKEN cannot trigger workflows
+      #          Uses PAT_TOKEN if available, otherwise falls back to GITHUB_TOKEN
       - name: Trigger PR Build Workflow
         id: dispatch
         uses: benc-uk/workflow-dispatch@v1
@@ -200,7 +201,7 @@ jobs:
           workflow: sparrow-app-pr-build.yml
           ref:      development
           inputs: '{"branch": "${{ needs.validate.outputs.branch }}"}'
-          token:    ${{ secrets.PAT_TOKEN }}
+          token:    ${{ secrets.PAT_TOKEN || github.token }}
 
       # Step 4 — Set commit status to success after dispatch
       #          (Scenario 4 — build feedback posted to PR)
