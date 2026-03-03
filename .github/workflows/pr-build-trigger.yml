@@ -9,6 +9,7 @@ permissions:
   pull-requests: write
   checks: write
   statuses: write
+  actions: write
 
 concurrency:
   group: pr-build-${{ github.event.issue.number || github.run_id }}
@@ -89,17 +90,6 @@ jobs:
             core.setOutput("sha",       sha);
             core.setOutput("repo",      repo);
             core.setOutput("pr_number", pr_number);
-
-            // Block builds from forked repositories
-            if (repo !== `${context.repo.owner}/${context.repo.repo}`) {
-              await github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner:        context.repo.owner,
-                repo:         context.repo.repo,
-                body:         "❌ Builds are not allowed from forked repositories."
-              });
-              core.setFailed("PR is from a fork. Build not allowed.");
-            }
 
       # Step 4 — Install yq to parse the YAML whitelist
       - name: Install yq
@@ -192,7 +182,6 @@ jobs:
             });
 
       # Step 3 — Dispatch the PR build workflow with the source branch
-      #          Uses a PAT (not GITHUB_TOKEN) as GITHUB_TOKEN cannot trigger workflows
       - name: Trigger PR Build Workflow
         id: dispatch
         uses: benc-uk/workflow-dispatch@v1
