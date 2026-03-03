@@ -340,40 +340,42 @@ jobs:
           $msiUrl = "https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/windows/$msiFileName"
           $buildDate = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
           $body = @{
-              type = "message"
-              attachments = @(
-                  @{
-                      contentType = "application/vnd.microsoft.card.adaptive"
-                      content = @{
-                          type = "AdaptiveCard"
-                          version = "1.4"
-                          body = @(
-                              @{
-                                  type = "TextBlock"
-                                  size = "Large"
-                                  weight = "Bolder"
-                                  text = "🪟 Windows Build - PR Branch: ${{ inputs.branch }}"
-                                  wrap = $true
-                              }
-                              @{
-                                  type = "TextBlock"
-                                  text = "Build Date: $buildDate"
-                                  wrap = $true
-                              }
-                              @{
-                                  type = "ActionSet"
-                                  actions = @(
-                                      @{
-                                          type = "Action.OpenUrl"
-                                          title = "Download MSI"
-                                          url = $msiUrl
-                                      }
-                                  )
-                              }
-                          )
-                      }
-                  }
-              )
+            "type" = "message"
+            "attachments" = @(
+              @{
+                "contentType" = "application/vnd.microsoft.card.adaptive"
+                "content" = @{
+                  "type" = "AdaptiveCard"
+                  "body" = @(
+                    @{
+                      "type" = "TextBlock"
+                      "text" = "Windows Preview Build Available"
+                      "weight" = "bolder"
+                      "size" = "large"
+                    }
+                    @{
+                      "type" = "TextBlock"
+                      "text" = "Repository: ${{ inputs.repository }} | Branch: ${{ inputs.branch }}"
+                      "wrap" = $true
+                    }
+                    @{
+                      "type" = "TextBlock"
+                      "text" = "Build Date: $buildDate"
+                      "wrap" = $true
+                    }
+                  )
+                  "actions" = @(
+                    @{
+                      "type" = "Action.OpenUrl"
+                      "title" = "📥 Download Windows Installer (.msi)"
+                      "url" = $msiUrl
+                    }
+                  )
+                  "$schema" = "http://adaptivecards.io/schemas/adaptive-card.json"
+                  "version" = "1.2"
+                }
+              }
+            )
           }
           $jsonBody = $body | ConvertTo-Json -Depth 10
           Invoke-RestMethod -Uri "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}" -Method Post -Body $jsonBody -ContentType 'application/json'
