@@ -1266,6 +1266,16 @@ export class DashboardViewModel {
     redirectPath?: string,
   ) => {
     const [authToken] = getAuthJwt();
+    const [, , selfhostAdminUrl] = getSelfhostUrls();
+
+    if (selfhostAdminUrl) {
+      if (redirectPath) {
+        await open(`${selfhostAdminUrl}${redirectPath}`);
+      } else {
+        await open(selfhostAdminUrl);
+      }
+      return;
+    }
 
     try {
       const response = await fetch(
