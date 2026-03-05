@@ -123,6 +123,8 @@ function formatToContentType(
 export interface FormatOptions {
   /** Tab ID */
   tabId: string;
+  /** Response ID */
+  responseId: string;
   /** Desired format */
   format: ResponseFormat;
   /** Callback for progress updates */
@@ -144,10 +146,10 @@ export interface FormatOptions {
 export async function getFormattedResponse(
   options: FormatOptions,
 ): Promise<string> {
-  const { tabId, format, onProgress, rawContent } = options;
+  const { tabId, responseId, format, onProgress, rawContent } = options;
 
   // Check cache first (works for both file-backed and in-memory)
-  const cachedContent = getCachedContent(tabId, format);
+  const cachedContent = getCachedContent(tabId, responseId, format);
   if (cachedContent) {
     onProgress?.("done");
     return cachedContent;
@@ -157,24 +159,34 @@ export async function getFormattedResponse(
   if (format === "raw") {
     onProgress?.("done");
     if (rawContent !== undefined) {
-      cacheInMemoryContent(tabId, format, rawContent);
+      cacheInMemoryContent(tabId, responseId, format, rawContent);
       return rawContent;
     }
-    return getOrCreateFormattedContent(tabId, format, async (raw) => raw);
+    return getOrCreateFormattedContent(
+      tabId,
+      responseId,
+      format,
+      async (raw) => raw,
+    );
   }
 
   // Check if this is a file-backed response
-  const artifact = getArtifact(tabId);
+  const artifact = getArtifact(tabId, responseId);
 
   if (artifact) {
     // File-backed response - use artifact system
     const contentType = formatToContentType(format);
-    return getOrCreateFormattedContent(tabId, format, async (raw) => {
-      onProgress?.("formatting");
-      const formatted = await formatContent(contentType, raw);
-      onProgress?.("writing");
-      return formatted;
-    });
+    return getOrCreateFormattedContent(
+      tabId,
+      responseId,
+      format,
+      async (raw) => {
+        onProgress?.("formatting");
+        const formatted = await formatContent(contentType, raw);
+        onProgress?.("writing");
+        return formatted;
+      },
+    );
   } else if (rawContent !== undefined) {
     // In-memory response - format and cache
     onProgress?.("formatting");
@@ -182,15 +194,17 @@ export async function getFormattedResponse(
     const formatted = await formatContent(contentType, rawContent);
 
     // Cache the formatted result
-    cacheInMemoryContent(tabId, format, formatted);
+    cacheInMemoryContent(tabId, responseId, format, formatted);
 
     onProgress?.("done");
     return formatted;
   } else {
     console.error(
-      `[FormattingService] No response data available for tab ${tabId}`,
+      `[FormattingService] No response data available for tab ${tabId} response ${responseId}`,
     );
-    throw new Error(`No response data available for tab ${tabId}`);
+    throw new Error(
+      `No response data available for tab ${tabId} response ${responseId}`,
+    );
   }
 }
 
@@ -202,6 +216,7 @@ export async function getFormattedResponse(
  */
 export async function prewarmFormattedResponses(
   tabId: string,
+  responseId: string,
   formats: ResponseFormat[],
 ): Promise<void> {
   const uniqueFormats = Array.from(new Set(formats));
@@ -209,7 +224,7 @@ export async function prewarmFormattedResponses(
 
   for (const format of uniqueFormats) {
     try {
-      await getFormattedResponse({ tabId, format });
+      await getFormattedResponse({ tabId, responseId, format });
     } catch (error) {
       console.warn(
         `[FormattingService] Failed to prewarm format ${format} for tab ${tabId}:`,
@@ -223,18 +238,20 @@ export async function prewarmFormattedResponses(
  * Check if formatted content is immediately available (cached).
  *
  * @param tabId - Tab ID
+ * @param responseId - Response ID
  * @param format - Format type
  */
 export function isFormattedContentReady(
   tabId: string,
+  responseId: string,
   format: ResponseFormat,
 ): boolean {
   // Check in-memory cache first (instant)
-  if (getCachedContent(tabId, format)) {
+  if (getCachedContent(tabId, responseId, format)) {
     return true;
   }
   // Check if file exists (also fast)
-  return hasFormattedFile(tabId, format);
+  return hasFormattedFile(tabId, responseId, format);
 }
 
 /**
@@ -242,19 +259,21 @@ export function isFormattedContentReady(
  * Call this after receiving a response to warm the cache.
  *
  * @param tabId - Tab ID
+ * @param responseId - Response ID
  * @param defaultFormat - Default format to preemptively generate
  */
 export async function preformatResponse(
   tabId: string,
+  responseId: string,
   defaultFormat: ResponseFormat = "json",
 ): Promise<void> {
-  const artifact = getArtifact(tabId);
+  const artifact = getArtifact(tabId, responseId);
   if (!artifact) return;
 
   // Only preformat if not already formatted
-  if (!isFormattedContentReady(tabId, defaultFormat)) {
+  if (!isFormattedContentReady(tabId, responseId, defaultFormat)) {
     try {
-      await getFormattedResponse({ tabId, format: defaultFormat });
+      await getFormattedResponse({ tabId, responseId, format: defaultFormat });
     } catch (e) {
       console.warn("Preformat failed:", e);
     }

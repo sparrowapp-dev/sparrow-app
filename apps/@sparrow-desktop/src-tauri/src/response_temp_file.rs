@@ -21,6 +21,7 @@ static FILE_CACHE: Lazy<Mutex<HashMap<String, ResponseArtifact>>> =
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ResponseArtifact {
     pub tab_id: String,
+    pub response_id: String,
     pub raw_path: String,
     pub pretty_paths: HashMap<String, String>, // format -> path
     pub size_bytes: usize,
@@ -64,10 +65,14 @@ fn sanitize_tab_id(tab_id: &str) -> Option<String> {
 /// Write response body to a temp file
 /// Returns the file path on success
 #[tauri::command]
-pub fn write_response_to_temp(tab_id: String, body: String) -> Result<String, String> {
+pub fn write_response_to_temp(
+    tab_id: String,
+    response_id: String,
+    body: String,
+) -> Result<String, String> {
     let safe_tab_id = sanitize_tab_id(&tab_id).ok_or_else(|| "Invalid tab_id".to_string())?;
     let temp_dir = get_response_temp_dir();
-    let file_name = format!("{}.raw", safe_tab_id);
+    let file_name = format!("{}-{}.raw", safe_tab_id, response_id);
     let file_path = temp_dir.join(&file_name);
 
     let mut file =
@@ -79,17 +84,19 @@ pub fn write_response_to_temp(tab_id: String, body: String) -> Result<String, St
     let size_bytes = body.len();
     let path_str = file_path.to_string_lossy().to_string();
 
-    // Update cache
+    // Update cache with composite key (tab_id:response_id)
+    let cache_key = format!("{}:{}", tab_id, response_id);
     let mut cache = FILE_CACHE
         .lock()
         .map_err(|e| format!("Lock error: {}", e))?;
     let artifact = ResponseArtifact {
         tab_id: tab_id.clone(),
+        response_id: response_id.clone(),
         raw_path: path_str.clone(),
         pretty_paths: HashMap::new(),
         size_bytes,
     };
-    cache.insert(tab_id, artifact);
+    cache.insert(cache_key, artifact);
 
     Ok(path_str)
 }
@@ -99,12 +106,13 @@ pub fn write_response_to_temp(tab_id: String, body: String) -> Result<String, St
 #[tauri::command]
 pub fn write_formatted_response(
     tab_id: String,
+    response_id: String,
     format: String,
     content: String,
 ) -> Result<String, String> {
     let safe_tab_id = sanitize_tab_id(&tab_id).ok_or_else(|| "Invalid tab_id".to_string())?;
     let temp_dir = get_response_temp_dir();
-    let file_name = format!("{}.pretty.{}", safe_tab_id, format);
+    let file_name = format!("{}-{}.pretty.{}", safe_tab_id, response_id, format);
     let file_path = temp_dir.join(&file_name);
 
     let mut file = File::create(&file_path)
@@ -115,11 +123,12 @@ pub fn write_formatted_response(
 
     let path_str = file_path.to_string_lossy().to_string();
 
-    // Update cache with pretty path
+    // Update cache with pretty path using composite key
+    let cache_key = format!("{}:{}", tab_id, response_id);
     let mut cache = FILE_CACHE
         .lock()
         .map_err(|e| format!("Lock error: {}", e))?;
-    if let Some(artifact) = cache.get_mut(&tab_id) {
+    if let Some(artifact) = cache.get_mut(&cache_key) {
         artifact.pretty_paths.insert(format, path_str.clone());
     }
 
@@ -154,13 +163,22 @@ pub fn cleanup_response_files(tab_id: String) -> Result<(), String> {
         .lock()
         .map_err(|e| format!("Lock error: {}", e))?;
 
-    if let Some(artifact) = cache.remove(&tab_id) {
-        // Remove raw file
-        let _ = fs::remove_file(&artifact.raw_path);
+    // Remove all artifacts for this tab (all response versions)
+    let keys_to_remove: Vec<String> = cache
+        .keys()
+        .filter(|key| key.starts_with(&format!("{}:", tab_id)))
+        .cloned()
+        .collect();
 
-        // Remove all pretty files
-        for (_, path) in artifact.pretty_paths {
-            let _ = fs::remove_file(&path);
+    for key in keys_to_remove {
+        if let Some(artifact) = cache.remove(&key) {
+            // Remove raw file
+            let _ = fs::remove_file(&artifact.raw_path);
+
+            // Remove all pretty files
+            for (_, path) in artifact.pretty_paths {
+                let _ = fs::remove_file(&path);
+            }
         }
     }
 
