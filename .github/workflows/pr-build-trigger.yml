@@ -191,14 +191,15 @@ jobs:
               ].join("\n")
             });
 
-      # Step 3 — Dispatch the actual development release workflow
+      # Step 3 — Dispatch the PR build workflow with the source branch
       #          Uses a PAT (not GITHUB_TOKEN) as GITHUB_TOKEN cannot trigger workflows
-      - name: Trigger Development Release Workflow
+      - name: Trigger PR Build Workflow
         id: dispatch
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: sparrow-app-development.yml
-          ref:      ${{ needs.validate.outputs.branch }}
+          workflow: sparrow-app-pr-build.yml
+          ref:      development
+          inputs: '{"branch": "${{ needs.validate.outputs.branch }}"}'
           token:    ${{ secrets.PAT_TOKEN }}
 
       # Step 4 — Set commit status to success after dispatch
