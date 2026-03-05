@@ -3,6 +3,7 @@ import constants from "@app/constants/constants";
 import { getSelfhostUrls } from "@app/utils/jwt";
 import { setNotifications, loadingNotifications } from "@sparrow/common/store";
 import { get } from "svelte/store";
+import { user } from "@app/store/auth.store";
 import { isGuestUserActive } from "@app/store/auth.store";
 
 export class NotificationService {
@@ -98,6 +99,12 @@ export class NotificationService {
     return response;
   };
   public loadNotificationsToStore = async () => {
+    const currentUser = get(user);
+
+    // DO NOT call API if user not logged in
+    if (!currentUser?._id) {
+      return;
+    }
     // Skip notifications for guest users
     if (get(isGuestUserActive)) {
       setNotifications([]);
