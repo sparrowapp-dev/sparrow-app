@@ -2,6 +2,8 @@ import { makeRequest, getAuthHeaders } from "@app/containers/api/api.common";
 import constants from "@app/constants/constants";
 import { getSelfhostUrls } from "@app/utils/jwt";
 import { setNotifications, loadingNotifications } from "@sparrow/common/store";
+import { get } from "svelte/store";
+import { isGuestUserActive } from "@app/store/auth.store";
 
 export class NotificationService {
   private apiUrl: string = constants.API_URL;
@@ -96,6 +98,11 @@ export class NotificationService {
     return response;
   };
   public loadNotificationsToStore = async () => {
+    // Skip notifications for guest users
+    if (get(isGuestUserActive)) {
+      setNotifications([]);
+      return;
+    }
     try {
       loadingNotifications.set(true);
 
