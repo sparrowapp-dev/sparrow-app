@@ -9,6 +9,7 @@ permissions:
   pull-requests: write
   checks: write
   statuses: write
+  actions: write
 
 concurrency:
   group: pr-build-${{ github.event.issue.number || github.run_id }}
@@ -27,6 +28,7 @@ jobs:
       branch:     ${{ steps.pr_info.outputs.branch }}
       sha:        ${{ steps.pr_info.outputs.sha }}
       pr_number:  ${{ steps.pr_info.outputs.pr_number }}
+      repo:       ${{ steps.pr_info.outputs.repo }}
 
     steps:
       # Step 1 — Ensure this is a /build comment on a PR (not a plain issue)
@@ -89,17 +91,6 @@ jobs:
             core.setOutput("sha",       sha);
             core.setOutput("repo",      repo);
             core.setOutput("pr_number", pr_number);
-
-            // Block builds from forked repositories
-            if (repo !== `${context.repo.owner}/${context.repo.repo}`) {
-              await github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner:        context.repo.owner,
-                repo:         context.repo.repo,
-                body:         "❌ Builds are not allowed from forked repositories."
-              });
-              core.setFailed("PR is from a fork. Build not allowed.");
-            }
 
       # Step 4 — Install yq to parse the YAML whitelist
       - name: Install yq
@@ -185,20 +176,20 @@ jobs:
               owner:        context.repo.owner,
               repo:         context.repo.repo,
               body: [
-                "🚀 **Build triggered** for branch `${{ needs.validate.outputs.branch }}`.",
+                "🚀 **Build triggered** for branch `${{ needs.validate.outputs.branch }}` from `${{ needs.validate.outputs.repo }}`.",
                 "",
                 "⏳ Build is currently in progress. You will receive a status update here once it completes."
               ].join("\n")
             });
 
-      # Step 3 — Dispatch the actual development release workflow
-      #          Uses a PAT (not GITHUB_TOKEN) as GITHUB_TOKEN cannot trigger workflows
-      - name: Trigger Development Release Workflow
+      # Step 3 — Dispatch the PR build workflow with the source branch and repository
+      - name: Trigger PR Build Workflow
         id: dispatch
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: sparrow-app-development.yml
-          ref:      ${{ needs.validate.outputs.branch }}
+          workflow: sparrow-app-pr-build.yml
+          ref:      development
+          inputs: '{"branch": "${{ needs.validate.outputs.branch }}", "repository": "${{ needs.validate.outputs.repo }}"}'
           token:    ${{ secrets.PAT_TOKEN }}
 
       # Step 4 — Set commit status to success after dispatch
@@ -228,7 +219,7 @@ jobs:
               owner:        context.repo.owner,
               repo:         context.repo.repo,
               body: [
-                "✅ **Build dispatched successfully** for branch `${{ needs.validate.outputs.branch }}`.",
+                "✅ **Build dispatched successfully** for branch `${{ needs.validate.outputs.branch }}` from `${{ needs.validate.outputs.repo }}`.",
                 "",
                 "You can monitor the build progress in the [Actions tab](https://github.com/${{ github.repository }}/actions)."
               ].join("\n")
@@ -260,7 +251,7 @@ jobs:
               owner:        context.repo.owner,
               repo:         context.repo.repo,
               body: [
-                "❌ **Build dispatch failed** for branch `${{ needs.validate.outputs.branch }}`.",
+                "❌ **Build dispatch failed** for branch `${{ needs.validate.outputs.branch }}` from `${{ needs.validate.outputs.repo }}`.",
                 "",
                 "Please check the [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for more details."
               ].join("\n")

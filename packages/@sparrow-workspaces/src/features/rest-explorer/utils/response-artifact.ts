@@ -29,6 +29,7 @@ export type ResponseFormat = "json" | "html" | "xml" | "raw";
  */
 export interface ResponseArtifact {
   tabId: string;
+  responseId: string;
   rawPath: string;
   prettyPaths: Map<ResponseFormat, string>;
   sizeBytes: number;
@@ -37,14 +38,15 @@ export interface ResponseArtifact {
 }
 
 /**
- * Non-reactive Map storing response artifacts per tab.
+ * Non-reactive Map storing response artifacts per tab and response.
+ * Key: `${tabId}:${responseId}`
  * This is explicitly NOT a Svelte store to avoid reactivity overhead.
  */
 const responseArtifacts = new Map<string, ResponseArtifact>();
 
 /**
  * Cache for formatted content that has been read from files.
- * Key: `${tabId}:${format}`
+ * Key: `${tabId}:${responseId}:${format}`
  * Value: formatted content string
  *
  * This is only populated on first read and never cleared until tab close.
@@ -53,7 +55,7 @@ const formattedContentCache = new Map<string, string>();
 
 /**
  * In-memory cache for small responses (no file backing).
- * Key: `${tabId}:${format}`
+ * Key: `${tabId}:${responseId}:${format}`
  * Value: formatted content string
  *
  * Used for responses below LARGE_RESPONSE_THRESHOLD to avoid
@@ -66,30 +68,32 @@ const inMemoryFormattedCache = new Map<string, string>();
  * Called immediately after receiving HTTP response.
  *
  * @param tabId - Unique tab identifier
+ * @param responseId - Unique response identifier (incremented per request)
  * @param body - Raw response body string
  * @returns ResponseArtifact with file path
  */
 export async function writeResponseArtifact(
   tabId: string,
+  responseId: string,
   body: string,
 ): Promise<ResponseArtifact> {
-  // Clean up any existing artifact for this tab
-  await cleanupArtifact(tabId);
-
   const rawPath = await invoke<string>("write_response_to_temp", {
     tabId,
+    responseId,
     body,
   });
 
   const artifact: ResponseArtifact = {
     tabId,
+    responseId,
     rawPath,
     prettyPaths: new Map(),
     sizeBytes: body.length,
     formattingInProgress: new Set(),
   };
 
-  responseArtifacts.set(tabId, artifact);
+  const cacheKey = `${tabId}:${responseId}`;
+  responseArtifacts.set(cacheKey, artifact);
   return artifact;
 }
 
@@ -103,13 +107,18 @@ export function isLargeResponse(bodySize: number): boolean {
 }
 
 /**
- * Get an existing artifact for a tab.
+ * Get an existing artifact for a tab and response.
  * Returns undefined if no artifact exists.
  *
  * @param tabId - Unique tab identifier
+ * @param responseId - Unique response identifier
  */
-export function getArtifact(tabId: string): ResponseArtifact | undefined {
-  const artifact = responseArtifacts.get(tabId);
+export function getArtifact(
+  tabId: string,
+  responseId: string,
+): ResponseArtifact | undefined {
+  const cacheKey = `${tabId}:${responseId}`;
+  const artifact = responseArtifacts.get(cacheKey);
   return artifact;
 }
 
@@ -117,13 +126,16 @@ export function getArtifact(tabId: string): ResponseArtifact | undefined {
  * Check if a formatted file exists for a tab.
  *
  * @param tabId - Unique tab identifier
+ * @param responseId - Unique response identifier
  * @param format - Format type (json, html, xml, raw)
  */
 export function hasFormattedFile(
   tabId: string,
+  responseId: string,
   format: ResponseFormat,
 ): boolean {
-  const artifact = responseArtifacts.get(tabId);
+  const cacheKey = `${tabId}:${responseId}`;
+  const artifact = responseArtifacts.get(cacheKey);
   if (!artifact) return false;
   return artifact.prettyPaths.has(format);
 }
@@ -132,13 +144,16 @@ export function hasFormattedFile(
  * Get the file path for a formatted response.
  *
  * @param tabId - Unique tab identifier
+ * @param responseId - Unique response identifier
  * @param format - Format type
  */
 export function getFormattedFilePath(
   tabId: string,
+  responseId: string,
   format: ResponseFormat,
 ): string | undefined {
-  const artifact = responseArtifacts.get(tabId);
+  const cacheKey = `${tabId}:${responseId}`;
+  const artifact = responseArtifacts.get(cacheKey);
   if (!artifact) return undefined;
   return artifact.prettyPaths.get(format);
 }
@@ -148,22 +163,28 @@ export function getFormattedFilePath(
  * Called after Worker or Rust completes formatting.
  *
  * @param tabId - Unique tab identifier
+ * @param responseId - Unique response identifier
  * @param format - Format type
  * @param content - Formatted content string
  */
 export async function storeFormattedResponse(
   tabId: string,
+  responseId: string,
   format: ResponseFormat,
   content: string,
 ): Promise<string> {
-  const artifact = responseArtifacts.get(tabId);
+  const cacheKey = `${tabId}:${responseId}`;
+  const artifact = responseArtifacts.get(cacheKey);
   if (!artifact) {
-    throw new Error(`No artifact exists for tab ${tabId}`);
+    throw new Error(
+      `No artifact exists for tab ${tabId} response ${responseId}`,
+    );
   }
 
   // Write formatted content to temp file
   const path = await invoke<string>("write_formatted_response", {
     tabId,
+    responseId,
     format,
     content,
   });
@@ -172,8 +193,8 @@ export async function storeFormattedResponse(
   artifact.formattingInProgress.delete(format);
 
   // Cache the content for instant retrieval
-  const cacheKey = `${tabId}:${format}`;
-  formattedContentCache.set(cacheKey, content);
+  const contentCacheKey = `${tabId}:${responseId}:${format}`;
+  formattedContentCache.set(contentCacheKey, content);
 
   return path;
 }
@@ -186,22 +207,27 @@ export async function storeFormattedResponse(
  * - If not, format the raw content and store it
  *
  * @param tabId - Unique tab identifier
+ * @param responseId - Unique response identifier
  * @param format - Desired format
  * @param formatFn - Function to format raw content (uses Worker)
  */
 export async function getOrCreateFormattedContent(
   tabId: string,
+  responseId: string,
   format: ResponseFormat,
   formatFn: (raw: string) => Promise<string>,
 ): Promise<string> {
-  const artifact = responseArtifacts.get(tabId);
+  const cacheKey = `${tabId}:${responseId}`;
+  const artifact = responseArtifacts.get(cacheKey);
   if (!artifact) {
-    throw new Error(`No artifact exists for tab ${tabId}`);
+    throw new Error(
+      `No artifact exists for tab ${tabId} response ${responseId}`,
+    );
   }
 
   // Check cache first (instant return)
-  const cacheKey = `${tabId}:${format}`;
-  const cached = formattedContentCache.get(cacheKey);
+  const contentCacheKey = `${tabId}:${responseId}:${format}`;
+  const cached = formattedContentCache.get(contentCacheKey);
   if (cached !== undefined) {
     return cached;
   }
@@ -210,7 +236,7 @@ export async function getOrCreateFormattedContent(
   if (artifact.prettyPaths.has(format)) {
     const path = artifact.prettyPaths.get(format)!;
     const content = await readLargeFileInChunks(path);
-    formattedContentCache.set(cacheKey, content);
+    formattedContentCache.set(contentCacheKey, content);
     return content;
   }
 
@@ -231,7 +257,7 @@ export async function getOrCreateFormattedContent(
         if (!artifact.formattingInProgress.has(format)) {
           clearInterval(checkInterval);
           clearTimeout(timeoutId);
-          const cachedContent = formattedContentCache.get(cacheKey);
+          const cachedContent = formattedContentCache.get(contentCacheKey);
           if (cachedContent) {
             resolve(cachedContent);
           } else {
@@ -253,7 +279,7 @@ export async function getOrCreateFormattedContent(
     const formatted = await formatFn(raw);
 
     // Store formatted content
-    await storeFormattedResponse(tabId, format, formatted);
+    await storeFormattedResponse(tabId, responseId, format, formatted);
 
     return formatted;
   } catch (error) {
@@ -267,11 +293,18 @@ export async function getOrCreateFormattedContent(
  * Only call this when you need the raw content (rare).
  *
  * @param tabId - Unique tab identifier
+ * @param responseId - Unique response identifier
  */
-export async function readRawContent(tabId: string): Promise<string> {
-  const artifact = responseArtifacts.get(tabId);
+export async function readRawContent(
+  tabId: string,
+  responseId: string,
+): Promise<string> {
+  const cacheKey = `${tabId}:${responseId}`;
+  const artifact = responseArtifacts.get(cacheKey);
   if (!artifact) {
-    throw new Error(`No artifact exists for tab ${tabId}`);
+    throw new Error(
+      `No artifact exists for tab ${tabId} response ${responseId}`,
+    );
   }
 
   return await readLargeFileInChunks(artifact.rawPath);
@@ -324,19 +357,40 @@ export async function readLargeFileInChunks(
  * @param tabId - Unique tab identifier
  */
 export async function cleanupArtifact(tabId: string): Promise<void> {
-  const artifact = responseArtifacts.get(tabId);
-  if (!artifact) return;
-
-  // Clean up all cached content for this tab (both file-backed and in-memory)
-  for (const format of ["json", "html", "xml", "raw"] as ResponseFormat[]) {
-    formattedContentCache.delete(`${tabId}:${format}`);
-    inMemoryFormattedCache.delete(`${tabId}:${format}`);
+  // Clean up all cached content for this tab (all response versions)
+  const keysToDelete: string[] = [];
+  for (const key of formattedContentCache.keys()) {
+    if (key.startsWith(`${tabId}:`)) {
+      keysToDelete.push(key);
+    }
+  }
+  for (const key of keysToDelete) {
+    formattedContentCache.delete(key);
   }
 
-  // Remove from local map
-  responseArtifacts.delete(tabId);
+  // Clean up in-memory cache
+  const inMemoryKeysToDelete: string[] = [];
+  for (const key of inMemoryFormattedCache.keys()) {
+    if (key.startsWith(`${tabId}:`)) {
+      inMemoryKeysToDelete.push(key);
+    }
+  }
+  for (const key of inMemoryKeysToDelete) {
+    inMemoryFormattedCache.delete(key);
+  }
 
-  // Clean up files on Rust side
+  // Remove all artifacts for this tab
+  const artifactKeysToDelete: string[] = [];
+  for (const key of responseArtifacts.keys()) {
+    if (key.startsWith(`${tabId}:`)) {
+      artifactKeysToDelete.push(key);
+    }
+  }
+  for (const key of artifactKeysToDelete) {
+    responseArtifacts.delete(key);
+  }
+
+  // Clean up files on Rust side (removes all response versions for tab)
   try {
     await invoke("cleanup_response_files", { tabId });
   } catch (e) {
@@ -360,12 +414,14 @@ export async function cleanupAllArtifacts(): Promise<void> {
 }
 
 /**
- * Check if an artifact exists for a tab.
+ * Check if an artifact exists for a tab and response.
  *
  * @param tabId - Unique tab identifier
+ * @param responseId - Unique response identifier
  */
-export function hasArtifact(tabId: string): boolean {
-  return responseArtifacts.has(tabId);
+export function hasArtifact(tabId: string, responseId: string): boolean {
+  const cacheKey = `${tabId}:${responseId}`;
+  return responseArtifacts.has(cacheKey);
 }
 
 /**
@@ -374,13 +430,15 @@ export function hasArtifact(tabId: string): boolean {
  * Works for both file-backed and in-memory responses.
  *
  * @param tabId - Unique tab identifier
+ * @param responseId - Unique response identifier
  * @param format - Format type
  */
 export function getCachedContent(
   tabId: string,
+  responseId: string,
   format: ResponseFormat,
 ): string | undefined {
-  const cacheKey = `${tabId}:${format}`;
+  const cacheKey = `${tabId}:${responseId}:${format}`;
   // Check file-backed cache first
   const cached = formattedContentCache.get(cacheKey);
   if (cached !== undefined) {
@@ -401,28 +459,45 @@ export function getCachedContent(
  * This avoids re-formatting on every tab switch.
  *
  * @param tabId - Unique tab identifier
+ * @param responseId - Unique response identifier
  * @param format - Format type
  * @param content - Formatted content to cache
  */
 export function cacheInMemoryContent(
   tabId: string,
+  responseId: string,
   format: ResponseFormat,
   content: string,
 ): void {
-  const cacheKey = `${tabId}:${format}`;
+  const cacheKey = `${tabId}:${responseId}:${format}`;
   inMemoryFormattedCache.set(cacheKey, content);
 }
 
 /**
- * Clear in-memory cache for a specific tab.
- * Called when tab is closed or response changes.
+ * Clear in-memory cache for a specific tab and response.
+ * Called when response changes.
  *
  * @param tabId - Unique tab identifier
+ * @param responseId - Unique response identifier (optional, clears all if not provided)
  */
-export function clearInMemoryCache(tabId: string): void {
-  for (const format of ["json", "html", "xml", "raw"] as ResponseFormat[]) {
-    const cacheKey = `${tabId}:${format}`;
-    inMemoryFormattedCache.delete(cacheKey);
+export function clearInMemoryCache(tabId: string, responseId?: string): void {
+  if (responseId) {
+    // Clear specific response
+    for (const format of ["json", "html", "xml", "raw"] as ResponseFormat[]) {
+      const cacheKey = `${tabId}:${responseId}:${format}`;
+      inMemoryFormattedCache.delete(cacheKey);
+    }
+  } else {
+    // Clear all responses for this tab
+    const keysToDelete: string[] = [];
+    for (const key of inMemoryFormattedCache.keys()) {
+      if (key.startsWith(`${tabId}:`)) {
+        keysToDelete.push(key);
+      }
+    }
+    for (const key of keysToDelete) {
+      inMemoryFormattedCache.delete(key);
+    }
   }
 }
 
