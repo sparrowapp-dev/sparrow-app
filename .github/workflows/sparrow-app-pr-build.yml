@@ -12,6 +12,10 @@ on:
         required: true
         type: string
         default: 'sparrowapp-dev/sparrow-app'
+      pr_number:
+        description: 'Pull Request number'
+        required: true
+        type: string  
 
 env:
   VITE_API_URL: ${{ vars.VITE_API_URL_DEV }}
@@ -360,6 +364,11 @@ jobs:
                     }
                     @{
                       "type" = "TextBlock"
+                      "text" = "PR: https://github.com/${{ inputs.repository }}/pull/${{ inputs.pr_number }}"
+                      "wrap" = $true
+                    }
+                    @{
+                      "type" = "TextBlock"
                       "text" = "Build Date: $buildDate"
                       "wrap" = $true
                     }
@@ -501,6 +510,11 @@ jobs:
                     {
                       \"type\": \"TextBlock\",
                       \"text\": \"Repository: ${{ inputs.repository }} | Branch: ${{ inputs.branch }}\",
+                      \"wrap\": true
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"PR: https://github.com/${{ inputs.repository }}/pull/${{ inputs.pr_number }}\",
                       \"wrap\": true
                     },
                     {

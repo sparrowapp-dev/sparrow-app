@@ -189,7 +189,7 @@ jobs:
         with:
           workflow: sparrow-app-pr-build.yml
           ref:      development
-          inputs: '{"branch": "${{ needs.validate.outputs.branch }}", "repository": "${{ needs.validate.outputs.repo }}"}'
+          inputs: '{"branch": "${{ needs.validate.outputs.branch }}", "repository": "${{ needs.validate.outputs.repo }}", "pr_number": "${{ needs.validate.outputs.pr_number }}"}'
           token:    ${{ secrets.PAT_TOKEN }}
 
       # Step 4 — Set commit status to success after dispatch
