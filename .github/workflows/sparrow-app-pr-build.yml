@@ -359,7 +359,12 @@ jobs:
                     }
                     @{
                       "type" = "TextBlock"
-                      "text" = "Repository: ${{ inputs.repository }} | Branch: ${{ inputs.branch }}"
+                      "text" = "Repository: ${{ inputs.repository }}"
+                      "wrap" = $true
+                    }
+                    @{
+                      "type" = "TextBlock"
+                      "text" = "Branch: ${{ inputs.branch }}"
                       "wrap" = $true
                     }
                     @{
@@ -509,7 +514,12 @@ jobs:
                     },
                     {
                       \"type\": \"TextBlock\",
-                      \"text\": \"Repository: ${{ inputs.repository }} | Branch: ${{ inputs.branch }}\",
+                      \"text\": \"Repository: ${{ inputs.repository }}\",
+                      \"wrap\": true
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"Branch: ${{ inputs.branch }}\",
                       \"wrap\": true
                     },
                     {
