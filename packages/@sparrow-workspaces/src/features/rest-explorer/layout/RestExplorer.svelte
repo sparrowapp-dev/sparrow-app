@@ -779,17 +779,7 @@
       bind:this={splitpaneContainer}
       style="flex:1; overflow:auto; margin-top: 12px;"
     >
-      <Motion
-        animate={aiPreferenceReady &&
-        $tab?.property?.request?.state?.isChatbotActive
-          ? chatbotOpenAnimation
-          : chatbotClosedAnimation}
-        transition={aiPreferenceReady &&
-        $tab?.property?.request?.state?.isChatbotActive
-          ? chatbotOpenTransition
-          : chatbotCloseTransition}
-        let:motion
-      >
+   
         <Splitpanes class="explorer-chatbot-splitter">
           <Pane class="position-relative bg-transparent">
             <!--Disabling the Quick Help feature, will be taken up in next release-->
@@ -1524,7 +1514,7 @@
             </Pane>
           {/if}
         </Splitpanes>
-      </Motion>
+      
     </div>
   </div>
   <!--
