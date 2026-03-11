@@ -12,6 +12,10 @@ on:
         required: true
         type: string
         default: 'sparrowapp-dev/sparrow-app'
+      pr_number:
+        description: 'Pull Request number'
+        required: true
+        type: string  
 
 env:
   VITE_API_URL: ${{ vars.VITE_API_URL_DEV }}
@@ -136,7 +140,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
-      
+
       - name: Setup kubectl
         uses: azure/setup-kubectl@v3
         with:
@@ -147,9 +151,9 @@ jobs:
         run: |
           Write-Host "🔎 Looking for signtool.exe"
           $signtool = Get-ChildItem 'C:\Program Files (x86)\Windows Kits\10\bin' -Recurse -Filter signtool.exe | Where-Object FullName -Match '\\x64\\signtool\.exe$' | Select-Object -First 1
-          
+
           if (-not $signtool) { throw "❌ signtool.exe not found!" }
-          
+
           Write-Host "✅ signtool.exe found at $($signtool.FullName)"
 
           # Export paths for later steps
@@ -159,16 +163,16 @@ jobs:
         run: |
           # Create self-signed certificate
           $cert = New-SelfSignedCertificate -Subject "CN=Certificate" -CertStoreLocation "Cert:\LocalMachine\My" -KeyUsage DigitalSignature -Type CodeSigningCert -KeySpec Signature -NotAfter (Get-Date).AddDays(90)
-          
+
           # Convert password to secure string
           $password = ConvertTo-SecureString -String "sparrow123" -Force -AsPlainText
-          
+
           # Find the actual bundle path dynamically (check both D: and C: drives)
           $possiblePaths = @(
               "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
               "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
           )
-          
+
           $bundlePath = $null
           foreach ($path in $possiblePaths) {
               if (Test-Path $path) {
@@ -177,21 +181,21 @@ jobs:
                   break
               }
           }
-          
+
           if (-not $bundlePath) {
               throw "Could not find bundle directory in any of the expected locations"
           }
-          
+
           # Export certificate with password parameter (THIS WAS MISSING)
           Export-PfxCertificate -Cert "Cert:\LocalMachine\My\$($cert.Thumbprint)" -FilePath "$bundlePath\Certificate.pfx" -Password $password
-          
+
           # Verify the certificate file was created
           if (-not (Test-Path "$bundlePath\Certificate.pfx")) {
               throw "Certificate file was not created successfully"
           }
-          
+
           Write-Host "Certificate exported successfully to: $bundlePath\Certificate.pfx"
-          
+
           # Find and sign MSI files individually
           $msiFiles = Get-ChildItem "$bundlePath\msi\*.msi" -ErrorAction SilentlyContinue
           if ($msiFiles) {
@@ -209,7 +213,7 @@ jobs:
           } else {
               Write-Warning "No MSI files found in $bundlePath\msi\"
           }
-          
+
           # Find and sign EXE files individually
           $exeFiles = Get-ChildItem "$bundlePath\nsis\*.exe" -ErrorAction SilentlyContinue
           if ($exeFiles) {
@@ -227,7 +231,7 @@ jobs:
           } else {
               Write-Warning "No EXE files found in $bundlePath\nsis\"
           }
-          
+
           # Debug: List all files in the bundle directory
           Write-Host "`nBundle directory contents:"
           Get-ChildItem $bundlePath -Recurse | ForEach-Object {
@@ -264,7 +268,7 @@ jobs:
               "D:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle",
               "C:\a\sparrow-app\sparrow-app\apps\@sparrow-desktop\src-tauri\target\debug\bundle"
           )
-          
+
           $bundlePath = $null
           foreach ($path in $possiblePaths) {
               if (Test-Path $path) {
@@ -273,20 +277,20 @@ jobs:
                   break
               }
           }
-          
+
           if (-not $bundlePath) {
               throw "Could not find bundle directory for S3 upload"
           }
-          
+
           # Check if msi directory exists
           $msiPath = "$bundlePath\msi"
           if (-not (Test-Path $msiPath)) {
               throw "MSI directory not found at: $msiPath"
           }
-          
+
           # Get current date-time in format YYYYMMDD_HHMMSS
           $dateTimeStamp = Get-Date -Format "yyyyMMdd_HHmmss"
-          
+
           # Rename MSI files with timestamp before uploading
           Get-ChildItem "$msiPath\*.msi" | ForEach-Object {
               $newName = $_.BaseName + "_" + $dateTimeStamp + $_.Extension
@@ -294,17 +298,17 @@ jobs:
               Rename-Item -Path $_.FullName -NewName $newName
               Write-Host "Renamed $($_.Name) to $newName"
           }
-          
+
           # List files before upload for debugging
           Write-Host "Files in MSI directory:"
           Get-ChildItem $msiPath | ForEach-Object {
               Write-Host "  $($_.Name) - $($_.Length) bytes"
           }
-          
+
           # Test AWS connectivity
           Write-Host "Testing AWS connectivity..."
           aws sts get-caller-identity
-          
+
           # Upload to S3
           Write-Host "Starting S3 upload..."
           aws s3 sync "$msiPath" s3://sparrow-release-assests-dev/windows --exclude "*" --include "*.zip" --include "*.msi" --include "*.msi.sig"
@@ -356,6 +360,11 @@ jobs:
                     @{
                       "type" = "TextBlock"
                       "text" = "Repository: ${{ inputs.repository }} | Branch: ${{ inputs.branch }}"
+                      "wrap" = $true
+                    }
+                    @{
+                      "type" = "TextBlock"
+                      "text" = "PR: https://github.com/${{ inputs.repository }}/pull/${{ inputs.pr_number }}"
                       "wrap" = $true
                     }
                     @{
@@ -501,6 +510,11 @@ jobs:
                     {
                       \"type\": \"TextBlock\",
                       \"text\": \"Repository: ${{ inputs.repository }} | Branch: ${{ inputs.branch }}\",
+                      \"wrap\": true
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"PR: https://github.com/${{ inputs.repository }}/pull/${{ inputs.pr_number }}\",
                       \"wrap\": true
                     },
                     {
