@@ -514,7 +514,7 @@ jobs:
                     },
                     {
                       \"type\": \"TextBlock\",
-                      \"text\": \"Repository: ${{ inputs.repository }}",
+                      \"text\": \"Repository: ${{ inputs.repository }}\",
                       \"wrap\": true
                     },
                     { 
