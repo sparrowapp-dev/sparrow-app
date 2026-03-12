@@ -11,8 +11,8 @@
 
   export let buttonClassProp = "";
 
-  export let startIcon;
-  export let endIcon;
+  export let startIcon = null;
+  export let endIcon = null;
   export let customWidth = "auto";
 
   let iconSize = 16;
