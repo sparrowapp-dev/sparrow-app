@@ -59,11 +59,11 @@ jobs:
 
           echo "✅ Trigger validation passed."
 
-      # Step 2 — Checkout development branch to access .github/pr-build-whitelist.yml
-      - name: Checkout development branch
+      # Step 2 — Checkout main branch to access .github/pr-build-whitelist.yml
+      - name: Checkout main branch
         uses: actions/checkout@v3
         with:
-          ref: development
+          ref: main
 
       # Step 3 — Fetch PR metadata (branch, SHA, number) via GitHub API
       - name: Get PR info
@@ -105,7 +105,7 @@ jobs:
           echo "Checking authorization for: $GH_USER"
 
           if [ ! -f ".github/pr-build-whitelist.yml" ]; then
-            echo "❌ .github/pr-build-whitelist.yml not found on development branch."
+            echo "❌ .github/pr-build-whitelist.yml not found on main branch."
             exit 1
           fi
 
@@ -188,7 +188,7 @@ jobs:
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: sparrow-app-pr-build.yml
-          ref:      development
+          ref:      main
           inputs: '{"branch": "${{ needs.validate.outputs.branch }}", "repository": "${{ needs.validate.outputs.repo }}", "pr_number": "${{ needs.validate.outputs.pr_number }}"}'
           token:    ${{ secrets.PAT_TOKEN }}
 
@@ -256,3 +256,4 @@ jobs:
                 "Please check the [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for more details."
               ].join("\n")
             });
+ 
