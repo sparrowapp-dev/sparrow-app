@@ -359,12 +359,17 @@ jobs:
                     }
                     @{
                       "type" = "TextBlock"
-                      "text" = "Repository: ${{ inputs.repository }} | Branch: ${{ inputs.branch }}"
+                      "text" = "Repository: ${{ inputs.repository }}"
                       "wrap" = $true
                     }
                     @{
                       "type" = "TextBlock"
-                      "text" = "PR: https://github.com/${{ inputs.repository }}/pull/${{ inputs.pr_number }}"
+                      "text" = "Branch: ${{ inputs.branch }}"
+                      "wrap" = $true
+                    }
+                    @{
+                      "type" = "TextBlock"
+                      "text" = "PR: [View Pull Request](https://github.com/${{ inputs.repository }}/pull/${{ inputs.pr_number }})"
                       "wrap" = $true
                     }
                     @{
@@ -509,12 +514,17 @@ jobs:
                     },
                     {
                       \"type\": \"TextBlock\",
-                      \"text\": \"Repository: ${{ inputs.repository }} | Branch: ${{ inputs.branch }}\",
+                      \"text\": \"Repository: ${{ inputs.repository }}",
+                      \"wrap\": true
+                    },
+                    { 
+                      \"type\": \"TextBlock\",
+                      \"text\": \"Branch: ${{ inputs.branch }}\",
                       \"wrap\": true
                     },
                     {
                       \"type\": \"TextBlock\",
-                      \"text\": \"PR: https://github.com/${{ inputs.repository }}/pull/${{ inputs.pr_number }}\",
+                      \"text\": \"PR: [View Pull Request](https://github.com/${{ inputs.repository }}/pull/${{ inputs.pr_number }})\",
                       \"wrap\": true
                     },
                     {
