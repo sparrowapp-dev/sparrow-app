@@ -79,7 +79,7 @@ jobs:
 
             const branch    = pr.data.head.ref;
             const sha       = pr.data.head.sha;
-            const repo      = pr.data.head.repo.full_name;
+            const repo      = pr.data.base.repo.full_name;
             const pr_number = pr.data.number;
 
             console.log(`Branch    : ${branch}`);
