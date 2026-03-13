@@ -342,6 +342,7 @@ jobs:
           }
           $msiFileName = $msiFile.Name
           $msiUrl = "https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/windows/$msiFileName"
+          $webappPreviewUrl = "https://pr-${{ inputs.pr_number }}.preview.sparrowapp.dev"
           $buildDate = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
           $body = @{
             "type" = "message"
@@ -383,6 +384,11 @@ jobs:
                       "type" = "Action.OpenUrl"
                       "title" = "📥 Download Windows Installer (.msi)"
                       "url" = $msiUrl
+                    }
+                    @{
+                      "type" = "Action.OpenUrl"
+                      "title" = "🌐 Open Webapp Preview"
+                      "url" = $webappPreviewUrl
                     }
                   )
                   "$schema" = "http://adaptivecards.io/schemas/adaptive-card.json"
@@ -497,6 +503,7 @@ jobs:
           ARM64_FILENAME="$(basename "${ARM64_DMG%.dmg}").dmg"
 
           ARM64_URL="https://sparrow-release-assests-dev.s3.us-west-1.amazonaws.com/macos/$ARM64_FILENAME"
+          WEBAPP_PREVIEW_URL="https://pr-${{ inputs.pr_number }}.preview.sparrowapp.dev"
 
           curl -H "Content-Type: application/json" -d "{
             \"type\": \"message\",
@@ -538,6 +545,11 @@ jobs:
                       \"type\": \"Action.OpenUrl\",
                       \"title\": \"📥 Download Apple Silicon (arm64)\",
                       \"url\": \"$ARM64_URL\"
+                    },
+                    {
+                      \"type\": \"Action.OpenUrl\",
+                      \"title\": \"🌐 Open Webapp Preview\",
+                      \"url\": \"$WEBAPP_PREVIEW_URL\"
                     }
                   ],
                   \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",

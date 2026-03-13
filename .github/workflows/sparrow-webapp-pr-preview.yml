@@ -1,0 +1,183 @@
+name: Webapp PR Preview
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to build'
+        required: true
+        type: string
+      repository:
+        description: 'Repository to build from (e.g., owner/repo)'
+        required: true
+        type: string
+        default: 'sparrowapp-dev/sparrow-app'
+      pr_number:
+        description: 'Pull Request number'
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: sparrow_web_Dev
+    outputs:
+      preview_url: ${{ steps.deploy_info.outputs.preview_url }}
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@master
+        with:
+          repository: ${{ inputs.repository }}
+          ref: ${{ inputs.branch }}
+
+      - name: Azure Container Registry Login
+        uses: Azure/docker-login@v1
+        with:
+          login-server: sparrowprod.azurecr.io
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -f ./Sparrow-Web.Dockerfile \
+            --build-arg PORT=${{ vars.PORT }} \
+            --build-arg VITE_WEB_API_URL=${{ vars.VITE_WEB_API_URL }} \
+            --build-arg VITE_WEB_API_TIMEOUT=${{ vars.VITE_WEB_API_TIMEOUT }} \
+            --build-arg VITE_WEB_ENABLE_MIX_PANEL=${{ vars.VITE_WEB_ENABLE_MIX_PANEL }} \
+            --build-arg VITE_WEB_MIX_PANEL_TOKEN=${{ vars.VITE_WEB_MIX_PANEL_TOKEN }} \
+            --build-arg VITE_WEB_SPARROW_SUPPORT_EMAIL=${{ vars.VITE_WEB_SPARROW_SUPPORT_EMAIL }} \
+            --build-arg VITE_WEB_AUTH_URL=${{ vars.VITE_WEB_AUTH_URL }} \
+            --build-arg VITE_WEB_SPARROW_GITHUB=${{ vars.VITE_WEB_SPARROW_GITHUB }} \
+            --build-arg VITE_WEB_SPARROW_DOWNLOAD_LINK=${{ vars.VITE_WEB_SPARROW_DOWNLOAD_LINK }} \
+            --build-arg VITE_WEB_RELEASE_NOTES_API=${{ vars.VITE_WEB_RELEASE_NOTES_API }} \
+            --build-arg VITE_WEB_AZURE_CDN_URL=${{ vars.VITE_WEB_AZURE_CDN_URL }} \
+            --build-arg VITE_WEB_BASE_URL=${{ vars.VITE_WEB_BASE_URL }} \
+            --build-arg VITE_WEB_SPARROW_LINKEDIN=${{ vars.VITE_WEB_SPARROW_LINKEDIN }} \
+            --build-arg VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING=${{ vars.VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING }} \
+            --build-arg VITE_WEB_MARKETING_URL=${{ vars.VITE_WEB_MARKETING_URL }} \
+            --build-arg VITE_WEB_SPARROW_DOCS=${{ vars.VITE_WEB_SPARROW_DOCS }} \
+            --build-arg VITE_WEB_PROXY_SERVICE=${{ vars.VITE_WEB_PROXY_SERVICE }} \
+            --build-arg VITE_WEB_SOCKET_IO_API_URL=${{ vars.VITE_WEB_SOCKET_IO_API_URL }} \
+            --build-arg VITE_WEB_SPARROW_AI_WEBSOCKET=${{ vars.VITE_WEB_SPARROW_AI_WEBSOCKET }} \
+            --build-arg VITE_WEB_APP_ENVIRONMENT_PATH=${{ vars.VITE_WEB_APP_ENVIRONMENT_PATH }} \
+            --build-arg VITE_WEB_OPENFEEDBACK_FEEDBACK_URL=${{ vars.VITE_WEB_OPENFEEDBACK_FEEDBACK_URL }} \
+            --build-arg VITE_WEB_OPENFEEDBACK_BOARD_ID=${{ vars.VITE_WEB_OPENFEEDBACK_BOARD_ID }} \
+            --build-arg VITE_WEB_SPARROW_WEB_APP_URL=${{ vars.VITE_WEB_SPARROW_WEB_APP_URL }} \
+            --build-arg VITE_WEB_SENTRY_DSN=${{ vars.VITE_WEB_SENTRY_DSN }} \
+            --build-arg VITE_WEB_APP_ENVIRONMENT=${{ vars.VITE_WEB_APP_ENVIRONMENT }} \
+            --build-arg VITE_WEB_POSTHOG_CONNECTION_API_KEY=${{ vars.VITE_WEB_POSTHOG_CONNECTION_API_KEY }} \
+            --build-arg VITE_WEB_POSTHOG_API_URL=${{ vars.VITE_WEB_POSTHOG_API_URL }} \
+            --build-arg VITE_WEB_SPARROW_ADMIN_URL=${{ vars.VITE_WEB_SPARROW_ADMIN_URL }} \
+            --build-arg VITE_WEB_APP_EDITION=${{ vars.VITE_WEB_APP_EDITION }} \
+            -t sparrowprod.azurecr.io/sparrow-web-preview:pr-${{ inputs.pr_number }} .
+
+          docker push sparrowprod.azurecr.io/sparrow-web-preview:pr-${{ inputs.pr_number }}
+
+      - name: Set deploy info
+        id: deploy_info
+        run: |
+          echo "preview_url=https://pr-${{ inputs.pr_number }}.preview.sparrowapp.dev" >> $GITHUB_OUTPUT
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+        with:
+          repository: ${{ inputs.repository }}
+          ref: ${{ inputs.branch }}
+
+      - name: Create preview deployment manifest
+        run: |
+          cat > /tmp/preview-deployment.yml << 'EOF'
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: sparrow-web-pr-${{ inputs.pr_number }}
+            namespace: sparrow-preview
+            labels:
+              app: sparrow-web-preview
+              pr: "${{ inputs.pr_number }}"
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: sparrow-web-pr-${{ inputs.pr_number }}
+            template:
+              metadata:
+                labels:
+                  app: sparrow-web-pr-${{ inputs.pr_number }}
+              spec:
+                containers:
+                  - name: sparrow-web
+                    image: sparrowprod.azurecr.io/sparrow-web-preview:pr-${{ inputs.pr_number }}
+                    imagePullPolicy: Always
+                    ports:
+                      - containerPort: 80
+                    resources:
+                      requests:
+                        cpu: 100m
+                        memory: 300Mi
+                      limits:
+                        cpu: 250m
+                        memory: 400Mi
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: sparrow-web-pr-${{ inputs.pr_number }}
+            namespace: sparrow-preview
+          spec:
+            selector:
+              app: sparrow-web-pr-${{ inputs.pr_number }}
+            ports:
+              - port: 80
+                targetPort: 80
+          ---
+          apiVersion: networking.k8s.io/v1
+          kind: Ingress
+          metadata:
+            name: sparrow-web-pr-${{ inputs.pr_number }}
+            namespace: sparrow-preview
+            annotations:
+              kubernetes.io/ingress.class: nginx
+              cert-manager.io/cluster-issuer: letsencrypt-prod
+          spec:
+            tls:
+              - hosts:
+                  - pr-${{ inputs.pr_number }}.preview.sparrowapp.dev
+                secretName: sparrow-web-pr-${{ inputs.pr_number }}-tls
+            rules:
+              - host: pr-${{ inputs.pr_number }}.preview.sparrowapp.dev
+                http:
+                  paths:
+                    - path: /
+                      pathType: Prefix
+                      backend:
+                        service:
+                          name: sparrow-web-pr-${{ inputs.pr_number }}
+                          port:
+                            number: 80
+          EOF
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v2.0
+
+      - name: Set Kubernetes context
+        uses: Azure/k8s-set-context@v2
+        with:
+          kubeconfig: ${{ secrets.KUBE_CONFIG }}
+
+      - name: Create preview namespace if not exists
+        run: |
+          kubectl create namespace sparrow-preview --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Deploy preview
+        run: |
+          kubectl apply -f /tmp/preview-deployment.yml
+
+      - name: Wait for deployment
+        run: |
+          kubectl rollout status deployment/sparrow-web-pr-${{ inputs.pr_number }} \
+            --namespace=sparrow-preview --timeout=300s

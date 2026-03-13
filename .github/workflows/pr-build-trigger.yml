@@ -176,18 +176,33 @@ jobs:
               owner:        context.repo.owner,
               repo:         context.repo.repo,
               body: [
-                "🚀 **Build triggered** for branch `${{ needs.validate.outputs.branch }}` from `${{ needs.validate.outputs.repo }}`.",
+                "🚀 **Builds triggered** for branch `${{ needs.validate.outputs.branch }}` from `${{ needs.validate.outputs.repo }}`.",
                 "",
-                "⏳ Build is currently in progress. You will receive a status update here once it completes."
+                "| Build | Type |",
+                "|-------|------|",
+                "| Desktop App (Win/Mac) | Binary |",
+                "| Webapp Preview | Docker + K8s |",
+                "",
+                "⏳ Builds are currently in progress. You will receive status updates here once they complete."
               ].join("\n")
             });
 
       # Step 3 — Dispatch the PR build workflow with the source branch and repository
-      - name: Trigger PR Build Workflow
+      - name: Trigger Desktop PR Build Workflow
         id: dispatch
         uses: benc-uk/workflow-dispatch@v1
         with:
           workflow: sparrow-app-pr-build.yml
+          ref:      main
+          inputs: '{"branch": "${{ needs.validate.outputs.branch }}", "repository": "${{ needs.validate.outputs.repo }}", "pr_number": "${{ needs.validate.outputs.pr_number }}"}'
+          token:    ${{ secrets.PAT_TOKEN }}
+
+      # Step 3b — Dispatch the Webapp Preview workflow
+      - name: Trigger Webapp Preview Workflow
+        id: dispatch_webapp
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: sparrow-webapp-pr-preview.yml
           ref:      main
           inputs: '{"branch": "${{ needs.validate.outputs.branch }}", "repository": "${{ needs.validate.outputs.repo }}", "pr_number": "${{ needs.validate.outputs.pr_number }}"}'
           token:    ${{ secrets.PAT_TOKEN }}
@@ -219,9 +234,14 @@ jobs:
               owner:        context.repo.owner,
               repo:         context.repo.repo,
               body: [
-                "✅ **Build dispatched successfully** for branch `${{ needs.validate.outputs.branch }}` from `${{ needs.validate.outputs.repo }}`.",
+                "✅ **Builds dispatched successfully** for branch `${{ needs.validate.outputs.branch }}` from `${{ needs.validate.outputs.repo }}`.",
                 "",
-                "You can monitor the build progress in the [Actions tab](https://github.com/${{ github.repository }}/actions)."
+                "| Build | Status |",
+                "|-------|--------|",
+                "| Desktop App | 🚀 Dispatched |",
+                "| Webapp Preview | 🚀 Dispatched |",
+                "",
+                "You can monitor progress in the [Actions tab](https://github.com/${{ github.repository }}/actions)."
               ].join("\n")
             });
 
