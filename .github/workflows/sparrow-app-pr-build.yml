@@ -359,7 +359,7 @@ jobs:
                     }
                     @{
                       "type" = "TextBlock"
-                      "text" = "Repository: ${{ inputs.repository }}"
+                      "text" = "Fork Repository: ${{ inputs.repository }}"
                       "wrap" = $true
                     }
                     @{
@@ -369,7 +369,7 @@ jobs:
                     }
                     @{
                       "type" = "TextBlock"
-                      "text" = "PR: [View Pull Request](https://github.com/${{ inputs.repository }}/pull/${{ inputs.pr_number }})"
+                      "text" = "PR: [View Pull Request](https://github.com/sparrowapp-dev/sparrow-app/pull/${{ inputs.pr_number }})"
                       "wrap" = $true
                     }
                     @{
@@ -514,7 +514,7 @@ jobs:
                     },
                     {
                       \"type\": \"TextBlock\",
-                      \"text\": \"Repository: ${{ inputs.repository }}\",
+                      \"text\": \"Fork Repository: ${{ inputs.repository }}\",
                       \"wrap\": true
                     },
                     { 
@@ -524,7 +524,7 @@ jobs:
                     },
                     {
                       \"type\": \"TextBlock\",
-                      \"text\": \"PR: [View Pull Request](https://github.com/${{ inputs.repository }}/pull/${{ inputs.pr_number }})\",
+                      \"text\": \"PR: [View Pull Request](https://github.com/sparrowapp-dev/sparrow-app/pull/${{ inputs.pr_number }})\",
                       \"wrap\": true
                     },
                     {
