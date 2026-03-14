@@ -66,9 +66,6 @@ jobs:
         with:
           node-version: "20.8"
 
-      - name: Install project dependencies
-        run: yarn
-
       - name: Increase Yarn network timeout
         run: yarn config set network-timeout 600000
 
@@ -109,18 +106,18 @@ jobs:
       - name: Extract Certificate IDs
         id: extract-cert-ids
         run: |
-          # Extract Apple Distribution (codesigning) ID
-          CODESIGN_ID=$(security find-identity -v -p codesigning build.keychain | grep "Apple Distribution" | awk -F'"' '{print $2}')
+          # Extract 3rd Party Mac Developer Application (codesigning) ID
+          CODESIGN_ID=$(security find-identity -v -p codesigning build.keychain | grep "3rd Party Mac Developer Application" | head -1 | awk -F'"' '{print $2}')
           if [ -z "$CODESIGN_ID" ]; then
-            echo "::error::Apple Distribution certificate not found in keychain"
+            echo "::error::3rd Party Mac Developer Application certificate not found in keychain"
             exit 1
           fi
           echo "CODESIGN_ID=$CODESIGN_ID" >> $GITHUB_ENV
 
-          # Extract 3rd Party Installer ID (must search all identities)
-          INSTALLER_ID=$(security find-identity -v build.keychain | grep "3rd Party Mac Developer Installer" | awk -F'"' '{print $2}')
+          # Extract 3rd Party Mac Developer Installer ID
+          INSTALLER_ID=$(security find-identity -v build.keychain | grep "3rd Party Mac Developer Installer" | head -1 | awk -F'"' '{print $2}')
           if [ -z "$INSTALLER_ID" ]; then
-            echo "::error::Installer certificate not found in keychain"
+            echo "::error::3rd Party Mac Developer Installer certificate not found in keychain"
             exit 1
           fi
           echo "INSTALLER_ID=$INSTALLER_ID" >> $GITHUB_ENV
