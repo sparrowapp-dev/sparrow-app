@@ -49,6 +49,7 @@ jobs:
   release_mac_app_store:
     runs-on: macos-latest
     environment: development
+    timeout-minutes: 60
 
     steps:
       - name: Checkout Repository
@@ -138,21 +139,29 @@ jobs:
 
       - name: Create signed .pkg for App Store
         run: |
+          set -euxo pipefail
           APP_NAME="Sparrow"
           BUNDLE_PATH="apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/${APP_NAME}.app"
           PKG_PATH="apps/@sparrow-desktop/src-tauri/target/debug/bundle/${APP_NAME}.pkg"
+
+          echo "Checking bundle path: $BUNDLE_PATH"
+          ls -R "$(dirname "$BUNDLE_PATH")" || true
 
           if [ ! -d "$BUNDLE_PATH" ]; then
             echo "::error::App bundle not found at $BUNDLE_PATH"
             exit 1
           fi
 
-          # Sign with INSTALLER_ID (3rd Party Mac Developer Installer)
-          productbuild \
+          echo "Verifying app code signature before productbuild…"
+          codesign --verify --deep --strict --verbose=4 "$BUNDLE_PATH" || echo "codesign verification failed"
+
+          echo "Starting productbuild…"
+          time productbuild \
             --component "$BUNDLE_PATH" /Applications \
             --sign "$INSTALLER_ID" \
             "$PKG_PATH"
 
+          echo "productbuild completed, checking pkg…"
           if [ ! -f "$PKG_PATH" ]; then
             echo "::error::Failed to create package at $PKG_PATH"
             exit 1
