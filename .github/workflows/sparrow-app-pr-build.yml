@@ -547,3 +547,84 @@ jobs:
             ]
           }" "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL}}"
         shell: bash
+      
+  web_preview:
+    name: Update Web Preview Deployment
+    runs-on: ubuntu-latest
+    needs: release_macos
+    environment: development
+
+    steps:
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Set Kubernetes context
+        uses: Azure/k8s-set-context@v2
+        with:
+          kubeconfig: ${{ secrets.KUBE_CONFIG }}
+
+      - name: Update preview deployment image
+        run: |
+          kubectl set image deployment/sparrow-web-preview \
+          sparrow-web=sparrowprod.azurecr.io/sparrow-web:${{ github.run_number }} \
+          --namespace=sparrow-dev
+
+      - name: Wait for rollout
+        run: |
+          kubectl rollout status deployment/sparrow-web-preview \
+          --namespace=sparrow-dev --timeout=300s
+
+      - name: Post Web Preview Link to Teams
+        run: |
+          PREVIEW_URL="https://preview.sparrowapp.dev"
+
+          curl -H "Content-Type: application/json" -d "{
+            \"type\": \"message\",
+            \"attachments\": [
+              {
+                \"contentType\": \"application/vnd.microsoft.card.adaptive\",
+                \"content\": {
+                  \"type\": \"AdaptiveCard\",
+                  \"body\": [
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"🌐 Sparrow Web Preview\",
+                      \"weight\": \"bolder\",
+                      \"size\": \"large\"
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"Fork Repository: ${{ inputs.repository }}\",
+                      \"wrap\": true
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"Branch: ${{ inputs.branch }}\",
+                      \"wrap\": true
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"PR: [View Pull Request](https://github.com/sparrowapp-dev/sparrow-app/pull/${{ inputs.pr_number }})\",
+                      \"wrap\": true
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"Build Date: $(date +'%Y-%m-%d %H:%M:%S')\",
+                      \"wrap\": true
+                    }
+                  ],
+                  \"actions\": [
+                    {
+                      \"type\": \"Action.OpenUrl\",
+                      \"title\": \"🔎 Open Web Preview\",
+                      \"url\": \"$PREVIEW_URL\"
+                    }
+                  ],
+                  \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
+                  \"version\": \"1.2\"
+                }
+              }
+            ]
+          }" "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL}}"
+        shell: bash
