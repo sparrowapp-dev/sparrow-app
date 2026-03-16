@@ -3,6 +3,13 @@ name: PR Build
 on:
   workflow_dispatch:
     inputs:
+      build_type:
+        description: 'Select what to build'
+        required: true
+        type: choice
+        options:
+          - App
+          - Web App
       branch:
         description: 'Branch to build'
         required: true
@@ -51,6 +58,7 @@ env:
 
 jobs:
   release_win:
+    if: inputs.build_type == 'App'
     runs-on: windows-latest
     environment: development
 
@@ -396,6 +404,7 @@ jobs:
         shell: pwsh
 
   release_macos:
+    if: inputs.build_type == 'App'
     runs-on: macos-latest
     environment: development
     needs: release_win
@@ -549,9 +558,9 @@ jobs:
         shell: bash
       
   web_preview:
+    if: inputs.build_type == 'Web App'
     name: Update Web Preview Deployment
     runs-on: ubuntu-latest
-    needs: release_macos
     environment: development
 
     steps:
