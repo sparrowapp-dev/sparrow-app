@@ -130,48 +130,71 @@ jobs:
         run: |
           yarn cache clean
           yarn install
-          yarn workspace @sparrow/desktop tauri build --debug --verbose
+          yarn workspace @sparrow/desktop tauri build --verbose
         env:
           APPLE_SIGNING_IDENTITY: "${{ env.CODESIGN_ID }}" 
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
 
-      - name: Create signed .pkg for App Store
+      # - name: Create signed .pkg for App Store
+      #   run: |
+      #     set -euxo pipefail
+      #     APP_NAME="Sparrow"
+      #     BUNDLE_PATH="apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/${APP_NAME}.app"
+      #     PKG_PATH="apps/@sparrow-desktop/src-tauri/target/debug/bundle/${APP_NAME}.pkg"
+
+      #     echo "Checking bundle path: $BUNDLE_PATH"
+      #     ls -R "$(dirname "$BUNDLE_PATH")" || true
+
+      #     if [ ! -d "$BUNDLE_PATH" ]; then
+      #       echo "::error::App bundle not found at $BUNDLE_PATH"
+      #       exit 1
+      #     fi
+
+      #     echo "Verifying app code signature before productbuild…"
+      #     codesign --verify --deep --strict --verbose=4 "$BUNDLE_PATH" || echo "codesign verification failed"
+
+      #     echo "Starting productbuild…"
+      #     time productbuild \
+      #       --component "$BUNDLE_PATH" /Applications \
+      #       --sign "$INSTALLER_ID" \
+      #       "$PKG_PATH"
+
+      #     echo "productbuild completed, checking pkg…"
+      #     if [ ! -f "$PKG_PATH" ]; then
+      #       echo "::error::Failed to create package at $PKG_PATH"
+      #       exit 1
+      #     fi
+      #   env:
+      #     INSTALLER_ID: ${{ env.INSTALLER_ID }}
+
+      - name: Create unsigned pkg
+        timeout-minutes: 10
         run: |
           set -euxo pipefail
           APP_NAME="Sparrow"
-          BUNDLE_PATH="apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/${APP_NAME}.app"
-          PKG_PATH="apps/@sparrow-desktop/src-tauri/target/debug/bundle/${APP_NAME}.pkg"
+          BUNDLE_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/macos/${APP_NAME}.app"
+          PKG_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/${APP_NAME}-unsigned.pkg"
 
-          echo "Checking bundle path: $BUNDLE_PATH"
-          ls -R "$(dirname "$BUNDLE_PATH")" || true
-
-          if [ ! -d "$BUNDLE_PATH" ]; then
-            echo "::error::App bundle not found at $BUNDLE_PATH"
-            exit 1
-          fi
-
-          echo "Verifying app code signature before productbuild…"
-          codesign --verify --deep --strict --verbose=4 "$BUNDLE_PATH" || echo "codesign verification failed"
-
-          echo "Starting productbuild…"
           time productbuild \
             --component "$BUNDLE_PATH" /Applications \
-            --sign "$INSTALLER_ID" \
             "$PKG_PATH"
 
-          echo "productbuild completed, checking pkg…"
-          if [ ! -f "$PKG_PATH" ]; then
-            echo "::error::Failed to create package at $PKG_PATH"
-            exit 1
-          fi
+      - name: Sign pkg
+        timeout-minutes: 10
+        run: |
+          set -euxo pipefail
+          UNSIGNED="apps/@sparrow-desktop/src-tauri/target/release/bundle/Sparrow-unsigned.pkg"
+          SIGNED="apps/@sparrow-desktop/src-tauri/target/release/bundle/Sparrow.pkg"
+
+          time productsign --sign "$INSTALLER_ID" "$UNSIGNED" "$SIGNED"
         env:
-          INSTALLER_ID: ${{ env.INSTALLER_ID }}
+          INSTALLER_ID: ${{ env.INSTALLER_ID }}    
 
       - name: Upload to App Store Connect
         env:
-          PKG_PATH: "apps/@sparrow-desktop/src-tauri/target/debug/bundle/Sparrow.pkg"
+          PKG_PATH: "apps/@sparrow-desktop/src-tauri/target/release/bundle/Sparrow.pkg"
           APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
