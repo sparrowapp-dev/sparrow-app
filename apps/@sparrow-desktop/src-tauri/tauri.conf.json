@@ -100,7 +100,7 @@
       }
     }
   },
-  "identifier": "dev.sparrowapp.desktop",
+  "identifier": "com.sparrowapp.desktop",
   "plugins": {
     "singleInstance": {
       "enabled": true
