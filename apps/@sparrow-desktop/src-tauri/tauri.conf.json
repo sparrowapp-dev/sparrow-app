@@ -77,7 +77,7 @@
       "entitlements": "./Entitlements.plist",
       "minimumSystemVersion": "12.0",
       "files": {
-        "embedded.provisionprofile": "./assets/Sparrow_Desktop_1.provisionprofile"
+        "embedded.provisionprofile": "./assets/Sparrow_Desktop_2.provisionprofile"
       },
       "dmg": {
         "background": "./icons/background.png",
