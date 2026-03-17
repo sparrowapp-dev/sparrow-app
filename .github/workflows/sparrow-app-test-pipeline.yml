@@ -65,7 +65,7 @@ jobs:
       - name: Sync node version and setup cache
         uses: actions/setup-node@v4
         with:
-          node-version: "20.8"
+          node-version: "22.12"
 
       - name: Increase Yarn network timeout
         run: yarn config set network-timeout 600000
@@ -146,7 +146,7 @@ jobs:
           
           yarn cache clean
           yarn install
-          yarn workspace @sparrow/desktop tauri build --verbose
+          yarn workspace @sparrow/desktop tauri build
         env:
           APPLE_SIGNING_IDENTITY: "${{ env.CODESIGN_ID }}" 
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
