@@ -3,13 +3,6 @@ name: PR Build
 on:
   workflow_dispatch:
     inputs:
-      build_type:
-        description: 'Select what to build'
-        required: true
-        type: choice
-        options:
-          - App
-          - Web App
       branch:
         description: 'Branch to build'
         required: true
@@ -23,6 +16,10 @@ on:
         description: 'Pull Request number'
         required: true
         type: string  
+      build_type:
+        description: 'Build type'
+        required: true
+        type: string    
 
 env:
   VITE_API_URL: ${{ vars.VITE_API_URL_DEV }}
@@ -58,7 +55,7 @@ env:
 
 jobs:
   release_win:
-    if: inputs.build_type == 'App'
+    if: inputs.build_type == 'all'
     runs-on: windows-latest
     environment: development
 
@@ -404,7 +401,7 @@ jobs:
         shell: pwsh
 
   release_macos:
-    if: inputs.build_type == 'App'
+    if: inputs.build_type == 'all'
     runs-on: macos-latest
     environment: development
     needs: release_win
@@ -556,17 +553,17 @@ jobs:
             ]
           }" "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL}}"
         shell: bash
-      
+
   web_preview:
-    if: inputs.build_type == 'Web App'
     name: Update Web Preview Deployment
+    if: inputs.build_type == 'all' || inputs.build_type == 'web'
     runs-on: ubuntu-latest
     environment: development
 
     steps:
 
       - name: Setup kubectl
-        uses: azure/setup-kubectl@v3
+        uses: azure/setup-kubectl@v2.0
 
       - name: Set Kubernetes context
         uses: Azure/k8s-set-context@v2
@@ -636,4 +633,4 @@ jobs:
               }
             ]
           }" "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL}}"
-        shell: bash
+        shell: bash      
