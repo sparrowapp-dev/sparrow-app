@@ -562,6 +562,12 @@ jobs:
 
     steps:
 
+      - name: Checkout k8s manifests
+        uses: actions/checkout@v3
+        with:
+          sparse-checkout: .github/k8s
+          sparse-checkout-cone-mode: false
+
       - name: Setup kubectl
         uses: azure/setup-kubectl@v2.0
 
@@ -570,20 +576,25 @@ jobs:
         with:
           kubeconfig: ${{ secrets.KUBE_CONFIG }}
 
-      - name: Update preview deployment image
+      - name: Deploy PR Preview
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
+          IMAGE_TAG: ${{ github.run_number }}
         run: |
-          kubectl set image deployment/sparrow-web-preview \
-          sparrow-web=sparrowprod.azurecr.io/sparrow-web:${{ github.run_number }} \
-          --namespace=sparrow-dev
+          # Substitute variables and apply manifests
+          envsubst < .github/k8s/pr-preview/deployment.yaml | kubectl apply -f -
+          envsubst < .github/k8s/pr-preview/service.yaml | kubectl apply -f -
+          envsubst < .github/k8s/pr-preview/ingress.yaml | kubectl apply -f -
 
       - name: Wait for rollout
         run: |
-          kubectl rollout status deployment/sparrow-web-preview \
+          kubectl rollout status deployment/sparrow-web-preview-pr-${{ inputs.pr_number }} \
           --namespace=sparrow-dev --timeout=300s
 
       - name: Post Web Preview Link to Teams
         run: |
-          PREVIEW_URL="https://preview.sparrowapp.dev"
+          PR_NUMBER="${{ inputs.pr_number }}"
+          PREVIEW_URL="https://pr-${PR_NUMBER}.preview.sparrowapp.dev"
 
           curl -H "Content-Type: application/json" -d "{
             \"type\": \"message\",
@@ -595,7 +606,7 @@ jobs:
                   \"body\": [
                     {
                       \"type\": \"TextBlock\",
-                      \"text\": \"🌐 Sparrow Web Preview\",
+                      \"text\": \"🌐 Sparrow Web Preview (PR #${PR_NUMBER})\",
                       \"weight\": \"bolder\",
                       \"size\": \"large\"
                     },
