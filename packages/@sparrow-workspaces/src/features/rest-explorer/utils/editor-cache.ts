@@ -24,8 +24,8 @@ interface CachedEditor {
   format: ResponseFormat;
   /** Whether the editor has been initialized with content */
   initialized: boolean;
-  /** Content hash to detect if re-initialization is needed (new response) */
-  contentHash: string;
+  /** Response ID to detect if re-initialization is needed (new response) */
+  responseId: string;
 }
 
 /**
@@ -36,29 +36,17 @@ interface CachedEditor {
 const editorCache = new Map<string, Map<ResponseFormat, CachedEditor>>();
 
 /**
- * Simple hash function for content comparison
- */
-function hashContent(content: string): string {
-  let hash = 0;
-  const len = Math.min(content.length, 10000); // Only hash first 10KB for performance
-  for (let i = 0; i < len; i++) {
-    const char = content.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash = hash & hash;
-  }
-  return hash.toString(36);
-}
-
-/**
  * Get or create a CodeMirror editor for a tab and format.
  *
  * @param tabId - Unique tab identifier
+ * @param responseId - Unique response identifier
  * @param format - Response format (json, html, xml, raw)
  * @param extensions - CodeMirror extensions to apply
  * @param parentElement - DOM element to attach editor to
  */
 export function getOrCreateEditor(
   tabId: string,
+  responseId: string,
   format: ResponseFormat,
   extensions: Extension[],
   parentElement: HTMLElement,
@@ -70,6 +58,15 @@ export function getOrCreateEditor(
   }
 
   let cached = tabEditors.get(format);
+
+  // If cached editor exists but responseId changed, destroy and recreate
+  if (cached && cached.responseId !== responseId) {
+    cached.view.destroy();
+    cached.container.remove();
+    tabEditors.delete(format);
+    cached = undefined;
+  }
+
   if (cached) {
     // Ensure the container is in the correct parent
     if (cached.container.parentElement !== parentElement) {
@@ -107,7 +104,7 @@ export function getOrCreateEditor(
     container,
     format,
     initialized: false,
-    contentHash: "",
+    responseId,
   };
 
   tabEditors.set(format, cached);
@@ -116,14 +113,16 @@ export function getOrCreateEditor(
 
 /**
  * Initialize editor with content (called once after formatting completes).
- * If content hash matches, this is a no-op.
+ * If responseId matches and already initialized, this is a no-op.
  *
  * @param tabId - Unique tab identifier
+ * @param responseId - Unique response identifier
  * @param format - Response format
  * @param content - Formatted content to display
  */
 export function initializeEditorContent(
   tabId: string,
+  responseId: string,
   format: ResponseFormat,
   content: string,
 ): void {
@@ -137,10 +136,13 @@ export function initializeEditorContent(
     return;
   }
 
-  const newHash = hashContent(content);
+  // If responseId changed, this editor will be recreated on next getOrCreateEditor
+  if (cached.responseId !== responseId) {
+    return;
+  }
 
-  // If already initialized with same content, skip
-  if (cached.initialized && cached.contentHash === newHash) {
+  // If already initialized for this response, skip
+  if (cached.initialized) {
     return;
   }
 
@@ -154,7 +156,6 @@ export function initializeEditorContent(
   });
 
   cached.initialized = true;
-  cached.contentHash = newHash;
 }
 
 /**
@@ -212,20 +213,25 @@ export function showTabEditor(tabId: string, format: ResponseFormat): void {
 }
 
 /**
- * Check if an editor exists and is initialized for a tab and format.
+ * Check if an editor exists and is initialized for a tab, response, and format.
  *
  * @param tabId - Unique tab identifier
+ * @param responseId - Unique response identifier
  * @param format - Response format
  */
 export function hasInitializedEditor(
   tabId: string,
+  responseId: string,
   format: ResponseFormat,
 ): boolean {
   const tabEditors = editorCache.get(tabId);
   if (!tabEditors) return false;
 
   const cached = tabEditors.get(format);
-  return cached?.initialized ?? false;
+  if (!cached) return false;
+
+  // Check if responseId matches and is initialized
+  return cached.responseId === responseId && cached.initialized;
 }
 
 /**
