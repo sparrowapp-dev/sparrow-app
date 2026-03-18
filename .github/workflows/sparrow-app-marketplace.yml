@@ -168,7 +168,7 @@ jobs:
 
   release_mac_app_store:
     runs-on: macos-latest
-    environment: development
+    environment: production
     timeout-minutes: 60
 
     steps:
@@ -185,7 +185,7 @@ jobs:
       - name: Sync node version and setup cache
         uses: actions/setup-node@v4
         with:
-          node-version: "22.12"
+          node-version: "24"
 
       - name: Increase Yarn network timeout
         run: yarn config set network-timeout 600000
