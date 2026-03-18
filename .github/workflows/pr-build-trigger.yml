@@ -9,6 +9,7 @@ permissions:
   pull-requests: write
   checks: write
   statuses: write
+  actions: write
 
 concurrency:
   group: pr-build-${{ github.event.issue.number || github.run_id }}
@@ -27,10 +28,13 @@ jobs:
       branch:     ${{ steps.pr_info.outputs.branch }}
       sha:        ${{ steps.pr_info.outputs.sha }}
       pr_number:  ${{ steps.pr_info.outputs.pr_number }}
+      repo:       ${{ steps.pr_info.outputs.repo }}
+      build_type: ${{ steps.validate_trigger.outputs.build_type }}
 
     steps:
       # Step 1 — Ensure this is a /build comment on a PR (not a plain issue)
       - name: Validate trigger
+        id: validate_trigger
         env:
           COMMENT_BODY: ${{ github.event.comment.body }}
           EVENT_NAME:   ${{ github.event_name }}
@@ -50,18 +54,27 @@ jobs:
             exit 1
           fi
 
-          if [[ "$COMMENT_BODY" != *"/build"* ]]; then
-            echo "❌ Comment does not contain /build — skipping."
+          BUILD_TYPE=""
+
+          if [[ "$COMMENT_BODY" == *"/build-web"* ]]; then
+            BUILD_TYPE="web"
+          elif [[ "$COMMENT_BODY" == *"/build"* ]]; then
+            BUILD_TYPE="all"
+          else
+            echo "❌ Comment does not contain /build or /build-web — skipping."
             exit 1
           fi
 
+          echo "Build type: $BUILD_TYPE"
+          echo "build_type=$BUILD_TYPE" >> $GITHUB_OUTPUT
+
           echo "✅ Trigger validation passed."
 
-      # Step 2 — Checkout development branch to access .github/pr-build-whitelist.yml
-      - name: Checkout development branch
+      # Step 2 — Checkout main branch to access .github/pr-build-whitelist.yml
+      - name: Checkout main branch
         uses: actions/checkout@v3
         with:
-          ref: development
+          ref: main
 
       # Step 3 — Fetch PR metadata (branch, SHA, number) via GitHub API
       - name: Get PR info
@@ -79,27 +92,19 @@ jobs:
             const sha       = pr.data.head.sha;
             const repo      = pr.data.head.repo.full_name;
             const pr_number = pr.data.number;
+            const build_type = "${{ steps.validate_trigger.outputs.build_type }}";
 
             console.log(`Branch    : ${branch}`);
             console.log(`SHA       : ${sha}`);
             console.log(`Repo      : ${repo}`);
             console.log(`PR Number : ${pr_number}`);
+            console.log(`Build Type: ${build_type}`);
 
             core.setOutput("branch",    branch);
             core.setOutput("sha",       sha);
             core.setOutput("repo",      repo);
             core.setOutput("pr_number", pr_number);
-
-            // Block builds from forked repositories
-            if (repo !== `${context.repo.owner}/${context.repo.repo}`) {
-              await github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner:        context.repo.owner,
-                repo:         context.repo.repo,
-                body:         "❌ Builds are not allowed from forked repositories."
-              });
-              core.setFailed("PR is from a fork. Build not allowed.");
-            }
+            core.setOutput("build_type", build_type);
 
       # Step 4 — Install yq to parse the YAML whitelist
       - name: Install yq
@@ -114,7 +119,7 @@ jobs:
           echo "Checking authorization for: $GH_USER"
 
           if [ ! -f ".github/pr-build-whitelist.yml" ]; then
-            echo "❌ .github/pr-build-whitelist.yml not found on development branch."
+            echo "❌ .github/pr-build-whitelist.yml not found on main branch."
             exit 1
           fi
 
@@ -185,20 +190,25 @@ jobs:
               owner:        context.repo.owner,
               repo:         context.repo.repo,
               body: [
-                "🚀 **Build triggered** for branch `${{ needs.validate.outputs.branch }}`.",
+                "🚀 **Build triggered** for branch `${{ needs.validate.outputs.branch }}` from `${{ needs.validate.outputs.repo }}`.",
                 "",
                 "⏳ Build is currently in progress. You will receive a status update here once it completes."
               ].join("\n")
             });
 
-      # Step 3 — Dispatch the actual development release workflow
-      #          Uses a PAT (not GITHUB_TOKEN) as GITHUB_TOKEN cannot trigger workflows
-      - name: Trigger Development Release Workflow
+      # Step 3 — Dispatch the PR build workflow with the source branch and repository
+      - name: Trigger PR Build Workflow
         id: dispatch
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: sparrow-app-development.yml
-          ref:      ${{ needs.validate.outputs.branch }}
+          workflow: sparrow-app-pr-build.yml
+          ref:      main
+          inputs: '{
+            "branch": "${{ needs.validate.outputs.branch }}",
+            "repository": "${{ needs.validate.outputs.repo }}",
+            "pr_number": "${{ needs.validate.outputs.pr_number }}",
+            "build_type": "${{ needs.validate.outputs.build_type }}"
+          }'
           token:    ${{ secrets.PAT_TOKEN }}
 
       # Step 4 — Set commit status to success after dispatch
@@ -228,7 +238,7 @@ jobs:
               owner:        context.repo.owner,
               repo:         context.repo.repo,
               body: [
-                "✅ **Build dispatched successfully** for branch `${{ needs.validate.outputs.branch }}`.",
+                "✅ **Build dispatched successfully** for branch `${{ needs.validate.outputs.branch }}` from `${{ needs.validate.outputs.repo }}`.",
                 "",
                 "You can monitor the build progress in the [Actions tab](https://github.com/${{ github.repository }}/actions)."
               ].join("\n")
@@ -260,8 +270,8 @@ jobs:
               owner:        context.repo.owner,
               repo:         context.repo.repo,
               body: [
-                "❌ **Build dispatch failed** for branch `${{ needs.validate.outputs.branch }}`.",
+                "❌ **Build dispatch failed** for branch `${{ needs.validate.outputs.branch }}` from `${{ needs.validate.outputs.repo }}`.",
                 "",
                 "Please check the [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for more details."
               ].join("\n")
-            });
+            });            
