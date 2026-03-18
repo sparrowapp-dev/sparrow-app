@@ -1259,18 +1259,59 @@ export class DashboardViewModel {
   };
 
   /**
-   * @description - This function will redirect you to billing section.
+   * @description - This function will redirect you to Admin Panel.
    */
-  public handleRedirectToAdminPanel = async (teamId: string) => {
+  public handleRedirectToAdminPanel = async (
+    teamId: string,
+    redirectPath?: string,
+  ) => {
     const [authToken] = getAuthJwt();
     const [, , selfhostAdminUrl] = getSelfhostUrls();
 
     if (selfhostAdminUrl) {
-      await open(selfhostAdminUrl);
-    } else {
-      await open(
-        `${constants.ADMIN_URL}/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
+      if (redirectPath) {
+        await open(`${selfhostAdminUrl}${redirectPath}`);
+      } else {
+        await open(selfhostAdminUrl);
+      }
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${constants.API_URL}/api/auth/admin-sso-token`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({ teamId }),
+        },
       );
+
+      if (response.status === 403) {
+        await open(`${constants.ADMIN_URL}/login`);
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error("Unexpected error");
+      }
+
+      const data = await response.json();
+
+      // base SSO url
+      let url = `${constants.ADMIN_URL}/sso?ssoToken=${data.ssoToken}`;
+
+      // if redirect provided → append it
+      if (redirectPath) {
+        url += `&redirectTo=${encodeURIComponent(redirectPath)}`;
+      }
+
+      await open(url);
+    } catch (error) {
+      await open(`${constants.ADMIN_URL}/login`);
     }
   };
 

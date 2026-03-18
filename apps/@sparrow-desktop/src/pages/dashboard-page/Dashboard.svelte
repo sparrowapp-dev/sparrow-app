@@ -927,7 +927,9 @@
     onUpgradeClick={handleHeaderUpgradeClick}
     handleDocsRedirect={_viewModel.redirectDocs}
     handleFeaturesRedirect={_viewModel.redirectFeatureUpdates}
-    onAdminRedirect={_viewModel.onAdminRedirect}
+    onAdminRedirect={() => {
+      _viewModel.handleRedirectToAdminPanel(openTeam?.teamId);
+    }}
     recentVisitedWorkspaces={$recentVisitedWorkspaces}
     on:acceptInvite={handleAcceptInvite}
     on:declineInvite={handleDeclineInvite}
@@ -958,7 +960,14 @@
           }}
         />
       {:else if openTeam?.plan?.name === "Community"}
-        <UpgradePlanBanner bind:isUpgradePlanModelOpen />
+        <UpgradePlanBanner
+          bind:isUpgradePlanModelOpen
+          onUpgradeRedirect={() =>
+            _viewModel.handleRedirectToAdminPanel(
+              openTeam?.teamId,
+              `/billing/billingOverview/${openTeam?.teamId}?redirectTo=changePlan`,
+            )}
+        />
       {/if}
     {/if}
   {/if}
