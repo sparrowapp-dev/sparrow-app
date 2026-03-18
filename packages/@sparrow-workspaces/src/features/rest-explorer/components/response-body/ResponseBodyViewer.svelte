@@ -160,15 +160,18 @@
    * Load content from file-backed storage
    */
   async function loadFileBackedContent(format: ResponseFormat) {
+    const responseId = String(response?.responseVersion ?? 0);
+
     // Always check for cached content first
-    const cachedContent = getCachedContent(tabId, format);
+    const cachedContent = getCachedContent(tabId, responseId, format);
 
     // If editor is already initialized and we have content, just show it
-    if (hasInitializedEditor(tabId, format) && cachedContent) {
+    if (hasInitializedEditor(tabId, responseId, format) && cachedContent) {
       hasDisplayedContent = true;
       if (editorContainer) {
         getOrCreateEditor(
           tabId,
+          responseId,
           format,
           createExtensions(format),
           editorContainer,
@@ -191,6 +194,7 @@
     try {
       const content = await getFormattedResponse({
         tabId,
+        responseId,
         format,
         onProgress: (stage) => {
           switch (stage) {
@@ -229,9 +233,11 @@
    * Load in-memory content (small responses)
    */
   async function loadInMemoryContent(format: ResponseFormat) {
+    const responseId = String(response?.responseVersion ?? 0);
+
     // Always check for cached content first
-    const cachedContent = getCachedContent(tabId, format);
-    const editorInitialized = hasInitializedEditor(tabId, format);
+    const cachedContent = getCachedContent(tabId, responseId, format);
+    const editorInitialized = hasInitializedEditor(tabId, responseId, format);
 
     // If editor is already initialized and we have content, just show it
     if (editorInitialized && cachedContent) {
@@ -239,6 +245,7 @@
       if (editorContainer) {
         getOrCreateEditor(
           tabId,
+          responseId,
           format,
           createExtensions(format),
           editorContainer,
@@ -266,6 +273,7 @@
     try {
       const formattedContent = await getFormattedResponse({
         tabId,
+        responseId,
         format,
         rawContent,
         onProgress: (stage) => {
@@ -294,8 +302,10 @@
   async function setupEditor(format: ResponseFormat, content: string) {
     if (!editorContainer) return;
 
+    const responseId = String(response?.responseVersion ?? 0);
     const cached = getOrCreateEditor(
       tabId,
+      responseId,
       format,
       createExtensions(format),
       editorContainer,
@@ -308,7 +318,7 @@
       await tick();
 
       try {
-        initializeEditorContent(tabId, format, content);
+        initializeEditorContent(tabId, responseId, format, content);
         hasDisplayedContent = true;
       } finally {
         isRenderingEditor = false;
@@ -367,7 +377,8 @@
 
       // Clear in-memory cache when response changes
       if (!isFileBacked()) {
-        clearInMemoryCache(tabId);
+        const responseId = String(responseVersion);
+        clearInMemoryCache(tabId, responseId);
       }
 
       loadContent();

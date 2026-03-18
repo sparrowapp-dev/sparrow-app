@@ -45,12 +45,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: "20.x"
+          node-version: "24"
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
@@ -413,7 +413,6 @@ jobs:
 
       - name: Remove App Store specific properties
         run: |
-          sed -i '' 's/dev.sparrowapp.desktop/com.sparrow.app/g' apps/@sparrow-desktop/src-tauri/Info.plist
           sed -i '' '/"macOS": {/,/},/ {
               /"entitlements":.*/d
               /"minimumSystemVersion":.*/d

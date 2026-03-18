@@ -23,6 +23,8 @@
   import { Events } from "@sparrow/common/enums/mixpanel-events.enum";
   import { Search } from "@sparrow/library/forms";
   import { SparrowLogo } from "@sparrow/common/images";
+  import constants from "@sparrow/desktop/src/constants/constants";
+
   export let listChangeLog;
 
   export let onReleaseNoteRedirect;
@@ -322,7 +324,8 @@
                           type="teritiary-regular"
                           startIcon={LinkRegular}
                           onClick={async () => {
-                            await copyToClipBoard(event.url);
+                            const releaseNoteUrl = `${constants.SPARROW_GITHUB}/sparrow-app/releases/tag/${event?.title}`;
+                            await copyToClipBoard(releaseNoteUrl);
                             notifications.success("Link copied to clipboard.");
                             MixpanelEvent(Events.Copy_Link);
                           }}
