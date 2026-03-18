@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sparrow-web-preview-pr-${PR_NUMBER}
+  namespace: sparrow-dev
+  labels:
+    app: sparrow-web-preview
+    pr: "${PR_NUMBER}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sparrow-web-preview-pr-${PR_NUMBER}
+  template:
+    metadata:
+      labels:
+        app: sparrow-web-preview-pr-${PR_NUMBER}
+    spec:
+      containers:
+      - name: sparrow-web
+        image: sparrowprod.azurecr.io/sparrow-web:${IMAGE_TAG}
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
