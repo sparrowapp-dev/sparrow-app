@@ -77,7 +77,7 @@
       "entitlements": "./Entitlements.plist",
       "minimumSystemVersion": "12.0",
       "files": {
-        "embedded.provisionprofile": "./assets/Sparrow_Desktop.provisionprofile"
+        "embedded.provisionprofile": "./assets/sparrow.provisionprofile"
       },
       "dmg": {
         "background": "./icons/background.png",
@@ -100,7 +100,7 @@
       }
     }
   },
-  "identifier": "dev.sparrowapp.desktop",
+  "identifier": "com.sparrowapp.desktop",
   "plugins": {
     "singleInstance": {
       "enabled": true
