@@ -1,0 +1,100 @@
+name: PR Preview Cleanup
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  cleanup:
+    name: Delete PR Preview Resources
+    runs-on: ubuntu-latest
+    environment: development
+
+    steps:
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v2.0
+
+      - name: Set Kubernetes context
+        uses: Azure/k8s-set-context@v2
+        with:
+          kubeconfig: ${{ secrets.KUBE_CONFIG }}
+
+      - name: Delete PR Preview Resources
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          NAMESPACE="sparrow-dev"
+          
+          echo "Cleaning up preview resources for PR #${PR_NUMBER}"
+          
+          # Delete Ingress
+          if kubectl get ingress sparrow-web-preview-pr-${PR_NUMBER} -n ${NAMESPACE} > /dev/null 2>&1; then
+            echo "Deleting ingress..."
+            kubectl delete ingress sparrow-web-preview-pr-${PR_NUMBER} -n ${NAMESPACE}
+          else
+            echo "Ingress not found, skipping..."
+          fi
+          
+          # Delete TLS Secret (created by cert-manager)
+          if kubectl get secret preview-pr-${PR_NUMBER}-tls -n ${NAMESPACE} > /dev/null 2>&1; then
+            echo "Deleting TLS secret..."
+            kubectl delete secret preview-pr-${PR_NUMBER}-tls -n ${NAMESPACE}
+          else
+            echo "TLS secret not found, skipping..."
+          fi
+          
+          # Delete Service
+          if kubectl get service sparrow-web-preview-pr-${PR_NUMBER} -n ${NAMESPACE} > /dev/null 2>&1; then
+            echo "Deleting service..."
+            kubectl delete service sparrow-web-preview-pr-${PR_NUMBER} -n ${NAMESPACE}
+          else
+            echo "Service not found, skipping..."
+          fi
+          
+          # Delete Deployment
+          if kubectl get deployment sparrow-web-preview-pr-${PR_NUMBER} -n ${NAMESPACE} > /dev/null 2>&1; then
+            echo "Deleting deployment..."
+            kubectl delete deployment sparrow-web-preview-pr-${PR_NUMBER} -n ${NAMESPACE}
+          else
+            echo "Deployment not found, skipping..."
+          fi
+          
+          echo "✅ Cleanup completed for PR #${PR_NUMBER}"
+
+      - name: Post Cleanup Notification to Teams
+        if: success()
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          
+          curl -H "Content-Type: application/json" -d "{
+            \"type\": \"message\",
+            \"attachments\": [
+              {
+                \"contentType\": \"application/vnd.microsoft.card.adaptive\",
+                \"content\": {
+                  \"type\": \"AdaptiveCard\",
+                  \"body\": [
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"🧹 PR Preview Cleaned Up\",
+                      \"weight\": \"bolder\",
+                      \"size\": \"large\"
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"PR #${PR_NUMBER}: ${PR_TITLE}\",
+                      \"wrap\": true
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"Preview URL https://pr-${PR_NUMBER}.preview.sparrowapp.dev has been decommissioned.\",
+                      \"wrap\": true
+                    }
+                  ],
+                  \"\$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",
+                  \"version\": \"1.2\"
+                }
+              }
+            ]
+          }" "${{ secrets.TEAMS_INCOMING_WEBHOOK_URL}}"
+        shell: bash
