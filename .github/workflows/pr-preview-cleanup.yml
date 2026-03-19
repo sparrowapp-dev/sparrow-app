@@ -22,7 +22,7 @@ jobs:
       - name: Delete PR Preview Resources
         run: |
           PR_NUMBER="${{ github.event.pull_request.number }}"
-          NAMESPACE="sparrow-dev"
+          NAMESPACE="sparrow-dev-preview"
           
           echo "Cleaning up preview resources for PR #${PR_NUMBER}"
           
