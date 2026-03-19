@@ -581,7 +581,10 @@ jobs:
           PR_NUMBER: ${{ inputs.pr_number }}
           IMAGE_TAG: ${{ github.run_number }}
         run: |
-          # Substitute variables and apply manifests
+          # Create namespace if it doesn't exist
+          kubectl get namespace sparrow-dev-preview || kubectl create namespace sparrow-dev-preview
+
+          # Apply manifests
           envsubst < .github/k8s/pr-preview/deployment.yaml | kubectl apply -f -
           envsubst < .github/k8s/pr-preview/service.yaml | kubectl apply -f -
           envsubst < .github/k8s/pr-preview/ingress.yaml | kubectl apply -f -
@@ -589,7 +592,7 @@ jobs:
       - name: Wait for rollout
         run: |
           kubectl rollout status deployment/sparrow-web-preview-pr-${{ inputs.pr_number }} \
-          --namespace=sparrow-dev --timeout=300s
+          --namespace=sparrow-dev-preview --timeout=300s
 
       - name: Post Web Preview Link to Teams
         run: |

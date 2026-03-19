@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sparrow-web-preview-pr-${PR_NUMBER}
-  namespace: sparrow-dev
+  namespace: sparrow-dev-preview
   labels:
     app: sparrow-web-preview
     pr: "${PR_NUMBER}"
