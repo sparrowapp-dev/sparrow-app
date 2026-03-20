@@ -9,6 +9,8 @@ export const initPostHog = () => {
       person_profiles: "always",
 
       capture_exceptions: true,
+
+      name: "sparrow-web",
     });
 
     isInitialized = true;
