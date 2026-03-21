@@ -177,6 +177,16 @@ export default defineConfig(async () => ({
 
   // Need this to make top level await work for curl converter
   optimizeDeps: {
+    exclude: [
+      "@tauri-apps/api",
+      "@tauri-apps/plugin-deep-link",
+      "@tauri-apps/plugin-dialog",
+      "@tauri-apps/plugin-fs",
+      "@tauri-apps/plugin-os",
+      "@tauri-apps/plugin-process",
+      "@tauri-apps/plugin-shell",
+      "@tauri-apps/plugin-updater",
+    ],
     esbuildOptions: {
       target: "esnext",
     },
