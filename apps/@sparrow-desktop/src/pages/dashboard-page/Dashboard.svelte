@@ -82,7 +82,7 @@
         ]);
         await notificationService.loadNotificationsToStore();
       } else {
-        console.error(`Throttled for ${userId}`);
+        console.warn(`Throttled for ${userId}`);
       }
     }
   });
