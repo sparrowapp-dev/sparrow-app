@@ -156,7 +156,7 @@ jobs:
       - name: Verify App Signature
         run: |
           APP_NAME="Sparrow"
-          APP_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/macos/${APP_NAME}.app"
+          APP_PATH="apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/${APP_NAME}.app"
           
           echo "Verifying app signature..."
           codesign -dvvv "$APP_PATH"
@@ -169,8 +169,8 @@ jobs:
         run: |
           set -euxo pipefail
           APP_NAME="Sparrow"
-          BUNDLE_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/macos/${APP_NAME}.app"
-          PKG_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/${APP_NAME}-unsigned.pkg"
+          BUNDLE_PATH="apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/${APP_NAME}.app"
+          PKG_PATH="apps/@sparrow-desktop/src-tauri/target/debug/bundle/${APP_NAME}-unsigned.pkg"
 
           # Verify app bundle exists
           if [ ! -d "$BUNDLE_PATH" ]; then
@@ -209,8 +209,8 @@ jobs:
         run: |
           set -euxo pipefail
           
-          UNSIGNED="apps/@sparrow-desktop/src-tauri/target/release/bundle/Sparrow-unsigned.pkg"
-          SIGNED="apps/@sparrow-desktop/src-tauri/target/release/bundle/Sparrow.pkg"
+          UNSIGNED="apps/@sparrow-desktop/src-tauri/target/debug/bundle/Sparrow-unsigned.pkg"
+          SIGNED="apps/@sparrow-desktop/src-tauri/target/debug/bundle/Sparrow.pkg"
           
           # Verify unsigned package exists
           if [ ! -f "$UNSIGNED" ]; then
@@ -243,7 +243,7 @@ jobs:
       - name: Upload to App Store Connect
         timeout-minutes: 15
         env:
-          PKG_PATH: "apps/@sparrow-desktop/src-tauri/target/release/bundle/Sparrow.pkg"
+          PKG_PATH: "apps/@sparrow-desktop/src-tauri/target/debug/bundle/Sparrow.pkg"
           APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
