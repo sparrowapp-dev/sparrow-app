@@ -54,6 +54,34 @@ export default defineConfig(async () => ({
         }
       },
     },
+    // @tauri-apps/plugin-updater: invoke('plugin:updater|check') resolves to null
+    // when no update is available. Production builds may access .available on the
+    // result before the null check, causing a TypeError. Harden the check function.
+    {
+      name: "patch-tauri-updater-null-check",
+      transform(code: string, id: string) {
+        if (id.includes("node_modules/@tauri-apps/plugin-updater")) {
+          return code.replace(
+            "return metadata ? new Update(metadata) : null;",
+            "return (metadata != null && typeof metadata === 'object') ? new Update(metadata) : null;",
+          );
+        }
+      },
+    },
+    // svelte-navigator: document.querySelector('[data-svnav-route-start=...]') can
+    // return null when the route marker hasn't been mounted yet (production build
+    // timing differs from dev). Guard queryHeading against a null marker.
+    {
+      name: "patch-svelte-navigator-query-heading",
+      transform(code: string, id: string) {
+        if (id.includes("node_modules/svelte-navigator")) {
+          return code.replace(
+            'const marker = query(`[data-svnav-route-start="${id}"]`);\n\tlet current = marker.nextElementSibling;',
+            'const marker = query(`[data-svnav-route-start="${id}"]`);\n\tif (!marker) return null;\n\tlet current = marker.nextElementSibling;',
+          );
+        }
+      },
+    },
   ],
   resolve: {
     alias: {
