@@ -602,7 +602,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Setup Rust 1.82.0
         uses: actions-rs/toolchain@v1
