@@ -562,11 +562,54 @@ jobs:
 
     steps:
 
-      - name: Checkout k8s manifests
+      - name: Checkout PR code
         uses: actions/checkout@v3
         with:
-          sparse-checkout: .github/k8s
-          sparse-checkout-cone-mode: false
+          repository: ${{ inputs.repository }}
+          ref: ${{ inputs.branch }}
+
+      - name: Login to Azure Container Registry
+        uses: azure/docker-login@v1
+        with:
+          login-server: sparrowprod.azurecr.io
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build and Push PR Preview Image
+        run: |
+          docker build -f ./Sparrow-Web.Dockerfile \
+            --build-arg VITE_WEB_API_URL=${{ vars.VITE_WEB_API_URL }} \
+            --build-arg VITE_WEB_API_TIMEOUT=${{ vars.VITE_WEB_API_TIMEOUT }} \
+            --build-arg VITE_WEB_ENABLE_MIX_PANEL=${{ vars.VITE_WEB_ENABLE_MIX_PANEL }} \
+            --build-arg VITE_WEB_MIX_PANEL_TOKEN=${{ vars.VITE_WEB_MIX_PANEL_TOKEN }} \
+            --build-arg VITE_WEB_SPARROW_SUPPORT_EMAIL=${{ vars.VITE_WEB_SPARROW_SUPPORT_EMAIL }} \
+            --build-arg VITE_WEB_AUTH_URL=${{ vars.VITE_WEB_AUTH_URL }} \
+            --build-arg VITE_WEB_SPARROW_GITHUB=${{ vars.VITE_WEB_SPARROW_GITHUB }} \
+            --build-arg VITE_WEB_SPARROW_DOWNLOAD_LINK=${{ vars.VITE_WEB_SPARROW_DOWNLOAD_LINK }} \
+            --build-arg VITE_WEB_RELEASE_NOTES_API=${{ vars.VITE_WEB_RELEASE_NOTES_API }} \
+            --build-arg VITE_WEB_AZURE_CDN_URL=${{ vars.VITE_WEB_AZURE_CDN_URL }} \
+            --build-arg VITE_WEB_BASE_URL=${{ vars.VITE_WEB_BASE_URL }} \
+            --build-arg VITE_WEB_SPARROW_LINKEDIN=${{ vars.VITE_WEB_SPARROW_LINKEDIN }} \
+            --build-arg VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING=${{ vars.VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING }} \
+            --build-arg VITE_WEB_MARKETING_URL=${{ vars.VITE_WEB_MARKETING_URL }} \
+            --build-arg VITE_WEB_SPARROW_DOCS=${{ vars.VITE_WEB_SPARROW_DOCS }} \
+            --build-arg VITE_WEB_PROXY_SERVICE=${{ vars.VITE_WEB_PROXY_SERVICE }} \
+            --build-arg VITE_WEB_SOCKET_IO_API_URL=${{ vars.VITE_WEB_SOCKET_IO_API_URL }} \
+            --build-arg VITE_WEB_SPARROW_AI_WEBSOCKET=${{ vars.VITE_WEB_SPARROW_AI_WEBSOCKET }} \
+            --build-arg VITE_WEB_APP_ENVIRONMENT_PATH=${{ vars.VITE_WEB_APP_ENVIRONMENT_PATH }} \
+            --build-arg VITE_WEB_OPENFEEDBACK_FEEDBACK_URL=${{ vars.VITE_WEB_OPENFEEDBACK_FEEDBACK_URL }} \
+            --build-arg VITE_WEB_OPENFEEDBACK_BOARD_ID=${{ vars.VITE_WEB_OPENFEEDBACK_BOARD_ID }} \
+            --build-arg VITE_WEB_SPARROW_WEB_APP_URL=${{ vars.VITE_WEB_SPARROW_WEB_APP_URL }} \
+            --build-arg VITE_WEB_SENTRY_DSN=${{ vars.VITE_WEB_SENTRY_DSN }} \
+            --build-arg VITE_WEB_APP_ENVIRONMENT=${{ vars.VITE_WEB_APP_ENVIRONMENT }} \
+            --build-arg VITE_WEB_POSTHOG_CONNECTION_API_KEY=${{ vars.VITE_WEB_POSTHOG_CONNECTION_API_KEY }} \
+            --build-arg VITE_WEB_POSTHOG_API_URL=${{ vars.VITE_WEB_POSTHOG_API_URL }} \
+            --build-arg VITE_WEB_SPARROW_ADMIN_URL=${{ vars.VITE_WEB_SPARROW_ADMIN_URL }} \
+            --build-arg VITE_WEB_APP_EDITION=${{ vars.VITE_WEB_APP_EDITION }} \
+            --no-cache \
+            -t sparrowprod.azurecr.io/sparrow-web:pr-${{ inputs.pr_number }} .
+
+          docker push sparrowprod.azurecr.io/sparrow-web:pr-${{ inputs.pr_number }}
 
       - name: Setup kubectl
         uses: azure/setup-kubectl@v2.0
@@ -579,7 +622,7 @@ jobs:
       - name: Deploy PR Preview
         env:
           PR_NUMBER: ${{ inputs.pr_number }}
-          IMAGE_TAG: ${{ github.run_number }}
+          IMAGE_TAG: pr-${{ inputs.pr_number }}
         run: |
           # Create namespace if it doesn't exist
           kubectl get namespace sparrow-dev-preview || kubectl create namespace sparrow-dev-preview
