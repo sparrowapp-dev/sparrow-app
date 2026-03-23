@@ -34,7 +34,27 @@ const getNodeModulePackageName = (id: string) => {
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
-  plugins: [svelte()],
+  plugins: [
+    svelte(),
+    // svelte-motion calls window.getComputedStyle() after a component unmounts,
+    // passing a detached (non-Element) node. This only crashes in production builds
+    // because of chunk-initialization order differences versus the dev server.
+    // Guard the wrapper so it returns a no-op style object instead of throwing.
+    {
+      name: "patch-svelte-motion-getcomputedstyle",
+      transform(code: string, id: string) {
+        if (
+          id.includes("node_modules/svelte-motion") &&
+          id.endsWith("visual-element.js")
+        ) {
+          return code.replace(
+            "function getComputedStyle(element) {\n    return window.getComputedStyle(element);\n}",
+            "function getComputedStyle(element) {\n    if (!element || !(element instanceof Element)) return { getPropertyValue: function() { return ''; } };\n    return window.getComputedStyle(element);\n}",
+          );
+        }
+      },
+    },
+  ],
   resolve: {
     alias: {
       "@app": path.resolve("./src/"),
