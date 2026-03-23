@@ -85,75 +85,8 @@ export default defineConfig(async () => ({
             return "vendor-misc";
           }
 
-          const workspacesFeatureMatch = id.match(
-            /\/packages\/@sparrow-workspaces\/src\/features\/([^/]+)/,
-          );
-          if (workspacesFeatureMatch?.[1]) {
-            return `feature-workspaces-${normalizeChunkName(
-              workspacesFeatureMatch[1],
-            )}`;
-          }
-
-          const librarySectionMatch = id.match(
-            /\/packages\/@sparrow-library\/src\/(?:features|components|ui|forms)\/([^/]+)/,
-          );
-          if (librarySectionMatch?.[1]) {
-            return `feature-library-${normalizeChunkName(
-              librarySectionMatch[1],
-            )}`;
-          }
-
-          const desktopPageMatch = id.match(
-            /\/apps\/@sparrow-desktop\/src\/pages\/([^/]+)/,
-          );
-
-          const desktopWorkspaceSubPageMatch = id.match(
-            /\/apps\/@sparrow-desktop\/src\/pages\/workspace-page\/sub-pages\/([^/]+)/,
-          );
-          if (desktopWorkspaceSubPageMatch?.[1]) {
-            return `desktop-workspace-subpage-${normalizeChunkName(
-              desktopWorkspaceSubPageMatch[1],
-            )}`;
-          }
-
-          if (
-            id.includes(
-              "/apps/@sparrow-desktop/src/pages/workspace-page/CollectionPage.ViewModel.ts",
-            )
-          ) {
-            return "desktop-workspace-collection-viewmodel";
-          }
-
-          if (
-            id.includes(
-              "/apps/@sparrow-desktop/src/pages/workspace-page/EnvironmentPage.ViewModel.ts",
-            )
-          ) {
-            return "desktop-workspace-environment-viewmodel";
-          }
-
-          if (
-            id.includes(
-              "/apps/@sparrow-desktop/src/pages/workspace-page/CollectionsPage.svelte",
-            )
-          ) {
-            return "desktop-workspace-collections-page";
-          }
-
-          if (desktopPageMatch?.[1]) {
-            return `desktop-page-${normalizeChunkName(desktopPageMatch[1])}`;
-          }
-
-          if (id.includes("/apps/@sparrow-desktop/src/database/")) {
-            return "desktop-database";
-          }
-          if (id.includes("/apps/@sparrow-desktop/src/repositories/")) {
-            return "desktop-repositories";
-          }
-          if (id.includes("/apps/@sparrow-desktop/src/store/")) {
-            return "desktop-store";
-          }
-
+          // Keep each workspace package as a single chunk to avoid circular
+          // chunk dependencies caused by cross-feature imports within the package.
           if (id.includes("/packages/@sparrow-workspaces/")) {
             return "feature-workspaces";
           }
