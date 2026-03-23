@@ -89,7 +89,7 @@
         _viewModel.refreshWorkspaces(userId),
       ]);
     } else {
-      console.error(`Throttled for ${userId}`);
+      console.warn(`Throttled for ${userId}`);
     }
 
     await _viewModel.fetchGithubRepo();
