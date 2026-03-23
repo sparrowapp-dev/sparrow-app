@@ -711,7 +711,7 @@ const makeHttpRequestV2 = async (
   const startTime = performance.now();
   try {
     let response;
-    if (selectedAgent === "Cloud Agent") {
+    if (selectedAgent === "Cloud Agent2") {
       const proxyUrl = constants.PROXY_SERVICE + "/proxy/http-request";
       response = await Promise.race([
         axios({
@@ -865,7 +865,7 @@ const makeHttpRequestV2 = async (
 
       appInsights?.trackDependencyData({
         id: uuidv4(),
-        name: "Cloud Agent Duration Metric",
+        name: "Cloud Agent2 Duration Metric",
         duration: duration,
         success: true,
         responseCode: parseInt(response.data.status),
@@ -1359,7 +1359,7 @@ const makeGraphQLRequest = async (
   const abortGraphqlRequestErrorMessage = `Running GraphQL Request with url ${_url} is aborted by the user`;
   const startTime = performance.now();
   try {
-    if (_selectedAgent === "Cloud Agent") {
+    if (_selectedAgent === "Cloud Agent2") {
       const proxyUrl = constants.PROXY_SERVICE + "/proxy/graphql-request";
       const axiosResponse = await axios({
         data: {

@@ -18,7 +18,7 @@
 
       <Alert
         varient="error"
-        description="Cloud Agent error: Please check the URL .Try again. Make sure that the domain is publicly accessible"
+        description="Cloud Agent2 error: Please check the URL .Try again. Make sure that the domain is publicly accessible"
         heading={"Error"}
       />
     </div>

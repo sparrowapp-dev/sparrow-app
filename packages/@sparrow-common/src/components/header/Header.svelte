@@ -154,9 +154,9 @@
 
   let multipleAgentData = [
     {
-      name: "Cloud Agent",
-      id: "Cloud Agent",
-      displayName: "Cloud Agent",
+      name: "Cloud Agent2",
+      id: "Cloud Agent2",
+      displayName: "Cloud Agent2",
       description: "Securely send request via Sparrow's cloud.",
     },
     {
