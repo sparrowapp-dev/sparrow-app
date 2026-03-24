@@ -623,10 +623,12 @@ jobs:
         run: |
           mkdir -p .github/k8s/pr-preview
           for file in deployment.yaml service.yaml ingress.yaml; do
-            curl -fsSL \
-              -H "Authorization: token ${{ secrets.PR_GITHUB_TOKEN }}" \
-              "https://raw.githubusercontent.com/sparrowapp-dev/sparrow-app/main/.github/k8s/pr-preview/$file" \
-              -o ".github/k8s/pr-preview/$file"
+            if [ ! -f ".github/k8s/pr-preview/$file" ]; then
+              curl -fsSL \
+                -H "Authorization: token ${{ secrets.PR_GITHUB_TOKEN }}" \
+                "https://raw.githubusercontent.com/sparrowapp-dev/sparrow-app/main/.github/k8s/pr-preview/$file" \
+                -o ".github/k8s/pr-preview/$file"
+            fi
           done
 
       - name: Deploy PR Preview
