@@ -558,7 +558,7 @@ jobs:
     name: Update Web Preview Deployment
     if: inputs.build_type == 'all' || inputs.build_type == 'web'
     runs-on: ubuntu-latest
-    environment: development
+    environment: sparrow_web_Dev
 
     steps:
 
