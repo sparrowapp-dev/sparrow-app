@@ -413,7 +413,7 @@ export class DashboardViewModel {
    */
   public getAllFeatures = async () => {
     const features = await this.featureSwitchService.getAllFeatures();
-    if (features.isSuccessful) {
+    if (features.isSuccessful && Array.isArray(features.data?.data)) {
       await this.featureSwitchRepository.bulkInsertData(features.data.data);
     }
   };
