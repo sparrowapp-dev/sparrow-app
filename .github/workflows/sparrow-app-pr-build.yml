@@ -558,7 +558,7 @@ jobs:
     name: Update Web Preview Deployment
     if: inputs.build_type == 'all' || inputs.build_type == 'web'
     runs-on: ubuntu-latest
-    environment: development
+    environment: sparrow_web_Dev
 
     steps:
 
@@ -588,7 +588,7 @@ jobs:
             --build-arg VITE_WEB_SPARROW_DOWNLOAD_LINK=${{ vars.VITE_WEB_SPARROW_DOWNLOAD_LINK }} \
             --build-arg VITE_WEB_RELEASE_NOTES_API=${{ vars.VITE_WEB_RELEASE_NOTES_API }} \
             --build-arg VITE_WEB_AZURE_CDN_URL=${{ vars.VITE_WEB_AZURE_CDN_URL }} \
-            --build-arg VITE_WEB_BASE_URL=${{ vars.VITE_WEB_BASE_URL }} \
+            --build-arg VITE_WEB_BASE_URL=https://pr-${{ inputs.pr_number }}.preview.sparrowapp.dev \
             --build-arg VITE_WEB_SPARROW_LINKEDIN=${{ vars.VITE_WEB_SPARROW_LINKEDIN }} \
             --build-arg VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING=${{ vars.VITE_WEB_AZURE_INSIGHTS_CONNECTION_STRING }} \
             --build-arg VITE_WEB_MARKETING_URL=${{ vars.VITE_WEB_MARKETING_URL }} \
@@ -599,7 +599,7 @@ jobs:
             --build-arg VITE_WEB_APP_ENVIRONMENT_PATH=${{ vars.VITE_WEB_APP_ENVIRONMENT_PATH }} \
             --build-arg VITE_WEB_OPENFEEDBACK_FEEDBACK_URL=${{ vars.VITE_WEB_OPENFEEDBACK_FEEDBACK_URL }} \
             --build-arg VITE_WEB_OPENFEEDBACK_BOARD_ID=${{ vars.VITE_WEB_OPENFEEDBACK_BOARD_ID }} \
-            --build-arg VITE_WEB_SPARROW_WEB_APP_URL=${{ vars.VITE_WEB_SPARROW_WEB_APP_URL }} \
+            --build-arg VITE_WEB_SPARROW_WEB_APP_URL=https://pr-${{ inputs.pr_number }}.preview.sparrowapp.dev \
             --build-arg VITE_WEB_SENTRY_DSN=${{ vars.VITE_WEB_SENTRY_DSN }} \
             --build-arg VITE_WEB_APP_ENVIRONMENT=${{ vars.VITE_WEB_APP_ENVIRONMENT }} \
             --build-arg VITE_WEB_POSTHOG_CONNECTION_API_KEY=${{ vars.VITE_WEB_POSTHOG_CONNECTION_API_KEY }} \
