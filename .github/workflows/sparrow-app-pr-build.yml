@@ -619,6 +619,16 @@ jobs:
         with:
           kubeconfig: ${{ secrets.KUBE_CONFIG }}
 
+      - name: Fetch K8s manifests from main repo
+        run: |
+          mkdir -p .github/k8s/pr-preview
+          for file in deployment.yaml service.yaml ingress.yaml; do
+            curl -fsSL \
+              -H "Authorization: token ${{ secrets.PR_GITHUB_TOKEN }}" \
+              "https://raw.githubusercontent.com/sparrowapp-dev/sparrow-app/main/.github/k8s/pr-preview/$file" \
+              -o ".github/k8s/pr-preview/$file"
+          done
+
       - name: Deploy PR Preview
         env:
           PR_NUMBER: ${{ inputs.pr_number }}
