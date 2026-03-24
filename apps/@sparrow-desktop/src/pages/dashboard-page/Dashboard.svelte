@@ -374,13 +374,15 @@
   onMount(async () => {
     try {
       updater = await check();
-      if (updater?.available) {
+      if (updater && updater.available) {
         // notifications.warning("Update Available");
         newAppVersion = updater.version;
         updateAvailable = true;
       }
     } catch (error) {
-      console.error(error);
+      if (updater != null) {
+        console.error(error);
+      }
     }
   });
 

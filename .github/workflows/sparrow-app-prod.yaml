@@ -46,12 +46,12 @@ jobs:
     steps:
       # --- STAGE 1: INITIAL SETUP AND PREREQUISITE INSTALLATIONS ---
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v6
         with:
-          node-version: "20.8"
+          node-version: "24"
 
       - name: Install Rust 1.82.0
         run: |
@@ -567,7 +567,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Setup Rust 1.82.0
         uses: actions-rs/toolchain@v1
@@ -763,7 +763,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
 
       - name: Use latest stable Xcode
         uses: maxim-lobanov/setup-xcode@v1
@@ -780,9 +780,9 @@ jobs:
           rustup target add aarch64-apple-darwin
 
       - name: Sync node version and setup cache
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
-          node-version: "20.8"
+          node-version: "24"
 
       - name: Install project dependencies
         run: |
@@ -967,7 +967,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3 
+        uses: actions/checkout@v5 
 
       - name: Download Windows, Linux, and macOS artifacts
         run: |

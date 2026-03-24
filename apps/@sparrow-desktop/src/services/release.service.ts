@@ -14,12 +14,7 @@ export class ReleaseService {
    */
 
   public getReleaseData = async () => {
-    const response = await makeRequest("GET", `${this.apiUrl}`, {
-      headers: {
-        Authorization: `Bearer ${constants.RELEASE_NOTES_PAT_TOKEN}`,
-        "X-GitHub-Api-Version": "2022-11-28",
-      },
-    });
+    const response = await makeRequest("GET", `${this.apiUrl}`);
     return response;
   };
 }
