@@ -225,11 +225,14 @@
     isPopoverContainer = !isPopoverContainer;
   };
 
+  let resizeObserver: ResizeObserver | null = null;
+
   onMount(async () => {
     const event = await onFetchCollectionGuide({
       id: "collection-guide",
     });
     event?.$.subscribe((e) => {
+      if (!e) return;
       if (e.isActive === false) {
         isPopoverContainer = false;
       } else {
@@ -241,11 +244,10 @@
     setTimeout(() => {
       updateSplitpaneContSizes();
       // Watch for container size changes and update pane size percentages
-      const resizeObserver = new ResizeObserver(() => {
+      resizeObserver = new ResizeObserver(() => {
         updateSplitpaneContSizes();
       });
       resizeObserver.observe(splitpaneContainer);
-      return () => resizeObserver.disconnect(); // Cleanup on component unmount
     }, 0);
   });
 
@@ -290,6 +292,7 @@
   }
   onDestroy(() => {
     isChatbotOpenInCurrTab.set(false);
+    resizeObserver?.disconnect();
   });
 
   /**

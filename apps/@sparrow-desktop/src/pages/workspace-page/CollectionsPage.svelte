@@ -717,6 +717,7 @@
   const collectionListSubscriber = collectionList.subscribe((collections) => {
     let count = 0;
     collections.forEach((collection, index) => {
+      if (!collection) return;
       const collectionData = collection.toMutableJSON();
       if (index === 0) {
         tourGuideCollectionId = collectionData.id;
