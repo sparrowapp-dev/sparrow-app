@@ -15,7 +15,7 @@ export class GuideRepository {
    * @returns - found document
    */
   public insert = async (data) => {
-    const document = await RxDB.getInstance().rxdb.guide.insert(data);
+    const document = await RxDB.getInstance().rxdb.guide.upsert(data);
     return document;
   };
 
@@ -45,6 +45,8 @@ export class GuideRepository {
         selector: query,
       })
       .exec();
+
+    if (!foundDocs) return;
 
     await foundDocs.incrementalModify((value) => {
       return { ...value, ...updateData };
