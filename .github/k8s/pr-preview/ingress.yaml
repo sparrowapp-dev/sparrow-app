@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sparrow-web-preview-pr-${PR_NUMBER}
+  namespace: sparrow-dev-preview
+  labels:
+    app: sparrow-web-preview
+    pr: "${PR_NUMBER}"
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - pr-${PR_NUMBER}.preview.sparrowapp.dev
+    secretName: preview-pr-${PR_NUMBER}-tls
+  rules:
+  - host: pr-${PR_NUMBER}.preview.sparrowapp.dev
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sparrow-web-preview-pr-${PR_NUMBER}
+            port:
+              number: 80
