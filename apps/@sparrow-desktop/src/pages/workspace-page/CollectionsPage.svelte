@@ -955,7 +955,7 @@
                 {#if true}
                   {#if $activeTab?.type === TabTypeEnum.REQUEST}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100">
+                      <div class="h-100" use:motion>
                         <RestExplorerPage
                           bind:isTourGuideOpen
                           tab={$activeTab}
@@ -964,13 +964,13 @@
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.AI_REQUEST}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100">
+                      <div class="h-100" use:motion>
                         <AiRequestExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.COLLECTION}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100">
+                      <div class="h-100" use:motion>
                         <CollectionExplorerPage
                           tab={$activeTab}
                           onSyncCollection={handleSyncCollection}
@@ -981,19 +981,19 @@
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.FOLDER}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100">
+                      <div class="h-100" use:motion>
                         <FolderExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.ENVIRONMENT}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100">
+                      <div class="h-100" use:motion>
                         <EnvironmentExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.WORKSPACE}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100">
+                      <div class="h-100" use:motion>
                         <WorkspaceExplorerPage
                           {collectionList}
                           tab={$activeTab}
@@ -1003,13 +1003,13 @@
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.WEB_SOCKET}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100">
+                      <div class="h-100" use:motion>
                         <WebSocketExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.TESTFLOW}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100">
+                      <div class="h-100" use:motion>
                         <TestFlowExplorerPage
                           tab={$activeTab}
                           {teamDetails}
@@ -1019,25 +1019,25 @@
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.SOCKET_IO}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100">
+                      <div class="h-100" use:motion>
                         <SocketIoExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.GRAPHQL}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100">
+                      <div class="h-100" use:motion>
                         <GraphqlExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.SAVED_REQUEST}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100">
+                      <div class="h-100" use:motion>
                         <RestExplorerSavedPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.MOCK_REQUEST}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100">
+                      <div class="h-100" use:motion>
                         <RestExplorerMockPage
                           bind:isTourGuideOpen
                           tab={$activeTab}
@@ -1046,37 +1046,37 @@
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.MOCK_HISTORY}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100">
+                      <div class="h-100" use:motion>
                         <MockHistoryExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.TESTFLOW_SCHEDULE_RUN_VIEW}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100">
+                      <div class="h-100" use:motion>
                         <TestflowScheduleRVExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.TESTFLOW_SCHEDULE}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100">
+                      <div class="h-100" use:motion>
                         <TestflowScheduleExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.TESTFLOW_DATASET}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100">
+                      <div class="h-100" use:motion>
                         <TestflowDataSetExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if $activeTab?.type === TabTypeEnum.HUB}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100">
+                      <div class="h-100" use:motion>
                         <HubExplorerPage tab={$activeTab} />
                       </div>
                     </Motion>
                   {:else if !$tabList?.length}
                     <Motion {...scaleMotionProps} let:motion>
-                      <div class="h-100">
+                      <div class="h-100" use:motion>
                         <WorkspaceDefault
                           {currentWorkspace}
                           {handleCreateEnvironment}
