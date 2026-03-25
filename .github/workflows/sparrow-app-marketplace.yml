@@ -40,7 +40,6 @@ env:
   VITE_SPARROW_ADMIN_URL: ${{ vars.VITE_SPARROW_ADMIN_URL }}
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
   CI: false
-  SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
 
 
 jobs:
@@ -59,6 +58,25 @@ jobs:
       - name: Install Snapcraft
         run: |
           sudo snap install snapcraft --classic
+
+      - name: Prepare Snapcraft credentials
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+        run: |
+          # 1. Override XDG_CONFIG_HOME to a .config folder in the workspace
+          export XDG_CONFIG_HOME="$PWD/.config"
+
+          # 2. Create the snapcraft subfolder under that config
+          mkdir -p "$XDG_CONFIG_HOME/snapcraft"
+
+          # 3. Write the exported credentials JSON (your long token) to the file
+          echo "$SNAPCRAFT_STORE_CREDENTIALS" > "$XDG_CONFIG_HOME/snapcraft/credentials.json"
+          chmod 600 "$XDG_CONFIG_HOME/snapcraft/credentials.json"
+
+          # 4. Persist XDG_CONFIG_HOME for all subsequent steps
+          echo "XDG_CONFIG_HOME=$PWD/.config" >> $GITHUB_ENV
+
+          echo "Stored Snapcraft creds in $XDG_CONFIG_HOME/snapcraft/credentials.json"
 
       - name: Check Snapcraft Credentials
         run: |
@@ -87,27 +105,9 @@ jobs:
         run: |
           sudo snapcraft --destructive-mode
 
-      - name: Prepare Snapcraft credentials
-        env:
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
-        run: |
-          # 1. Override XDG_CONFIG_HOME to a .config folder in the workspace
-          export XDG_CONFIG_HOME="$PWD/.config"
-
-          # 2. Create the snapcraft subfolder under that config
-          mkdir -p "$XDG_CONFIG_HOME/snapcraft"
-
-          # 3. Write the exported credentials JSON (your long token) to the file
-          echo "$SNAPCRAFT_STORE_CREDENTIALS" > "$XDG_CONFIG_HOME/snapcraft/credentials.json"
-          chmod 600 "$XDG_CONFIG_HOME/snapcraft/credentials.json"
-
-          echo "Stored Snapcraft creds in $XDG_CONFIG_HOME/snapcraft/credentials.json"
-
       - name: Upload Snap to Snap Store
         env:
           SNAP_CHANNEL: ${{ vars.SNAP_RELEASE_CHANNEL || 'edge' }}
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
-          XDG_CONFIG_HOME: "$PWD/.config"
         run: |
           SNAP_FILE=$(ls *.snap | head -n1)
           echo "Uploading $SNAP_FILE to $SNAP_CHANNEL"
@@ -277,7 +277,7 @@ jobs:
       - name: Verify App Signature
         run: |
           APP_NAME="Sparrow"
-          APP_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/macos/${APP_NAME}.app"
+          APP_PATH="apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/${APP_NAME}.app"
           
           echo "Verifying app signature..."
           codesign -dvvv "$APP_PATH"
@@ -290,8 +290,8 @@ jobs:
         run: |
           set -euxo pipefail
           APP_NAME="Sparrow"
-          BUNDLE_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/macos/${APP_NAME}.app"
-          PKG_PATH="apps/@sparrow-desktop/src-tauri/target/release/bundle/${APP_NAME}-unsigned.pkg"
+          BUNDLE_PATH="apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/${APP_NAME}.app"
+          PKG_PATH="apps/@sparrow-desktop/src-tauri/target/debug/bundle/${APP_NAME}-unsigned.pkg"
 
           # Verify app bundle exists
           if [ ! -d "$BUNDLE_PATH" ]; then
@@ -330,8 +330,8 @@ jobs:
         run: |
           set -euxo pipefail
           
-          UNSIGNED="apps/@sparrow-desktop/src-tauri/target/release/bundle/Sparrow-unsigned.pkg"
-          SIGNED="apps/@sparrow-desktop/src-tauri/target/release/bundle/Sparrow.pkg"
+          UNSIGNED="apps/@sparrow-desktop/src-tauri/target/debug/bundle/Sparrow-unsigned.pkg"
+          SIGNED="apps/@sparrow-desktop/src-tauri/target/debug/bundle/Sparrow.pkg"
           
           # Verify unsigned package exists
           if [ ! -f "$UNSIGNED" ]; then
@@ -364,7 +364,7 @@ jobs:
       - name: Upload to App Store Connect
         timeout-minutes: 15
         env:
-          PKG_PATH: "apps/@sparrow-desktop/src-tauri/target/release/bundle/Sparrow.pkg"
+          PKG_PATH: "apps/@sparrow-desktop/src-tauri/target/debug/bundle/Sparrow.pkg"
           APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
