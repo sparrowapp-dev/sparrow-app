@@ -73,6 +73,19 @@ jobs:
             --image sparrow-web:pr-${PR_NUMBER} \
             --yes || echo "Image pr-${PR_NUMBER} not found in ACR, skipping..."
 
+        # NEW STEP: Trigger auth preview cleanup
+      - name: Trigger Auth Preview Cleanup
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: pr-preview-build.yml
+          repo: sparrowapp-dev/sparrow-app-auth
+          ref: main
+          inputs: |
+            {
+              "pr_number": "${{ github.event.pull_request.number }}"
+            }
+          token: ${{ secrets.PAT_TOKEN }} 
+
       - name: Post Cleanup Notification to Teams
         if: success()
         run: |
