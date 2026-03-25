@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
       
       - name: Run Sparrow Bot Stale
         uses: sparrowapp-dev/sparrow-bot@main  # Replace with the actual repository
@@ -29,7 +29,7 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
       
       - name: Run Sparrow Bot PR Title Validation
         uses: sparrowapp-dev/sparrow-bot@main  # Replace with the actual repository
@@ -46,7 +46,7 @@ jobs:
     if: github.event_name == 'issues' || github.event_name == 'pull_request'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
       
       - name: Run Sparrow Bot Auto Label
         uses: sparrowapp-dev/sparrow-bot@main  # Replace with the actual repository

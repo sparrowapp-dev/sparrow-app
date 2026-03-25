@@ -304,10 +304,12 @@
     if (activeWorkspace?._id) {
       collectionListDocument = rawCollection
         .map((value) => {
+          if (!value) return null;
           return value.toMutableJSON();
         })
         ?.filter(
           (value) =>
+            value &&
             value.workspaceId === activeWorkspace?._id &&
             !(value?.activeSync && activeWorkspace?.isShared),
         );

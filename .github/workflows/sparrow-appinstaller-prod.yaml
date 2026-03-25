@@ -47,12 +47,12 @@ jobs:
     steps:
       # --- STAGE 1: INITIAL SETUP AND PREREQUISITE INSTALLATIONS ---
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v6
         with:
-          node-version: "20.8"
+          node-version: "24"
 
       - name: Install Rust 1.82.0
         run: |

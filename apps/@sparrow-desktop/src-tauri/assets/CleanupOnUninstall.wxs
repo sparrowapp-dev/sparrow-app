@@ -13,7 +13,7 @@
                 <util:RemoveFolderEx Id="RemoveAppFolder" On="uninstall" Property="LOCALAPPDATAFOLDER" />
                 <RegistryKey Root="HKCU" Key="Software\sparrowapp\Sparrow" ForceCreateOnInstall="yes"
           ForceDeleteOnUninstall="yes">
-                    <RegistryValue Name="LocalAppDataFolder" Type="string" Value="[LocalAppDataFolder]dev.sparrowapp.desktop" />
+                    <RegistryValue Name="LocalAppDataFolder" Type="string" Value="[LocalAppDataFolder]com.sparrowapp.desktop" />
                 </RegistryKey>
                 <CreateFolder />
             </Component>

@@ -61,15 +61,15 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
         with:
           repository: ${{ inputs.repository }}
           ref: ${{ inputs.branch }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v6
         with:
-          node-version: "20.x"
+          node-version: "24"
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
@@ -408,7 +408,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ inputs.repository }}
           ref: ${{ inputs.branch }}
@@ -428,9 +428,9 @@ jobs:
           rustup target add aarch64-apple-darwin
 
       - name: Sync node version and setup cache
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
-          node-version: "20.8"
+          node-version: "24"
 
       - name: Install project dependencies
         run: |

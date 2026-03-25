@@ -1,5 +1,6 @@
 <script lang="ts">
   export let isUpgradePlanModelOpen;
+  export let onUpgradeRedirect: () => void;
 </script>
 
 <div
@@ -12,7 +13,11 @@
       class="text-primary-400"
       style="text-decoration:underline; cursor:pointer;"
       on:click={() => {
-        isUpgradePlanModelOpen = true;
+        if (onUpgradeRedirect) {
+          onUpgradeRedirect();
+        } else {
+          isUpgradePlanModelOpen = true;
+        }
       }}>Upgrade Now</span
     >
   </p>
