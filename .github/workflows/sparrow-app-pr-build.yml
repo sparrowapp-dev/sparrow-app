@@ -627,7 +627,7 @@ jobs:
           inputs: |
             {
               "pr_number": "${{ inputs.pr_number }}",
-              "web_preview_url": "${{ steps.build.outputs.web_preview_url }}"
+              "web_preview_url": "https://pr-${{ inputs.pr_number }}.preview.sparrowapp.dev"
             }
           token: ${{ secrets.PAT_TOKEN }}
 
