@@ -308,3 +308,4 @@ export { default as StopFilledIcon } from "./StopFilledIcon.svelte";
 export { default as CalendarRegular } from "./CalendarRegular.svelte";
 export { default as ArrowLeftRegular } from "./ArrowLeftRegularIcon.svelte";
 export { default as ClockAlarmRegular } from "./ClockAlarmRegular.svelte";
+export { default as BellRegular } from "./BellRegular.svelte";

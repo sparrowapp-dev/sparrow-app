@@ -10,8 +10,10 @@
   import { initPostHog } from "@app/utils/posthog/posthogConfig";
   export let url = "/";
   import { inviteModalStore } from "@app/store/inviteModal.store";
+  import { NotificationService } from "../services/notification.service";
 
   let channel: BroadcastChannel;
+  const notificationService = new NotificationService();
 
   onMount(async () => {
     if (typeof window !== "undefined") {
@@ -25,6 +27,7 @@
         }
       };
     }
+    await notificationService.loadNotificationsToStore();
     handleLogin(window.location.search);
   });
 

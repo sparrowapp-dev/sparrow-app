@@ -19,15 +19,15 @@ env:
   VITE_RELEASE_NOTES_API: ${{ vars.VITE_RELEASE_NOTES_API }}
   VITE_AZURE_CDN_URL: ${{ vars.VITE_AZURE_CDN_URL }}
   VITE_AZURE_INSIGHTS_CONNECTION_STRING: ${{ vars.VITE_AZURE_INSIGHTS_CONNECTION_STRING }}
-  VITE_CANNY_API: ${{ vars.VITE_CANNY_API }}
-  VITE_CANNY_URL: ${{ vars.VITE_CANNY_URL }}
+  VITE_OPENFEEDBACK_API: ${{ vars.VITE_OPENFEEDBACK_API }}
+  VITE_OPENFEEDBACK_URL: ${{ vars.VITE_OPENFEEDBACK_URL }}
+  VITE_OPENFEEDBACK_BOARD_ID: ${{ vars.VITE_OPENFEEDBACK_BOARD_ID }}
   VITE_BASE_URL: ${{ vars.VITE_BASE_URL }}
   VITE_SPARROW_LINKEDIN: ${{ vars.VITE_SPARROW_LINKEDIN }}
   VITE_WEB_SOCKET_IO_API_URL: ${{ vars.VITE_WEB_SOCKET_IO_API_URL }}
   VITE_SPARROW_DOCS: ${{ vars.VITE_SPARROW_DOCS }}
   VITE_SPARROW_AI_WEBSOCKET: ${{ vars.VITE_SPARROW_AI_WEBSOCKET }}
   VITE_APP_ENVIRONMENT_PATH: ${{ vars.VITE_APP_ENVIRONMENT_PATH }}
-  VITE_CANNY_FEEDBACK_URL: ${{ vars.VITE_CANNY_FEEDBACK_URL }}
   VITE_SPARROW_WEB_APP_URL: ${{ vars.VITE_SPARROW_WEB_APP_URL }}
   VITE_MARKETING_URL: ${{ vars.VITE_MARKETING_URL }}
   VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
@@ -45,12 +45,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v6
         with:
-          node-version: "20.x"
+          node-version: "24"
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
@@ -378,7 +378,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Use latest stable Xcode
         uses: maxim-lobanov/setup-xcode@v1
@@ -395,9 +395,9 @@ jobs:
           rustup target add aarch64-apple-darwin
 
       - name: Sync node version and setup cache
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
-          node-version: "20.8"
+          node-version: "24"
 
       - name: Install project dependencies
         run: |
@@ -413,7 +413,6 @@ jobs:
 
       - name: Remove App Store specific properties
         run: |
-          sed -i '' 's/dev.sparrowapp.desktop/com.sparrow.app/g' apps/@sparrow-desktop/src-tauri/Info.plist
           sed -i '' '/"macOS": {/,/},/ {
               /"entitlements":.*/d
               /"minimumSystemVersion":.*/d
@@ -603,7 +602,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Setup Rust 1.82.0
         uses: actions-rs/toolchain@v1

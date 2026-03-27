@@ -137,51 +137,56 @@
     }}
   >
     <div class="pt-3"></div>
-    <div class="d-flex pb-3">
-      <Select
-        data={[
-          {
-            name: "Feature Request",
-            id: FeedbackType.FEATURE_REQUEST,
-          },
-          {
-            name: "UI Improvement",
-            id: FeedbackType.UI_IMPROVEMENT,
-          },
-          {
-            name: "Bugs",
-            id: FeedbackType.BUG,
-          },
-        ]}
-        iconRequired={true}
-        icon={DiversityRegular}
-        iconColor={"var(--icon-primary-300)"}
-        placeholderText={"Category"}
-        id={`feeds-${selectId}`}
-        zIndex={499}
-        titleId={type}
-        onclick={(id = "") => {
-          type = id;
-          isSelectEmpty = false;
-        }}
-        disabled={false}
-        borderType={"none"}
-        borderActiveType={"none"}
-        borderHighlight={"hover-active"}
-        headerHighlight={"hover-active"}
-        headerHeight={"28px"}
-        minBodyWidth={"150px"}
-        minHeaderWidth={"161px"}
-        maxHeaderWidth={"200px"}
-        borderRounded={"4px"}
-        headerTheme={"light-violet"}
-        bodyTheme={"violet"}
-        menuItem={"v2"}
-        headerFontSize={"13px"}
-        isDropIconFilled={true}
-        position={"absolute"}
-        variant={"light-violet"}
-      />
+    <div class="pb-3">
+      <div
+        class={isSelectEmpty ? "category-select-error" : ""}
+        style="display: inline-block;"
+      >
+        <Select
+          data={[
+            {
+              name: "Feature Request",
+              id: FeedbackType.FEATURE_REQUEST,
+            },
+            {
+              name: "UI Improvement",
+              id: FeedbackType.UI_IMPROVEMENT,
+            },
+            {
+              name: "Bugs",
+              id: FeedbackType.BUG,
+            },
+          ]}
+          iconRequired={true}
+          icon={DiversityRegular}
+          iconColor={"var(--icon-primary-300)"}
+          placeholderText={"Category"}
+          id={`feeds-${selectId}`}
+          zIndex={499}
+          titleId={type}
+          onclick={(id = "") => {
+            type = id;
+            isSelectEmpty = false;
+          }}
+          disabled={false}
+          borderType={"none"}
+          borderActiveType={"none"}
+          borderHighlight={"hover-active"}
+          headerHighlight={"hover-active"}
+          headerHeight={"28px"}
+          minBodyWidth={"150px"}
+          minHeaderWidth={"161px"}
+          maxHeaderWidth={"200px"}
+          borderRounded={"4px"}
+          headerTheme={"light-violet"}
+          bodyTheme={"violet"}
+          menuItem={"v2"}
+          headerFontSize={"13px"}
+          isDropIconFilled={true}
+          position={"absolute"}
+          variant={"light-violet"}
+        />
+      </div>
     </div>
     <!-- {#if isSelectEmpty}
       <p class="error-message">Please select a feedback category.</p>
@@ -201,10 +206,7 @@
       </p>
 
       <div
-        class="p-2 {isDescriptionEmpty ||
-        isSubjectEmpty ||
-        isTextArea ||
-        isSelectEmpty
+        class="p-2 {isDescriptionEmpty || isSubjectEmpty || isTextArea
           ? 'empty-data-error mb-0'
           : 'mb-3'}"
         style="height: 137px; border-radius: 4px; color: var(--text-ds-neutral-400); background-color: var(--bg-ds-surface-400);"
@@ -442,5 +444,9 @@
     max-width: 200px;
     padding: 2px;
     background-color: var(--bg-ds-surface-200);
+  }
+  .category-select-error {
+    border: 1px solid var(--error--color);
+    border-radius: 4px;
   }
 </style>

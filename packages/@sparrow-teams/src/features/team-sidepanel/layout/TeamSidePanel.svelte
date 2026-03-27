@@ -9,6 +9,7 @@
   import { base64ToURL, FormatCount } from "@sparrow/common/utils";
   import { List } from "@sparrow/library/ui";
   import { PeopleIcon } from "@sparrow/library/assets";
+  import { highlightedTeams } from "@sparrow/common/store";
 
   export let teamList: TeamDocument[] = [];
   export let tabList: TabDocument[] = [];
@@ -41,6 +42,8 @@
       activeIndex = openTeam.teamId;
     }
   }
+
+  $: highlightedTeamIds = $highlightedTeams;
 
   export let appVersion;
 </script>
@@ -138,9 +141,9 @@
                     {team.name}
                   </p>
                 </div>
-                {#if team.isNewInvite}
+                {#if team.isNewInvite || highlightedTeamIds.has(team.teamId)}
                   <p class="mb-0 new-invite text-labelColor w-50 ellipsis">
-                    NEW INVITE
+                    NEW
                   </p>
                 {:else}
                   <PeopleIcon

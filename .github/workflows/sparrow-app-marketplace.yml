@@ -21,15 +21,16 @@ env:
   VITE_RELEASE_NOTES_API: ${{ vars.VITE_RELEASE_NOTES_API }}
   VITE_AZURE_CDN_URL: ${{ vars.VITE_AZURE_CDN_URL }}
   VITE_AZURE_INSIGHTS_CONNECTION_STRING: ${{ vars.VITE_AZURE_INSIGHTS_CONNECTION_STRING }}
-  VITE_CANNY_API: ${{ vars.VITE_CANNY_API }}
-  VITE_CANNY_URL: ${{ vars.VITE_CANNY_URL }}
+  VITE_OPENFEEDBACK_API: ${{ vars.VITE_OPENFEEDBACK_API }}
+  VITE_OPENFEEDBACK_URL: ${{ vars.VITE_OPENFEEDBACK_URL }}
+  VITE_OPENFEEDBACK_BOARD_ID: ${{ vars.VITE_OPENFEEDBACK_BOARD_ID }}
   VITE_BASE_URL: ${{ vars.VITE_BASE_URL }}
   VITE_SPARROW_LINKEDIN: ${{ vars.VITE_SPARROW_LINKEDIN }}
   VITE_WEB_SOCKET_IO_API_URL: ${{ vars.VITE_WEB_SOCKET_IO_API_URL }}
   VITE_SPARROW_DOCS: ${{ vars.VITE_SPARROW_DOCS }}
   VITE_SPARROW_AI_WEBSOCKET: ${{ vars.VITE_SPARROW_AI_WEBSOCKET }}
   VITE_APP_ENVIRONMENT_PATH: ${{ vars.VITE_APP_ENVIRONMENT_PATH }}
-  VITE_CANNY_FEEDBACK_URL: ${{ vars.VITE_CANNY_FEEDBACK_URL }}
+  VITE_OPENFEEDBACK_FEEDBACK_URL: ${{ vars.VITE_OPENFEEDBACK_FEEDBACK_URL }}
   VITE_SPARROW_WEB_APP_URL: ${{ vars.VITE_SPARROW_WEB_APP_URL }}
   VITE_MARKETING_URL: ${{ vars.VITE_MARKETING_URL }}
   VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
@@ -39,7 +40,6 @@ env:
   VITE_SPARROW_ADMIN_URL: ${{ vars.VITE_SPARROW_ADMIN_URL }}
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
   CI: false
-  SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
 
 
 jobs:
@@ -53,11 +53,30 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Install Snapcraft
         run: |
           sudo snap install snapcraft --classic
+
+      - name: Prepare Snapcraft credentials
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+        run: |
+          # 1. Override XDG_CONFIG_HOME to a .config folder in the workspace
+          export XDG_CONFIG_HOME="$PWD/.config"
+
+          # 2. Create the snapcraft subfolder under that config
+          mkdir -p "$XDG_CONFIG_HOME/snapcraft"
+
+          # 3. Write the exported credentials JSON (your long token) to the file
+          echo "$SNAPCRAFT_STORE_CREDENTIALS" > "$XDG_CONFIG_HOME/snapcraft/credentials.json"
+          chmod 600 "$XDG_CONFIG_HOME/snapcraft/credentials.json"
+
+          # 4. Persist XDG_CONFIG_HOME for all subsequent steps
+          echo "XDG_CONFIG_HOME=$PWD/.config" >> $GITHUB_ENV
+
+          echo "Stored Snapcraft creds in $XDG_CONFIG_HOME/snapcraft/credentials.json"
 
       - name: Check Snapcraft Credentials
         run: |
@@ -86,27 +105,9 @@ jobs:
         run: |
           sudo snapcraft --destructive-mode
 
-      - name: Prepare Snapcraft credentials
-        env:
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
-        run: |
-          # 1. Override XDG_CONFIG_HOME to a .config folder in the workspace
-          export XDG_CONFIG_HOME="$PWD/.config"
-
-          # 2. Create the snapcraft subfolder under that config
-          mkdir -p "$XDG_CONFIG_HOME/snapcraft"
-
-          # 3. Write the exported credentials JSON (your long token) to the file
-          echo "$SNAPCRAFT_STORE_CREDENTIALS" > "$XDG_CONFIG_HOME/snapcraft/credentials.json"
-          chmod 600 "$XDG_CONFIG_HOME/snapcraft/credentials.json"
-
-          echo "Stored Snapcraft creds in $XDG_CONFIG_HOME/snapcraft/credentials.json"
-
       - name: Upload Snap to Snap Store
         env:
           SNAP_CHANNEL: ${{ vars.SNAP_RELEASE_CHANNEL || 'edge' }}
-          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
-          XDG_CONFIG_HOME: "$PWD/.config"
         run: |
           SNAP_FILE=$(ls *.snap | head -n1)
           echo "Uploading $SNAP_FILE to $SNAP_CHANNEL"
@@ -169,10 +170,11 @@ jobs:
     runs-on: macos-latest
     environment: production
     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    timeout-minutes: 60
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
 
       - name: Install Rust 1.82.0
         run: |
@@ -182,18 +184,17 @@ jobs:
           rustup target add x86_64-apple-darwin
 
       - name: Sync node version and setup cache
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
-          node-version: "20.8"
-
-      - name: Install project dependencies
-        run: yarn
+          node-version: "24"
 
       - name: Increase Yarn network timeout
         run: yarn config set network-timeout 600000
 
       - name: Import Apple Certificates
         env:
+          MAC_DISTRIBUTION_CERT: ${{ secrets.MAC_DISTRIBUTION_CERT }}
+          MAC_DISTRIBUTION_CERT_PASSWORD: ${{ secrets.MAC_DISTRIBUTION_CERT_PASSWORD }}
           MAC_INSTALLER_CERT: ${{ secrets.MAC_INSTALLER_CERT }}
           MAC_INSTALLER_CERT_PASSWORD: ${{ secrets.MAC_INSTALLER_CERT_PASSWORD }}
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
@@ -202,37 +203,56 @@ jobs:
           security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security set-keychain-settings -t 3600 -u build.keychain
+          security set-keychain-settings -t 7200 -u build.keychain
 
-          # Import certificates
+          # Import Apple Distribution (codesigning) certificate
+          echo "$MAC_DISTRIBUTION_CERT" | base64 --decode > DistributionCert.p12
+          security import DistributionCert.p12 \
+            -k build.keychain \
+            -P "$MAC_DISTRIBUTION_CERT_PASSWORD" \
+            -T /usr/bin/codesign \
+            -T /usr/bin/productbuild \
+            -T /usr/bin/productsign \
+            -A
+
+          # Import 3rd Party Mac Developer Installer certificate
           echo "$MAC_INSTALLER_CERT" | base64 --decode > InstallerCert.p12
           security import InstallerCert.p12 \
             -k build.keychain \
             -P "$MAC_INSTALLER_CERT_PASSWORD" \
             -T /usr/bin/codesign \
-            -T /usr/bin/productbuild
+            -T /usr/bin/productbuild \
+            -T /usr/bin/productsign \
+            -A
 
-          # Configure keychain permissions
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
+          # CRITICAL: Configure keychain partition list to allow access without GUI
+          security set-key-partition-list -S apple-tool:,apple:,codesign:,productsign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
 
           # Verify installation
+          echo "=== All identities in keychain ==="
+          security find-identity -v build.keychain
+          echo "=== Codesigning identities ==="
           security find-identity -v -p codesigning build.keychain
+          echo "=== Mac App Store identities ==="
+          security find-identity -v -p macappstore build.keychain
 
       - name: Extract Certificate IDs
         id: extract-cert-ids
         run: |
-          # Extract Apple Distribution (codesigning) ID
-          CODESIGN_ID=$(security find-identity -v -p codesigning build.keychain | grep "Apple Distribution" | awk -F'"' '{print $2}')
+          # Extract 3rd Party Mac Developer Application (codesigning) ID
+          CODESIGN_ID=$(security find-identity -v -p codesigning build.keychain | grep "3rd Party Mac Developer Application" | head -1 | awk -F'"' '{print $2}')
           if [ -z "$CODESIGN_ID" ]; then
-            echo "::error::Apple Distribution certificate not found in keychain"
+            echo "::error::3rd Party Mac Developer Application certificate not found in keychain"
+            security find-identity -v -p codesigning build.keychain
             exit 1
           fi
           echo "CODESIGN_ID=$CODESIGN_ID" >> $GITHUB_ENV
 
-          # Extract 3rd Party Installer ID (must search all identities)
-          INSTALLER_ID=$(security find-identity -v build.keychain | grep "3rd Party Mac Developer Installer" | awk -F'"' '{print $2}')
+          # Extract 3rd Party Mac Developer Installer ID
+          INSTALLER_ID=$(security find-identity -v build.keychain | grep "3rd Party Mac Developer Installer" | head -1 | awk -F'"' '{print $2}')
           if [ -z "$INSTALLER_ID" ]; then
-            echo "::error::Installer certificate not found in keychain"
+            echo "::error::3rd Party Mac Developer Installer certificate not found in keychain"
+            security find-identity -v build.keychain
             exit 1
           fi
           echo "INSTALLER_ID=$INSTALLER_ID" >> $GITHUB_ENV
@@ -242,56 +262,150 @@ jobs:
 
       - name: Build Tauri App
         run: |
+          # Ensure keychain is unlocked
+          security unlock-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" build.keychain
+          
           yarn cache clean
           yarn install
-          yarn workspace @sparrow/desktop tauri build --debug --verbose
+          yarn workspace @sparrow/desktop tauri build --debug
         env:
           APPLE_SIGNING_IDENTITY: "${{ env.CODESIGN_ID }}" 
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           GITHUB_TOKEN: ${{ secrets.PR_GITHUB_TOKEN }}
 
-      - name: Create signed .pkg for App Store
+      - name: Verify App Signature
         run: |
           APP_NAME="Sparrow"
-          BUNDLE_PATH="apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/${APP_NAME}.app"
-          PKG_PATH="apps/@sparrow-desktop/src-tauri/target/debug/bundle/${APP_NAME}.pkg"
+          APP_PATH="apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/${APP_NAME}.app"
+          
+          echo "Verifying app signature..."
+          codesign -dvvv "$APP_PATH"
+          
+          echo "App will be rejected by spctl (expected for App Store builds)"
+          spctl -a -t exec -vv "$APP_PATH" || true
 
+      - name: Create unsigned pkg
+        timeout-minutes: 10
+        run: |
+          set -euxo pipefail
+          APP_NAME="Sparrow"
+          BUNDLE_PATH="apps/@sparrow-desktop/src-tauri/target/debug/bundle/macos/${APP_NAME}.app"
+          PKG_PATH="apps/@sparrow-desktop/src-tauri/target/debug/bundle/${APP_NAME}-unsigned.pkg"
+
+          # Verify app bundle exists
           if [ ! -d "$BUNDLE_PATH" ]; then
             echo "::error::App bundle not found at $BUNDLE_PATH"
             exit 1
           fi
 
-          # Sign with INSTALLER_ID (3rd Party Mac Developer Installer)
-          productbuild \
+          echo "Creating unsigned package at $(date)"
+          time productbuild \
             --component "$BUNDLE_PATH" /Applications \
-            --sign "$INSTALLER_ID" \
             "$PKG_PATH"
+          
+          echo "Unsigned package created: $(ls -lh $PKG_PATH)"
 
-          if [ ! -f "$PKG_PATH" ]; then
-            echo "::error::Failed to create package at $PKG_PATH"
+      - name: Prepare Keychain for Signing
+        timeout-minutes: 2
+        run: |
+          set -euxo pipefail
+          
+          # Ensure keychain is unlocked and accessible
+          security unlock-keychain -p "${{ secrets.KEYCHAIN_PASSWORD }}" build.keychain
+          
+          # Reset partition list to ensure productsign can access
+          security set-key-partition-list -S apple-tool:,apple:,codesign:,productsign: -s -k "${{ secrets.KEYCHAIN_PASSWORD }}" build.keychain
+          
+          # Verify installer identity is still available
+          echo "Verifying installer identity: ${{ env.INSTALLER_ID }}"
+          security find-identity -v build.keychain | grep "${{ env.INSTALLER_ID }}" || {
+            echo "Installer identity not found in keychain"
+            security find-identity -v build.keychain
+            exit 1
+          }
+
+      - name: Sign pkg
+        timeout-minutes: 15
+        run: |
+          set -euxo pipefail
+          
+          UNSIGNED="apps/@sparrow-desktop/src-tauri/target/debug/bundle/Sparrow-unsigned.pkg"
+          SIGNED="apps/@sparrow-desktop/src-tauri/target/debug/bundle/Sparrow.pkg"
+          
+          # Verify unsigned package exists
+          if [ ! -f "$UNSIGNED" ]; then
+            echo "::error::Unsigned package not found at $UNSIGNED"
             exit 1
           fi
-        env:
-          INSTALLER_ID: ${{ env.INSTALLER_ID }}
+          
+          echo "Starting productsign at $(date)"
+          echo "Unsigned package size: $(du -h "$UNSIGNED" | cut -f1)"
+          echo "Using installer identity: ${{ env.INSTALLER_ID }}"
+          
+          # Sign with timeout and capture output
+          time productsign --sign "${{ env.INSTALLER_ID }}" "$UNSIGNED" "$SIGNED" 2>&1 | tee productsign.log
+          
+          # Check if successful using PIPESTATUS
+          if [ ${PIPESTATUS[0]} -eq 0 ]; then
+            echo "✅ productsign completed successfully at $(date)"
+            echo "Signed package size: $(du -h "$SIGNED" | cut -f1)"
+            
+            # Verify the package signature
+            echo "Verifying package signature..."
+            pkgutil --check-signature "$SIGNED"
+          else
+            echo "❌ productsign failed at $(date)"
+            echo "Last 50 lines of output:"
+            tail -50 productsign.log
+            exit 1
+          fi
 
       - name: Upload to App Store Connect
+        timeout-minutes: 15
         env:
           PKG_PATH: "apps/@sparrow-desktop/src-tauri/target/debug/bundle/Sparrow.pkg"
           APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER: ${{ secrets.APP_STORE_CONNECT_API_ISSUER }}
         run: |
+          set -euxo pipefail
+          
+          # Verify package exists and is signed
+          if [ ! -f "$PKG_PATH" ]; then
+            echo "::error::Package not found at $PKG_PATH"
+            exit 1
+          fi
+          
+          echo "Verifying package signature before upload..."
+          pkgutil --check-signature "$PKG_PATH"
+          
+          # Setup API key
           mkdir -p ~/.appstoreconnect/private_keys
           echo "$APP_STORE_CONNECT_API_KEY" | base64 --decode > ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8
           chmod 600 ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_API_KEY_ID}.p8
-
+          
+          echo "Uploading to App Store Connect at $(date)..."
+          echo "Package size: $(du -h "$PKG_PATH" | cut -f1)"
+          
+          # Upload with verbose output
           xcrun altool --upload-app -f "$PKG_PATH" -t macos \
-          --apiKey "$APP_STORE_CONNECT_API_KEY_ID" \
-          --apiIssuer "$APP_STORE_CONNECT_API_ISSUER" \
-          --verbose
+            --apiKey "$APP_STORE_CONNECT_API_KEY_ID" \
+            --apiIssuer "$APP_STORE_CONNECT_API_ISSUER" \
+            --verbose 2>&1 | tee upload.log
+          
+          if [ ${PIPESTATUS[0]} -eq 0 ]; then
+            echo "✅ Upload successful at $(date)"
+            echo "The build will appear in TestFlight in 15-30 minutes"
+          else
+            echo "❌ Upload failed at $(date)"
+            echo "Last 50 lines of upload log:"
+            tail -50 upload.log
+            exit 1
+          fi
       
       - name: Post Mac App Store TestFlight Link to Teams
+        if: success()
         env:
           TEAMS_WEBHOOK_URL: ${{ secrets.TEAMS_INCOMING_WEBHOOK_URL }}
           TESTFLIGHT_URL: ${{ secrets.TESTFLIGHT_URL }}
@@ -314,6 +428,11 @@ jobs:
                     {
                       \"type\": \"TextBlock\",
                       \"text\": \"A new macOS app store build is available for testing in TestFlight:\",
+                      \"wrap\": true
+                    },
+                    {
+                      \"type\": \"TextBlock\",
+                      \"text\": \"Build uploaded at: $(date)\",
                       \"wrap\": true
                     },
                     {

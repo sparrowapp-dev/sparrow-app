@@ -413,7 +413,7 @@ export class DashboardViewModel {
    */
   public getAllFeatures = async () => {
     const features = await this.featureSwitchService.getAllFeatures();
-    if (features.isSuccessful) {
+    if (features.isSuccessful && Array.isArray(features.data?.data)) {
       await this.featureSwitchRepository.bulkInsertData(features.data.data);
     }
   };
@@ -1310,17 +1310,67 @@ export class DashboardViewModel {
     }
   };
 
-  public handleRedirectToAdminPanel = async (teamId: string) => {
+  /**
+   * @description - This function will redirect you to Admin Panel.
+   */
+  public handleRedirectToAdminPanel = async (
+    teamId: string,
+    redirectPath?: string,
+  ) => {
     const [authToken] = getAuthJwt();
-    window.open(
-      constants.ADMIN_URL +
-        `/billing/billingOverview/${teamId}?redirectTo=changePlan&xid=${authToken}`,
-      "_blank",
-    );
-    return;
+
+    try {
+      const response = await fetch(
+        `${constants.API_URL}/api/auth/admin-sso-token`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({ teamId }),
+        },
+      );
+
+      if (response.status === 403) {
+        await open(`${constants.ADMIN_URL}/login`);
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error("Unexpected error");
+      }
+
+      const data = await response.json();
+
+      // base SSO url
+      let url = `${constants.ADMIN_URL}/sso?ssoToken=${data.ssoToken}`;
+
+      // if redirect provided → append it
+      if (redirectPath) {
+        url += `&redirectTo=${encodeURIComponent(redirectPath)}`;
+      }
+
+      await open(url);
+    } catch (error) {
+      await open(`${constants.ADMIN_URL}/login`);
+    }
   };
 
   public handleContactSales = async () => {
     window.open(`${constants.MARKETING_URL}/pricing/`);
   };
+
+  public async getWorkspacesByTeamId(teamId: string): Promise<any[]> {
+    const observable = await this.workspaces();
+
+    return new Promise((resolve) => {
+      const sub = observable.subscribe((list: any[]) => {
+        const filtered = list.filter((ws) => ws.team?.teamId === teamId);
+
+        resolve(filtered);
+        sub.unsubscribe();
+      });
+    });
+  }
 }

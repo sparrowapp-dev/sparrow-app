@@ -80,7 +80,7 @@
     width: 98px;
   }
   .container-width {
-    width: calc(100%-98px);
+    width: calc(100% - 98px);
   }
   .help-label-error {
     margin-top: 0px;

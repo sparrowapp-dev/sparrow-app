@@ -64,8 +64,11 @@
   } from "@sparrow/workspaces/stores";
   import { getSelfhostUrls } from "@app/utils/jwt";
   import { get } from "svelte/store";
+  import { NotificationService } from "@app/services/notification.service";
+  import { highlightTeam, highlightWorkspace } from "@sparrow/common/store";
 
   const _viewModel = new DashboardViewModel();
+  const notificationService = new NotificationService();
   const osDetector = new OSDetector();
   const location = useLocation();
   let userId: string;
@@ -77,8 +80,9 @@
           _viewModel.refreshTeams(userId),
           _viewModel.refreshWorkspaces(userId),
         ]);
+        await notificationService.loadNotificationsToStore();
       } else {
-        console.error(`Throttled for ${userId}`);
+        console.warn(`Throttled for ${userId}`);
       }
     }
   });
@@ -112,6 +116,7 @@
   let isUpgradePlanModelOpen: boolean = false;
   let currentWorkspacePlan = "";
   let isUpgradeCurrentTeamPlanModalOpen: boolean = false;
+  let notificationPollingInterval: any;
 
   const openDefaultBrowser = async () => {
     await open(externalSparrowLink);
@@ -324,12 +329,23 @@
 
     // Disabling web socket for now due to issues in release_v1 deployment, can be enabled in future if required.
     // await _viewModel.connectWebSocket();
+    // load notifications immediately
+    await notificationService.loadNotificationsToStore();
+    notificationPollingInterval = setInterval(
+      () => {
+        notificationService.loadNotificationsToStore();
+      },
+      5 * 60 * 1000,
+    );
   });
 
   onDestroy(() => {
     userUnsubscribe();
     activeWorkspaceSubscribe.unsubscribe();
     activeTeamSubscriber.unsubscribe();
+    if (notificationPollingInterval) {
+      clearInterval(notificationPollingInterval);
+    }
   });
 
   let updaterVisible = true;
@@ -358,13 +374,15 @@
   onMount(async () => {
     try {
       updater = await check();
-      if (updater?.available) {
+      if (updater && updater.available) {
         // notifications.warning("Update Available");
         newAppVersion = updater.version;
         updateAvailable = true;
       }
     } catch (error) {
-      console.error(error);
+      if (updater != null) {
+        console.error(error);
+      }
     }
   });
 
@@ -692,6 +710,146 @@
     upgradePlanModalWorkspace = true;
   };
 
+  async function handleAcceptInvite(e) {
+    try {
+      const payload = e.detail;
+
+      await notificationService.respondToInvite(
+        payload.notificationId,
+        "accept",
+      );
+
+      await notificationService.loadNotificationsToStore();
+
+      await _viewModel.refreshTeams(userId);
+      await _viewModel.refreshWorkspaces(userId);
+      await _viewModel.setOpenTeam(payload.teamId);
+
+      if (payload.role === "admin") {
+        highlightTeam(payload.teamId);
+
+        const allWorkspaces = await _viewModel.getWorkspacesByTeamId(
+          payload.teamId,
+        );
+
+        allWorkspaces.forEach((ws) => {
+          highlightWorkspace(ws._id);
+        });
+      } else {
+        highlightTeam(payload.teamId);
+
+        payload.workspaceIds?.forEach((id) => {
+          highlightWorkspace(id);
+        });
+      }
+
+      let message = "";
+
+      if (payload.role === "admin") {
+        message = `You are now an admin in ${payload.teamName} hub.`;
+      } else {
+        const workspaceText =
+          payload.workspaceNames.length > 1
+            ? `${payload.workspaceNames.join(", ")} workspaces`
+            : `${payload.workspaceNames[0]} workspace`;
+
+        message = `You are now a ${payload.role} in ${workspaceText}.`;
+      }
+
+      notifications.success(message);
+
+      navigate("/app/home");
+      window.dispatchEvent(new CustomEvent("closeNotifications"));
+    } catch (err) {
+      console.error(err);
+      notifications.error("Failed to accept invite");
+    }
+  }
+
+  async function handleDeclineInvite(e) {
+    try {
+      const payload = e.detail;
+
+      await notificationService.respondToInvite(
+        payload.notificationId,
+        "reject",
+      );
+
+      await notificationService.loadNotificationsToStore();
+
+      await _viewModel.refreshTeams(userId);
+      await _viewModel.refreshWorkspaces(userId);
+
+      let message = "";
+
+      if (payload.role === "admin") {
+        message = `You declined the invite to join ${payload.teamName} hub.`;
+      } else {
+        const workspaceText =
+          payload.workspaceNames.length > 1
+            ? `${payload.workspaceNames.join(", ")} workspaces`
+            : `${payload.workspaceNames[0]} workspace`;
+
+        message = `You declined the invite to join ${workspaceText}.`;
+      }
+
+      notifications.error(message);
+    } catch (err) {
+      console.error(err);
+      notifications.error("Failed to reject invite");
+    }
+  }
+
+  async function handleMarkAllRead() {
+    try {
+      await notificationService.markAllAsRead();
+
+      await notificationService.loadNotificationsToStore();
+
+      notifications.success("All notifications marked as read");
+    } catch (err) {
+      console.error("Mark all read failed", err);
+      notifications.error("Failed to mark all as read");
+    }
+  }
+
+  async function handleOpenInvite(e) {
+    const notification = e.detail;
+
+    if (!notification.isRead) {
+      try {
+        await notificationService.markAsRead(notification._id);
+        await notificationService.loadNotificationsToStore();
+      } catch (err) {
+        console.error("Failed to mark as read", err);
+      }
+    }
+  }
+
+  async function handleClearAllNotifications(e) {
+    try {
+      await notificationService.clearAllNotifications(e.detail);
+      notifications.success("All notifications cleared");
+    } catch (err) {
+      console.error(err);
+      notifications.error("Failed to clear notifications");
+    }
+  }
+
+  async function handleArchiveNotification(e) {
+    try {
+      const notification = e.detail;
+
+      await notificationService.archiveNotification(notification._id);
+      await notificationService.loadNotificationsToStore();
+
+      // notifications.success("Notification archived");
+    } catch (err) {
+      console.error(err);
+      notifications.error("Failed to archive notification");
+    }
+  }
+
   $: {
     if (userRole) {
       planContent = planInfoByRole(userRole);
@@ -771,8 +929,16 @@
     onUpgradeClick={handleHeaderUpgradeClick}
     handleDocsRedirect={_viewModel.redirectDocs}
     handleFeaturesRedirect={_viewModel.redirectFeatureUpdates}
-    onAdminRedirect={_viewModel.onAdminRedirect}
+    onAdminRedirect={() => {
+      _viewModel.handleRedirectToAdminPanel(openTeam?.teamId);
+    }}
     recentVisitedWorkspaces={$recentVisitedWorkspaces}
+    on:acceptInvite={handleAcceptInvite}
+    on:declineInvite={handleDeclineInvite}
+    on:markAllRead={handleMarkAllRead}
+    on:openInvite={handleOpenInvite}
+    on:clearAllNotifications={handleClearAllNotifications}
+    on:archiveNotification={handleArchiveNotification}
   />
 
   <!--
@@ -796,7 +962,14 @@
           }}
         />
       {:else if openTeam?.plan?.name === "Community"}
-        <UpgradePlanBanner bind:isUpgradePlanModelOpen />
+        <UpgradePlanBanner
+          bind:isUpgradePlanModelOpen
+          onUpgradeRedirect={() =>
+            _viewModel.handleRedirectToAdminPanel(
+              openTeam?.teamId,
+              `/billing/billingOverview/${openTeam?.teamId}?redirectTo=changePlan`,
+            )}
+        />
       {/if}
     {/if}
   {/if}

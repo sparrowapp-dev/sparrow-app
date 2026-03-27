@@ -228,7 +228,7 @@
                 const event = await onFetchCollectionGuide({
                   id: "collection-guide",
                 });
-                const guideData = event?.getLatest().toMutableJSON();
+                const guideData = event?.getLatest()?.toMutableJSON();
                 if (guideData?.isActive === false) {
                   onUpdateCollectionGuide(
                     {
