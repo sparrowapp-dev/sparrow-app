@@ -566,7 +566,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: ${{ inputs.repository }}
-          ref: refs/pull/${{ inputs.pr_number }}/head
+          ref: ${{ inputs.branch }}
 
       - name: Login to Azure Container Registry
         uses: azure/docker-login@v1
@@ -648,6 +648,7 @@ jobs:
           envsubst < .github/k8s/pr-preview/deployment.yaml | kubectl apply -f -
           envsubst < .github/k8s/pr-preview/service.yaml | kubectl apply -f -
           envsubst < .github/k8s/pr-preview/ingress.yaml | kubectl apply -f -
+          kubectl rollout restart deployment/sparrow-web-preview-pr-${{ inputs.pr_number }} --namespace=sparrow-dev-preview
 
       - name: Wait for rollout
         run: |
