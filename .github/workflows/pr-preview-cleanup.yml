@@ -77,7 +77,7 @@ jobs:
       - name: Trigger Auth Preview Cleanup
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: pr-preview-build.yaml
+          workflow: pr-preview-cleanup.yaml
           repo: sparrowapp-dev/sparrow-app-auth
           ref: main
           inputs: |
