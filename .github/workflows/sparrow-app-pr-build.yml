@@ -621,7 +621,7 @@ jobs:
       - name: Trigger Auth Preview Build
         uses: benc-uk/workflow-dispatch@v1
         with:
-          workflow: pr-preview-build.yml
+          workflow: pr-preview-build.yaml
           repo: sparrowapp-dev/sparrow-app-auth
           ref: main
           inputs: |
