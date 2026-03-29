@@ -27,9 +27,7 @@
     addCollectionItem,
     removeCollectionItem,
   } from "../../../../stores/recent-left-panel";
-  import {
-    dragState,
-  } from "../../../../stores/drag-state";
+  import { dragState } from "../../../../stores/drag-state";
   import {
     ChevronDownRegular,
     ChevronRightRegular,
@@ -86,11 +84,38 @@
   export let onItemMoved: (args: any) => void;
 
   // Drag handler functions passed from parent
-  export let dragStart: (event: DragEvent, collection: any, folder: any, api: any) => void;
+  export let dragStart: (
+    event: DragEvent,
+    collection: any,
+    folder: any,
+    api: any,
+  ) => void;
   export let dragStop: () => void;
-  export let handleDragOver: (event: DragEvent, collection: any, folder: any, api: any, requestTabWrapper: HTMLElement, setDropPosition: (pos: "top" | "bottom" | null) => void, setIsDragOver: (val: boolean) => void, setIsForbiddenDrop: (val: boolean) => void) => void;
-  export let handleDragLeave: (setIsDragOver: (val: boolean) => void, setIsForbiddenDrop: (val: boolean) => void, setDropPosition: (pos: "top" | "bottom" | null) => void) => void;
-  export let handleDrop: (event: DragEvent, collection: any, folder: any, api: any, setDropPosition: (pos: "top" | "bottom" | null) => void, setIsDragOver: (val: boolean) => void, setIsForbiddenDrop: (val: boolean) => void, currentDropPosition: "top" | "bottom" | null) => void;
+  export let handleDragOver: (
+    event: DragEvent,
+    collection: any,
+    folder: any,
+    api: any,
+    requestTabWrapper: HTMLElement,
+    setDropPosition: (pos: "top" | "bottom" | null) => void,
+    setIsDragOver: (val: boolean) => void,
+    setIsForbiddenDrop: (val: boolean) => void,
+  ) => void;
+  export let handleDragLeave: (
+    setIsDragOver: (val: boolean) => void,
+    setIsForbiddenDrop: (val: boolean) => void,
+    setDropPosition: (pos: "top" | "bottom" | null) => void,
+  ) => void;
+  export let handleDrop: (
+    event: DragEvent,
+    collection: any,
+    folder: any,
+    api: any,
+    setDropPosition: (pos: "top" | "bottom" | null) => void,
+    setIsDragOver: (val: boolean) => void,
+    setIsForbiddenDrop: (val: boolean) => void,
+    currentDropPosition: "top" | "bottom" | null,
+  ) => void;
 
   let isDeletePopup: boolean = false;
   let showMenu: boolean = false;
@@ -307,9 +332,34 @@
     isDragging = false;
     dragStop();
   }}
-  on:dragover={(event) => handleDragOver(event, collection, folder, api, requestTabWrapper, (pos) => dropPosition = pos, (val) => isDragOver = val, (val) => isForbiddenDrop = val)}
-  on:dragleave={() => handleDragLeave((val) => isDragOver = val, (val) => isForbiddenDrop = val, (pos) => dropPosition = pos)}
-  on:drop={(event) => handleDrop(event, collection, folder, api, (pos) => dropPosition = pos, (val) => isDragOver = val, (val) => isForbiddenDrop = val, dropPosition)}
+  on:dragover={(event) =>
+    handleDragOver(
+      event,
+      collection,
+      folder,
+      api,
+      requestTabWrapper,
+      (pos) => (dropPosition = pos),
+      (val) => (isDragOver = val),
+      (val) => (isForbiddenDrop = val),
+    )}
+  on:dragleave={() =>
+    handleDragLeave(
+      (val) => (isDragOver = val),
+      (val) => (isForbiddenDrop = val),
+      (pos) => (dropPosition = pos),
+    )}
+  on:drop={(event) =>
+    handleDrop(
+      event,
+      collection,
+      folder,
+      api,
+      (pos) => (dropPosition = pos),
+      (val) => (isDragOver = val),
+      (val) => (isForbiddenDrop = val),
+      dropPosition,
+    )}
   bind:this={requestTabWrapper}
   class="d-flex draggable align-items-center justify-content-between my-button btn-primary {api.id ===
   activeTabId
@@ -330,18 +380,13 @@
     tabindex="-1"
     on:contextmenu|preventDefault={(e) => rightClickContextMenu(e)}
     on:click|preventDefault|stopPropagation={(e) => {
-      // if (api?.items && api?.items?.length > 0) {
-      // } else {
-      //   expand = false;
-      // }
-      if (!isRenaming) {
-        // expand = !expand;
-        if (api?.items?.length) {
+      if (!isRenaming && api && api.id) {
+        if (api?.items && api.items.length > 0) {
           if (expand) {
             removeCollectionItem(api.id);
           } else {
             onItemOpened("request", {
-              workspaceId: collection.workspaceId,
+              workspaceId: collection?.workspaceId,
               collection,
               folder,
               request: api,
@@ -350,7 +395,7 @@
           }
         } else {
           onItemOpened("request", {
-            workspaceId: collection.workspaceId,
+            workspaceId: collection?.workspaceId,
             collection,
             folder,
             request: api,
