@@ -215,6 +215,11 @@
             environmentVariables = {
               local: filteredEnv[1],
               global: filteredEnv[0],
+              allLocalEnvironments: $environmentsObserver.filter(
+                (env) =>
+                  env.workspaceId === currentWorkspaceId &&
+                  env.type === environmentType.LOCAL,
+              ),
               filtered: [],
             };
 

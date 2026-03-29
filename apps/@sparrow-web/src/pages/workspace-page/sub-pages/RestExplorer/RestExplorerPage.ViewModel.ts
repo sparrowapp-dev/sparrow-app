@@ -499,6 +499,76 @@ class RestExplorerViewModel {
     ) {
       result = false;
     }
+    // oauth2 grantType
+    else if (
+      requestServer.request.auth.oauth2?.grantType !==
+      progressiveTab.property.request.auth.oauth2?.grantType
+    ) {
+      result = false;
+    }
+    // oauth2 headerPrefix
+    else if (
+      requestServer.request.auth.oauth2?.headerPrefix !==
+      progressiveTab.property.request.auth.oauth2?.headerPrefix
+    ) {
+      result = false;
+    }
+    // oauth2 callbackUrl
+    else if (
+      requestServer.request.auth.oauth2?.callbackUrl !==
+      progressiveTab.property.request.auth.oauth2?.callbackUrl
+    ) {
+      result = false;
+    }
+    // oauth2 clientId
+    else if (
+      requestServer.request.auth.oauth2?.clientId !==
+      progressiveTab.property.request.auth.oauth2?.clientId
+    ) {
+      result = false;
+    }
+    // oauth2 clientSecret
+    else if (
+      requestServer.request.auth.oauth2?.clientSecret !==
+      progressiveTab.property.request.auth.oauth2?.clientSecret
+    ) {
+      result = false;
+    }
+    // oauth2 authUrl
+    else if (
+      requestServer.request.auth.oauth2?.authUrl !==
+      progressiveTab.property.request.auth.oauth2?.authUrl
+    ) {
+      result = false;
+    }
+    // oauth2 accessTokenUrl
+    else if (
+      requestServer.request.auth.oauth2?.accessTokenUrl !==
+      progressiveTab.property.request.auth.oauth2?.accessTokenUrl
+    ) {
+      result = false;
+    }
+    // oauth2 scope
+    else if (
+      requestServer.request.auth.oauth2?.scope !==
+      progressiveTab.property.request.auth.oauth2?.scope
+    ) {
+      result = false;
+    }
+    // oauth2 state
+    else if (
+      requestServer.request.auth.oauth2?.state !==
+      progressiveTab.property.request.auth.oauth2?.state
+    ) {
+      result = false;
+    }
+    // oauth2 accessToken
+    else if (
+      requestServer.request.auth.oauth2?.accessToken !==
+      progressiveTab.property.request.auth.oauth2?.accessToken
+    ) {
+      result = false;
+    }
     // raw code
     else if (
       requestServer.request.body.raw !==
