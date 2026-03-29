@@ -12,7 +12,10 @@
   import { eyeShowIcon, eyeHideIcon } from "@sparrow/library/assets";
   import { copyToClipBoard } from "@sparrow/common/utils";
   import { HttpRequestOAuth2GrantTypeBaseEnum } from "@sparrow/common/types/workspace/http-request-base";
-  import { OAuth2TokenService } from "../../../../services/oauth2-token.service";
+  import {
+    OAuth2TokenService,
+    BROWSER_CALLBACK_URL,
+  } from "../../../../services/oauth2-token.service";
 
   export let oauth2Data: any;
   export let callback;
@@ -25,6 +28,28 @@
 
   let isGettingToken = false;
   let tokenStatus = "";
+
+  // Blocks the UI while any OAuth token flow is in progress
+  let showAuthProgressModal = false;
+  // Used to abort client-credentials fetch on cancel
+  let activeAbortController: AbortController | null = null;
+
+  // Dynamic text for the auth-progress modal
+  $: authProgressTitle =
+    oauth2Data?.grantType ===
+    HttpRequestOAuth2GrantTypeBaseEnum.AUTHORIZATION_CODE
+      ? oauth2Data?.authorizeUsingBrowser
+        ? "Authorize in Browser"
+        : "Authorize in Popup"
+      : "Getting Access Token";
+
+  $: authProgressDescription =
+    oauth2Data?.grantType ===
+    HttpRequestOAuth2GrantTypeBaseEnum.AUTHORIZATION_CODE
+      ? oauth2Data?.authorizeUsingBrowser
+        ? "Complete the authorization in your browser. This window will update automatically once done."
+        : "Complete the authorization in the popup window. It will close automatically once you authorize."
+      : "Fetching access token from the token endpoint. This usually takes a moment.";
 
   // Client secret visibility
   let showSecret = false;
@@ -53,6 +78,7 @@
         grantType: HttpRequestOAuth2GrantTypeBaseEnum.CLIENT_CREDENTIALS,
         headerPrefix: "Bearer",
         callbackUrl: getDefaultCallbackUrl(),
+        authorizeUsingBrowser: false,
         clientId: "",
         clientSecret: "",
         authUrl: "",
@@ -73,6 +99,9 @@
       if (!oauth2Data.callbackUrl) {
         oauth2Data.callbackUrl = getDefaultCallbackUrl();
       }
+      if (oauth2Data.authorizeUsingBrowser === undefined) {
+        oauth2Data.authorizeUsingBrowser = false;
+      }
     }
   }
 
@@ -85,8 +114,14 @@
     handleAuthChange();
   };
 
+  const handleAuthorizeBrowserToggle = () => {
+    oauth2Data.authorizeUsingBrowser = !oauth2Data.authorizeUsingBrowser;
+    handleAuthChange();
+  };
+
   const handleGetToken = async () => {
     isGettingToken = true;
+    showAuthProgressModal = true;
     tokenStatus = "Obtaining token...";
 
     try {
@@ -96,12 +131,15 @@
         oauth2Data.grantType ===
         HttpRequestOAuth2GrantTypeBaseEnum.CLIENT_CREDENTIALS
       ) {
+        activeAbortController = new AbortController();
         tokenResponse = await tokenService.getTokenClientCredentials({
           clientId: oauth2Data.clientId,
           clientSecret: oauth2Data.clientSecret,
           accessTokenUrl: oauth2Data.accessTokenUrl,
           scope: oauth2Data.scope,
+          signal: activeAbortController.signal,
         });
+        activeAbortController = null;
       } else if (
         oauth2Data.grantType ===
         HttpRequestOAuth2GrantTypeBaseEnum.AUTHORIZATION_CODE
@@ -112,6 +150,7 @@
           authUrl: oauth2Data.authUrl,
           accessTokenUrl: oauth2Data.accessTokenUrl,
           callbackUrl: oauth2Data.callbackUrl,
+          authorizeUsingBrowser: oauth2Data.authorizeUsingBrowser,
           scope: oauth2Data.scope,
           state: oauth2Data.state,
         });
@@ -129,12 +168,21 @@
         throw new Error("No access token received");
       }
     } catch (error) {
-      console.error("Error obtaining token:", error);
-      tokenStatus = "Failed to obtain token";
       const err = error as Error;
-      notifications.error("Failed to obtain access token: " + err.message);
+      // Don't show an error notification for user-initiated cancellations
+      const isCancelled =
+        err.name === "AbortError" || err.message.includes("cancelled by user");
+      if (!isCancelled) {
+        console.error("Error obtaining token:", error);
+        tokenStatus = "Failed to obtain token";
+        notifications.error("Failed to obtain access token: " + err.message);
+      } else {
+        tokenStatus = "";
+      }
     } finally {
       isGettingToken = false;
+      showAuthProgressModal = false;
+      activeAbortController = null;
     }
   };
 
@@ -154,6 +202,37 @@
     showClearConfirmation = true;
   };
 
+  // Cancel any in-progress token acquisition and dismiss the blocking modal
+  const handleCancelAuth = async () => {
+    // Optimistically close the modal and reset state
+    showAuthProgressModal = false;
+    isGettingToken = false;
+    tokenStatus = "";
+
+    // Abort client-credentials fetch
+    if (activeAbortController) {
+      activeAbortController.abort();
+      activeAbortController = null;
+    }
+
+    // Cancel Tauri flows
+    if (
+      oauth2Data.grantType ===
+      HttpRequestOAuth2GrantTypeBaseEnum.AUTHORIZATION_CODE
+    ) {
+      try {
+        const { invoke } = await import("@tauri-apps/api/core");
+        if (oauth2Data.authorizeUsingBrowser) {
+          await invoke("cancel_oauth_browser");
+        } else {
+          await invoke("cancel_oauth_window");
+        }
+      } catch (_) {
+        /* ignore – window may already be closed */
+      }
+    }
+  };
+
   // Clear token after confirmation
   const handleClearToken = () => {
     oauth2Data.accessToken = "";
@@ -167,10 +246,10 @@
     // Default to active local env if exists, otherwise global
     if (environmentVariables.local) {
       selectedEnvironmentType = "LOCAL";
-      selectedEnvironmentId = environmentVariables.local._data.id;
+      selectedEnvironmentId = environmentVariables.local.id;
     } else {
       selectedEnvironmentType = "GLOBAL";
-      selectedEnvironmentId = environmentVariables.global?._data.id || "";
+      selectedEnvironmentId = environmentVariables.global?.id || "";
     }
     showSaveModal = true;
   };
@@ -309,6 +388,7 @@
   // Handle overwrite confirmation
   const handleOverwriteConfirm = () => {
     const isGlobal = selectedEnvironmentType === "GLOBAL";
+    debugger;
     saveVariable(isGlobal, existingVariableIndex);
   };
 
@@ -449,25 +529,74 @@
   </div>
 
   {#if oauth2Data.grantType === HttpRequestOAuth2GrantTypeBaseEnum.AUTHORIZATION_CODE}
+    <!-- Authorize using browser toggle -->
+    <div class="mb-3">
+      <div class="d-flex align-items-center gap-2 auth-browser-toggle-row">
+        <button
+          type="button"
+          class="auth-browser-toggle {oauth2Data.authorizeUsingBrowser
+            ? 'active'
+            : ''}"
+          on:click={handleAuthorizeBrowserToggle}
+          aria-pressed={oauth2Data.authorizeUsingBrowser}
+          aria-label="Authorize using browser"
+          {disabled}
+        >
+          <span class="auth-browser-toggle-thumb"></span>
+        </button>
+        <span class="text-fs-12 fw-bold text-secondary-100"
+          >Authorize using browser</span
+        >
+      </div>
+      <p
+        class="text-fs-10 text-secondary-200"
+        style="font-style: italic; margin-top: 4px;"
+      >
+        Opens the system browser for login. Callback URL is set automatically.
+      </p>
+    </div>
+
     <!-- Callback URL (only for Authorization Code) -->
     <div class="mb-3" style="font-size: 12px; font-weight:500">
       <p class="mb-2 text-secondary-100">Callback URL</p>
-      <div class="position-relative" style="min-height: 40px;">
-        <div class="position-absolute top-0 auth-input-container">
-          <CodeMirrorInput
-            bind:value={oauth2Data.callbackUrl}
-            onUpdateInput={handleAuthChange}
-            placeholder={"http://localhost/callback"}
-            {theme}
-            {disabled}
-            {environmentVariables}
-            {onUpdateEnvironment}
+      {#if oauth2Data.authorizeUsingBrowser}
+        <div class="auth-input-container">
+          <input
+            type="text"
+            value={BROWSER_CALLBACK_URL}
+            readonly
+            class="form-control text-fs-12 auth-readonly-url"
+            title="Hardcoded callback URL used when authorizing via the system browser"
           />
         </div>
-      </div>
-      <p class="mt-2 text-fs-10 text-secondary-200" style="font-style: italic;">
-        Enter the redirect URI configured in your OAuth provider.
-      </p>
+        <p
+          class="mt-2 text-fs-10 text-secondary-200"
+          style="font-style: italic;"
+        >
+          Hardcoded to <strong>{BROWSER_CALLBACK_URL}</strong>. Register this as
+          a redirect URI in your OAuth provider.
+        </p>
+      {:else}
+        <div class="position-relative" style="min-height: 40px;">
+          <div class="position-absolute top-0 auth-input-container">
+            <CodeMirrorInput
+              bind:value={oauth2Data.callbackUrl}
+              onUpdateInput={handleAuthChange}
+              placeholder={"http://localhost/callback"}
+              {theme}
+              {disabled}
+              {environmentVariables}
+              {onUpdateEnvironment}
+            />
+          </div>
+        </div>
+        <p
+          class="mt-2 text-fs-10 text-secondary-200"
+          style="font-style: italic;"
+        >
+          Enter the redirect URI configured in your OAuth provider.
+        </p>
+      {/if}
     </div>
 
     <!-- Auth URL (only for Authorization Code) -->
@@ -550,7 +679,7 @@
     <div class="mb-3">
       <Button
         type="primary"
-        title={isGettingToken ? "Getting Token..." : "Get Access Token"}
+        title="Get Access Token"
         onClick={handleGetToken}
         disable={isGettingToken ||
           !oauth2Data.clientId ||
@@ -558,8 +687,9 @@
           !oauth2Data.accessTokenUrl ||
           (oauth2Data.grantType ===
             HttpRequestOAuth2GrantTypeBaseEnum.AUTHORIZATION_CODE &&
-            (!oauth2Data.authUrl || !oauth2Data.callbackUrl))}
-        loader={isGettingToken}
+            (!oauth2Data.authUrl ||
+              (!oauth2Data.authorizeUsingBrowser && !oauth2Data.callbackUrl)))}
+        loader={false}
         startIcon={undefined}
         endIcon={undefined}
       />
@@ -801,6 +931,33 @@
       />
     </div>
   </Modal>
+
+  <!-- Auth Progress Modal — blocks the UI while any token flow is running -->
+  <Modal
+    isOpen={showAuthProgressModal}
+    title={authProgressTitle}
+    description={authProgressDescription}
+    handleModalState={(flag) => {
+      if (!flag) handleCancelAuth();
+    }}
+    onClickHelpIcon={() => {}}
+    zIndex={10000}
+    width="420px"
+  >
+    <div class="d-flex flex-column align-items-center gap-3 pt-2 pb-1">
+      <div class="oauth-progress-spinner"></div>
+      <Button
+        type="teritiary-regular"
+        title="Cancel"
+        onClick={handleCancelAuth}
+        disable={false}
+        loader={false}
+        size="small"
+        startIcon={undefined}
+        endIcon={undefined}
+      />
+    </div>
+  </Modal>
 </div>
 
 <style>
@@ -847,5 +1004,74 @@
     width: 18px;
     height: 18px;
     display: block;
+  }
+
+  /* ── Authorize-using-browser toggle ─────────────────────────────────── */
+
+  .auth-browser-toggle {
+    flex-shrink: 0;
+    position: relative;
+    width: 36px;
+    height: 20px;
+    border-radius: 10px;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    background: var(--bg-ds-surface-400, #3a3a3a);
+    transition: background 0.2s ease;
+    outline: none;
+  }
+
+  .auth-browser-toggle:focus-visible {
+    box-shadow: 0 0 0 2px var(--border-ds-primary-300, #4b9ef8);
+  }
+
+  .auth-browser-toggle.active {
+    background: var(--bg-ds-primary-300, #4b9ef8);
+  }
+
+  .auth-browser-toggle:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .auth-browser-toggle-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #ffffff;
+    transition: transform 0.2s ease;
+    pointer-events: none;
+  }
+
+  .auth-browser-toggle.active .auth-browser-toggle-thumb {
+    transform: translateX(16px);
+  }
+
+  /* ── Read-only callback URL when "Authorize using browser" is on ──── */
+  .auth-readonly-url {
+    background: var(--bg-ds-surface-300, #2a2a2a);
+    color: var(--text-ds-neutral-300, #a0a0a0);
+    cursor: default;
+    border: 1px solid var(--border-ds-surface-200, #444444);
+  }
+
+  /* ── Auth-progress spinner ───────────────────────────────────────── */
+  .oauth-progress-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid var(--bg-ds-surface-400, #3a3a3a);
+    border-top-color: var(--bg-ds-primary-300, #4b9ef8);
+    border-radius: 50%;
+    animation: oauth-spin 0.75s linear infinite;
+  }
+
+  @keyframes oauth-spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 </style>

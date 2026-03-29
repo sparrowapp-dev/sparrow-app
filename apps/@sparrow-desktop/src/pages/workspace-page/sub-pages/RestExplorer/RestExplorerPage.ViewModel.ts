@@ -3597,7 +3597,7 @@ class RestExplorerViewModel {
     if (isGlobalVariable) {
       // api payload
       let payload = {
-        name: environmentVariables.global.name,
+        name: environmentVariables.global._data.name,
         variable: [
           ...environmentVariables.global.variable,
           {
@@ -3622,12 +3622,12 @@ class RestExplorerViewModel {
       if (isGuestUser === true) {
         // updates environment list
         this.environmentRepository.updateEnvironment(
-          environmentVariables.global.id,
+          environmentVariables.global._data.id,
           payload,
         );
 
         let currentTab = await this.tabRepository.getTabById(
-          environmentVariables.global.id,
+          environmentVariables.global._data.id,
         );
         if (currentTab) {
           const currentTabId = currentTab.tabId;
@@ -3650,7 +3650,7 @@ class RestExplorerViewModel {
       );
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path.workspaceId,
-        environmentVariables.global.id,
+        environmentVariables.global._data.id,
         payload,
         baseUrl,
       );
@@ -3686,7 +3686,7 @@ class RestExplorerViewModel {
     } else {
       // api payload
       const payload = {
-        name: environmentVariables.local.name,
+        name: environmentVariables.local._data.name,
         variable: [
           ...environmentVariables.local.variable,
           {
@@ -3710,12 +3710,12 @@ class RestExplorerViewModel {
       if (isGuestUser) {
         // updates environment list
         this.environmentRepository.updateEnvironment(
-          environmentVariables.local.id,
+          environmentVariables.local._data.id,
           payload,
         );
 
         const currentTab = await this.tabRepository.getTabById(
-          environmentVariables.local.id,
+          environmentVariables.local._data.id,
         );
 
         if (currentTab) {
@@ -3740,7 +3740,7 @@ class RestExplorerViewModel {
       // api response
       const response = await this.environmentService.updateEnvironment(
         this._tab.getValue().path.workspaceId,
-        environmentVariables.local.id,
+        environmentVariables.local._data.id,
         payload,
         baseUrl,
       );

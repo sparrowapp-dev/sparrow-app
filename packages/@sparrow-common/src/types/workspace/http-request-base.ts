@@ -19,7 +19,7 @@ export enum HttpRequestAuthTypeBaseEnum {
   BASIC_AUTH = "Basic Auth",
   OAUTH2 = "OAuth 2.0",
   INHERIT_AUTH = "Inherit Auth",
-  AUTH_PROFILES = "Authentication Profiles"
+  AUTH_PROFILES = "Authentication Profiles",
 }
 
 export interface HttpRequestBodyBaseInterface {
@@ -51,6 +51,7 @@ interface HttpRequestOAuth2BaseInterface {
   grantType?: HttpRequestOAuth2GrantTypeBaseEnum;
   headerPrefix?: string;
   callbackUrl?: string;
+  authorizeUsingBrowser?: boolean;
   clientId?: string;
   clientSecret?: string;
   authUrl?: string;

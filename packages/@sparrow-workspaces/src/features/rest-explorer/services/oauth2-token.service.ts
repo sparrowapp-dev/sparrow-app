@@ -5,11 +5,18 @@
 
 const isTauri = "__TAURI_INTERNALS__" in window;
 
+/**
+ * The hardcoded local callback URL used when "Authorize using browser" is enabled.
+ * Must match the port in the Rust open_oauth_browser command.
+ */
+export const BROWSER_CALLBACK_URL = "http://localhost:51423/callback";
+
 export interface OAuth2ClientCredentialsParams {
   clientId: string;
   clientSecret: string;
   accessTokenUrl: string;
   scope?: string;
+  signal?: AbortSignal;
 }
 
 export interface OAuth2AuthorizationCodeParams {
@@ -18,6 +25,7 @@ export interface OAuth2AuthorizationCodeParams {
   authUrl: string;
   accessTokenUrl: string;
   callbackUrl: string;
+  authorizeUsingBrowser?: boolean;
   scope?: string;
   state?: string;
 }
@@ -37,7 +45,7 @@ export class OAuth2TokenService {
   async getTokenClientCredentials(
     params: OAuth2ClientCredentialsParams,
   ): Promise<OAuth2TokenResponse> {
-    const { clientId, clientSecret, accessTokenUrl, scope } = params;
+    const { clientId, clientSecret, accessTokenUrl, scope, signal } = params;
 
     if (!clientId || !clientSecret || !accessTokenUrl) {
       throw new Error(
@@ -62,6 +70,7 @@ export class OAuth2TokenService {
           "Content-Type": "application/x-www-form-urlencoded",
         },
         body: body.toString(),
+        signal,
       });
 
       if (!response.ok) {
@@ -90,17 +99,23 @@ export class OAuth2TokenService {
       clientSecret,
       authUrl,
       accessTokenUrl,
-      callbackUrl,
+      authorizeUsingBrowser,
       scope,
       state,
     } = params;
+
+    // When "Authorize using browser" is on, the redirect_uri is always the
+    // hardcoded local callback URL regardless of what the user typed.
+    const effectiveCallbackUrl = authorizeUsingBrowser
+      ? BROWSER_CALLBACK_URL
+      : params.callbackUrl;
 
     if (
       !clientId ||
       !clientSecret ||
       !authUrl ||
       !accessTokenUrl ||
-      !callbackUrl
+      !effectiveCallbackUrl
     ) {
       throw new Error(
         "Missing required parameters for Authorization Code flow",
@@ -111,7 +126,8 @@ export class OAuth2TokenService {
     const authorizationCode = await this.getAuthorizationCode({
       authUrl,
       clientId,
-      redirectUri: callbackUrl,
+      redirectUri: effectiveCallbackUrl,
+      authorizeUsingBrowser,
       scope,
       state,
     });
@@ -126,7 +142,7 @@ export class OAuth2TokenService {
       code: authorizationCode,
       client_id: clientId,
       client_secret: clientSecret,
-      redirect_uri: callbackUrl,
+      redirect_uri: effectiveCallbackUrl,
     });
 
     if (scope) {
@@ -158,16 +174,24 @@ export class OAuth2TokenService {
   }
 
   /**
-   * Get authorization code using OAuth window
+   * Get authorization code using OAuth window or system browser
    */
   private async getAuthorizationCode(params: {
     authUrl: string;
     clientId: string;
     redirectUri: string;
+    authorizeUsingBrowser?: boolean;
     scope?: string;
     state?: string;
   }): Promise<string> {
-    const { authUrl, clientId, redirectUri, scope, state } = params;
+    const {
+      authUrl,
+      clientId,
+      redirectUri,
+      authorizeUsingBrowser,
+      scope,
+      state,
+    } = params;
 
     // Build authorization URL - handle case where authUrl already has query params
     const authUrlParams = new URLSearchParams({
@@ -188,8 +212,11 @@ export class OAuth2TokenService {
     const separator = authUrl.includes("?") ? "&" : "?";
     const fullAuthUrl = `${authUrl}${separator}${authUrlParams.toString()}`;
 
-    // For Tauri, use OAuth window
+    // For Tauri, use OAuth webview window or system browser
     if (isTauri) {
+      if (authorizeUsingBrowser) {
+        return this.getAuthorizationCodeTauriBrowser(fullAuthUrl);
+      }
       return this.getAuthorizationCodeTauri(fullAuthUrl, redirectUri);
     }
 
@@ -249,6 +276,64 @@ export class OAuth2TokenService {
       });
 
       // Timeout after 5 minutes
+      setTimeout(() => {
+        if (unlisten) {
+          unlisten();
+        }
+        reject(new Error("Authorization timeout"));
+      }, 300000);
+    });
+  }
+
+  /**
+   * Get authorization code by opening the system browser and capturing the
+   * OAuth callback via a temporary local HTTP server (port 51423).
+   */
+  private async getAuthorizationCodeTauriBrowser(
+    authUrl: string,
+  ): Promise<string> {
+    const { invoke } = await import("@tauri-apps/api/core");
+    const { listen } = await import("@tauri-apps/api/event");
+
+    return new Promise((resolve, reject) => {
+      let unlisten: (() => void) | null = null;
+
+      // Listen for the OAuth callback event emitted by the Rust command
+      listen<{ code?: string; error?: string; state?: string }>(
+        "oauth-callback-received",
+        (event) => {
+          if (unlisten) {
+            unlisten();
+          }
+
+          if (event.payload.error) {
+            reject(new Error(`Authorization failed: ${event.payload.error}`));
+            return;
+          }
+
+          if (event.payload.code) {
+            resolve(event.payload.code);
+          } else {
+            reject(new Error("No authorization code received"));
+          }
+        },
+      ).then((fn) => {
+        unlisten = fn;
+      });
+
+      // Open the system browser and start the local callback server
+      invoke("open_oauth_browser", { authUrl }).catch((error) => {
+        console.error(
+          "[OAuth Service] ERROR invoking open_oauth_browser:",
+          error,
+        );
+        if (unlisten) {
+          unlisten();
+        }
+        reject(new Error(`Failed to open browser for authorization: ${error}`));
+      });
+
+      // Timeout after 5 minutes (matches the Rust-side timeout)
       setTimeout(() => {
         if (unlisten) {
           unlisten();

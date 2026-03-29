@@ -1393,6 +1393,9 @@ fn main() {
 
             app.manage(Arc::new(Mutex::new(InitialDeepLink { url: initial_url })));
 
+            // Shared state for cancelling in-progress browser OAuth flows
+            app.manage(oauth_window::OAuthBrowserCancelState::default());
+
             let platform_name = platform();
             if platform_name == "macos" || platform_name == "linux" {
                 // Fetch tauri windows
@@ -1432,8 +1435,11 @@ fn main() {
             show_toolbar,
             hide_toolbar,
             get_initial_deep_link,
-            // OAuth2 window command
+            // OAuth2 window commands
             oauth_window::open_oauth_window,
+            oauth_window::open_oauth_browser,
+            oauth_window::cancel_oauth_browser,
+            oauth_window::cancel_oauth_window,
             // Response temp file commands
             response_temp_file::write_response_to_temp,
             response_temp_file::write_formatted_response,
