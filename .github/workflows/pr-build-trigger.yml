@@ -72,7 +72,7 @@ jobs:
 
       # Step 2 — Checkout main branch to access .github/pr-build-whitelist.yml
       - name: Checkout main branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
         with:
           ref: main
 

@@ -60,6 +60,32 @@ jobs:
           
           echo "✅ Cleanup completed for PR #${PR_NUMBER}"
 
+      - name: Delete ACR Preview Image
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Delete ACR image
+        run: |
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          az acr repository delete \
+            --name sparrowprod \
+            --image sparrow-web:pr-${PR_NUMBER} \
+            --yes || echo "Image pr-${PR_NUMBER} not found in ACR, skipping..."
+
+        # NEW STEP: Trigger auth preview cleanup
+      - name: Trigger Auth Preview Cleanup
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: pr-preview-cleanup.yaml
+          repo: sparrowapp-dev/sparrow-app-auth
+          ref: main
+          inputs: |
+            {
+              "pr_number": "${{ github.event.pull_request.number }}"
+            }
+          token: ${{ secrets.PAT_TOKEN }} 
+
       - name: Post Cleanup Notification to Teams
         if: success()
         run: |

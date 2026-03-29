@@ -3502,6 +3502,10 @@ export default class CollectionsViewModel {
     folder: CollectionItemsDto,
     request: CollectionItemsDto,
   ) => {
+    if (!request || !request?.id) {
+      console.warn("handleOpenRequest: Invalid request", request);
+      return;
+    }
     const requestTabAdapter = new RequestTabAdapter();
     const adaptedRequest = requestTabAdapter.adapt(
       workspaceId || "",
@@ -3509,6 +3513,10 @@ export default class CollectionsViewModel {
       folder?.id || "",
       request,
     );
+    if (!adaptedRequest) {
+      console.warn("handleOpenRequest: Adapted request is null");
+      return;
+    }
     adaptedRequest.persistence = TabPersistenceTypeEnum.TEMPORARY;
     this.tabRepository.createTab(adaptedRequest);
     scrollToTab(request.id);
