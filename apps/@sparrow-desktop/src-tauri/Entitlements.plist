@@ -30,8 +30,8 @@
     
     <!-- App identifiers -->
     <key>com.apple.application-identifier</key>
-    <string>9NQFM3WKMZ.dev.sparrowapp.desktop</string>
+    <string>6K4JQUWLJJ.com.sparrowapp.desktop</string>
     <key>com.apple.developer.team-identifier</key>
-    <string>9NQFM3WKMZ</string>
+    <string>6K4JQUWLJJ</string>
 </dict>
 </plist>

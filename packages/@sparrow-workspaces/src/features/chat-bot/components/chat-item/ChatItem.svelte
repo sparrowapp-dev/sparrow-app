@@ -10,7 +10,13 @@
   } from "../../assests";
   import { tick } from "svelte";
 
-  import hljs from "highlight.js";
+  import hljs from "highlight.js/lib/core";
+  import javascript from "highlight.js/lib/languages/javascript";
+  import typescript from "highlight.js/lib/languages/typescript";
+  import json from "highlight.js/lib/languages/json";
+  import xml from "highlight.js/lib/languages/xml";
+  import bash from "highlight.js/lib/languages/bash";
+  import python from "highlight.js/lib/languages/python";
   import "highlight.js/styles/atom-one-dark.css";
   import { TickIcon } from "@sparrow/library/icons";
   import { SparrowAIIcon } from "@sparrow/common/icons";
@@ -32,6 +38,15 @@
     ThumbDislikeRegular,
   } from "@sparrow/library/icons";
   import * as Sentry from "@sentry/svelte";
+
+  hljs.registerLanguage("javascript", javascript);
+  hljs.registerLanguage("typescript", typescript);
+  hljs.registerLanguage("json", json);
+  hljs.registerLanguage("xml", xml);
+  hljs.registerLanguage("html", xml);
+  hljs.registerLanguage("bash", bash);
+  hljs.registerLanguage("shell", bash);
+  hljs.registerLanguage("python", python);
 
   export let message: string;
   export let messageId: string;
@@ -224,8 +239,11 @@
         // Create a new container div
         const container = document.createElement("div");
         container.className = "wrapper";
-        const lang = pre.querySelector("code")?.getAttribute("class");
-        hljs.highlightBlock(pre.querySelector("code"));
+        const codeElement = pre.querySelector("code");
+        const lang = codeElement?.getAttribute("class");
+        if (codeElement) {
+          hljs.highlightElement(codeElement as HTMLElement);
+        }
 
         // Check if this was an actionable block
         const actionableData = pre.getAttribute("data-actionable");

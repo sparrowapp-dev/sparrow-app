@@ -6,6 +6,7 @@
     DotIcon,
   } from "@sparrow/library/icons";
   import { Tooltip } from "@sparrow/library/ui";
+  import { formatTime } from "@sparrow/workspaces/utils";
   export let response;
   export let onClearQuery;
   export let value;
@@ -122,7 +123,7 @@
                   ? 'var(--icon-success-100)'
                   : 'var(--request-delete)'};"
               >
-                {response.time}
+                {formatTime(response.time).value}
               </span>
               <p
                 class="mb-0 text-fs-12"
@@ -132,7 +133,7 @@
                   ? 'var(--icon-success-100)'
                   : 'var(--request-delete)'};"
               >
-                ms
+                {formatTime(response.time).unit}
               </p>
             </span>
           </Tooltip>
