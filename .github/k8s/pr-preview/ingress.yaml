@@ -4,25 +4,37 @@ metadata:
   name: sparrow-web-preview-pr-${PR_NUMBER}
   namespace: sparrow-dev-preview
   labels:
-    app: sparrow-web-preview
-    pr: "${PR_NUMBER}"
+    app: sparrow-web-preview
+    pr: "${PR_NUMBER}"
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true" 
 spec:
   ingressClassName: nginx
   tls:
   - hosts:
-    - pr-${PR_NUMBER}.preview.sparrowapp.dev
-    secretName: preview-pr-${PR_NUMBER}-tls
+    - pr-${PR_NUMBER}.preview.sparrowapp.dev
+    - auth-pr-${PR_NUMBER}.preview.sparrowapp.dev 
+    secretName: preview-pr-${PR_NUMBER}-tls
   rules:
   - host: pr-${PR_NUMBER}.preview.sparrowapp.dev
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: sparrow-web-preview-pr-${PR_NUMBER}
-            port:
-              number: 80
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sparrow-web-preview-pr-${PR_NUMBER}
+            port:
+              number: 80
+  - host: auth-pr-${PR_NUMBER}.preview.sparrowapp.dev 
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            
+            name: sparrow-auth-preview-pr-${PR_NUMBER} 
+            port:
+              number: 80
