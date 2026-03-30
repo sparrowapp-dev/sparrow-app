@@ -81,7 +81,7 @@
 
   let tokenErrorType = ""; // 'empty', 'invalid', 'format'
   const tokenFormatRegex =
-    /^sparrow:\/\/\?(?:(?:selfhostBackendUrl=[^&]*&|selfhostAdminUrl=[^&]*&|selfhostWebUrl=[^&]*&){0,3})accessToken=eyJ[A-Za-z0-9._-]+\.[A-Za-z0-9._-]+\.[A-Za-z0-9._-]+&refreshToken=eyJ[A-Za-z0-9._-]+\.[A-Za-z0-9._-]+\.[A-Za-z0-9._-]+(?:&response=.*?)?&event=login&method=[A-Za-z0-9_-]+\s*$/;
+    /^sparrow:\/\/\?(data=[A-Za-z0-9%+/=]+|.*accessToken=[^&]+&refreshToken=[^&]+)/;
 
   async function tokenValidationLogic() {
     // Reset error states
@@ -104,9 +104,31 @@
 
     // If format is valid, proceed with API validation
     const params = new URLSearchParams(token.split("?")[1]);
-    const accessToken = params.get("accessToken");
-    const refreshToken = params.get("refreshToken");
-    const selfhostBackendUrl = params.get("selfhostBackendUrl");
+
+    let accessToken;
+    let refreshToken;
+    let selfhostBackendUrl;
+
+    if (params.get("data")) {
+      // NEW FLOW (base64)
+      try {
+        const decoded = JSON.parse(
+          atob(decodeURIComponent(params.get("data") || "")),
+        );
+        accessToken = decoded.accessToken;
+        refreshToken = decoded.refreshToken;
+        selfhostBackendUrl = decoded.selfhostBackendUrl;
+      } catch (e) {
+        isTokenErrorMessage = true;
+        tokenErrorType = "format";
+        return;
+      }
+    } else {
+      // OLD FLOW (fallback)
+      accessToken = params.get("accessToken");
+      refreshToken = params.get("refreshToken");
+      selfhostBackendUrl = params.get("selfhostBackendUrl");
+    }
     // Additional format validation - check if tokens were extracted properly
     if (!accessToken || !refreshToken) {
       isTokenErrorMessage = true;
@@ -114,7 +136,14 @@
       return;
     }
 
-    const userDetails = jwtDecode(accessToken);
+    let userDetails;
+    try {
+      userDetails = jwtDecode(accessToken);
+    } catch (e) {
+      isTokenErrorMessage = true;
+      tokenErrorType = "invalid";
+      return;
+    }
 
     identifyUser(userDetails.email);
     const apiUrl = constants.API_URL;
@@ -142,7 +171,16 @@
       // Success - clear all errors
       isTokenErrorMessage = false;
       tokenErrorType = "";
-      _viewModel.handleAccountLogin(token);
+      const encodedData = params.get("data");
+      if (encodedData) {
+        const reconstructedToken = `sparrow://?selfhostBackendUrl=${
+          selfhostBackendUrl || ""
+        }&accessToken=${accessToken}&refreshToken=${refreshToken}&event=login&method=email`;
+
+        _viewModel.handleAccountLogin(reconstructedToken);
+      } else {
+        _viewModel.handleAccountLogin(token);
+      }
     } catch (e) {
       // API call failed - invalid or expired token
       isTokenErrorMessage = true;
