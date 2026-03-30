@@ -2,7 +2,7 @@ name: Sparrow-web-staging
 on:
   push:
     branches:
-      - release/2.38.0
+      - release/2.39.0
 
 jobs:
   build:
