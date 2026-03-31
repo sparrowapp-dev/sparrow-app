@@ -2,6 +2,7 @@
   import { InfoFilled } from "@sparrow/library/icons";
   import { onDestroy, onMount } from "svelte";
   import { Toggle } from "@sparrow/library/ui";
+  import { tick } from "svelte";
 
   /**
    * environment dialog box position
@@ -26,6 +27,8 @@
    */
   export let onUpdateEnvironment;
   export let environmentVariables;
+  let valueInputRef;
+
   let count = 0;
   function handleSelectClicked(event: MouseEvent) {
     const selectElement = document.getElementById(`env-not-found-${id}`);
@@ -56,6 +59,14 @@
       }
     }
   }
+
+  $: if (addVariable) {
+    tick().then(() => {
+      valueInputRef?.focus();
+    });
+  }
+
+  $: isValueEmpty = !newVariableObj.value || newVariableObj.value.trim() === "";
   onDestroy(() => {
     window.removeEventListener("click", handleSelectClicked);
   });
@@ -84,10 +95,11 @@
           placeholder="Enter Key"
           disabled
           class="w-100 border-0 text-fs-12 border-radius-2 mb-2 p-2 fw-medium"
-          style="background-color: var(--bg-ds-surface-400);placeholder-color: var(--text-ds-neutral-400)"
+          style="cursor: not-allowed; background-color: var(--bg-ds-surface-400);placeholder-color: var(--text-ds-neutral-400)"
         />
         <input
           type="text"
+          bind:this={valueInputRef}
           bind:value={newVariableObj.value}
           placeholder="Add Value"
           style={"outline:none;background-color: var(--bg-ds-surface-400);placeholder-color: var(--text-ds-neutral-400); color: var(--text-ds-neutral-200)"}
@@ -112,8 +124,11 @@
 
         <div
           class="prevent-default text-fs-12 text-center border-radius-2 p-2 add-btn"
-          style="cursor: pointer;"
+          style="cursor: {isValueEmpty
+            ? 'not-allowed'
+            : 'pointer'}; opacity: {isValueEmpty ? 0.5 : 1};"
           on:click={async (e) => {
+            if (isValueEmpty) return;
             const response = await onUpdateEnvironment(
               isGlobalVariable,
               environmentVariables,
