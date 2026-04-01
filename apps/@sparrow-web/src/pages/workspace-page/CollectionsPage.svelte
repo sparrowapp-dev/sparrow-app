@@ -150,6 +150,7 @@
 
   let isImportCollectionPopup: boolean = false;
   let isImportCurlPopup: boolean = false;
+  let isCodeSnippetPanelOpen = false;
   let loader = false;
   let splitter: HTMLElement | null;
   let isExposeSaveAsRequest: boolean = false;
@@ -1012,7 +1013,28 @@
               onClickForceCloseTabs={tabsForceCloseInitiator}
               onClickDuplicateTab={handleTabDuplication}
               {userRole}
+              onGenerateCodeSnippet={() => {
+                isCodeSnippetPanelOpen = !isCodeSnippetPanelOpen;
+              }}
+              isCodeSnippetActive={isCodeSnippetPanelOpen}
             />
+            {#if isCodeSnippetPanelOpen}
+              <div class="code-snippet-panel">
+                <div
+                  style="position:absolute; right:0; top:36px; width:350px; height:100%; background:#111; border-left:1px solid #2a2a2a; z-index:20;"
+                >
+                  <div style="padding:12px; color:white; font-size:14px;">
+                    Code snippet
+                    <button
+                      style="float:right;"
+                      on:click={() => (isCodeSnippetPanelOpen = false)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              </div>
+            {/if}
             <div style="flex:1; overflow: hidden;">
               <Route>
                 {#if true}
