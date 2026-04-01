@@ -8,6 +8,18 @@ export type RequestData = {
   url: string;
   headers?: HeaderType[];
   body?: any;
+  params?: Record<string, string>;
+  auth?: {
+    type: "bearer";
+    token: string;
+  } | null;
+};
+
+const appendQueryParams = (url: string, params?: Record<string, string>) => {
+  if (!params || Object.keys(params).length === 0) return url;
+
+  const query = new URLSearchParams(params).toString();
+  return `${url}?${query}`;
 };
 
 const formatHeaders = (headersArr: HeaderType[] = []) => {
@@ -26,6 +38,13 @@ const formatHeaders = (headersArr: HeaderType[] = []) => {
 export const generateFetchSnippet = (req: RequestData) => {
   const headersObj = formatHeaders(req.headers);
 
+  // AUTH
+  if (req.auth?.type === "bearer" && req.auth.token) {
+    headersObj["Authorization"] = `Bearer ${req.auth.token}`;
+  }
+
+  const finalUrl = appendQueryParams(req.url, req.params);
+
   const headers =
     Object.keys(headersObj).length > 0
       ? JSON.stringify(headersObj, null, 2)
@@ -40,13 +59,12 @@ export const generateFetchSnippet = (req: RequestData) => {
   method: "${req.method}",
   ${headers ? `headers: ${headers},` : ""}
   ${body}
-  redirect: "follow"
 };
 
-fetch("${req.url}", requestOptions)
-  .then((response) => response.text())
-  .then((result) => console.log(result))
-  .catch((error) => console.error(error));`;
+fetch("${finalUrl}", requestOptions)
+  .then(res => res.json())
+  .then(data => console.log(data))
+  .catch(err => console.error(err));`;
 };
 
 /* ================= jQuery ================= */
@@ -81,4 +99,56 @@ xhr.onload = function () {
 };
 
 xhr.send(${req.body ? JSON.stringify(req.body) : ""});`;
+};
+
+/* ================= AXIOS ================= */
+
+export const generateAxiosSnippet = (req: RequestData) => {
+  const headersObj = formatHeaders(req.headers);
+
+  if (req.auth?.type === "bearer" && req.auth.token) {
+    headersObj["Authorization"] = `Bearer ${req.auth.token}`;
+  }
+
+  const finalUrl = appendQueryParams(req.url, req.params);
+
+  return `import axios from "axios";
+
+const options = {
+  method: "${req.method}",
+  url: "${finalUrl}",
+  headers: ${JSON.stringify(headersObj, null, 2)},
+  ${
+    req.body && req.method !== "GET"
+      ? `data: ${JSON.stringify(req.body, null, 2)},`
+      : ""
+  }
+};
+
+axios.request(options)
+  .then(res => console.log(res.data))
+  .catch(err => console.error(err));`;
+};
+
+/* ================= cURL ================= */
+export const generateCurlSnippet = (req: RequestData) => {
+  const headersObj = formatHeaders(req.headers);
+
+  if (req.auth?.type === "bearer" && req.auth.token) {
+    headersObj["Authorization"] = `Bearer ${req.auth.token}`;
+  }
+
+  const finalUrl = appendQueryParams(req.url, req.params);
+
+  const headers = Object.entries(headersObj)
+    .map(([k, v]) => `-H "${k}: ${v}"`)
+    .join(" \\\n  ");
+
+  const body =
+    req.body && req.method !== "GET"
+      ? ` \\\n  -d '${JSON.stringify(req.body)}'`
+      : "";
+
+  return `curl --location --request ${req.method} '${finalUrl}' \\
+  ${headers}${body}`;
 };

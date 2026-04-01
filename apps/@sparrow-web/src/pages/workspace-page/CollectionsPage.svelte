@@ -1025,6 +1025,11 @@
                   method: $activeTab?.property?.request?.method || "GET",
                   url: $activeTab?.property?.request?.url || "",
                   headers: $activeTab?.property?.request?.headers || [],
+
+                  params: $activeTab?.property?.request?.params || {},
+
+                  auth: $activeTab?.property?.request?.auth || null,
+
                   body: (() => {
                     try {
                       const raw = $activeTab?.property?.request?.body?.raw;

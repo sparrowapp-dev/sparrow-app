@@ -4,6 +4,8 @@
     generateFetchSnippet,
     generateJquerySnippet,
     generateXHRSnippet,
+    generateAxiosSnippet,
+    generateCurlSnippet,
   } from "./utils/generateSnippet";
 
   export let requestData;
@@ -14,9 +16,13 @@
   $: generatedCode =
     activeTab === "fetch"
       ? generateFetchSnippet(requestData)
-      : activeTab === "jquery"
-        ? generateJquerySnippet(requestData)
-        : generateXHRSnippet(requestData);
+      : activeTab === "axios"
+        ? generateAxiosSnippet(requestData)
+        : activeTab === "curl"
+          ? generateCurlSnippet(requestData)
+          : activeTab === "jquery"
+            ? generateJquerySnippet(requestData)
+            : generateXHRSnippet(requestData);
 
   const code = `const requestOptions = {
   method: "GET",
@@ -56,24 +62,24 @@
   <div class="tabs">
     <span
       class="tab {activeTab === 'fetch' ? 'active' : ''}"
-      on:click={() => (activeTab = "fetch")}
+      on:click={() => (activeTab = "fetch")}>Fetch</span
     >
-      Fetch
-    </span>
-
+    <span
+      class="tab {activeTab === 'axios' ? 'active' : ''}"
+      on:click={() => (activeTab = "axios")}>Axios</span
+    >
+    <span
+      class="tab {activeTab === 'curl' ? 'active' : ''}"
+      on:click={() => (activeTab = "curl")}>cURL</span
+    >
     <span
       class="tab {activeTab === 'jquery' ? 'active' : ''}"
-      on:click={() => (activeTab = "jquery")}
+      on:click={() => (activeTab = "jquery")}>jQuery</span
     >
-      jQuery
-    </span>
-
     <span
       class="tab {activeTab === 'xhr' ? 'active' : ''}"
-      on:click={() => (activeTab = "xhr")}
+      on:click={() => (activeTab = "xhr")}>XHR</span
     >
-      XHR
-    </span>
   </div>
 
   <!-- CODE BLOCK -->
