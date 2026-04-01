@@ -142,7 +142,7 @@
 <div class="workspace-card-outer w-100">
   <Card
     cardClassProp={"flex-grow-1 col-lg-3 col-md-10  position-relative"}
-    cardStyleProp={"max-width: 32.8%; max-height: 32%;"}
+    cardStyleProp={"max-width: 33.3333%;"}
   >
     <div class="d-flex gap-1 position-absolute" style="top:20px; right:16px;">
       {#if workspace?.workspaceType === WorkspaceType.PUBLIC}
