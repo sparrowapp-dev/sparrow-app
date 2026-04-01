@@ -3,7 +3,7 @@
 # on:
 #   push:
 #     branches:
-#       - release/2.38.0
+#       - release/2.39.0
 #   workflow_dispatch:
 
 # env:
@@ -346,7 +346,7 @@
 #                     }
 #                     @{
 #                       "type" = "TextBlock"
-#                       "text" = "Branch: release/2.38.0"
+#                       "text" = "Branch: release/2.39.0"
 #                       "wrap" = $true
 #                     }
 #                     @{
@@ -474,7 +474,7 @@
 #                     },
 #                     {
 #                       \"type\": \"TextBlock\",
-#                       \"text\": \"Branch: release/2.38.0\",
+#                       \"text\": \"Branch: release/2.39.0\",
 #                       \"wrap\": true
 #                     },
 #                     {

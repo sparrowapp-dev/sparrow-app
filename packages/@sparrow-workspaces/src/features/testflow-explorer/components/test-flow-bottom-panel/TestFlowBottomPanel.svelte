@@ -428,6 +428,8 @@
                   {onGenerateTestCases}
                   {onGeneratePreScript}
                   {tab}
+                  {isGuestUser}
+                  {userRole}
                 />
               </div>
             {/key}
