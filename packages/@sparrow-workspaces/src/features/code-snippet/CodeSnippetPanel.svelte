@@ -1,10 +1,31 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
+  import {
+    generateFetchSnippet,
+    generateJquerySnippet,
+    generateXHRSnippet,
+  } from "./utils/generateSnippet";
+
+  export let requestData;
+  console.log("SNIPPET DATA =>", requestData);
+
+  let activeTab = "fetch";
+
+  $: generatedCode =
+    activeTab === "fetch"
+      ? generateFetchSnippet(requestData)
+      : activeTab === "jquery"
+        ? generateJquerySnippet(requestData)
+        : generateXHRSnippet(requestData);
 
   const code = `const requestOptions = {
   method: "GET",
   redirect: "follow"
 };`;
+
+  const copyCode = async () => {
+    await navigator.clipboard.writeText(generatedCode);
+  };
 
   const dispatch = createEventDispatcher();
 
@@ -28,19 +49,36 @@
       <span class="caret">▾</span>
     </div>
 
-    <button class="copy-btn"> Copy snippet </button>
+    <button on:click={copyCode} class="copy-btn"> Copy snippet </button>
   </div>
 
   <!-- TABS -->
   <div class="tabs">
-    <span class="tab active">Fetch</span>
-    <span class="tab">jQuery</span>
-    <span class="tab">XHR</span>
+    <span
+      class="tab {activeTab === 'fetch' ? 'active' : ''}"
+      on:click={() => (activeTab = "fetch")}
+    >
+      Fetch
+    </span>
+
+    <span
+      class="tab {activeTab === 'jquery' ? 'active' : ''}"
+      on:click={() => (activeTab = "jquery")}
+    >
+      jQuery
+    </span>
+
+    <span
+      class="tab {activeTab === 'xhr' ? 'active' : ''}"
+      on:click={() => (activeTab = "xhr")}
+    >
+      XHR
+    </span>
   </div>
 
   <!-- CODE BLOCK -->
   <div class="code-block">
-    <pre>{code}</pre>
+    <pre>{generatedCode}</pre>
   </div>
 </div>
 

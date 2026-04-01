@@ -1021,6 +1021,19 @@
             />
             {#if isCodeSnippetPanelOpen}
               <CodeSnippetPanel
+                requestData={{
+                  method: $activeTab?.property?.request?.method || "GET",
+                  url: $activeTab?.property?.request?.url || "",
+                  headers: $activeTab?.property?.request?.headers || [],
+                  body: (() => {
+                    try {
+                      const raw = $activeTab?.property?.request?.body?.raw;
+                      return raw ? JSON.parse(raw) : null;
+                    } catch {
+                      return $activeTab?.property?.request?.body?.raw || null;
+                    }
+                  })(),
+                }}
                 on:close={() => (isCodeSnippetPanelOpen = false)}
               />
             {/if}
