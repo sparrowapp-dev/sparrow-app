@@ -167,7 +167,7 @@ Request request = new Request.Builder()
     .url("${req.url}")
     .method("${req.method}", ${
       req.body && req.method !== "GET"
-        ? `RequestBody.create(MediaType.parse("application/json"), "${JSON.stringify(req.body)}")`
+        ? `RequestBody.create(MediaType.parse("application/json"), "${JSON.stringify(req.body || {}, null, 2)}")`
         : "null"
     })
     ${headers}
@@ -240,7 +240,7 @@ curl_setopt_array($curl, [
   ],
   ${
     req.body && req.method !== "GET"
-      ? `CURLOPT_POSTFIELDS => '${JSON.stringify(req.body)}',`
+      ? `CURLOPT_POSTFIELDS => '${JSON.stringify(req.body || {}, null, 2)}',`
       : ""
   }
 ]);
@@ -276,7 +276,7 @@ val request = Request.Builder()
   .url("${req.url}")
   .method("${req.method}", ${
     req.body && req.method !== "GET"
-      ? `RequestBody.create("${JSON.stringify(req.body)}".toRequestBody())`
+      ? `RequestBody.create("${JSON.stringify(req.body || {}, null, 2)}".toRequestBody())`
       : "null"
   })
   .build()
@@ -427,7 +427,7 @@ async fn main() {
 
   let res = client
     .${r.method.toLowerCase()}("${r.url}")
-    ${r.body ? `.body(r#\"${r.body}\"#)` : ""}
+    ${r.body ? `.body(serde_json::to_string(&${JSON.stringify(req.body || {}, null, 2)}).unwrap())` : ""}
     .send()
     .await
     .unwrap();
@@ -484,37 +484,25 @@ unirest("${req.method}", "${req.url}")
 .end(res => console.log(res.body));`;
 };
 
-export const generateShellHttpieSnippet = (req: RequestData) => {
-  return `http ${req.method} ${req.url}`;
+TEMPLATES["shell-httpie"] = (req) => {
+  const headers = formatHeaders(req.headers);
+
+  const headerString = Object.entries(headers || {})
+    .map(([k, v]) => `${k}:"${v}"`)
+    .join(" \\\n  ");
+
+  const body = req.body
+    ? Object.entries(req.body)
+        .map(([k, v]) => `${k}:=${JSON.stringify(v)}`)
+        .join(" \\\n  ")
+    : "";
+
+  return `http ${req.method} "${req.url}" \\
+  ${headerString}${body ? " \\\n  " + body : ""}`;
 };
 
 export const generateShellWgetSnippet = (req: RequestData) => {
   return `wget --method=${req.method} "${req.url}"`;
-};
-
-TEMPLATES["python-httpclient"] = (req) => {
-  const r = buildRequest(req);
-
-  const host = r.url.replace("https://", "").split("/")[0];
-  const path = "/" + r.url.split("/").slice(3).join("/");
-
-  return `import http.client
-import json
-
-conn = http.client.HTTPSConnection("${host}")
-
-payload = ${JSON.stringify(r.body || {})}
-
-headers = ${
-    Object.keys(r.headers).length ? JSON.stringify(r.headers, null, 2) : "{}"
-  }
-
-conn.request("${r.method}", "${path}", json.dumps(payload), headers)
-
-res = conn.getresponse()
-data = res.read()
-
-print(data.decode("utf-8"))`;
 };
 
 /* ================= REGISTER ALL TEMPLATES ================= */
@@ -529,7 +517,34 @@ TEMPLATES["curl"] = generateCurlSnippet;
 TEMPLATES["python-requests"] = generatePythonSnippet;
 
 TEMPLATES["node-axios"] = generateNodeAxiosSnippet;
-TEMPLATES["node-native"] = generateNodeNativeSnippet;
+TEMPLATES["node-native"] = (req) => {
+  const url = new URL(req.url);
+
+  return `const https = require("https");
+
+const options = {
+  method: "${req.method}",
+  hostname: "${url.hostname}",
+  path: "${url.pathname}",
+  headers: ${JSON.stringify(formatHeaders(req.headers), null, 2)}
+};
+
+const req = https.request(options, (res) => {
+  let data = "";
+
+  res.on("data", (chunk) => {
+    data += chunk;
+  });
+
+  res.on("end", () => {
+    console.log(data);
+  });
+});
+
+${req.body ? `req.write(JSON.stringify(${JSON.stringify(req.body, null, 2)}));` : ""}
+
+req.end();`;
+};
 TEMPLATES["node-request"] = generateNodeRequestSnippet;
 TEMPLATES["node-unirest"] = generateNodeUnirestSnippet;
 
@@ -561,8 +576,6 @@ TEMPLATES["php-guzzle"] = (req) => {
 $response = $client->request('${req.method}', '${req.url}');
 echo $response->getBody();`;
 };
-
-TEMPLATES["php-httprequest2"] = TEMPLATES["php-httprequest2"]; // already exists
 
 TEMPLATES["dart-http"] = generateDartSnippet;
 
@@ -620,4 +633,152 @@ TEMPLATES["c-libcurl"] = (req) => {
 curl_easy_setopt(curl, CURLOPT_URL, "${req.url}");
 curl_easy_perform(curl);
 curl_easy_cleanup(curl);`;
+};
+
+TEMPLATES["java-unirest"] = (req) => {
+  return `HttpResponse<String> response = Unirest.${req.method.toLowerCase()}("${req.url}")
+  .asString();
+
+System.out.println(response.getBody());`;
+};
+
+TEMPLATES["csharp-httpclient"] = (req) => {
+  return `var client = new HttpClient();
+var request = new HttpRequestMessage(HttpMethod.${req.method}, "${req.url}");
+
+${req.body ? `request.Content = new StringContent(JsonConvert.SerializeObject(${JSON.stringify(req.body, null, 2)}), Encoding.UTF8, "application/json");` : ""}
+
+var response = await client.SendAsync(request);
+var result = await response.Content.ReadAsStringAsync();
+
+Console.WriteLine(result);`;
+};
+
+TEMPLATES["php-guzzle"] = (req) => {
+  return `$client = new \\GuzzleHttp\\Client();
+
+$response = $client->request('${req.method}', '${req.url}', [
+  'headers' => ${JSON.stringify(formatHeaders(req.headers), null, 2)},
+  ${req.body ? `'json' => ${JSON.stringify(req.body, null, 2)}` : ""}
+]);
+
+echo $response->getBody();`;
+};
+
+TEMPLATES["dart-dio"] = (req) => {
+  return `import 'package:dio/dio.dart';
+
+void main() async {
+  final dio = Dio();
+
+  final response = await dio.request(
+    "${req.url}",
+    options: Options(method: "${req.method}"),
+    data: ${JSON.stringify(req.body || {}, null, 2)},
+  );
+
+  print(response.data);
+}`;
+};
+
+TEMPLATES["swift-urlsession"] = (req) => {
+  return `import Foundation
+
+let url = URL(string: "${req.url}")!
+var request = URLRequest(url: url)
+request.httpMethod = "${req.method}"
+
+${req.body ? `request.httpBody = try! JSONSerialization.data(withJSONObject: ${JSON.stringify(req.body || {}, null, 2)}, options: [])` : ""}
+
+let task = URLSession.shared.dataTask(with: request) { data, response, error in
+    if let data = data {
+        print(String(data: data, encoding: .utf8)!)
+    }
+}
+
+task.resume()`;
+};
+
+TEMPLATES["ruby-nethttp"] = (req) => {
+  return `require 'net/http'
+require 'json'
+
+uri = URI("${req.url}")
+http = Net::HTTP.new(uri.host, uri.port)
+http.use_ssl = true
+
+request = Net::HTTP::${req.method.charAt(0) + req.method.slice(1).toLowerCase()}.new(uri)
+request.body = ${JSON.stringify(req.body || {}, null, 2)}.to_json
+
+response = http.request(request)
+puts response.body`;
+};
+
+TEMPLATES["r-httr"] = (req) => {
+  return `library(httr)
+
+res <- VERB(
+  "${req.method}",
+  "${req.url}",
+  body = ${JSON.stringify(req.body || {}, null, 2)},
+  encode = "json"
+)
+
+content(res)`;
+};
+
+TEMPLATES["objc-nsurlsession"] = (req) => {
+  return `NSURL *url = [NSURL URLWithString:@"${req.url}"];
+NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+
+[request setHTTPMethod:@"${req.method}"];
+
+NSURLSession *session = [NSURLSession sharedSession];
+NSURLSessionDataTask *task = [session dataTaskWithRequest:request
+completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+  if (data) {
+    NSString *result = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSLog(@"%@", result);
+  }
+}];
+
+[task resume];`;
+};
+
+TEMPLATES["c-libcurl"] = (req) => {
+  return `#include <curl/curl.h>
+
+int main(void) {
+  CURL *curl = curl_easy_init();
+
+  if(curl) {
+    curl_easy_setopt(curl, CURLOPT_URL, "${req.url}");
+    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "${req.method}");
+
+    curl_easy_perform(curl);
+    curl_easy_cleanup(curl);
+  }
+
+  return 0;
+}`;
+};
+
+export const generatePythonHttpClientSnippet = (req: RequestData) => {
+  const url = new URL(req.url);
+
+  return `import http.client
+import json
+
+conn = http.client.HTTPSConnection("${url.host}")
+
+payload = json.dumps(${JSON.stringify(req.body || {}, null, 2)})
+
+headers = ${JSON.stringify(formatHeaders(req.headers), null, 2)}
+
+conn.request("${req.method}", "${url.pathname}", payload, headers)
+
+res = conn.getresponse()
+data = res.read()
+
+print(data.decode("utf-8"))`;
 };
