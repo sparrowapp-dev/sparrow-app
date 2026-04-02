@@ -1,22 +1,9 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import {
-    generateFetchSnippet,
-    generateJquerySnippet,
-    generateXHRSnippet,
-    generateAxiosSnippet,
-    generateCurlSnippet,
-    generatePythonSnippet,
-    generateJavaOkHttpSnippet,
-    generateCSharpSnippet,
-    generateGoSnippet,
-    generatePHPSnippet,
-    generateDartSnippet,
-    generateKotlinSnippet,
-  } from "./utils/generateSnippet";
   import LanguageSelector from "./LanguageSelector.svelte";
   import CodeViewer from "./CodeViewer.svelte";
   import { LANGUAGES } from "./utils/languages";
+  import { TEMPLATES } from "./utils/generateSnippet";
 
   export let requestData;
   console.log("SNIPPET DATA =>", requestData);
@@ -24,32 +11,9 @@
   let selectedLanguage = "javascript";
   let activeTab = "fetch";
 
-  $: generatedCode =
-    activeTab === "fetch"
-      ? generateFetchSnippet(requestData)
-      : activeTab === "axios"
-        ? generateAxiosSnippet(requestData)
-        : activeTab === "curl"
-          ? generateCurlSnippet(requestData)
-          : activeTab === "python-requests"
-            ? generatePythonSnippet(requestData)
-            : activeTab === "jquery"
-              ? generateJquerySnippet(requestData)
-              : activeTab === "xhr"
-                ? generateXHRSnippet(requestData)
-                : activeTab === "java-okhttp"
-                  ? generateJavaOkHttpSnippet(requestData)
-                  : activeTab === "csharp-restsharp"
-                    ? generateCSharpSnippet(requestData)
-                    : activeTab === "go-native"
-                      ? generateGoSnippet(requestData)
-                      : activeTab === "php-curl"
-                        ? generatePHPSnippet(requestData)
-                        : activeTab === "dart-http"
-                          ? generateDartSnippet(requestData)
-                          : activeTab === "kotlin-okhttp"
-                            ? generateKotlinSnippet(requestData)
-                            : "// Coming soon 🚀";
+  $: generatedCode = TEMPLATES[activeTab]
+    ? TEMPLATES[activeTab](requestData)
+    : "// Not implemented yet";
 
   $: currentLang =
     LANGUAGES.find((l) => l.key === selectedLanguage) || LANGUAGES[0];

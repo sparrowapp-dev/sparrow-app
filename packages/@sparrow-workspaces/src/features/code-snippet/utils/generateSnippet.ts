@@ -36,35 +36,24 @@ const formatHeaders = (headersArr: HeaderType[] = []) => {
 
 /* ================= FETCH ================= */
 export const generateFetchSnippet = (req: RequestData) => {
-  const headersObj = formatHeaders(req.headers);
-
-  // AUTH
-  if (req.auth?.type === "bearer" && req.auth.token) {
-    headersObj["Authorization"] = `Bearer ${req.auth.token}`;
-  }
-
-  const finalUrl = appendQueryParams(req.url, req.params);
-
-  const headers =
-    Object.keys(headersObj).length > 0
-      ? JSON.stringify(headersObj, null, 2)
-      : "";
-
-  const body =
-    req.body && req.method !== "GET"
-      ? `body: JSON.stringify(${JSON.stringify(req.body, null, 2)}),`
-      : "";
+  const r = buildRequest(req);
 
   return `const requestOptions = {
-  method: "${req.method}",
-  ${headers ? `headers: ${headers},` : ""}
-  ${body}
+  method: "${r.method}",
+  headers: ${
+    Object.keys(r.headers).length ? JSON.stringify(r.headers, null, 2) : "{}"
+  },
+  ${
+    r.body && r.method !== "GET"
+      ? `body: JSON.stringify(${JSON.stringify(r.body, null, 2)}),`
+      : ""
+  }
 };
 
-fetch("${finalUrl}", requestOptions)
-  .then(res => res.json())
-  .then(data => console.log(data))
-  .catch(err => console.error(err));`;
+fetch("${r.url}", requestOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));`;
 };
 
 /* ================= jQuery ================= */
@@ -104,84 +93,67 @@ xhr.send(${req.body ? JSON.stringify(req.body) : ""});`;
 /* ================= AXIOS ================= */
 
 export const generateAxiosSnippet = (req: RequestData) => {
-  const headersObj = formatHeaders(req.headers);
-
-  if (req.auth?.type === "bearer" && req.auth.token) {
-    headersObj["Authorization"] = `Bearer ${req.auth.token}`;
-  }
-
-  const finalUrl = appendQueryParams(req.url, req.params);
+  const r = buildRequest(req);
 
   return `import axios from "axios";
 
 const options = {
-  method: "${req.method}",
-  url: "${finalUrl}",
-  headers: ${JSON.stringify(headersObj, null, 2)},
+  method: "${r.method}",
+  url: "${r.url}",
+  headers: ${
+    Object.keys(r.headers).length ? JSON.stringify(r.headers, null, 2) : "{}"
+  },
   ${
-    req.body && req.method !== "GET"
-      ? `data: ${JSON.stringify(req.body, null, 2)},`
+    r.body && r.method !== "GET"
+      ? `data: ${JSON.stringify(r.body, null, 2)},`
       : ""
   }
 };
 
 axios.request(options)
-  .then(res => console.log(res.data))
-  .catch(err => console.error(err));`;
+  .then(response => console.log(response.data))
+  .catch(error => console.log(error));`;
 };
 
 /* ================= cURL ================= */
 export const generateCurlSnippet = (req: RequestData) => {
-  const headersObj = formatHeaders(req.headers);
+  const r = buildRequest(req);
 
-  if (req.auth?.type === "bearer" && req.auth.token) {
-    headersObj["Authorization"] = `Bearer ${req.auth.token}`;
-  }
+  const headers = Object.entries(r.headers)
+    .map(([k, v]) => `--header '${k}: ${v}'`)
+    .join(" \\\n");
 
-  const finalUrl = appendQueryParams(req.url, req.params);
-
-  const headers = Object.entries(headersObj)
-    .map(([k, v]) => `-H "${k}: ${v}"`)
-    .join(" \\\n  ");
-
-  const body =
-    req.body && req.method !== "GET"
-      ? ` \\\n  -d '${JSON.stringify(req.body)}'`
-      : "";
-
-  return `curl --location --request ${req.method} '${finalUrl}' \\
-  ${headers}${body}`;
+  return `curl --location '${r.url}' \\
+${headers}
+${
+  r.body && r.method !== "GET" ? `--data-raw '${JSON.stringify(r.body)}'` : ""
+}`;
 };
 
 export const generatePythonSnippet = (req: RequestData) => {
-  const headersObj = formatHeaders(req.headers);
-
-  if (req.auth?.type === "bearer" && req.auth.token) {
-    headersObj["Authorization"] = `Bearer ${req.auth.token}`;
-  }
-
-  const finalUrl = appendQueryParams(req.url, req.params);
+  const r = buildRequest(req);
 
   return `import requests
 
-url = "${finalUrl}"
+url = "${r.url}"
 
-headers = ${JSON.stringify(headersObj, null, 2)}
+headers = ${
+    Object.keys(r.headers).length ? JSON.stringify(r.headers, null, 2) : "{}"
+  }
 
 ${
-  req.body && req.method !== "GET"
-    ? `data = ${JSON.stringify(req.body, null, 2)}`
+  r.body && r.method !== "GET"
+    ? `payload = ${JSON.stringify(r.body, null, 2)}`
     : ""
 }
 
 response = requests.request(
-    "${req.method}",
+    "${r.method}",
     url,
-    headers=headers,${req.body && req.method !== "GET" ? "\n    json=data" : ""}
+    headers=headers,${r.body && r.method !== "GET" ? "\n    json=payload" : ""}
 )
 
-print(response.text)
-`;
+print(response.text)`;
 };
 
 export const generateJavaOkHttpSnippet = (req: RequestData) => {
@@ -311,4 +283,341 @@ val request = Request.Builder()
 
 val response = client.newCall(request).execute()
 println(response.body?.string())`;
+};
+
+export const generateGenericSnippet = (req: RequestData, lang: string) => {
+  return `// ${lang} snippet coming soon 🚀
+
+Method: ${req.method}
+URL: ${req.url}
+
+Headers:
+${JSON.stringify(formatHeaders(req.headers), null, 2)}
+
+Body:
+${JSON.stringify(req.body, null, 2)}
+`;
+};
+
+type Template = (req: any) => string;
+
+const buildRequest = (req: RequestData) => {
+  const headers = formatHeaders(req.headers);
+
+  const isJSON =
+    headers["Content-Type"]?.includes("application/json") ||
+    typeof req.body === "object";
+
+  return {
+    method: req.method,
+    url: appendQueryParams(req.url, req.params),
+    headers,
+    body: req.body,
+    isJSON,
+  };
+};
+
+export const TEMPLATES: Record<string, Template> = {
+  "python-httpclient": (req) => {
+    const r = buildRequest(req);
+
+    return `import http.client
+import json
+
+conn = http.client.HTTPSConnection("${r.url.replace("https://", "").split("/")[0]}")
+
+payload = ${r.body || "''"}
+
+headers = ${
+      Object.keys(r.headers).length ? JSON.stringify(r.headers, null, 2) : "{}"
+    }
+
+conn.request("${r.method}", "${new URL(r.url).pathname}", payload, headers)
+
+res = conn.getresponse()
+data = res.read()
+
+print(data.decode("utf-8"))`;
+  },
+
+  "node-axios": (req) => {
+    const r = buildRequest(req);
+
+    return `const axios = require('axios');
+
+let config = {
+  method: '${r.method}',
+  maxBodyLength: Infinity,
+  url: '${r.url}',
+  headers: ${
+    Object.keys(r.headers).length ? JSON.stringify(r.headers, null, 2) : "{}"
+  },
+  ${r.body ? `data: JSON.stringify(${JSON.stringify(r.body, null, 2)})` : ""}
+};
+
+axios.request(config)
+.then((response) => {
+  console.log(JSON.stringify(response.data));
+})
+.catch((error) => {
+  console.log(error);
+});`;
+  },
+
+  "shell-wget": (req) => {
+    const r = buildRequest(req);
+
+    return `wget --method=${r.method} "${r.url}" \\
+${Object.entries(r.headers)
+  .map(([k, v]) => `  --header="${k}: ${v}"`)
+  .join(" \\\n")}
+${r.body ? `  --body-data='${r.body}'` : ""}`;
+  },
+
+  "shell-httpie": (req) => {
+    const r = buildRequest(req);
+
+    return `http ${r.method} ${r.url} \\
+${Object.entries(r.headers)
+  .map(([k, v]) => `${k}:${v}`)
+  .join(" \\\n")}
+${r.body ? JSON.stringify(JSON.parse(r.body)) : ""}`;
+  },
+
+  "php-httprequest2": (req) => {
+    const r = buildRequest(req);
+
+    return `<?php
+require_once 'HTTP/Request2.php';
+
+$request = new HTTP_Request2('${r.url}');
+$request->setMethod(HTTP_Request2::METHOD_${r.method});
+
+$request->setHeader(${
+      Object.keys(r.headers).length ? JSON.stringify(r.headers, null, 2) : "{}"
+    });
+${r.body ? `$request->setBody('${r.body}');` : ""}
+
+$response = $request->send();
+echo $response->getBody();`;
+  },
+
+  "powershell-restmethod": (req) => {
+    const r = buildRequest(req);
+
+    return `$headers = ${
+      Object.keys(r.headers).length ? JSON.stringify(r.headers, null, 2) : "{}"
+    }
+
+$response = Invoke-RestMethod -Uri "${r.url}" -Method ${r.method} -Headers $headers ${
+      r.body ? `-Body '${r.body}'` : ""
+    }
+
+$response`;
+  },
+
+  "rust-reqwest": (req) => {
+    const r = buildRequest(req);
+
+    return `use reqwest;
+
+#[tokio::main]
+async fn main() {
+  let client = reqwest::Client::new();
+
+  let res = client
+    .${r.method.toLowerCase()}("${r.url}")
+    ${r.body ? `.body(r#\"${r.body}\"#)` : ""}
+    .send()
+    .await
+    .unwrap();
+
+  println!("{}", res.text().await.unwrap());
+}`;
+  },
+};
+
+export const generateNodeAxiosSnippet = (req: RequestData) => {
+  return `const axios = require("axios");
+
+axios({
+  method: "${req.method}",
+  url: "${req.url}",
+  headers: ${JSON.stringify(formatHeaders(req.headers), null, 2)},
+  data: ${JSON.stringify(req.body || {}, null, 2)}
+})
+.then(res => console.log(res.data))
+.catch(console.error);`;
+};
+
+export const generateNodeNativeSnippet = (req: RequestData) => {
+  return `fetch("${req.url}", {
+  method: "${req.method}",
+  headers: ${JSON.stringify(formatHeaders(req.headers), null, 2)},
+  body: JSON.stringify(${JSON.stringify(req.body || {}, null, 2)})
+})
+.then(res => res.json())
+.then(console.log)
+.catch(console.error);`;
+};
+
+export const generateNodeRequestSnippet = (req: RequestData) => {
+  return `const request = require("request");
+
+request({
+  method: "${req.method}",
+  url: "${req.url}",
+  headers: ${JSON.stringify(formatHeaders(req.headers), null, 2)},
+  body: JSON.stringify(${JSON.stringify(req.body || {}, null, 2)})
+}, (err, res) => {
+  if (err) throw err;
+  console.log(res.body);
+});`;
+};
+
+export const generateNodeUnirestSnippet = (req: RequestData) => {
+  return `const unirest = require("unirest");
+
+unirest("${req.method}", "${req.url}")
+.headers(${JSON.stringify(formatHeaders(req.headers), null, 2)})
+.send(${JSON.stringify(req.body || {}, null, 2)})
+.end(res => console.log(res.body));`;
+};
+
+export const generateShellHttpieSnippet = (req: RequestData) => {
+  return `http ${req.method} ${req.url}`;
+};
+
+export const generateShellWgetSnippet = (req: RequestData) => {
+  return `wget --method=${req.method} "${req.url}"`;
+};
+
+TEMPLATES["python-httpclient"] = (req) => {
+  const r = buildRequest(req);
+
+  const host = r.url.replace("https://", "").split("/")[0];
+  const path = "/" + r.url.split("/").slice(3).join("/");
+
+  return `import http.client
+import json
+
+conn = http.client.HTTPSConnection("${host}")
+
+payload = ${JSON.stringify(r.body || {})}
+
+headers = ${
+    Object.keys(r.headers).length ? JSON.stringify(r.headers, null, 2) : "{}"
+  }
+
+conn.request("${r.method}", "${path}", json.dumps(payload), headers)
+
+res = conn.getresponse()
+data = res.read()
+
+print(data.decode("utf-8"))`;
+};
+
+/* ================= REGISTER ALL TEMPLATES ================= */
+
+TEMPLATES["fetch"] = generateFetchSnippet;
+TEMPLATES["axios"] = generateAxiosSnippet;
+TEMPLATES["xhr"] = generateXHRSnippet;
+TEMPLATES["jquery"] = generateJquerySnippet;
+
+TEMPLATES["curl"] = generateCurlSnippet;
+
+TEMPLATES["python-requests"] = generatePythonSnippet;
+
+TEMPLATES["node-axios"] = generateNodeAxiosSnippet;
+TEMPLATES["node-native"] = generateNodeNativeSnippet;
+TEMPLATES["node-request"] = generateNodeRequestSnippet;
+TEMPLATES["node-unirest"] = generateNodeUnirestSnippet;
+
+TEMPLATES["java-okhttp"] = generateJavaOkHttpSnippet;
+
+/* 🚀 ADD THIS (YOU WERE MISSING) */
+TEMPLATES["java-unirest"] = (req) => {
+  return `Unirest.${req.method.toLowerCase()}("${req.url}")
+  .asString();`;
+};
+
+TEMPLATES["csharp-restsharp"] = generateCSharpSnippet;
+
+/* 🚀 ADD THIS (MISSING) */
+TEMPLATES["csharp-httpclient"] = (req) => {
+  return `var client = new HttpClient();
+var request = new HttpRequestMessage(HttpMethod.${req.method}, "${req.url}");
+var response = await client.SendAsync(request);
+var result = await response.Content.ReadAsStringAsync();`;
+};
+
+TEMPLATES["go-native"] = generateGoSnippet;
+
+TEMPLATES["php-curl"] = generatePHPSnippet;
+
+/* 🚀 ADD THESE (YOU MISSED) */
+TEMPLATES["php-guzzle"] = (req) => {
+  return `$client = new \\GuzzleHttp\\Client();
+$response = $client->request('${req.method}', '${req.url}');
+echo $response->getBody();`;
+};
+
+TEMPLATES["php-httprequest2"] = TEMPLATES["php-httprequest2"]; // already exists
+
+TEMPLATES["dart-http"] = generateDartSnippet;
+
+/* 🚀 ADD THIS */
+TEMPLATES["dart-dio"] = (req) => {
+  return `final dio = Dio();
+final response = await dio.${req.method.toLowerCase()}("${req.url}");
+print(response.data);`;
+};
+
+TEMPLATES["kotlin-okhttp"] = generateKotlinSnippet;
+
+/* 🚀 ADD REMAINING LANGUAGES */
+
+TEMPLATES["swift-urlsession"] = (req) => {
+  return `let url = URL(string: "${req.url}")!
+let task = URLSession.shared.dataTask(with: url) { data, _, _ in
+  print(String(data: data!, encoding: .utf8)!)
+}
+task.resume()`;
+};
+
+TEMPLATES["ruby-nethttp"] = (req) => {
+  return `require 'net/http'
+uri = URI("${req.url}")
+res = Net::HTTP.get_response(uri)
+puts res.body`;
+};
+
+TEMPLATES["r-httr"] = (req) => {
+  return `library(httr)
+res <- VERB("${req.method}", "${req.url}")
+content(res)`;
+};
+
+TEMPLATES["r-rcurl"] = (req) => {
+  return `library(RCurl)
+res <- getURL("${req.url}")
+print(res)`;
+};
+
+TEMPLATES["powershell-restmethod"] = TEMPLATES["powershell-restmethod"];
+
+TEMPLATES["objc-nsurlsession"] = (req) => {
+  return `NSURL *url = [NSURL URLWithString:@"${req.url}"];
+NSURLSessionDataTask *task = [[NSURLSession sharedSession]
+dataTaskWithURL:url completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+  NSLog(@"%@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+}];
+[task resume];`;
+};
+
+TEMPLATES["c-libcurl"] = (req) => {
+  return `CURL *curl = curl_easy_init();
+curl_easy_setopt(curl, CURLOPT_URL, "${req.url}");
+curl_easy_perform(curl);
+curl_easy_cleanup(curl);`;
 };
