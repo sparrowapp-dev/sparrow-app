@@ -77,7 +77,7 @@
 
   <!-- CODE BLOCK -->
   <div class="code-block">
-    <CodeViewer code={generatedCode} />
+    <CodeViewer code={generatedCode} language={selectedLanguage} />
   </div>
 </div>
 
