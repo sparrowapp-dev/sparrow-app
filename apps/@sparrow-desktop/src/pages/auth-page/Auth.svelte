@@ -81,7 +81,7 @@
 
   let tokenErrorType = ""; // 'empty', 'invalid', 'format'
   const tokenFormatRegex =
-    /^sparrow:\/\/\?(data=[A-Za-z0-9%+/=]+|.*accessToken=[^&]+&refreshToken=[^&]+)/;
+    /^sparrow:\/\/(invite-login\?)?(data=[A-Za-z0-9%+/=]+|.*accessToken=[^&]+&refreshToken=[^&]+)/;
 
   async function tokenValidationLogic() {
     // Reset error states
