@@ -6,11 +6,16 @@
     generateXHRSnippet,
     generateAxiosSnippet,
     generateCurlSnippet,
+    generatePythonSnippet,
   } from "./utils/generateSnippet";
+  import LanguageSelector from "./LanguageSelector.svelte";
+  import CodeViewer from "./CodeViewer.svelte";
+  import { LANGUAGES } from "./utils/languages";
 
   export let requestData;
   console.log("SNIPPET DATA =>", requestData);
 
+  let selectedLanguage = "javascript";
   let activeTab = "fetch";
 
   $: generatedCode =
@@ -20,17 +25,27 @@
         ? generateAxiosSnippet(requestData)
         : activeTab === "curl"
           ? generateCurlSnippet(requestData)
-          : activeTab === "jquery"
-            ? generateJquerySnippet(requestData)
-            : generateXHRSnippet(requestData);
+          : activeTab === "python-requests"
+            ? generatePythonSnippet(requestData)
+            : activeTab === "jquery"
+              ? generateJquerySnippet(requestData)
+              : generateXHRSnippet(requestData);
+
+  $: currentLang =
+    LANGUAGES.find((l) => l.key === selectedLanguage) || LANGUAGES[0];
 
   const code = `const requestOptions = {
   method: "GET",
   redirect: "follow"
 };`;
 
+  let copied = false;
+
   const copyCode = async () => {
     await navigator.clipboard.writeText(generatedCode);
+    copied = true;
+
+    setTimeout(() => (copied = false), 1500);
   };
 
   const dispatch = createEventDispatcher();
@@ -50,41 +65,35 @@
 
   <!-- SUBHEADER (LANGUAGE + COPY) -->
   <div class="subheader">
-    <div class="language-dropdown">
-      JavaScript(3)
-      <span class="caret">▾</span>
-    </div>
+    <LanguageSelector
+      {selectedLanguage}
+      selectedTab={activeTab}
+      on:change={(e) => {
+        selectedLanguage = e.detail.language;
+        activeTab = e.detail.tab;
+      }}
+    />
 
-    <button on:click={copyCode} class="copy-btn"> Copy snippet </button>
+    <button on:click={copyCode} class="copy-btn">
+      {copied ? "Copied!" : "Copy snippet"}
+    </button>
   </div>
 
   <!-- TABS -->
   <div class="tabs">
-    <span
-      class="tab {activeTab === 'fetch' ? 'active' : ''}"
-      on:click={() => (activeTab = "fetch")}>Fetch</span
-    >
-    <span
-      class="tab {activeTab === 'axios' ? 'active' : ''}"
-      on:click={() => (activeTab = "axios")}>Axios</span
-    >
-    <span
-      class="tab {activeTab === 'curl' ? 'active' : ''}"
-      on:click={() => (activeTab = "curl")}>cURL</span
-    >
-    <span
-      class="tab {activeTab === 'jquery' ? 'active' : ''}"
-      on:click={() => (activeTab = "jquery")}>jQuery</span
-    >
-    <span
-      class="tab {activeTab === 'xhr' ? 'active' : ''}"
-      on:click={() => (activeTab = "xhr")}>XHR</span
-    >
+    {#each currentLang.tabs as tab}
+      <span
+        class="tab {activeTab === tab.value ? 'active' : ''}"
+        on:click={() => (activeTab = tab.value)}
+      >
+        {tab.label}
+      </span>
+    {/each}
   </div>
 
   <!-- CODE BLOCK -->
   <div class="code-block">
-    <pre>{generatedCode}</pre>
+    <CodeViewer code={generatedCode} />
   </div>
 </div>
 
@@ -257,5 +266,13 @@
     font-family: "JetBrains Mono";
     font-size: 12px;
     color: #ffffff;
+  }
+
+  .selected {
+    background: #181c26;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #d8d8d9;
   }
 </style>

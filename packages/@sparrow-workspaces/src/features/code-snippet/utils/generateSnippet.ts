@@ -152,3 +152,34 @@ export const generateCurlSnippet = (req: RequestData) => {
   return `curl --location --request ${req.method} '${finalUrl}' \\
   ${headers}${body}`;
 };
+
+export const generatePythonSnippet = (req: RequestData) => {
+  const headersObj = formatHeaders(req.headers);
+
+  if (req.auth?.type === "bearer" && req.auth.token) {
+    headersObj["Authorization"] = `Bearer ${req.auth.token}`;
+  }
+
+  const finalUrl = appendQueryParams(req.url, req.params);
+
+  return `import requests
+
+url = "${finalUrl}"
+
+headers = ${JSON.stringify(headersObj, null, 2)}
+
+${
+  req.body && req.method !== "GET"
+    ? `data = ${JSON.stringify(req.body, null, 2)}`
+    : ""
+}
+
+response = requests.request(
+    "${req.method}",
+    url,
+    headers=headers,${req.body && req.method !== "GET" ? "\n    json=data" : ""}
+)
+
+print(response.text)
+`;
+};
