@@ -183,3 +183,132 @@ response = requests.request(
 print(response.text)
 `;
 };
+
+export const generateJavaOkHttpSnippet = (req: RequestData) => {
+  const headers = Object.entries(formatHeaders(req.headers))
+    .map(([k, v]) => `.addHeader("${k}", "${v}")`)
+    .join("\n    ");
+
+  return `OkHttpClient client = new OkHttpClient();
+
+Request request = new Request.Builder()
+    .url("${req.url}")
+    .method("${req.method}", ${
+      req.body && req.method !== "GET"
+        ? `RequestBody.create(MediaType.parse("application/json"), "${JSON.stringify(req.body)}")`
+        : "null"
+    })
+    ${headers}
+    .build();
+
+Response response = client.newCall(request).execute();`;
+};
+
+export const generateCSharpSnippet = (req: RequestData) => {
+  const headers = Object.entries(formatHeaders(req.headers))
+    .map(([k, v]) => `request.AddHeader("${k}", "${v}");`)
+    .join("\n");
+
+  return `var client = new RestClient("${req.url}");
+var request = new RestRequest(Method.${req.method});
+
+${headers}
+
+${
+  req.body && req.method !== "GET"
+    ? `request.AddJsonBody(${JSON.stringify(req.body, null, 2)});`
+    : ""
+}
+
+IRestResponse response = client.Execute(request);`;
+};
+
+export const generateGoSnippet = (req: RequestData) => {
+  const headers = Object.entries(formatHeaders(req.headers))
+    .map(([k, v]) => `req.Header.Add("${k}", "${v}")`)
+    .join("\n");
+
+  return `package main
+
+import (
+  "fmt"
+  "net/http"
+  "strings"
+)
+
+func main() {
+  client := &http.Client{}
+
+  var body = strings.NewReader(\`${JSON.stringify(req.body || {})}\`)
+
+  req, _ := http.NewRequest("${req.method}", "${req.url}", body)
+
+  ${headers}
+
+  res, _ := client.Do(req)
+  defer res.Body.Close()
+
+  fmt.Println(res.Status)
+}`;
+};
+
+export const generatePHPSnippet = (req: RequestData) => {
+  const headers = Object.entries(formatHeaders(req.headers))
+    .map(([k, v]) => `"${k}: ${v}"`)
+    .join(",\n");
+
+  return `$curl = curl_init();
+
+curl_setopt_array($curl, [
+  CURLOPT_URL => "${req.url}",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_CUSTOMREQUEST => "${req.method}",
+  CURLOPT_HTTPHEADER => [
+    ${headers}
+  ],
+  ${
+    req.body && req.method !== "GET"
+      ? `CURLOPT_POSTFIELDS => '${JSON.stringify(req.body)}',`
+      : ""
+  }
+]);
+
+$response = curl_exec($curl);
+curl_close($curl);
+
+echo $response;`;
+};
+
+export const generateDartSnippet = (req: RequestData) => {
+  return `import 'package:http/http.dart' as http;
+
+void main() async {
+  var response = await http.${req.method.toLowerCase()}(
+    Uri.parse("${req.url}"),
+    headers: ${JSON.stringify(formatHeaders(req.headers), null, 2)},
+    ${
+      req.body && req.method !== "GET"
+        ? `body: ${JSON.stringify(req.body, null, 2)},`
+        : ""
+    }
+  );
+
+  print(response.body);
+}`;
+};
+
+export const generateKotlinSnippet = (req: RequestData) => {
+  return `val client = OkHttpClient()
+
+val request = Request.Builder()
+  .url("${req.url}")
+  .method("${req.method}", ${
+    req.body && req.method !== "GET"
+      ? `RequestBody.create("${JSON.stringify(req.body)}".toRequestBody())`
+      : "null"
+  })
+  .build()
+
+val response = client.newCall(request).execute()
+println(response.body?.string())`;
+};

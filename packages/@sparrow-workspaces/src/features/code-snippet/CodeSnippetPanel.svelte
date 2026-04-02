@@ -7,6 +7,12 @@
     generateAxiosSnippet,
     generateCurlSnippet,
     generatePythonSnippet,
+    generateJavaOkHttpSnippet,
+    generateCSharpSnippet,
+    generateGoSnippet,
+    generatePHPSnippet,
+    generateDartSnippet,
+    generateKotlinSnippet,
   } from "./utils/generateSnippet";
   import LanguageSelector from "./LanguageSelector.svelte";
   import CodeViewer from "./CodeViewer.svelte";
@@ -29,7 +35,21 @@
             ? generatePythonSnippet(requestData)
             : activeTab === "jquery"
               ? generateJquerySnippet(requestData)
-              : generateXHRSnippet(requestData);
+              : activeTab === "xhr"
+                ? generateXHRSnippet(requestData)
+                : activeTab === "java-okhttp"
+                  ? generateJavaOkHttpSnippet(requestData)
+                  : activeTab === "csharp-restsharp"
+                    ? generateCSharpSnippet(requestData)
+                    : activeTab === "go-native"
+                      ? generateGoSnippet(requestData)
+                      : activeTab === "php-curl"
+                        ? generatePHPSnippet(requestData)
+                        : activeTab === "dart-http"
+                          ? generateDartSnippet(requestData)
+                          : activeTab === "kotlin-okhttp"
+                            ? generateKotlinSnippet(requestData)
+                            : "// Coming soon 🚀";
 
   $: currentLang =
     LANGUAGES.find((l) => l.key === selectedLanguage) || LANGUAGES[0];
