@@ -50,15 +50,26 @@
     cursor: pointer;
     font-size: 12px;
     color: #d8d8d9;
+
+    width: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: #181c26;
+    padding: 6px 10px;
+    border-radius: 4px;
   }
   .menu {
     position: absolute;
-    top: 28px;
+    top: 32px;
     background: #181c26;
     border: 1px solid #31353f;
     border-radius: 6px;
     padding: 6px;
     width: 180px;
+    max-height: 250px;
+    overflow-y: auto;
   }
   .group {
     font-size: 11px;
@@ -66,10 +77,19 @@
     margin-top: 6px;
   }
   .item {
-    padding: 6px;
+    padding: 8px 10px;
     cursor: pointer;
+    border-radius: 4px;
   }
   .item:hover {
     background: #2a2f3a;
+  }
+  .menu::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .menu::-webkit-scrollbar-thumb {
+    background: #2a2f3a;
+    border-radius: 4px;
   }
 </style>

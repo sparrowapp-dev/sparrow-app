@@ -4,6 +4,7 @@
   import CodeViewer from "./CodeViewer.svelte";
   import { LANGUAGES } from "./utils/languages";
   import { TEMPLATES } from "./utils/generateSnippet";
+  import { CopyRegular, CheckRegular } from "@sparrow/library/icons";
 
   export let requestData;
   console.log("SNIPPET DATA =>", requestData);
@@ -58,9 +59,19 @@
       }}
     />
 
-    <button on:click={copyCode} class="copy-btn">
-      {copied ? "Copied!" : "Copy snippet"}
-    </button>
+    <div class="copy-wrapper">
+      <button on:click={copyCode} class="copy-btn">
+        {#if copied}
+          <CheckRegular size="14px" />
+        {:else}
+          <CopyRegular size="14px" />
+        {/if}
+      </button>
+
+      <div class="tooltip">
+        {copied ? "Copied" : "Copy snippet"}
+      </div>
+    </div>
   </div>
 
   <!-- TABS -->
@@ -92,7 +103,7 @@
     background: var(--bg-ds-surface-900);
     border-left: 1px solid var(--border-subtle, #2a2a2a);
 
-    z-index: 20;
+    z-index: 999;
 
     display: flex;
     flex-direction: column;
@@ -258,5 +269,60 @@
     border-radius: 4px;
     font-size: 12px;
     color: #d8d8d9;
+  }
+
+  .copy-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  /* BUTTON */
+  .copy-btn {
+    width: 32px;
+    height: 32px;
+
+    background: #1c212b;
+    border: 1px solid #31353f;
+    border-radius: 6px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  /* HOVER */
+  .copy-btn:hover {
+    background: #2a2f3a;
+  }
+
+  /* TOOLTIP */
+  .tooltip {
+    position: absolute;
+    top: -30px;
+    right: 0;
+
+    background: #2a2f3a;
+    color: #fff;
+    font-size: 11px;
+
+    padding: 4px 8px;
+    border-radius: 4px;
+
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(4px);
+
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+
+  /* SHOW TOOLTIP ON HOVER */
+  .copy-wrapper:hover .tooltip {
+    opacity: 1;
+    transform: translateY(0);
   }
 </style>
