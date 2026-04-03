@@ -26,7 +26,11 @@
   <div class="selected" on:click={() => (open = !open)}>
     {#each LANGUAGES as lang}
       {#if lang.key === selectedLanguage}
-        {lang.label}{lang.tabs.length > 1 ? `(${lang.tabs.length})` : ""} ▾
+        <span class="label">
+          {lang.label}{lang.tabs.length > 1 ? `(${lang.tabs.length})` : ""}
+        </span>
+
+        <span class="arrow {open ? 'open' : ''}">▾</span>
       {/if}
     {/each}
   </div>
@@ -48,27 +52,42 @@
   }
   .selected {
     cursor: pointer;
-    font-size: 12px;
-    color: #d8d8d9;
 
-    width: 180px;
+    font-size: 12px;
+    line-height: 16px;
+
+    min-width: 140px;
+    height: 28px;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
 
     background: #181c26;
-    padding: 6px 10px;
-    border-radius: 4px;
+    padding: 0 8px;
+    border-radius: 6px;
+
+    color: #f4f9ff;
+  }
+
+  .label {
+    display: flex;
+    align-items: center;
   }
   .menu {
     position: absolute;
-    top: 32px;
-    background: #181c26;
-    border: 1px solid #31353f;
+    top: calc(100% + 4px); /* 🔥 dynamic spacing */
+    left: 0;
+
+    z-index: 1000; /* 🔥 ensures above tabs */
+
+    background: #14181f;
+    border: 1px solid #2a2f3a;
     border-radius: 6px;
-    padding: 6px;
+
+    padding: 4px 0;
     width: 180px;
-    max-height: 250px;
+    max-height: 220px;
     overflow-y: auto;
   }
   .group {
@@ -77,7 +96,12 @@
     margin-top: 6px;
   }
   .item {
-    padding: 8px 10px;
+    font-size: 12px;
+    line-height: 16px;
+
+    color: #d1d5db; /* match trigger */
+
+    padding: 6px 10px;
     cursor: pointer;
     border-radius: 4px;
   }
@@ -91,5 +115,21 @@
   .menu::-webkit-scrollbar-thumb {
     background: #2a2f3a;
     border-radius: 4px;
+  }
+
+  .arrow {
+    margin-left: 8px;
+    font-size: 12px;
+    font-weight: 700; /* 🔥 bold */
+    line-height: 1;
+
+    display: flex;
+    align-items: center;
+
+    transition: transform 0.2s ease;
+  }
+
+  .arrow.open {
+    transform: rotate(180deg); /* 🔥 rotate when open */
   }
 </style>

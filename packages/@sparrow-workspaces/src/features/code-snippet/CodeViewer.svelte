@@ -1,6 +1,5 @@
 <script lang="ts">
   import hljs from "highlight.js";
-  import "highlight.js/styles/github-dark.css";
 
   export let code: string = "";
   export let language: string = "javascript";
@@ -25,7 +24,23 @@
     } catch {
       highlighted = hljs.highlightAuto(safeCode).value;
     }
-    lines = highlighted.split("\n");
+    lines = highlighted
+      .split("\n")
+      .filter((line, i, arr) => {
+        if (i === 0 || i === arr.length - 1) {
+          return line.trim() !== "";
+        }
+        return true;
+      })
+      .reduce((acc: string[], line) => {
+        const isEmpty = line.trim() === "";
+        const prevEmpty = acc.length > 0 && acc[acc.length - 1].trim() === "";
+
+        if (isEmpty && prevEmpty) return acc;
+
+        acc.push(line);
+        return acc;
+      }, []);
   }
 </script>
 
@@ -47,10 +62,11 @@
     font-family: "JetBrains Mono", monospace;
     font-size: 12px;
     line-height: 1.6;
-    background: #0b1220;
+    background: transparent;
     border-radius: 6px;
-    padding: 12px;
+    padding: 6px 8px;
     user-select: text;
+    height: 100%;
   }
 
   .code-line {
@@ -59,12 +75,11 @@
   }
 
   .line-number {
-    width: 32px;
+    width: 28px;
     text-align: right;
     padding-right: 10px;
     margin-right: 10px;
-    border-right: 1px solid #30363d;
-    color: #6e7681;
+    color: #6b7280;
     user-select: none;
     flex-shrink: 0;
   }
@@ -80,53 +95,60 @@
     display: block;
   }
 
-  /* 🔥 BASE HLJS */
+  /* Base */
   .hljs {
-    color: #e6edf3;
-    background: transparent;
+    color: #e5e7eb !important; /* default white */
+    background: transparent !important;
   }
 
-  /* KEYWORDS */
+  /* Keywords → const, let */
   .hljs-keyword {
-    color: #ff7b72;
+    color: #3b82f6 !important; /* blue */
   }
 
-  /* STRINGS */
+  /* Strings → "GET" */
   .hljs-string {
-    color: #a5d6ff;
+    color: #facc15 !important; /* yellow */
   }
 
-  /* NUMBERS */
+  /* Numbers */
   .hljs-number {
-    color: #79c0ff;
+    color: #facc15 !important;
   }
 
-  /* VARIABLES / KEYS */
-  .hljs-attr,
-  .hljs-variable,
-  .hljs-property {
-    color: #c9d1d9;
+  /* Function names */
+  .hljs-title,
+  .hljs-title.function_ {
+    color: #3b82f6 !important;
   }
 
-  /* FUNCTIONS */
-  .hljs-title.function_,
-  .hljs-title {
-    color: #d2a8ff;
-  }
-
-  /* BUILT-IN */
+  /* Built-in (like fetch, console) */
   .hljs-built_in {
-    color: #ffa657;
+    color: #22c55e !important; /* green */
   }
 
-  /* COMMENTS */
+  /* ⚠️ IMPORTANT FIX */
+  .hljs-attr,
+  .hljs-property {
+    color: #e5e7eb !important; /* WHITE (this fixes "method") */
+  }
+
+  /* Variables */
+  .hljs-variable {
+    color: #e5e7eb !important;
+  }
+
+  /* Comments */
   .hljs-comment {
-    color: #8b949e;
+    color: #6b7280 !important;
   }
 
-  /* PUNCTUATION */
+  /* Punctuation */
   .hljs-punctuation {
-    color: #c9d1d9;
+    color: #9ca3af !important;
+  }
+  code {
+    color: inherit;
   }
 
   .code-line:hover {

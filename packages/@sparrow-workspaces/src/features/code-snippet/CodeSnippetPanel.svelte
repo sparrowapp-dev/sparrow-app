@@ -66,7 +66,22 @@
         activeTab = e.detail.tab;
       }}
     />
+  </div>
 
+  <!-- TABS -->
+  <div class="tabs-row">
+    <div class="tabs">
+      {#each currentLang.tabs as tab}
+        <span
+          class="tab {activeTab === tab.value ? 'active' : ''}"
+          on:click={() => (activeTab = tab.value)}
+        >
+          {tab.label}
+        </span>
+      {/each}
+    </div>
+
+    <!-- Copy Button moved here -->
     <div class="copy-wrapper">
       <button on:click={copyCode} class="copy-btn">
         {#if copied}
@@ -80,18 +95,6 @@
         {copied ? "Copied" : "Copy snippet"}
       </div>
     </div>
-  </div>
-
-  <!-- TABS -->
-  <div class="tabs">
-    {#each currentLang.tabs as tab}
-      <span
-        class="tab {activeTab === tab.value ? 'active' : ''}"
-        on:click={() => (activeTab = tab.value)}
-      >
-        {tab.label}
-      </span>
-    {/each}
   </div>
 
   <!-- CODE BLOCK -->
@@ -129,15 +132,18 @@
 
   .title {
     font-family: Inter, sans-serif;
-    font-weight: 500;
-    font-size: 14px;
+    font-weight: 400;
+    font-size: 13px;
     line-height: 20px;
     color: #ffffff;
   }
 
   .close-btn {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
+
+    font-size: 14px; /* 🔥 smaller cross */
+    color: #9ca3af; /* softer */
 
     display: flex;
     align-items: center;
@@ -146,8 +152,6 @@
     background: transparent;
     border: none;
     cursor: pointer;
-
-    color: var(--text-secondary-200);
   }
 
   .close-btn:hover {
@@ -242,33 +246,58 @@
   /* TABS */
   .tabs {
     display: flex;
-    gap: 16px;
+    gap: 12px;
+  }
+
+  .tabs-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding: 0 16px;
   }
 
   .tab {
     font-size: 12px;
-    color: #d8d8d9;
+    color: #c1c4c9; /* faded */
     cursor: pointer;
+    padding: 8px 0;
+    position: relative;
+    transition: color 0.15s ease;
   }
 
   .tab.active {
-    color: #316cf6;
-    border-bottom: 2px solid #316cf6;
+    color: #e5e7eb; /* brighter like figma */
+  }
+
+  .tab:hover {
+    color: #cbd5f5;
+  }
+
+  .tab.active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 2px;
+    background: #2f81f7;
+    border-radius: 2px;
   }
 
   /* CODE BLOCK */
   .code-block {
-    margin: 12px 16px;
-    padding: 12px;
+    margin: 10px 16px 16px 16px; /* tighter top spacing */
+    padding: 10px; /* reduced padding */
 
-    background: #0d1117;
-    border: 1px solid #31353f;
-    border-radius: 6px;
+    flex: 1; /* 🔥 IMPORTANT */
+    display: flex;
+    flex-direction: column;
 
-    font-family: "JetBrains Mono";
-    font-size: 12px;
-    color: #ffffff;
+    background: transparent; /* matches CodeViewer bg */
+    border: 1px solid #2a2f3a; /* softer border */
+    border-radius: 4px; /* slightly more rounded */
+
+    overflow: hidden; /* prevents overflow issues */
   }
 
   .selected {
@@ -287,8 +316,8 @@
 
   /* BUTTON */
   .copy-btn {
-    width: 32px;
-    height: 32px;
+    width: 24px;
+    height: 24px;
 
     background: #1c212b;
     border: 1px solid #31353f;
