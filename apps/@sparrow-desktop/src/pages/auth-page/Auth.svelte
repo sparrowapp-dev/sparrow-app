@@ -34,6 +34,7 @@
   import * as Sentry from "@sentry/svelte";
   import { identifyUser } from "@app/utils/posthog/posthogConfig";
   import { policyConfig } from "@sparrow/common/store";
+  import { listen } from "@tauri-apps/api/event";
 
   let externalSparrowLink =
     `${constants.SPARROW_AUTH_URL}` + "/init?source=desktop";
@@ -55,6 +56,23 @@
       isTokenFormEnabled = true;
       navigationState.set("");
     }
+
+    // HANDLE DEEP LINK AUTO LOGIN
+    await listen("tauri://open-url", async (event: any) => {
+      try {
+        const url = event.payload?.[0];
+        console.log("Deep link received:", url);
+
+        if (url && url.startsWith("sparrow://")) {
+          token = url; // assign token
+          isTokenFormEnabled = true; // optional (shows UI)
+
+          await tokenValidationLogic(); // AUTO LOGIN
+        }
+      } catch (e) {
+        console.error("Deep link handling failed", e);
+      }
+    });
   });
 
   const skipLoginHandler = async () => {
