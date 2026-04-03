@@ -35,6 +35,7 @@
   import { identifyUser } from "@app/utils/posthog/posthogConfig";
   import { policyConfig } from "@sparrow/common/store";
   import { listen } from "@tauri-apps/api/event";
+  import { invoke } from "@tauri-apps/api/core";
 
   let externalSparrowLink =
     `${constants.SPARROW_AUTH_URL}` + "/init?source=desktop";
@@ -48,29 +49,39 @@
   let os = "";
   onMount(async () => {
     os = await platform();
+
     let navigationPath = "";
     navigationState.subscribe((value) => {
       navigationPath = value;
     });
+
     if (navigationPath === "guestUser") {
       isTokenFormEnabled = true;
       navigationState.set("");
     }
 
-    // HANDLE DEEP LINK AUTO LOGIN
-    await listen("tauri://open-url", async (event: any) => {
-      try {
-        const url = event.payload?.[0];
-        console.log("Deep link received:", url);
+    // HANDLE INITIAL OPEN
+    const initialUrl = await invoke<string | null>("get_initial_deep_link");
 
-        if (url && url.startsWith("sparrow://")) {
-          token = url; // assign token
-          isTokenFormEnabled = true; // optional (shows UI)
+    if (initialUrl) {
+      console.log("Initial deep link:", initialUrl);
 
-          await tokenValidationLogic(); // AUTO LOGIN
-        }
-      } catch (e) {
-        console.error("Deep link handling failed", e);
+      token = initialUrl;
+      isTokenFormEnabled = true;
+
+      await tokenValidationLogic();
+    }
+
+    // HANDLE WHEN APP IS ALREADY OPEN
+    await listen("deep-link-urls", async (event: any) => {
+      const url = event.payload?.url;
+      console.log("Deep link received:", url);
+
+      if (url) {
+        token = url;
+        isTokenFormEnabled = true;
+
+        await tokenValidationLogic();
       }
     });
   });
