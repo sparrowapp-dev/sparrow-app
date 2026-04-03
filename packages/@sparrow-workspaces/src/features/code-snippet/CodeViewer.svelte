@@ -8,11 +8,22 @@
   let highlighted = "";
   let lines: string[] = [];
 
+  const langMap: Record<string, string> = {
+    node: "javascript",
+    javascript: "javascript",
+    python: "python",
+    java: "java",
+    csharp: "csharp",
+  };
+
   $: {
+    const safeLang = langMap[language] || "plaintext";
+    const safeCode = code || "// No code available";
+
     try {
-      highlighted = hljs.highlight(code, { language }).value;
+      highlighted = hljs.highlight(safeCode, { language: safeLang }).value;
     } catch {
-      highlighted = hljs.highlightAuto(code).value;
+      highlighted = hljs.highlightAuto(safeCode).value;
     }
     lines = highlighted.split("\n");
   }

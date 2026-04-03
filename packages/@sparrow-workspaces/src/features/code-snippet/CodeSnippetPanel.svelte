@@ -11,10 +11,18 @@
 
   let selectedLanguage = "javascript";
   let activeTab = "fetch";
+  let generatedCode: string = "";
 
-  $: generatedCode = TEMPLATES[activeTab]
-    ? TEMPLATES[activeTab](requestData)
-    : "// Not implemented yet";
+  $: {
+    try {
+      generatedCode = TEMPLATES[activeTab]
+        ? TEMPLATES[activeTab](requestData)
+        : "// Not implemented yet";
+    } catch (e) {
+      console.error("Snippet generation failed:", e);
+      generatedCode = "// Unable to generate snippet";
+    }
+  }
 
   $: currentLang =
     LANGUAGES.find((l) => l.key === selectedLanguage) || LANGUAGES[0];

@@ -15,6 +15,14 @@ export type RequestData = {
   } | null;
 };
 
+const getSafeUrl = (url?: string) => {
+  try {
+    return new URL(url || "http://localhost");
+  } catch {
+    return new URL("http://localhost");
+  }
+};
+
 const appendQueryParams = (url: string, params?: Record<string, string>) => {
   if (!params || Object.keys(params).length === 0) return url;
 
@@ -332,7 +340,7 @@ headers = ${
       Object.keys(r.headers).length ? JSON.stringify(r.headers, null, 2) : "{}"
     }
 
-conn.request("${r.method}", "${new URL(r.url).pathname}", payload, headers)
+conn.request("${r.method}", "${getSafeUrl(r.url).pathname}", payload, headers)
 
 res = conn.getresponse()
 data = res.read()
@@ -518,7 +526,7 @@ TEMPLATES["python-requests"] = generatePythonSnippet;
 
 TEMPLATES["node-axios"] = generateNodeAxiosSnippet;
 TEMPLATES["node-native"] = (req) => {
-  const url = new URL(req.url);
+  const url = getSafeUrl(req.url);
 
   return `const https = require("https");
 
@@ -764,7 +772,7 @@ int main(void) {
 };
 
 export const generatePythonHttpClientSnippet = (req: RequestData) => {
-  const url = new URL(req.url);
+  const url = getSafeUrl(req.url);
 
   return `import http.client
 import json
