@@ -110,9 +110,13 @@
 
   let tokenErrorType = ""; // 'empty', 'invalid', 'format'
   const tokenFormatRegex =
-    /^sparrow:\/\/(invite-login\?)?(data=[A-Za-z0-9%+/=]+|.*accessToken=[^&]+&refreshToken=[^&]+)/;
+    /^sparrow:\/\/(invite-login\/?\?)?(data=[A-Za-z0-9%+/=]+|.*accessToken=[^&]+&refreshToken=[^&]+)/;
 
   async function tokenValidationLogic() {
+    // FIX malformed URL
+    token = token
+      .replace("invite-login/?", "invite-login?")
+      .replace("sparrow://invite-login/", "sparrow://invite-login");
     // Reset error states
     isTokenErrorMessage = false;
     tokenErrorType = "";
