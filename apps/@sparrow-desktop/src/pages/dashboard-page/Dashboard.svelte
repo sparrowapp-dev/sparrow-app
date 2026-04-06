@@ -386,6 +386,15 @@
     }
   });
 
+  onMount(() => {
+    window.addEventListener("sparrow-upgrade-redirect", () => {
+      _viewModel.handleRedirectToAdminPanel(
+        openTeam?.teamId,
+        `/billing/billingOverview/${openTeam?.teamId}?redirectTo=changePlan`,
+      );
+    });
+  });
+
   const initiateUpdate = async () => {
     try {
       updateAvailable = false;
