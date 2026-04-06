@@ -200,6 +200,7 @@ export { default as CheckmarkCircleRegular } from "./CheckmarkCircleRegular.svel
 export { default as ClockRegular } from "./ClockRegular.svelte";
 export { default as CircleSmallFilled } from "./CircleSmallFilled.svelte";
 export { default as CopyRegular } from "./CopyRegular.svelte";
+export { default as CheckRegular } from "./CheckRegular.svelte";
 
 export { default as ArrowDownloadRegular } from "./ArrowDownloadRegular.svelte";
 export { default as ArrowUpRightRegular } from "./ArrowUpRightRegular.svelte";
@@ -309,3 +310,4 @@ export { default as CalendarRegular } from "./CalendarRegular.svelte";
 export { default as ArrowLeftRegular } from "./ArrowLeftRegularIcon.svelte";
 export { default as ClockAlarmRegular } from "./ClockAlarmRegular.svelte";
 export { default as BellRegular } from "./BellRegular.svelte";
+export { default as CodeIcon } from "./Code.svelte";

@@ -124,6 +124,7 @@
   import TestflowScheduleRVExplorerPage from "./sub-pages/TestflowScheduleRVExplorerPage.svelte/TestflowScheduleRVExplorerPage.svelte";
   import TestflowScheduleExplorerPage from "./sub-pages/TestflowScheduleExplorerPage/TestflowScheduleExplorerPage.svelte";
   import TestflowDataSetExplorerPage from "./sub-pages/TestflowDataSetExplorerPage/TestflowDataSetExplorerPage.svelte";
+  import { CodeSnippetPanel } from "@sparrow/workspaces/features";
 
   const _viewModel = new CollectionsViewModel();
 
@@ -150,6 +151,7 @@
 
   let isImportCollectionPopup: boolean = false;
   let isImportCurlPopup: boolean = false;
+  let isCodeSnippetPanelOpen = false;
   let loader = false;
   let splitter: HTMLElement | null;
   let isExposeSaveAsRequest: boolean = false;
@@ -1012,7 +1014,34 @@
               onClickForceCloseTabs={tabsForceCloseInitiator}
               onClickDuplicateTab={handleTabDuplication}
               {userRole}
+              onGenerateCodeSnippet={() => {
+                isCodeSnippetPanelOpen = !isCodeSnippetPanelOpen;
+              }}
+              isCodeSnippetActive={isCodeSnippetPanelOpen}
             />
+            {#if isCodeSnippetPanelOpen}
+              <CodeSnippetPanel
+                requestData={{
+                  method: $activeTab?.property?.request?.method || "GET",
+                  url: $activeTab?.property?.request?.url || "",
+                  headers: $activeTab?.property?.request?.headers || [],
+
+                  params: $activeTab?.property?.request?.params || {},
+
+                  auth: $activeTab?.property?.request?.auth || null,
+
+                  body: (() => {
+                    try {
+                      const raw = $activeTab?.property?.request?.body?.raw;
+                      return raw ? JSON.parse(raw) : null;
+                    } catch {
+                      return $activeTab?.property?.request?.body?.raw || null;
+                    }
+                  })(),
+                }}
+                on:close={() => (isCodeSnippetPanelOpen = false)}
+              />
+            {/if}
             <div style="flex:1; overflow: hidden;">
               <Route>
                 {#if true}

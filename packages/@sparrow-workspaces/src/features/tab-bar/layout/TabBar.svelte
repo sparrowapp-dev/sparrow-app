@@ -25,6 +25,7 @@
     VerticalGridIcon,
   } from "@sparrow/library/icons";
   import { TabTypeEnum } from "@sparrow/common/types/workspace/tab";
+  import { CodeIcon } from "@sparrow/library/icons";
 
   // ------ Props ------
   /**
@@ -69,10 +70,13 @@
   export let onClickCloseOtherTabs: (tabList: [], tabId: string) => void;
   export let onClickDuplicateTab: (tabId: string) => void;
   export let onClickForceCloseTabs: (tabList: [], tabId: string) => void;
+  export let onGenerateCodeSnippet: () => void;
+  export let isCodeSnippetActive: boolean = false;
   export let userRole;
   let isTabSaved: boolean;
 
   let activeTabType: string;
+  let isCodeHover = false;
 
   const getActiveTabType = (tabList) => {
     for (const tab of tabList) {
@@ -208,6 +212,40 @@
       </Tooltip>
     </div>
     <div class="d-flex ms-auto my-auto {!tabList.length ? 'd-none' : ''}">
+      {#if activeTabType === TabTypeEnum.REQUEST}
+        <div
+          class="d-flex align-items-center ms-auto ps-1"
+          style="height: 24px;"
+        >
+          <Tooltip
+            title={"Generate code snippet"}
+            placement={"bottom-center"}
+            distance={10}
+            zIndex={10}
+          >
+            <button
+              class="layout border-0 p-0 border-radius-2 d-flex align-items-center justify-content-center {isCodeSnippetActive
+                ? 'active'
+                : ''}"
+              style="height: 24px; width:24px; background-color: {isCodeSnippetActive ||
+              isCodeHover
+                ? 'var(--bg-ds-surface-800)'
+                : 'transparent'}"
+              on:click={onGenerateCodeSnippet}
+              on:mouseenter={() => (isCodeHover = true)}
+              on:mouseleave={() => (isCodeHover = false)}
+            >
+              <CodeIcon
+                height="16px"
+                width="16px"
+                color={isCodeSnippetActive || isCodeHover
+                  ? "var(--icon-primary-300)"
+                  : "var(--text-secondary-200)"}
+              />
+            </button>
+          </Tooltip>
+        </div>
+      {/if}
       {#if activeTabType === TabTypeEnum.REQUEST}
         <!-- QuickHelp Button -->
         <div
@@ -354,5 +392,44 @@
   }
   .layout:hover {
     background-color: var(--tab-bar-hover) !important;
+  }
+
+  .code-btn {
+    background-color: transparent;
+    color: var(--text-secondary-200); /* DEFAULT GREY */
+    transition: all 0.15s ease;
+  }
+
+  /* HOVER */
+  .code-btn:hover {
+    background-color: var(--bg-ds-surface-800);
+    color: var(--icon-primary-300); /* BLUE */
+  }
+
+  /* ACTIVE */
+  .code-btn.active {
+    background-color: var(--bg-ds-surface-800);
+    color: var(--icon-primary-300); /* BLUE */
+  }
+
+  /* HOVER (matches Figma) */
+  .code-btn:hover {
+    background-color: var(--bg-ds-surface-800);
+  }
+
+  .code-btn:hover svg {
+    color: var(--icon-primary-300);
+  }
+
+  /* ACTIVE (panel open) */
+  .code-btn.active {
+    background-color: var(--bg-ds-surface-800);
+  }
+
+  .code-btn.active svg {
+    color: var(--icon-primary-300);
+  }
+  .code-btn svg {
+    stroke: currentColor !important;
   }
 </style>
