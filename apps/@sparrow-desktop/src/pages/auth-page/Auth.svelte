@@ -64,24 +64,25 @@
     const initialUrl = await invoke<string | null>("get_initial_deep_link");
     const skipAutoLogin = localStorage.getItem("skipAutoLogin");
 
-    if (initialUrl && !skipAutoLogin) {
+    if (initialUrl) {
       console.log("Initial deep link:", initialUrl);
 
       token = initialUrl;
       isTokenFormEnabled = true;
 
-      await tokenValidationLogic();
-    }
-
-    if (initialUrl && !skipAutoLogin) {
+      // ALWAYS clear skip flag BEFORE validation
       localStorage.removeItem("skipAutoLogin");
+
+      await tokenValidationLogic();
     }
 
     // HANDLE WHEN APP IS ALREADY OPEN
     await listen("deep-link-urls", async (event: any) => {
       const skipAutoLogin = localStorage.getItem("skipAutoLogin");
 
-      if (skipAutoLogin) return;
+      if (skipAutoLogin) {
+        localStorage.removeItem("skipAutoLogin");
+      }
 
       const url = event.payload?.url;
 
