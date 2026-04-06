@@ -62,8 +62,9 @@
 
     // HANDLE INITIAL OPEN
     const initialUrl = await invoke<string | null>("get_initial_deep_link");
+    const skipAutoLogin = localStorage.getItem("skipAutoLogin");
 
-    if (initialUrl) {
+    if (initialUrl && !skipAutoLogin) {
       console.log("Initial deep link:", initialUrl);
 
       token = initialUrl;
@@ -72,10 +73,17 @@
       await tokenValidationLogic();
     }
 
+    if (initialUrl) {
+      localStorage.removeItem("skipAutoLogin");
+    }
+
     // HANDLE WHEN APP IS ALREADY OPEN
     await listen("deep-link-urls", async (event: any) => {
+      const skipAutoLogin = localStorage.getItem("skipAutoLogin");
+
+      if (skipAutoLogin) return;
+
       const url = event.payload?.url;
-      console.log("Deep link received:", url);
 
       if (url) {
         token = url;

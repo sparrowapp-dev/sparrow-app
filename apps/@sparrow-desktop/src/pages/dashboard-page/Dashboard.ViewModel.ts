@@ -410,6 +410,7 @@ export class DashboardViewModel {
 
   // logout to backend - expires jwt - auth and refresh tokens
   public handleLogout = async (): Promise<boolean> => {
+    localStorage.setItem("skipAutoLogin", "true");
     const response = await userLogout();
     if (response.isSuccessful) {
       await this.clientLogout();
