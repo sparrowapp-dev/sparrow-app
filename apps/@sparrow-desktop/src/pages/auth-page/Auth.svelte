@@ -70,8 +70,14 @@
       token = initialUrl;
       isTokenFormEnabled = true;
 
-      // ALWAYS clear skip flag BEFORE validation
-      localStorage.removeItem("skipAutoLogin");
+      const skipAutoLogin = localStorage.getItem("skipAutoLogin");
+
+      if (skipAutoLogin === "true") {
+        console.log("Skipping auto login (logout case)");
+
+        localStorage.removeItem("skipAutoLogin");
+        return; // 🚨 STOP here
+      }
 
       await tokenValidationLogic();
     }
@@ -80,8 +86,11 @@
     await listen("deep-link-urls", async (event: any) => {
       const skipAutoLogin = localStorage.getItem("skipAutoLogin");
 
-      if (skipAutoLogin) {
+      if (skipAutoLogin === "true") {
+        console.log("Skipping deep link (listener)");
+
         localStorage.removeItem("skipAutoLogin");
+        return;
       }
 
       const url = event.payload?.url;
@@ -165,17 +174,19 @@
         let decodedString;
 
         try {
-          // Step 1: normalize URL encoding safely
-          let normalized = rawData.replace(/ /g, "+");
+          let normalized = rawData;
 
-          // Step 2: try full decode (Windows)
-          try {
-            normalized = decodeURIComponent(normalized);
-          } catch (e) {}
+          // decode ONLY if encoded
+          if (normalized.includes("%")) {
+            try {
+              normalized = decodeURIComponent(normalized);
+            } catch (e) {}
+          }
 
-          // Step 3: ensure proper base64 padding
-          while (normalized.length % 4 !== 0) {
-            normalized += "=";
+          // fix base64 padding
+          const pad = normalized.length % 4;
+          if (pad) {
+            normalized += "=".repeat(4 - pad);
           }
 
           decodedString = atob(normalized);
