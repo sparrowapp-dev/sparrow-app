@@ -151,11 +151,34 @@
     let selfhostBackendUrl;
 
     if (params.get("data")) {
-      // NEW FLOW (base64)
       try {
-        const decoded = JSON.parse(
-          atob(decodeURIComponent(params.get("data") || "")),
-        );
+        let rawData = params.get("data") || "";
+
+        let decodedString;
+
+        try {
+          // Step 1: normalize URL encoding safely
+          let normalized = rawData.replace(/ /g, "+");
+
+          // Step 2: try full decode (Windows)
+          try {
+            normalized = decodeURIComponent(normalized);
+          } catch (e) {}
+
+          // Step 3: ensure proper base64 padding
+          while (normalized.length % 4 !== 0) {
+            normalized += "=";
+          }
+
+          decodedString = atob(normalized);
+        } catch (e) {
+          isTokenErrorMessage = true;
+          tokenErrorType = "format";
+          return;
+        }
+
+        const decoded = JSON.parse(decodedString);
+
         accessToken = decoded.accessToken;
         refreshToken = decoded.refreshToken;
         selfhostBackendUrl = decoded.selfhostBackendUrl;
