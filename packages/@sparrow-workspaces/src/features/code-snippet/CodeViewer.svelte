@@ -1,5 +1,17 @@
 <script lang="ts">
   import hljs from "highlight.js";
+  import "highlight.js/lib/languages/go";
+  import "highlight.js/lib/languages/php";
+  import "highlight.js/lib/languages/bash";
+  import "highlight.js/lib/languages/dart";
+  import "highlight.js/lib/languages/kotlin";
+  import "highlight.js/lib/languages/swift";
+  import "highlight.js/lib/languages/ruby";
+  import "highlight.js/lib/languages/rust";
+  import "highlight.js/lib/languages/r";
+  import "highlight.js/lib/languages/powershell";
+  import "highlight.js/lib/languages/c";
+  import "highlight.js/lib/languages/objectivec";
 
   export let code: string = "";
   export let language: string = "javascript";
@@ -8,11 +20,70 @@
   let lines: string[] = [];
 
   const langMap: Record<string, string> = {
-    node: "javascript",
-    javascript: "javascript",
-    python: "python",
-    java: "java",
-    csharp: "csharp",
+    // JS
+    fetch: "javascript",
+    axios: "javascript",
+    xhr: "javascript",
+    jquery: "javascript",
+
+    // Node
+    "node-axios": "javascript",
+    "node-native": "javascript",
+    "node-request": "javascript",
+    "node-unirest": "javascript",
+
+    // Python
+    "python-requests": "python",
+    "python-httpclient": "python",
+
+    // Java
+    "java-okhttp": "java",
+    "java-unirest": "java",
+
+    // C#
+    "csharp-restsharp": "csharp",
+    "csharp-httpclient": "csharp",
+
+    // Go
+    "go-native": "go",
+
+    // PHP
+    "php-curl": "php",
+    "php-guzzle": "php",
+    "php-httprequest2": "php",
+
+    // Shell
+    curl: "bash",
+    "shell-httpie": "bash",
+    "shell-wget": "bash",
+
+    // Dart
+    "dart-http": "dart",
+    "dart-dio": "dart",
+
+    // Kotlin
+    "kotlin-okhttp": "kotlin",
+
+    // Swift
+    "swift-urlsession": "swift",
+
+    // Ruby
+    "ruby-nethttp": "ruby",
+
+    // Rust
+    "rust-reqwest": "rust",
+
+    // R
+    "r-httr": "r",
+    "r-rcurl": "r",
+
+    // PowerShell
+    "powershell-restmethod": "powershell",
+
+    "objc-nsurlsession": "objectivec",
+
+    // C
+    "c-libcurl": "c",
   };
 
   $: {

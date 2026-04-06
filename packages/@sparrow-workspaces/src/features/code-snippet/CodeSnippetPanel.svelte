@@ -99,7 +99,7 @@
 
   <!-- CODE BLOCK -->
   <div class="code-block">
-    <CodeViewer code={generatedCode} language={selectedLanguage} />
+    <CodeViewer code={generatedCode} language={activeTab} />
   </div>
 </div>
 
