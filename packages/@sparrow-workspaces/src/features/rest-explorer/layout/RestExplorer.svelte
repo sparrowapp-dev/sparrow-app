@@ -682,6 +682,13 @@
     });
   };
 
+  const handleUpgradeFromExplorer = async () => {
+    // We DO NOT have teamId here
+    // So we trigger global redirect (same as header)
+
+    window.dispatchEvent(new CustomEvent("sparrow-upgrade-redirect"));
+  };
+
   $: {
     if ($tab?.property?.request?.isGeneratedVariable) {
       handleGenerateVariableShowDemoEvent();
@@ -1520,7 +1527,7 @@
                     {planName}
                     {selectedModel}
                     {updateRequestStatAiChatBot}
-                    {upgradePlanRedirect}
+                    upgradePlanRedirect={() => handleUpgradeFromExplorer()}
                   />
                 {/if}
               </div>

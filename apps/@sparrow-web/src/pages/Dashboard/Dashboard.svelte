@@ -335,6 +335,15 @@
     );
   });
 
+  onMount(() => {
+    window.addEventListener("sparrow-upgrade-redirect", () => {
+      _viewModel.handleRedirectToAdminPanel(
+        openTeam?.teamId,
+        `/billing/billingOverview/${openTeam?.teamId}?redirectTo=changePlan`,
+      );
+    });
+  });
+
   onDestroy(() => {
     userUnsubscribe();
     activeWorkspaceSubscribe.unsubscribe();

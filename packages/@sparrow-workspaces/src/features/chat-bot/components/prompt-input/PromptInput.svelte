@@ -296,16 +296,14 @@
     visibility: hidden;
     position: absolute;
     bottom: 100%;
-    left: 50%;
+    left: 80%;
     transform: translateX(-50%);
-    /* background-color: var(--bg-ds-surface-800); */
     background-color: #31353f;
     color: var(--text-ds-neutral-000);
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 12px;
     white-space: nowrap;
-    margin-bottom: 4px;
     z-index: 1000;
   }
   .custom-tooltip-upgrade-text {
