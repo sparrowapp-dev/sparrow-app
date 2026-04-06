@@ -73,7 +73,7 @@
       await tokenValidationLogic();
     }
 
-    if (initialUrl) {
+    if (initialUrl && !skipAutoLogin) {
       localStorage.removeItem("skipAutoLogin");
     }
 
@@ -95,6 +95,7 @@
   });
 
   const skipLoginHandler = async () => {
+    localStorage.setItem("skipAutoLogin", "true");
     // Save Guest User in local DB
     const response = await _viewModel.findUser({ name: "guestUser" });
     if (!response) {
@@ -144,7 +145,13 @@
     }
 
     // If format is valid, proceed with API validation
-    const params = new URLSearchParams(token.split("?")[1]);
+    let queryString = "";
+
+    if (token.includes("?")) {
+      queryString = token.substring(token.indexOf("?") + 1);
+    }
+
+    const params = new URLSearchParams(queryString);
 
     let accessToken;
     let refreshToken;
