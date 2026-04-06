@@ -64,34 +64,24 @@
     const initialUrl = await invoke<string | null>("get_initial_deep_link");
     const skipAutoLogin = localStorage.getItem("skipAutoLogin");
 
-    if (initialUrl) {
+    if (initialUrl && !skipAutoLogin) {
       console.log("Initial deep link:", initialUrl);
 
       token = initialUrl;
       isTokenFormEnabled = true;
 
-      const skipAutoLogin = localStorage.getItem("skipAutoLogin");
-
-      if (skipAutoLogin === "true") {
-        console.log("Skipping auto login (logout case)");
-
-        localStorage.removeItem("skipAutoLogin");
-        return; // 🚨 STOP here
-      }
-
       await tokenValidationLogic();
+    }
+
+    if (initialUrl) {
+      localStorage.removeItem("skipAutoLogin");
     }
 
     // HANDLE WHEN APP IS ALREADY OPEN
     await listen("deep-link-urls", async (event: any) => {
       const skipAutoLogin = localStorage.getItem("skipAutoLogin");
 
-      if (skipAutoLogin === "true") {
-        console.log("Skipping deep link (listener)");
-
-        localStorage.removeItem("skipAutoLogin");
-        return;
-      }
+      if (skipAutoLogin) return;
 
       const url = event.payload?.url;
 
@@ -105,7 +95,6 @@
   });
 
   const skipLoginHandler = async () => {
-    localStorage.setItem("skipAutoLogin", "true");
     // Save Guest User in local DB
     const response = await _viewModel.findUser({ name: "guestUser" });
     if (!response) {
@@ -155,13 +144,7 @@
     }
 
     // If format is valid, proceed with API validation
-    let queryString = "";
-
-    if (token.includes("?")) {
-      queryString = token.substring(token.indexOf("?") + 1);
-    }
-
-    const params = new URLSearchParams(queryString);
+    const params = new URLSearchParams(token.split("?")[1]);
 
     let accessToken;
     let refreshToken;
@@ -174,19 +157,17 @@
         let decodedString;
 
         try {
-          let normalized = rawData;
+          // Step 1: normalize URL encoding safely
+          let normalized = rawData.replace(/ /g, "+");
 
-          // decode ONLY if encoded
-          if (normalized.includes("%")) {
-            try {
-              normalized = decodeURIComponent(normalized);
-            } catch (e) {}
-          }
+          // Step 2: try full decode (Windows)
+          try {
+            normalized = decodeURIComponent(normalized);
+          } catch (e) {}
 
-          // fix base64 padding
-          const pad = normalized.length % 4;
-          if (pad) {
-            normalized += "=".repeat(4 - pad);
+          // Step 3: ensure proper base64 padding
+          while (normalized.length % 4 !== 0) {
+            normalized += "=";
           }
 
           decodedString = atob(normalized);
