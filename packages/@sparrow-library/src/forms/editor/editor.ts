@@ -185,6 +185,8 @@ const testJsCompletions = (context: CompletionContext) => {
   const spDotMatch = /sp\.$/.test(beforeCursor);
   const spResponseDotMatch = /sp\.response\.$/.test(beforeCursor);
   const spResponseBodyDotMatch = /sp\.response\.body\.$/.test(beforeCursor);
+  const spEnvironmentDotMatch = /sp\.environment\.$/.test(beforeCursor);
+  const spGlobalDotMatch = /sp\.global\.$/.test(beforeCursor);
   const expectDotMatch = /expect\([^)]*\)\.$/.test(beforeCursor);
   const expectToDotMatch = /expect\([^)]*\)\.to\.$/.test(beforeCursor); // expect().to.
   const expectToBeDotMatch = /expect\([^)]*\)\.to\.be\.$/.test(beforeCursor); // expect().to.be.
@@ -235,6 +237,27 @@ const testJsCompletions = (context: CompletionContext) => {
     };
   }
 
+  if (spEnvironmentDotMatch || spGlobalDotMatch) {
+    return {
+      from: context.pos,
+      options: [
+        {
+          label: "set",
+          type: "function",
+          info: "Set variable",
+          apply: "set('key', 'value');",
+        },
+        {
+          label: "get",
+          type: "function",
+          info: "Get variable",
+          apply: "get('key');",
+        },
+      ],
+      validFor: /^\w*$/,
+    };
+  }
+
   // Always show completions for 'sp.' and similar triggers, even if a word is present
   if (spDotMatch) {
     return {
@@ -258,6 +281,12 @@ const testJsCompletions = (context: CompletionContext) => {
           info: "Get response object",
           apply: "response",
         },
+        {
+          label: "environment",
+          type: "variable",
+          info: "Environment variables",
+        },
+        { label: "global", type: "variable", info: "Global variables" },
 
         {
           label: "test",

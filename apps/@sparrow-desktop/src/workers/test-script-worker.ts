@@ -121,6 +121,7 @@ import { XMLParser } from "fast-xml-parser";
 
 self.onmessage = (e) => {
   const { javaScriptTestCases, response } = e.data;
+  const env = e.data.env || [];
 
   const tests = [];
 
@@ -158,6 +159,60 @@ self.onmessage = (e) => {
         tests.push({ name, passed: false, error: err.message });
       }
     },
+    environment: {
+      set: (key: any, value: any) => {
+        if (key) {
+          for (const e of env) {
+            if (e.key === key && e.type === "E") {
+              e.value = value || "";
+              break;
+            }
+          }
+          // if didnt found the key then add new
+          if (!env.find((e: any) => e.key === key && e.type === "E")) {
+            env.unshift({ key, value: value || "", type: "E" });
+          }
+        }
+      },
+      get: (key: any) => {
+        if (key) {
+          for (const e of env) {
+            if (e.key === key && e.type === "E") {
+              return e.value || "";
+            }
+          }
+          return "";
+        }
+        return "";
+      },
+    },
+    global: {
+      set: (key: any, value: any) => {
+        if (key) {
+          for (const e of env) {
+            if (e.key === key && e.type === "G") {
+              e.value = value || "";
+              break;
+            }
+          }
+          // if didnt found the key then add new
+          if (!env.find((e: any) => e.key === key && e.type === "G")) {
+            env.push({ key, value: value || "", type: "G" });
+          }
+        }
+      },
+      get: (key: any) => {
+        if (key) {
+          for (const e of env) {
+            if (e.key === key && e.type === "G") {
+              return e.value || "";
+            }
+          }
+          return "";
+        }
+        return "";
+      },
+    },
     xmlToJSON: (xml) => {
       const parser = new XMLParser();
       return parser.parse(xml);
@@ -168,8 +223,12 @@ self.onmessage = (e) => {
   try {
     const fn = new Function("sp", javaScriptTestCases);
     fn(sp);
-    self.postMessage({ success: true, tests });
+    self.postMessage({ success: true, tests, env });
   } catch (err) {
-    self.postMessage({ success: false, error: `${err.name} - ${err.message}` });
+    self.postMessage({
+      success: false,
+      error: `${err.name} - ${err.message}`,
+      env,
+    });
   }
 };

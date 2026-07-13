@@ -1,5 +1,21 @@
 export const predefinedTestSnippets = [
   {
+    title: "Set Global Variable",
+    function: `sp.global.set("token", sp.response.body.json().token);`,
+  },
+  {
+    title: "Get Global Variable",
+    function: `sp.global.get("token");`,
+  },
+  {
+    title: "Set Environment Variable",
+    function: `sp.environment.set("token", sp.response.body.json().token);`,
+  },
+  {
+    title: "Get Environment Variable",
+    function: `sp.environment.get("token");`,
+  },
+  {
     title: "Status Code is 200",
     function: `sp.test("Status code is 200", function () {
   sp.expect(sp.response.statusCode).to.equal(200);

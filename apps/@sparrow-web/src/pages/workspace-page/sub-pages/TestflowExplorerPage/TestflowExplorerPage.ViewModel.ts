@@ -811,7 +811,14 @@ export class TestflowExplorerPageViewModel {
 
           this.executeNoCodeTestcases(nodeWithResponse);
 
-          await this.executeScriptTestcases(nodeWithResponse);
+          const postScriptEnv = await this.executeScriptTestcases(
+            nodeWithResponse,
+            environments.filtered || [],
+          );
+          // carry post-script env changes (sp.global.set) to subsequent nodes
+          if (Array.isArray(postScriptEnv)) {
+            environments.filtered = postScriptEnv;
+          }
 
           testFlowDataStore.update((testFlowDataMap) => {
             const existingTestFlowData = testFlowDataMap.get(
@@ -845,7 +852,14 @@ export class TestflowExplorerPageViewModel {
           };
 
           this.executeNoCodeTestcases(nodeWithResponse);
-          await this.executeScriptTestcases(nodeWithResponse);
+          const postScriptEnv = await this.executeScriptTestcases(
+            nodeWithResponse,
+            environments.filtered || [],
+          );
+          // carry post-script env changes (sp.global.set) to subsequent nodes
+          if (Array.isArray(postScriptEnv)) {
+            environments.filtered = postScriptEnv;
+          }
 
           testFlowDataStore.update((testFlowDataMap) => {
             const existingTestFlowData = testFlowDataMap.get(
@@ -1331,7 +1345,7 @@ export class TestflowExplorerPageViewModel {
     });
   }
 
-  private executeScriptTestcases = async (node) => {
+  private executeScriptTestcases = async (node, environmentFiltered = []) => {
     return new Promise((resolve) => {
       const worker = new Worker(
         new URL("../../../../workers/test-script-worker.ts", import.meta.url),
@@ -1352,10 +1366,11 @@ export class TestflowExplorerPageViewModel {
       worker.postMessage({
         javaScriptTestCases,
         response: node.response,
+        env: environmentFiltered,
       });
 
-      worker.onmessage = (e) => {
-        const { success, tests, error } = e.data;
+      worker.onmessage = async (e) => {
+        const { success, tests, error, env } = e.data;
 
         // Add script test results directly to node.response.testResults (same as no-code)
         if (success && tests?.length) {
@@ -1380,11 +1395,155 @@ export class TestflowExplorerPageViewModel {
           node.response.testResults.push(testResponse);
         }
 
+        await this.persistScriptEnvironmentChanges(environmentFiltered, env);
         worker.terminate(); // cleanup
-        resolve("resolved");
+        resolve(env);
       };
     });
   };
+
+  /**
+   * Persists environment variables mutated by the post-response script
+   * (sp.environment.set / sp.global.set) to the selected and global
+   * environments of the workspace.
+   * @param originalEnv - environment variables snapshot passed to the script
+   * @param mutatedEnv - environment variables returned by the script
+   */
+  private persistScriptEnvironmentChanges = async (
+    originalEnv: any[],
+    mutatedEnv: any[],
+  ) => {
+    try {
+      if (!Array.isArray(mutatedEnv)) return;
+      const changedByType = (type: string) =>
+        mutatedEnv.filter((variable) => {
+          if (variable?.type !== type || !variable?.key) return false;
+          const original = (originalEnv || []).find(
+            (item) => item.key === variable.key && item.type === type,
+          );
+          return !original || original.value !== variable.value;
+        });
+
+      const workspaceId = this._tab.getValue().path.workspaceId;
+
+      const changedGlobals = changedByType("G");
+      if (changedGlobals.length) {
+        const globalEnvironment =
+          await this.environmentRepository.getGlobalEnvironment(workspaceId);
+        await this.saveScriptEnvironmentVariables(
+          workspaceId,
+          globalEnvironment,
+          changedGlobals,
+        );
+      }
+
+      const changedLocals = changedByType("E");
+      if (changedLocals.length) {
+        const activeWorkspace =
+          await this.workspaceRepository.getActiveWorkspaceDoc();
+        const selectedEnvironmentId = activeWorkspace?.get("environmentId");
+        if (selectedEnvironmentId) {
+          const selectedEnvironment =
+            await this.environmentRepository.readEnvironment(
+              selectedEnvironmentId,
+            );
+          await this.saveScriptEnvironmentVariables(
+            workspaceId,
+            selectedEnvironment,
+            changedLocals,
+          );
+        }
+      }
+    } catch (error) {
+      console.error(
+        "Failed to persist post-script environment variables:",
+        error,
+      );
+    }
+  };
+
+  /**
+   * Saves post-script variable changes into the given environment document.
+   * @param workspaceId - id of the current workspace
+   * @param environmentDoc - environment document to be updated
+   * @param changedVariables - variables mutated by the script
+   */
+  private saveScriptEnvironmentVariables = async (
+    workspaceId: string,
+    environmentDoc,
+    changedVariables: any[],
+  ) => {
+    if (!environmentDoc) return;
+    const environmentJSON = environmentDoc.toMutableJSON();
+
+    const variables = (environmentJSON.variable || []).map((variable) => ({
+      ...variable,
+    }));
+    changedVariables.forEach((changed) => {
+      const existing = variables.find(
+        (variable) => variable.key === changed.key,
+      );
+      if (existing) {
+        existing.value = changed.value;
+        existing.checked = true;
+      } else {
+        variables.push({
+          key: changed.key,
+          value: changed.value,
+          checked: true,
+        });
+      }
+    });
+
+    // removes blank key value pairs
+    const payload = {
+      name: environmentJSON.name,
+      variable: [
+        ...variables.filter((variable) => variable.key.length > 0),
+        {
+          key: "",
+          value: "",
+          checked: false,
+        },
+      ],
+    };
+
+    let isGuestUser;
+    isGuestUserActive.subscribe((value) => {
+      isGuestUser = value;
+    });
+
+    let environmentId = environmentJSON.id;
+    let updatedEnvironment: any = payload;
+    if (isGuestUser !== true) {
+      const baseUrl = await this.constructBaseUrl(workspaceId);
+      const response = await this.environmentService.updateEnvironment(
+        workspaceId,
+        environmentId,
+        payload,
+        baseUrl,
+      );
+      if (!response.isSuccessful) return;
+      updatedEnvironment = response.data.data;
+      environmentId = response.data.data._id;
+    }
+    this.environmentRepository.updateEnvironment(
+      environmentId,
+      updatedEnvironment,
+    );
+
+    const currentTab = await this.tabRepository.getTabById(environmentId);
+    if (currentTab) {
+      const envTab = createDeepCopy(currentTab);
+      envTab.property.environment.variable = updatedEnvironment.variable;
+      envTab.isSaved = true;
+      await this.tabRepository.updateTab(currentTab.tabId as string, {
+        property: envTab.property,
+        isSaved: envTab.isSaved,
+      });
+    }
+  };
+
   public generateTestCases = async (prompt = "", node_id) => {
     const isGuestUser = await this.guestUserRepository.findOne({
       name: "guestUser",
@@ -1726,7 +1885,7 @@ export class TestflowExplorerPageViewModel {
     };
     this.executeNoCodeTestcases(newNode);
 
-    await this.executeScriptTestcases(newNode);
+    await this.executeScriptTestcases(newNode, environments.filtered || []);
     testFlowDataStore.update((testFlowDataMap) => {
       const wsData = testFlowDataMap.get(tab.tabId);
       if (wsData) {
